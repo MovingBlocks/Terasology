@@ -16,9 +16,7 @@
 package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.terasology.rendering.assets.TextureRegion;
@@ -28,12 +26,12 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.UIElement;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -42,34 +40,27 @@ import java.util.Set;
 public class UISkinBuilder {
 
     private Set<String> families = Sets.newLinkedHashSet();
-    private Set<Class<? extends UIElement>> elementClasses = Sets.newLinkedHashSet();
-    private SetMultimap<Class<? extends UIElement>, String> modes = HashMultimap.create();
+    private Set<StyleKey> baseStyleKeys = Sets.newLinkedHashSet();
 
     private Map<String, UIStyleFragment> baseStyles = Maps.newHashMap();
-    private Map<String, Table<Class<? extends UIElement>, String, UIStyleFragment>> elementStyles = Maps.newHashMap();
+    private Table<String, StyleKey, UIStyleFragment> elementStyles = HashBasedTable.create();
 
     private UIStyleFragment currentStyle = new UIStyleFragment();
     private String currentFamily = "";
     private Class<? extends UIElement> currentElement;
+    private String currentPart = "";
     private String currentMode = "";
 
     private void saveStyle() {
+        if (currentFamily.isEmpty() && currentElement != null) {
+            baseStyleKeys.add(new StyleKey(currentElement, currentPart, currentMode));
+        }
         if (currentElement != null) {
-            Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = getElementTable(currentFamily);
-            elementTable.put(currentElement, currentMode, currentStyle);
+            elementStyles.put(currentFamily, new StyleKey(currentElement, currentPart, currentMode), currentStyle);
         } else {
             baseStyles.put(currentFamily, currentStyle);
         }
         currentStyle = new UIStyleFragment();
-    }
-
-    private Table<Class<? extends UIElement>, String, UIStyleFragment> getElementTable(String family) {
-        Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = elementStyles.get(family);
-        if (elementTable == null) {
-            elementTable = HashBasedTable.create();
-            elementStyles.put(family, elementTable);
-        }
-        return elementTable;
     }
 
     public UISkinBuilder setFamily(String family) {
@@ -77,17 +68,27 @@ public class UISkinBuilder {
         families.add(family);
         currentFamily = family;
         currentElement = null;
+        currentPart = "";
         currentMode = "";
         return this;
     }
 
     public UISkinBuilder setElementClass(Class<? extends UIElement> widget) {
         saveStyle();
-        elementClasses.add(widget);
         currentElement = widget;
         currentMode = "";
+        currentPart = "";
         return this;
+    }
 
+    public UISkinBuilder setElementPart(String part) {
+        if (currentElement == null) {
+            throw new IllegalStateException("Element class must be set before element part");
+        }
+        saveStyle();
+        currentPart = part;
+        currentMode = "";
+        return this;
     }
 
     public UISkinBuilder setElementMode(String mode) {
@@ -95,7 +96,6 @@ public class UISkinBuilder {
             throw new IllegalStateException("Element class must be set before element mode");
         }
         saveStyle();
-        modes.put(currentElement, mode);
         currentMode = mode;
         return this;
     }
@@ -185,104 +185,61 @@ public class UISkinBuilder {
         saveStyle();
         Map<String, UIStyleFamily> skinFamilies = Maps.newHashMap();
 
-        UIStyle defaultStyle = new UIStyle();
-        baseStyles.get("").applyTo(defaultStyle);
-        Table<Class<? extends UIElement>, String, UIStyle> defaultElementStyles = buildDefaultElementStyles(defaultStyle);
-        skinFamilies.put("", new UIStyleFamily(defaultStyle, defaultElementStyles));
-        families.remove("");
-
+        UIStyle rootStyle = new UIStyle();
+        baseStyles.get("").applyTo(rootStyle);
+        skinFamilies.put("", buildFamily("", rootStyle));
         for (String family : families) {
-            skinFamilies.put(family, buildFamily(family, defaultStyle));
+            skinFamilies.put(family, buildFamily(family, rootStyle));
         }
         return new UISkinData(skinFamilies);
     }
 
     private UIStyleFamily buildFamily(String family, UIStyle defaultStyle) {
         UIStyle baseStyle = new UIStyle(defaultStyle);
-        UIStyleFragment fragment = baseStyles.get(family);
-        fragment.applyTo(baseStyle);
+        if (!family.isEmpty()) {
+            UIStyleFragment fragment = baseStyles.get(family);
+            fragment.applyTo(baseStyle);
+        }
 
-        Table<Class<? extends UIElement>, String, UIStyle> familyStyles = HashBasedTable.create();
-        Table<Class<? extends UIElement>, String, UIStyleFragment> table = getElementTable(family);
-        for (Class<? extends UIElement> element : elementClasses) {
+        Map<Class<? extends UIElement>, Table<String, String, UIStyle>> familyStyles = Maps.newHashMap();
+        Map<StyleKey, UIStyleFragment> styleLookup = elementStyles.row(family);
+        Map<StyleKey, UIStyleFragment> baseStyleLookup = (family.isEmpty()) ? Maps.<StyleKey, UIStyleFragment>newHashMap() : elementStyles.row("");
+        for (StyleKey styleKey : Sets.union(styleLookup.keySet(), baseStyleKeys)) {
             UIStyle elementStyle = new UIStyle(baseStyle);
+            List<Class<? extends UIElement>> inheritanceTree = ReflectionUtil.getInheritanceTree(styleKey.element, UIElement.class);
+            applyStylesForInheritanceTree(inheritanceTree, "", "", elementStyle, styleLookup, baseStyleLookup);
 
-            UIStyleFragment elementFrag = table.get(element, "");
-            UIStyleFragment defaultElementFrag = getDefaultElementStyleFrag(element);
-            if (defaultElementFrag != null) {
-                defaultElementFrag.applyTo(elementStyle);
+            if (!styleKey.part.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, "", elementStyle, styleLookup, baseStyleLookup);
             }
-            if (elementFrag != null) {
-                elementFrag.applyTo(elementStyle);
-            }
-            if (elementFrag != null || defaultElementFrag != null) {
-                familyStyles.put(element, "", elementStyle);
-                for (String mode : modes.get(element)) {
-                    UIStyleFragment defaultMode = getDefaultElementModeFrag(element, mode);
-                    UIStyleFragment elementMode = table.get(element, mode);
 
-                    UIStyle elementModeStyle = new UIStyle(elementStyle);
-                    if (defaultMode != null) {
-                        defaultMode.applyTo(elementModeStyle);
-                    }
-                    if (elementMode != null) {
-                        elementMode.applyTo(elementModeStyle);
-                    }
-                    familyStyles.put(element, mode, elementModeStyle);
-                }
+            if (!styleKey.mode.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, styleKey.mode, elementStyle, styleLookup, baseStyleLookup);
             }
+
+            Table<String, String, UIStyle> elementTable = familyStyles.get(styleKey.element);
+            if (elementTable == null) {
+                elementTable = HashBasedTable.create();
+                familyStyles.put(styleKey.element, elementTable);
+            }
+            elementTable.put(styleKey.part, styleKey.mode, elementStyle);
         }
         return new UIStyleFamily(baseStyle, familyStyles);
     }
 
-    private UIStyleFragment getDefaultElementModeFrag(Class<? extends UIElement> element, String mode) {
-        Table<Class<? extends UIElement>, String, UIStyleFragment> elementTable = getElementTable("");
-        return elementTable.get(element, mode);
-    }
+    private void applyStylesForInheritanceTree(List<Class<? extends UIElement>> inheritanceTree, String part, String mode, UIStyle elementStyle, Map<StyleKey, UIStyleFragment> styleLookup, Map<StyleKey, UIStyleFragment> baseStyleLookup) {
+        for (Class<? extends UIElement> element : inheritanceTree) {
+            StyleKey key = new StyleKey(element, part, mode);
+            UIStyleFragment baseElementStyle = baseStyleLookup.get(key);
+            if (baseElementStyle != null) {
+                baseElementStyle.applyTo(elementStyle);
+            }
 
-    private UIStyleFragment getDefaultElementStyleFrag(Class<? extends UIElement> element) {
-        return getDefaultElementModeFrag(element, "");
-    }
-
-    private Table<Class<? extends UIElement>, String, UIStyle> buildDefaultElementStyles(UIStyle defaultStyle) {
-        Table<Class<? extends UIElement>, String, UIStyle> results = HashBasedTable.create();
-        Table<Class<? extends UIElement>, String, UIStyleFragment> defaultTable = getElementTable("");
-        for (Class<? extends UIElement> element : elementClasses) {
-            UIStyleFragment fragment = defaultTable.get(element, "");
-            if (fragment != null) {
-                UIStyle style = new UIStyle(defaultStyle);
-
-                List<Class<? extends UIElement>> inheritanceTree = ReflectionUtil.getInheritanceTree(element, UIElement.class);
-                for (Class<? extends UIElement> elementType : inheritanceTree) {
-                    UIStyleFragment frag = defaultTable.get(elementType, "");
-                    if (frag != null) {
-                        frag.applyTo(style);
-                    }
-                }
-                results.put(element, "", style);
-
-                Map<String, UIStyle> modeStyles = Maps.newLinkedHashMap();
-                for (Class<? extends UIElement> elementType : inheritanceTree) {
-                    for (String state : modes.get(elementType)) {
-                        UIStyleFragment stateFrag = defaultTable.get(element, state);
-                        if (stateFrag != null) {
-                            UIStyle modeStyle = modeStyles.get(state);
-                            if (modeStyle == null) {
-                                modeStyle = new UIStyle(style);
-                                modeStyles.put(state, modeStyle);
-                            }
-                            stateFrag.applyTo(modeStyle);
-                        }
-
-                    }
-                }
-
-                for (Map.Entry<String, UIStyle> entry : modeStyles.entrySet()) {
-                    results.put(element, entry.getKey(), entry.getValue());
-                }
+            UIStyleFragment elemStyle = styleLookup.get(key);
+            if (elemStyle != null) {
+                elemStyle.applyTo(elementStyle);
             }
         }
-        return results;
     }
 
     private static class UIStyleFragment {
@@ -357,6 +314,40 @@ public class UISkinBuilder {
             if (alignmentV != null) {
                 style.setVerticalAlignment(alignmentV);
             }
+        }
+    }
+
+    private static final class StyleKey {
+        private Class<? extends UIElement> element;
+        private String part;
+        private String mode;
+
+        private StyleKey(Class<? extends UIElement> element, String part, String mode) {
+            this.element = element;
+            this.part = part;
+            this.mode = mode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof StyleKey) {
+                StyleKey other = (StyleKey) obj;
+                return Objects.equals(other.element, element) && Objects.equals(other.part, part) && Objects.equals(other.mode, mode);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(element, part, mode);
+        }
+
+        @Override
+        public String toString() {
+            return element.getSimpleName() + ":" + part + ":" + mode;
         }
     }
 }

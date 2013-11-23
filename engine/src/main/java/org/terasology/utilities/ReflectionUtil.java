@@ -65,13 +65,17 @@ public final class ReflectionUtil {
     }
 
     public static Method findGetter(Field field) {
-        Method result = findMethod(field.getDeclaringClass(), "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
-        if (result != null && field.getType().equals(result.getReturnType())) {
+        return findGetter(field.getName(), field.getDeclaringClass(), field.getType());
+    }
+
+    public static Method findGetter(String propertyName, Class beanClass, Class propertyType) {
+        Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        if (result != null && propertyType.equals(result.getReturnType())) {
             result.setAccessible(true);
             return result;
         }
-        result = findMethod(field.getDeclaringClass(), "is" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
-        if (result != null && field.getType().equals(result.getReturnType())) {
+        result = findMethod(beanClass, "is" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        if (result != null && propertyType.equals(result.getReturnType())) {
             result.setAccessible(true);
             return result;
         }
@@ -79,8 +83,12 @@ public final class ReflectionUtil {
     }
 
     public static Method findSetter(Field field) {
-        String setterName = "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1);
-        Method result = findMethod(field.getDeclaringClass(), setterName, field.getType());
+        return findSetter(field.getName(), field.getDeclaringClass(), field.getType());
+    }
+
+    public static Method findSetter(String propertyName, Class beanClass, Class propertyType) {
+        String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+        Method result = findMethod(beanClass, setterName, propertyType);
         if (result != null) {
             result.setAccessible(true);
         }

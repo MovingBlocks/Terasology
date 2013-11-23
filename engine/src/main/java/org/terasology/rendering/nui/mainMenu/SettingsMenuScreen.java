@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.baseWidgets.UISpace;
 import org.terasology.rendering.nui.layout.ArbitraryLayout;
 import org.terasology.rendering.nui.layout.ColumnLayout;
+import org.terasology.rendering.nui.mainMenu.videoSettings.VideoSettingsScreen;
 
 import javax.vecmath.Vector2f;
 

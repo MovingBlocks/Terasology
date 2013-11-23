@@ -28,7 +28,7 @@ public interface CanvasInternal extends Canvas {
 
     void postRender();
 
-    void processMouseOver(Vector2i position);
+    void processMousePosition(Vector2i position);
 
     void processMouseClick(MouseInput button, Vector2i pos);
 

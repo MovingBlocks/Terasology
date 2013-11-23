@@ -55,12 +55,24 @@ public class UISkin extends AbstractAsset<UISkinData> {
         return getStyleFor("", element, mode);
     }
 
+    public UIStyle getDefaultStyleFor(Class<? extends UIElement> element, String part, String mode) {
+        return getStyleFor("", element, part, mode);
+    }
+
     public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String mode) {
         UIStyleFamily styleFamily = getStyleFamily(family);
         if (element == null) {
             return styleFamily.getBaseStyle();
         }
-        return styleFamily.getElementStyle(element, mode);
+        return styleFamily.getElementStyle(element, "", mode);
+    }
+
+    public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String part, String mode) {
+        UIStyleFamily styleFamily = getStyleFamily(family);
+        if (element == null) {
+            return styleFamily.getBaseStyle();
+        }
+        return styleFamily.getElementStyle(element, part, mode);
     }
 
     private UIStyleFamily getStyleFamily(String family) {

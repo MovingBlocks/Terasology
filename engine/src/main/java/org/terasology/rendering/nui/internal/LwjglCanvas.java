@@ -182,7 +182,12 @@ public class LwjglCanvas implements CanvasInternal {
         checkGLError();
     }
 
-    public void processMouseOver(Vector2i position) {
+    public void processMousePosition(Vector2i position) {
+        if (clickedRegion != null) {
+            Vector2i relPos = new Vector2i(position).sub(clickedRegion.region.min());
+            clickedRegion.listener.onMouseDrag(relPos);
+        }
+
         Set<InteractionRegion> newMouseOverRegions = Sets.newLinkedHashSet();
         Iterator<InteractionRegion> iter = interactionRegions.descendingIterator();
         while (iter.hasNext()) {
@@ -222,7 +227,8 @@ public class LwjglCanvas implements CanvasInternal {
 
     public void processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
-            clickedRegion.listener.onMouseRelease(button, pos);
+            Vector2i relPos = new Vector2i(pos).sub(clickedRegion.region.min());
+            clickedRegion.listener.onMouseRelease(button, relPos);
             clickedRegion = null;
         }
     }
@@ -279,6 +285,11 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
+    public void setPart(String part) {
+        state.part = part;
+    }
+
+    @Override
     public UIStyle getCurrentStyle() {
         return state.getCurrentStyle();
     }
@@ -299,6 +310,7 @@ public class LwjglCanvas implements CanvasInternal {
             if (element.getFamily() != null) {
                 setFamily(element.getFamily());
             }
+            setPart("");
             setMode(element.getMode());
             if (newStyle.isBackgroundAutomaticallyDrawn()) {
                 drawBackground();
@@ -351,10 +363,18 @@ public class LwjglCanvas implements CanvasInternal {
     public void drawBackground(Rect2i region) {
         UIStyle style = getCurrentStyle();
         if (style.getBackground() != null) {
+            Rect2i regionArea = region;
+            if (style.getFixedWidth() != 0 || style.getFixedHeight() != 0) {
+                int newWidth = (style.getFixedWidth() != 0) ? style.getFixedWidth() : region.width();
+                int newHeight = (style.getFixedHeight() != 0) ? style.getFixedHeight() : region.height();
+                int newMinX = region.minX() + style.getHorizontalAlignment().getOffset(newWidth, region.width());
+                int newMinY = region.minY() + style.getVerticalAlignment().getOffset(newHeight, region.height());
+                regionArea = Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
+            }
             if (style.getBackgroundBorder().isEmpty()) {
-                drawTextureRaw(style.getBackground(), region, style.getBackgroundScaleMode());
+                drawTextureRaw(style.getBackground(), regionArea, style.getBackgroundScaleMode());
             } else {
-                drawTextureRawBordered(style.getBackground(), region, style.getBackgroundBorder(), style.getBackgroundScaleMode() == ScaleMode.TILED);
+                drawTextureRawBordered(style.getBackground(), regionArea, style.getBackgroundBorder(), style.getBackgroundScaleMode() == ScaleMode.TILED);
             }
         }
     }
@@ -714,6 +734,7 @@ public class LwjglCanvas implements CanvasInternal {
         public UISkin skin;
         public String family = "";
         public UIElement element;
+        public String part = "";
         public String mode = "";
 
         public Rect2i drawRegion;
@@ -733,6 +754,7 @@ public class LwjglCanvas implements CanvasInternal {
                 this.skin = previous.skin;
                 this.family = previous.family;
                 this.element = previous.element;
+                this.part = previous.part;
                 this.mode = previous.mode;
                 this.drawOnTop = previous.drawOnTop;
                 baseAlpha = previous.getAlpha();
@@ -746,7 +768,7 @@ public class LwjglCanvas implements CanvasInternal {
         }
 
         public UIStyle getCurrentStyle() {
-            return skin.getStyleFor(family, element.getClass(), mode);
+            return skin.getStyleFor(family, element.getClass(), part, mode);
         }
 
         public Rect2i getRelativeRegion() {

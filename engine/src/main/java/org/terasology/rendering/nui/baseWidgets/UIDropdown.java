@@ -34,10 +34,11 @@ import java.util.List;
  * @author Immortius
  */
 public class UIDropdown<T> extends AbstractWidget {
-    private static final String LIST_MODE = "list";
-    private static final String LIST_ITEM_MODE = "list-item";
-    private static final String ACTIVE_LIST_ITEM_MODE = "list-item-active";
+    private static final String BOX = "box";
+    private static final String LIST = "list";
+    private static final String LIST_ITEM = "list-item";
     private static final String ACTIVE_MODE = "active";
+    private static final String HOVER_MODE = "hover";
 
     private Binding<List<T>> options = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
     private Binding<T> selection = new DefaultBinding<>();
@@ -70,12 +71,14 @@ public class UIDropdown<T> extends AbstractWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+        canvas.setPart(BOX);
+        canvas.drawBackground();
         if (selection.get() != null) {
             canvas.drawText(selection.get().toString());
         }
 
         if (opened) {
-            canvas.setMode(LIST_MODE);
+            canvas.setPart(LIST);
             canvas.setDrawOnTop(true);
             Font font = canvas.getCurrentStyle().getFont();
             Border itemMargin = canvas.getCurrentStyle().getMargin();
@@ -85,19 +88,17 @@ public class UIDropdown<T> extends AbstractWidget {
             Rect2i location = Rect2i.createFromMinAndSize(0, canvas.size().y, canvas.size().x, height);
             canvas.drawBackground(location);
 
-            int baseHeight = canvas.size().y + itemMargin.getTop();
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
+            canvas.setPart(LIST_ITEM);
             for (int i = 0; i < options.get().size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
-                    canvas.setMode(ACTIVE_LIST_ITEM_MODE);
+                    canvas.setMode(HOVER_MODE);
                 } else {
-                    canvas.setMode(LIST_ITEM_MODE);
+                    canvas.setMode(DEFAULT_MODE);
                 }
                 Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
-                Rect2i itemTextRegion = Rect2i.createFromMinAndSize(itemMargin.getLeft(), baseHeight + i * itemHeight,
-                        canvas.size().x - itemMargin.getTotalWidth(), font.getLineHeight());
                 canvas.drawBackground(itemRegion);
-                canvas.drawText(options.get().get(i).toString(), itemTextRegion);
+                canvas.drawText(options.get().get(i).toString(), itemRegion);
                 canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
             }
         } else {

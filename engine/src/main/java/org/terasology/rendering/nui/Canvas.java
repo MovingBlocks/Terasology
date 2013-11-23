@@ -78,6 +78,12 @@ public interface Canvas {
     void setMode(String mode);
 
     /**
+     * Sets the part of the current skin/element/family selection to use for drawing operations
+     * @param part
+     */
+    void setPart(String part);
+
+    /**
      * @return The current style, as determined by the skin/widget/family/mode combination currently set.
      */
     UIStyle getCurrentStyle();

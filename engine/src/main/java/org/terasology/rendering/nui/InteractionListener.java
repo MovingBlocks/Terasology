@@ -45,10 +45,9 @@ public interface InteractionListener {
 
     /**
      * Called when the mouse is moved after clicking on the interaction region
-     * @param button The mouse button that is held down
      * @param pos The relative position of the mouse
      */
-    void onMouseDrag(MouseInput button, Vector2i pos);
+    void onMouseDrag(Vector2i pos);
 
     /**
      * Called when the mouse is released after clicking on the interaction region

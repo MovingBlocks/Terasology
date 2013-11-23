@@ -13,23 +13,27 @@
             "texture-scale-mode" : "scale_fit"
         },
         "UIDropdown" : {
-            "background" : "dropdown",
-            "background-border" : {
-                "top" : 3,
-                "bottom" : 3,
-                "left" : 3,
-                "right" : 29
-            },
-            "margin" : {
-                "top" : 3,
-                "bottom" : 3,
-                "left" : 5,
-                "right" : 31
-            },
             "text-align-horizontal" : "left",
-            "modes" : {
-                "active" : {
-                    "background" : "dropdownActive"
+            "parts" : {
+                "box" : {
+                    "background" : "dropdown",
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 29
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 31
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "dropdownActive"
+                        }
+                    }
                 },
                 "list" : {
                     "background" : "dropdownList",
@@ -47,11 +51,18 @@
                     }
                 },
                 "list-item" : {
-                    "background" : ""
-                },
-                "list-item-active" : {
-                    "text-color" : "FFFF00FF",
-                    "background" : "dropdownListItemActive"
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "hover" : {
+                            "text-color" : "FFFF00FF",
+                            "background" : "dropdownListItemActive"
+                        }
+                    }
                 }
             }
         },
@@ -95,6 +106,42 @@
                 },
                 "hover-active" : {
                     "background" : "engine:checkboxCheckedHover"
+                }
+            }
+        },
+        "UISlider" : {
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
+            "parts" : {
+                "slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-height" : 8,
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 0,
+                        "left" : 3,
+                        "right" : 3
+                    }
+                },
+                "ticker" : {
+                    "background" : "engine:box",
+                    "background-border" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 4,
+                        "right" : 4
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "engine:boxActive"
+                        }
+                    }
                 }
             }
         }

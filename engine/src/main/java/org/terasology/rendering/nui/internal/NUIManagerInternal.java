@@ -107,7 +107,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void update(float delta) {
-        canvas.processMouseOver(Mouse.getPosition());
+        canvas.processMousePosition(Mouse.getPosition());
+
         for (UIScreen screen : screens) {
             screen.update(delta);
         }

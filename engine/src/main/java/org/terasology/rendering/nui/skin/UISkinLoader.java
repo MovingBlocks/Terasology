@@ -143,7 +143,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
-    private static class ElementInfo extends StyleInfo {
+    private static class PartsInfo extends StyleInfo {
         public Map<String, StyleInfo> modes;
 
         public void apply(UISkinBuilder builder) {
@@ -151,6 +151,27 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             if (modes != null) {
                 for (Map.Entry<String, StyleInfo> entry : modes.entrySet()) {
                     builder.setElementMode(entry.getKey());
+                    entry.getValue().apply(builder);
+                }
+            }
+        }
+    }
+
+    private static class ElementInfo extends StyleInfo {
+        public Map<String, PartsInfo> parts;
+        public Map<String, StyleInfo> modes;
+
+        public void apply(UISkinBuilder builder) {
+            super.apply(builder);
+            if (modes != null) {
+                for (Map.Entry<String, StyleInfo> entry : modes.entrySet()) {
+                    builder.setElementMode(entry.getKey());
+                    entry.getValue().apply(builder);
+                }
+            }
+            if (parts != null) {
+                for (Map.Entry<String, PartsInfo> entry : parts.entrySet())  {
+                    builder.setElementPart(entry.getKey());
                     entry.getValue().apply(builder);
                 }
             }

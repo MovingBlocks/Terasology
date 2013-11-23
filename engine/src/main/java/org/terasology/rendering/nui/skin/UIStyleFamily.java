@@ -15,35 +15,38 @@
  */
 package org.terasology.rendering.nui.skin;
 
-import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.rendering.nui.UIElement;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class UIStyleFamily {
     private UIStyle baseStyle;
-    private Table<Class<? extends UIElement>, String, UIStyle> widgetStyles = HashBasedTable.create();
+    private Map<Class<? extends UIElement>, Table<String, String, UIStyle>> elementStyleLookup = Maps.newHashMap();
 
-    public UIStyleFamily(UIStyle baseStyle, Table<Class<? extends UIElement>, String, UIStyle> widgetStyles) {
+    public UIStyleFamily(UIStyle baseStyle, Map<Class<? extends UIElement>, Table<String, String, UIStyle>> elementStyles) {
         this.baseStyle = baseStyle;
-        this.widgetStyles = widgetStyles;
+        this.elementStyleLookup = elementStyles;
     }
 
     public UIStyle getBaseStyle() {
         return baseStyle;
     }
 
-    public UIStyle getWidgetStyle(Class<? extends UIElement> element) {
+    public UIStyle getElementStyle(Class<? extends UIElement> element) {
         List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
-            style = widgetStyles.get(classes.get(i), "");
+            Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
+            if (elementStyles != null) {
+                style = elementStyles.get("", "");
+            }
         }
         if (style == null) {
             return baseStyle;
@@ -51,14 +54,20 @@ public class UIStyleFamily {
         return style;
     }
 
-    public UIStyle getElementStyle(Class<? extends UIElement> element, String mode) {
+    public UIStyle getElementStyle(Class<? extends UIElement> element, String part, String mode) {
         List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
-            style = widgetStyles.get(classes.get(i), mode);
+            Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
+            if (elementStyles != null) {
+                style = elementStyles.get(part, mode);
+                if (style == null) {
+                    style = elementStyles.get(part, "");
+                }
+            }
         }
         if (style == null) {
-            return getWidgetStyle(element);
+            return getElementStyle(element);
         }
         return style;
     }
