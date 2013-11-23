@@ -285,7 +285,8 @@ public class MeshRenderer implements RenderSystem {
                         material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
                         material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
-                        lastMesh.doRender();
+                        if (lastMesh != null)
+                            lastMesh.doRender();
                     }
                 }
             }

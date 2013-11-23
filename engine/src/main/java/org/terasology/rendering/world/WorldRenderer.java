@@ -898,11 +898,14 @@ public final class WorldRenderer {
             }
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
-                    shader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
-                } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
-                    shader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
-                }
+        	// eclipse is paranoid about this - it thinks that shader could be null here
+        	if (shader != null) {
+                    if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
+                        shader.deactivateFeature(ShaderProgramFeature.FEATURE_REFRACTIVE_PASS);
+                    } else if (phase == ChunkMesh.RenderPhase.ALPHA_REJECT) {
+                        shader.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
+                    }
+        	}
             }
 
             GL11.glPopMatrix();
