@@ -1235,7 +1235,7 @@ public final class WorldRenderer {
     //TODO: make this data into key value pairs
     public String getPlayerBiome() {
         Vector3f pos = getPlayerPosition();
-        return "Temperature:" + worldProvider.getTemperature(pos) + " Humidity: " + worldProvider.getHumidity(pos);
+        return "Temperature: " + worldProvider.getTemperature(pos) + " Humidity: " + worldProvider.getHumidity(pos);
     }
 
     public WorldProvider getWorldProvider() {
