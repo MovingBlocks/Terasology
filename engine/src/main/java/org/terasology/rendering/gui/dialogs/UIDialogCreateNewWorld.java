@@ -126,7 +126,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         previewPos.x += inputSeed.getSize().x;
         previewPos.x += 8;
         
-	previewButton.setPosition(previewPos);
+        previewButton.setPosition(previewPos);
         parent.addDisplayElement(previewButton);
 
 
@@ -147,28 +147,28 @@ public class UIDialogCreateNewWorld extends UIDialog {
     }
 
     private void createPreviewButton() {
-	previewButton = new UIButton(new Vector2f(96, 32),UIButton.ButtonType.NORMAL);
+        previewButton = new UIButton(new Vector2f(96, 32), UIButton.ButtonType.NORMAL);
 
-	previewButton.setVisible(true);
-	previewButton.getLabel().setText("Preview...");
-	previewButton.addClickListener(new ClickListener() {
+        previewButton.setVisible(true);
+        previewButton.getLabel().setText("Preview...");
+        previewButton.addClickListener(new ClickListener() {
 
-	    @Override
-	    public void click(UIDisplayElement element, int button) {
-		WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
-		
-		UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
+
+                UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
                 dialog.addDialogListener(new DialogListener() {
                     @Override
                     public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
                         if (returnCode == EReturnCode.OK) {
-                            inputSeed.setText((String)returnValue);
+                            inputSeed.setText((String) returnValue);
                         }
                     }
                 });
                 dialog.open();
-	    }
-	});
+            }
+        });
     }
 
     private void createWorldTitleInput() {

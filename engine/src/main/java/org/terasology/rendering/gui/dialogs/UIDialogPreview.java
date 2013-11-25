@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,15 +63,6 @@ public class UIDialogPreview extends UIDialog {
 
     private static final Logger logger = LoggerFactory.getLogger(UIDialogPreview.class);
 
-    private interface ColorFunction<T> {
-	/**
-	 * @param x the x world coordinate
-	 * @param z the z world coordinate
-	 * @return never <code>null</code>
-	 */
-	Color get(int x, int z);
-    }
-    
     private UIButton buttonOk;
     private UIButton buttonCancel;
     
@@ -89,10 +80,10 @@ public class UIDialogPreview extends UIDialog {
     
     public UIDialogPreview(WorldGeneratorInfo info, String seed) {
 
-	super(new Vector2f(640f, 480f));
-	setTitle("Setup Map");
-	
-	inputSeed.setText(seed);
+        super(new Vector2f(640f, 480f));
+        setTitle("Setup Map");
+
+        inputSeed.setText(seed);
         biomeProvider = new WorldBiomeProviderImpl(seed);
 
 //        try {
@@ -101,22 +92,22 @@ public class UIDialogPreview extends UIDialog {
 //
 //            worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
 //            worldGenerator.setWorldSeed(seed);
-//	    worldGenerator.setWorldBiomeProvider(biomeProvider);
+//            worldGenerator.setWorldBiomeProvider(biomeProvider);
 //        } catch (UnresolvedWorldGeneratorException e) {
 //            logger.error("Unable to load world generator", e);
 //        }
 
-	updatePreview();
+        updatePreview();
     }
 
     @Override
     protected void createDialogArea(final UIDisplayContainer parent) {
-	setModal(true);
+        setModal(true);
 
         UIComposite detailPanel = new UIComposite();
         ColumnLayout layout = new ColumnLayout();
         layout.setSpacingVertical(8f);
-	detailPanel.setLayout(layout);
+        detailPanel.setLayout(layout);
 
         UILabel inputSeedLabel = new UILabel("Seed");
         inputSeedLabel.setColor(org.newdawn.slick.Color.darkGray);
@@ -124,85 +115,87 @@ public class UIDialogPreview extends UIDialog {
         inputSeed = new UIText();
         inputSeed.setSize(new Vector2f(120, 32));
         inputSeed.addChangedListener(new ChangedListener() {
-	    
-	    @Override
-	    public void changed(UIDisplayElement element) {
-		biomeProvider = new WorldBiomeProviderImpl(inputSeed.getText());
-		updatePreview();
-	    }
-	});
+
+            @Override
+            public void changed(UIDisplayElement element) {
+                biomeProvider = new WorldBiomeProviderImpl(inputSeed.getText());
+                updatePreview();
+            }
+        });
         
         detailPanel.addDisplayElement(inputSeedLabel);
         detailPanel.addDisplayElement(inputSeed);
  
         Vector2f defSize = new Vector2f(80, 32);
-	UIButton buttonShowBiomes = new UIButton(defSize, ButtonType.TOGGLE);
+        UIButton buttonShowBiomes = new UIButton(defSize, ButtonType.TOGGLE);
         buttonShowBiomes.getLabel().setText("Biomes");
         buttonShowBiomes.setToggleState(true);
         
-	ColorFunction biomeColor = new ColorFunction() {
-	    @Override
-	    public Color get(int x, int z) {
-		Biome biome = biomeProvider.getBiomeAt(x, z);
-		
-		switch (biome) {
-		case DESERT:
-		    return Color.YELLOW;
-		case FOREST:
-		    return Color.GREEN;
-		case MOUNTAINS:
-		    return new Color(240, 120, 120);
-		case PLAINS:
-		    return new Color(220, 220, 60);
-		case SNOW:
-		    return Color.WHITE;
-		default:
-		    return Color.GREY;
-		}
-	    }	    
-	};
-	buttonShowBiomes.setUserData(biomeColor);
-	
+        ColorFunction biomeColor = new ColorFunction() {
+            @Override
+            public Color get(int x, int z) {
+                Biome biome = biomeProvider.getBiomeAt(x, z);
+                
+                switch (biome) {
+                case DESERT:
+                    return Color.YELLOW;
+                case FOREST:
+                    return Color.GREEN;
+                case MOUNTAINS:
+                    return new Color(240, 120, 120);
+                case PLAINS:
+                    return new Color(220, 220, 60);
+                case SNOW:
+                    return Color.WHITE;
+                default:
+                    return Color.GREY;
+                }
+            }            
+        };
+        buttonShowBiomes.setUserData(biomeColor);
+        
         UIButton buttonShowHum = new UIButton(defSize, ButtonType.TOGGLE);
         buttonShowHum.getLabel().setText("Humidity");
 
         ColorFunction humColor = new ColorFunction() {
-	    @Override
-	    public Color get(int x, int z) {
-		float hum = biomeProvider.getHumidityAt(x, z);
-		return new Color(hum * 0.2f, hum * 0.2f, hum);
-	    }
-	};
-	
-	buttonShowHum.setUserData(humColor);
-	
+            @Override
+            public Color get(int x, int z) {
+                float hum = biomeProvider.getHumidityAt(x, z);
+                return new Color(hum * 0.2f, hum * 0.2f, hum);
+            }
+        };
+        
+        buttonShowHum.setUserData(humColor);
+        
         UIButton buttonShowTemp = new UIButton(defSize, ButtonType.TOGGLE);
         buttonShowTemp.getLabel().setText("Temperature");
 
-	ColorFunction tempColor = new ColorFunction() {
-	    @Override
-	    public Color get(int x, int z) {
-		float temp = biomeProvider.getTemperatureAt(x, z);
-		return new Color(temp, temp * 0.2f, temp * 0.2f);
-	    }
-	};
+        ColorFunction tempColor = new ColorFunction() {
+            @Override
+            public Color get(int x, int z) {
+                float temp = biomeProvider.getTemperatureAt(x, z);
+                return new Color(temp, temp * 0.2f, temp * 0.2f);
+            }
+        };
 
-	buttonShowTemp.setUserData(tempColor);
+        buttonShowTemp.setUserData(tempColor);
 
         radioGroup = Lists.newArrayList(buttonShowBiomes, buttonShowHum, buttonShowTemp);
         
         ClickListener btnClick = new ClickListener() {
-	    @Override
-	    public void click(UIDisplayElement element, int button) {
-		UIButton clickedBtn = (UIButton)element;
-		for (UIButton btn : radioGroup) {
-		    if (clickedBtn != btn)
-			btn.setToggleState(false); else
-			btn.setToggleState(true);
-		}
-		
-		updatePreview();
-	    }
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                UIButton clickedBtn = (UIButton) element;
+                for (UIButton btn : radioGroup) {
+                    if (clickedBtn != btn) {
+                        btn.setToggleState(false); 
+                    } else {
+                        btn.setToggleState(true); 
+                    }
+                }
+                
+                updatePreview();
+            }
         };
         
         for (UIButton btn : radioGroup) {
@@ -218,7 +211,7 @@ public class UIDialogPreview extends UIDialog {
             public void changed(UIDisplayElement element) {
                 UISlider slider = (UISlider) element;
                 slider.setText(slider.getValue() + "x");
-        	updatePreview();
+                updatePreview();
             }
         });
 
@@ -229,100 +222,108 @@ public class UIDialogPreview extends UIDialog {
         int imageScreenSize = 384;
         detailPanel.setPosition(new Vector2f(40 + imageScreenSize, 40));
         
-	imagePreview = new UIImage();
-	imagePreview.setSize(new Vector2f(imageScreenSize, imageScreenSize));
-	imagePreview.setPosition(new Vector2f(20, 40));
-	imagePreview.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), org.newdawn.slick.Color.black);
-	
-	parent.addDisplayElement(imagePreview);
-	parent.addDisplayElement(detailPanel);
-	
-	parent.layout();
+        imagePreview = new UIImage();
+        imagePreview.setSize(new Vector2f(imageScreenSize, imageScreenSize));
+        imagePreview.setPosition(new Vector2f(20, 40));
+        imagePreview.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), org.newdawn.slick.Color.black);
+        
+        parent.addDisplayElement(imagePreview);
+        parent.addDisplayElement(detailPanel);
+        
+        parent.layout();
     }
     
     @Override
     protected void createButtons(UIDisplayContainer parent) {
 
-	buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
-	buttonOk.getLabel().setText("OK");
-	buttonOk.setVisible(true);
-//	buttonOk.setHorizontalAlign(EHorizontalAlign.CENTER);
-	buttonOk.addClickListener(new ClickListener() {
-	    @Override
-	    public void click(UIDisplayElement element, int button) {
+        buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
+        buttonOk.getLabel().setText("OK");
+        buttonOk.setVisible(true);
+        buttonOk.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
 
-		closeDialog(EReturnCode.OK, inputSeed.getText());
-	    }
-	});
+                closeDialog(EReturnCode.OK, inputSeed.getText());
+            }
+        });
 
-	buttonCancel = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
-	buttonCancel.getLabel().setText("Cancel");
-	buttonCancel.setVisible(true);
-//	buttonCancel.setHorizontalAlign(EHorizontalAlign.CENTER);
-	buttonCancel.addClickListener(new ClickListener() {
-	    @Override
-	    public void click(UIDisplayElement element, int button) {
+        buttonCancel = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
+        buttonCancel.getLabel().setText("Cancel");
+        buttonCancel.setVisible(true);
+        buttonCancel.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
 
-		closeDialog(EReturnCode.CANCEL, null);
-	    }
-	});
+                closeDialog(EReturnCode.CANCEL, null);
+            }
+        });
 
-	parent.addDisplayElement(buttonCancel);
-	parent.addDisplayElement(buttonOk);
-	
-	parent.layout();
+        parent.addDisplayElement(buttonCancel);
+        parent.addDisplayElement(buttonOk);
+        
+        parent.layout();
     }
 
     
     private void updatePreview() {
-	
-	UIButton selected = null;
-	for (UIButton btn : radioGroup)
-	    if (btn.getToggleState()) {
-		selected = btn;
-		break;
-	    }
-	
-	int scale = zoomSlider.getValue();
-	
-	if (selected != null) {
-	    ColorFunction colorFunc = (ColorFunction)selected.getUserData();
-	    imagePreview.setTexture(createTexture(imageSize, imageSize, scale, colorFunc));
-	}
+        
+        UIButton selected = null;
+        for (UIButton btn : radioGroup) {
+            if (btn.getToggleState()) {
+                selected = btn;
+                break;
+            }
+        }
+        
+        int scale = zoomSlider.getValue();
+        
+        if (selected != null) {
+            ColorFunction colorFunc = (ColorFunction) selected.getUserData();
+            imagePreview.setTexture(createTexture(imageSize, imageSize, scale, colorFunc));
+        }
     }
     
     private Texture createTexture(int width, int height, int scale, ColorFunction colorFunc) {
 
-	int size = 4 * width * height;
-	byte[] array = new byte[size];
-	
-	final int offX = - width / 2;
-	final int offY = - height / 2;
-	final int scaleX = scale;
-	final int scaleY = scale;
-	
-	for (int y = 0; y < height; y++) {
-	    for (int x = 0; x < width; x++) {
-		int px = (x + offX) * scaleX;
-		int py = (y + offY) * scaleY;
-		Color c = colorFunc.get(px, py);
-		
-		array[(y * width + x) * 4 + 0] = (byte) c.r();
-		array[(y * width + x) * 4 + 1] = (byte) c.g();
-		array[(y * width + x) * 4 + 2] = (byte) c.b();
-		array[(y * width + x) * 4 + 3] = (byte) c.a();
-	    }
-	}
+        int size = 4 * width * height;
+        byte[] array = new byte[size];
+        
+        final int offX = -width / 2;
+        final int offY = -height / 2;
+        final int scaleX = scale;
+        final int scaleY = scale;
+        
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int px = (x + offX) * scaleX;
+                int py = (y + offY) * scaleY;
+                Color c = colorFunc.get(px, py);
+                
+                array[(y * width + x) * 4 + 0] = (byte) c.r();
+                array[(y * width + x) * 4 + 1] = (byte) c.g();
+                array[(y * width + x) * 4 + 2] = (byte) c.b();
+                array[(y * width + x) * 4 + 3] = (byte) c.a();
+            }
+        }
 
-	ByteBuffer buf = ByteBuffer.allocateDirect(size);
-	buf.put(array);
-	buf.flip();
+        ByteBuffer buf = ByteBuffer.allocateDirect(size);
+        buf.put(array);
+        buf.flip();
 
-	ByteBuffer[] data = new ByteBuffer[] { buf };
+        ByteBuffer[] data = new ByteBuffer[] {buf};
 
-	AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainpreview");
-	TextureData texdata = new TextureData(width, height, data, WrapMode.Clamp, FilterMode.Nearest);
+        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainpreview");
+        TextureData texdata = new TextureData(width, height, data, WrapMode.Clamp, FilterMode.Nearest);
 
-	return new OpenGLTexture(uri, texdata);
+        return new OpenGLTexture(uri, texdata);
+    }
+    
+    private interface ColorFunction<T> {
+        /**
+         * @param x the x world coordinate
+         * @param z the z world coordinate
+         * @return never <code>null</code>
+         */
+        Color get(int x, int z);
     }
 }
