@@ -71,6 +71,7 @@ public final class Config {
      * Create a new, empty config
      */
     public Config() {
+        logRenderingOptions();
     }
 
     /**
@@ -116,10 +117,46 @@ public final class Config {
      * Saves this config to the default configuration file
      */
     public void save() {
+        logRenderingOptions();
         try {
             save(getConfigFile(), this);
         } catch (IOException e) {
             logger.error("Failed to save config", e);
+        }
+    }
+
+    /**
+     * Prints to console all the graphics related options in the config file.
+     */
+    private void logRenderingOptions() {
+        logger.info("Rendering Settings: [PixelFormat: {}, WindowPosX: {}, WindowPosY: {}, DisplayMode: {}, " +
+                "FullScreen: {}, ViewDistance: {}, FlickeringLight: {}, AnimateGrass: {}, AnimateWater: {}, " +
+                "DynamicShadows: {}, FieldOfView: {}, CameraBobbing: {}, RenderPlacingBox: {}, BlurRadius: {}, " +
+                "BlurIntensity: {}, ReflectiveWater: {}, Vignette: {}, MotionBlur: {}, SSAO: {}, FilmGrain: {}, " +
+                "Outline: {}, LightShafts: {}, EyeAdaptation: {}, Bloom: {}, OculusVrSupport: {}, " +
+                "MaxTextureAtlasRes: {}, MaxChunksForShadowMapping: {}, ShadowMapResolution: {}, NormalMapping: {}, " +
+                "ParallaxMapping: {}, DynamicShadowsPcfFiltering: {}, VolumetricFog: {}, CloudShadows: {}, " +
+                "VolumetricLighting: {}, LocalReflections: {}, Inscattering: {}, RenderedNearest: {}, " +
+                "ParticleEffectLimit: {}, MeshLimit: {}, VSync: {}]", rendering.getPixelFormat().getDepthBits(),
+                rendering.getWindowPosX(), rendering.getWindowPosY(), rendering.getDisplayMode().toString(),
+                rendering.isFullscreen(), rendering.getViewDistance(), rendering.isFlickeringLight(),
+                rendering.isAnimateWater(), rendering.isAnimateGrass(), rendering.isDynamicShadows(),
+                rendering.getFieldOfView(), rendering.isCameraBobbing(), rendering.isRenderPlacingBox(),
+                rendering.getBlurRadius(), rendering.getBlurIntensity(), rendering.isReflectiveWater(),
+                rendering.isVignette(), rendering.isMotionBlur(), rendering.isSsao(), rendering.isFilmGrain(),
+                rendering.isOutline(), rendering.isLightShafts(), rendering.isEyeAdaptation(), rendering.isBloom(),
+                rendering.isOculusVrSupport(), rendering.getMaxTextureAtlasResolution(),
+                rendering.getMaxChunksUsedForShadowMapping(), rendering.getShadowMapResolution(),
+                rendering.isNormalMapping(), rendering.isParallaxMapping(), rendering.isDynamicShadowsPcfFiltering(),
+                rendering.isVolumetricFog(), rendering.isCloudShadows(), rendering.isVolumetricLighting(),
+                rendering.isLocalReflections(), rendering.isInscattering(), rendering.isRenderNearest(),
+                rendering.getParticleEffectLimit(), rendering.getMeshLimit(), rendering.isVSync());
+        if (rendering.getDebug().isEnabled()) {
+            logger.info("Rendering Debug Settings: [Stage: {}, FirstPersonElementsHidden: {}, HudHidden: {}, " +
+                    "WireFrame: {}, RenderChunkBoundingBoxes: {}, RenderSkeletons: {}]",
+                    rendering.getDebug().getStage(), rendering.getDebug().isFirstPersonElementsHidden(),
+                    rendering.getDebug().isHudHidden(), rendering.getDebug().isWireframe(),
+                    rendering.getDebug().isRenderChunkBoundingBoxes(), rendering.getDebug().isRenderSkeletons());
         }
     }
 
