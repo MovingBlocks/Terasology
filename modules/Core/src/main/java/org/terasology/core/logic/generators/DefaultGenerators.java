@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class DefaultGenerators {
 
-    public static void AddDefaultForestGenerators(ForestGenerator mngr) {
+    public static void addDefaultForestGenerators(ForestGenerator mngr) {
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
