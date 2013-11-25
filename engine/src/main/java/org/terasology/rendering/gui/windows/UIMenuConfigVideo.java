@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
@@ -41,6 +43,7 @@ import javax.vecmath.Vector2f;
  *         Date: 29/07/12
  */
 public class UIMenuConfigVideo extends UIWindow {
+    private static final Logger logger = LoggerFactory.getLogger(UIMenuConfigVideo.class);
 
     final UIImage title;
 
@@ -393,6 +396,8 @@ public class UIMenuConfigVideo extends UIWindow {
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
+                logger.info("Video Settings: " + config.getRendering().toString());
+                logger.info("Video Debug Settings: " + config.getRendering().getDebug().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
 
                 getGUIManager().openWindow("config");
