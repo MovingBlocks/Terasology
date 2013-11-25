@@ -19,7 +19,7 @@
  * However, more likely it will be used by reference by a Tree
  */
 {
-    "basedOn" : "core:leaf",
-    "tile" : "core:GreenLeaf",
+    "basedOn" : "leaf",
+    "tile" : "GreenLeaf",
     "colorOffset" : [2.0, 0.0, 0.5, 1.0]
 }

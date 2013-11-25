@@ -20,7 +20,7 @@
  */
 {
     "author" : "eleazzaar",
-    "basedOn" : "core:plant",
+    "basedOn" : "plant",
     "luminance" : 6,
     "waving" : true
 }

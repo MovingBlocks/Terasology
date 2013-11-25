@@ -18,7 +18,7 @@
     "hardness" : 6,
     "categories" : ["wood"],
     "tiles" : {
-        "topBottom" : "core:OakTrunk",
-        "sides" : "core:BirkBark"
+        "topBottom" : "OakTrunk",
+        "sides" : "BirkBark"
     }
 }

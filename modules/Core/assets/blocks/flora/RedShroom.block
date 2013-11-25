@@ -18,5 +18,5 @@
  * A red mushroom. It isn't magic yet
  */
 {
-    "basedOn" : "core:plant"
+    "basedOn" : "plant"
 }

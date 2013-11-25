@@ -19,11 +19,11 @@
  * In theory fancy cacti could possibly be L-system based? Not sure where L-system stuff should go
  */
 {
-    "shape" : "core:cactus",
+    "shape" : "cactus",
     "categories" : ["wood"],
     "tiles" : {
-        "top" : "core:CactusTop",
-        "bottom" : "core:CactusBottom"
+        "top" : "CactusTop",
+        "bottom" : "CactusBottom"
     },
     "translucent" : true
 }

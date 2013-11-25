@@ -19,9 +19,9 @@
  * Unlike Grass, it might be possible to have a SnowBlock as well
  */
 {
-    "basedOn" : "core:soil",
+    "basedOn" : "soil",
     "tiles" : {
-        "sides" : "core:SnowSide",
-        "bottom" : "core:dirt"
+        "sides" : "SnowSide",
+        "bottom" : "dirt"
     }
 }

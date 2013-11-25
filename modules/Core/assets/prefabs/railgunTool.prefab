@@ -7,6 +7,6 @@
     },
     "TunnelAction" : {},
     "PlaySoundAction" : {
-        "sounds" : ["core:Explode1", "core:Explode2", "core:Explode3", "core:Explode4", "core:Explode5"]
+        "sounds" : ["Explode1", "Explode2", "Explode3", "Explode4", "Explode5"]
     }
 }

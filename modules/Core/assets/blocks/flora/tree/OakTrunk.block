@@ -27,7 +27,7 @@
 
     // Graphics
     "tiles" : {
-        "sides" : "core:OakBark"
+        "sides" : "OakBark"
     }
 
     // Plant characteristics. Trees only world-gen atm so they "rarely grow" on dirt and spring instantly to full size

@@ -21,12 +21,12 @@
  * and that the appropriate image file to use equals the Block name + .png (in the same mod)
  */
 {
-    "basedOn" : "core:soil",
+    "basedOn" : "soil",
     "grass" : true,
     // Graphics
     "tiles" : {                     // "tiles" being present means we'll override some with a different graphic
-        "sides" : "core:GrassSide",     // sides means all four (not top/bottom) and can itself be overridden
-        "bottom" : "core:dirt"         // Since we add all images to the same map we don't need to worry about dir levels
+        "sides" : "GrassSide",     // sides means all four (not top/bottom) and can itself be overridden
+        "bottom" : "dirt"         // Since we add all images to the same map we don't need to worry about dir levels
     },
 
     // Works as an Enum :-)

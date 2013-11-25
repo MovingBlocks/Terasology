@@ -20,10 +20,10 @@
 {
     "rotation" : "AlignToSurface",
     "sides" : {
-        "shape" : "core:TorchWall"
+        "shape" : "TorchWall"
     },
     "top" : {
-        "shape" : "core:TorchGrounded"
+        "shape" : "TorchGrounded"
     },
 
     "penetrable" : true,

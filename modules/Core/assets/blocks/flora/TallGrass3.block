@@ -18,7 +18,7 @@
  * Tall grass variety 3 (higher number = taller)
  */
  {
-     "basedOn" : "core:plant",
+     "basedOn" : "plant",
      "colorSource" : "foliage_lut",
      "colorOffset" : [0.9, 0.9, 0.9, 1.0],
      "waving" : true

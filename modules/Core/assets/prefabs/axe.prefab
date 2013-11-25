@@ -4,6 +4,6 @@
         "name" : "Axe",
         "icon" : "Axe",
         "renderWithIcon" : true,
-        "damageType" : "core:axeDamage"
+        "damageType" : "axeDamage"
     }
 }

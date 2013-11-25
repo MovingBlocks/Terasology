@@ -15,7 +15,7 @@
  */
 
 {
-    "shape" : "core:door",
+    "shape" : "door",
     "rotation" : "horizontal",
     "attachmentAllowed" : false
 }

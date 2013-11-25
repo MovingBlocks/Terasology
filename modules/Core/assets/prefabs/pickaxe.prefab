@@ -4,6 +4,6 @@
         "name" : "Pick Axe",
         "icon" : "PickAxe",
         "renderWithIcon" : true,
-        "damageType" : "core:pickaxeDamage"
+        "damageType" : "pickaxeDamage"
     }
 }
