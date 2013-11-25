@@ -17,12 +17,7 @@
 package org.terasology.world.block.internal;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import gnu.trove.iterator.TObjectShortIterator;
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;

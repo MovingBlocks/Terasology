@@ -18,7 +18,6 @@ package org.terasology.world.block.items;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.entitySystem.event.Event;
 import org.terasology.world.block.family.BlockFamily;
 
 /**

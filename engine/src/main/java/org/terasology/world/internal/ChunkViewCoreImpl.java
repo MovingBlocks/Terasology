@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package org.terasology.world;
+package org.terasology.world.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkViewCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.liquid.LiquidData;
 
 /**
  * @author Immortius
  */
-public class RegionalChunkView implements ChunkView {
+public class ChunkViewCoreImpl implements ChunkViewCore {
 
-    private static final Logger logger = LoggerFactory.getLogger(RegionalChunkView.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChunkViewCoreImpl.class);
 
     private Vector3i offset;
     private Region3i chunkRegion;
     private Region3i blockRegion;
-    private Chunk[] chunks;
+    private ChunkImpl[] chunks;
 
     private Vector3i chunkPower;
     private Vector3i chunkSize;
@@ -44,12 +46,12 @@ public class RegionalChunkView implements ChunkView {
 
     private ThreadLocal<Boolean> locked = new ThreadLocal<Boolean>();
 
-    public RegionalChunkView(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
+    public ChunkViewCoreImpl(ChunkImpl[] chunks, Region3i chunkRegion, Vector3i offset) {
         locked.set(false);
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
-        setChunkSize(new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z));
+        setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
     }
 
     @Override
@@ -227,7 +229,7 @@ public class RegionalChunkView implements ChunkView {
     @Override
     public void lock() {
         if (!locked.get()) {
-            for (Chunk chunk : chunks) {
+            for (ChunkImpl chunk : chunks) {
                 chunk.lock();
             }
             locked.set(true);
@@ -238,7 +240,7 @@ public class RegionalChunkView implements ChunkView {
     public void unlock() {
         if (locked.get()) {
             locked.set(false);
-            for (Chunk chunk : chunks) {
+            for (ChunkImpl chunk : chunks) {
                 chunk.unlock();
             }
         }
@@ -251,7 +253,7 @@ public class RegionalChunkView implements ChunkView {
 
     @Override
     public boolean isValidView() {
-        for (Chunk chunk : chunks) {
+        for (ChunkImpl chunk : chunks) {
             if (chunk.isDisposed()) {
                 return false;
             }
@@ -278,6 +280,6 @@ public class RegionalChunkView implements ChunkView {
 
     @Override
     public Vector3i toWorldPos(Vector3i localPos) {
-        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * Chunk.SIZE_X, localPos.y, localPos.z + (offset.z + chunkRegion.min().z) * Chunk.SIZE_Z);
+        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y, localPos.z + (offset.z + chunkRegion.min().z) * ChunkConstants.SIZE_Z);
     }
 }

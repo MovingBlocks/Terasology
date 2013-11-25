@@ -26,6 +26,7 @@ import org.terasology.engine.API;
 @API
 public class LiquidData {
     private static final byte LIQUID_DEPTH_FILTER = 0x07;
+    public static final byte MAX_LIQUID_DEPTH = 0x07;
 
     private LiquidType type;
     private byte depth;

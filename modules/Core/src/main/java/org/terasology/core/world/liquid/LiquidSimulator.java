@@ -29,13 +29,14 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkView;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.event.OnChunkLoaded;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -200,6 +201,7 @@ public class LiquidSimulator implements ComponentSystem {
         LiquidData newState = calcStateFor(blockPos, view);
         if (!newState.equals(current)) {
             try {
+                view.lock();
                 if (view.isValidView() && world.setLiquid(blockPos, newState, current)) {
                     if (newState.getDepth() > 0) {
                         world.setBlock(blockPos, ((newState.getType() == LiquidType.WATER) ? water : lava));
@@ -345,7 +347,7 @@ public class LiquidSimulator implements ComponentSystem {
         public void run() {
             ChunkView view = world.getLocalView(chunkPos);
             if (view != null) {
-                for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(Chunk.SIZE_X + 2, Chunk.SIZE_Y, Chunk.SIZE_Z + 2))) {
+                for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(ChunkConstants.SIZE_X + 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z + 2))) {
                     view.lock();
                     try {
                         LiquidData state = view.getLiquid(pos);

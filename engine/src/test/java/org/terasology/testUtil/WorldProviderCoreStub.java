@@ -18,7 +18,7 @@ package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewCore;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
@@ -70,12 +70,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public ChunkView getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3i chunkPos) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public ChunkView getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

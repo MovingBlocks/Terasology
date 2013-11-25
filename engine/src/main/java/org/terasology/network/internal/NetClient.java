@@ -59,7 +59,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.Chunks;
 
 import java.util.Arrays;
@@ -113,7 +113,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
-    private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
+    private Map<Vector3i, ChunkImpl> readyChunks = Maps.newLinkedHashMap();
     private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
 
 
@@ -224,7 +224,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                         distance = chunkDistance;
                     }
                 }
-                Chunk chunk = readyChunks.remove(pos);
+                ChunkImpl chunk = readyChunks.remove(pos);
                 relevantChunks.add(pos);
                 message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
             }
@@ -336,7 +336,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3i pos, ChunkImpl chunk) {
         invalidatedChunks.remove(pos);
         readyChunks.put(pos, chunk);
     }

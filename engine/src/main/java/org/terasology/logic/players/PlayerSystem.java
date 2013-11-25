@@ -39,7 +39,7 @@ import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 
@@ -86,10 +86,10 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             SpawningClientInfo spawning = i.next();
             if (worldRenderer.getWorldProvider().isBlockRelevant(spawning.position)) {
                 if (spawning.playerStore == null) {
-                    spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+                    spawnPlayer(spawning.clientEntity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
                 } else if (!spawning.playerStore.hasCharacter()) {
                     spawning.playerStore.restoreEntities();
-                    spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+                    spawnPlayer(spawning.clientEntity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
                 } else {
                     restoreCharacter(spawning.clientEntity, spawning.playerStore);
                 }
@@ -137,9 +137,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         } else {
             Vector3i pos = Vector3i.zero();
             if (chunkProvider.getChunk(pos) != null) {
-                spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
             } else {
-                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
+                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }
@@ -150,7 +150,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         EntityRef character = playerStore.getCharacter();
         // TODO: adjust location to safe spot
         if (character == null) {
-            spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+            spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
         } else {
             Client clientListener = networkSystem.getOwner(entity);
             int distance = clientListener.getViewDistance().getChunkDistance();
@@ -170,7 +170,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
             } else {
                 character.destroy();
-                spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
             }
         }
     }
@@ -189,14 +189,14 @@ public class PlayerSystem implements UpdateSubscriberSystem {
         if (!client.character.exists()) {
             Vector3i pos = Vector3i.zero();
             if (chunkProvider.getChunk(pos) != null) {
-                spawnPlayer(entity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
+                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
             } else {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                loc.setWorldPosition(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
+                loc.setWorldPosition(new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
                 entity.saveComponent(loc);
                 worldRenderer.getChunkProvider().updateRelevanceEntity(entity, 4);
 
-                SpawningClientInfo info = new SpawningClientInfo(entity, new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2));
+                SpawningClientInfo info = new SpawningClientInfo(entity, new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
                 clientsPreparingToSpawn.add(info);
             }
         }

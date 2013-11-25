@@ -20,10 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.ChunkViewAPI;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -55,7 +55,7 @@ public abstract class TreeGenerator {
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public abstract void generate(ChunkViewAPI view, Random rand, int posX, int posY, int posZ);
+    public abstract void generate(ChunkView view, Random rand, int posX, int posY, int posZ);
 
     public double getGenerationProbability() {
         return generationProbability;
@@ -70,11 +70,11 @@ public abstract class TreeGenerator {
      * Checks if a tree can grow at the given position
      *
      * @param view Chunk view
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
+     * @param x Position on the x-axis
+     * @param y Position on the y-axis
+     * @param z Position on the z-axis
      */
-    public boolean canGenerateAt(ChunkViewAPI view, int x, int y, int z) {
+    public boolean canGenerateAt(ChunkView view, int x, int y, int z) {
         Block posBlock = view.getBlock(x, y - 1, z);
         if (posBlock == null) {
             logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", x, y, z);
@@ -85,7 +85,7 @@ public abstract class TreeGenerator {
             return false;
         }
 
-        for (int checkY = y; checkY < Chunk.SIZE_Y; ++checkY) {
+        for (int checkY = y; checkY < ChunkConstants.SIZE_Y; ++checkY) {
             if (!view.getBlock(x, checkY, z).isTranslucent()) {
                 return false;
             }

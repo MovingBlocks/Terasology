@@ -17,26 +17,26 @@ package org.terasology.monitoring.impl;
 
 import com.google.common.base.Preconditions;
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.lang.ref.WeakReference;
 
 public class WeakChunk {
 
     protected final Vector3i position;
-    protected final WeakReference<Chunk> ref;
+    protected final WeakReference<ChunkImpl> ref;
 
-    public WeakChunk(Chunk chunk) {
+    public WeakChunk(ChunkImpl chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         this.position = chunk.getPos();
-        this.ref = new WeakReference<Chunk>(chunk);
+        this.ref = new WeakReference<ChunkImpl>(chunk);
     }
 
     public final Vector3i getPos() {
         return new Vector3i(position);
     }
 
-    public final Chunk getChunk() {
+    public final ChunkImpl getChunk() {
         return ref.get();
     }
 }

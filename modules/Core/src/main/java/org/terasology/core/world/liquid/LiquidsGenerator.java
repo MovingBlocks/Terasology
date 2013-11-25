@@ -21,7 +21,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkAPI;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -55,20 +55,20 @@ public class LiquidsGenerator implements FirstPassGenerator {
     }
 
     @Override
-    public void generateChunk(ChunkAPI c) {
+    public void generateChunk(Chunk chunk) {
         // TODO: Better seeding mechanism
-        FastRandom random = new FastRandom(seed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
+        FastRandom random = new FastRandom(seed.hashCode() ^ (chunk.getPos().x + 39L * (chunk.getPos().y + 39L * chunk.getPos().z)));
         boolean grassGenerated = false;
         boolean lavaGenerated = false;
-        for (int y = Chunk.SIZE_Y - 1; y >= 0; y -= 2) {
-            Block currentBlock = c.getBlock(8, y, 8);
+        for (int y = chunk.getChunkSizeY() - 1; y >= 0; y -= 2) {
+            Block currentBlock = chunk.getBlock(8, y, 8);
             if ((grass.equals(currentBlock) || snow.equals(currentBlock)) && !grassGenerated && y >= 32 && random.nextDouble() > 0.8) {
-                c.setBlock(8, y, 8, water);
-                c.setLiquid(8, y, 8, new LiquidData(LiquidType.WATER, 7));
+                chunk.setBlock(8, y, 8, water);
+                chunk.setLiquid(8, y, 8, new LiquidData(LiquidType.WATER, 7));
                 grassGenerated = true;
-            } else if ((stone.equals(currentBlock)) && !lavaGenerated && c.getBlock(8, y + 1, 8).equals(BlockManager.getAir())) {
-                c.setBlock(8, y, 8, lava);
-                c.setLiquid(8, y, 8, new LiquidData(LiquidType.LAVA, 7));
+            } else if ((stone.equals(currentBlock)) && !lavaGenerated && chunk.getBlock(8, y + 1, 8).equals(BlockManager.getAir())) {
+                chunk.setBlock(8, y, 8, lava);
+                chunk.setLiquid(8, y, 8, new LiquidData(LiquidType.LAVA, 7));
                 lavaGenerated = true;
             }
         }

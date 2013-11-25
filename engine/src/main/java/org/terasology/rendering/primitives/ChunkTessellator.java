@@ -26,15 +26,14 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
-import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCoreImpl;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.MiniatureChunk;
-import org.terasology.world.RegionalChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -55,17 +54,17 @@ public final class ChunkTessellator {
         this.generatingChunkProvider = generatingChunkProvider;
     }
 
-    public ChunkMesh generateMesh(ChunkView chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
+    public ChunkMesh generateMesh(ChunkViewCore chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
 
-        Vector3f chunkOffset = new Vector3f(chunkPos.x * Chunk.SIZE_X, chunkPos.y * Chunk.SIZE_Y, chunkPos.z * Chunk.SIZE_Z);
+        Vector3f chunkOffset = new Vector3f(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z);
 
         final Stopwatch watch = new Stopwatch();
         watch.start();
 
-        for (int x = 0; x < Chunk.SIZE_X; x++) {
-            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
+            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                 Vector3f worldPos = new Vector3f(chunkOffset.x + x, chunkOffset.y, chunkOffset.z + z);
                 float biomeTemp = generatingChunkProvider.getTemperature(worldPos);
                 float biomeHumidity = generatingChunkProvider.getHumidity(worldPos);
@@ -98,7 +97,7 @@ public final class ChunkTessellator {
         ChunkMesh mesh = new ChunkMesh();
 
         MiniatureChunk[] chunks = {miniatureChunk};
-        RegionalChunkView localChunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
+        ChunkViewCoreImpl localChunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
         localChunkView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
 
         for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
@@ -120,7 +119,7 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
+    private void generateOptimizedBuffers(ChunkViewCore chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
@@ -191,7 +190,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void calcLightingValuesForVertexPos(ChunkView chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
+    private void calcLightingValuesForVertexPos(ChunkViewCore chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
         PerformanceMonitor.startActivity("calcLighting");
         float[] lights = new float[8];
         float[] blockLights = new float[8];
@@ -288,7 +287,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
+    private void generateBlockVertices(ChunkViewCore view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.

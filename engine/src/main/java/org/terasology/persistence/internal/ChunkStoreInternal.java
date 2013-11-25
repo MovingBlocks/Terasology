@@ -24,7 +24,7 @@ import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.List;
 
@@ -35,14 +35,14 @@ final class ChunkStoreInternal implements ChunkStore {
 
     private StorageManagerInternal storageManager;
     private Vector3i chunkPosition;
-    private Chunk chunk;
+    private ChunkImpl chunk;
 
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
     private TIntSet externalRefs;
     private List<EntityRef> entitiesToStore = Lists.newArrayList();
 
-    public ChunkStoreInternal(Chunk chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
+    public ChunkStoreInternal(ChunkImpl chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
         this.chunk = chunk;
         this.chunkPosition = new Vector3i(chunk.getPos());
         this.storageManager = storageManager;
@@ -54,7 +54,7 @@ final class ChunkStoreInternal implements ChunkStore {
         this.storageManager = storageManager;
         this.entityManager = entityManager;
 
-        this.chunk = new Chunk.ProtobufHandler().decode(chunkData);
+        this.chunk = new ChunkImpl.ProtobufHandler().decode(chunkData);
         this.entityStore = chunkData.getStore();
         this.externalRefs = externalRefs;
     }
@@ -65,7 +65,7 @@ final class ChunkStoreInternal implements ChunkStore {
     }
 
     @Override
-    public Chunk getChunk() {
+    public ChunkImpl getChunk() {
         chunk.prepareForReactivation();
         return chunk;
     }
@@ -119,7 +119,7 @@ final class ChunkStoreInternal implements ChunkStore {
     public EntityData.ChunkStore getStore() {
         chunk.lock();
         try {
-            EntityData.ChunkStore.Builder encoded = new Chunk.ProtobufHandler().encode(chunk, false);
+            EntityData.ChunkStore.Builder encoded = new ChunkImpl.ProtobufHandler().encode(chunk, false);
             encoded.setStore(entityStore);
             return encoded.build();
         } finally {

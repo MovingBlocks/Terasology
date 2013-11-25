@@ -17,7 +17,8 @@ package org.terasology.world.propagation;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * @author Immortius
@@ -25,16 +26,16 @@ import org.terasology.world.chunks.Chunk;
 public class SingleChunkView implements PropagatorWorldView {
 
     private final PropagationRules rules;
-    private final Chunk chunk;
+    private final ChunkImpl chunk;
 
-    public SingleChunkView(PropagationRules rules, Chunk chunk) {
+    public SingleChunkView(PropagationRules rules, ChunkImpl chunk) {
         this.rules = rules;
         this.chunk = chunk;
     }
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        if (Chunk.CHUNK_REGION.encompasses(pos)) {
+        if (ChunkConstants.CHUNK_REGION.encompasses(pos)) {
             return rules.getValue(chunk, pos);
         }
         return UNAVAILABLE;
@@ -47,7 +48,7 @@ public class SingleChunkView implements PropagatorWorldView {
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        if (Chunk.CHUNK_REGION.encompasses(pos)) {
+        if (ChunkConstants.CHUNK_REGION.encompasses(pos)) {
             return chunk.getBlock(pos);
         }
         return null;

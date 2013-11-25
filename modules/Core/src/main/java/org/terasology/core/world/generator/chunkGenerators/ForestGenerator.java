@@ -22,8 +22,8 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.core.world.generator.BiomeProviderDependentSecondPassGenerator;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.ChunkViewAPI;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.ChunkView;
+import org.terasology.world.chunks.ChunkConstants;
 
 import java.util.Map;
 
@@ -41,13 +41,13 @@ public class ForestGenerator implements BiomeProviderDependentSecondPassGenerato
     }
 
     @Override
-    public void postProcessChunk(Vector3i pos, ChunkViewAPI view) {
+    public void postProcessChunk(Vector3i pos, ChunkView view) {
         FastRandom random = new FastRandom(seed.hashCode() ^ (pos.x + 39L * (pos.y + 39L * pos.z)));
-        for (int y = 32; y < Chunk.SIZE_Y; y++) {
-            for (int x = 4; x < Chunk.SIZE_X; x += 4) {
-                for (int z = 4; z < Chunk.SIZE_Z; z += 4) {
+        for (int y = 32; y < ChunkConstants.SIZE_Y; y++) {
+            for (int x = 4; x < ChunkConstants.SIZE_X; x += 4) {
+                for (int z = 4; z < ChunkConstants.SIZE_Z; z += 4) {
                     Vector3i worldPos = new Vector3i(pos);
-                    worldPos.mult(new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z));
+                    worldPos.mult(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
                     worldPos.add(x, y, z);
                     WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(worldPos.x, worldPos.z);
 

@@ -29,12 +29,12 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
-import org.terasology.world.ChunkView;
-import org.terasology.world.RegionalChunkView;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
@@ -57,7 +57,7 @@ import java.util.concurrent.BlockingQueue;
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
-    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private Map<Vector3i, ChunkImpl> chunkCache = Maps.newHashMap();
     private final BlockingQueue<Vector3i> readyChunks = Queues.newLinkedBlockingQueue();
     private ChunkReadyListener listener;
 
@@ -79,7 +79,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         this.listener = chunkReadyListener;
     }
 
-    public void receiveChunk(Chunk chunk) {
+    public void receiveChunk(ChunkImpl chunk) {
         chunkCache.put(chunk.getPos(), chunk);
         pipeline.requestReview(Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.LOCAL_REGION_EXTENTS));
     }
@@ -93,11 +93,11 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         if (listener != null) {
             Vector3i pos = readyChunks.poll();
             if (pos != null) {
-                Chunk chunk = chunkCache.get(pos);
+                ChunkImpl chunk = chunkCache.get(pos);
                 chunk.markReady();
                 for (Side side : Side.horizontalSides()) {
                     Vector3i adjChunkPos = side.getAdjacentPos(pos);
-                    Chunk adjChunk = getChunk(adjChunkPos);
+                    ChunkImpl adjChunk = getChunk(adjChunkPos);
                     if (adjChunk != null) {
                         for (BatchPropagator propagator : loadEdgePropagators) {
                             propagator.propagateBetween(chunk, adjChunk, side);
@@ -113,12 +113,12 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public Chunk getChunk(int x, int y, int z) {
+    public ChunkImpl getChunk(int x, int y, int z) {
         return getChunk(new Vector3i(x, y, z));
     }
 
     @Override
-    public Chunk getChunk(Vector3i chunkPos) {
+    public ChunkImpl getChunk(Vector3i chunkPos) {
         if (isChunkReady(chunkPos)) {
             return chunkCache.get(chunkPos);
         }
@@ -127,8 +127,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public boolean isChunkReady(Vector3i pos) {
-        Chunk chunk = chunkCache.get(pos);
-        return chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE;
+        ChunkImpl chunk = chunkCache.get(pos);
+        return chunk != null && chunk.getChunkState() == ChunkImpl.State.COMPLETE;
     }
 
     @Override
@@ -137,7 +137,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkView getLocalView(Vector3i centerChunkPos) {
+    public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
             return createWorldView(region, Vector3i.one());
@@ -146,13 +146,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkView getSubviewAroundBlock(Vector3i blockPos, int extent) {
+    public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
         Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
     }
 
     @Override
-    public ChunkView getSubviewAroundChunk(Vector3i chunkPos) {
+    public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
             return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
@@ -160,17 +160,17 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         return null;
     }
 
-    private ChunkView createWorldView(Region3i region, Vector3i offset) {
-        Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
+    private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
+        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
-            Chunk chunk = chunkCache.get(chunkPos);
-            if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+            ChunkImpl chunk = chunkCache.get(chunkPos);
+            if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
                 return null;
             }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
             chunks[index] = chunk;
         }
-        return new RegionalChunkView(chunks, region, offset);
+        return new ChunkViewCoreImpl(chunks, region, offset);
     }
 
     @Override
@@ -196,22 +196,22 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkView getViewAround(Vector3i pos) {
+    public ChunkViewCore getViewAround(Vector3i pos) {
         Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
-        Chunk[] chunks = new Chunk[region.size().x * region.size().z];
+        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().z];
         for (Vector3i chunkPos : region) {
-            Chunk chunk = getChunkForProcessing(chunkPos);
+            ChunkImpl chunk = getChunkForProcessing(chunkPos);
             if (chunk == null) {
                 return null;
             }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
             chunks[index] = chunk;
         }
-        return new RegionalChunkView(chunks, region, Vector3i.one());
+        return new ChunkViewCoreImpl(chunks, region, Vector3i.one());
     }
 
     @Override
-    public Chunk getChunkForProcessing(Vector3i pos) {
+    public ChunkImpl getChunkForProcessing(Vector3i pos) {
         return chunkCache.get(pos);
     }
 

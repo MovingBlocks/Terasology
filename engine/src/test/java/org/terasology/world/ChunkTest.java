@@ -27,7 +27,8 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
 
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ChunkTest extends TerasologyTestingEnvironment {
 
-    private Chunk chunk;
+    private ChunkImpl chunk;
     private BlockManagerImpl blockManager;
 
     @Before
@@ -44,7 +45,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
         super.setup();
         blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
-        chunk = new Chunk(new Vector3i(0, 0, 0));
+        chunk = new ChunkImpl(new Vector3i(0, 0, 0));
     }
 
     @Test
@@ -59,7 +60,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     @Test
     public void getAABB() {
         assertEquals(new Vector3f(0, 0, 0), chunk.getAABB().getMin());
-        assertEquals(new Vector3f(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z), chunk.getAABB().getMax());
+        assertEquals(new Vector3f(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z), chunk.getAABB().getMax());
     }
 
 }

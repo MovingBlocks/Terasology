@@ -16,7 +16,7 @@
 package org.terasology.world.propagation;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewCore;
 import org.terasology.world.block.Block;
 
 /**
@@ -24,9 +24,9 @@ import org.terasology.world.block.Block;
  */
 public abstract class AbstractChunkView implements PropagatorWorldView {
 
-    private ChunkView chunkView;
+    private ChunkViewCore chunkView;
 
-    public AbstractChunkView(ChunkView chunkView) {
+    public AbstractChunkView(ChunkViewCore chunkView) {
         this.chunkView = chunkView;
     }
 
@@ -38,14 +38,14 @@ public abstract class AbstractChunkView implements PropagatorWorldView {
         return UNAVAILABLE;
     }
 
-    protected abstract byte getValueAt(ChunkView view, Vector3i pos);
+    protected abstract byte getValueAt(ChunkViewCore view, Vector3i pos);
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
         setValueAt(chunkView, pos, value);
     }
 
-    protected abstract void setValueAt(ChunkView view, Vector3i pos, byte value);
+    protected abstract void setValueAt(ChunkViewCore view, Vector3i pos, byte value);
 
     @Override
     public Block getBlockAt(Vector3i pos) {

@@ -25,7 +25,7 @@ import org.terasology.utilities.procedural.Noise;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkAPI;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -112,17 +112,17 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
     }
 
     @Override
-    public void generateChunk(ChunkAPI c) {
-        double[][][] densityMap = new double[Chunk.SIZE_X + 1][Chunk.SIZE_Y + 1][Chunk.SIZE_Z + 1];
+    public void generateChunk(Chunk chunk) {
+        double[][][] densityMap = new double[chunk.getChunkSizeX() + 1][chunk.getChunkSizeY() + 1][chunk.getChunkSizeZ() + 1];
 
         /*
          * Create the density map at a lower sample rate.
          */
-        for (int x = 0; x <= Chunk.SIZE_X; x += SAMPLE_RATE_3D_HOR) {
-            for (int z = 0; z <= Chunk.SIZE_Z; z += SAMPLE_RATE_3D_HOR) {
-                for (int y = 0; y <= Chunk.SIZE_Y; y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcDensity(c.getBlockWorldPosX(x),
-                            y, c.getBlockWorldPosZ(z));
+        for (int x = 0; x <= chunk.getChunkSizeX(); x += SAMPLE_RATE_3D_HOR) {
+            for (int z = 0; z <= chunk.getChunkSizeZ(); z += SAMPLE_RATE_3D_HOR) {
+                for (int y = 0; y <= chunk.getChunkSizeY(); y += SAMPLE_RATE_3D_VERT) {
+                    densityMap[x][y][z] = calcDensity(chunk.getBlockWorldPosX(x),
+                            y, chunk.getBlockWorldPosZ(z));
                 }
             }
         }
@@ -135,29 +135,29 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
         /*
          * Generate the chunk from the density map.
          */
-        for (int x = 0; x < Chunk.SIZE_X; x++) {
-            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+        for (int x = 0; x < chunk.getChunkSizeX(); x++) {
+            for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(
-                        c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                        chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
+                for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
 
                     if (y == 0) { // The very deepest layer of the world is an
                         // indestructible mantle
-                        c.setBlock(x, y, z, mantle);
+                        chunk.setBlock(x, y, z, mantle);
                         break;
                     }
 
                     if (y <= 32 && y > 0) { // Ocean
-                        c.setBlock(x, y, z, water);
-                        c.setLiquid(x, y, z, new LiquidData(LiquidType.WATER,
-                                Chunk.MAX_LIQUID_DEPTH));
+                        chunk.setBlock(x, y, z, water);
+                        chunk.setLiquid(x, y, z, new LiquidData(LiquidType.WATER,
+                                LiquidData.MAX_LIQUID_DEPTH));
 
                         if (y == 32) {
                             // Ice layer
                             if (type == WorldBiomeProvider.Biome.SNOW) {
-                                c.setBlock(x, y, z, ice);
+                                chunk.setBlock(x, y, z, ice);
                             }
                         }
                     }
@@ -171,10 +171,10 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7) {
-                            generateOuterLayer(x, y, z, firstBlockHeight, c, type);
+                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), y, chunk.getBlockWorldPosZ(z)) > -0.7) {
+                            generateOuterLayer(x, y, z, firstBlockHeight, chunk, type);
                         } else {
-                            c.setBlock(x, y, z, air);
+                            chunk.setBlock(x, y, z, air);
                         }
 
                         continue;
@@ -185,11 +185,11 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y,
-                                c.getBlockWorldPosZ(z)) > -0.6) {
-                            generateInnerLayer(x, y, z, c, type);
+                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), y,
+                                chunk.getBlockWorldPosZ(z)) > -0.6) {
+                            generateInnerLayer(x, y, z, chunk, type);
                         } else {
-                            c.setBlock(x, y, z, air);
+                            chunk.setBlock(x, y, z, air);
                         }
 
                         continue;
@@ -202,7 +202,7 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
         }
     }
 
-    private void generateInnerLayer(int x, int y, int z, ChunkAPI c,
+    private void generateInnerLayer(int x, int y, int z, Chunk c,
                                     WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at
         // org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
@@ -210,7 +210,7 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
     }
 
     private void generateOuterLayer(int x, int y, int z, int firstBlockHeight,
-                                    ChunkAPI c, WorldBiomeProvider.Biome type) {
+                                    Chunk c, WorldBiomeProvider.Biome type) {
         // TODO Add more complicated layers
         // And we need more biomes
         int depth = (firstBlockHeight - y);
@@ -264,9 +264,9 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
     }
 
     private void triLerpDensityMap(double[][][] densityMap) {
-        for (int x = 0; x < Chunk.SIZE_X; x++) {
-            for (int y = 0; y < Chunk.SIZE_Y; y++) {
-                for (int z = 0; z < Chunk.SIZE_Z; z++) {
+        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
+            for (int y = 0; y < ChunkConstants.SIZE_Y; y++) {
+                for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                     if (!(x % SAMPLE_RATE_3D_HOR == 0
                             && y % SAMPLE_RATE_3D_VERT == 0 && z
                             % SAMPLE_RATE_3D_HOR == 0)) {
@@ -325,8 +325,8 @@ public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGen
         double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
         //returned to original
-        int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
+        int plateauArea = (int) (ChunkConstants.SIZE_Y * 0.10);
+        double flatten = TeraMath.clamp(((ChunkConstants.SIZE_Y - 16) - y) / plateauArea);
 
         return -y
                 + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath

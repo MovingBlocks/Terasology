@@ -26,7 +26,7 @@ import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkAPI;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -98,56 +98,56 @@ public class BasicHMTerrainGenerator implements BiomeProviderDependentFirstPassG
      * Generate the local contents of a chunk. This should be purely deterministic from the chunk contents, chunk
      * position and world seed - should not depend on external state or other data.
      *
-     * @param c
+     * @param chunk
      */
-    public void generateChunk(ChunkAPI c) {
+    public void generateChunk(Chunk chunk) {
 
-        int hmX = (((c.getChunkWorldPosX() / Chunk.SIZE_X) % 512) + 512) % 512;
-        int hmZ = (((c.getChunkWorldPosZ() / Chunk.SIZE_Z) % 512) + 512) % 512;
+        int hmX = (((chunk.getChunkWorldPosX() / chunk.getChunkSizeX()) % 512) + 512) % 512;
+        int hmZ = (((chunk.getChunkWorldPosZ() / chunk.getChunkSizeZ()) % 512) + 512) % 512;
 
-        double scaleFactor = 0.05 * Chunk.SIZE_Y;
+        double scaleFactor = 0.05 * chunk.getChunkSizeY();
 
         double p00 = heightmap[hmX][hmZ] * scaleFactor;
         double p10 = heightmap[(hmX - 1 + 512) % 512][(hmZ) % 512] * scaleFactor;
         double p11 = heightmap[(hmX - 1 + 512) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
         double p01 = heightmap[(hmX) % 512][(hmZ + 1 + 512) % 512] * scaleFactor;
 
-        for (int x = 0; x < Chunk.SIZE_X; x++) {
-            for (int z = 0; z < Chunk.SIZE_Z; z++) {
+        for (int x = 0; x < chunk.getChunkSizeX(); x++) {
+            for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(
-                        c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
+                        chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
                 //calculate avg height
-                double interpolatedHeight = lerp(x / (double) Chunk.SIZE_X, lerp(z / (double) Chunk.SIZE_Z, p10, p11), lerp(z / (double) Chunk.SIZE_Z, p00, p01));
+                double interpolatedHeight = lerp(x / (double) chunk.getChunkSizeX(), lerp(z / (double) chunk.getChunkSizeZ(), p10, p11), lerp(z / (double) chunk.getChunkSizeZ(), p00, p01));
 
 
                 //Scale the height to fit one chunk (suppose we have max height 20 on the Heigthmap
                 //ToDo: Change this formula in later implementation of vertical chunks
                 double threshold = Math.floor(interpolatedHeight);
 
-                for (int y = Chunk.SIZE_Y - 1; y >= 0; y--) {
+                for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
                     if (y == 0) { // The very deepest layer of the world is an
                         // indestructible mantle
-                        c.setBlock(x, y, z, mantle);
+                        chunk.setBlock(x, y, z, mantle);
                         break;
                     } else if (y < threshold) {
-                        c.setBlock(x, y, z, stone);
+                        chunk.setBlock(x, y, z, stone);
                     } else if (y == threshold) {
-                        if (y < Chunk.SIZE_Y * 0.05 + 1) {
-                            c.setBlock(x, y, z, sand);
-                        } else if (y < Chunk.SIZE_Y * 0.05 * 12) {
-                            c.setBlock(x, y, z, grass);
+                        if (y < chunk.getChunkSizeY() * 0.05 + 1) {
+                            chunk.setBlock(x, y, z, sand);
+                        } else if (y < chunk.getChunkSizeY() * 0.05 * 12) {
+                            chunk.setBlock(x, y, z, grass);
                         } else {
-                            c.setBlock(x, y, z, snow);
+                            chunk.setBlock(x, y, z, snow);
                         }
                     } else {
-                        if (y <= Chunk.SIZE_Y / 20) { // Ocean
-                            c.setBlock(x, y, z, water);
-                            c.setLiquid(x, y, z, new LiquidData(LiquidType.WATER,
-                                    Chunk.MAX_LIQUID_DEPTH));
+                        if (y <= chunk.getChunkSizeY() / 20) { // Ocean
+                            chunk.setBlock(x, y, z, water);
+                            chunk.setLiquid(x, y, z, new LiquidData(LiquidType.WATER,
+                                    LiquidData.MAX_LIQUID_DEPTH));
 
                         } else {
-                            c.setBlock(x, y, z, air);
+                            chunk.setBlock(x, y, z, air);
                         }
                     }
                 }

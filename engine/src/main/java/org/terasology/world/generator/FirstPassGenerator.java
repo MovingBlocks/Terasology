@@ -17,7 +17,7 @@
 package org.terasology.world.generator;
 
 import org.terasology.engine.API;
-import org.terasology.world.chunks.ChunkAPI;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius
@@ -32,6 +32,6 @@ public interface FirstPassGenerator extends BaseChunkGenerator {
      *
      * @param chunk
      */
-    void generateChunk(ChunkAPI chunk);
+    void generateChunk(Chunk chunk);
 
 }

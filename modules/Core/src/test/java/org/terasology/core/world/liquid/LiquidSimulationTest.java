@@ -23,14 +23,15 @@ import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.internal.ChunkViewCoreImpl;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.ChunkView;
-import org.terasology.world.RegionalChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -47,11 +48,11 @@ public class LiquidSimulationTest extends TerasologyTestingEnvironment {
 
     @Before
     public void setup() {
-        Chunk[] chunks = new Chunk[]{new Chunk(new Vector3i(-1, 0, -1)), new Chunk(new Vector3i(0, 0, -1)), new Chunk(new Vector3i(1, 0, -1)),
-                new Chunk(new Vector3i(-1, 0, 0)), new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)),
-                new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
+        ChunkImpl[] chunks = new ChunkImpl[]{new ChunkImpl(new Vector3i(-1, 0, -1)), new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
+                new ChunkImpl(new Vector3i(-1, 0, 0)), new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)),
+                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), new ChunkImpl(new Vector3i(1, 0, 1))};
 
-        view = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        view = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         view.lock();
 
 
@@ -63,8 +64,8 @@ public class LiquidSimulationTest extends TerasologyTestingEnvironment {
         dirt.setId((byte) 1);
         blockManager.addBlockFamily(new SymmetricFamily(dirt.getURI(), dirt), true);
 
-        for (int x = -Chunk.SIZE_X + 1; x < 2 * Chunk.SIZE_X; ++x) {
-            for (int z = -Chunk.SIZE_Z + 1; z < 2 * Chunk.SIZE_Z; ++z) {
+        for (int x = -ChunkConstants.SIZE_X + 1; x < 2 * ChunkConstants.SIZE_X; ++x) {
+            for (int z = -ChunkConstants.SIZE_Z + 1; z < 2 * ChunkConstants.SIZE_Z; ++z) {
                 view.setBlock(x, 0, z, dirt);
             }
         }

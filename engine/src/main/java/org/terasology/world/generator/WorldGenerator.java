@@ -20,7 +20,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkAPI;
 
 /**
  * @author Immortius
@@ -33,7 +32,7 @@ public interface WorldGenerator {
 
     void applySecondPass(Vector3i chunkPos, ChunkView view);
 
-    void createChunk(ChunkAPI chunk);
+    void createChunk(Chunk chunk);
 
     float getFog(float x, float y, float z);
 

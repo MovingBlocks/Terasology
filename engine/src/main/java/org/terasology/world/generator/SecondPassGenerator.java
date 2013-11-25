@@ -18,12 +18,12 @@ package org.terasology.world.generator;
 
 import org.terasology.engine.API;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkViewAPI;
+import org.terasology.world.ChunkView;
 
 /**
  * @author Immortius
  */
 @API
 public interface SecondPassGenerator extends BaseChunkGenerator {
-    void postProcessChunk(Vector3i chunkPos, ChunkViewAPI view);
+    void postProcessChunk(Vector3i chunkPos, ChunkView view);
 }

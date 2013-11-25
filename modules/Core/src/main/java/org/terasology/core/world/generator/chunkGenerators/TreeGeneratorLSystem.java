@@ -19,7 +19,7 @@ import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.ChunkViewAPI;
+import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 
 import javax.vecmath.AxisAngle4f;
@@ -63,7 +63,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(ChunkViewAPI view, Random rand, int posX, int posY, int posZ) {
+    public void generate(ChunkView view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
         Matrix4f rotation = new Matrix4f();
@@ -74,7 +74,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
-    private void recurse(ChunkViewAPI view, Random rand, int posX, int posY, int posZ, float angleOffset,
+    private void recurse(ChunkView view, Random rand, int posX, int posY, int posZ, float angleOffset,
                          CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         while (axiomIterator.hasNext()) {

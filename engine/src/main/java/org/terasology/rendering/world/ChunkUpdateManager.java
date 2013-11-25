@@ -22,9 +22,10 @@ import org.terasology.engine.GameEngine;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewCore;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +45,7 @@ public final class ChunkUpdateManager {
     private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
 
     /* CHUNK UPDATES */
-    private final Set<Chunk> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<Chunk, Boolean>());
+    private final Set<ChunkImpl> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<ChunkImpl, Boolean>());
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
@@ -63,7 +64,7 @@ public final class ChunkUpdateManager {
      * @return True if a chunk update was executed
      */
     // TODO: Review this system
-    public boolean queueChunkUpdate(Chunk chunk, final UpdateType type) {
+    public boolean queueChunkUpdate(ChunkImpl chunk, final UpdateType type) {
 
         if (!currentlyProcessedChunks.contains(chunk) && (currentlyProcessedChunks.size() < MAX_THREADS || type != UpdateType.DEFAULT)) {
             executeChunkUpdate(chunk);
@@ -73,25 +74,25 @@ public final class ChunkUpdateManager {
         return false;
     }
 
-    private void executeChunkUpdate(final Chunk c) {
+    private void executeChunkUpdate(final ChunkImpl c) {
         currentlyProcessedChunks.add(c);
 
         CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider, this));
     }
 
-    private void finishedProcessing(Chunk c) {
+    private void finishedProcessing(ChunkImpl c) {
         currentlyProcessedChunks.remove(c);
     }
 
 
     private static class ChunkUpdater implements Runnable {
 
-        private Chunk c;
+        private ChunkImpl c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
         private ChunkUpdateManager chunkUpdateManager;
 
-        public ChunkUpdater(Chunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkUpdateManager chunkUpdateManager) {
+        public ChunkUpdater(ChunkImpl chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkUpdateManager chunkUpdateManager) {
             this.chunkUpdateManager = chunkUpdateManager;
             this.c = chunk;
             this.tessellator = tessellator;
@@ -101,12 +102,12 @@ public final class ChunkUpdateManager {
         @Override
         public void run() {
             ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-            ChunkView chunkView = worldProvider.getLocalView(c.getPos());
+            ChunkViewCore chunkView = worldProvider.getLocalView(c.getPos());
             if (chunkView != null) {
                 c.setDirty(false);
                 for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
-                    int meshHeight = Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS;
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), meshHeight, seg * (Chunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
+                    int meshHeight = ChunkConstants.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS;
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
                 }
 
                 c.setPendingMesh(newMeshes);

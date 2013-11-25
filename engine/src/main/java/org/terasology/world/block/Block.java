@@ -37,7 +37,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Matrix4f;
@@ -49,9 +49,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.
@@ -485,7 +483,7 @@ public final class Block {
     }
 
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunk.MAX_LIGHT);
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
 
     public Vector3f getTint() {
