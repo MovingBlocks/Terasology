@@ -197,6 +197,7 @@ idea {
     project {
         // Set JDK
         jdkName = '1.7'
+		wildcards -= '!?*.groovy'
 
         ipr {
             withXml { xmlProvider ->
@@ -207,7 +208,6 @@ idea {
                 ideaActivateCopyright(iprNode)
                 ideaActivateAnnotations(iprNode)
                 ideaActivateGit(iprNode)
-                //ideaExcludeLogbackGroovy(iprNode)
                 ideaActivateGradle(iprNode)
             }
 

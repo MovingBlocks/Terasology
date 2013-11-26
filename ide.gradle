@@ -102,23 +102,6 @@ ext {
         }
     }
 
-    // Exclude the directory where the logback Groovy file hangs out from execution (but not subdirs)
-    ideaExcludeLogbackGroovy = { Node iprNode ->
-        def compilerConf = iprNode.find { it.@name == 'CompilerConfiguration' }
-        //println "Compiler conf: " + compilerConf
-
-        def compilerExclude = compilerConf.excludeFromCompile
-
-        // Add the exclude if missing - could get trickier later if we need more than one exclude? Then the node might exist already
-        if (compilerExclude == []) {
-            compilerExclude = compilerConf.appendNode('excludeFromCompile')
-            compilerExclude.appendNode('directory', [
-                    'url' : 'file://$PROJECT_DIR$/facades/PC/src/main/resources',
-                    'includeSubdirectories' : 'false'
-            ])
-        }
-    }
-
     // Activate 'Gradle' plugin - TODO: Doesn't actually work with the Gradle wrapper in a non-default location :-(
     ideaActivateGradle = { Node iprNode ->
         def gradleSettings = iprNode.component.find { it.@name == 'GradleSettings' }

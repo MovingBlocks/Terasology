@@ -540,6 +540,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
         moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.util");
         moduleSecurityManager.addAPIPackage("java.util.concurrent");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
