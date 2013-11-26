@@ -17,7 +17,6 @@
 package org.terasology.config;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.world.WorldBiomeProvider.Biome;
 
 /**
  * @author Immortius
@@ -31,7 +30,7 @@ public class WorldGenerationConfig {
     private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Terasology";
 
-    private SimpleUri defaultGenerator = new SimpleUri("engine:perlin");
+    private SimpleUri defaultGenerator = new SimpleUri("core:perlin");
 
     public String getWorldTitle() {
         return worldTitle;
@@ -39,82 +38,6 @@ public class WorldGenerationConfig {
 
     public void setWorldTitle(String worldTitle) {
         this.worldTitle = worldTitle;
-    }
-
-    public float getForestGrassDensity() {
-        return forestGrassDensity;
-    }
-
-    public void setForestGrassDensity(float forestGrassDensity) {
-        this.forestGrassDensity = forestGrassDensity;
-    }
-
-    public float getPlainsGrassDensity() {
-        return plainsGrassDensity;
-    }
-
-    public void setPlainsGrassDensity(float plainsGrassDensity) {
-        this.plainsGrassDensity = plainsGrassDensity;
-    }
-
-    public float getSnowGrassDensity() {
-        return snowGrassDensity;
-    }
-
-    public void setSnowGrassDensity(float snowGrassDensity) {
-        this.snowGrassDensity = snowGrassDensity;
-    }
-
-    public float getMountainGrassDensity() {
-        return mountainGrassDensity;
-    }
-
-    public void setMountainGrassDensity(float mountainGrassDensity) {
-        this.mountainGrassDensity = mountainGrassDensity;
-    }
-
-    public float getDesertGrassDensity() {
-        return desertGrassDensity;
-    }
-
-    public void setDesertGrassDensity(float desertGrassDensity) {
-        this.desertGrassDensity = desertGrassDensity;
-    }
-
-    public float getGrassDensity(Biome biome) {
-        switch (biome) {
-            case PLAINS:
-                return getPlainsGrassDensity();
-            case MOUNTAINS:
-                return getMountainGrassDensity();
-            case FOREST:
-                return getForestGrassDensity();
-            case SNOW:
-                return getSnowGrassDensity();
-            case DESERT:
-                return getDesertGrassDensity();
-        }
-        return 1.0f;
-    }
-
-    public void setGrassDensity(Biome biome, float density) {
-        switch (biome) {
-            case PLAINS:
-                setPlainsGrassDensity(density);
-                break;
-            case MOUNTAINS:
-                setMountainGrassDensity(density);
-                break;
-            case FOREST:
-                setForestGrassDensity(density);
-                break;
-            case SNOW:
-                setSnowGrassDensity(density);
-                break;
-            case DESERT:
-                setDesertGrassDensity(density);
-                break;
-        }
     }
 
     public String getDefaultSeed() {

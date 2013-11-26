@@ -15,8 +15,8 @@
  */
 package org.terasology.benchmark.chunks.arrays;
 
-import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.Benchmarks;
+import org.terasology.benchmark.Benchmark;
 import org.terasology.benchmark.PrintToConsoleCallback;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 

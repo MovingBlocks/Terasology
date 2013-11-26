@@ -53,7 +53,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
@@ -85,7 +85,7 @@ public class ServerImpl implements Server {
 
     private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
-    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<ChunkImpl> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
@@ -170,9 +170,9 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks() {
         if (remoteWorldProvider != null) {
-            List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
+            List<ChunkImpl> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
             chunkQueue.drainTo(chunks);
-            for (Chunk chunk : chunks) {
+            for (ChunkImpl chunk : chunks) {
                 remoteWorldProvider.receiveChunk(chunk);
             }
         }
@@ -288,7 +288,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            Chunk chunk = Chunks.getInstance().decode(chunkInfo);
+            ChunkImpl chunk = Chunks.getInstance().decode(chunkInfo);
             chunkQueue.offer(chunk);
         }
     }

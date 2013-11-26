@@ -276,8 +276,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     private void renderBlockParticles(Vector3f worldPos, Vector3f cameraPosition, BlockParticleEffectComponent particleEffect) {
-        float temperature = worldProvider.getBiomeProvider().getTemperatureAt((int) worldPos.x, (int) worldPos.z);
-        float humidity = worldProvider.getBiomeProvider().getHumidityAt((int) worldPos.x, (int) worldPos.z);
+        float temperature = worldProvider.getTemperature(worldPos);
+        float humidity = worldProvider.getHumidity(worldPos);
 
         glPushMatrix();
         glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);

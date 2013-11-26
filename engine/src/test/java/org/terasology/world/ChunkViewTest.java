@@ -29,7 +29,9 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.internal.ChunkViewCoreImpl;
 
 import java.io.IOException;
 
@@ -57,75 +59,75 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Test
     public void simpleWorldView() {
-        Chunk chunk = new Chunk(new Vector3i());
+        ChunkImpl chunk = new ChunkImpl(new Vector3i());
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        ChunkView chunkView = new RegionalChunkView(new Chunk[]{chunk}, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), new Vector3i());
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(new ChunkImpl[]{chunk}, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), new Vector3i());
         assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
     public void offsetWorldView() {
-        Chunk chunk = new Chunk(new Vector3i());
+        ChunkImpl chunk = new ChunkImpl(new Vector3i());
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new Chunk(new Vector3i(-1, 0, -1)), new Chunk(new Vector3i(0, 0, -1)), new Chunk(new Vector3i(1, 0, -1)),
-                new Chunk(new Vector3i(-1, 0, 0)), chunk, new Chunk(new Vector3i(1, 0, 0)),
-                new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
+        ChunkImpl[] chunks = new ChunkImpl[]{new ChunkImpl(new Vector3i(-1, 0, -1)), new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
+                new ChunkImpl(new Vector3i(-1, 0, 0)), chunk, new ChunkImpl(new Vector3i(1, 0, 0)),
+                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), new ChunkImpl(new Vector3i(1, 0, 1))};
 
-        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
     public void offsetWorldViewBeforeMainChunk() {
-        Chunk chunk = new Chunk(new Vector3i());
+        ChunkImpl chunk = new ChunkImpl(new Vector3i());
         chunk.setBlock(new Vector3i(15, 0, 15), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{chunk, new Chunk(new Vector3i(0, 0, -1)), new Chunk(new Vector3i(1, 0, -1)),
-                new Chunk(new Vector3i(-1, 0, 0)), new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)),
-                new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), new Chunk(new Vector3i(1, 0, 1))};
+        ChunkImpl[] chunks = new ChunkImpl[]{chunk, new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
+                new ChunkImpl(new Vector3i(-1, 0, 0)), new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)),
+                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), new ChunkImpl(new Vector3i(1, 0, 1))};
 
-        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         assertEquals(solidBlock, chunkView.getBlock(-1, 0, -1));
     }
 
     @Test
     public void offsetWorldViewAfterMainChunk() {
-        Chunk chunk = new Chunk(new Vector3i());
+        ChunkImpl chunk = new ChunkImpl(new Vector3i());
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new Chunk(-1, 0, -1), new Chunk(new Vector3i(0, 0, -1)), new Chunk(new Vector3i(1, 0, -1)),
-                new Chunk(new Vector3i(-1, 0, 0)), new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)),
-                new Chunk(new Vector3i(-1, 0, 1)), new Chunk(new Vector3i(0, 0, 1)), chunk};
+        ChunkImpl[] chunks = new ChunkImpl[]{new ChunkImpl(-1, 0, -1), new ChunkImpl(new Vector3i(0, 0, -1)), new ChunkImpl(new Vector3i(1, 0, -1)),
+                new ChunkImpl(new Vector3i(-1, 0, 0)), new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)),
+                new ChunkImpl(new Vector3i(-1, 0, 1)), new ChunkImpl(new Vector3i(0, 0, 1)), chunk};
 
-        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(0, 0, 0), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         assertEquals(solidBlock, chunkView.getBlock(16, 0, 16));
     }
 
     @Test
     public void offsetChunksWorldView() {
-        Chunk chunk = new Chunk(new Vector3i(1, 0, 1));
+        ChunkImpl chunk = new ChunkImpl(new Vector3i(1, 0, 1));
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)), new Chunk(new Vector3i(2, 0, 0)),
-                new Chunk(new Vector3i(0, 0, 1)), chunk, new Chunk(new Vector3i(2, 0, 1)),
-                new Chunk(new Vector3i(0, 0, 2)), new Chunk(new Vector3i(1, 0, 2)), new Chunk(new Vector3i(2, 0, 2))};
+        ChunkImpl[] chunks = new ChunkImpl[]{new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)), new ChunkImpl(new Vector3i(2, 0, 0)),
+                new ChunkImpl(new Vector3i(0, 0, 1)), chunk, new ChunkImpl(new Vector3i(2, 0, 1)),
+                new ChunkImpl(new Vector3i(0, 0, 2)), new ChunkImpl(new Vector3i(1, 0, 2)), new ChunkImpl(new Vector3i(2, 0, 2))};
 
-        ChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        ChunkViewCore chunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
         assertEquals(solidBlock, chunkView.getBlock(0, 0, 0));
     }
 
     @Test
     public void localToWorld() {
-        Chunk chunk = new Chunk(new Vector3i(1, 0, 1));
+        ChunkImpl chunk = new ChunkImpl(new Vector3i(1, 0, 1));
         chunk.setBlock(new Vector3i(0, 0, 0), solidBlock);
 
-        Chunk[] chunks = new Chunk[]{new Chunk(new Vector3i(0, 0, 0)), new Chunk(new Vector3i(1, 0, 0)), new Chunk(new Vector3i(2, 0, 0)),
-                new Chunk(new Vector3i(0, 0, 1)), chunk, new Chunk(new Vector3i(2, 0, 1)),
-                new Chunk(new Vector3i(0, 0, 2)), new Chunk(new Vector3i(1, 0, 2)), new Chunk(new Vector3i(2, 0, 2))};
+        ChunkImpl[] chunks = new ChunkImpl[]{new ChunkImpl(new Vector3i(0, 0, 0)), new ChunkImpl(new Vector3i(1, 0, 0)), new ChunkImpl(new Vector3i(2, 0, 0)),
+                new ChunkImpl(new Vector3i(0, 0, 1)), chunk, new ChunkImpl(new Vector3i(2, 0, 1)),
+                new ChunkImpl(new Vector3i(0, 0, 2)), new ChunkImpl(new Vector3i(1, 0, 2)), new ChunkImpl(new Vector3i(2, 0, 2))};
 
-        RegionalChunkView chunkView = new RegionalChunkView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
-        assertEquals(new Vector3i(Chunk.SIZE_X, 0, Chunk.SIZE_Z), chunkView.toWorldPos(Vector3i.zero()));
+        ChunkViewCoreImpl chunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1, 0, 1)), new Vector3i(1, 1, 1));
+        assertEquals(new Vector3i(ChunkConstants.SIZE_X, 0, ChunkConstants.SIZE_Z), chunkView.toWorldPos(Vector3i.zero()));
     }
 }

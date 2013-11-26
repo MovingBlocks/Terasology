@@ -18,7 +18,7 @@ package org.terasology.monitoring.impl;
 import com.google.common.base.Preconditions;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.Date;
@@ -89,10 +89,10 @@ public abstract class ChunkMonitorEvent {
 
     public static class StateChanged extends BasicChunkEvent {
 
-        public final Chunk.State oldState;
-        public final Chunk.State newState;
+        public final ChunkImpl.State oldState;
+        public final ChunkImpl.State newState;
 
-        public StateChanged(Vector3i position, Chunk.State oldState, Chunk.State newState) {
+        public StateChanged(Vector3i position, ChunkImpl.State oldState, ChunkImpl.State newState) {
             super(position);
             this.oldState = oldState;
             this.newState = newState;

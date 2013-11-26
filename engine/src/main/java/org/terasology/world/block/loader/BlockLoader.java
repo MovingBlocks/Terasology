@@ -397,6 +397,8 @@ public class BlockLoader implements BlockBuilderHelper {
         block.setLiquid(def.liquid);
         block.setWater(def.water);
         block.setLava(def.lava);
+        block.setGrass(def.grass);
+        block.setIce(def.ice);
         block.setHardness(def.hardness);
         block.setAttachmentAllowed(def.attachmentAllowed);
         block.setReplacementAllowed(def.replacementAllowed);

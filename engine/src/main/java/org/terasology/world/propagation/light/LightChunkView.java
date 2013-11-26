@@ -16,7 +16,7 @@
 package org.terasology.world.propagation.light;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
+import org.terasology.world.ChunkViewCore;
 import org.terasology.world.propagation.AbstractChunkView;
 
 /**
@@ -24,17 +24,17 @@ import org.terasology.world.propagation.AbstractChunkView;
  */
 public class LightChunkView extends AbstractChunkView {
 
-    public LightChunkView(ChunkView chunkView) {
+    public LightChunkView(ChunkViewCore chunkView) {
         super(chunkView);
     }
 
     @Override
-    protected byte getValueAt(ChunkView view, Vector3i pos) {
+    protected byte getValueAt(ChunkViewCore view, Vector3i pos) {
         return view.getLight(pos);
     }
 
     @Override
-    protected void setValueAt(ChunkView view, Vector3i pos, byte value) {
+    protected void setValueAt(ChunkViewCore view, Vector3i pos, byte value) {
         view.setLight(pos, value);
     }
 }

@@ -48,11 +48,6 @@ public interface WorldProviderCore {
     WorldInfo getWorldInfo();
 
     /**
-     * @return Thw world's biome provider
-     */
-    WorldBiomeProvider getBiomeProvider();
-
-    /**
      * Process any propagation, such as light
      */
     void processPropagation();
@@ -68,13 +63,13 @@ public interface WorldProviderCore {
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    ChunkView getLocalView(Vector3i chunkPos);
+    ChunkViewCore getLocalView(Vector3i chunkPos);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    ChunkView getWorldViewAround(Vector3i chunk);
+    ChunkViewCore getWorldViewAround(Vector3i chunk);
 
 
     /**
@@ -157,4 +152,7 @@ public interface WorldProviderCore {
 
     float getFog(float x, float y, float z);
 
+    float getTemperature(float x, float y, float z);
+
+    float getHumidity(float x, float y, float z);
 }

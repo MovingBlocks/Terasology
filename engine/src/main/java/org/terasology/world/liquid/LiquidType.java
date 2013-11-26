@@ -16,9 +16,12 @@
 
 package org.terasology.world.liquid;
 
+import org.terasology.engine.API;
+
 /**
  * @author Immortius
  */
+@API
 public enum LiquidType {
     WATER(0),
     LAVA(1);

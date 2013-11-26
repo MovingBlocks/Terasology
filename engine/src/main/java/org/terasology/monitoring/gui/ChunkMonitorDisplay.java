@@ -31,7 +31,7 @@ import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.swing.*;
 import java.awt.*;
@@ -665,7 +665,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private Color calcChunkColor(ChunkMonitorEntry entry) {
-            final Chunk chunk = entry.getLatestChunk();
+            final ChunkImpl chunk = entry.getLatestChunk();
 
             if (chunk == null) {
                 return COLOR_DEAD;

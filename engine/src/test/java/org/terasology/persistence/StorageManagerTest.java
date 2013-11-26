@@ -47,7 +47,7 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
 import java.nio.file.FileSystem;
@@ -246,7 +246,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void storeAndRestoreChunkStore() {
-        Chunk chunk = new Chunk(CHUNK_POS);
+        ChunkImpl chunk = new ChunkImpl(CHUNK_POS);
         ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
         chunk.setBlock(0, 0, 0, testBlock);
         chunkStore.save();
@@ -260,7 +260,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void chunkSurvivesStorageSaveAndRestore() throws Exception {
-        Chunk chunk = new Chunk(CHUNK_POS);
+        ChunkImpl chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
         chunkStore.save();
@@ -280,7 +280,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     @Test
     public void entitySurvivesStorageInChunkStore() throws Exception {
-        Chunk chunk = new Chunk(CHUNK_POS);
+        ChunkImpl chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
         EntityRef entity = entityManager.create();

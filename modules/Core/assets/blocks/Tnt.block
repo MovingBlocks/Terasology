@@ -19,10 +19,10 @@
  */
 {
     "tiles" : {
-        "top" : "core:TntTop",
-        "bottom" : "core:TntBottom"
+        "top" : "TntTop",
+        "bottom" : "TntBottom"
     },
     "entity" : {
-        "prefab" : "core:TNT"
+        "prefab" : "TNT"
     }
 }

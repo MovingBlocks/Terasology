@@ -121,4 +121,14 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     public float getFog(Vector3f pos) {
         return core.getFog(pos.x, pos.y, pos.z);
     }
+
+    @Override
+    public float getTemperature(Vector3f pos) {
+        return core.getTemperature(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public float getHumidity(Vector3f pos) {
+        return core.getHumidity(pos.x, pos.y, pos.z);
+    }
 }
