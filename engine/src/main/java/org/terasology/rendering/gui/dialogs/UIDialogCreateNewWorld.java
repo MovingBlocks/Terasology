@@ -79,7 +79,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     private boolean createServerGame;
     private ModuleSelection selection;
-    private UIButton previewButton;
 
     public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));
@@ -123,10 +122,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         Vector2f previewPos = inputSeed.getPosition();
         previewPos.x += inputSeed.getSize().x;
         previewPos.x += 8;
-        
-        previewButton.setPosition(previewPos);
-        parent.addDisplayElement(previewButton);
-
 
         content.orderDisplayElementTop(worldGenerator);
         parent.layout();
