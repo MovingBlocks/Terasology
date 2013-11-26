@@ -231,7 +231,6 @@ public class TerasologyEngine implements GameEngine {
             config.save();
         }
         logger.info("Video Settings: " + config.getRendering().toString());
-        logger.info("Video Debug Settings: " + config.getRendering().getDebug().toString());
         CoreRegistry.putPermanently(Config.class, config);
     }
 

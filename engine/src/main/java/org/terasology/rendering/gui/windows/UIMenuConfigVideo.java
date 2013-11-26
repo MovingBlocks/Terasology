@@ -397,7 +397,6 @@ public class UIMenuConfigVideo extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 logger.info("Video Settings: " + config.getRendering().toString());
-                logger.info("Video Debug Settings: " + config.getRendering().getDebug().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
 
                 getGUIManager().openWindow("config");

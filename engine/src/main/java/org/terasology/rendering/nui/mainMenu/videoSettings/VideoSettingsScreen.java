@@ -162,7 +162,6 @@ public class VideoSettingsScreen extends UIScreen {
             @Override
             public void onButtonActivated(UIButton button) {
                 logger.info("Video Settings: " + config.getRendering().toString());
-                logger.info("Video Debug Settings: " + config.getRendering().getDebug().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
                 TerasologyEngine te = (TerasologyEngine) engine;
                 if (te.isFullscreen() != find("fullscreen", UICheckbox.class).isChecked()) {
