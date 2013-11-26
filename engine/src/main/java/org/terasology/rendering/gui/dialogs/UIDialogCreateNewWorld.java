@@ -103,8 +103,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         createSeedInput();
         createWorldGeneratorInput();
 
-        createPreviewButton();
-
         ColumnLayout layout = new ColumnLayout();
         layout.setSpacingVertical(4);
         layout.setBorder(20);
@@ -144,31 +142,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(modButton);
         parent.addDisplayElement(okButton);
         parent.addDisplayElement(cancelButton);
-    }
-
-    private void createPreviewButton() {
-        previewButton = new UIButton(new Vector2f(96, 32), UIButton.ButtonType.NORMAL);
-
-        previewButton.setVisible(true);
-        previewButton.getLabel().setText("Preview...");
-        previewButton.addClickListener(new ClickListener() {
-
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
-
-                UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
-                dialog.addDialogListener(new DialogListener() {
-                    @Override
-                    public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
-                        if (returnCode == EReturnCode.OK) {
-                            inputSeed.setText((String) returnValue);
-                        }
-                    }
-                });
-                dialog.open();
-            }
-        });
     }
 
     private void createWorldTitleInput() {
