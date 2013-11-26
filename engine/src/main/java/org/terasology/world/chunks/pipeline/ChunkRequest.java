@@ -23,8 +23,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.utilities.concurrency.Task;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
@@ -102,13 +102,13 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     private void checkState(Vector3i pos) {
-        Chunk chunk = provider.getChunkForProcessing(pos);
+        ChunkImpl chunk = provider.getChunkForProcessing(pos);
         if (chunk != null) {
             checkState(chunk);
         }
     }
 
-    private void checkState(Chunk chunk) {
+    private void checkState(ChunkImpl chunk) {
         switch (chunk.getChunkState()) {
             case ADJACENCY_GENERATION_PENDING:
                 checkReadyForSecondPass(chunk);
@@ -122,7 +122,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     private void checkOrCreateChunk(Vector3i chunkPos) {
-        Chunk chunk = provider.getChunkForProcessing(chunkPos);
+        ChunkImpl chunk = provider.getChunkForProcessing(chunkPos);
         if (chunk == null) {
             provider.createOrLoadChunk(chunkPos);
         } else {
@@ -130,12 +130,12 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         }
     }
 
-    private void checkReadyForSecondPass(Chunk chunk) {
+    private void checkReadyForSecondPass(ChunkImpl chunk) {
         Vector3i pos = chunk.getPos();
-        if (chunk.getChunkState() == Chunk.State.ADJACENCY_GENERATION_PENDING) {
+        if (chunk.getChunkState() == ChunkImpl.State.ADJACENCY_GENERATION_PENDING) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = provider.getChunkForProcessing(adjPos);
+                    ChunkImpl adjChunk = provider.getChunkForProcessing(adjPos);
                     if (adjChunk == null) {
                         return;
                     }
@@ -146,14 +146,14 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         }
     }
 
-    private void checkReadyToDoInternalLighting(Chunk chunk) {
+    private void checkReadyToDoInternalLighting(ChunkImpl chunk) {
         Vector3i pos = chunk.getPos();
-        if (chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+        if (chunk.getChunkState() == ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
             if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority()) {
                 for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
                     if (!adjPos.equals(pos)) {
-                        Chunk adjChunk = provider.getChunkForProcessing(adjPos);
-                        if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
+                        ChunkImpl adjChunk = provider.getChunkForProcessing(adjPos);
+                        if (adjChunk == null || adjChunk.getChunkState().compareTo(ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
                             return;
                         }
                     }

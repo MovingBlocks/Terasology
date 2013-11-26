@@ -17,8 +17,9 @@
 package org.terasology.world.chunks.internal;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.ChunkViewCore;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.generator.WorldGenerator;
 
 /**
  * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including
@@ -26,7 +27,7 @@ import org.terasology.world.chunks.Chunk;
  *
  * @author Immortius
  */
-public interface GeneratingChunkProvider {
+public interface GeneratingChunkProvider extends ChunkProvider {
 
     /**
      * @param pos
@@ -40,7 +41,7 @@ public interface GeneratingChunkProvider {
      * @param pos
      * @return The requested chunk, or null if it isn't currently loaded.
      */
-    Chunk getChunkForProcessing(Vector3i pos);
+    ChunkImpl getChunkForProcessing(Vector3i pos);
 
     /**
      * Obtains a local chunk view of the chunk at the given position and the immediately surrounding chunks.
@@ -49,7 +50,7 @@ public interface GeneratingChunkProvider {
      * @param chunkPos
      * @return A local chunk view, or null if some of the chunks are unavailable.
      */
-    ChunkView getViewAround(Vector3i chunkPos);
+    ChunkViewCore getViewAround(Vector3i chunkPos);
 
     /**
      * Causes the creation or loading of a chunk.
@@ -64,4 +65,6 @@ public interface GeneratingChunkProvider {
      * @param position
      */
     void onChunkIsReady(Vector3i position);
+
+    WorldGenerator getWorldGenerator();
 }

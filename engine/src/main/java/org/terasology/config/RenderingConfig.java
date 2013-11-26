@@ -80,15 +80,15 @@ public class RenderingConfig {
     }
 
     public int getWindowPosX() {
-	return windowPosX;
+        return windowPosX;
     }
-    
+
     public void setWindowPosX(int posX) {
         this.windowPosX = posX;
     }
-    
+
     public int getWindowPosY() {
-	return windowPosY;
+        return windowPosY;
     }
 
     public void setWindowPosY(int posY) {

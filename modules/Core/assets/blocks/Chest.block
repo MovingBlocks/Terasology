@@ -22,12 +22,12 @@
     "rotation" : "horizontal",
     // Graphics
     "tiles" : {
-        "sides" : "core:ChestSides",
-        "front" : "core:ChestFront",
-        "topBottom" : "core:ChestTopBottom"
+        "sides" : "ChestSides",
+        "front" : "ChestFront",
+        "topBottom" : "ChestTopBottom"
     },
     "entity" : {
-        "prefab" : "core:chest"
+        "prefab" : "chest"
     },
     "inventory" : {
         "stackable" : false,

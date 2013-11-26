@@ -16,7 +16,7 @@
 
 package org.terasology.math;
 
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
 
 import javax.vecmath.Vector3f;
 
@@ -426,7 +426,7 @@ public final class TeraMath {
     }
 
     public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, Chunk.POWER_X);
+        return calcChunkPosX(x, ChunkConstants.POWER_X);
     }
 
     /**
@@ -436,15 +436,15 @@ public final class TeraMath {
      * @return The Y-coordinate of the chunk
      */
     public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, Chunk.POWER_Y);
+        return calcChunkPosY(y, ChunkConstants.POWER_Y);
     }
 
     /**
-    * Returns the chunk position of a given coordinate.
-    *
-    * @param y The Y-coordinate of the block
-    * @return The Y-coordinate of the chunk
-    */
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param y The Y-coordinate of the block
+     * @return The Y-coordinate of the chunk
+     */
     public static int calcChunkPosY(int y, int chunkPowerY) {
         return 0;
         //return (y >> chunkPowerY);
@@ -467,7 +467,7 @@ public final class TeraMath {
      * @return The Z-coordinate of the chunk
      */
     public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, Chunk.POWER_Z);
+        return calcChunkPosZ(z, ChunkConstants.POWER_Z);
     }
 
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
@@ -479,7 +479,7 @@ public final class TeraMath {
     }
 
     public static Vector3i calcChunkPos(int x, int y, int z) {
-        return calcChunkPos(x, y, z, Chunk.CHUNK_POWER);
+        return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
     }
 
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
@@ -498,7 +498,7 @@ public final class TeraMath {
 
 
     public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, Chunk.INNER_CHUNK_POS_FILTER_X);
+        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER_X);
     }
 
     public static int calcBlockPosY(int blockY) {
@@ -516,15 +516,15 @@ public final class TeraMath {
     }
 
     public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, Chunk.INNER_CHUNK_POS_FILTER_Z);
+        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER_Z);
     }
 
     public static Vector3i calcBlockPos(Vector3i worldPos) {
-        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, Chunk.INNER_CHUNK_POS_FILTER);
+        return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z) {
-        return calcBlockPos(x, y, z, Chunk.INNER_CHUNK_POS_FILTER);
+        return calcBlockPos(x, y, z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
@@ -606,6 +606,7 @@ public final class TeraMath {
 
     /**
      * Produces a region containing the region touching the side of the given region, both in and outside the region.
+     *
      * @param region
      * @param side
      * @return

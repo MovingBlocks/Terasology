@@ -19,11 +19,11 @@
  */
 {
     "tiles" : {
-        "sides" : "core:FurnaceSides",
-        "front" : "core:FurnaceFront",
-        "topBottom" : "core:FurnaceTopBottom"
+        "sides" : "FurnaceSides",
+        "front" : "FurnaceFront",
+        "topBottom" : "FurnaceTopBottom"
     },
     "entity" : {
-        "prefab" : "core:chest"
+        "prefab" : "chest"
     }
 }

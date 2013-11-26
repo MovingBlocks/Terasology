@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -31,7 +31,7 @@ import org.terasology.world.chunks.Chunk;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class MiniatureChunk extends Chunk {
+public class MiniatureChunk extends ChunkImpl {
     public static final int SIZE_X = 512;
     public static final int SIZE_Y = 256;
     public static final int SIZE_Z = 512;
