@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.math.Rect2i;
+
 import java.util.Objects;
 
 /**
@@ -24,6 +26,8 @@ import java.util.Objects;
  * @author Immortius
  */
 public class Border {
+    public static final Border ZERO = new Border(0, 0, 0, 0);
+
     private int left;
     private int right;
     private int top;
@@ -83,5 +87,10 @@ public class Border {
     @Override
     public int hashCode() {
         return Objects.hash(left, right, top, bottom);
+    }
+
+    public Rect2i shrink(Rect2i region) {
+        return Rect2i.createFromMinAndSize(region.minX() + getLeft(), region.minY() + getTop(),
+                region.width() - getTotalWidth(), region.height() - getTotalHeight());
     }
 }

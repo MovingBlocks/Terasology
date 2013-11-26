@@ -15,12 +15,19 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.Input;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+
 /**
  * @author Immortius
  */
 public interface UIElement {
 
     String DEFAULT_MODE = "";
+    String HOVER_MODE = "hover";
+    String ACTIVE_MODE = "active";
 
     String getFamily();
 
@@ -37,4 +44,10 @@ public interface UIElement {
     void onGainFocus();
 
     void onLoseFocus();
+
+    void onMouseButtonEvent(MouseButtonEvent event);
+
+    void onMouseWheelEvent(MouseWheelEvent event);
+
+    void onKeyEvent(KeyEvent event);
 }

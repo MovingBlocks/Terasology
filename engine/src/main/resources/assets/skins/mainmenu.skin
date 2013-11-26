@@ -3,7 +3,7 @@
     "font" : "default",
     "elements" : {
         "UIScreen" : {
-            "background-mode" : "scale_fill",
+            "background-scale-mode" : "scale_fill",
             "background" : "menuBackground"
         },
         "UILabel" : {
@@ -93,6 +93,34 @@
                 }
             }
         },
+        "UIInputBind" : {
+            "fixed-width" : 108,
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
+            "background" : "button",
+            "background-border" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "margin" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "texture-scale-mode" : "scale_fit",
+            "modes" : {
+                "hover" : {
+                    "background" : "buttonOver"
+                },
+                "active" : {
+                    "background" : "buttonDown",
+                    "text-color" : "FFFF00FF"
+                }
+            }
+        },
         "UICheckbox" : {
             "background" : "engine:checkbox",
             "fixed-width" : 24,
@@ -107,6 +135,38 @@
                 "hover-active" : {
                     "background" : "engine:checkboxCheckedHover"
                 }
+            }
+        },
+        "ScrollableArea" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 6,
+                "bottom" : 6,
+                "left" : 6,
+                "right" : 6
+            },
+            "parts" : {
+                "scrollbar-slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-width" : 8,
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 0,
+                        "right" : 0
+                    }
+                },
+                "scrollbar-handle" : {
+                    "background" : "engine:handle",
+                    "fixed-width" : 16,
+                    "fixed-height" : 16
+                 }
             }
         },
         "UISlider" : {
@@ -155,6 +215,9 @@
                     "text-align-horizontal" : "right"
                 }
             }
+        },
+        "title" : {
+            "font" : "title"
         }
     }
 }

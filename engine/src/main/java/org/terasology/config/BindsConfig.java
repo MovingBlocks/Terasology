@@ -65,9 +65,17 @@ public final class BindsConfig {
     public void setBinds(BindsConfig other) {
         data.clear();
         for (String key : other.data.keySet()) {
-            Multimap<String, Input> map = getPackageMap(key);
+            Multimap<String, Input> map = getModuleMap(key);
             map.putAll(other.data.get(key));
         }
+    }
+
+    public Collection<Input> getBinds(String moduleId, String bindId) {
+        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
+        if (moduleMap != null) {
+            return moduleMap.get(bindId);
+        }
+        return Collections.emptyList();
     }
 
     /**
@@ -77,28 +85,22 @@ public final class BindsConfig {
     public Collection<Input> getBinds(String uri) {
         String[] parts = uri.split(":", 2);
         if (parts.length == 2) {
-            Multimap<String, Input> packageMap = getPackageMap(parts[0]);
-            if (packageMap != null) {
-                return packageMap.get(parts[1]);
-            }
+            return getBinds(parts[0], parts[1]);
         }
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 
     /**
      * Returns whether an input bind has been registered with the BindsConfig.
      * It may just have trivial None input.
      *
-     * @param packageName The name of the bind's package
+     * @param moduleId The name of the bind's package
      * @param id          The id of the bind
      * @return Whether the given bind has been registered with the BindsConfig
      */
-    public boolean hasBinds(String packageName, String id) {
-        Multimap<String, Input> packageMap = getPackageMap(packageName);
-        if (packageMap != null) {
-            return packageMap.containsKey(id);
-        }
-        return false;
+    public boolean hasBinds(String moduleId, String id) {
+        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
+        return moduleMap != null && moduleMap.containsKey(id);
     }
 
     /**
@@ -110,26 +112,23 @@ public final class BindsConfig {
      */
     public boolean hasBinds(String id) {
         String[] parts = id.split(":", 2);
-        if (parts.length == 2) {
-            return hasBinds(parts[0], parts[1]);
-        }
-        return false;
+        return parts.length == 2 && hasBinds(parts[0], parts[1]);
     }
 
     /**
      * Sets the inputs for a given bind, replacing any previous inputs
      *
-     * @param packageName
+     * @param moduleId
      * @param bindName
      * @param inputs
      */
-    public void setBinds(String packageName, String bindName, Input... inputs) {
-        Multimap<String, Input> packageMap = getPackageMap(packageName);
+    public void setBinds(String moduleId, String bindName, Input... inputs) {
+        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
         if (inputs.length == 0) {
-            packageMap.removeAll(bindName);
-            packageMap.put(bindName, new Input());
+            moduleMap.removeAll(bindName);
+            moduleMap.put(bindName, new Input());
         } else {
-            packageMap.replaceValues(bindName, Arrays.asList(inputs));
+            moduleMap.replaceValues(bindName, Arrays.asList(inputs));
         }
     }
 
@@ -146,13 +145,13 @@ public final class BindsConfig {
         }
     }
 
-    private Multimap<String, Input> getPackageMap(String part) {
-        Multimap<String, Input> packageMap = data.get(part);
-        if (packageMap == null) {
-            packageMap = HashMultimap.create();
-            data.put(part, packageMap);
+    private Multimap<String, Input> getModuleMap(String part) {
+        Multimap<String, Input> moduleMap = data.get(part);
+        if (moduleMap == null) {
+            moduleMap = HashMultimap.create();
+            data.put(part, moduleMap);
         }
-        return packageMap;
+        return moduleMap;
     }
 
     /**
@@ -187,22 +186,22 @@ public final class BindsConfig {
         }
     }
 
-    private void updateInputsFor(String packageName, Iterable<Class<?>> classes) {
+    private void updateInputsFor(String moduleId, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = (RegisterBindButton) buttonEvent.getAnnotation(RegisterBindButton.class);
-                if (!hasBinds(packageName, info.id())) {
-                    addBind(packageName, buttonEvent, info);
+                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
+                if (!hasBinds(moduleId, info.id())) {
+                    addBind(moduleId, buttonEvent, info);
                 }
             }
         }
     }
 
-    private void addDefaultsFor(String packageName, Iterable<Class<?>> classes) {
+    private void addDefaultsFor(String moduleId, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
-                RegisterBindButton info = (RegisterBindButton) buttonEvent.getAnnotation(RegisterBindButton.class);
-                addBind(packageName, buttonEvent, info);
+                RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
+                addBind(moduleId, buttonEvent, info);
             }
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.

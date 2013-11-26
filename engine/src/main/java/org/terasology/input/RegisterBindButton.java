@@ -29,6 +29,8 @@ import java.lang.annotation.Target;
 public @interface RegisterBindButton {
     String id();
 
+    String category() default "";
+
     String description() default "";
 
     ActivateMode mode() default ActivateMode.BOTH;

@@ -31,8 +31,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  * @author Immortius
  */
 public class UISlider extends AbstractWidget {
-    public static final String HOVER_MODE = "hover";
-    public static final String ACTIVE_MODE = "active";
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 

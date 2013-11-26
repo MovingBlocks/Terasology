@@ -28,8 +28,6 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  * @author Immortius
  */
 public class UICheckbox extends AbstractWidget {
-    public static final String ACTIVE_MODE = "active";
-    public static final String HOVER_MODE = "hover";
     public static final String HOVER_ACTIVE_MODE = "hover-active";
 
     private Binding<Boolean> active = new DefaultBinding<>(false);

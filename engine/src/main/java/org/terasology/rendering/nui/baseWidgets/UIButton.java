@@ -32,7 +32,6 @@ import java.util.List;
  * @author Immortius
  */
 public class UIButton extends AbstractWidget {
-    public static final String HOVER_MODE = "hover";
     public static final String DOWN_MODE = "down";
 
     private Binding<TextureRegion> image = new DefaultBinding<>();

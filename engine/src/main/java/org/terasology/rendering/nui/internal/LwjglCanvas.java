@@ -212,36 +212,28 @@ public class LwjglCanvas implements CanvasInternal {
         mouseOverRegions = newMouseOverRegions;
     }
 
-    public void processMouseClick(MouseInput button, Vector2i pos) {
+    public boolean processMouseClick(MouseInput button, Vector2i pos) {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos).sub(next.region.min());
                 if (next.listener.onMouseClick(button, relPos)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
-    public void processMouseRelease(MouseInput button, Vector2i pos) {
+    public boolean processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(pos).sub(clickedRegion.region.min());
             clickedRegion.listener.onMouseRelease(button, relPos);
             clickedRegion = null;
+            return true;
         }
-    }
-
-    public void processMouseWheeled(int amount, Vector2i pos) {
-        for (InteractionRegion next : mouseOverRegions) {
-            if (next.region.contains(pos)) {
-                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
-                if (next.listener.onMouseWheeled(amount, relPos)) {
-                    break;
-                }
-            }
-        }
+        return false;
     }
 
     @Override
@@ -296,7 +288,11 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawElement(UIElement element, Rect2i region) {
-        UIStyle newStyle = state.skin.getStyleFor((element.getFamily() != null) ? element.getFamily() : state.family, element.getClass(), element.getMode());
+        if (element == null) {
+            return;
+        }
+        String family = (element.getFamily() != null) ? element.getFamily() : state.family;
+        UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea = applyFixedSizesToRegion(region, newStyle);
         try (SubRegion ignored = subRegion(regionArea, false)) {
             state.element = element;

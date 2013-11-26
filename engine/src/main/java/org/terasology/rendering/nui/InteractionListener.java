@@ -57,14 +57,6 @@ public interface InteractionListener {
     void onMouseRelease(MouseInput button, Vector2i pos);
 
     /**
-     * Called when the mouse is wheeled over an interaction region
-     * @param amount The amount the mouse wheel is moved
-     * @param pos The relative position of the mouse
-     * @return Whether the mouse input should be consumed, and thus not propagated to other intertaction regions
-     */
-    boolean onMouseWheeled(int amount, Vector2i pos);
-
-    /**
      * @return True if the mouse was over the interaction region last frame
      */
     boolean isMouseOver();

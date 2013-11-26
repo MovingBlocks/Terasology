@@ -50,11 +50,6 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
-    public boolean onMouseWheeled(int amount, Vector2i pos) {
-        return false;
-    }
-
-    @Override
     public boolean isMouseOver() {
         return mouseOver;
     }

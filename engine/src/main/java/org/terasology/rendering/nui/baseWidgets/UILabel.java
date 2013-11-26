@@ -43,6 +43,12 @@ public class UILabel extends AbstractWidget {
         this.text.set(text);
     }
 
+    public UILabel(String id, String family, String text) {
+        super(id);
+        this.text.set(text);
+        setFamily(family);
+    }
+
     public UILabel(String id, Binding<String> text) {
         super(id);
         this.text = text;

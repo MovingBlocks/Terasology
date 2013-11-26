@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+
 /**
  * @author Immortius
  */
@@ -76,5 +80,20 @@ public abstract class AbstractWidget implements UIWidget {
 
     public boolean isFocused() {
         return focused;
+    }
+
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onMouseWheelEvent(MouseWheelEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onKeyEvent(KeyEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

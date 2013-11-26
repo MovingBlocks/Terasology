@@ -39,8 +39,6 @@ public class UIDropdown<T> extends AbstractWidget {
     private static final String BOX = "box";
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
-    private static final String ACTIVE_MODE = "active";
-    private static final String HOVER_MODE = "hover";
 
     private Binding<List<T>> options = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
     private Binding<T> selection = new DefaultBinding<>();

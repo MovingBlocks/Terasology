@@ -145,21 +145,37 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
+        if (focus != null) {
+            focus.onMouseButtonEvent(event);
+            if (event.isConsumed()) {
+                return;
+            }
+        }
         if (event.isDown()) {
-            canvas.processMouseClick(event.getButton(), Mouse.getPosition());
+            if (canvas.processMouseClick(event.getButton(), Mouse.getPosition())) {
+                event.consume();
+            }
         } else {
-            canvas.processMouseRelease(event.getButton(), Mouse.getPosition());
+            if (canvas.processMouseRelease(event.getButton(), Mouse.getPosition())) {
+                event.consume();
+            }
         }
     }
 
     //mouse wheel events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
+        if (focus != null) {
+            focus.onMouseWheelEvent(event);
+        }
     }
 
     //raw input events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
+        if (focus != null) {
+            focus.onKeyEvent(event);
+        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)

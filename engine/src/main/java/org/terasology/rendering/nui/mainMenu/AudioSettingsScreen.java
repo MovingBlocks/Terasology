@@ -58,7 +58,7 @@ public class AudioSettingsScreen extends UIScreen {
 
         ArbitraryLayout layout = new ArbitraryLayout();
         layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("Audio Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+        layout.addFillWidget(new UILabel("title", "title", "Audio Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
         layout.addFixedWidget(grid, new Vector2i(500, 192), new Vector2f(0.45f, 0.6f));
         layout.addFixedWidget(new UIButton("close", "Back"), new Vector2i(280, 32), new Vector2f(0.5f, 0.95f));
 

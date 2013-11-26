@@ -18,6 +18,9 @@ package org.terasology.rendering.nui;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.input.MouseInput;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
 
@@ -71,6 +74,18 @@ public class UIScreen implements UIElement {
 
     @Override
     public void onLoseFocus() {
+    }
+
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+    }
+
+    @Override
+    public void onMouseWheelEvent(MouseWheelEvent event) {
+    }
+
+    @Override
+    public void onKeyEvent(KeyEvent event) {
     }
 
     @Override
