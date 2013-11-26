@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.skin;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.nui.UIElement;
-import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius

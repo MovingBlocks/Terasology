@@ -860,7 +860,8 @@ public final class WorldRenderer {
                     shader.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
                 }
 
-                shader.setFloat3("chunkPositionWorld", chunk.getPos().x * ChunkConstants.SIZE_X, chunk.getPos().y * ChunkConstants.SIZE_Y, chunk.getPos().z * ChunkConstants.SIZE_Z);
+                shader.setFloat3("chunkPositionWorld", chunk.getPos().x * ChunkConstants.SIZE_X,
+                        chunk.getPos().y * ChunkConstants.SIZE_Y, chunk.getPos().z * ChunkConstants.SIZE_Z);
                 shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
                 if (mode == ChunkRenderMode.REFLECTION) {
@@ -1130,7 +1131,8 @@ public final class WorldRenderer {
 
                 ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
                 for (int seg = 0; seg < VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = chunkTessellator.generateMesh(view, chunk.getPos(), ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS, seg * (ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS));
+                    newMeshes[seg] = chunkTessellator.generateMesh(view, chunk.getPos(),
+                            ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS, seg * (ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS));
                 }
 
                 chunk.setPendingMesh(newMeshes);

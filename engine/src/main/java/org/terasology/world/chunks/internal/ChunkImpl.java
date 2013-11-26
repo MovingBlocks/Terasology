@@ -151,7 +151,8 @@ public class ChunkImpl implements Chunk {
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
-        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z), ChunkConstants.CHUNK_SIZE);
+        region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
+                ChunkConstants.CHUNK_SIZE);
         initialGenerationComplete = loaded;
         ChunkMonitor.fireChunkCreated(this);
     }

@@ -117,7 +117,8 @@ public class BasicHMTerrainGenerator implements BiomeProviderDependentFirstPassG
                         chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
                 //calculate avg height
-                double interpolatedHeight = lerp(x / (double) chunk.getChunkSizeX(), lerp(z / (double) chunk.getChunkSizeZ(), p10, p11), lerp(z / (double) chunk.getChunkSizeZ(), p00, p01));
+                double interpolatedHeight = lerp(x / (double) chunk.getChunkSizeX(), lerp(z / (double) chunk.getChunkSizeZ(), p10, p11),
+                        lerp(z / (double) chunk.getChunkSizeZ(), p00, p01));
 
 
                 //Scale the height to fit one chunk (suppose we have max height 20 on the Heigthmap

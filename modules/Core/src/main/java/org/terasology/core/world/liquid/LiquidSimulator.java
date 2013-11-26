@@ -346,7 +346,8 @@ public class LiquidSimulator implements ComponentSystem {
         public void run() {
             ChunkView view = world.getLocalView(chunkPos);
             if (view != null) {
-                for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(ChunkConstants.SIZE_X + 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z + 2))) {
+                for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1),
+                        new Vector3i(ChunkConstants.SIZE_X + 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z + 2))) {
                     view.lock();
                     try {
                         LiquidData state = view.getLiquid(pos);

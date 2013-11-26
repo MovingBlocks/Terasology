@@ -280,6 +280,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public Vector3i toWorldPos(Vector3i localPos) {
-        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y, localPos.z + (offset.z + chunkRegion.min().z) * ChunkConstants.SIZE_Z);
+        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y,
+                localPos.z + (offset.z + chunkRegion.min().z) * ChunkConstants.SIZE_Z);
     }
 }

@@ -227,7 +227,8 @@ public class UISkinBuilder {
         return new UIStyleFamily(baseStyle, familyStyles);
     }
 
-    private void applyStylesForInheritanceTree(List<Class<? extends UIElement>> inheritanceTree, String part, String mode, UIStyle elementStyle, Map<StyleKey, UIStyleFragment> styleLookup, Map<StyleKey, UIStyleFragment> baseStyleLookup) {
+    private void applyStylesForInheritanceTree(List<Class<? extends UIElement>> inheritanceTree, String part, String mode, UIStyle elementStyle,
+                                               Map<StyleKey, UIStyleFragment> styleLookup, Map<StyleKey, UIStyleFragment> baseStyleLookup) {
         for (Class<? extends UIElement> element : inheritanceTree) {
             StyleKey key = new StyleKey(element, part, mode);
             UIStyleFragment baseElementStyle = baseStyleLookup.get(key);

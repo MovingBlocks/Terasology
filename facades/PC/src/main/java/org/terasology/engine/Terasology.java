@@ -65,13 +65,14 @@ public final class Terasology {
         String nl = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
 
-        while (t != null && t != t.getCause()) {
-            if (t.getMessage() != null) {
+        Throwable cause = t;
+        while (cause != null && cause != cause.getCause()) {
+            if (cause.getMessage() != null) {
                 sb.append(t.getLocalizedMessage());
                 sb.append(nl);
             }
 
-            t = t.getCause();
+            cause = cause.getCause();
         }
 
         return sb.toString();

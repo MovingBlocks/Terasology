@@ -138,7 +138,8 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             if (chunkProvider.getChunk(pos) != null) {
                 spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
             } else {
-                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
+                SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity,
+                        new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }

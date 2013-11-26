@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
