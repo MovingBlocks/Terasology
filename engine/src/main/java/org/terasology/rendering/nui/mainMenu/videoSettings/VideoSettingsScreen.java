@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.mainMenu.videoSettings;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
@@ -49,6 +51,8 @@ import java.util.Arrays;
  * @author Immortius
  */
 public class VideoSettingsScreen extends UIScreen {
+    private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
+
     @In
     private NUIManager nuiManager;
 
@@ -157,6 +161,7 @@ public class VideoSettingsScreen extends UIScreen {
         find("close", UIButton.class).subscribe(new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
+                logger.info("Video Settings: " + config.getRendering().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
                 TerasologyEngine te = (TerasologyEngine) engine;
                 if (te.isFullscreen() != find("fullscreen", UICheckbox.class).isChecked()) {

@@ -230,6 +230,7 @@ public class TerasologyEngine implements GameEngine {
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
             config.save();
         }
+        logger.info("Video Settings: " + config.getRendering().toString());
         CoreRegistry.putPermanently(Config.class, config);
     }
 
