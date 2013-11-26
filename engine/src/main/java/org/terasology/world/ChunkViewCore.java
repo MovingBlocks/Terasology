@@ -16,9 +16,7 @@
 
 package org.terasology.world;
 
-import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
 
 public interface ChunkViewCore extends ChunkView {
 

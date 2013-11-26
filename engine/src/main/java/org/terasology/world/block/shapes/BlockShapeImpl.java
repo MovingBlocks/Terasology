@@ -15,14 +15,22 @@
  */
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.collision.shapes.CompoundShapeChild;
+import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Maps;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.math.*;
+import org.terasology.math.Pitch;
+import org.terasology.math.Roll;
+import org.terasology.math.Rotation;
+import org.terasology.math.Side;
+import org.terasology.math.Yaw;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 

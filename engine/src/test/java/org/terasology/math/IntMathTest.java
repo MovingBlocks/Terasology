@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import static org.junit.Assert.assertEquals;
 

@@ -15,18 +15,13 @@
  */
 package org.terasology.logic.players;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
 

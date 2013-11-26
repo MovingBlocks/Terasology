@@ -27,7 +27,7 @@ import org.terasology.world.block.BlockManager;
 
 import java.util.Map;
 
-public class DefaultGenerators {
+public abstract class DefaultGenerators {
 
     public static void addDefaultForestGenerators(ForestGenerator mngr) {
 

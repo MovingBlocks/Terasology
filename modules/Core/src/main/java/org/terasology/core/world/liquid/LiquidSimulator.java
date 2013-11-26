@@ -29,7 +29,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.world.ChunkView;
-import org.terasology.world.ChunkView;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;

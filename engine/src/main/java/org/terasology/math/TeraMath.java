@@ -17,7 +17,6 @@
 package org.terasology.math;
 
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
 
@@ -441,11 +440,11 @@ public final class TeraMath {
     }
 
     /**
-    * Returns the chunk position of a given coordinate.
-    *
-    * @param y The Y-coordinate of the block
-    * @return The Y-coordinate of the chunk
-    */
+     * Returns the chunk position of a given coordinate.
+     *
+     * @param y The Y-coordinate of the block
+     * @return The Y-coordinate of the chunk
+     */
     public static int calcChunkPosY(int y, int chunkPowerY) {
         return 0;
         //return (y >> chunkPowerY);
@@ -607,6 +606,7 @@ public final class TeraMath {
 
     /**
      * Produces a region containing the region touching the side of the given region, both in and outside the region.
+     *
      * @param region
      * @param side
      * @return

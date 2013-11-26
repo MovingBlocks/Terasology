@@ -82,8 +82,8 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     }
 
     private void setBiome(BaseChunkGenerator generator) {
-        if( generator instanceof BiomeProviderDependent) {
-            ((BiomeProviderDependent)generator).setWorldBiomeProvider(biomeProvider);
+        if (generator instanceof BiomeProviderDependent) {
+            ((BiomeProviderDependent) generator).setWorldBiomeProvider(biomeProvider);
         }
     }
 
@@ -108,12 +108,12 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
 
     @Override
     public float getTemperature(float x, float y, float z) {
-        return biomeProvider.getTemperatureAt((int)x, (int)z);
+        return biomeProvider.getTemperatureAt((int) x, (int) z);
     }
 
     @Override
     public float getHumidity(float x, float y, float z) {
-        return biomeProvider.getHumidityAt((int)x, (int)z);
+        return biomeProvider.getHumidityAt((int) x, (int) z);
     }
 
 }

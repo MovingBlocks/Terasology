@@ -39,7 +39,6 @@ import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 

@@ -22,7 +22,7 @@ import org.terasology.world.ChunkView;
 
 public class RemoteWorldGenerator implements WorldGenerator {
 
-    private String seed;
+    private String worldSeed;
 
     @Override
     public SimpleUri getUri() {
@@ -31,7 +31,7 @@ public class RemoteWorldGenerator implements WorldGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        this.seed = seed;
+        worldSeed = seed;
     }
 
     @Override
