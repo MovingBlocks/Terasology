@@ -9,8 +9,8 @@
         "usage" : "ON_BLOCK"
     },
     "Door" : {
-        "topBlockFamily" : "DoorTop",
-        "bottomBlockFamily" : "DoorBottom",
+        "topBlockFamily" : "core:DoorTop",
+        "bottomBlockFamily" : "core:DoorBottom",
         "openSound" : "DoorOpen",
         "closeSound" : "DoorClose"
     },
