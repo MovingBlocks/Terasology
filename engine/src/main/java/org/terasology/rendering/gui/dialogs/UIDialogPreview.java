@@ -78,8 +78,8 @@ public class UIDialogPreview extends UIDialog {
 
     private List<UIButton> layerButtons;
     private UIText inputSeed;
-    UIComposite detailPanel;
-    Vector2f defSize;
+    private UIComposite detailPanel;
+    private Vector2f defSize;
     private boolean isPreviewPossible;
 
 
@@ -105,8 +105,7 @@ public class UIDialogPreview extends UIDialog {
         } catch (UnresolvedWorldGeneratorException e) {
             // if errors happen, dont enable this feature
             logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview");
-        }
-        finally {
+        } finally {
             moduleManager.disableModule(worldGeneratorModule);
         }
 
