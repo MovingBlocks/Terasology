@@ -40,4 +40,5 @@ public interface WorldGenerator {
 
     float getHumidity(float x, float y, float z);
 
+    void initialize();
 }

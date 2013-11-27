@@ -47,6 +47,7 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
+import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.random.FastRandom;
@@ -158,15 +159,20 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
 
                 UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
-                dialog.addDialogListener(new DialogListener() {
-                    @Override
-                    public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
-                        if (returnCode == EReturnCode.OK) {
-                            inputSeed.setText((String) returnValue);
+                if (dialog.isPreviewPossible()) {
+                    dialog.addDialogListener(new DialogListener() {
+                        @Override
+                        public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
+                            if (returnCode == EReturnCode.OK) {
+                                inputSeed.setText((String) returnValue);
+                            }
                         }
-                    }
-                });
-                dialog.open();
+                    });
+                    dialog.open();
+                }              else {
+                    UIMessageBox messageBox = new UIMessageBox("Preview Unavailable", "This world generator does not support previewing");
+                    messageBox.openDialog();
+                }
             }
         });
     }

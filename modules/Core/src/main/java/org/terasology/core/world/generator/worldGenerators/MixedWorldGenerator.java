@@ -32,6 +32,10 @@ public class MixedWorldGenerator extends AbstractBaseWorldGenerator {
 
     public MixedWorldGenerator(SimpleUri uri) {
         super(uri);
+    }
+
+    @Override
+    public void initialize() {
         register(new MultiTerrainGenerator());
         register(new FloraGenerator());
         register(new LiquidsGenerator());
