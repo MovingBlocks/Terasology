@@ -30,6 +30,8 @@ public interface ModuleManager {
 
     void enableModule(Module module);
 
+    void enableModuleAndDependencies(Module module);
+
     void disableModule(Module module);
 
     /**

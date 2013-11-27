@@ -216,7 +216,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
         JsonObject parentObj = blockDefJson;
         while (parentObj.has("basedOn")) {
-            AssetUri parentUri = new AssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
+            AssetUri parentUri = Assets.resolveAssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
             if (rootAssetUri.equals(parentUri)) {
                 logger.error("Circular inheritance detected in {}", rootAssetUri);
                 break;

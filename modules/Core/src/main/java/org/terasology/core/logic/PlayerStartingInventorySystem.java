@@ -46,10 +46,8 @@ public class PlayerStartingInventorySystem implements ComponentSystem {
         chest.addComponent(new InventoryComponent(30));
 
         inventoryManager.giveItem(chest, blockFactory.newInstance(blockManager.getBlockFamily("core:companion"), 99));
-        inventoryManager.giveItem(chest, blockFactory.newInstance(blockManager.getBlockFamily("core:brick:core:stair"), 99));
+        inventoryManager.giveItem(chest, blockFactory.newInstance(blockManager.getBlockFamily("core:brick:engine:stair"), 99));
         inventoryManager.giveItem(chest, blockFactory.newInstance(blockManager.getBlockFamily("core:Tnt"), 99));
-
-        inventoryManager.giveItem(chest, blockFactory.newInstance(blockManager.getBlockFamily("core:StoneStair"), 99));
 
         inventoryManager.giveItem(chest, entityManager.create("core:railgunTool"));
 

@@ -91,7 +91,7 @@ public class UIDialogPreview extends UIDialog {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
         try {
-            moduleManager.enableModule(worldGeneratorModule);
+            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
 
             worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
 
@@ -106,7 +106,7 @@ public class UIDialogPreview extends UIDialog {
             // if errors happen, dont enable this feature
             logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview");
         } finally {
-            moduleManager.disableModule(worldGeneratorModule);
+            moduleManager.disableAllModules();
         }
 
 

@@ -31,9 +31,13 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -43,6 +47,7 @@ import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.loader.FreeformFamily;
 import org.terasology.world.block.loader.WorldAtlas;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,6 +67,8 @@ public class BlockManagerImpl extends BlockManager {
     // we set them to the last id (don't want to use 0 as they would override air)
     private static final short UNKNOWN_ID = (short) 65535;
     private static final int MAX_ID = 65534;
+
+    private ModuleManager moduleManager;
 
     /* Families */
     private final Set<BlockUri> freeformBlockUris = Sets.newHashSet();
@@ -89,6 +96,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds,
                             BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
+        this.moduleManager = CoreRegistry.get(ModuleManager.class);
         blockLoader = new BlockLoader(CoreRegistry.get(AssetManager.class), blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
@@ -237,7 +245,7 @@ public class BlockManagerImpl extends BlockManager {
      * @return a list of matching block uris
      */
     @Override
-    public List<BlockUri> resolveBlockUri(String uri) {
+    public List<BlockUri> resolveAllBlockFamilyUri(String uri) {
         List<BlockUri> matches = Lists.newArrayList();
         BlockUri straightUri = new BlockUri(uri);
         if (straightUri.isValid()) {
@@ -253,6 +261,48 @@ public class BlockManagerImpl extends BlockManager {
             }
         }
         return matches;
+    }
+
+    @Override
+    public BlockUri resolveBlockFamilyUri(String uri) {
+        List<BlockUri> matches = resolveAllBlockFamilyUri(uri);
+        switch (matches.size()) {
+            case 0:
+                logger.warn("Failed to resolve block family '{}'", uri);
+                return null;
+            case 1:
+                return matches.get(0);
+            default:
+                Module context = ModuleContext.getContext();
+                if (context != null) {
+                    Set<String> dependencies = moduleManager.getDependencyNamesOf(context);
+                    Iterator<BlockUri> iterator = matches.iterator();
+                    while (iterator.hasNext()) {
+                        BlockUri possibleUri = iterator.next();
+                        if (context.getId().equals(possibleUri.getNormalisedModuleName())) {
+                            return possibleUri;
+                        }
+                        if (!dependencies.contains(possibleUri.getNormalisedModuleName())) {
+                            iterator.remove();
+                        }
+                    }
+                    if (matches.size() == 1) {
+                        return matches.get(0);
+                    }
+                }
+                logger.warn("Failed to resolve block family '{}' - too many valid matches {}", uri, matches);
+                return null;
+        }
+    }
+
+    @Override
+    public List<BlockUri> resolveAllBlockUri(String uri) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public BlockUri resolveBlockUri(String name) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -278,7 +328,11 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockFamily getBlockFamily(String uri) {
-        return getBlockFamily(new BlockUri(uri));
+        BlockUri blockUri = resolveBlockFamilyUri(uri);
+        if (blockUri != null) {
+            return getBlockFamily(blockUri);
+        }
+        return null;
     }
 
     @Override
@@ -377,7 +431,10 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public boolean hasBlockFamily(BlockUri uri) {
-        return registeredBlockInfo.get().registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri);
+        if (registeredBlockInfo.get().registeredFamilyByUri.containsKey(uri) || availableFamilies.containsKey(uri) || freeformBlockUris.contains(uri)) {
+            return true;
+        }
+        return uri.hasShape() && Assets.get(uri.getShapeUri()) != null && freeformBlockUris.contains(uri.getRootFamilyUri());
     }
 
     @Override

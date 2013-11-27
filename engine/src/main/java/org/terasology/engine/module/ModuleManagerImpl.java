@@ -136,6 +136,24 @@ public class ModuleManagerImpl implements ModuleManager {
         }
     }
 
+    public void enableModuleAndDependencies(Module module) {
+        for (DependencyInfo info : module.getModuleInfo().getDependencies()) {
+            Module dependency = getLatestModuleVersion(info.getId());
+            if (info.getMaxVersion().compareTo(dependency.getVersion()) <= 0) {
+                enableModuleAndDependencies(dependency);
+            }
+        }
+        Module oldModule = activeModules.put(module.getId(), module);
+        if (!module.equals(oldModule)) {
+            if (oldModule != null && oldModule instanceof ExtensionModule) {
+                ((ExtensionModule) oldModule).disable();
+            }
+            if (module instanceof ExtensionModule) {
+                ((ExtensionModule) module).enable();
+            }
+        }
+    }
+
     @Override
     public void disableModule(Module module) {
         Module removedModule = activeModules.remove(module.getId());
