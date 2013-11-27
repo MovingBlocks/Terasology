@@ -20,5 +20,5 @@
  */
 {
     "author" : "eleazzaar",
-    "basedOn" : "plant"
+    "basedOn" : "core:plant"
 }
