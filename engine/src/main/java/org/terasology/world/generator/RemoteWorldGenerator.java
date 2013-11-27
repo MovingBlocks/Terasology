@@ -25,6 +25,10 @@ public class RemoteWorldGenerator implements WorldGenerator {
     private String worldSeed;
 
     @Override
+    public void initialize() {
+    }
+
+    @Override
     public SimpleUri getUri() {
         return null;
     }

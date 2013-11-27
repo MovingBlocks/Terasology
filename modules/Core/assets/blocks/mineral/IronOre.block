@@ -18,5 +18,5 @@
  * A mineral block that would drop Iron
  */
 {
-    "basedOn" : "mineral"
+    "basedOn" : "core:mineral"
 }

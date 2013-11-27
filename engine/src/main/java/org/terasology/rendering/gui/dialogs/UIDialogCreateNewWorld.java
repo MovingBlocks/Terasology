@@ -47,6 +47,7 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
+import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.random.FastRandom;
@@ -79,6 +80,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     private boolean createServerGame;
     private ModuleSelection selection;
+    private UIButton previewButton;
 
     public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));
@@ -102,6 +104,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
         createSeedInput();
         createWorldGeneratorInput();
 
+        createPreviewButton();
+
         ColumnLayout layout = new ColumnLayout();
         layout.setSpacingVertical(4);
         layout.setBorder(20);
@@ -122,6 +126,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
         Vector2f previewPos = inputSeed.getPosition();
         previewPos.x += inputSeed.getSize().x;
         previewPos.x += 8;
+        
+        previewButton.setPosition(previewPos);
+        parent.addDisplayElement(previewButton);
+
 
         content.orderDisplayElementTop(worldGenerator);
         parent.layout();
@@ -137,6 +145,36 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(modButton);
         parent.addDisplayElement(okButton);
         parent.addDisplayElement(cancelButton);
+    }
+
+    private void createPreviewButton() {
+        previewButton = new UIButton(new Vector2f(96, 32), UIButton.ButtonType.NORMAL);
+
+        previewButton.setVisible(true);
+        previewButton.getLabel().setText("Preview...");
+        previewButton.addClickListener(new ClickListener() {
+
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
+
+                UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
+                if (dialog.isPreviewPossible()) {
+                    dialog.addDialogListener(new DialogListener() {
+                        @Override
+                        public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
+                            if (returnCode == EReturnCode.OK) {
+                                inputSeed.setText((String) returnValue);
+                            }
+                        }
+                    });
+                    dialog.open();
+                }              else {
+                    UIMessageBox messageBox = new UIMessageBox("Preview Unavailable", "This world generator does not support previewing");
+                    messageBox.openDialog();
+                }
+            }
+        });
     }
 
     private void createWorldTitleInput() {

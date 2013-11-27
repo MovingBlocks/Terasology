@@ -22,19 +22,22 @@ import org.terasology.core.world.WorldBiomeProvider;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.generator.SecondPassGenerator;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.WorldGenerator2DPreview;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class AbstractBaseWorldGenerator implements WorldGenerator {
+public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
     private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
 
     private String worldSeed;
@@ -46,6 +49,8 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
     public AbstractBaseWorldGenerator(SimpleUri uri) {
         this.uri = uri;
     }
+
+    public abstract void initialize();
 
     @Override
     public final SimpleUri getUri() {
@@ -116,4 +121,38 @@ public class AbstractBaseWorldGenerator implements WorldGenerator {
         return biomeProvider.getHumidityAt((int) x, (int) z);
     }
 
+    @Override
+    public Color get(String layerName, int x, int z) {
+        switch(layerName) {
+            case "Biome":
+                WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(x, z);
+                switch (biome) {
+                    case DESERT:
+                        return Color.YELLOW;
+                    case FOREST:
+                        return Color.GREEN;
+                    case MOUNTAINS:
+                        return new Color(240, 120, 120);
+                    case PLAINS:
+                        return new Color(220, 220, 60);
+                    case SNOW:
+                        return Color.WHITE;
+                    default:
+                        return Color.GREY;
+                }
+            case "Humidity":
+                float hum = biomeProvider.getHumidityAt(x, z);
+                return new Color(hum * 0.2f, hum * 0.2f, hum);
+            case "Temperature":
+                float temp = biomeProvider.getTemperatureAt(x, z);
+                return new Color(temp, temp * 0.2f, temp * 0.2f);
+            default:
+                return new Color();
+        }
+    }
+
+    @Override
+    public Iterable<String> getLayers() {
+        return Arrays.asList("Biome", "Humidity", "Temperature");
+    }
 }

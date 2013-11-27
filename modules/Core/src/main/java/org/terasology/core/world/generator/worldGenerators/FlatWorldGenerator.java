@@ -32,6 +32,10 @@ public class FlatWorldGenerator extends AbstractBaseWorldGenerator {
 
     public FlatWorldGenerator(SimpleUri uri) {
         super(uri);
+    }
+
+    @Override
+    public void initialize() {
         register(new FlatTerrainGenerator());
         register(new FloraGenerator());
         register(new LiquidsGenerator());

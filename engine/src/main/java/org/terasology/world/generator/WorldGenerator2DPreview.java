@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,29 +16,22 @@
 package org.terasology.world.generator;
 
 import org.terasology.engine.API;
-import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.rendering.nui.Color;
 
-/**
- * @author Immortius
- */
 @API
-public interface WorldGenerator {
-    SimpleUri getUri();
+public interface WorldGenerator2DPreview {
 
-    void setWorldSeed(String seed);
+    /**
+     * @param x the x chunk coordinate
+     * @param z the z chunk coordinate
+     * @return never <code>null</code>
+     */
+    Color get(String layerName, int x, int z);
 
-    void applySecondPass(Vector3i chunkPos, ChunkView view);
+    /**
+     *
+     * @return the named layers that can be rendered as 2D previews
+     */
+    Iterable<String> getLayers();
 
-    void createChunk(Chunk chunk);
-
-    float getFog(float x, float y, float z);
-
-    float getTemperature(float x, float y, float z);
-
-    float getHumidity(float x, float y, float z);
-
-    void initialize();
 }

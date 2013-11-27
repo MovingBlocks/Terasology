@@ -18,5 +18,5 @@
  * A mineral block that would drop Copper
  */
 {
-    "basedOn" : "mineral"
+    "basedOn" : "core:mineral"
 }

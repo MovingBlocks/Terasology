@@ -32,6 +32,10 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
 
     public PerlinWorldGenerator(SimpleUri uri) {
         super(uri);
+    }
+
+    @Override
+    public void initialize() {
         register(new PerlinTerrainGenerator());
         register(new FloraGenerator());
         register(new LiquidsGenerator());

@@ -21,7 +21,7 @@
  * and that the appropriate image file to use equals the Block name + .png (in the same mod)
  */
 {
-    "basedOn" : "soil",
+    "basedOn" : "core:soil",
     "grass" : true,
     // Graphics
     "tiles" : {                     // "tiles" being present means we'll override some with a different graphic
