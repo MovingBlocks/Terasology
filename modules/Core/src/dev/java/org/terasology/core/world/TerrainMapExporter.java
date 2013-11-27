@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.core.TerasologyDevelopment;
 import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerator;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 
 import javax.imageio.ImageIO;

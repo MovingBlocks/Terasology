@@ -54,13 +54,13 @@ import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
-import org.terasology.world.ChunkViewCore;
-import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.ChunkView;
 import org.terasology.world.TimerEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -69,7 +69,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LIGHT0;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 /**
  * The world of Terasology. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -1123,7 +1141,7 @@ public final class WorldRenderer {
             if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
                 complete = false;
             } else if (chunk.isDirty()) {
-                ChunkViewCore view = worldProvider.getLocalView(chunk.getPos());
+                ChunkView view = worldProvider.getLocalView(chunk.getPos());
                 if (view == null) {
                     continue;
                 }

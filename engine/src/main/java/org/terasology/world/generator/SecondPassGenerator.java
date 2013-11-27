@@ -23,7 +23,6 @@ import org.terasology.world.ChunkView;
 /**
  * @author Immortius
  */
-@API
 public interface SecondPassGenerator extends BaseChunkGenerator {
     void postProcessChunk(Vector3i chunkPos, ChunkView view);
 }

@@ -66,11 +66,6 @@ public abstract class BlockManager {
     public abstract List<BlockUri> resolveAllBlockFamilyUri(String uri);
 
     public abstract BlockUri resolveBlockFamilyUri(String name);
-
-    public abstract List<BlockUri> resolveAllBlockUri(String uri);
-
-    public abstract BlockUri resolveBlockUri(String name);
-
     /**
      * @return A map of the mapping between Block Uris and Ids
      */

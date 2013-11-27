@@ -18,19 +18,19 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.core.world.generator.BiomeProviderDependentSecondPassGenerator;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generator.SecondPassGenerator;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class ForestGenerator implements BiomeProviderDependentSecondPassGenerator {
+public class ForestGenerator implements SecondPassGenerator {
     private String seed;
     private WorldBiomeProvider biomeProvider;
 

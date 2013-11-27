@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.world.generator.internal;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -23,6 +23,9 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.UnresolvedWorldGeneratorException;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;

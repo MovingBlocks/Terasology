@@ -30,7 +30,6 @@ import org.terasology.world.liquid.LiquidData;
  *
  * @author Immortius
  */
-@API
 public interface ChunkView {
     /**
      * @param x

@@ -296,16 +296,6 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     @Override
-    public List<BlockUri> resolveAllBlockUri(String uri) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public BlockUri resolveBlockUri(String name) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public Map<String, Short> getBlockIdMap() {
         Map<String, Short> result = Maps.newHashMapWithExpectedSize(registeredBlockInfo.get().idByUri.size());
         TObjectShortIterator<BlockUri> iterator = registeredBlockInfo.get().idByUri.iterator();

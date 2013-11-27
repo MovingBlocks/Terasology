@@ -17,14 +17,16 @@
 package org.terasology.world.generator;
 
 import org.terasology.engine.API;
+import org.terasology.world.WorldBiomeProvider;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-@API
 public interface BaseChunkGenerator {
+
+    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
     void setWorldSeed(String seed);
 

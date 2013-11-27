@@ -45,8 +45,8 @@ import org.terasology.rendering.opengl.OpenGLTexture;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
-import org.terasology.world.generator.WorldGeneratorInfo;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;

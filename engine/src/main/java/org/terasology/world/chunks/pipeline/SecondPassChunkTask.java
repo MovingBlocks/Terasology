@@ -18,7 +18,7 @@ package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -39,7 +39,7 @@ public class SecondPassChunkTask extends AbstractChunkTask {
 
     @Override
     public void enact() {
-        ChunkViewCore view = getProvider().getViewAround(getPosition());
+        ChunkView view = getProvider().getViewAround(getPosition());
         if (view == null) {
             return;
         }

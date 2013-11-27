@@ -18,9 +18,9 @@ package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldProviderCore;
+import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.liquid.LiquidData;

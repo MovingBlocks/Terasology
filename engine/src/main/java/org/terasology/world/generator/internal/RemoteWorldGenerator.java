@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.world.generator.internal;
 
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.ChunkView;
+import org.terasology.world.generator.WorldGenerator;
 
 public class RemoteWorldGenerator implements WorldGenerator {
 

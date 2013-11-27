@@ -98,7 +98,7 @@ import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.swing.*;
 import java.awt.*;

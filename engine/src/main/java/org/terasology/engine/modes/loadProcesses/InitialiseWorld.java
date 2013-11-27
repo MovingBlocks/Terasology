@@ -42,7 +42,7 @@ import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;

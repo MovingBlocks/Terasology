@@ -26,7 +26,8 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.ChunkView;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.MiniatureChunk;
@@ -54,7 +55,7 @@ public final class ChunkTessellator {
         this.generatingChunkProvider = generatingChunkProvider;
     }
 
-    public ChunkMesh generateMesh(ChunkViewCore chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
+    public ChunkMesh generateMesh(ChunkView chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
 
@@ -119,7 +120,7 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    private void generateOptimizedBuffers(ChunkViewCore chunkView, ChunkMesh mesh) {
+    private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
@@ -190,7 +191,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void calcLightingValuesForVertexPos(ChunkViewCore chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
+    private void calcLightingValuesForVertexPos(ChunkView chunkView, Vector3f vertexPos, float[] output, Vector3f normal) {
         PerformanceMonitor.startActivity("calcLighting");
         float[] lights = new float[8];
         float[] blockLights = new float[8];
@@ -287,7 +288,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateBlockVertices(ChunkViewCore view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
+    private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.

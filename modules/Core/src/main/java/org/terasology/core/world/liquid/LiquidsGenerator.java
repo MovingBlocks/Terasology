@@ -15,7 +15,7 @@
  */
 package org.terasology.core.world.liquid;
 
-import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.Block;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class LiquidsGenerator implements FirstPassGenerator {
 
     private String seed;
-    private WorldBiomeProvider biomeProvider;
+    private WorldBiomeProvider worldBiomeProvider;
 
     private Block grass;
     private Block snow;
@@ -71,6 +71,11 @@ public class LiquidsGenerator implements FirstPassGenerator {
                 lavaGenerated = true;
             }
         }
+    }
+
+    @Override
+    public void setWorldBiomeProvider(WorldBiomeProvider worldBiomeProvider) {
+        this.worldBiomeProvider = worldBiomeProvider;
     }
 
     @Override

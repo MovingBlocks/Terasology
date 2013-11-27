@@ -24,7 +24,6 @@ import org.terasology.world.chunks.Chunk;
 /**
  * @author Immortius
  */
-@API
 public interface WorldGenerator {
     SimpleUri getUri();
 

@@ -16,8 +16,7 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.core.world.generator.BiomeProviderDependentFirstPassGenerator;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -25,6 +24,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
  */
-public class PerlinTerrainGenerator implements BiomeProviderDependentFirstPassGenerator {
+public class PerlinTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 

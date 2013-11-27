@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.world;
+package org.terasology.world.internal;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.ChunkView;
 
 public interface ChunkViewCore extends ChunkView {
 

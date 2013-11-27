@@ -39,7 +39,7 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;

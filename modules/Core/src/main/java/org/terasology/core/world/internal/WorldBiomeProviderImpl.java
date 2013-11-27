@@ -16,7 +16,7 @@
 
 package org.terasology.core.world.internal;
 
-import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.PerlinNoise;
 

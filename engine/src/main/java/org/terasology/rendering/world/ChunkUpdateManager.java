@@ -22,7 +22,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -102,7 +102,7 @@ public final class ChunkUpdateManager {
         @Override
         public void run() {
             ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-            ChunkViewCore chunkView = worldProvider.getLocalView(c.getPos());
+            ChunkView chunkView = worldProvider.getLocalView(c.getPos());
             if (chunkView != null) {
                 c.setDirty(false);
                 for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {

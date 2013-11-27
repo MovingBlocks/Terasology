@@ -17,13 +17,13 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.core.world.generator.BiomeProviderDependentFirstPassGenerator;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Mathias Kalb
  */
-public class FlatTerrainGenerator implements BiomeProviderDependentFirstPassGenerator {
+public class FlatTerrainGenerator implements FirstPassGenerator {
 
     // TODO FlatTerrainGenerator: What is a good value for MAX_Y?
     public static final int MAX_HEIGHT = ChunkConstants.SIZE_Y - 100;

@@ -50,7 +50,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
-import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;

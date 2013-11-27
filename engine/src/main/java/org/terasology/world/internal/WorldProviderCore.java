@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world;
+package org.terasology.world.internal;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
-import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 

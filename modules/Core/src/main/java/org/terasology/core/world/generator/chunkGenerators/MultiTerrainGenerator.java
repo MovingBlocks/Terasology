@@ -16,8 +16,7 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.core.world.WorldBiomeProvider;
-import org.terasology.core.world.generator.BiomeProviderDependentFirstPassGenerator;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.EPNoise;
@@ -26,6 +25,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author Esa-Petri
  */
-public class MultiTerrainGenerator implements BiomeProviderDependentFirstPassGenerator {
+public class MultiTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 

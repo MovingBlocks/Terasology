@@ -18,7 +18,7 @@ package org.terasology.world.chunks;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**

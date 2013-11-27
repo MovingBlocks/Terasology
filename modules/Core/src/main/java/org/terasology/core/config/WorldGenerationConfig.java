@@ -16,7 +16,7 @@
 
 package org.terasology.core.config;
 
-import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProvider;
 
 /**
  * @author Immortius

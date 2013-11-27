@@ -18,7 +18,7 @@ package org.terasology.core.world.generator;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.core.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
@@ -87,9 +87,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     private void setBiome(BaseChunkGenerator generator) {
-        if (generator instanceof BiomeProviderDependent) {
-            ((BiomeProviderDependent) generator).setWorldBiomeProvider(biomeProvider);
-        }
+        generator.setWorldBiomeProvider(biomeProvider);
     }
 
     @Override
