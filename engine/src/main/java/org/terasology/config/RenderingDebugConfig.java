@@ -123,4 +123,8 @@ public class RenderingDebugConfig {
         this.renderSkeletons = renderSkeletons;
     }
 
+    @Override
+    public String toString() {
+        return Config.createGson().toJsonTree(this).toString();
+    }
 }

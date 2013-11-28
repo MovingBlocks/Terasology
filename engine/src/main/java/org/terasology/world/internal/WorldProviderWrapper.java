@@ -19,7 +19,6 @@ package org.terasology.world.internal;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
@@ -120,5 +119,15 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     @Override
     public float getFog(Vector3f pos) {
         return core.getFog(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public float getTemperature(Vector3f pos) {
+        return core.getTemperature(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public float getHumidity(Vector3f pos) {
+        return core.getHumidity(pos.x, pos.y, pos.z);
     }
 }

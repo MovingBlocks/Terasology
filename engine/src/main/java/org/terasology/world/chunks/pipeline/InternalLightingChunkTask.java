@@ -17,7 +17,7 @@
 package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
@@ -37,19 +37,19 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
 
     @Override
     public void enact() {
-        Chunk chunk = getProvider().getChunkForProcessing(getPosition());
+        ChunkImpl chunk = getProvider().getChunkForProcessing(getPosition());
         if (chunk == null) {
             return;
         }
 
         chunk.lock();
         try {
-            if (chunk.isDisposed() || chunk.getChunkState() != Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+            if (chunk.isDisposed() || chunk.getChunkState() != ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
                 return;
             }
             InternalLightProcessor.generateInternalLighting(chunk);
             chunk.deflate();
-            chunk.setChunkState(Chunk.State.COMPLETE);
+            chunk.setChunkState(ChunkImpl.State.COMPLETE);
             getProvider().onChunkIsReady(chunk.getPos());
         } finally {
             chunk.unlock();

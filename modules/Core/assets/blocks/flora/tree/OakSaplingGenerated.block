@@ -1,0 +1,6 @@
+{
+    "basedOn": "core:plant",
+    "entity": {
+        "prefab": "core:OakTreeGenerated"
+    }
+}

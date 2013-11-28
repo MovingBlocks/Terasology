@@ -74,6 +74,8 @@ public class BlockDefinition {
     public String rotation;
     public boolean water;
     public boolean lava;
+    public boolean grass;
+    public boolean ice;
 
     public static class Tiles {
         public EnumMap<BlockPart, String> map = Maps.newEnumMap(BlockPart.class);

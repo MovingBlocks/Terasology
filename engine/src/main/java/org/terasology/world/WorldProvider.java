@@ -17,6 +17,7 @@ package org.terasology.world;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
@@ -107,5 +108,9 @@ public interface WorldProvider extends WorldProviderCore {
     byte getTotalLight(Vector3i pos);
 
     float getFog(Vector3f pos);
+
+    float getTemperature(Vector3f pos);
+
+    float getHumidity(Vector3f pos);
 
 }

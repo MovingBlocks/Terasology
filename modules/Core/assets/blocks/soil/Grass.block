@@ -1,0 +1,37 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Grass is a little more interesting as its tiles differ.
+ * Note how we don't need to indicate the top face (stays default)
+ * If "tiles" wasn't present Block would simply assume all the faces are the same
+ * and that the appropriate image file to use equals the Block name + .png (in the same mod)
+ */
+{
+    "basedOn" : "core:soil",
+    "grass" : true,
+    // Graphics
+    "tiles" : {                     // "tiles" being present means we'll override some with a different graphic
+        "sides" : "GrassSide",     // sides means all four (not top/bottom) and can itself be overridden
+        "bottom" : "dirt"         // Since we add all images to the same map we don't need to worry about dir levels
+    },
+
+    // Works as an Enum :-)
+    "colorSource" : "color_lut",
+    "colorSources" : {
+        "bottom" : "default"
+    }
+}

@@ -79,7 +79,7 @@ public class BlockTypeEntityGenerator implements BlockRegistrationListener {
         EntityBuilder builder = entityManager.newBuilder(blockTypePrefab);
         builder.getComponent(BlockTypeComponent.class).block = block;
         // TODO: Copy across settings as necessary
-        Prefab prefab = prefabManager.getPrefab(block.getPrefab());
+        Prefab prefab = (!block.getPrefab().isEmpty()) ? prefabManager.getPrefab(block.getPrefab()) : null;
         if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 if (!(comp instanceof NetworkComponent)) {

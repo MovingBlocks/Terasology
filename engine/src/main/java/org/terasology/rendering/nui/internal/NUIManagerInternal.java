@@ -42,7 +42,6 @@ import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Field;
 import java.util.Deque;

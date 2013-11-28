@@ -98,7 +98,7 @@ import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -230,6 +230,7 @@ public class TerasologyEngine implements GameEngine {
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
             config.save();
         }
+        logger.info("Video Settings: " + config.getRendering().toString());
         CoreRegistry.putPermanently(Config.class, config);
     }
 
@@ -539,6 +540,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
         moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.util");
         moduleSecurityManager.addAPIPackage("java.util.concurrent");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");

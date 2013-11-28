@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world;
 
+import org.terasology.engine.API;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -31,17 +31,6 @@ import org.terasology.world.liquid.LiquidData;
  * @author Immortius
  */
 public interface ChunkView {
-
-    /***
-     * @return The region of the world which this view is over
-     */
-    Region3i getWorldRegion();
-
-    /**
-     * @return A Region3i denoting the chunks covered by this view
-     */
-    Region3i getChunkRegion();
-
     /**
      * @param x
      * @param y
@@ -159,40 +148,22 @@ public interface ChunkView {
     void setLiquid(int x, int y, int z, LiquidData newState);
 
     /**
-     * Sets the light level at the given position
+     * Converts a coordinate from view-space to world space.
      *
-     * @param pos
-     * @param light
+     * @param localPos
+     * @return The equivalent world-space coordinate for the given view coord.
      */
-    void setLight(Vector3i pos, byte light);
+    Vector3i toWorldPos(Vector3i localPos);
+
+    /***
+     * @return The region of the world which this view is over
+     */
+    Region3i getWorldRegion();
 
     /**
-     * Sets the light level at the given coordinates
-     *
-     * @param blockX
-     * @param blockY
-     * @param blockZ
-     * @param light
+     * @return A Region3i denoting the chunks covered by this view
      */
-    void setLight(int blockX, int blockY, int blockZ, byte light);
-
-    /**
-     * Sets the sunlight level at the given position
-     *
-     * @param pos
-     * @param light
-     */
-    void setSunlight(Vector3i pos, byte light);
-
-    /**
-     * Sets the sunlight level at the given coordinates
-     *
-     * @param blockX
-     * @param blockY
-     * @param blockZ
-     * @param light
-     */
-    void setSunlight(int blockX, int blockY, int blockZ, byte light);
+    Region3i getChunkRegion();
 
     /**
      * Sets the chunks containing or adjacent to blockPos, which are contained in the chunk view, to dirty. This causes
@@ -230,13 +201,4 @@ public interface ChunkView {
      *         view was created. Should be checked within a lock.
      */
     boolean isValidView();
-
-    /**
-     * Converts a coordinate from view-space to world space.
-     *
-     * @param localPos
-     * @return The equivalent world-space coordinate for the given view coord.
-     */
-    Vector3i toWorldPos(Vector3i localPos);
-
 }

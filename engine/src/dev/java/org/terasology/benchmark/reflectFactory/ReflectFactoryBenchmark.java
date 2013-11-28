@@ -17,11 +17,11 @@
 package org.terasology.benchmark.reflectFactory;
 
 import com.google.common.collect.Lists;
+import org.terasology.benchmark.Benchmarks;
+import org.terasology.benchmark.PrintToConsoleCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.benchmark.Benchmark;
-import org.terasology.benchmark.Benchmarks;
-import org.terasology.benchmark.PrintToConsoleCallback;
 import org.terasology.classMetadata.reflect.ByteCodeReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 

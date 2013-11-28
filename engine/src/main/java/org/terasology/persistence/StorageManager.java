@@ -16,7 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.IOException;
 
@@ -60,7 +60,7 @@ public interface StorageManager {
      * @param chunk The chunk to be saved
      * @return The new chunk store
      */
-    ChunkStore createChunkStoreForSave(Chunk chunk);
+    ChunkStore createChunkStoreForSave(ChunkImpl chunk);
 
     /**
      * Loads a saved chunk store

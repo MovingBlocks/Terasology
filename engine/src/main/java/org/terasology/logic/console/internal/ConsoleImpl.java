@@ -213,8 +213,6 @@ public class ConsoleImpl implements Console {
         //get the parameters
         List<String> params = splitParameters(parameterPart);
 
-        String paramsStr = PARAMETER_JOINER.join(params);
-
         //get the command
         CommandInfo cmd = commandLookup.get(commandName, params.size());
 
@@ -230,14 +228,12 @@ public class ConsoleImpl implements Console {
         }
 
         if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
+            String paramsStr = PARAMETER_JOINER.join(params);
             callingClient.send(new CommandEvent(commandName, paramsStr));
             return true;
         } else {
-            String executeString = paramsStr;
-            logger.debug("Execute command with params '{}'", executeString);
-
             try {
-                String result = cmd.execute(paramsStr, callingClient);
+                String result = cmd.execute(params, callingClient);
                 if (result != null && !result.isEmpty()) {
                     if (callingClient.exists()) {
                         callingClient.send(new ConsoleMessageEvent(result));

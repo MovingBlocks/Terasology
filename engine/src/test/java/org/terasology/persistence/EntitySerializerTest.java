@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -36,6 +37,7 @@ import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
@@ -64,6 +66,12 @@ public class EntitySerializerTest {
     public static void setupClass() {
         moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
         AssetManager assetManager = new AssetManager(moduleManager);
+        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+            @Override
+            public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                return new PojoPrefab(uri, data);
+            }
+        });
         CoreRegistry.put(AssetManager.class, assetManager);
     }
 

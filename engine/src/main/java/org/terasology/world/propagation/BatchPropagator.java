@@ -22,7 +22,8 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -52,19 +53,19 @@ public class BatchPropagator {
         for (Side side : Side.values()) {
             Vector3i delta = new Vector3i(side.getVector3i());
             if (delta.x < 0) {
-                delta.x += Chunk.SIZE_X;
+                delta.x += ChunkConstants.SIZE_X;
             } else if (delta.x > 0) {
-                delta.x -= Chunk.SIZE_X;
+                delta.x -= ChunkConstants.SIZE_X;
             }
             if (delta.y < 0) {
-                delta.y += Chunk.SIZE_Y;
+                delta.y += ChunkConstants.SIZE_Y;
             } else if (delta.y > 0) {
-                delta.y -= Chunk.SIZE_Y;
+                delta.y -= ChunkConstants.SIZE_Y;
             }
             if (delta.z < 0) {
-                delta.z += Chunk.SIZE_Z;
+                delta.z += ChunkConstants.SIZE_Z;
             } else if (delta.z > 0) {
-                delta.z -= Chunk.SIZE_Z;
+                delta.z -= ChunkConstants.SIZE_Z;
             }
             chunkEdgeDeltas.put(side, delta);
         }
@@ -224,8 +225,8 @@ public class BatchPropagator {
         }
     }
 
-    public void propagateBetween(Chunk chunk, Chunk adjChunk, Side side) {
-        Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), Chunk.CHUNK_SIZE), side);
+    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
+        Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
         Vector3i adjPos = new Vector3i();
         for (Vector3i pos : edgeRegion) {
             adjPos.set(pos);

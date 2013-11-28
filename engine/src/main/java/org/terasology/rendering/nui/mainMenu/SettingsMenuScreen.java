@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
@@ -40,6 +42,7 @@ import javax.vecmath.Vector2f;
  * @author Immortius
  */
 public class SettingsMenuScreen extends UIScreen {
+    private static final Logger logger = LoggerFactory.getLogger(SettingsMenuScreen.class);
 
     @In
     private NUIManager nuiManager;

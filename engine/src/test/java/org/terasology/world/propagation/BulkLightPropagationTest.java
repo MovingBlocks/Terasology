@@ -32,7 +32,8 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
@@ -66,7 +67,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         fullLight.setDisplayName("Torch");
         fullLight.setUri(new BlockUri("engine:torch"));
         fullLight.setId((byte) 2);
-        fullLight.setLuminance(Chunk.MAX_LIGHT);
+        fullLight.setLuminance(ChunkConstants.MAX_LIGHT);
         blockManager.addBlockFamily(new SymmetricFamily(fullLight.getURI(), fullLight), true);
 
         weakLight = new Block();
@@ -347,14 +348,14 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     @Test
     public void betweenChunks() throws Exception {
         Thread.sleep(10000);
-        Chunk main = new Chunk(new Vector3i(0, 0, 0));
-        main.setChunkState(Chunk.State.COMPLETE);
-        for (Vector3i pos : Chunk.CHUNK_REGION) {
+        ChunkImpl main = new ChunkImpl(new Vector3i(0, 0, 0));
+        main.setChunkState(ChunkImpl.State.COMPLETE);
+        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             main.setSunlight(pos, (byte) 15);
         }
-        Chunk adjacent = new Chunk(new Vector3i(1, 0, 0));
-        adjacent.setChunkState(Chunk.State.COMPLETE);
-        for (Vector3i pos : TeraMath.getEdgeRegion(Chunk.CHUNK_REGION, Side.TOP)) {
+        ChunkImpl adjacent = new ChunkImpl(new Vector3i(1, 0, 0));
+        adjacent.setChunkState(ChunkImpl.State.COMPLETE);
+        for (Vector3i pos : TeraMath.getEdgeRegion(ChunkConstants.CHUNK_REGION, Side.TOP)) {
             adjacent.setBlock(pos, solid);
         }
 

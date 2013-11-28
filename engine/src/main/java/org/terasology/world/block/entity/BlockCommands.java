@@ -98,7 +98,7 @@ public class BlockCommands implements ComponentSystem {
 
         BlockFamily blockFamily;
 
-        List<BlockUri> matchingUris = blockManager.resolveBlockUri(blockName);
+        List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(blockName);
         if (matchingUris.size() == 1) {
             blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
 
@@ -236,7 +236,7 @@ public class BlockCommands implements ComponentSystem {
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory", runOnServer = true)
     public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity, EntityRef client) {
-        List<BlockUri> matchingUris = blockManager.resolveBlockUri(uri);
+        List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
             return giveBlock(blockFamily, quantity, client);
@@ -254,7 +254,7 @@ public class BlockCommands implements ComponentSystem {
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true)
     public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity, EntityRef client) {
-        List<BlockUri> resolvedBlockUris = blockManager.resolveBlockUri(uri);
+        List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             return "No block found for '" + uri + "'";
         } else if (resolvedBlockUris.size() > 1) {

@@ -17,6 +17,7 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -27,6 +28,7 @@ import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -66,6 +68,12 @@ public class PojoPrefabManagerTest {
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
         AssetManager assetManager = new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager()));
+        assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
+            @Override
+            public Prefab buildAsset(AssetUri uri, PrefabData data) {
+                return new PojoPrefab(uri, data);
+            }
+        });
         CoreRegistry.put(AssetManager.class, assetManager);
     }
 

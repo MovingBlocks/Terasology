@@ -55,26 +55,26 @@ public final class Terasology {
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
-        	String text = getNestedMessageText(t);
+            String text = getNestedMessageText(t);
             JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
         }
         System.exit(0);
     }
 
-	private static String getNestedMessageText(Throwable t)
-	{
-		String nl = System.getProperty("line.separator"); 
-		StringBuilder sb = new StringBuilder();
-		
-		while (t != null && t != t.getCause()) {
-			if (t.getMessage() != null) {
-				sb.append(t.getLocalizedMessage());
-				sb.append(nl);
-			}
+    private static String getNestedMessageText(Throwable t) {
+        String nl = System.getProperty("line.separator");
+        StringBuilder sb = new StringBuilder();
 
-			t = t.getCause();
-		}
-			
-		return sb.toString();
-	}
+        Throwable cause = t;
+        while (cause != null && cause != cause.getCause()) {
+            if (cause.getMessage() != null) {
+                sb.append(t.getLocalizedMessage());
+                sb.append(nl);
+            }
+
+            cause = cause.getCause();
+        }
+
+        return sb.toString();
+    }
 }

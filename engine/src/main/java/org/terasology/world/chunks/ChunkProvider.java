@@ -18,7 +18,8 @@ package org.terasology.world.chunks;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
+import org.terasology.world.internal.ChunkViewCore;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * @author Immortius
@@ -31,20 +32,20 @@ public interface ChunkProvider {
      * @param centerChunkPos
      * @return A chunk view centered on the given chunk, with all of the surrounding chunks included.
      */
-    ChunkView getLocalView(Vector3i centerChunkPos);
+    ChunkViewCore getLocalView(Vector3i centerChunkPos);
 
     /**
      * @param blockPos
      * @param extent
      * @return A chunk view of the chunks around the given blockPos.
      */
-    ChunkView getSubviewAroundBlock(Vector3i blockPos, int extent);
+    ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent);
 
     /**
      * @param chunkPos
      * @return A chunk view including the chunks around the given chunk
      */
-    ChunkView getSubviewAroundChunk(Vector3i chunkPos);
+    ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos);
 
     /**
      * Sets the world entity, for the purpose of receiving chunk events.
@@ -104,7 +105,7 @@ public interface ChunkProvider {
      * @param z The chunk position on the z-axis
      * @return The chunk, or null if the chunk is not ready
      */
-    Chunk getChunk(int x, int y, int z);
+    ChunkImpl getChunk(int x, int y, int z);
 
     /**
      * Returns the chunk at the given position if possible.
@@ -112,7 +113,7 @@ public interface ChunkProvider {
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready
      */
-    Chunk getChunk(Vector3i chunkPos);
+    ChunkImpl getChunk(Vector3i chunkPos);
 
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using

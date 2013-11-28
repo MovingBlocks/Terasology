@@ -22,7 +22,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkProvider;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public final class ChunkMonitor {
         EVENT_BUS.post(event);
     }
 
-    private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
+    private static synchronized ChunkMonitorEntry registerChunk(ChunkImpl chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         final Vector3i pos = chunk.getPos();
         ChunkMonitorEntry entry = CHUNKS.get(pos);
@@ -66,7 +66,7 @@ public final class ChunkMonitor {
         post(new ChunkMonitorEvent.ChunkProviderDisposed(provider));
     }
 
-    public static void fireChunkCreated(Chunk chunk) {
+    public static void fireChunkCreated(ChunkImpl chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         final ChunkMonitorEntry entry = registerChunk(chunk);
         if (entry != null) {
@@ -74,22 +74,22 @@ public final class ChunkMonitor {
         }
     }
 
-    public static void fireChunkDisposed(Chunk chunk) {
+    public static void fireChunkDisposed(ChunkImpl chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         post(new ChunkMonitorEvent.Disposed(chunk.getPos()));
     }
 
-    public static void fireChunkRevived(Chunk chunk) {
+    public static void fireChunkRevived(ChunkImpl chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         post(new ChunkMonitorEvent.Revived(chunk.getPos()));
     }
 
-    public static void fireStateChanged(Chunk chunk, Chunk.State oldState) {
+    public static void fireStateChanged(ChunkImpl chunk, ChunkImpl.State oldState) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         post(new ChunkMonitorEvent.StateChanged(chunk.getPos(), oldState, chunk.getChunkState()));
     }
 
-    public static void fireChunkDeflated(Chunk chunk, int oldSize, int newSize) {
+    public static void fireChunkDeflated(ChunkImpl chunk, int oldSize, int newSize) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         post(new ChunkMonitorEvent.Deflated(chunk.getPos(), oldSize, newSize));
     }

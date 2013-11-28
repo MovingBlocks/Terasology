@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;

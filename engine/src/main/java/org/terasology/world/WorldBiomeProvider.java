@@ -60,7 +60,7 @@ public interface WorldBiomeProvider {
      */
     float getTemperatureAt(int x, int z);
 
-    float getFog(float x, float y, float z);
+    float getFogAt(float x, float y, float z);
 
     /*
     * Returns the biome type at the given position.
