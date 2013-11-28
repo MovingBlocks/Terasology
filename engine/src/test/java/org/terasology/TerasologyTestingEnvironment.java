@@ -40,8 +40,8 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.Terasology;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
@@ -134,7 +134,7 @@ public abstract class TerasologyTestingEnvironment {
             assetManager = new AssetManager(moduleManager);
             CoreRegistry.put(AssetManager.class, assetManager);
             AssetType.registerAssetTypes(assetManager);
-            assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, Terasology.class.getProtectionDomain().getCodeSource(),
+            assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, TerasologyEngine.class.getProtectionDomain().getCodeSource(),
                     TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
             assetManager.addAssetSource(new ClasspathSource("unittest", TerasologyTestingEnvironment.class.getProtectionDomain().getCodeSource(),
                     TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
