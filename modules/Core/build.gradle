@@ -57,7 +57,7 @@ if (!moduleFile.exists()) {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    testCompile project(':engine').sourceSets.test.output
+    testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
 
     println "Dependencies for " + project.name + " will be engine and potentially more on any following lines:"
     moduleDepends.each {
@@ -70,6 +70,9 @@ dependencies {
 
         // In multi-project mode we should always have an engine project to depend on. Also satisfies external libs
         compile project(':engine')
+
+        // Added after Core had unit tests - only ever gets used by Core as other modules do not use the engine build
+        testCompile project(':engine').sourceSets.test.output
 
         // If the module has dependencies on other modules we look in a few different spots to find them
         for (dependency in moduleDepends) {
