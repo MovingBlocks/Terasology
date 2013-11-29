@@ -57,6 +57,7 @@ if (!moduleFile.exists()) {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+    testCompile project(':engine').sourceSets.test.output
 
     println "Dependencies for " + project.name + " will be engine and potentially more on any following lines:"
     moduleDepends.each {
