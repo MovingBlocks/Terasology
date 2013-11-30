@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+package org.terasology.input.binds.interaction;
+
+import org.lwjgl.input.Keyboard;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
-public class UISpace extends CoreWidget {
-
-    @Override
-    public void onDraw(Canvas canvas) {
-    }
+@RegisterBindButton(id = "frob", description = "Use Target")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_E)
+public class FrobButton extends BindButtonEvent {
 }

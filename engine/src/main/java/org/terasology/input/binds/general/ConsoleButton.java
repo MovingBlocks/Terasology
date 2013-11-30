@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.general;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
@@ -24,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "useItem", description = "Use Held Item", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
-public class UseItemButton extends BindButtonEvent {
+@RegisterBindButton(id = "console", description = "Toggle Console", category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_TAB)
+public class ConsoleButton extends BindButtonEvent {
 }

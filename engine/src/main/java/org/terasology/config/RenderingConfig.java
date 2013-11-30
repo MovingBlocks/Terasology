@@ -59,7 +59,7 @@ public class RenderingConfig {
     private boolean normalMapping;
     private boolean parallaxMapping;
     private boolean dynamicShadowsPcfFiltering;
-    private boolean volumetricFog;
+    private boolean volumetricFog = true;
     private boolean cloudShadows;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;

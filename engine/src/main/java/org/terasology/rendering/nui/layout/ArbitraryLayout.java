@@ -22,15 +22,17 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.UIWidget;
 
 import javax.vecmath.Vector2f;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class ArbitraryLayout extends AbstractWidget {
+public class ArbitraryLayout extends CoreLayout {
 
     private List<WidgetInfo> widgets = Lists.newArrayList();
 
@@ -68,6 +70,15 @@ public class ArbitraryLayout extends AbstractWidget {
             }
         }
         return result;
+    }
+
+    @Override
+    public Iterator<UIWidget> iterator() {
+        List<UIWidget> contents = Lists.newArrayList();
+        for (WidgetInfo info : widgets) {
+            contents.add(info.getWidget());
+        }
+        return contents.iterator();
     }
 
     private abstract static class WidgetInfo {

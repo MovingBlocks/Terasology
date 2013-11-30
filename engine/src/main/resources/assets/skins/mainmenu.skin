@@ -94,7 +94,6 @@
             }
         },
         "UIInputBind" : {
-            "fixed-width" : 108,
             "text-align-horizontal" : "center",
             "text-align-vertical" : "middle",
             "background" : "button",
@@ -125,6 +124,7 @@
             "background" : "engine:checkbox",
             "fixed-width" : 24,
             "fixed-height" : 24,
+            "align-horizontal" : "left",
             "modes" : {
                 "hover" : {
                     "background" : "engine:checkboxHover"
@@ -218,6 +218,10 @@
         },
         "title" : {
             "font" : "title"
+        },
+        "heading-input" : {
+            "font" : "title",
+            "text-align-horizontal" : "left"
         }
     }
 }

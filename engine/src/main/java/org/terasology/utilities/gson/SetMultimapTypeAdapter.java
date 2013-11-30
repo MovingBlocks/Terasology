@@ -18,7 +18,7 @@ package org.terasology.utilities.gson;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -37,17 +37,17 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class MultimapTypeAdapter<V> implements JsonDeserializer<Multimap<String, V>>, JsonSerializer<Multimap<String, V>> {
+public class SetMultimapTypeAdapter<V> implements JsonDeserializer<SetMultimap<String, V>>, JsonSerializer<SetMultimap<String, V>> {
 
     private Class<V> valueType;
 
-    public MultimapTypeAdapter(Class<V> valueType) {
+    public SetMultimapTypeAdapter(Class<V> valueType) {
         this.valueType = valueType;
     }
 
     @Override
-    public Multimap<String, V> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        Multimap<String, V> result = HashMultimap.create();
+    public SetMultimap<String, V> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        SetMultimap<String, V> result = HashMultimap.create();
         JsonObject obj = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
             if (entry.getValue().isJsonArray()) {
@@ -62,7 +62,7 @@ public class MultimapTypeAdapter<V> implements JsonDeserializer<Multimap<String,
     }
 
     @Override
-    public JsonElement serialize(Multimap<String, V> src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(SetMultimap<String, V> src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject result = new JsonObject();
         List<String> keys = Lists.newArrayList(src.keys());
         Collections.sort(keys);

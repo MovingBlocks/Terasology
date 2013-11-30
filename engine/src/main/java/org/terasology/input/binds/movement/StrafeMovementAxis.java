@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.movement;
 
-import org.lwjgl.input.Keyboard;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.SendEventMode;
 
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "right", description = "Strafe Right")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_D)
-public class RightStrafeButton extends BindButtonEvent {
+@RegisterBindAxis(id = "strafe", positiveButton = "engine:left", negativeButton = "engine:right", eventMode = SendEventMode.WHEN_CHANGED)
+public class StrafeMovementAxis extends BindAxisEvent {
 }

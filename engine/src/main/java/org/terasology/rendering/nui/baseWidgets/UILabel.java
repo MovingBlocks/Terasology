@@ -17,13 +17,14 @@ package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
  * @author Immortius
  */
-public class UILabel extends AbstractWidget {
+public class UILabel extends CoreWidget {
 
     private Binding<String> text = new DefaultBinding<>("");
 

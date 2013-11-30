@@ -13,18 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 
-/**
- * @author Immortius
- */
-public class UISpace extends CoreWidget {
+@API
+@InputCategory(id = "interaction",
+        displayName = "Interaction",
+        ordering = {
+                "engine:attack",
+                "engine:frob"
+        }) package org.terasology.input.binds.interaction;
 
-    @Override
-    public void onDraw(Canvas canvas) {
-    }
-}
+import org.terasology.engine.API;
+import org.terasology.input.InputCategory;

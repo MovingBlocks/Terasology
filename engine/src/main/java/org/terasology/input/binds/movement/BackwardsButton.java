@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.input.binds;
+
+package org.terasology.input.binds.movement;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
@@ -24,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "hideHUD", description = "Hide HDU")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_H)
-public class HideHUDButton extends BindButtonEvent {
+@RegisterBindButton(id = "backwards", description = "Backwards")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_S)
+public class BackwardsButton extends BindButtonEvent {
 }

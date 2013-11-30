@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.inventory;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "frob", description = "Use Target")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_E)
-public class FrobButton extends BindButtonEvent {
+public class ToolbarSlotButton extends BindButtonEvent {
+    private int slot;
+
+    public ToolbarSlotButton(int slot) {
+        this.slot = slot;
+    }
+
+    public int getSlot() {
+        return slot;
+    }
 }

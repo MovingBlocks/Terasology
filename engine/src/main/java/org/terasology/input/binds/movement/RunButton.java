@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.movement;
 
-import org.terasology.input.ActivateMode;
+import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "toolbarPrev", description = "Previous Toolbar Item", mode = ActivateMode.PRESS)
-@DefaultBinding(type = InputType.MOUSE_WHEEL, id = -1)
-public class ToolbarPrevButton extends BindButtonEvent {
+@RegisterBindButton(id = "run", description = "Run")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_LSHIFT)
+public class RunButton extends BindButtonEvent {
 }

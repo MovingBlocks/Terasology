@@ -37,10 +37,6 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public void update(float delta) {
-    }
-
-    @Override
     public String getMode() {
         return DEFAULT_MODE;
     }
@@ -62,8 +58,17 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        if (this.id.equals(targetId) && type.isInstance(this)) {
-            return type.cast(this);
+        if (this.id.equals(targetId)) {
+            if (type.isInstance(this)) {
+                return type.cast(this);
+            }
+            return null;
+        }
+        for (UIWidget contents : this) {
+            T result = contents.find(targetId, type);
+            if (result != null) {
+                return result;
+            }
         }
         return null;
     }
@@ -82,18 +87,4 @@ public abstract class AbstractWidget implements UIWidget {
         return focused;
     }
 
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

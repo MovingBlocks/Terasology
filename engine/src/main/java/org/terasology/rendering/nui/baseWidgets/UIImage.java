@@ -18,13 +18,14 @@ package org.terasology.rendering.nui.baseWidgets;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 /**
  * @author Immortius
  */
-public class UIImage extends AbstractWidget {
+public class UIImage extends CoreWidget {
     private Binding<TextureRegion> texture = new DefaultBinding<>();
 
     public UIImage() {

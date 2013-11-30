@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
@@ -129,7 +130,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private final Set<NetClient> netClientList = Sets.newLinkedHashSet();
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
-    private Multimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
+    private SetMultimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
     private StorageManager storageManager;
 
     // Client only

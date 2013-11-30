@@ -20,6 +20,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -27,7 +28,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 /**
  * @author Immortius
  */
-public class UICheckbox extends AbstractWidget {
+public class UICheckbox extends CoreWidget {
     public static final String HOVER_ACTIVE_MODE = "hover-active";
 
     private Binding<Boolean> active = new DefaultBinding<>(false);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.input;
 
 import java.lang.annotation.ElementType;
@@ -22,21 +21,24 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * This annotation is used to declare categories of inputs to display in any input binding screens.
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface RegisterBindButton {
+@Target(ElementType.PACKAGE)
+public @interface InputCategory {
+    /**
+     * @return The id of the category, used within binds belonging to this category
+     */
     String id();
 
     /**
-     * @return The category this bind button belongs to, if not explicitly listed in the category
+     * @return The displayable name for this category
      */
-    String category() default "";
+    String displayName();
 
-    String description() default "";
-
-    ActivateMode mode() default ActivateMode.BOTH;
-
-    boolean repeating() default false;
+    /**
+     * @return The ordering of binds within this category. Any binds not listed will appear in alphabetical order (by display name) at the end.
+     */
+    String[] ordering() default {};
 }

@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
-@API package org.terasology.input.binds;
+package org.terasology.input.binds.general;
 
-import org.terasology.engine.API;
+import org.lwjgl.input.Keyboard;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
+
+/**
+ * @author Immortius
+ */
+@RegisterBindButton(id = "pause", description = "Pause", category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_ESCAPE)
+public class PauseButton extends BindButtonEvent {
+}

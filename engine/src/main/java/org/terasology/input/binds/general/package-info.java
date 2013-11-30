@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
 
-import org.lwjgl.input.Keyboard;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+@API
+@InputCategory(id = "general",
+        displayName = "General"
+        ) package org.terasology.input.binds.general;
 
-/**
- * @author Immortius
- */
-@RegisterBindButton(id = "pause", description = "Pause")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_ESCAPE)
-public class PauseButton extends BindButtonEvent {
-}
+import org.terasology.engine.API;
+import org.terasology.input.InputCategory;

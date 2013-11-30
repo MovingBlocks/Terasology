@@ -16,6 +16,8 @@
 
 package org.terasology.input;
 
+import org.terasology.engine.SimpleUri;
+
 /**
  * @author Immortius
  */
@@ -24,7 +26,7 @@ public interface BindableButton {
     /**
      * @return The identifier for this button
      */
-    String getId();
+    SimpleUri getId();
 
     /**
      * @return The display name for this button

@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.movement;
 
-import org.lwjgl.input.Keyboard;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.SendEventMode;
 
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "console", description = "Toggle Console")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_TAB)
-public class ConsoleButton extends BindButtonEvent {
+@RegisterBindAxis(id = "forwardsMovement", positiveButton = "engine:forwards", negativeButton = "engine:backwards", eventMode = SendEventMode.WHEN_CHANGED)
+public class ForwardsMovementAxis extends BindAxisEvent {
 }

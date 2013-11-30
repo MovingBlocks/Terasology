@@ -16,31 +16,53 @@
 package org.terasology.rendering.nui.mainMenu.inputSettings;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import org.terasology.config.BindsConfig;
+import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.rendering.nui.databinding.Binding;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class InputConfigBinding implements Binding<Input> {
     private BindsConfig config;
-    private String moduleId;
-    private String bindId;
+    private SimpleUri bindUri;
+    private int position;
 
-    public InputConfigBinding(BindsConfig config, String moduleId, String bindId) {
+    public InputConfigBinding(BindsConfig config, SimpleUri bindUri) {
         this.config = config;
-        this.moduleId = moduleId;
-        this.bindId = bindId;
+        this.bindUri = bindUri;
+    }
+
+    public InputConfigBinding(BindsConfig config, SimpleUri bindUri, int position) {
+        this.config = config;
+        this.bindUri = bindUri;
+        this.position = position;
     }
 
     @Override
     public Input get() {
-        return Iterators.get(config.getBinds(moduleId, bindId).iterator(), 0, null);
+        return Iterators.get(config.getBinds(bindUri).iterator(), position, null);
     }
 
     @Override
     public void set(Input value) {
-        config.setBinds(moduleId, bindId, value);
+        List<Input> binds = Lists.newArrayList(config.getBinds(bindUri));
+        if (value == null) {
+            if (position < binds.size()) {
+                binds.remove(position);
+            }
+        } else {
+            if (position < binds.size()) {
+                binds.set(position, value);
+            } else {
+                binds.add(value);
+            }
+        }
+        config.setBinds(bindUri, binds);
     }
 }

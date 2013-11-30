@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.mainMenu.inputSettings;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.MouseInput;
@@ -25,6 +26,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -32,7 +34,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 /**
  * @author Immortius
  */
-public class UIInputBind extends AbstractWidget {
+public class UIInputBind extends CoreWidget {
     public static final String HOVER_MODE = "hover";
     public static final String ACTIVE_MODE = "active";
 
@@ -89,7 +91,11 @@ public class UIInputBind extends AbstractWidget {
     @Override
     public void onKeyEvent(KeyEvent event) {
         if (capturingInput && event.isDown()) {
-            setInput(new Input(InputType.KEY, event.getKey()));
+            if (event.getKey() == Keyboard.KEY_ESCAPE) {
+                setInput(null);
+            } else {
+                setInput(new Input(InputType.KEY, event.getKey()));
+            }
             capturingInput = false;
             event.consume();
         }

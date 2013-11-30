@@ -15,39 +15,43 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.input.Input;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.utilities.collection.NullIterator;
+
+import java.util.Iterator;
 
 /**
  * @author Immortius
  */
-public interface UIElement extends Iterable<UIWidget> {
+public abstract class CoreWidget extends AbstractWidget {
 
-    String DEFAULT_MODE = "";
-    String HOVER_MODE = "hover";
-    String ACTIVE_MODE = "active";
+    public CoreWidget() {
+    }
 
-    String getFamily();
+    public CoreWidget(String id) {
+        super(id);
+    }
 
-    void setFamily(String family);
+    @Override
+    public Iterator<UIWidget> iterator() {
+        return NullIterator.newInstance();
+    }
 
-    String getMode();
+    @Override
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+    }
 
-    <T extends UIWidget> T find(String id, Class<T> type);
+    @Override
+    public void onMouseWheelEvent(MouseWheelEvent event) {
+    }
 
-    void onDraw(Canvas canvas);
+    @Override
+    public void onKeyEvent(KeyEvent event) {
+    }
 
-    void update(float delta);
-
-    void onGainFocus();
-
-    void onLoseFocus();
-
-    void onMouseButtonEvent(MouseButtonEvent event);
-
-    void onMouseWheelEvent(MouseWheelEvent event);
-
-    void onKeyEvent(KeyEvent event);
+    @Override
+    public void update(float delta) {
+    }
 }

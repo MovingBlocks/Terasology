@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.input.binds;
+package org.terasology.input.binds.general;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
@@ -25,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "crouch", description = "Crouch")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_C)
-public class CrouchButton extends BindButtonEvent {
+@RegisterBindButton(id = "hideHUD", description = "Hide HUD", category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_H)
+public class HideHUDButton extends BindButtonEvent {
 }

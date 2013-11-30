@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.inventory;
 
-import org.terasology.input.BindAxisEvent;
-import org.terasology.input.RegisterBindAxis;
-import org.terasology.input.SendEventMode;
+import org.lwjgl.input.Keyboard;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
-@RegisterBindAxis(id = "forwardsMovement", positiveButton = "engine:forwards", negativeButton = "engine:backwards", eventMode = SendEventMode.WHEN_CHANGED)
-public class ForwardsMovementAxis extends BindAxisEvent {
+@RegisterBindButton(id = "toolbarSlot6", description = "Toolbar Slot 7")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_7)
+public class ToolbarSlot6Button extends ToolbarSlotButton {
+    public ToolbarSlot6Button() {
+        super(6);
+    }
 }

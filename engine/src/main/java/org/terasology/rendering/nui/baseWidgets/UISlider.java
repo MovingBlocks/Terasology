@@ -22,6 +22,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -30,7 +31,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 /**
  * @author Immortius
  */
-public class UISlider extends AbstractWidget {
+public class UISlider extends CoreWidget {
     public static final String SLIDER = "slider";
     public static final String TICKER = "ticker";
 
@@ -74,6 +75,8 @@ public class UISlider extends AbstractWidget {
 
     private int sliderWidth;
 
+    private String formatString = "0.0";
+
     public UISlider() {
     }
 
@@ -88,7 +91,7 @@ public class UISlider extends AbstractWidget {
 
         canvas.setPart(TICKER);
         String display = String.format("%." + precision + "f", value.get());
-        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(display);
+        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
 
         sliderWidth = canvas.size().x - tickerWidth;
@@ -121,6 +124,7 @@ public class UISlider extends AbstractWidget {
 
     public void setMinimum(float min) {
         this.minimum.set(min);
+        generateFormatString();
     }
 
     public void bindRange(Binding<Float> binding) {
@@ -133,6 +137,7 @@ public class UISlider extends AbstractWidget {
 
     public void setRange(float val) {
         range.set(val);
+        generateFormatString();
     }
 
     public void bindIncrement(Binding<Float> binding) {
@@ -165,6 +170,26 @@ public class UISlider extends AbstractWidget {
 
     public void setPrecision(int precision) {
         this.precision = precision;
+        generateFormatString();
+    }
+
+    private void generateFormatString() {
+        float maxValue = getRange() + getMinimum();
+        int leadingValues = String.format("%.0f", maxValue).length();
+        StringBuilder newFormat = new StringBuilder();
+        if (getMinimum() < 0) {
+            newFormat.append('-');
+        }
+        for (int i = 0; i < leadingValues; ++i) {
+            newFormat.append('0');
+        }
+        if (precision > 0) {
+            newFormat.append('.');
+            for (int i = 0; i < precision; ++i) {
+                newFormat.append('0');
+            }
+        }
+        formatString = newFormat.toString();
     }
 
     private int pixelOffsetFor(float val, int width) {

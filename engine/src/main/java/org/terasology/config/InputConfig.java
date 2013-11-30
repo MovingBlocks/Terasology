@@ -34,4 +34,11 @@ public class InputConfig {
     public void setMouseSensitivity(float mouseSensitivity) {
         this.mouseSensitivity = mouseSensitivity;
     }
+
+    public void reset() {
+        binds.setBinds(BindsConfig.createDefault());
+        InputConfig defaultConfig = new InputConfig();
+        setMouseSensitivity(defaultConfig.mouseSensitivity);
+    }
+
 }

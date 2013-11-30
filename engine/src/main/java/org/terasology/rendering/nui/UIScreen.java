@@ -23,6 +23,9 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 /**
  * @author Immortius
  */
@@ -104,5 +107,10 @@ public class UIScreen implements UIElement {
 
     public <T extends UIWidget> T find(String id, Class<T> type) {
         return contents.find(id, type);
+    }
+
+    @Override
+    public Iterator<UIWidget> iterator() {
+        return Arrays.asList(contents).iterator();
     }
 }

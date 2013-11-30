@@ -21,6 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.events.KeyEvent;
@@ -248,7 +249,7 @@ public final class UIMenuConfigControls extends UIWindow {
 
     private void changeButton(UIButton button, Input input) {
         String bindId = button.getUserData().toString();
-        config.getInput().getBinds().setBinds(bindId, input);
+        config.getInput().getBinds().setBinds(new SimpleUri(bindId), input);
 
         editButton.getLabel().setText(input.toShortString());
     }
@@ -257,7 +258,7 @@ public final class UIMenuConfigControls extends UIWindow {
         BindsConfig bindsConfig = config.getInput().getBinds();
         for (UIButton button : inputButtons) {
             String bindId = button.getUserData().toString();
-            Collection<Input> inputs = bindsConfig.getBinds(bindId);
+            Collection<Input> inputs = bindsConfig.getBinds(new SimpleUri(bindId));
             if (inputs.size() > 0) {
                 // TODO: Support multiple binds?
                 button.getLabel().setText(inputs.iterator().next().toShortString());

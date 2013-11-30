@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.interaction;
 
-import org.terasology.input.ActivateMode;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
@@ -25,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "toolbarNext", description = "Next Toolbar Item", mode = ActivateMode.PRESS)
-@DefaultBinding(type = InputType.MOUSE_WHEEL, id = 1)
-public class ToolbarNextButton extends BindButtonEvent {
+@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
+@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
+public class AttackButton extends BindButtonEvent {
 }

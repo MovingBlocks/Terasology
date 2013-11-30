@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
 
-/**
- * @author Immortius
- */
-public class UISpace extends CoreWidget {
+@API
+@InputCategory(id = "movement",
+        displayName = "Movement",
+        ordering = {
+                "engine:forwards",
+                "engine:backwards",
+                "engine:left",
+                "engine:right",
+                "engine:run",
+                "engine:jump",
+                "engine:crouch"
+        }) package org.terasology.input.binds.movement;
 
-    @Override
-    public void onDraw(Canvas canvas) {
-    }
-}
+import org.terasology.engine.API;
+import org.terasology.input.InputCategory;

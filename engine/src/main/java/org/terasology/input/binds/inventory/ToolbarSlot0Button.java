@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.inventory;
 
 import org.lwjgl.input.Keyboard;
-import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
 import org.terasology.input.RegisterBindButton;
@@ -25,7 +24,10 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "jump", description = "Jump", repeating = false)
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_SPACE)
-public class JumpButton extends BindButtonEvent {
+@RegisterBindButton(id = "toolbarSlot0", description = "Toolbar Slot 1")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_1)
+public class ToolbarSlot0Button extends ToolbarSlotButton {
+    public ToolbarSlot0Button() {
+        super(0);
+    }
 }

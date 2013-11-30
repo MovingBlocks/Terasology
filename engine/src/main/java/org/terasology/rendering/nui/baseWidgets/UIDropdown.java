@@ -24,6 +24,7 @@ import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -35,7 +36,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class UIDropdown<T> extends AbstractWidget {
+public class UIDropdown<T> extends CoreWidget {
     private static final String BOX = "box";
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";

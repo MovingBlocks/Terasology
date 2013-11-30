@@ -17,6 +17,7 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.ActivateMode;
@@ -39,7 +40,7 @@ import java.util.List;
  */
 public class BindableButtonImpl implements BindableButton {
 
-    private String id;
+    private SimpleUri id;
     private String displayName;
     private BindButtonEvent buttonEvent;
     private int activeInputs;
@@ -58,7 +59,7 @@ public class BindableButtonImpl implements BindableButton {
      * @param id
      * @param event
      */
-    public BindableButtonImpl(String id, String displayName, BindButtonEvent event) {
+    public BindableButtonImpl(SimpleUri id, String displayName, BindButtonEvent event) {
         this.id = id;
         this.displayName = displayName;
         this.buttonEvent = event;
@@ -66,7 +67,7 @@ public class BindableButtonImpl implements BindableButton {
     }
 
     @Override
-    public String getId() {
+    public SimpleUri getId() {
         return id;
     }
 

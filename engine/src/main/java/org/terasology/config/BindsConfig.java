@@ -16,10 +16,14 @@
 
 package org.terasology.config;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -29,6 +33,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lwjgl.input.Keyboard;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -45,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User binds configuration. This holds the key/mouse binding for Button Binds. They are sorted by package.
@@ -52,7 +58,7 @@ import java.util.Map;
  * @author Immortius
  */
 public final class BindsConfig {
-    private Map<String, Multimap<String, Input>> data = Maps.newHashMap();
+    private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
 
     public BindsConfig() {
     }
@@ -64,94 +70,37 @@ public final class BindsConfig {
      */
     public void setBinds(BindsConfig other) {
         data.clear();
-        for (String key : other.data.keySet()) {
-            Multimap<String, Input> map = getModuleMap(key);
-            map.putAll(other.data.get(key));
-        }
+        data.putAll(other.data);
     }
 
-    public Collection<Input> getBinds(String moduleId, String bindId) {
-        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
-        if (moduleMap != null) {
-            return moduleMap.get(bindId);
-        }
-        return Collections.emptyList();
-    }
-
-    /**
-     * @param uri A uri for the bind to get inputs for
-     * @return All the inputs associated with the given bind
-     */
-    public Collection<Input> getBinds(String uri) {
-        String[] parts = uri.split(":", 2);
-        if (parts.length == 2) {
-            return getBinds(parts[0], parts[1]);
-        }
-        return Collections.emptyList();
+    public Collection<Input> getBinds(SimpleUri uri) {
+        return data.get(uri);
     }
 
     /**
      * Returns whether an input bind has been registered with the BindsConfig.
      * It may just have trivial None input.
      *
-     * @param moduleId The name of the bind's package
-     * @param id          The id of the bind
+     * @param uri The bind's uri
      * @return Whether the given bind has been registered with the BindsConfig
      */
-    public boolean hasBinds(String moduleId, String id) {
-        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
-        return moduleMap != null && moduleMap.containsKey(id);
-    }
-
-    /**
-     * Returns whether an input bind has been registered with the BindsConfig.
-     * It may just have the trivial None input.
-     *
-     * @param id
-     * @return Whether the given bind has been registered with the BindsConfig
-     */
-    public boolean hasBinds(String id) {
-        String[] parts = id.split(":", 2);
-        return parts.length == 2 && hasBinds(parts[0], parts[1]);
+    public boolean hasBinds(SimpleUri uri) {
+        return !data.get(uri).isEmpty();
     }
 
     /**
      * Sets the inputs for a given bind, replacing any previous inputs
      *
-     * @param moduleId
-     * @param bindName
+     * @param bindUri
      * @param inputs
      */
-    public void setBinds(String moduleId, String bindName, Input... inputs) {
-        Multimap<String, Input> moduleMap = getModuleMap(moduleId);
-        if (inputs.length == 0) {
-            moduleMap.removeAll(bindName);
-            moduleMap.put(bindName, new Input());
-        } else {
-            moduleMap.replaceValues(bindName, Arrays.asList(inputs));
-        }
+    public void setBinds(SimpleUri bindUri, Input... inputs) {
+        setBinds(bindUri, Arrays.asList(inputs));
     }
 
-    /**
-     * Sets the inputs for a given bind, replacing any previous inputs
-     *
-     * @param id
-     * @param inputs
-     */
-    public void setBinds(String id, Input... inputs) {
-        String[] parts = id.split(":", 2);
-        if (parts.length == 2) {
-            setBinds(parts[0], parts[1], inputs);
-        }
-    }
-
-    private Multimap<String, Input> getModuleMap(String part) {
-        Multimap<String, Input> moduleMap = data.get(part);
-        if (moduleMap == null) {
-            moduleMap = HashMultimap.create();
-            data.put(part, moduleMap);
-        }
-        return moduleMap;
+    public void setBinds(SimpleUri bindUri, Iterable<Input> inputs) {
+        Set<Input> uniqueInputs = Sets.newLinkedHashSet(inputs);
+        data.replaceValues(bindUri, uniqueInputs);
     }
 
     /**
@@ -178,19 +127,14 @@ public final class BindsConfig {
                 updateInputsFor(module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             }
         }
-        // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
-        for (int i = 0; i < 10; ++i) {
-            if (!hasBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i)) {
-                setBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
-            }
-        }
     }
 
     private void updateInputsFor(String moduleId, Iterable<Class<?>> classes) {
         for (Class<?> buttonEvent : classes) {
             if (ButtonEvent.class.isAssignableFrom(buttonEvent)) {
                 RegisterBindButton info = buttonEvent.getAnnotation(RegisterBindButton.class);
-                if (!hasBinds(moduleId, info.id())) {
+                SimpleUri bindUri = new SimpleUri(moduleId, info.id());
+                if (!hasBinds(bindUri)) {
                     addBind(moduleId, buttonEvent, info);
                 }
             }
@@ -204,13 +148,9 @@ public final class BindsConfig {
                 addBind(moduleId, buttonEvent, info);
             }
         }
-        // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
-        for (int i = 0; i < 10; ++i) {
-            setBinds(TerasologyConstants.ENGINE_MODULE, "toolbarSlot" + i, new Input(InputType.KEY, Keyboard.KEY_1 + i));
-        }
     }
 
-    private void addBind(String packageName, Class<?> buttonEvent, RegisterBindButton info) {
+    private void addBind(String moduleName, Class<?> buttonEvent, RegisterBindButton info) {
         List<Input> defaultInputs = Lists.newArrayList();
         for (Annotation annotation : buttonEvent.getAnnotations()) {
             if (annotation instanceof DefaultBinding) {
@@ -218,7 +158,8 @@ public final class BindsConfig {
                 defaultInputs.add(new Input(defaultBinding.type(), defaultBinding.id()));
             }
         }
-        setBinds(packageName, info.id(), defaultInputs.toArray(new Input[defaultInputs.size()]));
+        SimpleUri bindUri = new SimpleUri(moduleName, info.id());
+        setBinds(bindUri, defaultInputs.toArray(new Input[defaultInputs.size()]));
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {
@@ -228,8 +169,11 @@ public final class BindsConfig {
             BindsConfig result = new BindsConfig();
             JsonObject inputObj = json.getAsJsonObject();
             for (Map.Entry<String, JsonElement> entry : inputObj.entrySet()) {
-                Multimap<String, Input> map = context.deserialize(entry.getValue(), Multimap.class);
-                result.data.put(entry.getKey(), map);
+                SetMultimap<String, Input> map = context.deserialize(entry.getValue(), SetMultimap.class);
+                for (String id : map.keySet()) {
+                    SimpleUri uri = new SimpleUri(entry.getKey(), id);
+                    result.data.putAll(uri, map.get(id));
+                }
             }
             return result;
         }
@@ -237,11 +181,19 @@ public final class BindsConfig {
         @Override
         public JsonElement serialize(BindsConfig src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
-            List<String> keys = Lists.newArrayList(src.data.keySet());
-            Collections.sort(keys);
-            for (String packageName : keys) {
-                JsonElement map = context.serialize(src.data.get(packageName), Multimap.class);
-                result.add(packageName, map);
+            SetMultimap<String, SimpleUri> bindByModule = HashMultimap.create();
+            for (SimpleUri key : src.data.keySet()) {
+                bindByModule.put(key.getNormalisedModuleName(), key);
+            }
+            List<String> sortedModules = Lists.newArrayList(bindByModule.keySet());
+            Collections.sort(sortedModules);
+            for (String moduleId : sortedModules) {
+                SetMultimap<String, Input> moduleBinds = HashMultimap.create();
+                for (SimpleUri bindUri : bindByModule.get(moduleId)) {
+                    moduleBinds.putAll(bindUri.getNormalisedObjectName(), src.data.get(bindUri));
+                }
+                JsonElement map = context.serialize(moduleBinds, SetMultimap.class);
+                result.add(moduleId, map);
             }
             return result;
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.input.binds;
+package org.terasology.input.binds.movement;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "forwards", description = "Forwards")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_W)
-public class ForwardsButton extends BindButtonEvent {
+@RegisterBindButton(id = "right", description = "Strafe Right")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_D)
+public class RightStrafeButton extends BindButtonEvent {
 }

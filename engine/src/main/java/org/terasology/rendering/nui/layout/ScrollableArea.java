@@ -19,20 +19,23 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.util.Arrays;
+import java.util.Iterator;
+
 /**
  * @author Immortius
  */
-public class ScrollableArea extends AbstractWidget {
+public class ScrollableArea extends CoreLayout {
     private UIWidget content;
-    private Vector2i contentSize = new Vector2i();
+    private int contentHeight;
     private int scrollbarWidth = 16;
 
     private int offset;
@@ -47,9 +50,9 @@ public class ScrollableArea extends AbstractWidget {
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            int newPosition = TeraMath.clamp(pos.y + mouseOffset, 0, sliderHeight);
+            int newPosition = TeraMath.clamp(pos.y - mouseOffset, 0, sliderHeight);
 
-            offset = newPosition * (contentSize.y - canvasHeight) / sliderHeight;
+            offset = newPosition * (contentHeight - canvasHeight) / sliderHeight;
         }
 
         @Override
@@ -70,12 +73,13 @@ public class ScrollableArea extends AbstractWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (canvas.size().y < contentSize.y) {
+        if (canvas.size().y < contentHeight) {
             Border margin = canvas.getCurrentStyle().getMargin();
 
             // Draw content
-            try (SubRegion ignored = canvas.subRegion(margin.shrink(canvas.getRegion()), true)) {
-                canvas.drawElement(content, Rect2i.createFromMinAndSize(0, -offset, contentSize.x, contentSize.y));
+            Rect2i contentRegion = margin.shrink(Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y));
+            try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
+                canvas.drawElement(content, Rect2i.createFromMinAndSize(0, -offset, canvas.size().x, contentHeight));
             }
             try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth - margin.getRight(), margin.getTop(),
                     scrollbarWidth, canvas.size().y - margin.getTotalHeight()), false)) {
@@ -91,20 +95,20 @@ public class ScrollableArea extends AbstractWidget {
                 canvas.addInteractionRegion(handleListener, handleRegion);
             }
         } else {
-            canvas.drawElement(content, canvas.getRegion());
+            canvas.drawElement(content, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, contentHeight));
         }
     }
 
     private int pixelOffsetFor(int value) {
-        return sliderHeight * value / (contentSize.y - canvasHeight);
+        return sliderHeight * value / (contentHeight - canvasHeight);
     }
 
     public void setContent(UIWidget widget) {
         this.content = widget;
     }
 
-    public void setContentSize(Vector2i size) {
-        this.contentSize.set(size);
+    public void setContentHeight(int height) {
+        this.contentHeight = height;
     }
 
     public int getScrollbarWidth() {
@@ -123,5 +127,10 @@ public class ScrollableArea extends AbstractWidget {
             return HOVER_MODE;
         }
         return DEFAULT_MODE;
+    }
+
+    @Override
+    public Iterator<UIWidget> iterator() {
+        return Arrays.asList(content).iterator();
     }
 }

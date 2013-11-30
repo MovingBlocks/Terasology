@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+package org.terasology.input.binds.inventory;
+
+import org.lwjgl.input.Keyboard;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
-public class UISpace extends CoreWidget {
-
-    @Override
-    public void onDraw(Canvas canvas) {
+@RegisterBindButton(id = "toolbarSlot9", description = "Toolbar Slot 10")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_0)
+public class ToolbarSlot9Button extends ToolbarSlotButton {
+    public ToolbarSlot9Button() {
+        super(9);
     }
 }
