@@ -74,6 +74,18 @@ public class ZoomableLayout extends CoreLayout {
         widget.onAdded(this);
     }
 
+    public void removeWidget(PositionalWidget widget) {
+        widget.onRemoved(this);
+        widgets.remove(widget);
+    }
+
+    public void removeAll() {
+        for (PositionalWidget widget : widgets) {
+            widget.onRemoved(this);
+        }
+        widgets.clear();
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(dragListener);
@@ -93,6 +105,10 @@ public class ZoomableLayout extends CoreLayout {
         for (PositionalWidget widget : widgets) {
             widget.update(delta);
         }
+    }
+
+    public List<PositionalWidget> getWidgets() {
+        return widgets;
     }
 
     @Override
@@ -261,5 +277,7 @@ public class ZoomableLayout extends CoreLayout {
         Vector2f getSize();
 
         void onAdded(ZoomableLayout layout);
+
+        void onRemoved(ZoomableLayout layout);
     }
 }
