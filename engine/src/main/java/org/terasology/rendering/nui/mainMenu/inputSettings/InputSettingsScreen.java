@@ -76,10 +76,9 @@ public class InputSettingsScreen extends UIScreen {
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
-        //TODO mouseYAxisInverted and mouseSensitivity need to be bound to their respective config options
         mainLayout.addRow(new UILabel("mouseLabel", "heading-input", "Mouse"));
         mainLayout.addRow(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f);
-        mainLayout.addRow(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f);
+        mainLayout.addRow(new UILabel("Invert Mouse:"), new UICheckbox("invertMouse")).setColumnRatios(0.4f);
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
