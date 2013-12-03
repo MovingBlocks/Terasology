@@ -29,6 +29,7 @@ import org.terasology.asset.Assets;
 import org.terasology.input.MouseInput;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
+import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -91,7 +92,6 @@ import static org.lwjgl.opengl.Util.checkGLError;
 public class LwjglCanvas implements CanvasInternal {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
-    private static final Quat4f IDENTITY_ROT = new Quat4f(0, 0, 0, 1);
 
     private final NUIManager nuiManager;
 
@@ -182,6 +182,7 @@ public class LwjglCanvas implements CanvasInternal {
         checkGLError();
     }
 
+    @Override
     public void processMousePosition(Vector2i position) {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(position).sub(clickedRegion.region.min());
@@ -212,6 +213,7 @@ public class LwjglCanvas implements CanvasInternal {
         mouseOverRegions = newMouseOverRegions;
     }
 
+    @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
@@ -226,12 +228,28 @@ public class LwjglCanvas implements CanvasInternal {
         return false;
     }
 
+    @Override
     public boolean processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(pos).sub(clickedRegion.region.min());
             clickedRegion.listener.onMouseRelease(button, relPos);
             clickedRegion = null;
             return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean processMouseWheel(int wheelTurns, Vector2i pos) {
+        for (InteractionRegion next : mouseOverRegions) {
+            if (next.region.contains(pos)) {
+                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
+                if (next.listener.onMouseWheel(wheelTurns, relPos)) {
+                    clickedRegion = next;
+                    nuiManager.setFocus(next.element);
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -610,9 +628,9 @@ public class LwjglCanvas implements CanvasInternal {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.scale(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(IDENTITY_ROT, centerOffset, 1.0f);
+        Matrix4f centerTransform = new Matrix4f(Quat4fUtil.IDENTITY, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(IDENTITY_ROT,
+        Matrix4f translateTransform = new Matrix4f(Quat4fUtil.IDENTITY,
                 new Vector3f(state.drawRegion.minX() + region.minX() + region.width() / 2,
                         state.drawRegion.minY() + region.minY() + region.height() / 2, 0), 1);
 

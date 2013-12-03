@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.internal;
+package org.terasology.math;
 
-import org.terasology.input.MouseInput;
-import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.Canvas;
+import javax.vecmath.Quat4f;
 
 /**
  * @author Immortius
  */
-public interface CanvasInternal extends Canvas {
+public final class Quat4fUtil {
 
-    void preRender();
+    public static final Quat4f IDENTITY = new Quat4f(0, 0, 0, 1);
 
-    void postRender();
-
-    void processMousePosition(Vector2i position);
-
-    boolean processMouseClick(MouseInput button, Vector2i pos);
-
-    boolean processMouseRelease(MouseInput button, Vector2i pos);
-
-    boolean processMouseWheel(int wheelTurns, Vector2i pos);
+    private Quat4fUtil() {
+    }
 }

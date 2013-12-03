@@ -166,7 +166,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onMouseWheelEvent(event);
+            if (event.isConsumed()) {
+                return;
+            }
+            if (canvas.processMouseWheel(event.getWheelTurns(), Mouse.getPosition())) {
+                event.consume();
+            }
         }
+
     }
 
     //raw input events

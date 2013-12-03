@@ -50,6 +50,14 @@ public interface InteractionListener {
     void onMouseDrag(Vector2i pos);
 
     /**
+     * Called when the mouse is wheeled while over the interaction region
+     * @param wheelTurns
+     * @param pos
+     * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
+     */
+    boolean onMouseWheel(int wheelTurns, Vector2i pos);
+
+    /**
      * Called when the mouse is released after clicking on the interaction region
      * @param button The mouse button that was clicked
      * @param pos The relative position of the mouse

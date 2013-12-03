@@ -35,18 +35,12 @@ public class UIScrollbar extends CoreWidget {
     private Binding<Integer> range = new DefaultBinding<>(100);
     private Binding<Integer> value = new DefaultBinding<>(0);
 
-    private boolean dragging;
     private int sliderSize;
+    private int handleSize;
+    private boolean dragging;
+    private int mouseOffset;
 
     private InteractionListener handleListener = new BaseInteractionListener() {
-        private int mouseOffset;
-
-        @Override
-        public void onMouseDrag(Vector2i pos) {
-            int newPosition = TeraMath.clamp(pos.y - mouseOffset, 0, sliderSize);
-
-            setValue(newPosition * getRange() / sliderSize);
-        }
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
@@ -62,17 +56,48 @@ public class UIScrollbar extends CoreWidget {
         public void onMouseRelease(MouseInput button, Vector2i pos) {
             dragging = false;
         }
+
+        @Override
+        public void onMouseDrag(Vector2i pos) {
+            updatePosition(pos.y - mouseOffset);
+        }
+    };
+
+    private InteractionListener sliderListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            if (button == MouseInput.MOUSE_LEFT) {
+                setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
+                mouseOffset = handleSize / 2;
+                dragging = true;
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onMouseDrag(Vector2i pos) {
+            updatePosition(pos.y - mouseOffset);
+        }
+
+        @Override
+        public void onMouseRelease(MouseInput button, Vector2i pos) {
+            dragging = false;
+        }
     };
 
     @Override
     public void onDraw(Canvas canvas) {
         canvas.setPart("slider");
         canvas.drawBackground();
+        canvas.addInteractionRegion(sliderListener);
 
         canvas.setPart("handle");
         sliderSize = canvas.size().y - canvas.getCurrentStyle().getFixedHeight();
+
         int drawLocation = pixelOffsetFor(getValue());
-        Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), canvas.getCurrentStyle().getFixedHeight());
+        handleSize = canvas.getCurrentStyle().getFixedHeight();
+        Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
         canvas.drawBackground(handleRegion);
         canvas.addInteractionRegion(handleListener, handleRegion);
     }
@@ -120,11 +145,16 @@ public class UIScrollbar extends CoreWidget {
     }
 
     public int getValue() {
-        return value.get();
+        return TeraMath.clamp(value.get(), getMinimum(), getMinimum() + getRange());
     }
 
     public void setValue(int val) {
         value.set(val);
+    }
+
+    private void updatePosition(int pixelPos) {
+        int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
+        setValue(newPosition * getRange() / sliderSize);
     }
 
 }
