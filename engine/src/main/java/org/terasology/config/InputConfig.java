@@ -22,6 +22,7 @@ package org.terasology.config;
 public class InputConfig {
     private BindsConfig binds = new BindsConfig();
     private float mouseSensitivity = 0.075f;
+    private boolean mouseYAxisInverted = false;
 
     public BindsConfig getBinds() {
         return binds;
@@ -34,11 +35,20 @@ public class InputConfig {
     public void setMouseSensitivity(float mouseSensitivity) {
         this.mouseSensitivity = mouseSensitivity;
     }
-
+    
     public void reset() {
         binds.setBinds(BindsConfig.createDefault());
         InputConfig defaultConfig = new InputConfig();
         setMouseSensitivity(defaultConfig.mouseSensitivity);
+        setMouseYAxisInverted(defaultConfig.mouseYAxisInverted);
+    }
+
+    public boolean isMouseYAxisInverted() {
+        return mouseYAxisInverted;
+    }
+
+    public void setMouseYAxisInverted(boolean mouseYAxisInverted) {
+        this.mouseYAxisInverted = mouseYAxisInverted;
     }
 
 }
