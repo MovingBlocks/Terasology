@@ -1,0 +1,73 @@
+task findSub {
+    dependsOn 'findModules'
+    dependsOn 'findFacades'
+}
+task findModules {
+    // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+    new File(rootDir,'modules').eachDir { possibleSubprojectDir ->
+        def subprojectName = 'modules:' + possibleSubprojectDir.name
+        //println "Gradle is reviewing module $subprojectName for inclusion as a sub-project"
+        File buildFile = new File(possibleSubprojectDir, "build.gradle")
+        if (buildFile.exists()) {
+            def containsSub = false
+            def f = new File(rootDir, "modules/subprojects.gradle")
+            if(!f.exists())
+            {
+                def success = f.createNewFile()
+                if(!success)
+                {
+                    println "Failed to create subproject.gradle in modules/ :("
+                }
+            }
+            f.eachLine() { ln ->
+                if (ln.contains("include \'modules:"+possibleSubprojectDir.name+"\'"))
+                {
+                    containsSub = true
+                }
+            }
+            if(!containsSub)
+            {
+                f.write("include \'modules:"+possibleSubprojectDir.name+"\'")
+            } 
+        } else {
+            println "***** WARNING: Found a module subdir without a build.gradle, corrupt dir? NOT including module *****"
+        }
+    }  
+}
+
+task findFacades {
+    // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+    // The first time this type of sub is added this file is created, but the sub-sub isn't available until next run
+
+    dependsOn 'findModules'
+
+    new File(rootDir,'facades').eachDir { possibleSubprojectDir ->
+        def subprojectName = 'facades:' + possibleSubprojectDir.name
+        //println "Gradle is reviewing module $subprojectName for inclusion as a sub-project"
+        File buildFile = new File(possibleSubprojectDir, "build.gradle")
+        if (buildFile.exists()) {
+            def containsSub = false
+            def f = new File(rootDir, "facades/subprojects.gradle")
+            if(!f.exists())
+            {
+                def success = f.createNewFile()
+                if(!success)
+                {
+                    println "Failed to create subproject.gradle in facades/ :("
+                }
+            }
+            f.eachLine() { ln ->
+                if (ln.contains("include \'facades:"+possibleSubprojectDir.name+"\'"))
+                {
+                    containsSub = true
+                }
+            }
+            if(!containsSub)
+            {
+                f.write("include \'facades:"+possibleSubprojectDir.name+"\'")
+            } 
+        } else {
+            println "***** WARNING: Found a facade subdir without a build.gradle, corrupt dir? NOT including module *****"
+        }
+    }
+}
