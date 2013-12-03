@@ -287,10 +287,24 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
+    public Rect2i calculateSize(UIElement element, Rect2i areaHint) {
+        if (element == null) {
+            return areaHint;
+        }
+        String family = (element.getFamily() != null) ? element.getFamily() : state.family;
+        UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
+        Rect2i adjustedArea = applyFixedSizesToRegion(areaHint, elementStyle);
+        return applyFixedSizesToRegion(element.calculateSize(elementStyle, adjustedArea), elementStyle);
+
+
+    }
+
+    @Override
     public void drawElement(UIElement element, Rect2i region) {
         if (element == null) {
             return;
         }
+
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea = applyFixedSizesToRegion(region, newStyle);

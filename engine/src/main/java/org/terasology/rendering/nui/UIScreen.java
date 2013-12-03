@@ -20,8 +20,10 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.skin.UIStyle;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -88,6 +90,11 @@ public class UIScreen implements UIElement {
 
     @Override
     public void onKeyEvent(KeyEvent event) {
+    }
+
+    @Override
+    public Rect2i calculateSize(UIStyle style, Rect2i areaHint) {
+        return areaHint;
     }
 
     @Override

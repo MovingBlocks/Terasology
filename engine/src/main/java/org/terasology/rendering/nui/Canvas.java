@@ -89,10 +89,18 @@ public interface Canvas {
     UIStyle getCurrentStyle();
 
     /**
+     * @param element The element to get the size of
+     * @param areaHint A hint as to the available area for the drawing the element
+     * @return The "desired" size of the element
+     */
+    Rect2i calculateSize(UIElement element, Rect2i areaHint);
+
+    /**
      * Draws a widget to the given region of the current canvas
      *
      * @param element
      * @param region
+     * @return the actual region drawn to
      */
     void drawElement(UIElement element, Rect2i region);
 

@@ -19,6 +19,8 @@ import org.terasology.input.Input;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.Rect2i;
+import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
  * @author Immortius
@@ -50,4 +52,7 @@ public interface UIElement extends Iterable<UIWidget> {
     void onMouseWheelEvent(MouseWheelEvent event);
 
     void onKeyEvent(KeyEvent event);
+
+    Rect2i calculateSize(UIStyle style, Rect2i areaHint);
+
 }

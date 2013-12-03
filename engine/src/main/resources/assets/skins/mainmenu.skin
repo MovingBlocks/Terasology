@@ -169,6 +169,26 @@
                  }
             }
         },
+        "UIScrollbar" : {
+            "fixed-width" : 16,
+            "parts" : {
+                "slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-width" : 8,
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 0,
+                        "right" : 0
+                    }
+                },
+                "handle" : {
+                    "background" : "engine:handle",
+                    "fixed-width" : 16,
+                    "fixed-height" : 16
+                }
+            }
+        },
         "UISlider" : {
             "text-align-horizontal" : "center",
             "text-align-vertical" : "middle",
