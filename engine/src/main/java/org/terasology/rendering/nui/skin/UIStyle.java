@@ -36,6 +36,10 @@ public class UIStyle {
     private Border margin = new Border(0, 0, 0, 0);
     private int fixedWidth;
     private int fixedHeight;
+    private int minWidth;
+    private int minHeight;
+    private int maxWidth = Integer.MAX_VALUE;
+    private int maxHeight = Integer.MAX_VALUE;
     private HorizontalAlign alignmentH = HorizontalAlign.CENTER;
     private VerticalAlign alignmentV = VerticalAlign.MIDDLE;
 
@@ -47,7 +51,6 @@ public class UIStyle {
     private HorizontalAlign textAlignmentH = HorizontalAlign.CENTER;
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
-
 
     public UIStyle() {
     }
@@ -61,6 +64,10 @@ public class UIStyle {
         this.margin = other.margin;
         this.fixedWidth = other.fixedWidth;
         this.fixedHeight = other.fixedHeight;
+        this.minWidth = other.minWidth;
+        this.minHeight = other.minHeight;
+        this.maxWidth = other.maxWidth;
+        this.maxHeight = other.maxHeight;
         this.alignmentH = other.alignmentH;
         this.alignmentV = other.alignmentV;
 
@@ -200,5 +207,37 @@ public class UIStyle {
 
     public VerticalAlign getVerticalAlignment() {
         return alignmentV;
+    }
+
+    public int getMinWidth() {
+        return minWidth;
+    }
+
+    public void setMinWidth(int minWidth) {
+        this.minWidth = minWidth;
+    }
+
+    public int getMinHeight() {
+        return minHeight;
+    }
+
+    public void setMinHeight(int minHeight) {
+        this.minHeight = minHeight;
+    }
+
+    public int getMaxWidth() {
+        return maxWidth;
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
     }
 }

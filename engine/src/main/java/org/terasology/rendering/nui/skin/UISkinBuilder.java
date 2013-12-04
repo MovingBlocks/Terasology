@@ -101,83 +101,87 @@ public class UISkinBuilder {
     }
 
     public UISkinBuilder setBackground(TextureRegion background) {
-        currentStyle.background = background;
-        currentStyle.backgroundSet = true;
+        currentStyle.setBackground(background);
         return this;
     }
 
     public UISkinBuilder setBackgroundBorder(Border border) {
-        currentStyle.backgroundBorder = border;
+        currentStyle.setBackgroundBorder(border);
         return this;
     }
 
     public UISkinBuilder setBackgroundMode(ScaleMode mode) {
-        currentStyle.backgroundScaleMode = mode;
+        currentStyle.setBackgroundScaleMode(mode);
         return this;
     }
 
     public UISkinBuilder setBackgroundAutomaticallyDrawn(boolean autoDraw) {
-        currentStyle.autoDrawBackground = autoDraw;
+        currentStyle.setAutoDrawBackground(autoDraw);
         return this;
     }
 
     public UISkinBuilder setFixedWidth(int width) {
-        currentStyle.fixedWidth = width;
+        currentStyle.setFixedWidth(width);
         return this;
     }
 
     public UISkinBuilder setFixedHeight(int height) {
-        currentStyle.fixedHeight = height;
+        currentStyle.setFixedHeight(height);
         return this;
     }
 
     public UISkinBuilder setHorizontalAlignment(HorizontalAlign align) {
-        currentStyle.alignmentH = align;
+        currentStyle.setAlignmentH(align);
         return this;
     }
 
     public UISkinBuilder setVerticalAlignment(VerticalAlign align) {
-        currentStyle.alignmentV = align;
+        currentStyle.setAlignmentV(align);
         return this;
     }
 
     public UISkinBuilder setMargin(Border margin) {
-        currentStyle.margin = margin;
+        currentStyle.setMargin(margin);
         return this;
     }
 
     public UISkinBuilder setTextureScaleMode(ScaleMode scaleMode) {
-        currentStyle.textureScaleMode = scaleMode;
+        currentStyle.setTextureScaleMode(scaleMode);
         return this;
     }
 
     public UISkinBuilder setFont(Font font) {
-        currentStyle.font = font;
+        currentStyle.setFont(font);
         return this;
     }
 
     public UISkinBuilder setTextColor(Color color) {
-        currentStyle.textColor = color;
+        currentStyle.setTextColor(color);
         return this;
     }
 
     public UISkinBuilder setTextShadowColor(Color color) {
-        currentStyle.textShadowColor = color;
+        currentStyle.setTextShadowColor(color);
         return this;
     }
 
     public UISkinBuilder setTextShadowed(boolean shadowed) {
-        currentStyle.textShadowed = shadowed;
+        currentStyle.setTextShadowed(shadowed);
         return this;
     }
 
     public UISkinBuilder setTextHorizontalAlignment(HorizontalAlign hAlign) {
-        currentStyle.textAlignmentH = hAlign;
+        currentStyle.setTextAlignmentH(hAlign);
         return this;
     }
 
     public UISkinBuilder setTextVerticalAlignment(VerticalAlign vAlign) {
-        currentStyle.textAlignmentV = vAlign;
+        currentStyle.setTextAlignmentV(vAlign);
+        return this;
+    }
+
+    public UISkinBuilder setStyleFragment(UIStyleFragment fragment) {
+        currentStyle = fragment;
         return this;
     }
 
@@ -239,81 +243,6 @@ public class UISkinBuilder {
             UIStyleFragment elemStyle = styleLookup.get(key);
             if (elemStyle != null) {
                 elemStyle.applyTo(elementStyle);
-            }
-        }
-    }
-
-    private static class UIStyleFragment {
-        private boolean backgroundSet;
-        private TextureRegion background;
-        private Border backgroundBorder;
-        private ScaleMode backgroundScaleMode;
-
-        private Border margin;
-
-        private ScaleMode textureScaleMode;
-
-        private Font font;
-        private Color textColor;
-        private Color textShadowColor;
-        private HorizontalAlign textAlignmentH;
-        private VerticalAlign textAlignmentV;
-        private Boolean textShadowed;
-
-        private Boolean autoDrawBackground;
-        private Integer fixedWidth;
-        private Integer fixedHeight;
-        private HorizontalAlign alignmentH;
-        private VerticalAlign alignmentV;
-
-        public void applyTo(UIStyle style) {
-            if (backgroundSet) {
-                style.setBackground(background);
-            }
-            if (backgroundBorder != null) {
-                style.setBackgroundBorder(backgroundBorder);
-            }
-            if (backgroundScaleMode != null) {
-                style.setBackgroundScaleMode(backgroundScaleMode);
-            }
-            if (margin != null) {
-                style.setMargin(margin);
-            }
-            if (textureScaleMode != null) {
-                style.setTextureScaleMode(textureScaleMode);
-            }
-            if (font != null) {
-                style.setFont(font);
-            }
-            if (textColor != null) {
-                style.setTextColor(textColor);
-            }
-            if (textShadowColor != null) {
-                style.setTextShadowColor(textShadowColor);
-            }
-            if (textAlignmentH != null) {
-                style.setTextAlignmentH(textAlignmentH);
-            }
-            if (textAlignmentV != null) {
-                style.setTextAlignmentV(textAlignmentV);
-            }
-            if (textShadowed != null) {
-                style.setTextShadowed(textShadowed);
-            }
-            if (autoDrawBackground != null) {
-                style.setBackgroundAutomaticallyDrawn(autoDrawBackground);
-            }
-            if (fixedWidth != null) {
-                style.setFixedWidth(fixedWidth);
-            }
-            if (fixedHeight != null) {
-                style.setFixedHeight(fixedHeight);
-            }
-            if (alignmentH != null) {
-                style.setHorizontalAlignment(alignmentH);
-            }
-            if (alignmentV != null) {
-                style.setVerticalAlignment(alignmentV);
             }
         }
     }

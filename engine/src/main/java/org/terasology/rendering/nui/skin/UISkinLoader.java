@@ -21,7 +21,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,18 +31,12 @@ import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
-import org.terasology.math.Rect2f;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.UIElement;
-import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.ColorTypeAdapter;
@@ -87,9 +80,6 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         @Override
         public TextureRegion deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String uri = json.getAsString();
-            if (uri.isEmpty()) {
-                return new NullTextureRegion();
-            }
             return Assets.getTextureRegion(uri);
         }
     }
@@ -170,7 +160,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
                 }
             }
             if (parts != null) {
-                for (Map.Entry<String, PartsInfo> entry : parts.entrySet())  {
+                for (Map.Entry<String, PartsInfo> entry : parts.entrySet()) {
                     builder.setElementPart(entry.getKey());
                     entry.getValue().apply(builder);
                 }
@@ -178,117 +168,11 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
-    private static class StyleInfo {
-        public TextureRegion background;
-        @SerializedName("background-border")
-        public Border backgroundBorder;
-        @SerializedName("background-scale-mode")
-        public ScaleMode backgroundScaleMode;
-        @SerializedName("background-auto-draw")
-        public Boolean backgroundAutomaticallyDrawn;
+    private static class StyleInfo extends UIStyleFragment {
 
-        public Border margin;
-        @SerializedName("fixed-width")
-        public Integer fixedWidth;
-        @SerializedName("fixed-height")
-        public Integer fixedHeight;
-        @SerializedName("align-horizontal")
-        public HorizontalAlign alignmentH;
-        @SerializedName("align-vertical")
-        public VerticalAlign alignmentV;
-
-        @SerializedName("texture-scale-mode")
-        public ScaleMode textureScaleMode;
-
-        public Font font;
-        @SerializedName("text-color")
-        public Color textColor;
-        @SerializedName("text-shadow-color")
-        public Color textShadowColor;
-
-        @SerializedName("text-align-horizontal")
-        public HorizontalAlign textAlignmentH;
-        @SerializedName("text-align-vertical")
-        public VerticalAlign textAlignmentV;
-        @SerializedName("text-shadowed")
-        public Boolean textShadowed;
-
-        public void apply(UISkinBuilder builder) {
-            if (background != null) {
-                if (background.getRegion().isEmpty()) {
-                    builder.setBackground(null);
-                } else {
-                    builder.setBackground(background);
-                }
-            }
-            if (backgroundBorder != null) {
-                builder.setBackgroundBorder(backgroundBorder);
-            }
-            if (backgroundScaleMode != null) {
-                builder.setBackgroundMode(backgroundScaleMode);
-            }
-            if (margin != null) {
-                builder.setMargin(margin);
-            }
-            if (textureScaleMode != null) {
-                builder.setTextureScaleMode(textureScaleMode);
-            }
-            if (font != null) {
-                builder.setFont(font);
-            }
-            if (textColor != null) {
-                builder.setTextColor(textColor);
-            }
-            if (textShadowColor != null) {
-                builder.setTextShadowColor(textShadowColor);
-            }
-            if (textAlignmentH != null) {
-                builder.setTextHorizontalAlignment(textAlignmentH);
-            }
-            if (textAlignmentV != null) {
-                builder.setTextVerticalAlignment(textAlignmentV);
-            }
-            if (textShadowed != null) {
-                builder.setTextShadowed(textShadowed);
-            }
-            if (backgroundAutomaticallyDrawn != null) {
-                builder.setBackgroundAutomaticallyDrawn(backgroundAutomaticallyDrawn);
-            }
-            if (fixedWidth != null) {
-                builder.setFixedWidth(fixedWidth);
-            }
-            if (fixedHeight != null) {
-                builder.setFixedHeight(fixedHeight);
-            }
-            if (alignmentH != null) {
-                builder.setHorizontalAlignment(alignmentH);
-            }
-            if (alignmentV != null) {
-                builder.setVerticalAlignment(alignmentV);
-            }
+        private void apply(UISkinBuilder builder) {
+            builder.setStyleFragment(this);
         }
     }
 
-    private static class NullTextureRegion implements TextureRegion {
-
-        @Override
-        public Texture getTexture() {
-            return null;
-        }
-
-        @Override
-        public Rect2f getRegion() {
-            return Rect2f.EMPTY;
-        }
-
-        @Override
-        public int getWidth() {
-            return 0;
-        }
-
-        @Override
-        public int getHeight() {
-            return 0;
-        }
-    }
 }
