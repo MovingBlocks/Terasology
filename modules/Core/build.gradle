@@ -74,6 +74,13 @@ dependencies {
         // Added after Core had unit tests - only ever gets used by Core as other modules do not use the engine build
         testCompile project(':engine').sourceSets.test.output
 
+        // Special case: Any module OTHER than the Core module needs to have the Core module on the classpath
+        if (project.name != 'Core') {
+            println "Adding Core module as a dependency for module $project.name"
+            compile project(':modules:Core')
+            //TODO: See about replacing this with an Artifactory dependency like other modules
+        }
+
         // If the module has dependencies on other modules we look in a few different spots to find them
         for (dependency in moduleDepends) {
 

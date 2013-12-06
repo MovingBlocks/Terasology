@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.config;
 
 /**
  * @author Immortius
  */
 public class InputConfig {
+
     private BindsConfig binds = new BindsConfig();
     private float mouseSensitivity = 0.075f;
+    private boolean mouseYAxisInverted = false;
 
     public BindsConfig getBinds() {
         return binds;
@@ -39,6 +40,17 @@ public class InputConfig {
         binds.setBinds(BindsConfig.createDefault());
         InputConfig defaultConfig = new InputConfig();
         setMouseSensitivity(defaultConfig.mouseSensitivity);
+        setMouseYAxisInverted(defaultConfig.mouseYAxisInverted);
+    }
+
+    public boolean isMouseYAxisInverted() {
+        return mouseYAxisInverted;
+    }
+
+    public void setMouseYAxisInverted(boolean mouseYAxisInverted) {
+
+        this.mouseYAxisInverted = mouseYAxisInverted;
+
     }
 
 }
