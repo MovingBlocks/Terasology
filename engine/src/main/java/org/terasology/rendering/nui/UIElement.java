@@ -53,6 +53,7 @@ public interface UIElement extends Iterable<UIWidget> {
 
     void onKeyEvent(KeyEvent event);
 
-    Rect2i calculateSize(UIStyle style, Rect2i areaHint);
+    Rect2i calcContentSize(UIStyle style, Rect2i areaHint);
 
+    boolean isBackgroundAutomaticallyDrawn();
 }

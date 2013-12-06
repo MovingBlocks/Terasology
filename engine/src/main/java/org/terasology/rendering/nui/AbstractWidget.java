@@ -44,22 +44,22 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
     @Override
-    public String getFamily() {
+    public final String getFamily() {
         return family;
     }
 
     @Override
-    public void setFamily(String family) {
+    public final void setFamily(String family) {
         this.family = family;
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
+    public final <T extends UIWidget> T find(String targetId, Class<T> type) {
         if (this.id.equals(targetId)) {
             if (type.isInstance(this)) {
                 return type.cast(this);
@@ -85,13 +85,17 @@ public abstract class AbstractWidget implements UIWidget {
         focused = false;
     }
 
-    public boolean isFocused() {
+    public final boolean isFocused() {
         return focused;
     }
 
     @Override
-    public Rect2i calculateSize(UIStyle style, Rect2i areaHint) {
+    public Rect2i calcContentSize(UIStyle style, Rect2i areaHint) {
         return areaHint;
     }
 
+    @Override
+    public boolean isBackgroundAutomaticallyDrawn() {
+        return true;
+    }
 }

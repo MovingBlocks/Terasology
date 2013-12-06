@@ -312,7 +312,7 @@ public class LwjglCanvas implements CanvasInternal {
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i adjustedArea = applyFixedSizesToRegion(areaHint, elementStyle);
-        return applyFixedSizesToRegion(element.calculateSize(elementStyle, adjustedArea), elementStyle);
+        return applyFixedSizesToRegion(element.calcContentSize(elementStyle, adjustedArea), elementStyle);
 
 
     }
@@ -333,7 +333,7 @@ public class LwjglCanvas implements CanvasInternal {
             }
             setPart("");
             setMode(element.getMode());
-            if (newStyle.isBackgroundAutomaticallyDrawn()) {
+            if (element.isBackgroundAutomaticallyDrawn()) {
                 drawBackground();
             }
             element.onDraw(this);
@@ -350,9 +350,9 @@ public class LwjglCanvas implements CanvasInternal {
         Rect2i drawRegion = applyMarginToRegion(region);
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getTextAlignmentH(), style.getTextAlignmentV());
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         } else {
-            drawTextRaw(text, style.getFont(), style.getTextColor(), drawRegion, style.getTextAlignmentH(), style.getTextAlignmentV());
+            drawTextRaw(text, style.getFont(), style.getTextColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
     }
 

@@ -28,49 +28,49 @@ import org.terasology.rendering.nui.VerticalAlign;
  * @author Immortius
  */
 public class UIStyleFragment {
-    public TextureRegion background;
+    private TextureRegion background;
     @SerializedName("background-border")
-    public Border backgroundBorder;
+    private Border backgroundBorder;
     @SerializedName("background-scale-mode")
-    public ScaleMode backgroundScaleMode;
-    @SerializedName("background-auto-draw")
-    public Boolean backgroundAutomaticallyDrawn;
+    private ScaleMode backgroundScaleMode;
 
-    public Border margin;
+    private Border margin;
+    @SerializedName("crop-to-margin")
+    private Boolean cropToMargin;
     @SerializedName("fixed-width")
-    public Integer fixedWidth;
+    private Integer fixedWidth;
     @SerializedName("fixed-height")
-    public Integer fixedHeight;
+    private Integer fixedHeight;
 
     @SerializedName("min-width")
-    public Integer minWidth;
+    private Integer minWidth;
     @SerializedName("min-height")
-    public Integer minHeight;
+    private Integer minHeight;
     @SerializedName("max-width")
-    public Integer maxWidth;
+    private Integer maxWidth;
     @SerializedName("max-height")
-    public Integer maxHeight;
+    private Integer maxHeight;
 
     @SerializedName("align-horizontal")
-    public HorizontalAlign alignmentH;
+    private HorizontalAlign alignmentH;
     @SerializedName("align-vertical")
-    public VerticalAlign alignmentV;
+    private VerticalAlign alignmentV;
 
     @SerializedName("texture-scale-mode")
-    public ScaleMode textureScaleMode;
+    private ScaleMode textureScaleMode;
 
-    public Font font;
+    private Font font;
     @SerializedName("text-color")
-    public Color textColor;
+    private Color textColor;
     @SerializedName("text-shadow-color")
-    public Color textShadowColor;
+    private Color textShadowColor;
 
     @SerializedName("text-align-horizontal")
-    public HorizontalAlign textAlignmentH;
+    private HorizontalAlign textAlignmentH;
     @SerializedName("text-align-vertical")
-    public VerticalAlign textAlignmentV;
+    private VerticalAlign textAlignmentV;
     @SerializedName("text-shadowed")
-    public Boolean textShadowed;
+    private Boolean textShadowed;
 
 
     public void applyTo(UIStyle style) {
@@ -86,6 +86,9 @@ public class UIStyleFragment {
         if (margin != null) {
             style.setMargin(margin);
         }
+        if (cropToMargin != null) {
+            style.setCropToMargin(cropToMargin);
+        }
         if (textureScaleMode != null) {
             style.setTextureScaleMode(textureScaleMode);
         }
@@ -99,16 +102,13 @@ public class UIStyleFragment {
             style.setTextShadowColor(textShadowColor);
         }
         if (textAlignmentH != null) {
-            style.setTextAlignmentH(textAlignmentH);
+            style.setHorizontalTextAlignment(textAlignmentH);
         }
         if (textAlignmentV != null) {
-            style.setTextAlignmentV(textAlignmentV);
+            style.setVerticalTextAlignment(textAlignmentV);
         }
         if (textShadowed != null) {
             style.setTextShadowed(textShadowed);
-        }
-        if (backgroundAutomaticallyDrawn != null) {
-            style.setBackgroundAutomaticallyDrawn(backgroundAutomaticallyDrawn);
         }
         if (fixedWidth != null) {
             style.setFixedWidth(fixedWidth);
@@ -168,6 +168,14 @@ public class UIStyleFragment {
         this.margin = margin;
     }
 
+    public Boolean getCropToMargin() {
+        return cropToMargin;
+    }
+
+    public void setCropToMargin(Boolean cropToMargin) {
+        this.cropToMargin = cropToMargin;
+    }
+
     public ScaleMode getTextureScaleMode() {
         return textureScaleMode;
     }
@@ -222,14 +230,6 @@ public class UIStyleFragment {
 
     public void setTextShadowed(Boolean textShadowed) {
         this.textShadowed = textShadowed;
-    }
-
-    public Boolean getAutoDrawBackground() {
-        return backgroundAutomaticallyDrawn;
-    }
-
-    public void setAutoDrawBackground(Boolean autoDrawBackground) {
-        this.backgroundAutomaticallyDrawn = autoDrawBackground;
     }
 
     public Integer getFixedWidth() {

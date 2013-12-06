@@ -59,20 +59,6 @@ public class ArbitraryLayout extends CoreLayout {
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        T result = super.find(targetId, type);
-        if (result == null) {
-            for (WidgetInfo widgetInfo : widgets) {
-                result = widgetInfo.widget.find(targetId, type);
-                if (result != null) {
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public Iterator<UIWidget> iterator() {
         List<UIWidget> contents = Lists.newArrayList();
         for (WidgetInfo info : widgets) {

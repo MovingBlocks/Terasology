@@ -115,11 +115,6 @@ public class UISkinBuilder {
         return this;
     }
 
-    public UISkinBuilder setBackgroundAutomaticallyDrawn(boolean autoDraw) {
-        currentStyle.setAutoDrawBackground(autoDraw);
-        return this;
-    }
-
     public UISkinBuilder setFixedWidth(int width) {
         currentStyle.setFixedWidth(width);
         return this;
@@ -142,6 +137,11 @@ public class UISkinBuilder {
 
     public UISkinBuilder setMargin(Border margin) {
         currentStyle.setMargin(margin);
+        return this;
+    }
+
+    public UISkinBuilder setCropToMargin(boolean cropToMargin) {
+        currentStyle.setCropToMargin(cropToMargin);
         return this;
     }
 

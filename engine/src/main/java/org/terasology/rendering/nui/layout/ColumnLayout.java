@@ -114,20 +114,6 @@ public class ColumnLayout extends AbstractWidget {
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        T result = super.find(targetId, type);
-        if (result == null) {
-            for (UIWidget widget : widgetList) {
-                result = widget.find(targetId, type);
-                if (result != null) {
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public Iterator<UIWidget> iterator() {
         return widgetList.iterator();
     }
