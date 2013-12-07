@@ -35,8 +35,6 @@ public class UIStyleFragment {
     private ScaleMode backgroundScaleMode;
 
     private Border margin;
-    @SerializedName("crop-to-margin")
-    private Boolean cropToMargin;
     @SerializedName("fixed-width")
     private Integer fixedWidth;
     @SerializedName("fixed-height")
@@ -85,9 +83,6 @@ public class UIStyleFragment {
         }
         if (margin != null) {
             style.setMargin(margin);
-        }
-        if (cropToMargin != null) {
-            style.setCropToMargin(cropToMargin);
         }
         if (textureScaleMode != null) {
             style.setTextureScaleMode(textureScaleMode);
@@ -166,14 +161,6 @@ public class UIStyleFragment {
 
     public void setMargin(Border margin) {
         this.margin = margin;
-    }
-
-    public Boolean getCropToMargin() {
-        return cropToMargin;
-    }
-
-    public void setCropToMargin(Boolean cropToMargin) {
-        this.cropToMargin = cropToMargin;
     }
 
     public ScaleMode getTextureScaleMode() {

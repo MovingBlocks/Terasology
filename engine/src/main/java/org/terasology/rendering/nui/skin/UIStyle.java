@@ -33,7 +33,6 @@ public class UIStyle {
     private ScaleMode backgroundScaleMode = ScaleMode.STRETCH;
 
     private Border margin = new Border(0, 0, 0, 0);
-    private boolean cropToMargin;
     private int fixedWidth;
     private int fixedHeight;
     private int minWidth;
@@ -61,7 +60,6 @@ public class UIStyle {
         this.backgroundScaleMode = other.backgroundScaleMode;
 
         this.margin = other.margin;
-        this.cropToMargin = other.cropToMargin;
         this.fixedWidth = other.fixedWidth;
         this.fixedHeight = other.fixedHeight;
         this.minWidth = other.minWidth;
@@ -133,18 +131,6 @@ public class UIStyle {
 
     public void setMargin(Border margin) {
         this.margin = margin;
-    }
-
-    /**
-     * Whether the contents of the element should be cropped to the margin - any parts of the contents that exceed the inner region will not be drawn
-     * @return Whether the contents of the element should be cropped to the margin
-     */
-    public boolean isCropToMargin() {
-        return cropToMargin;
-    }
-
-    public void setCropToMargin(boolean cropToMargin) {
-        this.cropToMargin = cropToMargin;
     }
 
     /**
@@ -228,6 +214,10 @@ public class UIStyle {
         this.fixedWidth = fixedWidth;
     }
 
+    /**
+     * The width to draw the element - if non-zero.
+     * @return The fixed width to draw the element
+     */
     public int getFixedWidth() {
         return fixedWidth;
     }
@@ -236,6 +226,10 @@ public class UIStyle {
         this.fixedHeight = fixedHeight;
     }
 
+    /**
+     * The height to draw the element - if non-zero.
+     * @return The fixed height to draw the element
+     */
     public int getFixedHeight() {
         return fixedHeight;
     }
@@ -244,6 +238,10 @@ public class UIStyle {
         this.alignmentH = horizontalAlignment;
     }
 
+    /**
+     * If the element does not use the full width of the available to it, how should it be aligned
+     * @return The horizontal alignment of the element
+     */
     public HorizontalAlign getHorizontalAlignment() {
         return alignmentH;
     }
@@ -252,10 +250,17 @@ public class UIStyle {
         this.alignmentV = verticalAlignment;
     }
 
+    /**
+     * If the element does not use the full height of the available to it, how should it be aligned
+     * @return The vertical alignment of the element
+     */
     public VerticalAlign getVerticalAlignment() {
         return alignmentV;
     }
 
+    /**
+     * @return The minimum width this element can use
+     */
     public int getMinWidth() {
         return minWidth;
     }
@@ -264,6 +269,9 @@ public class UIStyle {
         this.minWidth = minWidth;
     }
 
+    /**
+     * @return The minimum height this element can use
+     */
     public int getMinHeight() {
         return minHeight;
     }
@@ -272,6 +280,9 @@ public class UIStyle {
         this.minHeight = minHeight;
     }
 
+    /**
+     * @return The maximum width this element will use
+     */
     public int getMaxWidth() {
         return maxWidth;
     }
@@ -280,6 +291,9 @@ public class UIStyle {
         this.maxWidth = maxWidth;
     }
 
+    /**
+     * @return The maximum height this element will use
+     */
     public int getMaxHeight() {
         return maxHeight;
     }

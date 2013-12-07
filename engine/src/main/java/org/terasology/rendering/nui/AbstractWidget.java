@@ -19,6 +19,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
@@ -90,12 +91,12 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public Rect2i calcContentSize(UIStyle style, Rect2i areaHint) {
+    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
         return areaHint;
     }
 
     @Override
-    public boolean isBackgroundAutomaticallyDrawn() {
+    public boolean isSkinAppliedByCanvas() {
         return true;
     }
 }

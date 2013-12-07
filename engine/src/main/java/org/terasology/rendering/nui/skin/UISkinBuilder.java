@@ -140,11 +140,6 @@ public class UISkinBuilder {
         return this;
     }
 
-    public UISkinBuilder setCropToMargin(boolean cropToMargin) {
-        currentStyle.setCropToMargin(cropToMargin);
-        return this;
-    }
-
     public UISkinBuilder setTextureScaleMode(ScaleMode scaleMode) {
         currentStyle.setTextureScaleMode(scaleMode);
         return this;

@@ -64,6 +64,11 @@ public interface Canvas {
     void setSkin(UISkin skin);
 
     /**
+     * @return The skin being used for drawing operations
+     */
+    UISkin getSkin();
+
+    /**
      * Sets the family subset of the current skin to use for drawing operations
      *
      * @param familyName
@@ -89,18 +94,23 @@ public interface Canvas {
     UIStyle getCurrentStyle();
 
     /**
+     * Calculates the size an element would like to have. Skin settings are taken into account, unless element.isSkinAppliedByCanvas() returns false.
+     *
      * @param element The element to get the size of
-     * @param areaHint A hint as to the available area for the drawing the element
+     * @param sizeHint A hint as to the available area for the drawing the element
      * @return The "desired" size of the element
      */
-    Rect2i calculateSize(UIElement element, Rect2i areaHint);
+    Vector2i calculateSize(UIElement element, Vector2i sizeHint);
 
     /**
-     * Draws a widget to the given region of the current canvas
+     * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
+     *
+     * This method will update the skin settings for the given element and its current mode.  Min/max and fixed size settings will be applied, along with horizontal
+     * and vertical alignment as necessary. If element.isSkinAppliedByCanvas() returns true, any background will be drawn and margin applied to remaining region to
+     * determine the region provided to the element for drawing content.
      *
      * @param element
      * @param region
-     * @return the actual region drawn to
      */
     void drawElement(UIElement element, Rect2i region);
 
@@ -173,8 +183,8 @@ public interface Canvas {
     SubRegion subRegion(Rect2i region, boolean crop);
 
     /**
-     * When focused is set to true, subsequent drawing will be on top of everything else.
-     * This ceases when focused is set to false or the current subRegion ends.
+     * When drawOnTop is set to true, subsequent drawing will be on top of everything else.
+     * This ceases when drawOnTop is set to false or the current subRegion ends.
      *
      * @param focused
      */

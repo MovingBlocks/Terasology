@@ -94,7 +94,6 @@ public class LwjglCanvas implements CanvasInternal {
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
 
     private final NUIManager nuiManager;
-
     private CanvasState state;
 
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -285,6 +284,11 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
+    public UISkin getSkin() {
+        return state.skin;
+    }
+
+    @Override
     public void setFamily(String familyName) {
         state.family = familyName;
     }
@@ -305,16 +309,15 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public Rect2i calculateSize(UIElement element, Rect2i areaHint) {
+    public Vector2i calculateSize(UIElement element, Vector2i sizeHint) {
         if (element == null) {
-            return areaHint;
+            return sizeHint;
         }
+
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
-        Rect2i adjustedArea = applyFixedSizesToRegion(areaHint, elementStyle);
-        return applyFixedSizesToRegion(element.calcContentSize(elementStyle, adjustedArea), elementStyle);
-
-
+        Rect2i adjustedArea = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeHint), elementStyle);
+        return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), element.calcContentSize(elementStyle, adjustedArea.size())), elementStyle).size();
     }
 
     @Override
@@ -325,7 +328,7 @@ public class LwjglCanvas implements CanvasInternal {
 
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
-        Rect2i regionArea = applyFixedSizesToRegion(region, newStyle);
+        Rect2i regionArea = applySizesToRegion(region, newStyle);
         try (SubRegion ignored = subRegion(regionArea, false)) {
             state.element = element;
             if (element.getFamily() != null) {
@@ -333,7 +336,7 @@ public class LwjglCanvas implements CanvasInternal {
             }
             setPart("");
             setMode(element.getMode());
-            if (element.isBackgroundAutomaticallyDrawn()) {
+            if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
             }
             element.onDraw(this);
@@ -377,23 +380,33 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawBackground() {
-        Rect2i region = applyFixedSizesToRegion(getRegion());
+        Rect2i region = applySizesToRegion(getRegion());
         drawBackground(region);
     }
 
-    private Rect2i applyFixedSizesToRegion(Rect2i region) {
-        return applyFixedSizesToRegion(region, getCurrentStyle());
+    private Rect2i applySizesToRegion(Rect2i region) {
+        return applySizesToRegion(region, getCurrentStyle());
     }
 
-    private Rect2i applyFixedSizesToRegion(Rect2i region, UIStyle style) {
-        if (style.getFixedWidth() != 0 || style.getFixedHeight() != 0) {
-            int newWidth = (style.getFixedWidth() != 0) ? style.getFixedWidth() : region.width();
-            int newHeight = (style.getFixedHeight() != 0) ? style.getFixedHeight() : region.height();
-            int newMinX = region.minX() + style.getHorizontalAlignment().getOffset(newWidth, region.width());
-            int newMinY = region.minY() + style.getVerticalAlignment().getOffset(newHeight, region.height());
-            return  Rect2i.createFromMinAndSize(newMinX, newMinY, newWidth, newHeight);
+    private Rect2i applySizesToRegion(Rect2i region, UIStyle style) {
+        int width = region.width();
+        if (style.getFixedWidth() != 0) {
+            width = style.getFixedWidth();
+        } else {
+            width = TeraMath.clamp(width, style.getMinWidth(), style.getMaxWidth());
         }
-        return region;
+
+        int height = region.height();
+        if (style.getFixedHeight() != 0) {
+            height = style.getFixedHeight();
+        } else {
+            height = TeraMath.clamp(height, style.getMinHeight(), style.getMaxHeight());
+        }
+
+        int minX = region.minX() + style.getHorizontalAlignment().getOffset(width, region.width());
+        int minY = region.minY() + style.getVerticalAlignment().getOffset(height, region.height());
+
+        return Rect2i.createFromMinAndSize(minX, minY, width, height);
     }
 
     @Override
@@ -674,7 +687,7 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(listener, applyFixedSizesToRegion(getRegion()));
+        addInteractionRegion(listener, applySizesToRegion(getRegion()));
     }
 
     @Override

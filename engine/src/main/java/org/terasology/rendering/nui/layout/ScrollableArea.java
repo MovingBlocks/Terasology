@@ -15,10 +15,7 @@
  */
 package org.terasology.rendering.nui.layout;
 
-import org.terasology.input.MouseInput;
-import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Rect2i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Border;
@@ -31,7 +28,6 @@ import org.terasology.rendering.nui.baseWidgets.UIScrollbar;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Immortius
@@ -56,7 +52,7 @@ public class ScrollableArea extends CoreLayout {
         if (canvas.size().y < contentHeight) {
             canvas.addInteractionRegion(scrollListener);
             Border margin = canvas.getCurrentStyle().getMargin();
-            int scrollbarWidth = canvas.calculateSize(scrollbar, canvas.getRegion()).width();
+            int scrollbarWidth = canvas.calculateSize(scrollbar, canvas.size()).x;
             canvas.drawElement(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth - margin.getRight(), margin.getTop(),
                     scrollbarWidth, canvas.size().y - margin.getTotalHeight()));
 

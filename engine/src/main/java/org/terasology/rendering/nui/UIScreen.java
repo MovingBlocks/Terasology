@@ -93,12 +93,12 @@ public class UIScreen implements UIElement {
     }
 
     @Override
-    public Rect2i calcContentSize(UIStyle style, Rect2i areaHint) {
+    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
         return areaHint;
     }
 
     @Override
-    public boolean isBackgroundAutomaticallyDrawn() {
+    public boolean isSkinAppliedByCanvas() {
         return true;
     }
 

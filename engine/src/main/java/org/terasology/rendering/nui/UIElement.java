@@ -20,6 +20,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
@@ -53,7 +54,8 @@ public interface UIElement extends Iterable<UIWidget> {
 
     void onKeyEvent(KeyEvent event);
 
-    Rect2i calcContentSize(UIStyle style, Rect2i areaHint);
+    Vector2i calcContentSize(UIStyle style, Vector2i sizeHint);
 
-    boolean isBackgroundAutomaticallyDrawn();
+    boolean isSkinAppliedByCanvas();
+
 }
