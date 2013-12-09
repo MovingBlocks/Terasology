@@ -71,6 +71,15 @@ sourceSets {
             output.classesDir 'build/classes'
         }
     }
+
+    // Put the main engine unit tests outside the standard build dir to exclude them from the standard jar
+    // TODO This prevents an issue during game load but need to make the test classes available for modules
+    test {
+        java {
+            output.classesDir 'build/testClasses'
+            output.resourcesDir 'build/testClasses'
+        }
+    }
 }
 
 // Customizations for the main compilation configuration
