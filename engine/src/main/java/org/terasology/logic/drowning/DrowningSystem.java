@@ -67,21 +67,21 @@ public class DrowningSystem implements UpdateSubscriberSystem {
 
             // update breath time
             if (drowning.isBreathing()) {
-                drowning.breathTime += delta * drowns.breathRechargeRate;
+                drowning.breathRemaining += delta * drowns.breathRechargeRate;
             } else {
-                drowning.breathTime -= delta;
+                drowning.breathRemaining -= delta;
             }
 
             // check for out of breath and full breath conditions
-            if (drowning.breathTime > drowns.breathCapacity) {
+            if (drowning.breathRemaining > drowns.breathCapacity) {
                 // clean up the drowning component
                 entity.removeComponent(DrowningComponent.class);
             } else {
-                if (drowning.breathTime <= drowns.timeBetweenDrownDamage * -1) {
+                if (drowning.breathRemaining <= drowns.timeBetweenDrownDamage * -1) {
                     // damage the entity,  give breath in trade for taking damage
                     EntityRef liquidBlock = blockEntityProvider.getBlockEntityAt(loc.getWorldPosition());
                     entity.send(new DoDamageEvent(drowns.drownDamage, EngineDamageTypes.DROWNING.get(), liquidBlock));
-                    drowning.breathTime += drowns.timeBetweenDrownDamage;
+                    drowning.breathRemaining += drowns.timeBetweenDrownDamage;
                 }
                 entity.saveComponent(drowning);
             }
@@ -99,7 +99,7 @@ public class DrowningSystem implements UpdateSubscriberSystem {
                     entity.saveComponent(drowning);
                 } else {
                     drowning = new DrowningComponent();
-                    drowning.breathTime = drowns.breathCapacity;
+                    drowning.breathRemaining = drowns.breathCapacity;
                     entity.addComponent(drowning);
                 }
             } else {

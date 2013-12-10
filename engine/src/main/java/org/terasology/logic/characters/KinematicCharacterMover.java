@@ -172,21 +172,15 @@ public class KinematicCharacterMover implements CharacterMover {
         }
 
         Vector3f worldPos = state.getPosition();
-        Vector3f oldWorldPos = oldState.getPosition();
-
-
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.25f * movementComp.height;
         bottom.y -= 0.25f * movementComp.height;
 
+        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
+        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
 
-        Block topBlock = worldProvider.getBlock(top);
-        Block bottomBlock = worldProvider.getBlock(bottom);
-
-
-        final boolean newSwimming = topBlock.isLiquid() && bottomBlock.isLiquid();
-        final boolean isUnderground = !newSwimming && topBlock.isPenetrable() && bottomBlock.isPenetrable();
+        final boolean newSwimming = topUnderwater && bottomUnderwater;
         boolean newClimbing = false;
 
         //TODO: refactor this knot of if-else statements into something easy to read. Some sub-methods and switch statements would be nice.

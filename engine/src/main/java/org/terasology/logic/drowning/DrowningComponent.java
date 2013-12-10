@@ -24,7 +24,7 @@ import org.terasology.network.Replicate;
  */
 public class DrowningComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public float breathTime;
+    public float breathRemaining;
 
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     private boolean isBreathing;
