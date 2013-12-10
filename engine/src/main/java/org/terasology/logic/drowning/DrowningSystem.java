@@ -23,18 +23,14 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.events.OnEnterLiquidEvent;
-import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.rendering.RenderHelper;
+import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -66,52 +62,57 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(DrowningComponent.class, DrownsComponent.class, LocationComponent.class)) {
             DrowningComponent drowning = entity.getComponent(DrowningComponent.class);
-
             LocationComponent loc = entity.getComponent(LocationComponent.class);
+            DrownsComponent drowns = entity.getComponent(DrownsComponent.class);
 
-            // Check if the player's head/eyes are actually below the water surface
-            CharacterComponent charComp = entity.getComponent(CharacterComponent.class);
-            if (charComp != null) {
-                Vector3f worldPosition = new Vector3f(loc.getWorldPosition());
-                worldPosition.y += charComp.eyeOffset;
-                worldPosition.y -= RenderHelper.evaluateOceanHeightAtPosition(worldPosition, worldProvider.getTime().getDays());
-
-                if (worldProvider.isBlockRelevant(new Vector3f(worldPosition))) {
-                    Block block = worldProvider.getBlock(new Vector3f(worldPosition));
-
-                    if (!block.isLiquid()) {
-                        resetDrowning(drowning, entity.getComponent(DrownsComponent.class));
-                        continue;
-                    }
-                }
+            // update breath time
+            if (drowning.isBreathing()) {
+                drowning.breathTime += delta * drowns.breathRechargeRate;
+            } else {
+                drowning.breathTime -= delta;
             }
 
-            if (drowning.nextDrownDamageTime < time.getGameTimeInMs()) {
-                DrownsComponent drowns = entity.getComponent(DrownsComponent.class);
-
-                drowning.nextDrownDamageTime = time.getGameTimeInMs() + (long) (drowns.timeBetweenDrownDamage * 1000);
+            // check for out of breath and full breath conditions
+            if (drowning.breathTime > drowns.breathCapacity) {
+                // clean up the drowning component
+                entity.removeComponent(DrowningComponent.class);
+            } else {
+                if (drowning.breathTime <= drowns.timeBetweenDrownDamage * -1) {
+                    // damage the entity,  give breath in trade for taking damage
+                    EntityRef liquidBlock = blockEntityProvider.getBlockEntityAt(loc.getWorldPosition());
+                    entity.send(new DoDamageEvent(drowns.drownDamage, EngineDamageTypes.DROWNING.get(), liquidBlock));
+                    drowning.breathTime += drowns.timeBetweenDrownDamage;
+                }
                 entity.saveComponent(drowning);
-
-                EntityRef liquidBlock = blockEntityProvider.getBlockEntityAt(loc.getWorldPosition());
-                entity.send(new DoDamageEvent(drowns.drownDamage, EngineDamageTypes.DROWNING.get(), liquidBlock));
             }
         }
     }
 
-    @ReceiveEvent
-    public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity, DrownsComponent drowns) {
-        DrowningComponent drowning = new DrowningComponent();
-        resetDrowning(drowning, drowns);
-        entity.addComponent(drowning);
+    @ReceiveEvent(components = {DrownsComponent.class})
+    public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, DrownsComponent drowns) {
+        // only trigger drowning if liquid is covering the top of the character (aka,  the head)
+        if (isHeadLevel(event.getcharacterRelativePosition(), entity)) {
+            DrowningComponent drowning = entity.getComponent(DrowningComponent.class);
+            if (event.getBlock().isLiquid()) {
+                if (drowning != null) {
+                    drowning.setBreathing(false);
+                    entity.saveComponent(drowning);
+                } else {
+                    drowning = new DrowningComponent();
+                    drowning.breathTime = drowns.breathCapacity;
+                    entity.addComponent(drowning);
+                }
+            } else {
+                if (drowning != null) {
+                    drowning.setBreathing(true);
+                    entity.saveComponent(drowning);
+                }
+            }
+        }
     }
 
-    @ReceiveEvent(components = DrowningComponent.class)
-    public void onLeaveLiquid(OnLeaveLiquidEvent event, EntityRef entity) {
-        entity.removeComponent(DrowningComponent.class);
-    }
-
-    private void resetDrowning(DrowningComponent drowningComponent, DrownsComponent drownsComponent) {
-        drowningComponent.startDrowningTime = time.getGameTimeInMs() + (long) (1000 * drownsComponent.timeBeforeDrownStart);
-        drowningComponent.nextDrownDamageTime = drowningComponent.startDrowningTime;
+    private boolean isHeadLevel(Vector3i relativePosition, EntityRef entity) {
+        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        return (int) Math.ceil(characterMovementComponent.height) - 1 == relativePosition.y;
     }
 }

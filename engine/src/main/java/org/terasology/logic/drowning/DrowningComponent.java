@@ -24,7 +24,16 @@ import org.terasology.network.Replicate;
  */
 public class DrowningComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public long startDrowningTime;
+    public float breathTime;
 
-    public long nextDrownDamageTime;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    private boolean isBreathing;
+
+    public boolean isBreathing() {
+        return isBreathing;
+    }
+
+    public void setBreathing(boolean breathing) {
+        isBreathing = breathing;
+    }
 }

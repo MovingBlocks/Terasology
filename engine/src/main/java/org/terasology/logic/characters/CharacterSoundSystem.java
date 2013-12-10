@@ -28,8 +28,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
-import org.terasology.logic.characters.events.OnEnterLiquidEvent;
-import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
+import org.terasology.logic.characters.events.OnEnterBlockEvent;
+import org.terasology.logic.characters.events.OnLeaveBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DamageSoundComponent;
@@ -177,8 +177,8 @@ public class CharacterSoundSystem implements ComponentSystem {
     }
 
     @ReceiveEvent
-    public void onEnterLiquid(OnEnterLiquidEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+    public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+        if (event.getBlock().isLiquid() && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.nextItem(characterSounds.enterWaterSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
             characterSounds.lastSoundTime = time.getGameTimeInMs();
@@ -187,8 +187,8 @@ public class CharacterSoundSystem implements ComponentSystem {
     }
 
     @ReceiveEvent
-    public void onLeaveLiquid(OnLeaveLiquidEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+    public void onLeaveBlock(OnLeaveBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+        if (event.getBlock().isLiquid() && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             Sound sound = random.nextItem(characterSounds.leaveWaterSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
             characterSounds.lastSoundTime = time.getGameTimeInMs();
