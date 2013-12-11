@@ -91,9 +91,9 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = {DrownsComponent.class})
     public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, DrownsComponent drowns) {
         // only trigger drowning if liquid is covering the top of the character (aka,  the head)
-        if (isHeadLevel(event.getcharacterRelativePosition(), entity)) {
+        if (isHeadLevel(event.getCharacterRelativePosition(), entity)) {
             DrowningComponent drowning = entity.getComponent(DrowningComponent.class);
-            if (event.getBlock().getEntity().hasComponent(UnbreathableBlockComponent.class)) {
+            if (event.getNewBlock().getEntity().hasComponent(UnbreathableBlockComponent.class)) {
                 if (drowning != null) {
                     drowning.setBreathing(false);
                     entity.saveComponent(drowning);

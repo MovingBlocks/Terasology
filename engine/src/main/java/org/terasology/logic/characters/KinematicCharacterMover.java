@@ -144,13 +144,9 @@ public class KinematicCharacterMover implements CharacterMover {
                 currentPosition.add(0, 1, 0);
             }
 
-            // compare the two sets and send events if the blocks are different
             for (int i = 0; i < characterHeight; i++) {
-                if (newBlocks[i] != oldBlocks[i]) {
-                    // send a blocked enter/leave event for this block
-                    entity.send(new OnLeaveBlockEvent(oldBlocks[i], new Vector3i(oldPosition.x, oldPosition.y + i, oldPosition.z), new Vector3i(0, i, 0)));
-                    entity.send(new OnEnterBlockEvent(newBlocks[i], new Vector3i(newPosition.x, newPosition.y + i, newPosition.z), new Vector3i(0, i, 0)));
-                }
+                // send a block enter/leave event for this character
+                entity.send(new OnEnterBlockEvent(oldBlocks[i], newBlocks[i], new Vector3i(0, i, 0)));
             }
         }
     }

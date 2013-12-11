@@ -23,25 +23,25 @@ import org.terasology.world.block.Block;
  * @author Immortius
  */
 public class OnEnterBlockEvent implements Event {
-    private Block block;
-    private Vector3i blockWorldPosition;
+    private Block oldBlock;
+    private Block newBlock;
     private Vector3i characterRelativePosition;
 
-    public OnEnterBlockEvent(Block block, Vector3i blockWorldPosition, Vector3i characterRelativePosition) {
-        this.block = block;
-        this.blockWorldPosition = blockWorldPosition;
+    public OnEnterBlockEvent(Block oldBlock, Block newBlock, Vector3i characterRelativePosition) {
+        this.oldBlock = oldBlock;
+        this.newBlock = newBlock;
         this.characterRelativePosition = characterRelativePosition;
     }
 
-    public Block getBlock() {
-        return block;
+    public Block getNewBlock() {
+        return newBlock;
     }
 
-    public Vector3i getBlockWorldPosition() {
-        return blockWorldPosition;
+    public Block getOldBlock() {
+        return oldBlock;
     }
 
-    public Vector3i getcharacterRelativePosition() {
+    public Vector3i getCharacterRelativePosition() {
         return characterRelativePosition;
     }
 }

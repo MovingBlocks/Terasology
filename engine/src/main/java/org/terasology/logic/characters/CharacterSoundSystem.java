@@ -29,7 +29,6 @@ import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
-import org.terasology.logic.characters.events.OnLeaveBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DamageSoundComponent;
@@ -178,21 +177,21 @@ public class CharacterSoundSystem implements ComponentSystem {
 
     @ReceiveEvent
     public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (event.getBlock().isLiquid() && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = random.nextItem(characterSounds.enterWaterSounds);
-            entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
-            characterSounds.lastSoundTime = time.getGameTimeInMs();
-            entity.saveComponent(characterSounds);
-        }
-    }
-
-    @ReceiveEvent
-    public void onLeaveBlock(OnLeaveBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (event.getBlock().isLiquid() && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = random.nextItem(characterSounds.leaveWaterSounds);
-            entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
-            characterSounds.lastSoundTime = time.getGameTimeInMs();
-            entity.saveComponent(characterSounds);
+        // only play this sound if the feet hit the water
+        if (event.getCharacterRelativePosition().y == 0 && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            boolean oldBlockIsLiquid = event.getOldBlock().isLiquid();
+            boolean newBlockIsLiquid = event.getNewBlock().isLiquid();
+            if (!oldBlockIsLiquid && newBlockIsLiquid) {
+                Sound sound = random.nextItem(characterSounds.enterWaterSounds);
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+                characterSounds.lastSoundTime = time.getGameTimeInMs();
+                entity.saveComponent(characterSounds);
+            } else if (oldBlockIsLiquid && !newBlockIsLiquid) {
+                Sound sound = random.nextItem(characterSounds.leaveWaterSounds);
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
+                characterSounds.lastSoundTime = time.getGameTimeInMs();
+                entity.saveComponent(characterSounds);
+            }
         }
     }
 
