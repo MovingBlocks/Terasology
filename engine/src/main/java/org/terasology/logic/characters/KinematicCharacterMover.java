@@ -106,7 +106,9 @@ public class KinematicCharacterMover implements CharacterMover {
         if (worldProvider.isBlockRelevant(initial.getPosition())) {
             updatePosition(characterMovementComponent, result, input, entity);
 
-            checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
+            if (input.isFirstRun()) {
+                checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
+            }
 
             if (result.getMode() != MovementMode.GHOSTING) {
                 checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());

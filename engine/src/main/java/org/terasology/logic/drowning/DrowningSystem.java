@@ -65,25 +65,20 @@ public class DrowningSystem implements UpdateSubscriberSystem {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             DrownsComponent drowns = entity.getComponent(DrownsComponent.class);
 
-            // update breath time
-            if (drowning.isBreathing()) {
-                drowning.breathRemaining += delta * drowns.breathRechargeRate;
-            } else {
-                drowning.breathRemaining -= delta;
-            }
-
+            long gameTime = time.getGameTimeInMs();
             // check for out of breath and full breath conditions
-            if (drowning.breathRemaining > drowns.breathCapacity) {
+            if (drowning.isBreathing && gameTime > drowning.endTime) {
                 // clean up the drowning component
                 entity.removeComponent(DrowningComponent.class);
             } else {
-                if (drowning.breathRemaining <= drowns.timeBetweenDrownDamage * -1) {
-                    // damage the entity,  give breath in trade for taking damage
+                if (gameTime > drowning.nextDrownDamageTime) {
+                    // damage the entity
                     EntityRef liquidBlock = blockEntityProvider.getBlockEntityAt(loc.getWorldPosition());
                     entity.send(new DoDamageEvent(drowns.drownDamage, EngineDamageTypes.DROWNING.get(), liquidBlock));
-                    drowning.breathRemaining += drowns.timeBetweenDrownDamage;
+                    // set the next damage time
+                    drowning.nextDrownDamageTime = gameTime + drowns.timeBetweenDrownDamage;
+                    entity.saveComponent(drowning);
                 }
-                entity.saveComponent(drowning);
             }
         }
     }
@@ -95,16 +90,18 @@ public class DrowningSystem implements UpdateSubscriberSystem {
             DrowningComponent drowning = entity.getComponent(DrowningComponent.class);
             if (event.getNewBlock().getEntity().hasComponent(UnbreathableBlockComponent.class)) {
                 if (drowning != null) {
-                    drowning.setBreathing(false);
-                    entity.saveComponent(drowning);
+                    if (drowning.isBreathing) {
+                        setBreathing(false, drowning, drowns);
+                        entity.saveComponent(drowning);
+                    }
                 } else {
                     drowning = new DrowningComponent();
-                    drowning.breathRemaining = drowns.breathCapacity;
+                    setBreathing(false, drowning, drowns);
                     entity.addComponent(drowning);
                 }
             } else {
-                if (drowning != null) {
-                    drowning.setBreathing(true);
+                if (drowning != null && !drowning.isBreathing) {
+                    setBreathing(true, drowning, drowns);
                     entity.saveComponent(drowning);
                 }
             }
@@ -114,5 +111,25 @@ public class DrowningSystem implements UpdateSubscriberSystem {
     private boolean isHeadLevel(Vector3i relativePosition, EntityRef entity) {
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         return (int) Math.ceil(characterMovementComponent.height) - 1 == relativePosition.y;
+    }
+
+    private void setBreathing(boolean isBreathing, DrowningComponent drowning, DrownsComponent drowns) {
+        long gameTime = time.getGameTimeInMs();
+        // if this is a new drowning component, set to 0% so that it starts from the current time
+        float currentPercentage = drowning.startTime != 0 ? drowning.getPercentageBreath(gameTime) : 1f;
+        if (!isBreathing) {
+            currentPercentage = 1f - currentPercentage;
+        }
+        float scale = isBreathing ? drowns.breathRechargeRate : 1.0f;
+
+        drowning.isBreathing = isBreathing;
+        drowning.startTime = gameTime - (int) (drowns.breathCapacity * currentPercentage / scale);
+        drowning.endTime = gameTime + (int) (drowns.breathCapacity * (1f - currentPercentage) / scale);
+
+        if (isBreathing) {
+            drowning.nextDrownDamageTime = Long.MAX_VALUE;
+        } else {
+            drowning.nextDrownDamageTime = drowning.endTime + drowns.timeBetweenDrownDamage;
+        }
     }
 }
