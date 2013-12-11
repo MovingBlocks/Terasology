@@ -148,6 +148,8 @@ public class MersenneRandomTest {
     public void speedTest() {
 
         final long seed = 4357;
+        
+        final int warmUpCount = 10000;
         final int count = 10000000;
 
         int sum;
@@ -158,38 +160,56 @@ public class MersenneRandomTest {
         // -------------------------------------------------------
         
         java.util.Random rr = new java.util.Random(seed);
+
+        // warmup
         sum = 0;
-        start = System.currentTimeMillis();
+        for (int j = 0; j < warmUpCount; j++) {
+            sum += rr.nextInt();
+        }
+        sum = 0;
+        start = System.nanoTime();
         for (int j = 0; j < count; j++) {
             sum += rr.nextInt();
         }
 
-        logger.info("java.util.Random: {}ms.", (System.currentTimeMillis() - start));
+        logger.info("java.util.Random: {}ms.", (System.nanoTime() - start) / 1000000);
         logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
 
         // -------------------------------------------------------
 
         FastRandom fr = new FastRandom(seed);
+
+        // warmup
         sum = 0;
-        start = System.currentTimeMillis();
+        for (int j = 0; j < warmUpCount; j++) {
+            sum += fr.nextInt();
+        }
+        sum = 0;
+        start = System.nanoTime();
         for (int j = 0; j < count; j++) {
             sum += fr.nextInt();
         }
 
-        logger.info("FastRandom: {}ms.", (System.currentTimeMillis() - start));
+        logger.info("FastRandom: {}ms.", (System.nanoTime() - start) / 1000000);
         logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
 
         // -------------------------------------------------------
 
         MersenneRandom r = new MersenneRandom(seed);
 
+        // warmup
         sum = 0;
-        start = System.currentTimeMillis();
+        for (int j = 0; j < warmUpCount; j++) {
+            sum += r.nextInt();
+        }
+        
+        sum = 0;
+        start = System.nanoTime();
         for (int j = 0; j < count; j++) {
             sum += r.nextInt();
         }
 
-        logger.info("MersenneRandom: {}ms.", (System.currentTimeMillis() - start));
+        logger.info("MersenneRandom: {}ms.", (System.nanoTime() - start) / 1000000);
         logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
     }
 }
