@@ -23,7 +23,6 @@ import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
-import org.terasology.logic.characters.events.OnLeaveBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
