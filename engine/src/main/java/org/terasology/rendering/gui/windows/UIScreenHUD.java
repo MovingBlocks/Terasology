@@ -230,7 +230,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     private void updateBreathBar(DrownsComponent drownsComponent, DrowningComponent drowningComponent) {
         if (drownsComponent != null && drowningComponent != null) {
-            float breath = (drowningComponent.startDrowningTime - time.getGameTimeInMs()) / (1000 * drownsComponent.timeBeforeDrownStart);
+            float breath = drowningComponent.getPercentageBreath(time.getGameTimeInMs());
             if (breath <= 0) {
                 for (int i = 0; i < breathBubbles.length; ++i) {
                     breathBubbles[i].setVisible(true);

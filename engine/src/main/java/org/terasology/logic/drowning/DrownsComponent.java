@@ -24,8 +24,9 @@ import org.terasology.entitySystem.Component;
  */
 public class DrownsComponent implements Component {
 
-    public float timeBeforeDrownStart = 15.0f;
-    public float timeBetweenDrownDamage = 1.0f;
+    public long breathCapacity = 15000;
+    public float breathRechargeRate = 2.0f;
+    public int timeBetweenDrownDamage = 1000;
     public int drownDamage = 10;
 
 }
