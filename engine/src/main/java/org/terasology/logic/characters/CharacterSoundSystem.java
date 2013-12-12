@@ -178,16 +178,16 @@ public class CharacterSoundSystem implements ComponentSystem {
     @ReceiveEvent
     public void onEnterBlock(OnEnterBlockEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         // only play this sound if the feet hit the water
-        if (event.getCharacterRelativePosition().y == 0 && characterSounds.enterWaterSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+        if (event.getCharacterRelativePosition().y == 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             boolean oldBlockIsLiquid = event.getOldBlock().isLiquid();
             boolean newBlockIsLiquid = event.getNewBlock().isLiquid();
+            Sound sound = null;
             if (!oldBlockIsLiquid && newBlockIsLiquid) {
-                Sound sound = random.nextItem(characterSounds.enterWaterSounds);
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
-                characterSounds.lastSoundTime = time.getGameTimeInMs();
-                entity.saveComponent(characterSounds);
+                sound = random.nextItem(characterSounds.enterWaterSounds);
             } else if (oldBlockIsLiquid && !newBlockIsLiquid) {
-                Sound sound = random.nextItem(characterSounds.leaveWaterSounds);
+                sound = random.nextItem(characterSounds.leaveWaterSounds);
+            }
+            if (sound != null) {
                 entity.send(new PlaySoundEvent(entity, sound, characterSounds.diveVolume));
                 characterSounds.lastSoundTime = time.getGameTimeInMs();
                 entity.saveComponent(characterSounds);
