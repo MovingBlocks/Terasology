@@ -116,6 +116,7 @@ dependencies {
     compile group: 'org.newdawn.slick', name: 'slick', version: '237'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
     compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
+	compile group: 'ec.util', name: 'MersenneTwister', version: '20'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
