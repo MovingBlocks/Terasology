@@ -41,7 +41,7 @@ public class NoiseTest {
         FastRandom sfr = new FastRandom(seed);
         
         PerlinNoise pn = new PerlinNoise(seed);
-        SimplexNoise sn = new SimplexNoise();
+        SimplexNoise sn = new SimplexNoise(seed);
         
         for (int i = 0; i < warmUp; i++) {
             double posX = pfr.nextDouble() * 1000d;
