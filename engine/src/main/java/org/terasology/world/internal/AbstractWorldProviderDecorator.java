@@ -17,10 +17,7 @@
 package org.terasology.world.internal;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
@@ -52,11 +49,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public WorldBiomeProvider getBiomeProvider() {
-        return base.getBiomeProvider();
-    }
-
-    @Override
     public void processPropagation() {
         base.processPropagation();
     }
@@ -72,12 +64,12 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public ChunkView getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3i chunkPos) {
         return base.getLocalView(chunkPos);
     }
 
     @Override
-    public ChunkView getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
         return base.getWorldViewAround(chunk);
     }
 
@@ -134,5 +126,15 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public float getFog(float x, float y, float z) {
         return base.getFog(x, y, z);
+    }
+
+    @Override
+    public float getTemperature(float x, float y, float z) {
+        return base.getTemperature(x, y, z);
+    }
+
+    @Override
+    public float getHumidity(float x, float y, float z) {
+        return base.getHumidity(x, y, z);
     }
 }

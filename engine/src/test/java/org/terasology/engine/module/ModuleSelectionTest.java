@@ -266,6 +266,10 @@ public class ModuleSelectionTest {
         }
 
         @Override
+        public void enableModuleAndDependencies(Module module) {
+        }
+
+        @Override
         public void disableModule(Module module) {
         }
 

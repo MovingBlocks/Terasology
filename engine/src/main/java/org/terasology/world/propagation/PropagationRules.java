@@ -18,7 +18,7 @@ package org.terasology.world.propagation;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * Rules to drive value propagation.
@@ -74,7 +74,7 @@ public interface PropagationRules {
      * @param pos
      * @return The value of the given position of a chunk
      */
-    byte getValue(Chunk chunk, Vector3i pos);
+    byte getValue(ChunkImpl chunk, Vector3i pos);
 
     /**
      * Sets the value for a given chunk position
@@ -82,5 +82,5 @@ public interface PropagationRules {
      * @param pos
      * @param value
      */
-    void setValue(Chunk chunk, Vector3i pos, byte value);
+    void setValue(ChunkImpl chunk, Vector3i pos, byte value);
 }

@@ -15,6 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.skin.UIStyle;
+
 /**
  * @author Immortius
  */
@@ -22,6 +29,7 @@ public abstract class AbstractWidget implements UIWidget {
 
     private final String id;
     private String family;
+    private boolean focused;
 
     public AbstractWidget() {
         id = "";
@@ -32,34 +40,63 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public void update(float delta) {
-    }
-
-    @Override
     public String getMode() {
         return DEFAULT_MODE;
     }
 
     @Override
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
     @Override
-    public String getFamily() {
+    public final String getFamily() {
         return family;
     }
 
     @Override
-    public void setFamily(String family) {
+    public final void setFamily(String family) {
         this.family = family;
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        if (this.id.equals(targetId) && type.isInstance(this)) {
-            return type.cast(this);
+    public final <T extends UIWidget> T find(String targetId, Class<T> type) {
+        if (this.id.equals(targetId)) {
+            if (type.isInstance(this)) {
+                return type.cast(this);
+            }
+            return null;
+        }
+        for (UIWidget contents : this) {
+            T result = contents.find(targetId, type);
+            if (result != null) {
+                return result;
+            }
         }
         return null;
+    }
+
+    @Override
+    public void onGainFocus() {
+        focused = true;
+    }
+
+    @Override
+    public void onLoseFocus() {
+        focused = false;
+    }
+
+    public final boolean isFocused() {
+        return focused;
+    }
+
+    @Override
+    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
+        return areaHint;
+    }
+
+    @Override
+    public boolean isSkinAppliedByCanvas() {
+        return true;
     }
 }

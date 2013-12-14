@@ -40,7 +40,10 @@ public class PojoPrefabManager implements PrefabManager {
      */
     @Override
     public Prefab getPrefab(String name) {
-        return Assets.getPrefab(name);
+        if (!name.isEmpty()) {
+            return Assets.getPrefab(name);
+        }
+        return null;
 
     }
 

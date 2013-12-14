@@ -16,12 +16,16 @@
 
 package org.terasology.world.liquid;
 
+import org.terasology.engine.API;
+
 /**
  * Describes the liquid state of a single block
  *
  * @author Immortius
  */
+@API
 public class LiquidData {
+    public static final byte MAX_LIQUID_DEPTH = 0x07;
     private static final byte LIQUID_DEPTH_FILTER = 0x07;
 
     private LiquidType type;

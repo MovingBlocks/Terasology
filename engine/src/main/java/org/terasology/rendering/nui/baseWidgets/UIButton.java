@@ -22,26 +22,27 @@ import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DirectBinding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class UIButton extends AbstractWidget {
-    public static final String HOVER_MODE = "hover";
+public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
 
-    private Binding<TextureRegion> image = new DirectBinding<>();
-    private Binding<String> text = new DirectBinding<>("");
+    private Binding<TextureRegion> image = new DefaultBinding<>();
+    private Binding<String> text = new DefaultBinding<>("");
 
     private boolean down;
 
     private List<ButtonEventListener> listeners = Lists.newArrayList();
 
-    private BaseInteractionListener interactionListener = new BaseInteractionListener() {
+    private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {

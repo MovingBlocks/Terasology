@@ -18,10 +18,9 @@ package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.WorldProviderCore;
+import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.liquid.LiquidData;
@@ -57,11 +56,6 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public WorldBiomeProvider getBiomeProvider() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void processPropagation() {
     }
 
@@ -76,12 +70,12 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
-    public ChunkView getLocalView(Vector3i chunkPos) {
+    public ChunkViewCore getLocalView(Vector3i chunkPos) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public ChunkView getWorldViewAround(Vector3i chunk) {
+    public ChunkViewCore getWorldViewAround(Vector3i chunk) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -145,6 +139,16 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     @Override
     public float getFog(float x, float y, float z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public float getTemperature(float x, float y, float z) {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public float getHumidity(float x, float y, float z) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.skin;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIElement;
 
 /**
  * @author Immortius
@@ -50,16 +50,28 @@ public class UISkin extends AbstractAsset<UISkinData> {
         return getStyleFamily("").getBaseStyle();
     }
 
-    public UIStyle getDefaultStyleFor(Class<? extends UIWidget> widget, String mode) {
-        return getStyleFor("", widget, mode);
+    public UIStyle getDefaultStyleFor(Class<? extends UIElement> element, String mode) {
+        return getStyleFor("", element, mode);
     }
 
-    public UIStyle getStyleFor(String family, Class<? extends UIWidget> widget, String mode) {
+    public UIStyle getDefaultStyleFor(Class<? extends UIElement> element, String part, String mode) {
+        return getStyleFor("", element, part, mode);
+    }
+
+    public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String mode) {
         UIStyleFamily styleFamily = getStyleFamily(family);
-        if (widget == null) {
+        if (element == null) {
             return styleFamily.getBaseStyle();
         }
-        return styleFamily.getWidgetStyle(widget, mode);
+        return styleFamily.getElementStyle(element, "", mode);
+    }
+
+    public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String part, String mode) {
+        UIStyleFamily styleFamily = getStyleFamily(family);
+        if (element == null) {
+            return styleFamily.getBaseStyle();
+        }
+        return styleFamily.getElementStyle(element, part, mode);
     }
 
     private UIStyleFamily getStyleFamily(String family) {

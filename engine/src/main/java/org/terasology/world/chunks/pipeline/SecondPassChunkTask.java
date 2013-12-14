@@ -19,8 +19,8 @@ package org.terasology.world.chunks.pipeline;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
@@ -48,13 +48,13 @@ public class SecondPassChunkTask extends AbstractChunkTask {
             if (!view.isValidView()) {
                 return;
             }
-            Chunk chunk = getProvider().getChunkForProcessing(getPosition());
-            if (chunk.getChunkState() != Chunk.State.ADJACENCY_GENERATION_PENDING) {
+            ChunkImpl chunk = getProvider().getChunkForProcessing(getPosition());
+            if (chunk.getChunkState() != ChunkImpl.State.ADJACENCY_GENERATION_PENDING) {
                 return;
             }
 
             getPipeline().getWorldGenerator().applySecondPass(getPosition(), view);
-            chunk.setChunkState(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING);
+            chunk.setChunkState(ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING);
             getPipeline().requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
         } finally {
             view.unlock();

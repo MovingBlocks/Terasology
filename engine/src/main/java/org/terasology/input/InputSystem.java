@@ -21,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
@@ -69,7 +70,7 @@ public class InputSystem implements ComponentSystem {
     private MouseDevice mouse = new NullMouseDevice();
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
-    private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
+    private Map<SimpleUri, BindableButtonImpl> buttonLookup = Maps.newHashMap();
 
     private List<BindableAxisImpl> axisBinds = Lists.newArrayList();
     private List<BindableButtonImpl> buttonBinds = Lists.newArrayList();
@@ -102,22 +103,22 @@ public class InputSystem implements ComponentSystem {
         return mouse;
     }
 
-    public BindableButton registerBindButton(String bindId, String displayName) {
+    public BindableButton registerBindButton(SimpleUri bindId, String displayName) {
         return registerBindButton(bindId, displayName, new BindButtonEvent());
     }
 
-    public BindableButton registerBindButton(String bindId, String displayName, BindButtonEvent event) {
+    public BindableButton registerBindButton(SimpleUri bindId, String displayName, BindButtonEvent event) {
         BindableButtonImpl bind = new BindableButtonImpl(bindId, displayName, event);
         buttonLookup.put(bindId, bind);
         buttonBinds.add(bind);
         return bind;
     }
 
-    public BindableButton getBindButton(String bindId) {
+    public BindableButton getBindButton(SimpleUri bindId) {
         return buttonLookup.get(bindId);
     }
 
-    public void linkBindButtonToInput(Input input, String bindId) {
+    public void linkBindButtonToInput(Input input, SimpleUri bindId) {
         switch (input.getType()) {
             case KEY:
                 linkBindButtonToKey(input.getId(), bindId);
@@ -132,7 +133,7 @@ public class InputSystem implements ComponentSystem {
         }
     }
 
-    public void linkBindButtonToInput(InputEvent input, String bindId) {
+    public void linkBindButtonToInput(InputEvent input, SimpleUri bindId) {
         if (input instanceof KeyEvent) {
             linkBindButtonToKey(((KeyEvent) input).getKey(), bindId);
         } else if (input instanceof MouseButtonEvent) {
@@ -142,17 +143,17 @@ public class InputSystem implements ComponentSystem {
         }
     }
 
-    public void linkBindButtonToKey(int key, String bindId) {
+    public void linkBindButtonToKey(int key, SimpleUri bindId) {
         BindableButtonImpl bindInfo = buttonLookup.get(bindId);
         keyBinds.put(key, bindInfo);
     }
 
-    public void linkBindButtonToMouse(MouseInput mouseButton, String bindId) {
+    public void linkBindButtonToMouse(MouseInput mouseButton, SimpleUri bindId) {
         BindableButtonImpl bindInfo = buttonLookup.get(bindId);
         mouseButtonBinds.put(mouseButton, bindInfo);
     }
 
-    public void linkBindButtonToMouseWheel(int direction, String bindId) {
+    public void linkBindButtonToMouseWheel(int direction, SimpleUri bindId) {
         if (direction > 0) {
             mouseWheelDownBind = buttonLookup.get(bindId);
         } else if (direction < 0) {
@@ -164,7 +165,7 @@ public class InputSystem implements ComponentSystem {
         return registerBindAxis(id, new BindAxisEvent(), positiveButton, negativeButton);
     }
 
-    public BindableAxis registerBindAxis(String id, BindAxisEvent event, String positiveButtonId, String negativeButtonId) {
+    public BindableAxis registerBindAxis(String id, BindAxisEvent event, SimpleUri positiveButtonId, SimpleUri negativeButtonId) {
         return registerBindAxis(id, event, getBindButton(positiveButtonId), getBindButton(negativeButtonId));
     }
 

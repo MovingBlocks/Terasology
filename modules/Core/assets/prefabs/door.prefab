@@ -4,15 +4,15 @@
         "name" : "Door",
         "icon" : "door",
         "renderWithIcon" : true,
-        "stackId" : "core:door",
+        "stackId" : "door",
         "consumedOnUse" : true,
         "usage" : "ON_BLOCK"
     },
     "Door" : {
-        "topBlockFamily" : "engine:DoorTop",
-        "bottomBlockFamily" : "engine:DoorBottom",
-        "openSound" : "engine:DoorOpen",
-        "closeSound" : "engine:DoorClose"
+        "topBlockFamily" : "DoorTop",
+        "bottomBlockFamily" : "DoorBottom",
+        "openSound" : "DoorOpen",
+        "closeSound" : "DoorClose"
     },
     "Health" : {
         "currentHealth" : 5,

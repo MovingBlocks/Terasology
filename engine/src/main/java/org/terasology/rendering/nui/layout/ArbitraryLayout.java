@@ -22,15 +22,17 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.UIWidget;
 
 import javax.vecmath.Vector2f;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class ArbitraryLayout extends AbstractWidget {
+public class ArbitraryLayout extends CoreLayout {
 
     private List<WidgetInfo> widgets = Lists.newArrayList();
 
@@ -57,17 +59,12 @@ public class ArbitraryLayout extends AbstractWidget {
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        T result = super.find(targetId, type);
-        if (result == null) {
-            for (WidgetInfo widgetInfo : widgets) {
-                result = widgetInfo.widget.find(targetId, type);
-                if (result != null) {
-                    break;
-                }
-            }
+    public Iterator<UIWidget> iterator() {
+        List<UIWidget> contents = Lists.newArrayList();
+        for (WidgetInfo info : widgets) {
+            contents.add(info.getWidget());
         }
-        return result;
+        return contents.iterator();
     }
 
     private abstract static class WidgetInfo {
@@ -82,7 +79,7 @@ public class ArbitraryLayout extends AbstractWidget {
         }
 
         public void draw(Canvas canvas) {
-            canvas.drawWidget(widget, Rect2i.createFromMinAndSize(getPosition(canvas.size()), getSize(canvas.size())));
+            canvas.drawElement(widget, Rect2i.createFromMinAndSize(getPosition(canvas.size()), getSize(canvas.size())));
         }
 
         public abstract Vector2i getSize(Vector2i canvasSize);

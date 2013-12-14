@@ -31,11 +31,14 @@ public class UIStyle {
     private TextureRegion background;
     private Border backgroundBorder = new Border(0, 0, 0, 0);
     private ScaleMode backgroundScaleMode = ScaleMode.STRETCH;
-    private boolean backgroundAutomaticallyDrawn = true;
 
     private Border margin = new Border(0, 0, 0, 0);
     private int fixedWidth;
     private int fixedHeight;
+    private int minWidth;
+    private int minHeight;
+    private int maxWidth = Integer.MAX_VALUE;
+    private int maxHeight = Integer.MAX_VALUE;
     private HorizontalAlign alignmentH = HorizontalAlign.CENTER;
     private VerticalAlign alignmentV = VerticalAlign.MIDDLE;
 
@@ -48,7 +51,6 @@ public class UIStyle {
     private VerticalAlign textAlignmentV = VerticalAlign.MIDDLE;
     private boolean textShadowed;
 
-
     public UIStyle() {
     }
 
@@ -56,11 +58,14 @@ public class UIStyle {
         this.background = other.background;
         this.backgroundBorder = other.backgroundBorder;
         this.backgroundScaleMode = other.backgroundScaleMode;
-        this.backgroundAutomaticallyDrawn = other.backgroundAutomaticallyDrawn;
 
         this.margin = other.margin;
         this.fixedWidth = other.fixedWidth;
         this.fixedHeight = other.fixedHeight;
+        this.minWidth = other.minWidth;
+        this.minHeight = other.minHeight;
+        this.maxWidth = other.maxWidth;
+        this.maxHeight = other.maxHeight;
         this.alignmentH = other.alignmentH;
         this.alignmentV = other.alignmentV;
 
@@ -74,6 +79,12 @@ public class UIStyle {
         this.textAlignmentH = other.textAlignmentH;
     }
 
+    /**
+     * The background is a texture that is drawn filling the area of a widget or part, after taking into account size modified but not margin.
+     * It is drawn before any contents
+     *
+     * @return A texture region to render for a background
+     */
     public TextureRegion getBackground() {
         return background;
     }
@@ -82,6 +93,12 @@ public class UIStyle {
         this.background = background;
     }
 
+    /**
+     * The background border is the part of the background texture around the edges that should not scale with the size of the area being drawn.
+     * This allows for things like windows to have a take a background and resize it for any area without losing the desired border feel.
+     *
+     * @return The border of the background texture that should not be resized
+     */
     public Border getBackgroundBorder() {
         return backgroundBorder;
     }
@@ -90,6 +107,11 @@ public class UIStyle {
         this.backgroundBorder = backgroundBorder;
     }
 
+    /**
+     * The scale mode determines the technique to use when drawing the background to an area that doesn't match the background's size.
+     *
+     * @return The technique to use when scaling the background texture for different areas.
+     */
     public ScaleMode getBackgroundScaleMode() {
         return backgroundScaleMode;
     }
@@ -98,6 +120,11 @@ public class UIStyle {
         this.backgroundScaleMode = value;
     }
 
+    /**
+     * The margin is a gap between the outside of an element and the contents. Often this should be the same or a little more than the border.
+     * For instance, a window's contents should sit inside the border.
+     * @return The margin between the edges of an element and its contents
+     */
     public Border getMargin() {
         return margin;
     }
@@ -106,6 +133,9 @@ public class UIStyle {
         this.margin = margin;
     }
 
+    /**
+     * @return The scale mode for texture contents of an element
+     */
     public ScaleMode getTextureScaleMode() {
         return textureScaleMode;
     }
@@ -114,6 +144,9 @@ public class UIStyle {
         this.textureScaleMode = textureScaleMode;
     }
 
+    /**
+     * @return The font to use for any drawn text
+     */
     public Font getFont() {
         return font;
     }
@@ -122,6 +155,9 @@ public class UIStyle {
         this.font = font;
     }
 
+    /**
+     * @return The color of any drawn text
+     */
     public Color getTextColor() {
         return textColor;
     }
@@ -130,6 +166,9 @@ public class UIStyle {
         this.textColor = textColor;
     }
 
+    /**
+     * @return The color of any drawn text's shadow.
+     */
     public Color getTextShadowColor() {
         return textShadowColor;
     }
@@ -138,22 +177,31 @@ public class UIStyle {
         this.textShadowColor = textShadowColor;
     }
 
-    public HorizontalAlign getTextAlignmentH() {
+    /**
+     * @return How any drawn text should be horizontally aligned within its region
+     */
+    public HorizontalAlign getHorizontalTextAlignment() {
         return textAlignmentH;
     }
 
-    public void setTextAlignmentH(HorizontalAlign textAlignmentH) {
+    public void setHorizontalTextAlignment(HorizontalAlign textAlignmentH) {
         this.textAlignmentH = textAlignmentH;
     }
 
-    public VerticalAlign getTextAlignmentV() {
+    /**
+     * @return How any drawn text should be vertically aligned within its region
+     */
+    public VerticalAlign getVerticalTextAlignment() {
         return textAlignmentV;
     }
 
-    public void setTextAlignmentV(VerticalAlign textAlignmentV) {
+    public void setVerticalTextAlignment(VerticalAlign textAlignmentV) {
         this.textAlignmentV = textAlignmentV;
     }
 
+    /**
+     * @return Whether drawn text should have a shadow
+     */
     public boolean isTextShadowed() {
         return textShadowed;
     }
@@ -162,18 +210,14 @@ public class UIStyle {
         this.textShadowed = textShadowed;
     }
 
-    public void setBackgroundAutomaticallyDrawn(boolean backgroundAutomaticallyDrawn) {
-        this.backgroundAutomaticallyDrawn = backgroundAutomaticallyDrawn;
-    }
-
-    public boolean isBackgroundAutomaticallyDrawn() {
-        return backgroundAutomaticallyDrawn;
-    }
-
     public void setFixedWidth(int fixedWidth) {
         this.fixedWidth = fixedWidth;
     }
 
+    /**
+     * The width to draw the element - if non-zero.
+     * @return The fixed width to draw the element
+     */
     public int getFixedWidth() {
         return fixedWidth;
     }
@@ -182,6 +226,10 @@ public class UIStyle {
         this.fixedHeight = fixedHeight;
     }
 
+    /**
+     * The height to draw the element - if non-zero.
+     * @return The fixed height to draw the element
+     */
     public int getFixedHeight() {
         return fixedHeight;
     }
@@ -190,6 +238,10 @@ public class UIStyle {
         this.alignmentH = horizontalAlignment;
     }
 
+    /**
+     * If the element does not use the full width of the available to it, how should it be aligned
+     * @return The horizontal alignment of the element
+     */
     public HorizontalAlign getHorizontalAlignment() {
         return alignmentH;
     }
@@ -198,7 +250,55 @@ public class UIStyle {
         this.alignmentV = verticalAlignment;
     }
 
+    /**
+     * If the element does not use the full height of the available to it, how should it be aligned
+     * @return The vertical alignment of the element
+     */
     public VerticalAlign getVerticalAlignment() {
         return alignmentV;
+    }
+
+    /**
+     * @return The minimum width this element can use
+     */
+    public int getMinWidth() {
+        return minWidth;
+    }
+
+    public void setMinWidth(int minWidth) {
+        this.minWidth = minWidth;
+    }
+
+    /**
+     * @return The minimum height this element can use
+     */
+    public int getMinHeight() {
+        return minHeight;
+    }
+
+    public void setMinHeight(int minHeight) {
+        this.minHeight = minHeight;
+    }
+
+    /**
+     * @return The maximum width this element will use
+     */
+    public int getMaxWidth() {
+        return maxWidth;
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+
+    /**
+     * @return The maximum height this element will use
+     */
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
     }
 }

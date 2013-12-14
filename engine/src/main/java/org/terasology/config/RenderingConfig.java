@@ -59,7 +59,7 @@ public class RenderingConfig {
     private boolean normalMapping;
     private boolean parallaxMapping;
     private boolean dynamicShadowsPcfFiltering;
-    private boolean volumetricFog;
+    private boolean volumetricFog = true;
     private boolean cloudShadows;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
@@ -80,15 +80,15 @@ public class RenderingConfig {
     }
 
     public int getWindowPosX() {
-	return windowPosX;
+        return windowPosX;
     }
-    
+
     public void setWindowPosX(int posX) {
         this.windowPosX = posX;
     }
-    
+
     public int getWindowPosY() {
-	return windowPosY;
+        return windowPosY;
     }
 
     public void setWindowPosY(int posY) {
@@ -411,5 +411,10 @@ public class RenderingConfig {
 
     public RenderingDebugConfig getDebug() {
         return debug;
+    }
+
+    @Override
+    public String toString() {
+        return Config.createGson().toJsonTree(this).toString();
     }
 }

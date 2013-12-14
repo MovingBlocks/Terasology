@@ -63,8 +63,9 @@ public abstract class BlockManager {
      * @param uri the uri pattern to match
      * @return a list of matching block uris
      */
-    public abstract List<BlockUri> resolveBlockUri(String uri);
+    public abstract List<BlockUri> resolveAllBlockFamilyUri(String uri);
 
+    public abstract BlockUri resolveBlockFamilyUri(String name);
     /**
      * @return A map of the mapping between Block Uris and Ids
      */

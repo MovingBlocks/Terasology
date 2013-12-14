@@ -31,7 +31,8 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 
 import static org.junit.Assert.assertEquals;
@@ -64,38 +65,38 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
     @Test
     public void unblockedSunlightPropagation() {
 
-        Chunk chunk = new Chunk(0, 0, 0);
+        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z))) {
-            assertEquals(Chunk.MAX_LIGHT, chunk.getSunlight(pos));
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
+            assertEquals(ChunkConstants.MAX_LIGHT, chunk.getSunlight(pos));
         }
     }
 
     @Test
     public void blockedSunlightPropagation() {
-        Chunk chunk = new Chunk(0, 0, 0);
+        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
         chunk.setBlock(0, 15, 0, solidBlock);
         InternalLightProcessor.generateInternalLighting(chunk);
 
         assertEquals(0, chunk.getSunlight(0, 15, 0));
         for (int y = 0; y < 15; ++y) {
-            assertEquals(Chunk.MAX_LIGHT - 1, chunk.getSunlight(0, y, 0));
+            assertEquals(ChunkConstants.MAX_LIGHT - 1, chunk.getSunlight(0, y, 0));
         }
     }
 
     @Test
     public void pinholeSunlightPropagation() {
-        Chunk chunk = new Chunk(0, 0, 0);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, Chunk.SIZE_Y - 1, 0), new Vector3i(Chunk.SIZE_X, 1, Chunk.SIZE_Z))) {
+        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, ChunkConstants.SIZE_Y - 1, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
-        chunk.setBlock(8, Chunk.SIZE_Y - 1, 8, airBlock);
+        chunk.setBlock(8, ChunkConstants.SIZE_Y - 1, 8, airBlock);
         InternalLightProcessor.generateInternalLighting(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(Chunk.SIZE_X, Chunk.SIZE_Y - 1, Chunk.SIZE_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 1, ChunkConstants.SIZE_Z))) {
             int dist = TeraMath.fastAbs(pos.x - 8) + TeraMath.fastAbs(pos.z - 8);
-            int expected = Math.max(Chunk.MAX_LIGHT - dist, 0);
+            int expected = Math.max(ChunkConstants.MAX_LIGHT - dist, 0);
             assertEquals("Incorrect at " + pos, expected, chunk.getSunlight(pos));
         }
 
@@ -103,7 +104,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void sunlightPropagatesUpward() {
-        Chunk chunk = new Chunk(0, 0, 0);
+        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(9, 9, 9), Vector3i.one())) {
             chunk.setBlock(pos, solidBlock);
         }

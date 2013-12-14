@@ -27,8 +27,10 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 
 /**
  * @author Immortius
@@ -45,8 +47,8 @@ public class ModuleClassLoader extends URLClassLoader {
         pool = new ClassPool(ClassPool.getDefault());
         for (URL url : urls) {
             try {
-                pool.appendClassPath(url.getFile());
-            } catch (NotFoundException e) {
+                pool.appendClassPath(Paths.get(url.toURI()).toString());
+            } catch (NotFoundException | URISyntaxException e) {
                 logger.error("Failed to process module url: {}", url);
             }
         }

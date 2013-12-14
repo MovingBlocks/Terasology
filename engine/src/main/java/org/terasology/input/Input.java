@@ -19,6 +19,7 @@ package org.terasology.input;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * The description of an input, whether key, mouse button or mouse wheel.
@@ -83,5 +84,22 @@ public final class Input {
                 return MouseInput.getInputFor(type, id).toString();
         }
         return "";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof Input) {
+            Input other = (Input) obj;
+            return Objects.equals(type, other.type) && Objects.equals(id, other.id);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, id);
     }
 }

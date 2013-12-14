@@ -16,6 +16,9 @@
 package org.terasology.rendering.nui.layout;
 
 import com.google.common.collect.Lists;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -24,6 +27,7 @@ import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,7 +77,7 @@ public class ColumnLayout extends AbstractWidget {
             for (UIWidget widget : widgetList) {
                 if (widget != null) {
                     Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x + padding.getLeft(), currentOffset.y + padding.getTop(), drawSize.x, drawSize.y);
-                    canvas.drawWidget(widget, drawRegion);
+                    canvas.drawElement(widget, drawRegion);
                 }
 
                 if (++currentColumn == columns) {
@@ -95,16 +99,22 @@ public class ColumnLayout extends AbstractWidget {
     }
 
     @Override
-    public <T extends UIWidget> T find(String targetId, Class<T> type) {
-        T result = super.find(targetId, type);
-        if (result == null) {
-            for (UIWidget widget : widgetList) {
-                result = widget.find(targetId, type);
-                if (result != null) {
-                    break;
-                }
-            }
-        }
-        return result;
+    public void onMouseButtonEvent(MouseButtonEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onMouseWheelEvent(MouseWheelEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void onKeyEvent(KeyEvent event) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Iterator<UIWidget> iterator() {
+        return widgetList.iterator();
     }
 }

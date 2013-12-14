@@ -17,6 +17,7 @@
 package org.terasology.config;
 
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -36,7 +37,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.input.Input;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
-import org.terasology.utilities.gson.MultimapTypeAdapter;
+import org.terasology.utilities.gson.SetMultimapTypeAdapter;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
 
 import java.io.BufferedWriter;
@@ -167,10 +168,10 @@ public final class Config {
         }
     }
 
-    private static Gson createGson() {
+    protected static Gson createGson() {
         return new GsonBuilder()
                 .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
-                .registerTypeAdapter(Multimap.class, new MultimapTypeAdapter<>(Input.class))
+                .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
                 .registerTypeAdapter(Input.class, new InputHandler())
                 .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())

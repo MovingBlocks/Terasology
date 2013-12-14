@@ -18,22 +18,8 @@ package org.terasology.rendering.nui;
 /**
  * @author Immortius
  */
-public interface UIWidget {
-
-    String DEFAULT_MODE = "";
+public interface UIWidget extends UIElement {
 
     String getId();
-
-    <T extends UIWidget> T find(String id, Class<T> type);
-
-    void onDraw(Canvas canvas);
-
-    void update(float delta);
-
-    String getFamily();
-
-    void setFamily(String family);
-
-    String getMode();
 
 }

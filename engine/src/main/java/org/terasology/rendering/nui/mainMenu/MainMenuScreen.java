@@ -57,7 +57,7 @@ public class MainMenuScreen extends UIScreen {
 
         ArbitraryLayout layout = new ArbitraryLayout();
         layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("Pre Alpha"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+        layout.addFillWidget(new UILabel("version", "title", "Pre Alpha"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
         layout.addFixedWidget(grid, new Vector2i(280, 192), new Vector2f(0.5f, 0.7f));
 
         setContents(layout);

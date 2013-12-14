@@ -4,6 +4,6 @@
         "name" : "Pick Axe",
         "icon" : "PickAxe",
         "renderWithIcon" : true,
-        "damageType" : "engine:pickaxeDamage"
+        "damageType" : "pickaxeDamage"
     }
 }

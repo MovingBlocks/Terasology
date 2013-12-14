@@ -98,7 +98,7 @@ import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -230,6 +230,7 @@ public class TerasologyEngine implements GameEngine {
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
             config.save();
         }
+        logger.info("Video Settings: " + config.getRendering().toString());
         CoreRegistry.putPermanently(Config.class, config);
     }
 
@@ -539,6 +540,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
         moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.util");
         moduleSecurityManager.addAPIPackage("java.util.concurrent");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
@@ -546,6 +548,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.util.regex");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
         moduleSecurityManager.addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.addAPIPackage("com.google.common.base");
         moduleSecurityManager.addAPIPackage("com.google.common.math");
         moduleSecurityManager.addAPIPackage("com.google.common.primitives");
         moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
@@ -667,9 +670,9 @@ public class TerasologyEngine implements GameEngine {
             GameThread.processWaitingProcesses();
 
             PerformanceMonitor.startActivity("Render");
-            currentState.render();
             Display.update();
             Display.sync(60);
+            currentState.render();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");

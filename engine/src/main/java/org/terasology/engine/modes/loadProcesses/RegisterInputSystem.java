@@ -16,13 +16,13 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindAxisEvent;
@@ -33,7 +33,6 @@ import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.players.LocalPlayerSystem;
 
@@ -75,24 +74,7 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
             }
         }
 
-        registerToolbarShortcuts(inputSystem, bindsConfig);
         return true;
-    }
-
-    private void registerToolbarShortcuts(InputSystem inputSystem, BindsConfig inputConfig) {
-        // Manually register toolbar shortcut keys
-        // TODO: Put this elsewhere? (Maybe under gametype) And give mods a similar opportunity
-        for (int i = 0; i < 10; ++i) {
-            String inventorySlotBind = "engine:toolbarSlot" + i;
-            inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
-            if (inputConfig.hasBinds(inventorySlotBind)) {
-                for (Input input : inputConfig.getBinds(inventorySlotBind)) {
-                    inputSystem.linkBindButtonToInput(input, inventorySlotBind);
-                }
-            } else {
-                inputSystem.linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
-            }
-        }
     }
 
     private void registerAxisBinds(InputSystem inputSystem, String packageName, Iterable<Class<?>> classes) {
@@ -101,8 +83,8 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
             RegisterBindAxis info = (RegisterBindAxis) registerBindClass.getAnnotation(RegisterBindAxis.class);
             String id = prefix + info.id();
             if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
-                BindableButton positiveButton = inputSystem.getBindButton(info.positiveButton());
-                BindableButton negativeButton = inputSystem.getBindButton(info.negativeButton());
+                BindableButton positiveButton = inputSystem.getBindButton(new SimpleUri(info.positiveButton()));
+                BindableButton negativeButton = inputSystem.getBindButton(new SimpleUri(info.negativeButton()));
                 if (positiveButton == null) {
                     logger.warn("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
                     continue;
@@ -124,27 +106,26 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
         }
     }
 
-    private void registerButtonBinds(InputSystem inputSystem, String packageName, Iterable<Class<?>> classes, BindsConfig config) {
-        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+    private void registerButtonBinds(InputSystem inputSystem, String moduleId, Iterable<Class<?>> classes, BindsConfig config) {
         for (Class registerBindClass : classes) {
             RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
-            String id = prefix + info.id();
+            SimpleUri bindUri = new SimpleUri(moduleId, info.id());
             if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
                 try {
-                    BindableButton bindButton = inputSystem.registerBindButton(id, info.description(), (BindButtonEvent) registerBindClass.newInstance());
+                    BindableButton bindButton = inputSystem.registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
 
-                    for (Input input : config.getBinds(id)) {
-                        inputSystem.linkBindButtonToInput(input, id);
+                    for (Input input : config.getBinds(bindUri)) {
+                        inputSystem.linkBindButtonToInput(input, bindUri);
                     }
 
-                    logger.debug("Registered button bind: {}", id);
+                    logger.debug("Registered button bind: {}", bindUri);
                 } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("Failed to register button bind \"{}\"", e);
                 }
             } else {
-                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", id);
+                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
             }
         }
     }

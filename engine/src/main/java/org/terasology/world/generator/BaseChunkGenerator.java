@@ -16,6 +16,7 @@
 
 package org.terasology.world.generator;
 
+import org.terasology.engine.API;
 import org.terasology.world.WorldBiomeProvider;
 
 import java.util.Map;
@@ -25,9 +26,9 @@ import java.util.Map;
  */
 public interface BaseChunkGenerator {
 
-    void setWorldSeed(String seed);
-
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
+
+    void setWorldSeed(String seed);
 
     Map<String, String> getInitParameters();
 

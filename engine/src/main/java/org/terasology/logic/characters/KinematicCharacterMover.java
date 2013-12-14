@@ -22,17 +22,18 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.events.FootstepEvent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.JumpEvent;
-import org.terasology.logic.characters.events.OnEnterLiquidEvent;
-import org.terasology.logic.characters.events.OnLeaveLiquidEvent;
+import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
+import org.terasology.math.Vector3i;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
@@ -104,6 +105,11 @@ public class KinematicCharacterMover implements CharacterMover {
         result.setSequenceNumber(input.getSequenceNumber());
         if (worldProvider.isBlockRelevant(initial.getPosition())) {
             updatePosition(characterMovementComponent, result, input, entity);
+
+            if (input.isFirstRun()) {
+                checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
+            }
+
             if (result.getMode() != MovementMode.GHOSTING) {
                 checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
@@ -114,6 +120,36 @@ public class KinematicCharacterMover implements CharacterMover {
         result.setYaw(input.getYaw());
         input.runComplete();
         return result;
+    }
+
+    /*
+     * Figure out if our position has put us into a new set of blocks and fire the appropriate events.
+     */
+    private void checkBlockEntry(EntityRef entity, Vector3i oldPosition, Vector3i newPosition, float characterHeight) {
+        // TODO: This will only work for tall mobs/players and single block mobs
+        // is this a different position than previously
+        if (!oldPosition.equals(newPosition)) {
+            // get the old position's blocks
+            Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
+            Vector3i currentPosition = oldPosition.clone();
+            for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
+                oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                currentPosition.add(0, 1, 0);
+            }
+
+            // get the new position's blocks
+            Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
+            currentPosition = newPosition.clone();
+            for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
+                newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
+                currentPosition.add(0, 1, 0);
+            }
+
+            for (int i = 0; i < characterHeight; i++) {
+                // send a block enter/leave event for this character
+                entity.send(new OnEnterBlockEvent(oldBlocks[i], newBlocks[i], new Vector3i(0, i, 0)));
+            }
+        }
     }
 
     /**
@@ -166,15 +202,9 @@ public class KinematicCharacterMover implements CharacterMover {
         if (newSwimming) {
             //Note that you cannot climb under water!
             if (state.getMode() != MovementMode.SWIMMING) {
-                if (firstRun) {
-                    entity.send(new OnEnterLiquidEvent(worldProvider.getBlock(state.getPosition())));
-                }
                 state.setMode(MovementMode.SWIMMING);
             }
         } else if (state.getMode() == MovementMode.SWIMMING) {
-            if (firstRun) {
-                entity.send(new OnLeaveLiquidEvent(worldProvider.getBlock(oldState.getPosition())));
-            }
             if (newClimbing) {
                 state.setMode(MovementMode.CLIMBING);
                 state.getVelocity().y = 0;

@@ -42,9 +42,8 @@ import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.EntityAwareWorldProvider;
-import org.terasology.world.internal.WorldBiomeProviderImpl;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;
 import org.terasology.world.internal.WorldProviderWrapper;
@@ -83,8 +82,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldGenerator worldGenerator;
         try {
             worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(worldInfo.getWorldGenerator());
+            worldGenerator.initialize();
             worldGenerator.setWorldSeed(worldInfo.getSeed());
-            worldGenerator.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
         } catch (UnresolvedWorldGeneratorException e) {
             logger.error("Unable to load world generator", e);
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));

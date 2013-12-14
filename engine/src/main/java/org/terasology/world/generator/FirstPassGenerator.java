@@ -16,6 +16,7 @@
 
 package org.terasology.world.generator;
 
+import org.terasology.engine.API;
 import org.terasology.world.chunks.Chunk;
 
 /**

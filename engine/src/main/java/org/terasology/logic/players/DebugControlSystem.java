@@ -26,7 +26,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.binds.HideHUDButton;
+import org.terasology.input.binds.general.HideHUDButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.ConsoleMessageEvent;

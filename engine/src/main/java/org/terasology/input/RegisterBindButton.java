@@ -29,6 +29,11 @@ import java.lang.annotation.Target;
 public @interface RegisterBindButton {
     String id();
 
+    /**
+     * @return The category this bind button belongs to, if not explicitly listed in the category
+     */
+    String category() default "";
+
     String description() default "";
 
     ActivateMode mode() default ActivateMode.BOTH;

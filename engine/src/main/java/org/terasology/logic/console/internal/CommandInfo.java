@@ -18,8 +18,6 @@ package org.terasology.logic.console.internal;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +25,7 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +42,7 @@ public class CommandInfo {
     private static final String PROVIDER_VAR = "provider";
     private static final String CLIENT_VAR = "client";
 
+    private Method method;
     private Object provider;
 
     private String name;
@@ -53,6 +53,7 @@ public class CommandInfo {
     private boolean runOnServer;
 
     public CommandInfo(Method method, Object provider) {
+        this.method = method;
         this.provider = provider;
         this.name = method.getName();
         Command commandAnnotation = method.getAnnotation(Command.class);
@@ -123,23 +124,45 @@ public class CommandInfo {
      * @param callingClient
      * @return
      */
-    public String execute(String params, EntityRef callingClient) {
-        Binding bind = new Binding();
-        bind.setVariable(PROVIDER_VAR, provider);
+    public String execute(List<String> params, EntityRef callingClient) {
+        Object[] processedParams = new Object[method.getParameterTypes().length];
         if (isClientEntityRequired()) {
-            bind.setVariable(CLIENT_VAR, callingClient);
-        }
-        GroovyShell shell = new GroovyShell(bind);
+            if (params.size() + 1 != method.getParameterTypes().length) {
+                return "Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1);
+            }
 
-        Object result;
-        if (isClientEntityRequired()) {
-            String fullParams = (params.trim().isEmpty()) ? CLIENT_VAR : PARAM_JOINER.join(params, CLIENT_VAR);
-            logger.debug("Executing command {}.{}({})", PROVIDER_VAR, name, fullParams);
-            result = shell.evaluate(PROVIDER_VAR + "." + name + "(" + fullParams + ")");
-        } else {
-            logger.debug("Executing command {}.{}({})", PROVIDER_VAR, name, params);
-            result = shell.evaluate(PROVIDER_VAR + "." + name + "(" + params + ")");
+            processedParams[processedParams.length - 1] = callingClient;
+        } else if (params.size() != method.getParameterTypes().length) {
+            return "Incorrect number of parameters, expected " + (method.getParameterTypes().length);
         }
-        return (result != null) ? result.toString() : "";
+        for (int i = 0; i < params.size(); ++i) {
+            Class<?> type = method.getParameterTypes()[i];
+            if (type == Float.TYPE) {
+                try {
+                    processedParams[i] = Float.parseFloat(params.get(i));
+                } catch (NumberFormatException e) {
+                    return "Bad argument '" + params.get(i) + "' - " + e.getMessage();
+                }
+            } else if (type == Integer.TYPE) {
+                try {
+                    processedParams[i] = Integer.parseInt(params.get(i));
+                } catch (NumberFormatException e) {
+                    return "Bad argument '" + params.get(i) + "' - " + e.getMessage();
+                }
+            } else if (type == String.class) {
+                String value = params.get(i);
+                if (value.startsWith("\"") && value.endsWith("\"")) {
+                    value = value.substring(1, value.length() - 1);
+                }
+                processedParams[i] = value;
+            }
+        }
+        try {
+            Object result = method.invoke(provider, processedParams);
+            return (result != null) ? result.toString() : "";
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            logger.error("Error running command {} with parameters {}", name, params, e);
+            return "Error running command: " + e.getMessage();
+        }
     }
 }

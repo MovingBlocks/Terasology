@@ -21,7 +21,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +34,9 @@ import org.terasology.engine.module.Module;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.ColorTypeAdapter;
@@ -117,19 +112,19 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     private static class FamilyInfo extends StyleInfo {
-        public Map<String, WidgetInfo> widgets;
+        public Map<String, ElementInfo> elements;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
-            if (widgets != null) {
-                for (Map.Entry<String, WidgetInfo> entry : widgets.entrySet()) {
-                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
-                    ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
+            if (elements != null) {
+                for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
+                    ClassLibrary<UIElement> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
+                    ClassMetadata<? extends UIElement, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
-                        builder.setWidgetClass(metadata.getType());
+                        builder.setElementClass(metadata.getType());
                         entry.getValue().apply(builder);
                     } else {
-                        logger.warn("Failed to resolve widget class {}, skipping style information", entry.getKey());
+                        logger.warn("Failed to resolve UIElement class {}, skipping style information", entry.getKey());
                     }
 
 
@@ -138,104 +133,46 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
-    private static class WidgetInfo extends StyleInfo {
+    private static class PartsInfo extends StyleInfo {
         public Map<String, StyleInfo> modes;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
             if (modes != null) {
                 for (Map.Entry<String, StyleInfo> entry : modes.entrySet()) {
-                    builder.setWidgetMode(entry.getKey());
+                    builder.setElementMode(entry.getKey());
                     entry.getValue().apply(builder);
                 }
             }
         }
     }
 
-    private static class StyleInfo {
-        public TextureRegion background;
-        @SerializedName("background-border")
-        public Border backgroundBorder;
-        @SerializedName("background-scale-mode")
-        public ScaleMode backgroundScaleMode;
-        @SerializedName("background-auto-draw")
-        public Boolean backgroundAutomaticallyDrawn;
-
-        public Border margin;
-        @SerializedName("fixed-width")
-        public Integer fixedWidth;
-        @SerializedName("fixed-height")
-        public Integer fixedHeight;
-        @SerializedName("align-horizontal")
-        public HorizontalAlign alignmentH;
-        @SerializedName("align-vertical")
-        public VerticalAlign alignmentV;
-
-        @SerializedName("texture-scale-mode")
-        public ScaleMode textureScaleMode;
-
-        public Font font;
-        @SerializedName("text-color")
-        public Color textColor;
-        @SerializedName("text-shadow-color")
-        public Color textShadowColor;
-
-        @SerializedName("text-align-horizontal")
-        public HorizontalAlign textAlignmentH;
-        @SerializedName("text-align-vertical")
-        public VerticalAlign textAlignmentV;
-        @SerializedName("text-shadowed")
-        public Boolean textShadowed;
+    private static class ElementInfo extends StyleInfo {
+        public Map<String, PartsInfo> parts;
+        public Map<String, StyleInfo> modes;
 
         public void apply(UISkinBuilder builder) {
-            if (background != null) {
-                builder.setBackground(background);
+            super.apply(builder);
+            if (modes != null) {
+                for (Map.Entry<String, StyleInfo> entry : modes.entrySet()) {
+                    builder.setElementMode(entry.getKey());
+                    entry.getValue().apply(builder);
+                }
             }
-            if (backgroundBorder != null) {
-                builder.setBackgroundBorder(backgroundBorder);
-            }
-            if (backgroundScaleMode != null) {
-                builder.setBackgroundMode(backgroundScaleMode);
-            }
-            if (margin != null) {
-                builder.setMargin(margin);
-            }
-            if (textureScaleMode != null) {
-                builder.setTextureScaleMode(textureScaleMode);
-            }
-            if (font != null) {
-                builder.setFont(font);
-            }
-            if (textColor != null) {
-                builder.setTextColor(textColor);
-            }
-            if (textShadowColor != null) {
-                builder.setTextShadowColor(textShadowColor);
-            }
-            if (textAlignmentH != null) {
-                builder.setTextHorizontalAlignment(textAlignmentH);
-            }
-            if (textAlignmentV != null) {
-                builder.setTextVerticalAlignment(textAlignmentV);
-            }
-            if (textShadowed != null) {
-                builder.setTextShadowed(textShadowed);
-            }
-            if (backgroundAutomaticallyDrawn != null) {
-                builder.setBackgroundAutomaticallyDrawn(backgroundAutomaticallyDrawn);
-            }
-            if (fixedWidth != null) {
-                builder.setFixedWidth(fixedWidth);
-            }
-            if (fixedHeight != null) {
-                builder.setFixedHeight(fixedHeight);
-            }
-            if (alignmentH != null) {
-                builder.setHorizontalAlignment(alignmentH);
-            }
-            if (alignmentV != null) {
-                builder.setVerticalAlignment(alignmentV);
+            if (parts != null) {
+                for (Map.Entry<String, PartsInfo> entry : parts.entrySet()) {
+                    builder.setElementPart(entry.getKey());
+                    entry.getValue().apply(builder);
+                }
             }
         }
     }
+
+    private static class StyleInfo extends UIStyleFragment {
+
+        private void apply(UISkinBuilder builder) {
+            builder.setStyleFragment(this);
+        }
+    }
+
 }

@@ -82,6 +82,7 @@ public class AssetManager {
         List<AssetUri> possibilities = resolveAll(type, name);
         switch (possibilities.size()) {
             case 0:
+                logger.warn("Failed to resolve {}:{}", type, name);
                 return null;
             case 1:
                 return possibilities.get(0);
@@ -103,6 +104,7 @@ public class AssetManager {
                         return possibilities.get(0);
                     }
                 }
+                logger.warn("Failed to resolve {}:{} - too many valid matches {}", type, name, possibilities);
                 return null;
         }
     }

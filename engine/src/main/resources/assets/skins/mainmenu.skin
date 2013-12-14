@@ -1,9 +1,9 @@
 {
     "text-shadowed" : true,
     "font" : "default",
-    "widgets" : {
-        "ArbitraryLayout" : {
-            "background-mode" : "scale_fill",
+    "elements" : {
+        "UIScreen" : {
+            "background-scale-mode" : "scale_fill",
             "background" : "menuBackground"
         },
         "UILabel" : {
@@ -11,6 +11,60 @@
         },
         "UIImage" : {
             "texture-scale-mode" : "scale_fit"
+        },
+        "UIDropdown" : {
+            "text-align-horizontal" : "left",
+            "parts" : {
+                "box" : {
+                    "background" : "dropdown",
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 29
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 31
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "dropdownActive"
+                        }
+                    }
+                },
+                "list" : {
+                    "background" : "dropdownList",
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 3,
+                        "left" : 3,
+                        "right" : 3
+                    },
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    }
+                },
+                "list-item" : {
+                    "margin" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "hover" : {
+                            "text-color" : "FFFF00FF",
+                            "background" : "dropdownListItemActive"
+                        }
+                    }
+                }
+            }
         },
         "UIButton" : {
             "text-align-horizontal" : "center",
@@ -39,10 +93,38 @@
                 }
             }
         },
+        "UIInputBind" : {
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
+            "background" : "button",
+            "background-border" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "margin" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 2,
+                "right" : 2
+            },
+            "texture-scale-mode" : "scale_fit",
+            "modes" : {
+                "hover" : {
+                    "background" : "buttonOver"
+                },
+                "active" : {
+                    "background" : "buttonDown",
+                    "text-color" : "FFFF00FF"
+                }
+            }
+        },
         "UICheckbox" : {
             "background" : "engine:checkbox",
             "fixed-width" : 24,
             "fixed-height" : 24,
+            "align-horizontal" : "left",
             "modes" : {
                 "hover" : {
                     "background" : "engine:checkboxHover"
@@ -54,16 +136,112 @@
                     "background" : "engine:checkboxCheckedHover"
                 }
             }
+        },
+        "ScrollableArea" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 6,
+                "bottom" : 6,
+                "left" : 6,
+                "right" : 6
+            },
+            "parts" : {
+                "scrollbar-slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-width" : 8,
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 0,
+                        "right" : 0
+                    }
+                },
+                "scrollbar-handle" : {
+                    "background" : "engine:handle",
+                    "fixed-width" : 16,
+                    "fixed-height" : 16
+                 }
+            }
+        },
+        "UIScrollbar" : {
+            "fixed-width" : 16,
+            "parts" : {
+                "slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-width" : 8,
+                    "background-border" : {
+                        "top" : 3,
+                        "bottom" : 3,
+                        "left" : 0,
+                        "right" : 0
+                    }
+                },
+                "handle" : {
+                    "background" : "engine:handle",
+                    "fixed-width" : 16,
+                    "fixed-height" : 16
+                }
+            }
+        },
+        "UISlider" : {
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
+            "parts" : {
+                "slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-height" : 8,
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 0,
+                        "left" : 3,
+                        "right" : 3
+                    }
+                },
+                "ticker" : {
+                    "background" : "engine:box",
+                    "fixed-height" : 32,
+                    "background-border" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 4,
+                        "right" : 4
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "engine:boxActive"
+                        }
+                    }
+                }
+            }
         }
     },
     "families" : {
         "option-grid" : {
-            "widgets" : {
+            "elements" : {
                 "UILabel" : {
                     "text-align-vertical" : "middle",
                     "text-align-horizontal" : "right"
                 }
             }
+        },
+        "title" : {
+            "font" : "title"
+        },
+        "heading-input" : {
+            "font" : "title",
+            "text-align-horizontal" : "left"
         }
     }
 }

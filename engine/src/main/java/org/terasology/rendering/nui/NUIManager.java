@@ -22,6 +22,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  * @author Immortius
  */
 public interface NUIManager extends ComponentSystem {
+
     void pushScreen(UIScreen screen);
 
     void popScreen();
@@ -34,5 +35,9 @@ public interface NUIManager extends ComponentSystem {
 
     void update(float delta);
 
-    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
+    ClassLibrary<UIElement> getElementMetadataLibrary();
+
+    void setFocus(UIElement element);
+
+    UIElement getFocus();
 }

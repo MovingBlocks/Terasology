@@ -45,10 +45,17 @@ public interface InteractionListener {
 
     /**
      * Called when the mouse is moved after clicking on the interaction region
-     * @param button The mouse button that is held down
      * @param pos The relative position of the mouse
      */
-    void onMouseDrag(MouseInput button, Vector2i pos);
+    void onMouseDrag(Vector2i pos);
+
+    /**
+     * Called when the mouse is wheeled while over the interaction region
+     * @param wheelTurns
+     * @param pos
+     * @return Whether the mouse input should be consumed, and thus not propagated to other interaction regions
+     */
+    boolean onMouseWheel(int wheelTurns, Vector2i pos);
 
     /**
      * Called when the mouse is released after clicking on the interaction region
@@ -58,10 +65,8 @@ public interface InteractionListener {
     void onMouseRelease(MouseInput button, Vector2i pos);
 
     /**
-     * Called when the mouse is wheeled over an interaction region
-     * @param amount The amount the mouse wheel is moved
-     * @param pos The relative position of the mouse
-     * @return Whether the mouse input should be consumed, and thus not propagated to other intertaction regions
+     * @return True if the mouse was over the interaction region last frame
      */
-    boolean onMouseWheeled(int amount, Vector2i pos);
+    boolean isMouseOver();
+
 }

@@ -16,6 +16,7 @@
 
 package org.terasology.input;
 
+import org.terasology.engine.SimpleUri;
 import org.terasology.input.events.ButtonEvent;
 
 /**
@@ -23,20 +24,20 @@ import org.terasology.input.events.ButtonEvent;
  */
 public class BindButtonEvent extends ButtonEvent {
 
-    private String id;
+    private SimpleUri id;
     private ButtonState state;
 
     public BindButtonEvent() {
         super(0);
     }
 
-    public void prepare(String buttonId, ButtonState newState, float delta) {
+    public void prepare(SimpleUri buttonId, ButtonState newState, float delta) {
         reset(delta);
         this.id = buttonId;
         this.state = newState;
     }
 
-    public String getId() {
+    public SimpleUri getId() {
         return id;
     }
 
@@ -46,6 +47,6 @@ public class BindButtonEvent extends ButtonEvent {
 
     @Override
     public String getButtonName() {
-        return "bind:" + id;
+        return id.toString();
     }
 }

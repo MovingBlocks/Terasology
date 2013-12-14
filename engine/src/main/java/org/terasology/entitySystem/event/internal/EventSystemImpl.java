@@ -206,7 +206,7 @@ public class EventSystemImpl implements EventSystem {
 
     @Override
     public <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
-        Multimap<Class<? extends Component>, EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
+        SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
         if (eventHandlerMap != null) {
             ReceiverEventHandlerInfo testReceiver = new ReceiverEventHandlerInfo<T>(eventReceiver, 0, componentTypes);
             for (Class<? extends Component> c : componentTypes) {
@@ -322,7 +322,7 @@ public class EventSystemImpl implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event, component));
         } else {
-            Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
+            SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
                 for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
                     if (eventHandler.isValidFor(entity)) {
@@ -336,7 +336,7 @@ public class EventSystemImpl implements EventSystem {
     private Set<EventHandlerInfo> selectEventHandlers(Class<? extends Event> eventType, EntityRef entity) {
         Set<EventHandlerInfo> result = Sets.newHashSet();
         result.addAll(generalHandlers.get(eventType));
-        Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
+        SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
         if (handlers == null) {
             return result;
         }

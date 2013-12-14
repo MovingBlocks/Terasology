@@ -16,9 +16,7 @@
 package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.terasology.rendering.assets.TextureRegion;
@@ -27,10 +25,13 @@ import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIElement;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.utilities.ReflectionUtil;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,142 +40,143 @@ import java.util.Set;
 public class UISkinBuilder {
 
     private Set<String> families = Sets.newLinkedHashSet();
-    private Set<Class<? extends UIWidget>> widgetClasses = Sets.newLinkedHashSet();
-    private SetMultimap<Class<? extends UIWidget>, String> modes = HashMultimap.create();
+    private Set<StyleKey> baseStyleKeys = Sets.newLinkedHashSet();
 
     private Map<String, UIStyleFragment> baseStyles = Maps.newHashMap();
-    private Map<String, Table<Class<? extends UIWidget>, String, UIStyleFragment>> widgetStyles = Maps.newHashMap();
+    private Table<String, StyleKey, UIStyleFragment> elementStyles = HashBasedTable.create();
 
     private UIStyleFragment currentStyle = new UIStyleFragment();
     private String currentFamily = "";
-    private Class<? extends UIWidget> currentWidget;
+    private Class<? extends UIElement> currentElement;
+    private String currentPart = "";
     private String currentMode = "";
 
     private void saveStyle() {
-        if (currentWidget != null) {
-            Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = getWidgetTable(currentFamily);
-            widgetTable.put(currentWidget, currentMode, currentStyle);
+        if (currentFamily.isEmpty() && currentElement != null) {
+            baseStyleKeys.add(new StyleKey(currentElement, currentPart, currentMode));
+        }
+        if (currentElement != null) {
+            elementStyles.put(currentFamily, new StyleKey(currentElement, currentPart, currentMode), currentStyle);
         } else {
             baseStyles.put(currentFamily, currentStyle);
         }
         currentStyle = new UIStyleFragment();
     }
 
-    private Table<Class<? extends UIWidget>, String, UIStyleFragment> getWidgetTable(String family) {
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = widgetStyles.get(family);
-        if (widgetTable == null) {
-            widgetTable = HashBasedTable.create();
-            widgetStyles.put(family, widgetTable);
-        }
-        return widgetTable;
-    }
-
     public UISkinBuilder setFamily(String family) {
         saveStyle();
         families.add(family);
         currentFamily = family;
-        currentWidget = null;
+        currentElement = null;
+        currentPart = "";
         currentMode = "";
         return this;
     }
 
-    public UISkinBuilder setWidgetClass(Class<? extends UIWidget> widget) {
+    public UISkinBuilder setElementClass(Class<? extends UIElement> widget) {
         saveStyle();
-        widgetClasses.add(widget);
-        currentWidget = widget;
+        currentElement = widget;
         currentMode = "";
+        currentPart = "";
         return this;
-
     }
 
-    public UISkinBuilder setWidgetMode(String mode) {
-        if (currentWidget == null) {
-            throw new IllegalStateException("Widget class must be set before widget mode");
+    public UISkinBuilder setElementPart(String part) {
+        if (currentElement == null) {
+            throw new IllegalStateException("Element class must be set before element part");
         }
         saveStyle();
-        modes.put(currentWidget, mode);
+        currentPart = part;
+        currentMode = "";
+        return this;
+    }
+
+    public UISkinBuilder setElementMode(String mode) {
+        if (currentElement == null) {
+            throw new IllegalStateException("Element class must be set before element mode");
+        }
+        saveStyle();
         currentMode = mode;
         return this;
     }
 
     public UISkinBuilder setBackground(TextureRegion background) {
-        currentStyle.background = background;
-        currentStyle.backgroundSet = true;
+        currentStyle.setBackground(background);
         return this;
     }
 
     public UISkinBuilder setBackgroundBorder(Border border) {
-        currentStyle.backgroundBorder = border;
+        currentStyle.setBackgroundBorder(border);
         return this;
     }
 
     public UISkinBuilder setBackgroundMode(ScaleMode mode) {
-        currentStyle.backgroundScaleMode = mode;
-        return this;
-    }
-
-    public UISkinBuilder setBackgroundAutomaticallyDrawn(boolean autoDraw) {
-        currentStyle.autoDrawBackground = autoDraw;
+        currentStyle.setBackgroundScaleMode(mode);
         return this;
     }
 
     public UISkinBuilder setFixedWidth(int width) {
-        currentStyle.fixedWidth = width;
+        currentStyle.setFixedWidth(width);
         return this;
     }
 
     public UISkinBuilder setFixedHeight(int height) {
-        currentStyle.fixedHeight = height;
+        currentStyle.setFixedHeight(height);
         return this;
     }
 
     public UISkinBuilder setHorizontalAlignment(HorizontalAlign align) {
-        currentStyle.alignmentH = align;
+        currentStyle.setAlignmentH(align);
         return this;
     }
 
     public UISkinBuilder setVerticalAlignment(VerticalAlign align) {
-        currentStyle.alignmentV = align;
+        currentStyle.setAlignmentV(align);
         return this;
     }
 
     public UISkinBuilder setMargin(Border margin) {
-        currentStyle.margin = margin;
+        currentStyle.setMargin(margin);
         return this;
     }
 
     public UISkinBuilder setTextureScaleMode(ScaleMode scaleMode) {
-        currentStyle.textureScaleMode = scaleMode;
+        currentStyle.setTextureScaleMode(scaleMode);
         return this;
     }
 
     public UISkinBuilder setFont(Font font) {
-        currentStyle.font = font;
+        currentStyle.setFont(font);
         return this;
     }
 
     public UISkinBuilder setTextColor(Color color) {
-        currentStyle.textColor = color;
+        currentStyle.setTextColor(color);
         return this;
     }
 
     public UISkinBuilder setTextShadowColor(Color color) {
-        currentStyle.textShadowColor = color;
+        currentStyle.setTextShadowColor(color);
         return this;
     }
 
     public UISkinBuilder setTextShadowed(boolean shadowed) {
-        currentStyle.textShadowed = shadowed;
+        currentStyle.setTextShadowed(shadowed);
         return this;
     }
 
     public UISkinBuilder setTextHorizontalAlignment(HorizontalAlign hAlign) {
-        currentStyle.textAlignmentH = hAlign;
+        currentStyle.setTextAlignmentH(hAlign);
         return this;
     }
 
     public UISkinBuilder setTextVerticalAlignment(VerticalAlign vAlign) {
-        currentStyle.textAlignmentV = vAlign;
+        currentStyle.setTextAlignmentV(vAlign);
+        return this;
+    }
+
+    public UISkinBuilder setStyleFragment(UIStyleFragment fragment) {
+        currentStyle = fragment;
         return this;
     }
 
@@ -182,161 +184,95 @@ public class UISkinBuilder {
         saveStyle();
         Map<String, UIStyleFamily> skinFamilies = Maps.newHashMap();
 
-        UIStyle defaultStyle = new UIStyle();
-        baseStyles.get("").applyTo(defaultStyle);
-        Table<Class<? extends UIWidget>, String, UIStyle> defaultWidgetStyles = buildDefaultWidgetStyles(defaultStyle);
-        skinFamilies.put("", new UIStyleFamily(defaultStyle, defaultWidgetStyles));
-        families.remove("");
-
+        UIStyle rootStyle = new UIStyle();
+        baseStyles.get("").applyTo(rootStyle);
+        skinFamilies.put("", buildFamily("", rootStyle));
         for (String family : families) {
-            skinFamilies.put(family, buildFamily(family, defaultStyle));
+            skinFamilies.put(family, buildFamily(family, rootStyle));
         }
         return new UISkinData(skinFamilies);
     }
 
     private UIStyleFamily buildFamily(String family, UIStyle defaultStyle) {
         UIStyle baseStyle = new UIStyle(defaultStyle);
-        UIStyleFragment fragment = baseStyles.get(family);
-        fragment.applyTo(baseStyle);
+        if (!family.isEmpty()) {
+            UIStyleFragment fragment = baseStyles.get(family);
+            fragment.applyTo(baseStyle);
+        }
 
-        Table<Class<? extends UIWidget>, String, UIStyle> familyStyles = HashBasedTable.create();
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> table = getWidgetTable(family);
-        for (Class<? extends UIWidget> widget : widgetClasses) {
-            UIStyle widgetStyle = new UIStyle(baseStyle);
+        Map<Class<? extends UIElement>, Table<String, String, UIStyle>> familyStyles = Maps.newHashMap();
+        Map<StyleKey, UIStyleFragment> styleLookup = elementStyles.row(family);
+        Map<StyleKey, UIStyleFragment> baseStyleLookup = (family.isEmpty()) ? Maps.<StyleKey, UIStyleFragment>newHashMap() : elementStyles.row("");
+        for (StyleKey styleKey : Sets.union(styleLookup.keySet(), baseStyleKeys)) {
+            UIStyle elementStyle = new UIStyle(baseStyle);
+            List<Class<? extends UIElement>> inheritanceTree = ReflectionUtil.getInheritanceTree(styleKey.element, UIElement.class);
+            applyStylesForInheritanceTree(inheritanceTree, "", "", elementStyle, styleLookup, baseStyleLookup);
 
-            UIStyleFragment widgetFrag = table.get(widget, "");
-            UIStyleFragment defaultWidgetFrag = getDefaultWidgetStyleFrag(widget);
-            if (defaultWidgetFrag != null) {
-                defaultWidgetFrag.applyTo(widgetStyle);
+            if (!styleKey.part.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, "", elementStyle, styleLookup, baseStyleLookup);
             }
-            if (widgetFrag != null) {
-                widgetFrag.applyTo(widgetStyle);
-            }
-            if (widgetFrag != null || defaultWidgetFrag != null) {
-                familyStyles.put(widget, "", widgetStyle);
-                for (String mode : modes.get(widget)) {
-                    UIStyleFragment defaultMode = getDefaultWidgetModeFrag(widget, mode);
-                    UIStyleFragment widgetMode = table.get(widget, mode);
 
-                    UIStyle widgetModeStyle = new UIStyle(widgetStyle);
-                    if (defaultMode != null) {
-                        defaultMode.applyTo(widgetModeStyle);
-                    }
-                    if (widgetMode != null) {
-                        widgetMode.applyTo(widgetModeStyle);
-                    }
-                    familyStyles.put(widget, mode, widgetModeStyle);
-                }
+            if (!styleKey.mode.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, styleKey.mode, elementStyle, styleLookup, baseStyleLookup);
             }
+
+            Table<String, String, UIStyle> elementTable = familyStyles.get(styleKey.element);
+            if (elementTable == null) {
+                elementTable = HashBasedTable.create();
+                familyStyles.put(styleKey.element, elementTable);
+            }
+            elementTable.put(styleKey.part, styleKey.mode, elementStyle);
         }
         return new UIStyleFamily(baseStyle, familyStyles);
     }
 
-    private UIStyleFragment getDefaultWidgetModeFrag(Class<? extends UIWidget> widget, String mode) {
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> widgetTable = getWidgetTable("");
-        return widgetTable.get(widget, mode);
-    }
+    private void applyStylesForInheritanceTree(List<Class<? extends UIElement>> inheritanceTree, String part, String mode, UIStyle elementStyle,
+                                               Map<StyleKey, UIStyleFragment> styleLookup, Map<StyleKey, UIStyleFragment> baseStyleLookup) {
+        for (Class<? extends UIElement> element : inheritanceTree) {
+            StyleKey key = new StyleKey(element, part, mode);
+            UIStyleFragment baseElementStyle = baseStyleLookup.get(key);
+            if (baseElementStyle != null) {
+                baseElementStyle.applyTo(elementStyle);
+            }
 
-    private UIStyleFragment getDefaultWidgetStyleFrag(Class<? extends UIWidget> widget) {
-        return getDefaultWidgetModeFrag(widget, "");
-    }
-
-    private Table<Class<? extends UIWidget>, String, UIStyle> buildDefaultWidgetStyles(UIStyle defaultStyle) {
-        Table<Class<? extends UIWidget>, String, UIStyle> results = HashBasedTable.create();
-        Table<Class<? extends UIWidget>, String, UIStyleFragment> defaultTable = getWidgetTable("");
-        for (Class<? extends UIWidget> widget : widgetClasses) {
-            UIStyleFragment fragment = defaultTable.get(widget, "");
-            if (fragment != null) {
-                UIStyle style = new UIStyle(defaultStyle);
-                fragment.applyTo(style);
-                results.put(widget, "", style);
-
-                for (String state : modes.get(widget)) {
-                    UIStyleFragment stateFrag = defaultTable.get(widget, state);
-                    if (stateFrag != null) {
-                        UIStyle modeStyle = new UIStyle(style);
-                        stateFrag.applyTo(modeStyle);
-                        results.put(widget, state, modeStyle);
-                    }
-                }
+            UIStyleFragment elemStyle = styleLookup.get(key);
+            if (elemStyle != null) {
+                elemStyle.applyTo(elementStyle);
             }
         }
-        return results;
     }
 
+    private static final class StyleKey {
+        private Class<? extends UIElement> element;
+        private String part;
+        private String mode;
 
-    private static class UIStyleFragment {
-        private boolean backgroundSet;
-        private TextureRegion background;
-        private Border backgroundBorder;
-        private ScaleMode backgroundScaleMode;
+        private StyleKey(Class<? extends UIElement> element, String part, String mode) {
+            this.element = element;
+            this.part = part;
+            this.mode = mode;
+        }
 
-        private Border margin;
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof StyleKey) {
+                StyleKey other = (StyleKey) obj;
+                return Objects.equals(other.element, element) && Objects.equals(other.part, part) && Objects.equals(other.mode, mode);
+            }
+            return false;
+        }
 
-        private ScaleMode textureScaleMode;
+        @Override
+        public int hashCode() {
+            return Objects.hash(element, part, mode);
+        }
 
-        private Font font;
-        private Color textColor;
-        private Color textShadowColor;
-        private HorizontalAlign textAlignmentH;
-        private VerticalAlign textAlignmentV;
-        private Boolean textShadowed;
-
-        private Boolean autoDrawBackground;
-        private Integer fixedWidth;
-        private Integer fixedHeight;
-        private HorizontalAlign alignmentH;
-        private VerticalAlign alignmentV;
-
-        public void applyTo(UIStyle style) {
-            if (backgroundSet) {
-                style.setBackground(background);
-            }
-            if (backgroundBorder != null) {
-                style.setBackgroundBorder(backgroundBorder);
-            }
-            if (backgroundScaleMode != null) {
-                style.setBackgroundScaleMode(backgroundScaleMode);
-            }
-            if (margin != null) {
-                style.setMargin(margin);
-            }
-            if (textureScaleMode != null) {
-                style.setTextureScaleMode(textureScaleMode);
-            }
-            if (font != null) {
-                style.setFont(font);
-            }
-            if (textColor != null) {
-                style.setTextColor(textColor);
-            }
-            if (textShadowColor != null) {
-                style.setTextShadowColor(textShadowColor);
-            }
-            if (textAlignmentH != null) {
-                style.setTextAlignmentH(textAlignmentH);
-            }
-            if (textAlignmentV != null) {
-                style.setTextAlignmentV(textAlignmentV);
-            }
-            if (textShadowed != null) {
-                style.setTextShadowed(textShadowed);
-            }
-            if (autoDrawBackground != null) {
-                style.setBackgroundAutomaticallyDrawn(autoDrawBackground);
-            }
-            if (fixedWidth != null) {
-                style.setFixedWidth(fixedWidth);
-            }
-            if (fixedHeight != null) {
-                style.setFixedHeight(fixedHeight);
-            }
-            if (alignmentH != null) {
-                style.setHorizontalAlignment(alignmentH);
-            }
-            if (alignmentV != null) {
-                style.setVerticalAlignment(alignmentV);
-            }
+        @Override
+        public String toString() {
+            return element.getSimpleName() + ":" + part + ":" + mode;
         }
     }
 }

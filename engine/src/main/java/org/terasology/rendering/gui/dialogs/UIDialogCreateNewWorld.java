@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.gui.dialogs;
 
+import java.nio.file.Files;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.newdawn.slick.Color;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
@@ -41,18 +47,14 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
+import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.generator.WorldGeneratorInfo;
-import org.terasology.world.generator.WorldGeneratorManager;
+import org.terasology.world.generator.internal.WorldGeneratorInfo;
+import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.nio.file.Files;
-import java.util.List;
 
 /*
  * Dialog for generate new world
@@ -78,6 +80,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     private boolean createServerGame;
     private ModuleSelection selection;
+    private UIButton previewButton;
 
     public UIDialogCreateNewWorld(boolean createServer) {
         super(new Vector2f(512f, 380f));
@@ -101,6 +104,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
         createSeedInput();
         createWorldGeneratorInput();
 
+        createPreviewButton();
+
         ColumnLayout layout = new ColumnLayout();
         layout.setSpacingVertical(4);
         layout.setBorder(20);
@@ -116,6 +121,15 @@ public class UIDialogCreateNewWorld extends UIDialog {
         content.addDisplayElement(worldGenerator);
 
         parent.addDisplayElement(content);
+        
+        // add worldGenerator combobox and setup button in a row
+        Vector2f previewPos = inputSeed.getPosition();
+        previewPos.x += inputSeed.getSize().x;
+        previewPos.x += 8;
+        
+        previewButton.setPosition(previewPos);
+        parent.addDisplayElement(previewButton);
+
 
         content.orderDisplayElementTop(worldGenerator);
         parent.layout();
@@ -125,11 +139,42 @@ public class UIDialogCreateNewWorld extends UIDialog {
     protected void createButtons(UIDisplayContainer parent) {
         createOkayButton();
         createCancelButton();
+    
         createModButton();
 //
         parent.addDisplayElement(modButton);
         parent.addDisplayElement(okButton);
         parent.addDisplayElement(cancelButton);
+    }
+
+    private void createPreviewButton() {
+        previewButton = new UIButton(new Vector2f(96, 32), UIButton.ButtonType.NORMAL);
+
+        previewButton.setVisible(true);
+        previewButton.getLabel().setText("Preview...");
+        previewButton.addClickListener(new ClickListener() {
+
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                WorldGeneratorInfo info = (WorldGeneratorInfo) worldGenerator.getSelection().getValue();
+
+                UIDialogPreview dialog = new UIDialogPreview(info, inputSeed.getText());
+                if (dialog.isPreviewPossible()) {
+                    dialog.addDialogListener(new DialogListener() {
+                        @Override
+                        public void close(UIDisplayElement closingDialog, EReturnCode returnCode, Object returnValue) {
+                            if (returnCode == EReturnCode.OK) {
+                                inputSeed.setText((String) returnValue);
+                            }
+                        }
+                    });
+                    dialog.open();
+                }              else {
+                    UIMessageBox messageBox = new UIMessageBox("Preview Unavailable", "This world generator does not support previewing");
+                    messageBox.openDialog();
+                }
+            }
+        });
     }
 
     private void createWorldTitleInput() {

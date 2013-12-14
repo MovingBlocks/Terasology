@@ -28,12 +28,11 @@ public interface CanvasInternal extends Canvas {
 
     void postRender();
 
-    void processMouseOver(Vector2i position);
+    void processMousePosition(Vector2i position);
 
-    void processMouseClick(MouseInput button, Vector2i pos);
+    boolean processMouseClick(MouseInput button, Vector2i pos);
 
-    void processMouseRelease(MouseInput button, Vector2i pos);
+    boolean processMouseRelease(MouseInput button, Vector2i pos);
 
-    void processMouseWheeled(int amount, Vector2i pos);
-
+    boolean processMouseWheel(int wheelTurns, Vector2i pos);
 }

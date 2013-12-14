@@ -15,6 +15,8 @@
  */
 package org.terasology.world.generator;
 
+import org.terasology.engine.API;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -17,6 +17,7 @@
 package org.terasology.world.chunks;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * @author Immortius
@@ -30,7 +31,7 @@ public interface ChunkRegionListener {
      * @param pos
      * @param chunk
      */
-    void onChunkRelevant(Vector3i pos, Chunk chunk);
+    void onChunkRelevant(Vector3i pos, ChunkImpl chunk);
 
     /**
      * Invoked when a chunk ceases to be relevant for this chunk region (

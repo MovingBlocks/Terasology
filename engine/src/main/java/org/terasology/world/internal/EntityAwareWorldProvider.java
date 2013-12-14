@@ -50,7 +50,6 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
-import org.terasology.world.WorldProviderCore;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
@@ -217,8 +216,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param type        The new type of the block
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
-        Prefab oldPrefab = entityManager.getPrefabManager().getPrefab(oldType.getPrefab());
-        Prefab newPrefab = entityManager.getPrefabManager().getPrefab(type.getPrefab());
+        Prefab oldPrefab = (!oldType.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(oldType.getPrefab()) : null;
+        Prefab newPrefab = (!type.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(type.getPrefab()) : null;
 
         for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
             if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()

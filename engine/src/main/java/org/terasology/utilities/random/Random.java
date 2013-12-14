@@ -16,6 +16,7 @@
 
 package org.terasology.utilities.random;
 
+import org.terasology.engine.API;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3f;
@@ -26,6 +27,7 @@ import java.util.List;
  *
  * @author Marcos Vives Del Sol <socram8888@gmail.com>
  */
+@API
 public abstract class Random {
 
     // This is the list of characters nextString can return
@@ -221,7 +223,7 @@ public abstract class Random {
      *
      * @return The value
      */
-    public double nextStandNormalDistrDouble() {
+    public double nextGaussian() {
 
         double q = Double.MAX_VALUE;
         double u1 = 0;
