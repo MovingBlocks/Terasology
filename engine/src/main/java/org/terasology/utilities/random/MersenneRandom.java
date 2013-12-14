@@ -97,7 +97,7 @@ public class MersenneRandom extends Random {
     }
 
     @Override
-    public double nextStandNormalDistrDouble() {
+    public double nextGaussian() {
         return mersenne.nextGaussian();
     }
 
