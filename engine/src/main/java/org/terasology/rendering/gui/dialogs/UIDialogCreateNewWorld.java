@@ -24,6 +24,7 @@ import javax.vecmath.Vector4f;
 import org.newdawn.slick.Color;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
+import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
@@ -194,6 +195,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
         inputSeed.setSize(new Vector2f(COMPONENT_WIDTH, COMPONENT_HEIGHT));
         //inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         inputSeed.setVisible(true);
+        
+//        Config config = CoreRegistry.get(Config.class);
+//        String defaultSeed = config.getWorldGeneration().getDefaultSeed();
+//        inputSeed.setText(defaultSeed);
     }
 
     private void createWorldGeneratorInput() {
@@ -252,7 +257,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                Config config = CoreRegistry.get(Config.class);
+                WorldGenerationConfig config = CoreRegistry.get(Config.class).getWorldGeneration();
 
                 //validation of the input
                 if (inputWorldTitle.getText().isEmpty()) {
@@ -265,18 +270,22 @@ public class UIDialogCreateNewWorld extends UIDialog {
                     return;
                 }
 
+                // set selected world generator as default
+                WorldGeneratorInfo worldGeneratorInfo = getSelectedWorldGenerator();
+                config.setDefaultGenerator(worldGeneratorInfo.getUri());
+
                 //set the world settings
                 if (inputSeed.getText().length() > 0) {
-                    config.getWorldGeneration().setDefaultSeed(inputSeed.getText());
+                    config.setDefaultSeed(inputSeed.getText());
                 } else {
                     FastRandom random = new FastRandom();
-                    config.getWorldGeneration().setDefaultSeed(random.nextString(32));
+                    config.setDefaultSeed(random.nextString(32));
                 }
 
                 if (inputWorldTitle.getText().length() > 0) {
-                    config.getWorldGeneration().setWorldTitle(inputWorldTitle.getText());
+                    config.setWorldTitle(inputWorldTitle.getText());
                 } else {
-                    config.getWorldGeneration().setWorldTitle(getWorldName());
+                    config.setWorldTitle(getWorldName());
                 }
 
                 ModuleConfig moduleConfig = CoreRegistry.get(Config.class).getDefaultModSelection();
@@ -286,16 +295,14 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 }
                 CoreRegistry.get(Config.class).save();
 
-                WorldGeneratorInfo worldGeneratorInfo = getSelectedWorldGenerator();
-
                 GameManifest gameManifest = new GameManifest();
-                gameManifest.setTitle(config.getWorldGeneration().getWorldTitle());
-                gameManifest.setSeed(config.getWorldGeneration().getDefaultSeed());
+                gameManifest.setTitle(config.getWorldTitle());
+                gameManifest.setSeed(config.getDefaultSeed());
                 for (Module module : selection.getSelection()) {
                     gameManifest.addModule(module.getId(), module.getVersion());
                 }
 
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getWorldGeneration().getDefaultSeed(),
+                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, config.getDefaultSeed(),
                         (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorInfo.getUri());
                 gameManifest.addWorld(worldInfo);
 
