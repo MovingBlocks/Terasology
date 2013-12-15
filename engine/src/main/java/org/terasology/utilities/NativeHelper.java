@@ -17,8 +17,11 @@
 package org.terasology.utilities;
 
 import com.google.common.collect.Lists;
+import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.rendering.oculusVr.OculusVrHelper;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -59,6 +62,42 @@ public final class NativeHelper {
         } catch (Exception e) {
             logger.error("Couldn't link static libraries. ", e);
             System.exit(1);
+        }
+    }
+
+    /**
+     * Used on initializing the game environment, either for playing or for running unit tests
+     */
+    public static void initNativeLibs() {
+        switch (LWJGLUtil.getPlatform()) {
+            case LWJGLUtil.PLATFORM_MACOSX:
+                addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
+                break;
+            case LWJGLUtil.PLATFORM_LINUX:
+                addLibraryPath(PathManager.getInstance().getNativesPath().resolve("linux"));
+                if (System.getProperty("os.arch").contains("64")) {
+                    System.loadLibrary("openal64");
+                } else {
+                    System.loadLibrary("openal");
+                }
+                break;
+            case LWJGLUtil.PLATFORM_WINDOWS:
+                addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
+
+                if (System.getProperty("os.arch").contains("64")) {
+                    System.loadLibrary("OpenAL64");
+                } else {
+                    System.loadLibrary("OpenAL32");
+                }
+                try {
+                    OculusVrHelper.loadNatives();
+                } catch (UnsatisfiedLinkError e) {
+                    logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
+                }
+                break;
+            default:
+                logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
+                System.exit(1);
         }
     }
 }

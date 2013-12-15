@@ -128,6 +128,9 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
     testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
 
+    // For reading logback.groovy when running unit tests. Excessive just for a config file?
+    testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
+
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
 }
@@ -141,6 +144,20 @@ jar {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
         attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
     }
+}
+
+// Package a jar with compiled test output that may be needed by modules basing unit tests on frameworky stuff
+task testJar(type: Jar) {
+    dependsOn jar
+    from sourceSets.test.output
+    duplicatesStrategy = 'exclude'
+    classifier = 'tests'
+}
+
+task distTestJar (type: Sync) {
+    description = "Prepares the engine's test jar for distribution (for module unit tests)"
+    into ("$distsDir/testJar")
+    from testJar
 }
 
 task distEngine (type: Sync) {

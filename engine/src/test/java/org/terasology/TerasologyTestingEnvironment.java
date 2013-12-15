@@ -125,7 +125,7 @@ public abstract class TerasologyTestingEnvironment {
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
         if (!setup) {
             setup = true;
-            bindLwjgl();
+            NativeHelper.initNativeLibs();
 
             moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
             moduleManager.applyActiveModules();
@@ -265,34 +265,4 @@ public abstract class TerasologyTestingEnvironment {
     public EngineEntityManager getEntityManager() {
         return engineEntityManager;
     }
-
-    public static void bindLwjgl() throws LWJGLException {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
-                break;
-            case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("linux"));
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("openal64");
-                } else {
-                    System.loadLibrary("openal");
-                }
-                break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
-
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("OpenAL64");
-                } else {
-                    System.loadLibrary("OpenAL32");
-                }
-                break;
-            default:
-                logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
-                System.exit(1);
-        }
-    }
-
-
 }
