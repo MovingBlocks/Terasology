@@ -16,8 +16,9 @@
 package org.terasology.engine;
 
 /**
- * URIs are used to identify resources, like assets and systems introduced by mods. URIs can the be serialized/deserialized to and from Strings.
- * URIs are immutable.
+ * Uris are used to identify resources, like assets and systems introduced by mods. Uris can then be serialized/deserialized to and from Strings.
+ * Uris are case-insensitive. They have a normalised form which is lower-case (using English casing).
+ * Uris are immutable.
  * <p/>
  * All uris include a module name as part of their structure.
  *

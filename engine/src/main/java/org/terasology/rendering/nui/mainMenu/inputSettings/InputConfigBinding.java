@@ -22,7 +22,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.input.Input;
 import org.terasology.rendering.nui.databinding.Binding;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

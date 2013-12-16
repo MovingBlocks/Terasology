@@ -22,7 +22,7 @@ public class InputConfig {
 
     private BindsConfig binds = new BindsConfig();
     private float mouseSensitivity = 0.075f;
-    private boolean mouseYAxisInverted = false;
+    private boolean mouseYAxisInverted;
 
     public BindsConfig getBinds() {
         return binds;

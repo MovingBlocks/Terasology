@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 

@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
@@ -41,7 +40,7 @@ public class RowLayout extends CoreLayout {
     private List<Row> rows = Lists.newArrayList();
     private Border padding = Border.ZERO;
 
-    public Row addRow(UIWidget ... widgets) {
+    public Row addRow(UIWidget... widgets) {
         Row row = new Row(widgets);
         rows.add(row);
         return row;
@@ -85,7 +84,7 @@ public class RowLayout extends CoreLayout {
         private List<UIWidget> items;
         private TFloatList columnWidths = new TFloatArrayList();
 
-        public Row(UIWidget ... widgets) {
+        public Row(UIWidget... widgets) {
             this.items = Lists.newArrayList(widgets);
             if (widgets.length > 0) {
                 float equalWidth = 1.0f / widgets.length;
@@ -108,7 +107,7 @@ public class RowLayout extends CoreLayout {
             }
         }
 
-        public Row setColumnRatios(float ... columns) {
+        public Row setColumnRatios(float... columns) {
             if (columns.length > items.size()) {
                 throw new IllegalArgumentException("Number of column ratios must not exceed number of elements in row.");
             }

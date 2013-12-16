@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.input.Input;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UIStyle;
 

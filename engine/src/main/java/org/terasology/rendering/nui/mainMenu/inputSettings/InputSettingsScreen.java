@@ -168,21 +168,6 @@ public class InputSettingsScreen extends UIScreen {
         layout.addRow(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f);
     }
 
-    private static class ExtensionBind implements Comparable<ExtensionBind> {
-        private SimpleUri uri;
-        private RegisterBindButton bind;
-
-        private ExtensionBind(SimpleUri uri, RegisterBindButton bind) {
-            this.uri = uri;
-            this.bind = bind;
-        }
-
-        @Override
-        public int compareTo(ExtensionBind o) {
-            return bind.description().compareTo(o.bind.description());
-        }
-    }
-
     @Override
     public void setContents(UIWidget contents) {
         super.setContents(contents);
@@ -200,4 +185,21 @@ public class InputSettingsScreen extends UIScreen {
             }
         });
     }
+
+    private static final class ExtensionBind implements Comparable<ExtensionBind> {
+        private SimpleUri uri;
+        private RegisterBindButton bind;
+
+        private ExtensionBind(SimpleUri uri, RegisterBindButton bind) {
+            this.uri = uri;
+            this.bind = bind;
+        }
+
+        @Override
+        public int compareTo(ExtensionBind o) {
+            return bind.description().compareTo(o.bind.description());
+        }
+    }
+
+
 }

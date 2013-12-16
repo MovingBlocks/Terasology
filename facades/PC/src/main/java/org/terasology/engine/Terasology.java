@@ -68,8 +68,8 @@ public final class Terasology {
         Throwable cause = t;
         while (cause != null && cause != cause.getCause()) {
             if (cause.getMessage() != null) {
-            	sb.append(cause.getClass().getSimpleName());
-            	sb.append(": ");
+                sb.append(cause.getClass().getSimpleName());
+                sb.append(": ");
                 sb.append(cause.getLocalizedMessage());
                 sb.append(nl);
             }
