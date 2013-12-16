@@ -1,0 +1,76 @@
+{
+    "type" : "engine:mainMenuScreen",
+    "skin" : "engine:mainMenu",
+    "content" : {
+        "type" : "arbitraryLayout",
+        "fixedWidgets" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "layoutInfo" : {
+                    "size" : [512, 128],
+                    "center" : [0.5, 0.2]
+                }
+            },
+            {
+                "type" : "engine:columnLayout",
+                "layoutInfo" : {
+                    "size" : [280, 192],
+                    "center" : [0.5, 0.7]
+                },
+                "columns" : 1,
+                "padding" : {
+                    "top" : 0,
+                    "bottom" : 0,
+                    "left" : 4,
+                    "right" : 4
+                },
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "id" : "singleplayer",
+                        "text" : "Single Player"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "multiplayer",
+                        "text" : "Host Game"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "join",
+                        "text" : "Join Game"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "settings",
+                        "text" : "Settings"
+                    },
+                    {
+                        "type" : "UISpace"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "exit",
+                        "text" : "Exit"
+                    }
+                ]
+            }
+        ],
+        "fillWidgets" : [
+            {
+                "type" : "UILabel",
+                "id" : "version",
+                "family" : "title",
+                "text", "Pre Alpha",
+                "layoutInfo" : {
+                    "region" : {
+                        "min" : [0.0, 0.3],
+                        "size" : [1.0, 0.1]
+                    }
+                }
+            }
+        ]
+    }
+
+}
