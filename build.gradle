@@ -35,10 +35,6 @@ assert org.gradle.api.JavaVersion.current().isJava7Compatible()
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
-    // Version levels for LWJGL
-    LWJGL_VERSION = '2.9.0'
-    JINPUT_VERSION = '2.0.5'
-
     dirNatives = 'natives'
     templatesDir = 'templates'
 
@@ -63,11 +59,6 @@ repositories {
 // Define a custom configuration named "natives"
 configurations {
     natives
-}
-
-// For the "natives" configuration make it depend on the native files from LWJGL
-dependencies {
-    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
 }
 
 task extractWindowsNatives(type:Sync) {

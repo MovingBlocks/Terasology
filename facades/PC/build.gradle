@@ -75,7 +75,6 @@ task runPC(type:JavaExec) {
     classpath sourceSets.main.output.classesDir
     classpath project(':engine').sourceSets.main.output.classesDir
     classpath project(':engine').configurations.runtime
-    classpath rootProject.configurations.natives
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
