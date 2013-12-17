@@ -223,7 +223,7 @@ public abstract class Random {
      *
      * @return The value
      */
-    public double nextStandNormalDistrDouble() {
+    public double nextGaussian() {
 
         double q = Double.MAX_VALUE;
         double u1 = 0;

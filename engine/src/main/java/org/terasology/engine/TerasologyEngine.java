@@ -546,8 +546,20 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
         moduleSecurityManager.addAPIPackage("java.util.regex");
+        moduleSecurityManager.addAPIClass(java.awt.Shape.class);
+        moduleSecurityManager.addAPIClass(java.awt.Rectangle.class);
+        moduleSecurityManager.addAPIClass(java.awt.Color.class);
+        moduleSecurityManager.addAPIClass(java.awt.BasicStroke.class);
+        moduleSecurityManager.addAPIClass(java.awt.Stroke.class);
+        moduleSecurityManager.addAPIClass(java.awt.Font.class);
+        moduleSecurityManager.addAPIClass(java.awt.FontMetrics.class);
+        moduleSecurityManager.addAPIClass(java.awt.Graphics.class);
+        moduleSecurityManager.addAPIClass(java.awt.Graphics2D.class);
+        moduleSecurityManager.addAPIPackage("java.awt.geom");
+        moduleSecurityManager.addAPIPackage("java.awt.image");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
         moduleSecurityManager.addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.addAPIPackage("com.google.common.base");
         moduleSecurityManager.addAPIPackage("com.google.common.math");
         moduleSecurityManager.addAPIPackage("com.google.common.primitives");
         moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
@@ -669,9 +681,9 @@ public class TerasologyEngine implements GameEngine {
             GameThread.processWaitingProcesses();
 
             PerformanceMonitor.startActivity("Render");
-            currentState.render();
             Display.update();
             Display.sync(60);
+            currentState.render();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");

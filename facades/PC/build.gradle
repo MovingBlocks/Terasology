@@ -125,17 +125,6 @@ task distApp (type: Sync) {
     into(dirNatives) {
         from "$rootDir/$dirNatives"
     }
-
-    // TODO: Need to sort out versioned vs. non-versioned engine jar in dist + PC jar manifest. This is a hack :P
-    // Can't get a hold of a valid version var for engine, nor find a working rename combo in the "from" above :(
-    doLast {
-        File appLibDir = new File("$distsDir/app/libs")
-        appLibDir.listFiles().each {
-            if (it.name.startsWith("engine")) {
-                it.renameTo(new File(appLibDir, "engine.jar"))
-            }
-        }
-    }
 }
 
 // This is a TEMPORARY tweak to make "changing" dependencies always ('0') check for newer snapshots available

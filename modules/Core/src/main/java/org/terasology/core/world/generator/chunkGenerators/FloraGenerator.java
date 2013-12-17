@@ -110,7 +110,7 @@ public class FloraGenerator implements FirstPassGenerator {
                 /*
                  * Generate tall grass.
                  */
-                double rand = random.nextStandNormalDistrDouble();
+                double rand = random.nextGaussian();
 
                 if (rand > -0.4 && rand < 0.4) {
                     c.setBlock(x, y + 1, z, tallGrass1);
@@ -123,7 +123,7 @@ public class FloraGenerator implements FirstPassGenerator {
                 /*
                  * Generate flowers.
                  */
-                if (random.nextStandNormalDistrDouble() < -2) {
+                if (random.nextGaussian() < -2) {
                     c.setBlock(x, y + 1, z, random.nextItem(flowers));
                 }
             }

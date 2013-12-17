@@ -123,10 +123,10 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         replacementMap.put('b', smallBranch);
 
 
-        Block oakSapling = blockManager.getBlock("engine:OakSapling");
-        Block oakSaplingGenerated = blockManager.getBlock("engine:OakSaplingGenerated");
-        Block greenLeaf = blockManager.getBlock("engine:GreenLeaf");
-        Block oakTrunk = blockManager.getBlock("engine:OakTrunk");
+        Block oakSapling = blockManager.getBlock("core:OakSapling");
+        Block oakSaplingGenerated = blockManager.getBlock("core:OakSaplingGenerated");
+        Block greenLeaf = blockManager.getBlock("core:GreenLeaf");
+        Block oakTrunk = blockManager.getBlock("core:OakTrunk");
 
         float trunkAdvance = 0.2f;
         float branchAdvance = 0.25f;

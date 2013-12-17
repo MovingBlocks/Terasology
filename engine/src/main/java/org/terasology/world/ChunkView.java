@@ -15,7 +15,6 @@
  */
 package org.terasology.world;
 
-import org.terasology.engine.API;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -155,7 +154,7 @@ public interface ChunkView {
      */
     Vector3i toWorldPos(Vector3i localPos);
 
-    /***
+    /**
      * @return The region of the world which this view is over
      */
     Region3i getWorldRegion();
@@ -198,7 +197,7 @@ public interface ChunkView {
 
     /**
      * @return Whether the chunk view is still valid - will be false if a chunk has been unloaded since the chunk
-     *         view was created. Should be checked within a lock.
+     * view was created. Should be checked within a lock.
      */
     boolean isValidView();
 }

@@ -113,7 +113,7 @@ public class RowLayout extends CoreLayout {
             }
         }
 
-        public Row setColumnRatios(float ... columns) {
+        public Row setColumnRatios(float... columns) {
             if (columns.length > items.size()) {
                 throw new IllegalArgumentException("Number of column ratios must not exceed number of elements in row.");
             }

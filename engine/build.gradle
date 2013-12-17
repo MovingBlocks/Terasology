@@ -71,6 +71,15 @@ sourceSets {
             output.classesDir 'build/classes'
         }
     }
+
+    // Put the main engine unit tests outside the standard build dir to exclude them from the standard jar
+    // TODO This prevents an issue during game load but need to make the test classes available for modules
+    test {
+        java {
+            output.classesDir 'build/testClasses'
+            output.resourcesDir 'build/testClasses'
+        }
+    }
 }
 
 // Customizations for the main compilation configuration
@@ -107,6 +116,7 @@ dependencies {
     compile group: 'org.newdawn.slick', name: 'slick', version: '237'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
     compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
+	compile group: 'ec.util', name: 'MersenneTwister', version: '20'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')

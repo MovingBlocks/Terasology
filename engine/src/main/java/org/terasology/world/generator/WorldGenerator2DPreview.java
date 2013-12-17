@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generator;
 
-import org.terasology.engine.API;
 import org.terasology.rendering.nui.Color;
 
 public interface WorldGenerator2DPreview {
@@ -28,7 +27,6 @@ public interface WorldGenerator2DPreview {
     Color get(String layerName, int x, int z);
 
     /**
-     *
      * @return the named layers that can be rendered as 2D previews
      */
     Iterable<String> getLayers();

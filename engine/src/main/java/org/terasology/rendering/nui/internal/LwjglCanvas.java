@@ -353,7 +353,8 @@ public class LwjglCanvas implements CanvasInternal {
         Rect2i drawRegion = applyMarginToRegion(region);
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getHorizontalTextAlignment(),
+                    style.getVerticalTextAlignment());
         } else {
             drawTextRaw(text, style.getFont(), style.getTextColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }

@@ -98,7 +98,7 @@ public class ArbitraryLayout extends CoreLayout<ArbitraryLayoutHint> {
         public abstract Vector2i getPosition(Vector2i canvasSize);
     }
 
-    private static class RegionedWidgetInfo extends WidgetInfo  {
+    private static class RegionedWidgetInfo extends WidgetInfo {
         private Rect2f region;
 
         public RegionedWidgetInfo(UIWidget widget, Rect2f region) {
