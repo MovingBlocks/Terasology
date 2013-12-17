@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.skin;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.util.List;
@@ -28,9 +28,9 @@ import java.util.Map;
  */
 public class UIStyleFamily {
     private UIStyle baseStyle;
-    private Map<Class<? extends UIElement>, Table<String, String, UIStyle>> elementStyleLookup = Maps.newHashMap();
+    private Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyleLookup = Maps.newHashMap();
 
-    public UIStyleFamily(UIStyle baseStyle, Map<Class<? extends UIElement>, Table<String, String, UIStyle>> elementStyles) {
+    public UIStyleFamily(UIStyle baseStyle, Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyles) {
         this.baseStyle = baseStyle;
         this.elementStyleLookup = elementStyles;
     }
@@ -39,8 +39,8 @@ public class UIStyleFamily {
         return baseStyle;
     }
 
-    public UIStyle getElementStyle(Class<? extends UIElement> element) {
-        List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
+    public UIStyle getElementStyle(Class<? extends UIWidget> element) {
+        List<Class<? extends UIWidget>> classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
@@ -54,8 +54,8 @@ public class UIStyleFamily {
         return style;
     }
 
-    public UIStyle getElementStyle(Class<? extends UIElement> element, String part, String mode) {
-        List<Class<? extends UIElement>> classes = ReflectionUtil.getInheritanceTree(element, UIElement.class);
+    public UIStyle getElementStyle(Class<? extends UIWidget> element, String part, String mode) {
+        List<Class<? extends UIWidget>> classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));

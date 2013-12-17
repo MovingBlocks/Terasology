@@ -22,10 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.util.Iterator;
@@ -41,7 +41,7 @@ public class RowLayout extends CoreLayout {
     private List<Row> rows = Lists.newArrayList();
     private Border padding = Border.ZERO;
 
-    public Row addRow(UIWidget ... widgets) {
+    public Row addRow(UIWidget... widgets) {
         Row row = new Row(widgets);
         rows.add(row);
         return row;
@@ -81,11 +81,16 @@ public class RowLayout extends CoreLayout {
         return widgets.iterator();
     }
 
+    @Override
+    public void addWidget(UIWidget element, LayoutHint hint) {
+
+    }
+
     public class Row {
         private List<UIWidget> items;
         private TFloatList columnWidths = new TFloatArrayList();
 
-        public Row(UIWidget ... widgets) {
+        public Row(UIWidget... widgets) {
             this.items = Lists.newArrayList(widgets);
             if (widgets.length > 0) {
                 float equalWidth = 1.0f / widgets.length;

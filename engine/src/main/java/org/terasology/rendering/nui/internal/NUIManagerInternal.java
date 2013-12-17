@@ -40,7 +40,7 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
 
 import java.lang.reflect.Field;
@@ -55,13 +55,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Deque<UIScreen> screens = Queues.newArrayDeque();
     private CanvasInternal canvas = new LwjglCanvas(this);
-    private ClassLibrary<UIElement> elementsLibrary;
-    private UIElement focus;
+    private ClassLibrary<UIWidget> elementsLibrary;
+    private UIWidget focus;
 
     public void refreshElementsLibrary() {
         elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
-            for (Class<? extends UIElement> elementType : module.getReflections().getSubTypesOf(UIElement.class)) {
+            for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
                 if (!elementType.isInterface()) {
                     elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
                 }
@@ -114,12 +114,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIElement> getElementMetadataLibrary() {
+    public ClassLibrary<UIWidget> getElementMetadataLibrary() {
         return elementsLibrary;
     }
 
     @Override
-    public void setFocus(UIElement widget) {
+    public void setFocus(UIWidget widget) {
         if (!Objects.equal(widget, focus)) {
             if (focus != null) {
                 focus.onLoseFocus();
@@ -132,7 +132,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIElement getFocus() {
+    public UIWidget getFocus() {
         return focus;
     }
 

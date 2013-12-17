@@ -39,12 +39,12 @@ public class ReflectionReflectFactory implements ReflectFactory {
 
     @Override
     public <T> FieldAccessor<T, ?> createFieldAccessor(Class<T> ownerType, Field field) {
-        return new ReflectionFieldAccessor<>(field);
+        return new ReflectionFieldAccessor<>(field, field.getType());
     }
 
     @Override
     public <T, U> FieldAccessor<T, U> createFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) {
-        return new ReflectionFieldAccessor<>(field);
+        return new ReflectionFieldAccessor<>(field, fieldType);
     }
 
     /**
@@ -86,10 +86,10 @@ public class ReflectionReflectFactory implements ReflectFactory {
         private Method setter;
 
         @SuppressWarnings("unchecked")
-        public ReflectionFieldAccessor(Field field) {
+        public ReflectionFieldAccessor(Field field, Class<U> fieldType) {
             this.field = field;
-            getter = ReflectionUtil.findGetter(field);
-            setter = ReflectionUtil.findSetter(field);
+            getter = ReflectionUtil.findGetter(field.getName(), field.getDeclaringClass(), fieldType);
+            setter = ReflectionUtil.findSetter(field.getName(), field.getDeclaringClass(), fieldType);
             if (getter == null || setter == null) {
                 field.setAccessible(true);
             }

@@ -13,39 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-
-import java.util.Iterator;
+import org.terasology.asset.Asset;
+import org.terasology.asset.Assets;
+import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
+import org.terasology.rendering.assets.TextureRegion;
 
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
-
-    public CoreLayout() {
-    }
-
-    public CoreLayout(String id) {
-        super(id);
+public class TextureRegionTypeHandler extends StringRepresentationTypeHandler<TextureRegion> {
+    @Override
+    public String getAsString(TextureRegion item) {
+        if (item instanceof Asset) {
+            return ((Asset) item).getURI().toSimpleString();
+        }
+        return "";
     }
 
     @Override
-    public void update(float delta) {
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
+    public TextureRegion getFromString(String representation) {
+        return Assets.getTextureRegion(representation);
     }
 }

@@ -36,7 +36,7 @@ import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.gson.AssetTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.ColorTypeAdapter;
@@ -118,13 +118,13 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             super.apply(builder);
             if (elements != null) {
                 for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
-                    ClassLibrary<UIElement> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
-                    ClassMetadata<? extends UIElement, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
+                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
+                    ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
                         builder.setElementClass(metadata.getType());
                         entry.getValue().apply(builder);
                     } else {
-                        logger.warn("Failed to resolve UIElement class {}, skipping style information", entry.getKey());
+                        logger.warn("Failed to resolve UIWidget class {}, skipping style information", entry.getKey());
                     }
 
 

@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.skin;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
@@ -50,15 +50,15 @@ public class UISkin extends AbstractAsset<UISkinData> {
         return getStyleFamily("").getBaseStyle();
     }
 
-    public UIStyle getDefaultStyleFor(Class<? extends UIElement> element, String mode) {
+    public UIStyle getDefaultStyleFor(Class<? extends UIWidget> element, String mode) {
         return getStyleFor("", element, mode);
     }
 
-    public UIStyle getDefaultStyleFor(Class<? extends UIElement> element, String part, String mode) {
+    public UIStyle getDefaultStyleFor(Class<? extends UIWidget> element, String part, String mode) {
         return getStyleFor("", element, part, mode);
     }
 
-    public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String mode) {
+    public UIStyle getStyleFor(String family, Class<? extends UIWidget> element, String mode) {
         UIStyleFamily styleFamily = getStyleFamily(family);
         if (element == null) {
             return styleFamily.getBaseStyle();
@@ -66,7 +66,7 @@ public class UISkin extends AbstractAsset<UISkinData> {
         return styleFamily.getElementStyle(element, "", mode);
     }
 
-    public UIStyle getStyleFor(String family, Class<? extends UIElement> element, String part, String mode) {
+    public UIStyle getStyleFor(String family, Class<? extends UIWidget> element, String part, String mode) {
         UIStyleFamily styleFamily = getStyleFamily(family);
         if (element == null) {
             return styleFamily.getBaseStyle();

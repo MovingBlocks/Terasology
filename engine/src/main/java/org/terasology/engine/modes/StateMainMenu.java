@@ -15,6 +15,9 @@
  */
 package org.terasology.engine.modes;
 
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.classMetadata.reflect.ReflectFactory;
@@ -35,6 +38,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.layout.UILayoutData;
 import org.terasology.rendering.nui.mainMenu.MainMenuScreen;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -101,16 +105,17 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        guiManager.openWindow("main");
-        //openMainMenu();
+        //guiManager.openWindow("main");
+        openMainMenu();
         if (!messageOnLoad.isEmpty()) {
             guiManager.showMessage("", messageOnLoad);
         }
     }
 
     private void openMainMenu() {
-        UIScreen mainMenu = new MainMenuScreen();
-        mainMenu.setSkin(Assets.getSkin("engine:mainmenu"));
+        UILayoutData data = CoreRegistry.get(AssetManager.class).loadAssetData(new AssetUri(AssetType.UI_LAYOUT, "engine", "mainMenuScreen"), UILayoutData.class);
+        UIScreen mainMenu = (UIScreen) data.getRootElement();
+        //mainMenu.setSkin(Assets.getSkin("engine:mainmenu"));
         CoreRegistry.get(NUIManager.class).pushScreen(mainMenu);
     }
 

@@ -25,6 +25,8 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.util.Iterator;
@@ -33,7 +35,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ColumnLayout extends AbstractWidget {
+public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private int columns = 1;
     private Border padding = new Border(0, 0, 0, 0);
@@ -100,21 +102,23 @@ public class ColumnLayout extends AbstractWidget {
 
     @Override
     public void onMouseButtonEvent(MouseButtonEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void onMouseWheelEvent(MouseWheelEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void onKeyEvent(KeyEvent event) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public Iterator<UIWidget> iterator() {
         return widgetList.iterator();
+    }
+
+    @Override
+    public void addWidget(UIWidget element, LayoutHint hint) {
+        addWidget(element);
     }
 }

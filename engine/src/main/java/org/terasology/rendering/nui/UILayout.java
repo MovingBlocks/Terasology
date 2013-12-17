@@ -15,37 +15,10 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-
-import java.util.Iterator;
-
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
+public interface UILayout<T extends LayoutHint> extends UIWidget {
 
-    public CoreLayout() {
-    }
-
-    public CoreLayout(String id) {
-        super(id);
-    }
-
-    @Override
-    public void update(float delta) {
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-    }
+    void addWidget(UIWidget element, T hint);
 }

@@ -48,7 +48,7 @@ import org.terasology.rendering.nui.LineBuilder;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
@@ -309,7 +309,7 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public Vector2i calculateSize(UIElement element, Vector2i sizeHint) {
+    public Vector2i calculateSize(UIWidget element, Vector2i sizeHint) {
         if (element == null) {
             return sizeHint;
         }
@@ -321,7 +321,7 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public void drawElement(UIElement element, Rect2i region) {
+    public void drawElement(UIWidget element, Rect2i region) {
         if (element == null) {
             return;
         }
@@ -775,7 +775,7 @@ public class LwjglCanvas implements CanvasInternal {
     private static class CanvasState {
         public UISkin skin;
         public String family = "";
-        public UIElement element;
+        public UIWidget element;
         public String part = "";
         public String mode = "";
 
@@ -909,9 +909,9 @@ public class LwjglCanvas implements CanvasInternal {
     private static class InteractionRegion {
         public InteractionListener listener;
         public Rect2i region;
-        public UIElement element;
+        public UIWidget element;
 
-        public InteractionRegion(Rect2i region, InteractionListener listener, UIElement element) {
+        public InteractionRegion(Rect2i region, InteractionListener listener, UIWidget element) {
             this.listener = listener;
             this.region = region;
             this.element = element;
@@ -1000,9 +1000,9 @@ public class LwjglCanvas implements CanvasInternal {
 
         private final Rect2i region;
         private final InteractionListener listener;
-        private final UIElement currentElement;
+        private final UIWidget currentElement;
 
-        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIElement currentElement) {
+        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIWidget currentElement) {
             this.region = region;
             this.listener = listener;
             this.currentElement = currentElement;

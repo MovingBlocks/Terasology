@@ -1,13 +1,14 @@
 {
     "type" : "engine:mainMenuScreen",
     "skin" : "engine:mainMenu",
-    "content" : {
+    "contents" : {
         "type" : "arbitraryLayout",
-        "fixedWidgets" : [
+        "contents" : [
             {
                 "type" : "UIImage",
                 "image" : "engine:terasology",
                 "layoutInfo" : {
+                    "mode" : "fixed",
                     "size" : [512, 128],
                     "center" : [0.5, 0.2]
                 }
@@ -15,15 +16,16 @@
             {
                 "type" : "engine:columnLayout",
                 "layoutInfo" : {
+                    "mode" : "fixed",
                     "size" : [280, 192],
                     "center" : [0.5, 0.7]
                 },
                 "columns" : 1,
                 "padding" : {
-                    "top" : 0,
-                    "bottom" : 0,
-                    "left" : 4,
-                    "right" : 4
+                    "left" : 0,
+                    "right" : 0,
+                    "top" : 4,
+                    "bottom" : 4
                 },
                 "contents" : [
                     {
@@ -55,15 +57,14 @@
                         "text" : "Exit"
                     }
                 ]
-            }
-        ],
-        "fillWidgets" : [
+            },
             {
                 "type" : "UILabel",
                 "id" : "version",
                 "family" : "title",
-                "text", "Pre Alpha",
+                "text" : "Pre Alpha",
                 "layoutInfo" : {
+                    "mode" : "fill",
                     "region" : {
                         "min" : [0.0, 0.3],
                         "size" : [1.0, 0.1]

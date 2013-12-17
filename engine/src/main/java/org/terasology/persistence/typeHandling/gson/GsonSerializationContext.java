@@ -41,6 +41,10 @@ public class GsonSerializationContext implements SerializationContext {
 
     private JsonSerializationContext context;
 
+    public GsonSerializationContext(JsonSerializationContext context) {
+        this.context = context;
+    }
+
     @Override
     public PersistedData create(String value) {
         return new GsonPersistedData(new JsonPrimitive(value));

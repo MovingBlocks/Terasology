@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.baseWidgets;
 
 import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -26,32 +25,32 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  * @author Immortius
  */
 public class UIImage extends CoreWidget {
-    private Binding<TextureRegion> texture = new DefaultBinding<>();
+    private Binding<TextureRegion> image = new DefaultBinding<>();
 
     public UIImage() {
     }
 
-    public UIImage(TextureRegion texture) {
-        this.texture.set(texture);
+    public UIImage(TextureRegion image) {
+        this.image.set(image);
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (texture.get() != null) {
-            canvas.drawTexture(texture.get());
+        if (image.get() != null) {
+            canvas.drawTexture(image.get());
         }
     }
 
-    public TextureRegion getTexture() {
-        return texture.get();
+    public TextureRegion getImage() {
+        return image.get();
     }
 
-    public void setTexture(TextureRegion texture) {
-        this.texture.set(texture);
+    public void setImage(TextureRegion image) {
+        this.image.set(image);
     }
 
     public void bindTexture(Binding<TextureRegion> binding) {
-        this.texture = binding;
+        this.image = binding;
     }
 
 }

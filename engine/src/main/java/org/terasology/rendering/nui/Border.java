@@ -33,7 +33,7 @@ public class Border {
     private int top;
     private int bottom;
 
-    public Border() {
+    private Border() {
     }
 
     public Border(int left, int right, int top, int bottom) {

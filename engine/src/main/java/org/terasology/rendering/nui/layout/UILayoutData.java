@@ -13,31 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.layout;
 
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.asset.AssetData;
+import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
+public class UILayoutData implements AssetData {
+    private UIWidget rootElement;
 
-    void pushScreen(UIScreen screen);
+    public UILayoutData(UIWidget rootElement) {
+        this.rootElement = rootElement;
+    }
 
-    void popScreen();
-
-    void setScreen(UIScreen screen);
-
-    void closeScreens();
-
-    void render();
-
-    void update(float delta);
-
-    ClassLibrary<UIWidget> getElementMetadataLibrary();
-
-    void setFocus(UIWidget element);
-
-    UIWidget getFocus();
+    public UIWidget getRootElement() {
+        return rootElement;
+    }
 }

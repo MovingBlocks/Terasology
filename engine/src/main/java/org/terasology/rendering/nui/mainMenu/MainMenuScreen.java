@@ -22,8 +22,8 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIImage;
@@ -64,8 +64,7 @@ public class MainMenuScreen extends UIScreen {
     }
 
     @Override
-    public void setContents(UIWidget contents) {
-        super.setContents(contents);
+    public void initialise() {
         find("singleplayer", UIButton.class).subscribe(new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {

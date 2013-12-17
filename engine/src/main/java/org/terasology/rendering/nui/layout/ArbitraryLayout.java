@@ -20,7 +20,6 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.UIWidget;
@@ -32,7 +31,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ArbitraryLayout extends CoreLayout {
+public class ArbitraryLayout extends CoreLayout<ArbitraryLayoutHint> {
 
     private List<WidgetInfo> widgets = Lists.newArrayList();
 
@@ -65,6 +64,18 @@ public class ArbitraryLayout extends CoreLayout {
             contents.add(info.getWidget());
         }
         return contents.iterator();
+    }
+
+    @Override
+    public void addWidget(UIWidget element, ArbitraryLayoutHint hint) {
+        switch (hint.getMode()) {
+            case FILL:
+                addFillWidget(element, hint.getRegion());
+                break;
+            default:
+                addFixedWidget(element, hint.getSize(), hint.getCenter());
+                break;
+        }
     }
 
     private abstract static class WidgetInfo {

@@ -18,7 +18,7 @@ package org.terasology.utilities;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -69,13 +69,21 @@ public final class ReflectionUtil {
     }
 
     public static Method findGetter(String propertyName, Class beanClass, Class propertyType) {
-        Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        Method result = findGetter(propertyName, beanClass);
         if (result != null && propertyType.equals(result.getReturnType())) {
+            return result;
+        }
+        return null;
+    }
+
+    public static Method findGetter(String propertyName, Class beanClass) {
+        Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
+        if (result != null) {
             result.setAccessible(true);
             return result;
         }
         result = findMethod(beanClass, "is" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
-        if (result != null && propertyType.equals(result.getReturnType())) {
+        if (result != null) {
             result.setAccessible(true);
             return result;
         }
@@ -131,7 +139,7 @@ public final class ReflectionUtil {
 
     private static <T> void addInterfaceToInheritanceTree(Class<? extends T> interfaceType, Class<T> baseClass, Set<Class<? extends T>> result) {
         for (Class<?> parentInterface : interfaceType.getInterfaces()) {
-            if (UIElement.class.isAssignableFrom(parentInterface)) {
+            if (UIWidget.class.isAssignableFrom(parentInterface)) {
                 addInterfaceToInheritanceTree((Class<? extends T>) parentInterface, baseClass, result);
             }
         }

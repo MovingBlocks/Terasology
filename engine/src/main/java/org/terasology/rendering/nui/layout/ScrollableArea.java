@@ -22,6 +22,7 @@ import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseWidgets.UIScrollbar;
@@ -80,4 +81,8 @@ public class ScrollableArea extends CoreLayout {
         return Arrays.asList(content).iterator();
     }
 
+    @Override
+    public void addWidget(UIWidget element, LayoutHint hint) {
+
+    }
 }
