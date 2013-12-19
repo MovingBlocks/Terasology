@@ -490,6 +490,32 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
+    public void purgeChunks() {
+        ChunkMonitor.fireChunkProviderDisposed(this);
+        pipeline.shutdown();
+        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
+
+        for (ChunkImpl chunk : nearCache.values()) {
+            worldEntity.send(new BeforeChunkUnload(chunk.getPos()));
+            chunk.dispose();
+            ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+            store.storeAllEntities();
+            store.save();
+        }
+        nearCache.clear();
+        storageManager.purgeChunks();
+
+        this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
+        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
+        ChunkMonitor.fireChunkProviderInitialized(this);
+
+        for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
+            pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
+            chunkRelevanceRegion.setUpToDate();
+        }
+    }
+
+    @Override
     public ChunkViewCore getViewAround(Vector3i pos) {
         Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
         ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().z];

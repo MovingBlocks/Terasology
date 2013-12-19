@@ -56,6 +56,7 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
 import org.terasology.world.TimerEvent;
+import org.terasology.world.WorldCommands;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
@@ -219,6 +220,7 @@ public final class WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
+        CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
         initTimeEvents();
     }
 
