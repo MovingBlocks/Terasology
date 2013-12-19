@@ -22,8 +22,9 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIImage;
@@ -46,49 +47,32 @@ public class AudioSettingsScreen extends UIScreen {
     @In
     private Config config;
 
-    public void initialise() {
-        ColumnLayout grid = new ColumnLayout();
-        grid.setColumns(2);
-        grid.addWidget(new UILabel("Sound Volume:"));
-        grid.addWidget(new UISlider("sound"));
-        grid.addWidget(new UILabel("Music Volume:"));
-        grid.addWidget(new UISlider("music"));
-        grid.setPadding(new Border(4, 4, 4, 4));
-        grid.setFamily("option-grid");
-
-        ArbitraryLayout layout = new ArbitraryLayout();
-        layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("title", "title", "Audio Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
-        layout.addFixedWidget(grid, new Vector2i(500, 192), new Vector2f(0.45f, 0.6f));
-        layout.addFixedWidget(new UIButton("close", "Back"), new Vector2i(280, 32), new Vector2f(0.5f, 0.95f));
-
-        setContents(layout);
-    }
-
     @Override
-    @SuppressWarnings("unchecked")
-    public void setContents(UIWidget contents) {
-        super.setContents(contents);
-
+    public void initialise() {
         UISlider sound = find("sound", UISlider.class);
-        sound.setIncrement(0.05f);
-        sound.setPrecision(2);
-        sound.setMinimum(0);
-        sound.setRange(1.0f);
-        sound.bindValue(BindHelper.bindBeanProperty("soundVolume", config.getAudio(), Float.TYPE));
+        if (sound != null) {
+            sound.setIncrement(0.05f);
+            sound.setPrecision(2);
+            sound.setMinimum(0);
+            sound.setRange(1.0f);
+            sound.bindValue(BindHelper.bindBeanProperty("soundVolume", config.getAudio(), Float.TYPE));
+        }
 
         UISlider music = find("music", UISlider.class);
-        music.setIncrement(0.05f);
-        music.setPrecision(2);
-        music.setMinimum(0);
-        music.setRange(1.0f);
-        music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
+        if (music != null) {
+            music.setIncrement(0.05f);
+            music.setPrecision(2);
+            music.setMinimum(0);
+            music.setRange(1.0f);
+            music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
+        }
 
-        find("close", UIButton.class).subscribe(new ButtonEventListener() {
+        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.popScreen();
             }
         });
     }
+
 }

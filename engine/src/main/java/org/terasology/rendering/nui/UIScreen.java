@@ -56,7 +56,9 @@ public class UIScreen implements UIWidget {
 
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(screenListener);
-        canvas.drawElement(contents, canvas.getRegion());
+        if (contents != null) {
+            canvas.drawElement(contents, canvas.getRegion());
+        }
     }
 
     public UISkin getSkin() {
@@ -68,7 +70,9 @@ public class UIScreen implements UIWidget {
     }
 
     public void update(float delta) {
-        contents.update(delta);
+        if (contents != null) {
+            contents.update(delta);
+        }
     }
 
     @Override

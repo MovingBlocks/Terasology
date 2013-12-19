@@ -27,7 +27,7 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.displayAdapting.DisplayValueAdapter;
+import org.terasology.rendering.nui.displayAdapting.DisplayStringAdapter;
 import org.terasology.rendering.nui.displayAdapting.ToStringAdapter;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public class UIDropdown<T> extends CoreWidget {
         }
     };
     private List<InteractionListener> optionListeners = Lists.newArrayList();
-    private DisplayValueAdapter<T> optionAdapter = new ToStringAdapter<>();
+    private DisplayStringAdapter<T> optionAdapter = new ToStringAdapter<>();
 
     private boolean opened;
 
@@ -145,8 +145,8 @@ public class UIDropdown<T> extends CoreWidget {
         selection.set(value);
     }
 
-    public void setOptionAdapter(DisplayValueAdapter<T> displayValueAdapter) {
-        optionAdapter = displayValueAdapter;
+    public void setOptionAdapter(DisplayStringAdapter<T> displayStringAdapter) {
+        optionAdapter = displayStringAdapter;
     }
 
     private class ItemListener extends BaseInteractionListener {

@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.displayAdapting;
 /**
  * @author Immortius
  */
-public interface DisplayValueAdapter<T> {
+public interface DisplayStringAdapter<T> {
 
     String convert(T value);
 }

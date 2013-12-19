@@ -76,7 +76,6 @@ public class InputSettingsScreen extends UIScreen {
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
-        //TODO mouseYAxisInverted and mouseSensitivity need to be bound to their respective config options
         mainLayout.addRow(new UILabel("mouseLabel", "heading-input", "Mouse"));
         mainLayout.addRow(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f);
         mainLayout.addRow(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f);
@@ -172,6 +171,7 @@ public class InputSettingsScreen extends UIScreen {
     public void setContents(UIWidget contents) {
         super.setContents(contents);
         find("mouseSensitivity", UISlider.class).bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
+        find("mouseYAxisInverted", UICheckbox.class).bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
         find("reset", UIButton.class).subscribe(new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {

@@ -68,13 +68,15 @@ public class ArbitraryLayout extends CoreLayout<ArbitraryLayoutHint> {
 
     @Override
     public void addWidget(UIWidget element, ArbitraryLayoutHint hint) {
-        switch (hint.getMode()) {
-            case FILL:
-                addFillWidget(element, hint.getRegion());
-                break;
-            default:
-                addFixedWidget(element, hint.getSize(), hint.getCenter());
-                break;
+        if (hint != null) {
+            switch (hint.getMode()) {
+                case FILL:
+                    addFillWidget(element, hint.getRegion());
+                    break;
+                default:
+                    addFixedWidget(element, hint.getSize(), hint.getCenter());
+                    break;
+            }
         }
     }
 

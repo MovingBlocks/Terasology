@@ -1,0 +1,92 @@
+{
+    "type" : "AudioSettingsScreen",
+    "skin" : "mainmenu",
+    "contents" : {
+        "type" : "arbitraryLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "layoutInfo" : {
+                    "mode" : "fixed",
+                    "size" : [512, 128],
+                    "center" : [0.5, 0.2]
+                }
+            },
+            {
+                "type" : "UILabel",
+                "text" : "Audio Settings",
+                "family" : "title",
+                "layoutInfo" : {
+                    "mode" : "fill",
+                    "region" : {
+                        "min" : [0.0, 0.3],
+                        "size" : [1, 0.1]
+                    }
+                }
+            },
+            {
+                "type" : "ColumnLayout",
+                "family" : "option-grid",
+                "columns" : 2,
+                "padding" : {
+                    "top" : 4,
+                    "bottom" : 4,
+                    "left" : 4,
+                    "right" : 4
+                },
+                "layoutInfo" : {
+                    "mode" : "fixed",
+                    "size" : [500, 192],
+                    "center" : [0.45, 0.6]
+                },
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "Sound Volume:"
+                    },
+                    {
+                        "type" : "UISlider",
+                        "id" : "sound"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Music Volume:"
+                    },
+                    {
+                        "type" : "UISlider",
+                        "id" : "music"
+                    }
+                ]
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "mode" : "fixed",
+                    "size" : [280, 32],
+                    "center" : [0.5, 0.95]
+                }
+
+            }
+
+        ]
+    }
+    /*ArbitraryLayout layout = new ArbitraryLayout();
+                    layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
+                    layout.addFillWidget(new UILabel("title", "title", "Audio Settings"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
+                    layout.addFixedWidget(grid, new Vector2i(500, 192), new Vector2f(0.45f, 0.6f));
+                    layout.addFixedWidget(new UIButton("close", "Back"), new Vector2i(280, 32), new Vector2f(0.5f, 0.95f));
+
+        ColumnLayout grid = new ColumnLayout();
+                grid.setColumns(2);
+                grid.addWidget(new UILabel("Sound Volume:"));
+                grid.addWidget(new UISlider("sound"));
+                grid.addWidget(new UILabel("Music Volume:"));
+                grid.addWidget(new UISlider("music"));
+                grid.setPadding(new Border(4, 4, 4, 4));
+                grid.setFamily("option-grid");*/
+
+
+}

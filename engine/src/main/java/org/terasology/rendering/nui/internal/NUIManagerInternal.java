@@ -20,6 +20,10 @@ import com.google.common.collect.Queues;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.DefaultClassLibrary;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
@@ -42,6 +46,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.uiAsset.UIData;
 
 import java.lang.reflect.Field;
 import java.util.Deque;
@@ -53,10 +58,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
+    private AssetManager assetManager;
+
     private Deque<UIScreen> screens = Queues.newArrayDeque();
     private CanvasInternal canvas = new LwjglCanvas(this);
     private ClassLibrary<UIWidget> elementsLibrary;
     private UIWidget focus;
+
+    public NUIManagerInternal(AssetManager assetManager) {
+        this.assetManager = assetManager;
+    }
 
     public void refreshElementsLibrary() {
         elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
@@ -66,6 +77,22 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                     elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
                 }
             }
+        }
+    }
+
+    @Override
+    public void pushScreen(AssetUri screenUri) {
+        UIData data = assetManager.loadAssetData(screenUri, UIData.class);
+        if (data != null && data.getRootElement() instanceof UIScreen) {
+            pushScreen((UIScreen) data.getRootElement());
+        }
+    }
+
+    @Override
+    public void pushScreen(String screenUri) {
+        AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
+        if (assetUri != null) {
+            pushScreen(assetUri);
         }
     }
 
@@ -80,6 +107,22 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void popScreen() {
         if (!screens.isEmpty()) {
             screens.pop();
+        }
+    }
+
+    @Override
+    public void setScreen(AssetUri screenUri) {
+        UIData data = assetManager.loadAssetData(screenUri, UIData.class);
+        if (data != null && data.getRootElement() instanceof UIScreen) {
+            setScreen((UIScreen) data.getRootElement());
+        }
+    }
+
+    @Override
+    public void setScreen(String screenUri) {
+        AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
+        if (assetUri != null) {
+            setScreen(assetUri);
         }
     }
 

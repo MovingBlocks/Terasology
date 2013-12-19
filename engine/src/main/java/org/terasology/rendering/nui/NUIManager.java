@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
@@ -23,9 +24,17 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface NUIManager extends ComponentSystem {
 
+    void pushScreen(AssetUri screenUri);
+
+    void pushScreen(String screenUri);
+
     void pushScreen(UIScreen screen);
 
     void popScreen();
+
+    void setScreen(AssetUri screenUri);
+
+    void setScreen(String screenUri);
 
     void setScreen(UIScreen screen);
 

@@ -112,10 +112,10 @@ public class Color {
      * @param a
      */
     public Color(int r, int g, int b, int a) {
-        Preconditions.checkArgument(r >= 0 || r <= MAX, "Color values must be in range 0-255");
-        Preconditions.checkArgument(g >= 0 || g <= MAX, "Color values must be in range 0-255");
-        Preconditions.checkArgument(b >= 0 || b <= MAX, "Color values must be in range 0-255");
-        Preconditions.checkArgument(a >= 0 || a <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(r >= 0 && r <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(g >= 0 && g <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(b >= 0 && b <= MAX, "Color values must be in range 0-255");
+        Preconditions.checkArgument(a >= 0 && a <= MAX, "Color values must be in range 0-255");
         representation = r << RED_OFFSET | g << GREEN_OFFSET | b << BLUE_OFFSET | a;
     }
 

@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * @author Immortius
  */
-public class ToStringAdapter<T> implements DisplayValueAdapter<T> {
+public class ToStringAdapter<T> implements DisplayStringAdapter<T> {
     @Override
     public String convert(T value) {
         return Objects.toString(value.toString());

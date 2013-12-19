@@ -20,5 +20,10 @@ package org.terasology.rendering.nui;
  */
 public interface UILayout<T extends LayoutHint> extends UIWidget {
 
+    /**
+     * Adds a widget with an optional layout hint
+     * @param element
+     * @param hint A hint as to how the widget should be laid out - may be null (and null values should be handled).
+     */
     void addWidget(UIWidget element, T hint);
 }

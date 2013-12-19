@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layout;
+package org.terasology.rendering.nui.uiAsset;
 
 import org.terasology.asset.AssetData;
 import org.terasology.rendering.nui.UIWidget;
@@ -21,10 +21,10 @@ import org.terasology.rendering.nui.UIWidget;
 /**
  * @author Immortius
  */
-public class UILayoutData implements AssetData {
+public class UIData implements AssetData {
     private UIWidget rootElement;
 
-    public UILayoutData(UIWidget rootElement) {
+    public UIData(UIWidget rootElement) {
         this.rootElement = rootElement;
     }
 

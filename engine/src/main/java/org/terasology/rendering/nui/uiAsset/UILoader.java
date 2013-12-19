@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layout;
+package org.terasology.rendering.nui.uiAsset;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -51,8 +51,8 @@ import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UILayout;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
@@ -70,16 +70,16 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class UILayoutLoader implements AssetLoader<UILayoutData> {
-    private static final Logger logger = LoggerFactory.getLogger(UILayoutLoader.class);
+public class UILoader implements AssetLoader<UIData> {
+    private static final Logger logger = LoggerFactory.getLogger(UILoader.class);
 
     @Override
-    public UILayoutData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         Gson gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-                .registerTypeAdapter(UILayoutData.class, new UILayoutDataTypeAdapter(nuiManager))
-                .registerTypeHierarchyAdapter(UIWidget.class, new UIElementTypeAdapter(nuiManager))
+                .registerTypeAdapter(UIData.class, new UIDataTypeAdapter(nuiManager))
+                .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager))
                 .registerTypeAdapter(Vector3i.class, new JsonTypeHandlerAdapter<>(new Vector3iTypeHandler()))
                 .registerTypeAdapter(Region3i.class, new JsonTypeHandlerAdapter<>(new Region3iTypeHandler()))
                 .registerTypeAdapter(Vector2i.class, new JsonTypeHandlerAdapter<>(new Vector2iTypeHandler()))
@@ -93,29 +93,29 @@ public class UILayoutLoader implements AssetLoader<UILayoutData> {
 
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
             reader.setLenient(true);
-            return gson.fromJson(reader, UILayoutData.class);
+            return gson.fromJson(reader, UIData.class);
         }
     }
 
-    private static final class UILayoutDataTypeAdapter implements JsonDeserializer<UILayoutData> {
+    private static final class UIDataTypeAdapter implements JsonDeserializer<UIData> {
 
         private NUIManager nuiManager;
 
-        public UILayoutDataTypeAdapter(NUIManager nuiManager) {
+        public UIDataTypeAdapter(NUIManager nuiManager) {
             this.nuiManager = nuiManager;
         }
 
         @Override
-        public UILayoutData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return new UILayoutData((UIWidget) context.deserialize(json, UIWidget.class));
+        public UIData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return new UIData((UIWidget) context.deserialize(json, UIWidget.class));
         }
     }
 
-    private static final class UIElementTypeAdapter implements JsonDeserializer<UIWidget> {
+    private static final class UIWidgetTypeAdapter implements JsonDeserializer<UIWidget> {
 
         private NUIManager nuiManager;
 
-        public UIElementTypeAdapter(NUIManager nuiManager) {
+        public UIWidgetTypeAdapter(NUIManager nuiManager) {
             this.nuiManager = nuiManager;
         }
 
@@ -163,15 +163,16 @@ public class UILayoutLoader implements AssetLoader<UILayoutData> {
                 if (jsonObject.has("contents")) {
                     for (JsonElement child : jsonObject.getAsJsonArray("contents")) {
                         UIWidget childElement = context.deserialize(child, UIWidget.class);
-
-                        LayoutHint hint = null;
-                        if (child.isJsonObject()) {
-                            JsonObject childObject = child.getAsJsonObject();
-                            if (layoutHintType != null && childObject.has("layoutInfo")) {
-                                hint = context.deserialize(childObject.get("layoutInfo"), layoutHintType);
+                        if (childElement != null) {
+                            LayoutHint hint = null;
+                            if (child.isJsonObject()) {
+                                JsonObject childObject = child.getAsJsonObject();
+                                if (layoutHintType != null && childObject.has("layoutInfo")) {
+                                    hint = context.deserialize(childObject.get("layoutInfo"), layoutHintType);
+                                }
                             }
+                            layout.addWidget(childElement, hint);
                         }
-                        layout.addWidget(childElement, hint);
                     }
                 }
             }
