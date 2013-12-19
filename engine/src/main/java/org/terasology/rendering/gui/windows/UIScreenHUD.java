@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import java.util.Locale;
+
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
@@ -36,6 +38,7 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 /**
@@ -221,7 +224,9 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             if (entityManager != null) {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
             }
-            debugLine3.setText(String.format("%s, %.2f", CoreRegistry.get(LocalPlayer.class).getPosition(), (character != null) ? character.yaw : 0));
+            Vector3f pos = CoreRegistry.get(LocalPlayer.class).getPosition();
+            float yaw = (character != null) ? character.yaw : 0;
+            debugLine3.setText(String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Yaw %.2f", pos.x, pos.y, pos.z, yaw));
             debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f",
                     ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
                     CoreRegistry.get(WorldProvider.class).getTime().getDays()));
