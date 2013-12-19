@@ -236,7 +236,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 }
             }
         });
-        worldGenerator.select(defaultIndex);
+
+        if (worldGenerator.getItemCount() > defaultIndex) {
+            worldGenerator.select(defaultIndex);
+        }
     }
 
     private UILabel createLabel(String text) {

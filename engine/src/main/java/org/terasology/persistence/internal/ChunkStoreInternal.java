@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
+import org.terasology.network.ClientComponent;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.internal.ChunkImpl;
@@ -96,7 +97,7 @@ final class ChunkStoreInternal implements ChunkStore {
     public void storeAllEntities() {
         AABB aabb = chunk.getAABB();
         for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
-            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant()) {
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null) {
                     if (aabb.contains(loc.getWorldPosition())) {

@@ -79,4 +79,5 @@ public interface StorageManager {
 
     void shutdown();
 
+    void purgeChunks();
 }

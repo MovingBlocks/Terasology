@@ -559,6 +559,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.awt.geom");
         moduleSecurityManager.addAPIPackage("java.awt.image");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
+        moduleSecurityManager.addAPIPackage("com.google.common.cache");
         moduleSecurityManager.addAPIPackage("com.google.common.collect");
         moduleSecurityManager.addAPIPackage("com.google.common.base");
         moduleSecurityManager.addAPIPackage("com.google.common.math");
