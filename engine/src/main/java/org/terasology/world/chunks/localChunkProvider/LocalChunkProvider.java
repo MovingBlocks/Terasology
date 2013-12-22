@@ -496,7 +496,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
 
         for (ChunkImpl chunk : nearCache.values()) {
-            worldEntity.send(new BeforeChunkUnload(chunk.getPos()));
+            if (chunk.getChunkState() == ChunkImpl.State.COMPLETE && chunk.isReady()) {
+                worldEntity.send(new BeforeChunkUnload(chunk.getPos()));
+            }
             chunk.dispose();
             ChunkStore store = storageManager.createChunkStoreForSave(chunk);
             store.storeAllEntities();
