@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.NUIManager;
@@ -29,11 +28,10 @@ import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UICheckbox;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.displayAdapting.DisplayStringAdapter;
+import org.terasology.rendering.nui.formatting.ObjectFormatter;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
@@ -88,9 +86,9 @@ public class VideoSettingsScreen extends UIScreen {
         if (blur != null) {
             blur.setOptions(Lists.newArrayList(0, 1, 2, 3));
             blur.bindSelection(BindHelper.bindBeanProperty("blurIntensity", config.getRendering(), Integer.TYPE));
-            blur.setOptionAdapter(new DisplayStringAdapter<Integer>() {
+            blur.setOptionAdapter(new ObjectFormatter<Integer>() {
                 @Override
-                public String convert(Integer value) {
+                public String format(Integer value) {
                     switch (value) {
                         case 1:
                             return "Some";

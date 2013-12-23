@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.math.Rect2i;
+
 /**
  * @author Immortius
  */
@@ -40,4 +42,8 @@ public enum VerticalAlign {
     };
 
     public abstract int getOffset(int elementHeight, int availableHeight);
+
+    public int getStart(Rect2i region) {
+        return region.minY() + getOffset(0, region.height());
+    }
 }

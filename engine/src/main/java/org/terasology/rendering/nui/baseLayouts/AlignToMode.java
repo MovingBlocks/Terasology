@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.displayAdapting;
+package org.terasology.rendering.nui.baseLayouts;
 
 /**
  * @author Immortius
  */
-public interface DisplayStringAdapter<T> {
+public enum AlignToMode {
 
-    String convert(T value);
+    CANVAS,
+    ELEMENT
 }

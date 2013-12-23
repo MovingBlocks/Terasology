@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
-
-import org.terasology.math.Rect2i;
+package org.terasology.math;
 
 import java.util.Objects;
 

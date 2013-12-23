@@ -17,27 +17,14 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.math.Rect2f;
-import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenUtil;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIImage;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UISpace;
-import org.terasology.rendering.nui.layout.ArbitraryLayout;
-import org.terasology.rendering.nui.layout.ColumnLayout;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
-import org.terasology.rendering.nui.mainMenu.videoSettings.VideoSettingsScreen;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius

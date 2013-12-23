@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class LineBuilder {
+public class TextLineBuilder {
 
     private final Font font;
     private final int spaceWidth;
@@ -34,16 +34,16 @@ public class LineBuilder {
     private int currentLineLength;
     private StringBuilder lineBuilder = new StringBuilder();
 
-    public LineBuilder(Font font, int maxWidth) {
+    public TextLineBuilder(Font font, int maxWidth) {
         this.font = font;
         this.spaceWidth = font.getWidth(' ');
         this.maxWidth = maxWidth;
     }
 
     public static List<String> getLines(Font font, String text, int maxWidth) {
-        LineBuilder lineBuilder = new LineBuilder(font, maxWidth);
-        lineBuilder.addText(text);
-        return lineBuilder.getLines();
+        TextLineBuilder textLineBuilder = new TextLineBuilder(font, maxWidth);
+        textLineBuilder.addText(text);
+        return textLineBuilder.getLines();
     }
 
     public void addText(String text) {

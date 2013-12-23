@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.displayAdapting;
-
-import java.util.Objects;
+package org.terasology.rendering.nui.baseLayouts;
 
 /**
  * @author Immortius
  */
-public class ToStringAdapter<T> implements DisplayStringAdapter<T> {
-    @Override
-    public String convert(T value) {
-        return Objects.toString(value.toString());
-    }
+public enum RelativeSize {
+
+    FIXED,
+    PREFERRED,
+    FILL
 }

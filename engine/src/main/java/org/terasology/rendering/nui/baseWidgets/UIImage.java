@@ -30,6 +30,10 @@ public class UIImage extends CoreWidget {
     public UIImage() {
     }
 
+    public UIImage(String id) {
+        super(id);
+    }
+
     public UIImage(TextureRegion image) {
         this.image.set(image);
     }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layout;
+package org.terasology.rendering.nui.baseLayouts;
 
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.nui.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutHint;

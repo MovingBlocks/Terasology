@@ -40,7 +40,7 @@ public class MainMenuScreen extends UIScreen {
         UIScreenUtil.trySubscribe(this, "singleplayer", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                // Open
+                nuiManager.pushScreen("engine:selectGameScreen");
             }
         });
         UIScreenUtil.trySubscribe(this, "multiplayer", new ButtonEventListener() {

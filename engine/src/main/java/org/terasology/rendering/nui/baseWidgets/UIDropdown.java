@@ -21,14 +21,14 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.displayAdapting.DisplayStringAdapter;
-import org.terasology.rendering.nui.displayAdapting.ToStringAdapter;
+import org.terasology.rendering.nui.formatting.ObjectFormatter;
+import org.terasology.rendering.nui.formatting.ToStringFormatter;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class UIDropdown<T> extends CoreWidget {
         }
     };
     private List<InteractionListener> optionListeners = Lists.newArrayList();
-    private DisplayStringAdapter<T> optionAdapter = new ToStringAdapter<>();
+    private ObjectFormatter<T> optionAdapter = new ToStringFormatter<>();
 
     private boolean opened;
 
@@ -75,7 +75,7 @@ public class UIDropdown<T> extends CoreWidget {
         canvas.setPart(BOX);
         canvas.drawBackground();
         if (selection.get() != null) {
-            canvas.drawText(optionAdapter.convert(selection.get()));
+            canvas.drawText(optionAdapter.format(selection.get()));
         }
 
         if (opened) {
@@ -99,7 +99,7 @@ public class UIDropdown<T> extends CoreWidget {
                 }
                 Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
                 canvas.drawBackground(itemRegion);
-                canvas.drawText(optionAdapter.convert(options.get().get(i)), itemRegion);
+                canvas.drawText(optionAdapter.format(options.get().get(i)), itemRegion);
                 canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
             }
         } else {
@@ -145,8 +145,8 @@ public class UIDropdown<T> extends CoreWidget {
         selection.set(value);
     }
 
-    public void setOptionAdapter(DisplayStringAdapter<T> displayStringAdapter) {
-        optionAdapter = displayStringAdapter;
+    public void setOptionAdapter(ObjectFormatter<T> objectFormatter) {
+        optionAdapter = objectFormatter;
     }
 
     private class ItemListener extends BaseInteractionListener {

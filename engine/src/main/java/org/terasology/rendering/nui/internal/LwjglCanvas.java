@@ -40,11 +40,11 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LineBuilder;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
@@ -741,7 +741,7 @@ public class LwjglCanvas implements CanvasInternal {
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = LineBuilder.getLines(font, text, absoluteRegion.width());
+        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
         if (fontMesh == null) {
             fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
             cachedText.put(key, fontMesh);

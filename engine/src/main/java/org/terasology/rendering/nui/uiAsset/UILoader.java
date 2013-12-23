@@ -48,7 +48,7 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.rendering.nui.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -72,6 +72,8 @@ import java.util.List;
  */
 public class UILoader implements AssetLoader<UIData> {
     private static final Logger logger = LoggerFactory.getLogger(UILoader.class);
+    public static final String CONTENTS_FIELD = "contents";
+    public static final String LAYOUT_INFO_FIELD = "layoutInfo";
 
     @Override
     public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
@@ -148,6 +150,9 @@ public class UILoader implements AssetLoader<UIData> {
 
             for (FieldMetadata<? extends UIWidget, ?> field : elementMetadata.getFields()) {
                 if (jsonObject.has(field.getName())) {
+                    if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
+                        continue;
+                    }
                     try {
                         field.setValue(element, context.deserialize(jsonObject.get(field.getName()), field.getType()));
                     } catch (Throwable e) {
@@ -160,15 +165,15 @@ public class UILoader implements AssetLoader<UIData> {
 
                 Class<? extends LayoutHint> layoutHintType = (Class<? extends LayoutHint>)
                         ReflectionUtil.getTypeParameter(elementMetadata.getType().getGenericSuperclass(), 0);
-                if (jsonObject.has("contents")) {
-                    for (JsonElement child : jsonObject.getAsJsonArray("contents")) {
+                if (jsonObject.has(CONTENTS_FIELD)) {
+                    for (JsonElement child : jsonObject.getAsJsonArray(CONTENTS_FIELD)) {
                         UIWidget childElement = context.deserialize(child, UIWidget.class);
                         if (childElement != null) {
                             LayoutHint hint = null;
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
-                                if (layoutHintType != null && childObject.has("layoutInfo")) {
-                                    hint = context.deserialize(childObject.get("layoutInfo"), layoutHintType);
+                                if (layoutHintType != null && childObject.has(LAYOUT_INFO_FIELD)) {
+                                    hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }
                             layout.addWidget(childElement, hint);
