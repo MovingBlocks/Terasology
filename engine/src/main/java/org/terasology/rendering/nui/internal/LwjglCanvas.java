@@ -184,7 +184,8 @@ public class LwjglCanvas implements CanvasInternal {
     @Override
     public void processMousePosition(Vector2i position) {
         if (clickedRegion != null) {
-            Vector2i relPos = new Vector2i(position).sub(clickedRegion.region.min());
+            Vector2i relPos = new Vector2i(position);
+            relPos.sub(clickedRegion.region.min());
             clickedRegion.listener.onMouseDrag(relPos);
         }
 
@@ -193,7 +194,8 @@ public class LwjglCanvas implements CanvasInternal {
         while (iter.hasNext()) {
             InteractionRegion next = iter.next();
             if (next.region.contains(position)) {
-                Vector2i relPos = new Vector2i(position).sub(next.region.min());
+                Vector2i relPos = new Vector2i(position);
+                relPos.sub(next.region.min());
                 next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty());
                 newMouseOverRegions.add(next);
             }
@@ -216,7 +218,8 @@ public class LwjglCanvas implements CanvasInternal {
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
-                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
+                Vector2i relPos = new Vector2i(pos);
+                relPos.sub(next.region.min());
                 if (next.listener.onMouseClick(button, relPos)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
@@ -230,7 +233,8 @@ public class LwjglCanvas implements CanvasInternal {
     @Override
     public boolean processMouseRelease(MouseInput button, Vector2i pos) {
         if (clickedRegion != null) {
-            Vector2i relPos = new Vector2i(pos).sub(clickedRegion.region.min());
+            Vector2i relPos = new Vector2i(pos);
+            relPos.sub(clickedRegion.region.min());
             clickedRegion.listener.onMouseRelease(button, relPos);
             clickedRegion = null;
             return true;
@@ -242,7 +246,8 @@ public class LwjglCanvas implements CanvasInternal {
     public boolean processMouseWheel(int wheelTurns, Vector2i pos) {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
-                Vector2i relPos = new Vector2i(pos).sub(next.region.min());
+                Vector2i relPos = new Vector2i(pos);
+                relPos.sub(next.region.min());
                 if (next.listener.onMouseWheel(wheelTurns, relPos)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
