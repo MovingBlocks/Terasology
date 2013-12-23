@@ -589,7 +589,17 @@ public final class TeraMath {
         return (val < 0 && val != i) ? i - 1 : i;
     }
 
+    public static int floorToInt(double val) {
+        int i = (int) val;
+        return (val < 0 && val != i) ? i - 1 : i;
+    }
+
     public static int ceilToInt(float val) {
+        int i = (int) val;
+        return (val >= 0 && val != i) ? i + 1 : i;
+    }
+
+    public static int ceilToInt(double val) {
         int i = (int) val;
         return (val >= 0 && val != i) ? i + 1 : i;
     }
