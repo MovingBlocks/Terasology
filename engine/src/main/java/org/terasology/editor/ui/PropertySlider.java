@@ -28,6 +28,8 @@ import java.awt.*;
  */
 public class PropertySlider extends JPanel implements ChangeListener {
 
+    private static final long serialVersionUID = 3157887601371629996L;
+
     private JSlider slider;
     private FloatProperty activeProperty;
 

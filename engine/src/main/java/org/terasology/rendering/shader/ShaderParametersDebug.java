@@ -114,7 +114,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
                 program.setInt("texDebug", texId++, true);
                 break;
-            case VOLUMETRIC_LIGHTING:L:
+            case VOLUMETRIC_LIGHTING:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
                 DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
                 program.setInt("texDebug", texId++, true);

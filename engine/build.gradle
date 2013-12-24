@@ -116,7 +116,7 @@ dependencies {
     compile group: 'org.newdawn.slick', name: 'slick', version: '237'
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
     compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
-	compile group: 'ec.util', name: 'MersenneTwister', version: '20'
+    compile group: 'ec.util', name: 'MersenneTwister', version: '20'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -249,6 +249,15 @@ idea {
         testOutputDir = file('build/testClasses')
     }
 }
+
+//eclipse.jdt.file.withProperties { props ->
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.rawTypeReference', 'ignore');
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedLocal', 'ignore');
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedPrivateMember', 'ignore');
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.incompleteEnumSwitch', 'ignore');
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.missingSerialVersion', 'ignore');
+//	props.setProperty('org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation', 'ignore');
+//}
 
 checkstyle {
     ignoreFailures = true

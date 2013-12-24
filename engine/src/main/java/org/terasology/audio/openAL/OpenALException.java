@@ -23,6 +23,8 @@ import java.util.List;
 
 public final class OpenALException extends IllegalStateException {
 
+    private static final long serialVersionUID = 8714084225307679407L;
+
     private OpenALException(String message, int errorCode) {
         super("OpenAL Error (" + errorCode + ") at " + message + " - " + AL10.alGetString(errorCode));
     }

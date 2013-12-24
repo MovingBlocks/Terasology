@@ -220,7 +220,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      */
     @SuppressWarnings("unchecked")
     void setFieldId(FieldMetadata<T, ?> field, byte id) {
-        if (fields.containsValue((FIELD) field)) {
+        if (fields.containsValue(field)) {
             fieldsById.put(id, (FIELD) field);
         }
     }
