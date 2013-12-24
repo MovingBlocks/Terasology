@@ -30,9 +30,8 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class UIScreen implements UIWidget {
+public class UIScreen extends AbstractWidget {
 
-    private String family;
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
     private InteractionListener screenListener = new BaseInteractionListener() {
@@ -41,6 +40,13 @@ public class UIScreen implements UIWidget {
             return true;
         }
     };
+
+    public UIScreen() {
+    }
+
+    public UIScreen(String id) {
+        super(id);
+    }
 
     public void initialise() {
 
@@ -106,27 +112,8 @@ public class UIScreen implements UIWidget {
     }
 
     @Override
-    public String getId() {
-        return "";
-    }
-
-    @Override
-    public String getFamily() {
-        return family;
-    }
-
-    @Override
-    public void setFamily(String family) {
-        this.family = family;
-    }
-
-    @Override
     public String getMode() {
         return DEFAULT_MODE;
-    }
-
-    public <T extends UIWidget> T find(String id, Class<T> type) {
-        return contents.find(id, type);
     }
 
     @Override

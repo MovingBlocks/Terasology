@@ -327,7 +327,7 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawElement(UIWidget element, Rect2i region) {
-        if (element == null) {
+        if (element == null || !element.isVisible()) {
             return;
         }
 

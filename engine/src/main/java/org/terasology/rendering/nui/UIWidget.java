@@ -38,6 +38,8 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     String getMode();
 
+    boolean isVisible();
+
     <T extends UIWidget> T find(String id, Class<T> type);
 
     void onDraw(Canvas canvas);

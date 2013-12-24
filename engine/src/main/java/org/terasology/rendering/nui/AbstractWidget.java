@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
@@ -26,6 +28,8 @@ public abstract class AbstractWidget implements UIWidget {
     private final String id;
     private String family;
     private boolean focused;
+
+    private Binding<Boolean> visible = new DefaultBinding<>(true);
 
     public AbstractWidget() {
         id = "";
@@ -70,6 +74,18 @@ public abstract class AbstractWidget implements UIWidget {
             }
         }
         return null;
+    }
+
+    public boolean isVisible() {
+        return visible.get();
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible.set(visible);
+    }
+
+    public void bindVisible(Binding<Boolean> bind) {
+        this.visible = bind;
     }
 
     @Override
