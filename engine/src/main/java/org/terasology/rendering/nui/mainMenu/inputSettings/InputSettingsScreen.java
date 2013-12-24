@@ -33,6 +33,10 @@ import org.terasology.math.Border;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.baseLayouts.relative.HorizontalHint;
+import org.terasology.rendering.nui.baseLayouts.relative.RelativeLayout;
+import org.terasology.rendering.nui.baseLayouts.relative.VerticalHint;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UICheckbox;
@@ -41,7 +45,6 @@ import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
 import org.terasology.rendering.nui.baseWidgets.UISpace;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.baseLayouts.ArbitraryLayout;
 import org.terasology.rendering.nui.baseLayouts.ColumnLayout;
 import org.terasology.rendering.nui.baseLayouts.RowLayout;
 import org.terasology.rendering.nui.baseLayouts.ScrollableArea;
@@ -109,17 +112,25 @@ public class InputSettingsScreen extends UIScreen {
         area.setContent(mainLayout);
         area.setContentHeight(mainLayout.getRowCount() * 32);
 
-        ColumnLayout footerGrid = new ColumnLayout();
+        ColumnLayout footerGrid = new ColumnLayout("footer");
         footerGrid.setColumns(2);
         footerGrid.addWidget(new UIButton("reset", "Restore Defaults"));
         footerGrid.addWidget(new UIButton("close", "Back"));
         footerGrid.setPadding(new Border(4, 4, 0, 0));
 
-        ArbitraryLayout layout = new ArbitraryLayout();
-        layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.1f));
-        layout.addFillWidget(new UILabel("title", "title", "Input Settings"), Rect2f.createFromMinAndSize(0.0f, 0.2f, 1.0f, 0.1f));
-        layout.addFillWidget(area, Rect2f.createFromMinAndSize(0.3f, 0.25f, 0.4f, 0.6f));
-        layout.addFixedWidget(footerGrid, new Vector2i(400, 32), new Vector2f(0.50f, 0.95f));
+        RelativeLayout layout = new RelativeLayout();
+        layout.addWidget(new UIImage("title", Assets.getTexture("engine:terasology")),
+                HorizontalHint.create().fixedWidth(512).center(),
+                VerticalHint.create().fixedHeight(128).alignTop(48));
+        layout.addWidget(new UILabel("subtitle", "title", "Input Settings"),
+                HorizontalHint.create().center(),
+                VerticalHint.create().fixedHeight(48).alignTopRelativeTo("title", VerticalAlign.BOTTOM));
+        layout.addWidget(area,
+                HorizontalHint.create().fixedWidth(640).center(),
+                VerticalHint.create().alignTopRelativeTo("subtitle", VerticalAlign.BOTTOM).alignBottomRelativeTo("footer", VerticalAlign.TOP, 48));
+        layout.addWidget(footerGrid,
+                HorizontalHint.create().center().fixedWidth(400),
+                VerticalHint.create().fixedHeight(48).alignBottom(48));
 
         setContents(layout);
     }

@@ -131,7 +131,12 @@ public final class ReflectionUtil {
     }
 
     private static <T> void addClassToInheritanceTree(Class<? extends T> element, Class<T> baseClass, Set<Class<? extends T>> result) {
-        if (baseClass.isAssignableFrom(element.getSuperclass())) {
+        for (Class<?> interfaceType : element.getInterfaces()) {
+            if (baseClass.isAssignableFrom(interfaceType)) {
+                addInterfaceToInheritanceTree((Class<? extends T>) interfaceType, baseClass, result);
+            }
+        }
+        if (element.getSuperclass() != null && baseClass.isAssignableFrom(element.getSuperclass())) {
             addClassToInheritanceTree((Class<? extends T>) element.getSuperclass(), baseClass, result);
         }
         result.add(element);

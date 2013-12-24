@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.baseLayouts;
 
 import com.google.common.collect.Lists;
+import com.google.gson.annotations.SerializedName;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -41,6 +42,16 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
+    @SerializedName("column-widths")
+    private float[] columnWidths = new float[] {1.0f};
+
+    public ColumnLayout() {
+    }
+
+    public ColumnLayout(String id) {
+       super(id);
+    }
+
     public void addWidget(UIWidget widget) {
         widgetList.add(widget);
     }
@@ -55,6 +66,37 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public void setColumns(int columns) {
         this.columns = columns;
+        columnWidths = new float[columns];
+        float equalWidth = 1.0f / columns;
+        for (int i = 0; i < columnWidths.length; ++i) {
+            columnWidths[i] = equalWidth;
+        }
+    }
+
+    public void setColumnWidths(float ... widths) {
+        if (widths.length > columns) {
+            throw new IllegalArgumentException("More widths than columns");
+        }
+
+        float total = 0;
+        int columnIndex = 0;
+        while (columnIndex < widths.length) {
+            total += widths[columnIndex];
+            columnWidths[columnIndex] = widths[columnIndex];
+            columnIndex++;
+        }
+
+        if (total > 1.0f) {
+            throw new IllegalArgumentException("Total width exceeds 1.0");
+        }
+
+        if (columnIndex < columnWidths.length) {
+            float remainingWidth = 1.0f - total;
+            float widthPerColumn = remainingWidth / (columnWidths.length - columnIndex);
+            while (columnIndex < columnWidths.length) {
+                columnWidths[columnIndex++] = widthPerColumn;
+            }
+        }
     }
 
     public void setPadding(Border padding) {
@@ -64,19 +106,20 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     @Override
     public void onDraw(Canvas canvas) {
         if (!widgetList.isEmpty()) {
-            Vector2i cellSize = canvas.size();
-            cellSize.x /= columns;
+            Vector2i rowSize = canvas.size();
             int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
-            cellSize.y /= numRows;
-
-            Vector2i drawSize = new Vector2i(cellSize);
-            drawSize.x -= padding.getLeft() + padding.getRight();
-            drawSize.y -= padding.getTop() + padding.getBottom();
+            rowSize.y /= numRows;
 
             Vector2i currentOffset = new Vector2i();
             int currentColumn = 0;
             for (UIWidget widget : widgetList) {
+                Vector2i cellSize = new Vector2i(rowSize);
+                cellSize.x *= columnWidths[currentColumn];
                 if (widget != null) {
+                    Vector2i drawSize = new Vector2i(cellSize);
+                    drawSize.x -= padding.getLeft() + padding.getRight();
+                    drawSize.y -= padding.getTop() + padding.getBottom();
+
                     Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x + padding.getLeft(), currentOffset.y + padding.getTop(), drawSize.x, drawSize.y);
                     canvas.drawElement(widget, drawRegion);
                 }

@@ -34,7 +34,18 @@ public class ReflectionReflectFactory implements ReflectFactory {
 
     @Override
     public <T> ObjectConstructor<T> createConstructor(Class<T> type) throws NoSuchMethodException {
-        return new ReflectionConstructor<>(type);
+        if (hasConstructor(type)) {
+            return new ReflectionConstructor<>(type);
+        }
+        return null;
+    }
+
+    private <T> boolean hasConstructor(Class<T> type) {
+        try {
+            return !type.isInterface() && type.getDeclaredConstructor() != null;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
 
     @Override

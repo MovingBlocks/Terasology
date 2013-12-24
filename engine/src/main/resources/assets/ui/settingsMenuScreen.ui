@@ -2,26 +2,33 @@
     "type" : "engine:SettingsMenuScreen",
     "skin" : "mainmenu",
     "contents" : {
-        "type" : "arbitraryLayout",
+        "type" : "relativeLayout",
         "contents" : [
             {
                 "type" : "UIImage",
                 "image" : "engine:terasology",
+                "id" : "title",
                 "layoutInfo" : {
-                    "mode" : "fixed",
-                    "size" : [512, 128],
-                    "center" : [0.5, 0.2]
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
                 }
             },
             {
                 "type" : "UILabel",
                 "text" : "Settings",
                 "family" : "title",
+                "id" : "subtitle",
                 "layoutInfo" : {
-                    "mode" : "fill",
-                    "region" : {
-                        "min" : [0.0, 0.3],
-                        "size" : [1.0, 0.1]
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "title"
                     }
                 }
             },
@@ -34,9 +41,17 @@
                     "right" : 0
                 },
                 "layoutInfo" : {
-                    "mode" : "fixed",
-                    "size" : [280, 192],
-                    "center" : [0.5, 0.7]
+                    "width" : 280,
+                    "height" : 288,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "offset" : 32
+                    }
                 },
                 "contents" : [
                     {

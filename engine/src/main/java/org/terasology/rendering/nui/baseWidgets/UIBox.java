@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.baseWidgets;
+
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
 
 /**
  * @author Immortius
  */
-public enum AlignToMode {
+public class UIBox extends CoreWidget {
 
-    CANVAS,
-    ELEMENT
+    @Override
+    public void onDraw(Canvas canvas) {
+    }
 }

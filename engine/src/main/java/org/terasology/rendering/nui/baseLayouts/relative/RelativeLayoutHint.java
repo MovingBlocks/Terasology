@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.baseLayouts.relative;
 
 import com.google.gson.annotations.SerializedName;
 import org.terasology.math.Rect2i;
@@ -42,6 +42,21 @@ public class RelativeLayoutHint implements LayoutHint {
     private VerticalInfo positionBottom;
     @SerializedName("position-vertical-center")
     private VerticalInfo positionCenterVertical;
+
+    public RelativeLayoutHint() {
+    }
+
+    public RelativeLayoutHint(HorizontalHint horizontal, VerticalHint vertical) {
+        width = horizontal.getWidth();
+        positionLeft = horizontal.getPositionLeft();
+        positionCenterHorizontal = horizontal.getPositionCenter();
+        positionRight = horizontal.getPositionRight();
+
+        height = vertical.getHeight();
+        positionTop = vertical.getPositionTop();
+        positionCenterVertical = vertical.getPositionCenter();
+        positionBottom = vertical.getPositionBottom();
+    }
 
     public int getWidth() {
         return width;
@@ -105,66 +120,6 @@ public class RelativeLayoutHint implements LayoutHint {
 
     public void setPositionCenterVertical(VerticalInfo positionCenterVertical) {
         this.positionCenterVertical = positionCenterVertical;
-    }
-
-    public static class HorizontalInfo {
-        private HorizontalAlign target;
-        private String widget;
-        private int offset;
-
-        public HorizontalAlign getTarget() {
-            return target;
-        }
-
-        public void setTarget(HorizontalAlign target) {
-            this.target = target;
-        }
-
-        public String getWidget() {
-            return widget;
-        }
-
-        public void setWidget(String widget) {
-            this.widget = widget;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public void setOffset(int offset) {
-            this.offset = offset;
-        }
-    }
-
-    public static class VerticalInfo {
-        private VerticalAlign target;
-        private String widget;
-        private int offset;
-
-        public VerticalAlign getTarget() {
-            return target;
-        }
-
-        public void setTarget(VerticalAlign target) {
-            this.target = target;
-        }
-
-        public String getWidget() {
-            return widget;
-        }
-
-        public void setWidget(String widget) {
-            this.widget = widget;
-        }
-
-        public int getOffset() {
-            return offset;
-        }
-
-        public void setOffset(int offset) {
-            this.offset = offset;
-        }
     }
 
 }

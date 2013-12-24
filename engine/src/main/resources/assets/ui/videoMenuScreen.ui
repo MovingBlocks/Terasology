@@ -2,26 +2,51 @@
     "type" : "VideoSettingsScreen",
     "skin" : "mainmenu",
     "contents" : {
-        "type" : "ArbitraryLayout",
+        "type" : "RelativeLayout",
         "contents" : [
             {
                 "type" : "UIImage",
                 "image" : "engine:terasology",
+                "id" : "title",
                 "layoutInfo" : {
-                    "mode" : "fixed",
-                    "size" : [512, 128],
-                    "center" : [0.5, 0.2]
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
                 }
             },
             {
                 "type" : "UILabel",
                 "family" : "title",
                 "text" : "Video Settings",
+                "id" : "subtitle",
                 "layoutInfo" : {
-                    "mode" : "fill",
-                    "region" : {
-                        "min" : [0, 0.3],
-                        "size" : [1, 0.1]
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "layoutInfo" : {
+                    "width" : 740,
+                    "height" : 280,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
                     }
                 }
             },
@@ -121,9 +146,19 @@
                     }
                 ],
                 "layoutInfo" : {
-                    "mode" : "fixed",
-                    "size" : [720, 192],
-                    "center" : [0.5, 0.6]
+                    "width" : 720,
+                    "height" : 240,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
                 }
             },
             {
@@ -131,9 +166,13 @@
                 "text" : "Back",
                 "id" : "close",
                 "layoutInfo" : {
-                    "mode" : "fixed",
-                    "size" : [280, 32],
-                    "center" : [0.5, 0.95]
+                    "height" : 48,
+                    "width" : 280,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
                 }
             }
         ]

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.baseLayouts.relative;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -53,6 +53,10 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         }
     }
 
+    public void addWidget(UIWidget widget, HorizontalHint horizontal, VerticalHint vertical) {
+        addWidget(widget, new RelativeLayoutHint(horizontal, vertical));
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         for (WidgetInfo element : contents) {
@@ -72,19 +76,19 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         int right = canvas.size().x;
         int center = canvas.size().x / 2;
         if (element.layoutHint.getPositionCenterHorizontal() != null) {
-            RelativeLayoutHint.HorizontalInfo info = element.layoutHint.getPositionCenterHorizontal();
+            HorizontalInfo info = element.layoutHint.getPositionCenterHorizontal();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             HorizontalAlign align = (info.getTarget() != null) ? info.getTarget() : HorizontalAlign.CENTER;
             center = align.getStart(targetRegion) + info.getOffset();
         }
         if (element.layoutHint.getPositionLeft() != null) {
-            RelativeLayoutHint.HorizontalInfo info = element.layoutHint.getPositionLeft();
+            HorizontalInfo info = element.layoutHint.getPositionLeft();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             HorizontalAlign align = (info.getTarget() != null) ? info.getTarget() : HorizontalAlign.LEFT;
             left = align.getStart(targetRegion) + info.getOffset();
         }
         if (element.layoutHint.getPositionRight() != null) {
-            RelativeLayoutHint.HorizontalInfo info = element.layoutHint.getPositionLeft();
+            HorizontalInfo info = element.layoutHint.getPositionLeft();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             HorizontalAlign align = (info.getTarget() != null) ? info.getTarget() : HorizontalAlign.RIGHT;
             right = align.getStart(targetRegion) - info.getOffset();
@@ -97,7 +101,12 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             if (element.layoutHint.getPositionCenterHorizontal() != null) {
                 left = center - width / 2;
             } else if (element.layoutHint.getPositionRight() != null) {
-                left = right - width;
+                if (element.layoutHint.getPositionLeft() != null) {
+                    center = left + (right - left) / 2;
+                    left = center - width / 2;
+                } else {
+                    left = right - width;
+                }
             }
         }
 
@@ -105,19 +114,19 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         int bottom = canvas.size().y;
         int vcenter = canvas.size().y / 2;
         if (element.layoutHint.getPositionCenterVertical() != null) {
-            RelativeLayoutHint.VerticalInfo info = element.layoutHint.getPositionCenterVertical();
+            VerticalInfo info = element.layoutHint.getPositionCenterVertical();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             VerticalAlign align = (info.getTarget() != null) ? info.getTarget() : VerticalAlign.MIDDLE;
             vcenter = align.getStart(targetRegion) + info.getOffset();
         }
         if (element.layoutHint.getPositionTop() != null) {
-            RelativeLayoutHint.VerticalInfo info = element.layoutHint.getPositionTop();
+            VerticalInfo info = element.layoutHint.getPositionTop();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             VerticalAlign align = (info.getTarget() != null) ? info.getTarget() : VerticalAlign.TOP;
             top = align.getStart(targetRegion) + info.getOffset();
         }
         if (element.layoutHint.getPositionBottom() != null) {
-            RelativeLayoutHint.VerticalInfo info = element.layoutHint.getPositionBottom();
+            VerticalInfo info = element.layoutHint.getPositionBottom();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             VerticalAlign align = (info.getTarget() != null) ? info.getTarget() : VerticalAlign.BOTTOM;
             bottom = align.getStart(targetRegion) - info.getOffset();
@@ -130,7 +139,12 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             if (element.layoutHint.getPositionCenterVertical() != null) {
                 top = vcenter - height / 2;
             } else if (element.layoutHint.getPositionBottom() != null) {
-                top = bottom - height;
+                if (element.layoutHint.getPositionTop() != null) {
+                    vcenter = top + (bottom - top) / 2;
+                    top = vcenter - height / 2;
+                } else {
+                    top = bottom - height;
+                }
             }
         }
         Rect2i region = Rect2i.createFromMinAndSize(left, top, width, height);

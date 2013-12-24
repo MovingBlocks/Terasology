@@ -12,6 +12,21 @@
         "UIImage" : {
             "texture-scale-mode" : "scale_fit"
         },
+        "UIBox" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            }
+        },
         "UIDropdown" : {
             "text-align-horizontal" : "left",
             "parts" : {
@@ -146,10 +161,10 @@
                 "right" : 4
             },
             "margin" : {
-                "top" : 6,
-                "bottom" : 6,
-                "left" : 6,
-                "right" : 6
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
             },
             "parts" : {
                 "scrollbar-slider" : {

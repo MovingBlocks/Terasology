@@ -38,6 +38,11 @@ public class UIImage extends CoreWidget {
         this.image.set(image);
     }
 
+    public UIImage(String id, TextureRegion image) {
+        super(id);
+        this.image.set(image);
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (image.get() != null) {

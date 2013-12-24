@@ -73,9 +73,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
             for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
-                if (!elementType.isInterface()) {
-                    elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
-                }
+                elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
             }
         }
     }
