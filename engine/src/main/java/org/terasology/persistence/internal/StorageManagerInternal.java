@@ -37,6 +37,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
@@ -114,6 +115,23 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     @Override
     public void shutdown() {
         storageTaskMaster.shutdown(new ShutdownTask(), true);
+    }
+
+    @Override
+    public void purgeChunks() {
+        storageTaskMaster.shutdown(new ShutdownTask(), true);
+        pendingProcessingChunkStore.clear();
+        compressedChunkStore.clear();
+
+        try {
+            FilesUtil.recursiveDelete(PathManager.getInstance().getCurrentSavePath()
+                    .resolve(WORLDS_PATH)
+                    .resolve(TerasologyConstants.MAIN_WORLD));
+        } catch (IOException e) {
+            logger.error("Failed to purge chunks", e);
+        }
+
+        storageTaskMaster.restart();
     }
 
     @Override

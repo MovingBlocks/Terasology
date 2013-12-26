@@ -20,7 +20,6 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.AbstractWidget;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.UIWidget;
@@ -87,7 +86,7 @@ public class ArbitraryLayout extends CoreLayout {
         public abstract Vector2i getPosition(Vector2i canvasSize);
     }
 
-    private static class RegionedWidgetInfo extends WidgetInfo  {
+    private static class RegionedWidgetInfo extends WidgetInfo {
         private Rect2f region;
 
         public RegionedWidgetInfo(UIWidget widget, Rect2f region) {

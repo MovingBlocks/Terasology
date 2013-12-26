@@ -27,18 +27,18 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.ChunkViewCoreImpl;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.internal.ChunkViewCoreImpl;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Generates tessellated chunk meshes from chunks.
@@ -61,8 +61,7 @@ public final class ChunkTessellator {
 
         Vector3f chunkOffset = new Vector3f(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z);
 
-        final Stopwatch watch = new Stopwatch();
-        watch.start();
+        final Stopwatch watch = Stopwatch.createStarted();
 
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
@@ -81,12 +80,12 @@ public final class ChunkTessellator {
         }
         watch.stop();
 
-        mesh.setTimeToGenerateBlockVertices((int) watch.elapsedMillis());
+        mesh.setTimeToGenerateBlockVertices((int) watch.elapsed(TimeUnit.MILLISECONDS));
 
         watch.reset().start();
         generateOptimizedBuffers(chunkView, mesh);
         watch.stop();
-        mesh.setTimeToGenerateOptimizedBuffers((int) watch.elapsedMillis());
+        mesh.setTimeToGenerateOptimizedBuffers((int) watch.elapsed(TimeUnit.MILLISECONDS));
         statVertexArrayUpdateCount++;
 
         PerformanceMonitor.endActivity();

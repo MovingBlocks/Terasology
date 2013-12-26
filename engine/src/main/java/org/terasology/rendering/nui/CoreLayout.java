@@ -19,8 +19,6 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 
-import java.util.Iterator;
-
 /**
  * @author Immortius
  */

@@ -16,7 +16,6 @@
 
 package org.terasology.config;
 
-import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -15,7 +15,6 @@
  */
 package org.terasology.world.generator;
 
-import org.terasology.engine.API;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;

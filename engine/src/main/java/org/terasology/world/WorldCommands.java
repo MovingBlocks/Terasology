@@ -13,17 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.world;
 
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.logic.console.Command;
+import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius
  */
-public class UISpace extends CoreWidget {
+public class WorldCommands implements ComponentSystem {
+
+    private ChunkProvider chunkProvider;
+
+    public WorldCommands(ChunkProvider chunkProvider) {
+        this.chunkProvider = chunkProvider;
+    }
 
     @Override
-    public void onDraw(Canvas canvas) {
+    public void initialise() {
+
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Command
+    public void purgeWorld() {
+        chunkProvider.purgeChunks();
     }
 }

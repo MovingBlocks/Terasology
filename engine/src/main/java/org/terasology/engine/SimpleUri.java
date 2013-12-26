@@ -20,7 +20,8 @@ import com.google.common.base.Preconditions;
 import org.terasology.engine.module.UriUtil;
 
 /**
- * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>
+ * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>. They are case-insensitive (using
+ * English casing), and have a "normalized" form that is lower case.
  *
  * @author synopia
  */
@@ -32,9 +33,17 @@ public class SimpleUri extends AbstractBaseUri {
     private String normalisedModuleName = "";
     private String normalisedObjectName = "";
 
+    /**
+     * Creates an empty, invalid SimpleUri
+     */
     public SimpleUri() {
     }
 
+    /**
+     * Creates a SimpleUri for the given module:object combo
+     * @param moduleName
+     * @param objectName
+     */
     public SimpleUri(String moduleName, String objectName) {
         Preconditions.checkNotNull(moduleName);
         Preconditions.checkNotNull(objectName);
@@ -44,6 +53,10 @@ public class SimpleUri extends AbstractBaseUri {
         this.normalisedObjectName = UriUtil.normalise(objectName);
     }
 
+    /**
+     * Creates a SimpleUri from a string in the format "module:object". If the string does not match this format, it will be marked invalid
+     * @param simpleUri
+     */
     public SimpleUri(String simpleUri) {
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {

@@ -31,7 +31,6 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
@@ -344,6 +343,8 @@ public class BlockManagerImpl extends BlockManager {
                 } finally {
                     lock.unlock();
                 }
+            } else {
+                logger.warn("Unable to resolve block family {}", uri);
             }
         }
         return family;

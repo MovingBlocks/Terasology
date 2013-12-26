@@ -119,4 +119,9 @@ public interface ChunkProvider {
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using
      */
     void dispose();
+
+    /**
+     * Destroys all chunks and triggers their regeneration
+     */
+    void purgeChunks();
 }

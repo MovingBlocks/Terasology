@@ -184,8 +184,8 @@ public class UIStyle {
         return textAlignmentH;
     }
 
-    public void setHorizontalTextAlignment(HorizontalAlign textAlignmentH) {
-        this.textAlignmentH = textAlignmentH;
+    public void setHorizontalTextAlignment(HorizontalAlign alignH) {
+        this.textAlignmentH = alignH;
     }
 
     /**
@@ -195,8 +195,8 @@ public class UIStyle {
         return textAlignmentV;
     }
 
-    public void setVerticalTextAlignment(VerticalAlign textAlignmentV) {
-        this.textAlignmentV = textAlignmentV;
+    public void setVerticalTextAlignment(VerticalAlign alignV) {
+        this.textAlignmentV = alignV;
     }
 
     /**
