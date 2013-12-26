@@ -73,7 +73,9 @@ dependencies {
 // Instructions for packaging a jar file for the engine
 jar {
     duplicatesStrategy = 'exclude'
-    classifier = 'tests'
+
+    // Just copying test stuff, which isn't included by default
+    from sourceSets.test.output
 }
 
 // Extra details provided for unit tests

@@ -222,6 +222,11 @@ test {
 
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
+
+    // Make sure the natives have been extracted, but only if we're in a multi-workspace setup
+    if (project.name != project(':').name) {
+        dependsOn rootProject.extractNatives
+    }
 }
 
 checkstyle {

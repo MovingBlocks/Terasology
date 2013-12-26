@@ -5,6 +5,10 @@
  * - View tasks for this project: $ gradlew tasks
  */
 
+// Needed for extending the "clean" task to also delete custom stuff defined here like natives
+apply plugin: 'base'
+
+// For generating IntelliJ project files
 apply plugin: 'idea'
 
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
@@ -40,6 +44,8 @@ ext {
 
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
+
+    LwjglVersion = '2.9.0'
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
@@ -59,6 +65,11 @@ repositories {
 // Define a custom configuration named "natives"
 configurations {
     natives
+}
+
+// For the "natives" configuration make it depend on the native files from LWJGL
+dependencies {
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -157,6 +168,11 @@ gradle.projectsEvaluated {
 // TODO: Remove this when versioning and promotion works fully, then we shouldn't care about snapshots normally anyway
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+// Include deletion of extracted natives in the global clean task
+clean {
+    new File(dirNatives).deleteDir()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
