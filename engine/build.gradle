@@ -71,15 +71,6 @@ sourceSets {
             output.classesDir 'build/classes'
         }
     }
-
-    // Put the main engine unit tests outside the standard build dir to exclude them from the standard jar
-    // TODO This prevents an issue during game load but need to make the test classes available for modules
-    test {
-        java {
-            output.classesDir 'build/testClasses'
-            output.resourcesDir 'build/testClasses'
-        }
-    }
 }
 
 // Customizations for the main compilation configuration
@@ -105,8 +96,8 @@ dependencies {
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LWJGL_VERSION
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.9.0'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.9.0'
     compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
@@ -123,14 +114,6 @@ dependencies {
     // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 
-    // These dependencies are only needed for running tests
-    testCompile group: 'junit', name: 'junit', version: '4.10'
-    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
-
-    // For reading logback.groovy when running unit tests. Excessive just for a config file?
-    testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
-
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
 }
@@ -144,20 +127,6 @@ jar {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
         attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
     }
-}
-
-// Package a jar with compiled test output that may be needed by modules basing unit tests on frameworky stuff
-task testJar(type: Jar) {
-    dependsOn jar
-    from sourceSets.test.output
-    duplicatesStrategy = 'exclude'
-    classifier = 'tests'
-}
-
-task distTestJar (type: Sync) {
-    description = "Prepares the engine's test jar for distribution (for module unit tests)"
-    into ("$distsDir/testJar")
-    from testJar
 }
 
 task distEngine (type: Sync) {
@@ -184,20 +153,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     manifest.attributes("Implementation-Title": "Terasology-" + project.name)
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-// Extra details provided for unit tests
-test {
-    dependsOn rootProject.extractNatives
-
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-
-    // Arguments to include while running tests
-    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

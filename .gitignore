@@ -14,6 +14,7 @@ build/
 modules/Core/Core.iml
 facades/PC/PC.iml
 engine/engine.iml
+engine-tests/engine-tests.iml
 /*.iml
 /*.ipr
 /*.iws

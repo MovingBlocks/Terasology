@@ -12,9 +12,6 @@ apply plugin: 'pmd'
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
-
-    LWJGL_VERSION = '2.9.0'
-    JINPUT_VERSION = '2.0.5'
 }
 
 // Same repository configuration as root project
@@ -73,18 +70,11 @@ dependencies {
     if (project.name != project(':').name) {
         println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
 
-        // In multi-project mode we should always have an engine project to depend on. Also satisfies external libs
+        // Dependency on the engine itself (actually its built jar file)
         compile project(':engine')
 
-        // Added after Core had unit tests - only ever gets used by Core as other modules do not use the engine build
-        // TODO: Actually .. in Jenkins other modules build differently, but for developers they all do this
-        // TODO: And in Eclipse it causes a broken dependency (probably until a force-run of tests makes the dir)
-        testCompile project(':engine').sourceSets.test.output
-        // TODO: The above line allows child classes of TerasologyTestingEnvironment to compile BUT
-        // TODO: The next broken step is not having the LWJGL natives available on the Java library path
-        // TODO: Maybe that is an issue with how the TTE copies/uses the engine way of loading natives?
-        //testCompile project(':engine').testJar.outputs.files
-
+        // Unit tests for the engine have been split out into their own sub-project (eases some config)
+        testCompile project(':engine-tests')
 
         // Special case: Any module OTHER than the Core module needs to have the Core module on the classpath
         if (project.name != 'Core') {
