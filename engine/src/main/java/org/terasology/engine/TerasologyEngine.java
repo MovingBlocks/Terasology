@@ -584,7 +584,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
-
+        moduleSecurityManager.addAPIPackage("org.lwjgl.opengl");
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
