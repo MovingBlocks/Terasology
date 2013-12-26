@@ -19,6 +19,9 @@ package org.terasology.classMetadata.reflect;
  * @author Immortius
  */
 public class InaccessibleFieldException extends Exception {
+
+    private static final long serialVersionUID = 3617077464713877750L;
+
     public InaccessibleFieldException() {
     }
 

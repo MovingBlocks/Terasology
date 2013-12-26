@@ -30,6 +30,8 @@ import java.util.List;
  */
 public class PropertyPanel extends JPanel {
 
+    private static final long serialVersionUID = 6844552770055484579L;
+
     private PropertyProvider activePropertyProvider;
 
     private TitledBorder border;

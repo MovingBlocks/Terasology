@@ -10,8 +10,6 @@ import java.text.SimpleDateFormat;
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
-// TODO: Add groovy as a runtime dependency for the PC Facade (so it can load the logback.groovy
-
 ext {
     mainClassName = 'org.terasology.engine.Terasology'
     subDirLibs = 'libs'
@@ -77,6 +75,7 @@ task runPC(type:JavaExec) {
     classpath sourceSets.main.output.classesDir
     classpath project(':engine').sourceSets.main.output.classesDir
     classpath project(':engine').configurations.runtime
+    classpath rootProject.configurations.natives
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file
@@ -207,14 +206,14 @@ idea {
 }
 
 task copyEclipseLauncher(type: Copy) {
-    from "$rootDir/config/eclipse"
-    into ".settings"
-    include("*.launch")
+	from "$rootDir/config/eclipse"
+	into ".settings"
+	include("*.launch")
 }
 
 tasks.eclipse {
-    dependsOn copyEclipseLauncher
-    dependsOn rootProject.extractNatives
+	dependsOn copyEclipseLauncher
+	dependsOn rootProject.extractNatives
 
 }
 

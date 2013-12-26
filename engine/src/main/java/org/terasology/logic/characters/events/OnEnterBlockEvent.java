@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,32 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
  * @author Immortius
  */
-public class OnLeaveLiquidEvent implements Event {
-    private Block liquid;
+public class OnEnterBlockEvent implements Event {
+    private Block oldBlock;
+    private Block newBlock;
+    private Vector3i characterRelativePosition;
 
-    public OnLeaveLiquidEvent(Block liquid) {
-        this.liquid = liquid;
+    public OnEnterBlockEvent(Block oldBlock, Block newBlock, Vector3i characterRelativePosition) {
+        this.oldBlock = oldBlock;
+        this.newBlock = newBlock;
+        this.characterRelativePosition = characterRelativePosition;
     }
 
-    public Block getLiquid() {
-        return liquid;
+    public Block getNewBlock() {
+        return newBlock;
+    }
+
+    public Block getOldBlock() {
+        return oldBlock;
+    }
+
+    public Vector3i getCharacterRelativePosition() {
+        return characterRelativePosition;
     }
 }

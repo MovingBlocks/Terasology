@@ -20,6 +20,8 @@ package org.terasology.identity;
  */
 public class BadEncryptedDataException extends Exception {
 
+    private static final long serialVersionUID = 7220484295134905387L;
+
     public BadEncryptedDataException() {
     }
 

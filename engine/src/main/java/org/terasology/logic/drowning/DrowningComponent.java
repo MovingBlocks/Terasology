@@ -23,8 +23,23 @@ import org.terasology.network.Replicate;
  * @author Immortius
  */
 public class DrowningComponent implements Component {
-    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public long startDrowningTime;
 
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public boolean isBreathing;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public long endTime;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    public long startTime;
+    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public long nextDrownDamageTime;
+
+    public float getPercentageBreath(long gameTime) {
+        long capacity = (endTime - startTime);
+        float percentage = (gameTime - startTime) / (float) capacity;
+        if (!isBreathing) {
+            percentage = 1.0f - percentage;
+        }
+        return Math.min(Math.max(percentage, 0f), 1f);
+    }
+
 }

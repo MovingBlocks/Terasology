@@ -514,6 +514,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.util.regex");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
         moduleSecurityManager.addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.addAPIPackage("com.google.common.base");
         moduleSecurityManager.addAPIPackage("com.google.common.math");
         moduleSecurityManager.addAPIPackage("com.google.common.primitives");
         moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
@@ -635,9 +636,9 @@ public class TerasologyEngine implements GameEngine {
             GameThread.processWaitingProcesses();
 
             PerformanceMonitor.startActivity("Render");
-            currentState.render();
             Display.update();
             Display.sync(60);
+            currentState.render();
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");
