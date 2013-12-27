@@ -170,8 +170,8 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-// Include deletion of extracted natives in the global clean task
-clean {
+// Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
+clean.doLast {
     new File(dirNatives).deleteDir()
 }
 

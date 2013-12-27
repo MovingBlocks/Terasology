@@ -123,16 +123,7 @@ public abstract class TerasologyTestingEnvironment {
     public static void setupEnvironment() throws Exception {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        System.out.println("Home dir before override: " + PathManager.getInstance().getHomePath().toAbsolutePath());
-        System.out.println("Install dir before override: " + PathManager.getInstance().getInstallPath().toAbsolutePath());
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
-        System.out.println("Home dir after override: " + PathManager.getInstance().getHomePath().toAbsolutePath());
-        Path installPath = PathManager.getInstance().getInstallPath();
-        System.out.println("Install dir after override: " + installPath);
-        if (PathManager.getInstance().isRunningFromJar()) {
-            PathManager.getInstance().useOverrideInstallPath(installPath.getParent().getParent());
-            System.out.println("Install dir after JAR override: " + installPath.getParent().getParent());
-        }
 
         if (!setup) {
             setup = true;

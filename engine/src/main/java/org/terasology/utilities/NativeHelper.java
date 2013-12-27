@@ -42,35 +42,22 @@ public final class NativeHelper {
         try {
             String envPath = System.getProperty("java.library.path");
 
-            System.out.println("java.library.path before adding: " + envPath);
-
             if (envPath == null || envPath.isEmpty()) {
                 System.setProperty("java.library.path", libPath.toAbsolutePath().toString());
             } else {
                 System.setProperty("java.library.path", libPath.toAbsolutePath().toString() + File.pathSeparator + envPath);
             }
 
-            System.out.println("java.library.path after adding: " + libPath.toAbsolutePath().toString() + File.pathSeparator + envPath);
-
-
-
             final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
             usrPathsField.setAccessible(true);
 
             List<String> paths = Lists.newArrayList((String[]) usrPathsField.get(null));
-
-            System.out.println("Paths before adding: " + paths);
-
-            if (paths.contains(libPath.toAbsolutePath().toString())) {
+           if (paths.contains(libPath.toAbsolutePath().toString())) {
                 return;
             }
-
             paths.add(0, libPath.toAbsolutePath().toString()); // Add to beginning, to override system libraries
 
             usrPathsField.set(null, paths.toArray(new String[paths.size()]));
-
-            System.out.println("Paths before adding: " + paths);
-
         } catch (Exception e) {
             logger.error("Couldn't link static libraries. ", e);
             System.exit(1);
@@ -94,10 +81,7 @@ public final class NativeHelper {
                 }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                Path zePath = PathManager.getInstance().getNativesPath().resolve("windows");
-                System.out.println("PathMan sez: " + zePath);
-                // TODO: Add groovy as a runtime dependency for the PC Facade (so it can load the logback.groovy
-                addLibraryPath(zePath);
+                addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
 
                 if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");
