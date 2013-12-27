@@ -78,6 +78,12 @@ jar {
     from sourceSets.test.output
 }
 
+task distEngineTests (type: Sync) {
+    description = "Prepares the engine's tests for distribution (so later unit tests can extend utility classes"
+    into ("$distsDir/engine-tests")
+    from jar
+}
+
 // Extra details provided for unit tests
 test {
     dependsOn rootProject.extractNatives
