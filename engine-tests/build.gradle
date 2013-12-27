@@ -79,8 +79,8 @@ jar {
 }
 
 task distEngineTests (type: Sync) {
-    description = "Prepares the engine's tests for distribution (so later unit tests can extend utility classes"
-    into ("$distsDir/engine-tests")
+    description = "Prepares the engine's tests for distribution (so later unit tests can extend utility classes)"
+    into ("$rootDir/engine/build/distributions/engine-tests")
     from jar
 }
 
