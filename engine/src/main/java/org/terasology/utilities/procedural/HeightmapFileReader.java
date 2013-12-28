@@ -31,9 +31,9 @@ public final class HeightmapFileReader {
     }
 
     public static float[][] readFile(String file, String delimiter) throws IOException {
-	try (InputStream fis = new FileInputStream(file)) {
-	    return readValues(fis, delimiter);
-	}
+        try (InputStream fis = new FileInputStream(file)) {
+            return readValues(fis, delimiter);
+        }
     }
 
     public static float[][] readValues(java.io.InputStream in, String delimiter) throws java.io.IOException, java.lang.NumberFormatException {

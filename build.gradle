@@ -188,6 +188,7 @@ ideaModule.dependsOn extractNatives
 idea {
 
     // Exclude Eclipse dirs
+    // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
     module.excludeDirs += file('bin')
     module.excludeDirs += file('.settings')
 

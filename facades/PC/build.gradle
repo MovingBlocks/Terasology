@@ -214,7 +214,10 @@ task copyEclipseLauncher(type: Copy) {
 tasks.eclipse {
 	dependsOn copyEclipseLauncher
 	dependsOn rootProject.extractNatives
+}
 
+cleanEclipse.doLast {
+    new File(projectDir, ".settings/Terasology.launch").delete()
 }
 
 checkstyle {

@@ -55,7 +55,6 @@ public final class PathManager {
     private ImmutableList<Path> modPaths = ImmutableList.of();
     private Path screenshotPath;
     private Path nativesPath;
-    private boolean runningFromJar;
 
     private PathManager() {
         // By default, the path should be the code location (where terasology.jar is)
@@ -70,7 +69,6 @@ public final class PathManager {
                     System.out.println("Failed to find the natives dir - unable to launch!");
                     throw new RuntimeException("Failed to find natives from .jar launch");
                 }
-                runningFromJar = true;
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
@@ -121,11 +119,6 @@ public final class PathManager {
             instance = new PathManager();
         }
         return instance;
-    }
-
-    public void useOverrideInstallPath(Path rootPath) throws IOException {
-        this.installPath = rootPath;
-        updateDirs();
     }
 
     public void useOverrideHomePath(Path rootPath) throws IOException {
@@ -233,9 +226,5 @@ public final class PathManager {
 
     public Path getSavePath(String title) {
         return savesPath.resolve(title.replaceAll("[^A-Za-z0-9-_ ]", ""));
-    }
-
-    public boolean isRunningFromJar() {
-        return runningFromJar;
     }
 }

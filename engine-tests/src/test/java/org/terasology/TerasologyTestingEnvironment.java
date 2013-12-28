@@ -22,8 +22,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.slf4j.Logger;
@@ -82,7 +80,7 @@ import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
-import org.terasology.utilities.NativeHelper;
+import org.terasology.utilities.LWJGLHelper;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -94,7 +92,6 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 
 import java.nio.file.FileSystem;
-import java.nio.file.Path;
 
 import static org.mockito.Mockito.mock;
 
@@ -127,7 +124,7 @@ public abstract class TerasologyTestingEnvironment {
 
         if (!setup) {
             setup = true;
-            NativeHelper.initNativeLibs();
+            LWJGLHelper.initNativeLibs();
 
             moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
             moduleManager.applyActiveModules();
