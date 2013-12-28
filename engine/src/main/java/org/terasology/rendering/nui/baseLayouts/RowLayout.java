@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Border;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutHint;
@@ -58,14 +59,22 @@ public class RowLayout extends CoreLayout {
     @Override
     public void onDraw(Canvas canvas) {
         if (!rows.isEmpty()) {
-            int height = canvas.size().y / rows.size();
             int yOffset = 0;
             for (Row row : rows) {
-
-                row.draw(canvas, yOffset, height);
-                yOffset += height;
+                yOffset += row.draw(canvas, yOffset);
             }
         }
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Vector2i sizeHint = new Vector2i(areaHint.x, areaHint.y / rows.size());
+        int height = 0;
+        for (Row row : rows) {
+            height += row.calcRowHeight(canvas, sizeHint);
+            height += padding.getTotalHeight();
+        }
+        return new Vector2i(areaHint.x, height);
     }
 
     public int getRowCount() {
@@ -100,17 +109,28 @@ public class RowLayout extends CoreLayout {
             }
         }
 
-        public void draw(Canvas canvas, int yOffset, int height) {
+        public int draw(Canvas canvas, int yOffset) {
             if (!items.isEmpty()) {
+                int height = calcRowHeight(canvas, canvas.size());
                 int xOffset = 0;
                 for (int i = 0; i < items.size(); ++i) {
                     int itemWidth = TeraMath.floorToInt(canvas.size().x * columnWidths.get(i));
                     Rect2i region = Rect2i.createFromMinAndSize(xOffset + padding.getLeft(), yOffset + padding.getTop(),
-                            itemWidth - padding.getTotalWidth(), height - padding.getTotalHeight());
+                            itemWidth - padding.getTotalWidth(), height);
                     canvas.drawElement(items.get(i), region);
                     xOffset += itemWidth;
                 }
+                return height + padding.getTotalHeight();
             }
+            return 0;
+        }
+
+        public int calcRowHeight(Canvas canvas, Vector2i sizeHint) {
+            int height = 0;
+            for (UIWidget item : items) {
+                height = Math.max(height, canvas.calculateSize(item, sizeHint).y);
+            }
+            return height;
         }
 
         public Row setColumnRatios(float... columns) {

@@ -13,40 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.itemRendering;
 
-import org.terasology.math.Vector2i;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.SubRegion;
 
 /**
- * @author Immortius
+ *
  */
-public class UISpace extends CoreWidget {
-
-    private Vector2i size = new Vector2i();
-
-    public UISpace() {
-    }
-
-    public UISpace(Vector2i size) {
-        this.size.set(size);
-    }
-
-    public Vector2i getSize() {
-        return size;
-    }
-
-    public void setSize(Vector2i size) {
-        this.size.set(size);
-    }
+public abstract class AbstractItemRenderer<T> implements ItemRenderer<T> {
 
     @Override
-    public void onDraw(Canvas canvas) {
-    }
-
-    @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        return new Vector2i(size);
+    public void draw(T value, Canvas canvas, Rect2i subregion) {
+        try (SubRegion ignored= canvas.subRegion(subregion, false)) {
+            draw(value, canvas);
+        }
     }
 }

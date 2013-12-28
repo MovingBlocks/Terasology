@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.formatting;
+package org.terasology.rendering.nui.itemRendering;
 
 import java.util.Objects;
 
 /**
- * This formatter uses the object's toString() method to format it. If the object is null, 'null' is displayed.
+ * This ItemRenderer displays the result of the object's toString() method. If the object is null, 'null' is displayed.
  * @author Immortius
  */
-public class ToStringFormatter<T> implements ObjectFormatter<T> {
+public class ToStringTextRenderer<T> extends StringTextRenderer<T> {
+
     @Override
-    public String format(T value) {
-        return Objects.toString(value.toString());
+    public String getString(T value) {
+        return Objects.toString(value);
     }
 }

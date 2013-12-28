@@ -22,7 +22,6 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UIStyle;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -102,7 +101,7 @@ public class UIScreen extends AbstractWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         return areaHint;
     }
 

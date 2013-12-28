@@ -19,8 +19,9 @@ import java.util.Objects;
 
 /**
  * The size of a border, supporting independent widths on each side.
- *
+ * <p/>
  * Immutable
+ *
  * @author Immortius
  */
 public class Border {
@@ -90,5 +91,9 @@ public class Border {
     public Rect2i shrink(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + getLeft(), region.minY() + getTop(),
                 region.width() - getTotalWidth(), region.height() - getTotalHeight());
+    }
+
+    public Vector2i getTotals() {
+        return new Vector2i(getTotalWidth(), getTotalHeight());
     }
 }

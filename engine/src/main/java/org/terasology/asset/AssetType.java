@@ -31,7 +31,7 @@ import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.rendering.md5.MD5AnimationLoader;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
-import org.terasology.rendering.nui.uiAsset.UILoader;
+import org.terasology.rendering.nui.asset.UILoader;
 import org.terasology.rendering.nui.skin.UISkinLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;

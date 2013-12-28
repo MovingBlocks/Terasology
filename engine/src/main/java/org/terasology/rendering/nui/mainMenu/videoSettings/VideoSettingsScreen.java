@@ -31,7 +31,7 @@ import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.formatting.ObjectFormatter;
+import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
@@ -86,9 +86,10 @@ public class VideoSettingsScreen extends UIScreen {
         if (blur != null) {
             blur.setOptions(Lists.newArrayList(0, 1, 2, 3));
             blur.bindSelection(BindHelper.bindBeanProperty("blurIntensity", config.getRendering(), Integer.TYPE));
-            blur.setOptionAdapter(new ObjectFormatter<Integer>() {
+            blur.setOptionRenderer(new StringTextRenderer<Integer>() {
+
                 @Override
-                public String format(Integer value) {
+                public String getString(Integer value) {
                     switch (value) {
                         case 1:
                             return "Some";

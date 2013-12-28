@@ -322,7 +322,11 @@ public class LwjglCanvas implements CanvasInternal {
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i adjustedArea = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeHint), elementStyle);
-        return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), element.calcContentSize(elementStyle, adjustedArea.size())), elementStyle).size();
+        try (SubRegion ignored = subRegionForWidget(element, adjustedArea, false)) {
+            Vector2i preferredSize = element.calcContentSize(this, adjustedArea.size());
+            preferredSize.add(elementStyle.getMargin().getTotals());
+            return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), preferredSize), elementStyle).size();
+        }
     }
 
     @Override
@@ -334,18 +338,23 @@ public class LwjglCanvas implements CanvasInternal {
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea = applySizesToRegion(region, newStyle);
-        try (SubRegion ignored = subRegion(regionArea, false)) {
-            state.element = element;
-            if (element.getFamily() != null) {
-                setFamily(element.getFamily());
-            }
-            setPart("");
-            setMode(element.getMode());
+        try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
             }
             element.onDraw(this);
         }
+    }
+
+    private SubRegion subRegionForWidget(UIWidget widget, Rect2i region, boolean crop) {
+        SubRegion result = subRegion(region, crop);
+        state.element = widget;
+        if (widget.getFamily() != null) {
+            setFamily(widget.getFamily());
+        }
+        setPart("");
+        setMode(widget.getMode());
+        return result;
     }
 
     @Override

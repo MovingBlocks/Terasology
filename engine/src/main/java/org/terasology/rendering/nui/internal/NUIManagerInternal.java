@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.DefaultClassLibrary;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
@@ -46,7 +45,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.uiAsset.UIData;
+import org.terasology.rendering.nui.asset.UIData;
 
 import java.lang.reflect.Field;
 import java.util.Deque;

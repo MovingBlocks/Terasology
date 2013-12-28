@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.formatting;
+package org.terasology.rendering.nui.asset;
+
+import org.terasology.asset.AssetData;
+import org.terasology.rendering.nui.UIWidget;
 
 /**
- * An object formatter converts an object of a given type to a String for display purposes.
  * @author Immortius
  */
-public interface ObjectFormatter<T> {
+public class UIData implements AssetData {
+    private UIWidget rootElement;
 
-    /**
-     * @param value The object to format
-     * @return A string suitable for display
-     */
-    String format(T value);
+    public UIData(UIWidget rootElement) {
+        this.rootElement = rootElement;
+    }
+
+    public UIWidget getRootElement() {
+        return rootElement;
+    }
 }

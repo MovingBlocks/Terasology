@@ -27,8 +27,8 @@ import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.formatting.ObjectFormatter;
-import org.terasology.rendering.nui.formatting.ToStringFormatter;
+import org.terasology.rendering.nui.itemRendering.ItemRenderer;
+import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 
 import java.util.List;
 
@@ -56,7 +56,7 @@ public class UIDropdown<T> extends CoreWidget {
         }
     };
     private List<InteractionListener> optionListeners = Lists.newArrayList();
-    private ObjectFormatter<T> optionAdapter = new ToStringFormatter<>();
+    private ItemRenderer<T> optionRenderer = new ToStringTextRenderer<>();
 
     private boolean opened;
 
@@ -75,7 +75,7 @@ public class UIDropdown<T> extends CoreWidget {
         canvas.setPart(BOX);
         canvas.drawBackground();
         if (selection.get() != null) {
-            canvas.drawText(optionAdapter.format(selection.get()));
+            optionRenderer.draw(selection.get(), canvas);
         }
 
         if (opened) {
@@ -99,12 +99,21 @@ public class UIDropdown<T> extends CoreWidget {
                 }
                 Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
                 canvas.drawBackground(itemRegion);
-                canvas.drawText(optionAdapter.format(options.get().get(i)), itemRegion);
+                optionRenderer.draw(options.get().get(i), canvas, itemRegion);
                 canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
             }
         } else {
             canvas.addInteractionRegion(mainListener);
         }
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        canvas.setPart(BOX);
+        if (selection.get() != null) {
+            return optionRenderer.getPreferredSize(selection.get(), canvas);
+        }
+        return Vector2i.zero();
     }
 
     @Override
@@ -145,8 +154,8 @@ public class UIDropdown<T> extends CoreWidget {
         selection.set(value);
     }
 
-    public void setOptionAdapter(ObjectFormatter<T> objectFormatter) {
-        optionAdapter = objectFormatter;
+    public void setOptionRenderer(ItemRenderer<T> itemRenderer) {
+        optionRenderer = itemRenderer;
     }
 
     private class ItemListener extends BaseInteractionListener {

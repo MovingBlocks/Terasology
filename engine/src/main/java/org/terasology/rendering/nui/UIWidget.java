@@ -56,7 +56,7 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     void onKeyEvent(KeyEvent event);
 
-    Vector2i calcContentSize(UIStyle style, Vector2i sizeHint);
+    Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint);
 
     boolean isSkinAppliedByCanvas();
 

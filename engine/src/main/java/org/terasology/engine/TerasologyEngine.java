@@ -83,7 +83,6 @@ import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.uiAsset.UIData;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;

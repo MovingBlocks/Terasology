@@ -13,40 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.itemRendering;
 
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.TextLineBuilder;
+
+import java.util.List;
 
 /**
- * @author Immortius
+ *
  */
-public class UISpace extends CoreWidget {
+public abstract class StringTextRenderer<T> extends AbstractItemRenderer<T> {
 
-    private Vector2i size = new Vector2i();
+    @Override
+    public void draw(T value, Canvas canvas) {
+        canvas.drawText(getString(value));
 
-    public UISpace() {
-    }
-
-    public UISpace(Vector2i size) {
-        this.size.set(size);
-    }
-
-    public Vector2i getSize() {
-        return size;
-    }
-
-    public void setSize(Vector2i size) {
-        this.size.set(size);
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
+    public Vector2i getPreferredSize(T value, Canvas canvas) {
+        Font font = canvas.getCurrentStyle().getFont();
+        List<String> lines = TextLineBuilder.getLines(font, getString(value), canvas.size().x);
+        return font.getSize(lines);
     }
 
-    @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        return new Vector2i(size);
-    }
+    public abstract String getString(T value);
 }

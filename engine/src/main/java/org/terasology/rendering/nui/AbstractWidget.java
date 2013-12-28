@@ -18,7 +18,6 @@ package org.terasology.rendering.nui;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
  * @author Immortius
@@ -103,7 +102,7 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         return areaHint;
     }
 

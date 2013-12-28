@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontCharacter;
@@ -178,6 +179,16 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
+    public Vector2i getSize(List<String> lines) {
+        int height = getLineHeight() * lines.size();
+        int width = 0;
+        for (String line : lines) {
+            width = Math.max(width, getWidth(line));
+        }
+        return new Vector2i(width, height);
+    }
+
+    @Override
     public void reload(FontData newData) {
         this.data = newData;
     }
@@ -213,4 +224,8 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
         builder.addTexCoord(texLeft, texBottom);
     }
 
+    @Override
+    public String toString() {
+        return getURI().toString();
+    }
 }

@@ -38,7 +38,6 @@ public class ScrollableArea extends CoreLayout {
 
     private UIWidget content;
     private UIScrollbar scrollbar = new UIScrollbar();
-    private int contentHeight;
 
     private InteractionListener scrollListener = new BaseInteractionListener() {
         @Override
@@ -50,6 +49,7 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
+        int contentHeight = canvas.calculateSize(content, canvas.size()).y;
         if (canvas.size().y < contentHeight) {
             canvas.addInteractionRegion(scrollListener);
             Border margin = canvas.getCurrentStyle().getMargin();
@@ -70,10 +70,6 @@ public class ScrollableArea extends CoreLayout {
 
     public void setContent(UIWidget widget) {
         this.content = widget;
-    }
-
-    public void setContentHeight(int height) {
-        this.contentHeight = height;
     }
 
     @Override

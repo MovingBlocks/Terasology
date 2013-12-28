@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.uiAsset;
+package org.terasology.rendering.nui.itemRendering;
 
-import org.terasology.asset.AssetData;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.Canvas;
 
 /**
+ * An item renderer draws an object of a given type as part of a UI.
  * @author Immortius
  */
-public class UIData implements AssetData {
-    private UIWidget rootElement;
+public interface ItemRenderer<T> {
 
-    public UIData(UIWidget rootElement) {
-        this.rootElement = rootElement;
-    }
+    /**
+     * @param value The object to format.
+     * @param canvas The canvas to draw the item with.
+     */
+    void draw(T value, Canvas canvas);
 
-    public UIWidget getRootElement() {
-        return rootElement;
-    }
+    void draw(T value, Canvas canvas, Rect2i subregion);
+
+    Vector2i getPreferredSize(T value, Canvas canvas);
 }

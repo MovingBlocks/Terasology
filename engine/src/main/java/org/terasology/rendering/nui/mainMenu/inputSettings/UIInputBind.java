@@ -23,12 +23,12 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -66,6 +66,20 @@ public class UIInputBind extends CoreWidget {
             canvas.drawText("???");
         }
         canvas.addInteractionRegion(interactionListener);
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Font font = canvas.getCurrentStyle().getFont();
+        String text = "";
+        if (capturingInput) {
+            text = "???";
+        } else if (input.get() != null) {
+            text = input.get().toShortString();
+        }
+        List<String> lines = TextLineBuilder.getLines(font, text, areaHint.getX());
+        Vector2i size = font.getSize(lines);
+        return size;
     }
 
     @Override

@@ -17,6 +17,7 @@
 package org.terasology.rendering.assets.font;
 
 import org.terasology.asset.Asset;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.nui.HorizontalAlign;
@@ -46,4 +47,6 @@ public interface Font extends Asset<FontData> {
     int getHeight(String text);
 
     int getLineHeight();
+
+    Vector2i getSize(List<String> lines);
 }
