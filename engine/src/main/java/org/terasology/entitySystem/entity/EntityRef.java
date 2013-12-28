@@ -19,7 +19,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
