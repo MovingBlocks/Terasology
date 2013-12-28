@@ -33,12 +33,22 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.hudElement.HUDElementBubbles;
+import org.terasology.rendering.hudElement.HUDElementCrosshair;
+import org.terasology.rendering.hudElement.HUDElementDebugLines;
+import org.terasology.rendering.hudElement.HUDElementHearts;
+import org.terasology.rendering.hudElement.HUDElementLeftGearWheel;
+import org.terasology.rendering.hudElement.HUDElementRightGearWheel;
+import org.terasology.rendering.hudElement.HUDElementToolbar;
+import org.terasology.rendering.logic.manager.HUD;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -89,7 +99,26 @@ public class StateIngame implements GameState {
         eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
+        // TODO: initalize HUD elements differently
+        UIWindow window = guiManager.getWindowById(MenuControlSystem.HUD);
+        if (window == null) {
+            window = guiManager.loadWindow(MenuControlSystem.HUD);
+        }
+        if (window != null) {
+        	HUD hud = (HUD)window;
+            CoreRegistry.put(HUD.class, hud);
+
+        	hud.addHUDElement(new HUDElementHearts());
+        	hud.addHUDElement(new HUDElementBubbles());
+        	hud.addHUDElement(new HUDElementCrosshair());
+        	hud.addHUDElement(new HUDElementDebugLines());
+        	hud.addHUDElement(new HUDElementLeftGearWheel());
+        	hud.addHUDElement(new HUDElementRightGearWheel());
+        	hud.addHUDElement(new HUDElementToolbar());
+        }
+
         guiManager.openWindow(MenuControlSystem.HUD);
+        
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
