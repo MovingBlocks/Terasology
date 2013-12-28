@@ -68,8 +68,6 @@ dependencies {
 
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
     if (project.name != project(':').name) {
-        println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
-
         // Dependency on the engine itself (actually its built jar file)
         compile project(':engine')
 
@@ -77,6 +75,10 @@ dependencies {
         testCompile project(':engine-tests')
 
         // If the module has dependencies on other modules we look in a few different spots to find them
+        if (moduleDepends.size() > 0) {
+            println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
+        }
+
         for (dependency in moduleDepends) {
 
             File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
@@ -84,20 +86,20 @@ dependencies {
             // TODO: module jars with version info (maybe supplied by user) won't match. Artifactory fetches get renamed
             File wouldBeModuleJar = new File(rootDir, 'modules/' + dependency + '.jar')
 
-            println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
-            println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
+            //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
+            //println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
 
             // First see if we have an actual source module project in the Gradle project tree (user addModule'ed it)
             if (wouldBeSrcPath.exists()) {
                 //TODO: This is fragile, of course, and will hit problems with corrupt module directories (empty dir)
 
-                println "Found dependency source module locally, setting a direct project dependency: " + dependency
+                println "Found " + wouldBeSrcPath.getAbsolutePath() + ", setting a direct project dependency"
                 compile project(':modules:' + dependency)
 
             } else if (wouldBeModuleJar.exists()) {
 
                 // Alternatively might find the dependency in the modules dir as a binary (manually placed or fetched)
-                println "Found dependency binary locally in /modules, it will be included via file dependency"
+                println "Found " + wouldBeModuleJar.getAbsoluteFile() + ", it will be included via file dependency"
 
                 compile files(wouldBeModuleJar)
 

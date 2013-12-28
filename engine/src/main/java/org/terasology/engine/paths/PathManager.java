@@ -95,15 +95,16 @@ public final class PathManager {
      */
     private Path findNativesHome(Path startPath, int maxDepth) {
         int levelsToSearch = maxDepth;
+        Path checkedPath = startPath;
         while (levelsToSearch > 0) {
-            File dirToTest = new File(startPath.toFile(), NATIVES_DIR);
+            File dirToTest = new File(checkedPath.toFile(), NATIVES_DIR);
             if (dirToTest.exists()) {
                 System.out.println("Found the natives dir: " + dirToTest);
-                return startPath;
+                return checkedPath;
             }
 
-            startPath = startPath.getParent();
-            if (startPath.equals(startPath.getRoot())) {
+            checkedPath = checkedPath.getParent();
+            if (checkedPath.equals(startPath.getRoot())) {
                 System.out.println("Uh oh, reached the root path, giving up");
                 return null;
             }
