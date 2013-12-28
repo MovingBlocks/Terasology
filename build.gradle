@@ -191,6 +191,7 @@ idea {
     // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
     module.excludeDirs += file('bin')
     module.excludeDirs += file('.settings')
+    // TODO: Add a single file exclude for facades/PC/Terasology.launch ?
 
     // Exclude special dirs
     module.excludeDirs += file('natives')

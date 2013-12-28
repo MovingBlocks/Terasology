@@ -207,7 +207,7 @@ idea {
 
 task copyEclipseLauncher(type: Copy) {
 	from "$rootDir/config/eclipse"
-	into ".settings"
+	into projectDir
 	include("*.launch")
 }
 
@@ -217,7 +217,7 @@ tasks.eclipse {
 }
 
 cleanEclipse.doLast {
-    new File(projectDir, ".settings/Terasology.launch").delete()
+    new File(projectDir, "Terasology.launch").delete()
 }
 
 checkstyle {
