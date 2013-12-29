@@ -35,8 +35,6 @@ repositories {
 
 dependencies {
     compile project(':engine')
-	runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
-    testCompile group: 'junit', name: 'junit', version: '4.10'
 }
 
 // Change the output dir
@@ -45,6 +43,7 @@ sourceSets {
         java {
             output.classesDir 'build/classes'
         }
+        output.resourcesDir 'build/classes'
     }
 }
 
@@ -71,11 +70,10 @@ task runPC(type:JavaExec) {
     workingDir = rootDir
     args '-homedir'
 
-    // Classpath: PC itself, engine classes, engine dependencies, natives. Not modules since the engine finds those
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDir
     classpath project(':engine').sourceSets.main.output.classesDir
     classpath project(':engine').configurations.runtime
-    classpath rootProject.configurations.natives
 }
 
 // Preps a version file to bundle with PC dists. This eventually goes into the root of a zip file

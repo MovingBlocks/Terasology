@@ -111,6 +111,9 @@ dependencies {
     // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 
+    // And here is Groovy to read the config file
+    runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
+
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
 }
