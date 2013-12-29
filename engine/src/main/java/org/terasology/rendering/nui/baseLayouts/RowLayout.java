@@ -42,6 +42,13 @@ public class RowLayout extends CoreLayout {
     private List<Row> rows = Lists.newArrayList();
     private Border padding = Border.ZERO;
 
+    public RowLayout() {
+    }
+
+    public RowLayout(String id) {
+        super(id);
+    }
+
     public Row addRow(UIWidget... widgets) {
         Row row = new Row(widgets);
         rows.add(row);

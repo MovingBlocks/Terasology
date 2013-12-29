@@ -29,6 +29,15 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
+import org.terasology.classMetadata.copying.strategy.Color4fCopyStrategy;
+import org.terasology.classMetadata.copying.strategy.Quat4fCopyStrategy;
+import org.terasology.classMetadata.copying.strategy.Vector2fCopyStrategy;
+import org.terasology.classMetadata.copying.strategy.Vector3fCopyStrategy;
+import org.terasology.classMetadata.copying.strategy.Vector3iCopyStrategy;
+import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
+import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.math.Border;
@@ -38,6 +47,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ModuleContext;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
@@ -57,7 +67,11 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
+import javax.vecmath.Color4f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -77,10 +91,16 @@ public class UILoader implements AssetLoader<UIData> {
 
     private static final Logger logger = LoggerFactory.getLogger(UILoader.class);
 
+    private TypeSerializationLibrary typeSerializationLibrary;
+
 
     @Override
     public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
+        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
+        TypeSerializationLibrary library = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
+
         Gson gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapter(UIData.class, new UIDataTypeAdapter(nuiManager))

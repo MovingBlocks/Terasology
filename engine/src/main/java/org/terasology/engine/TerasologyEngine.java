@@ -34,10 +34,12 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
@@ -59,6 +61,7 @@ import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.gui.AdvancedMonitor;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.VertexBufferObjectManager;
@@ -522,8 +525,12 @@ public class TerasologyEngine implements GameEngine {
         GameThread.setGameThread();
         ModuleManager moduleManager = initModuleManager();
 
+        ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
+        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
+
+        CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
+
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
-        CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
@@ -534,6 +541,8 @@ public class TerasologyEngine implements GameEngine {
         ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
                 getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
         assetManager.addAssetSource(source);
+
+        ApplyModulesUtil.applyModules();
     }
 
     private ModuleManager initModuleManager() {

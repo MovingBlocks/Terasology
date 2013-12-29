@@ -16,6 +16,7 @@
 
 package org.terasology.utilities;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.rendering.nui.UIWidget;
@@ -115,9 +116,10 @@ public final class ReflectionUtil {
     /**
      * Returns an ordered list of super classes and interfaces for the given class, that have a common base class.
      * The set is ordered with the deepest interface first, through all the interfaces, and then all the super classes.
+     *
      * @param forClass
      * @param baseClass
-     * @return  an ordered list of super classes and interfaces for the given class, that have a common base class.
+     * @return an ordered list of super classes and interfaces for the given class, that have a common base class.
      */
     public static <T> List<Class<? extends T>> getInheritanceTree(Class<? extends T> forClass, Class<T> baseClass) {
         Set<Class<? extends T>> result = Sets.newLinkedHashSet();
@@ -150,4 +152,51 @@ public final class ReflectionUtil {
         }
         result.add(interfaceType);
     }
+
+    public static <T> Class<?> getTypeParameterForSuper(Type target, Class<T> superClass, int index) {
+        Class targetClass = getClassOfType(target);
+        Preconditions.checkArgument(superClass.isAssignableFrom(targetClass), "Target must be a child of superClass");
+
+        if (superClass.isInterface()) {
+            return getTypeParameterForSuperInterface(target, superClass, index);
+        } else {
+            return getTypeParameterForSuperClass(target, superClass, index);
+        }
+    }
+
+    private static <T> Class<?> getTypeParameterForSuperClass(Type target, Class<T> superClass, int index) {
+        Class targetClass = getClassOfType(target);
+        if (superClass.equals(getClassOfType(targetClass.getGenericSuperclass()))) {
+            Type superType = targetClass.getGenericSuperclass();
+            if (superType instanceof ParameterizedType) {
+                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
+                    Type boundType = ((ParameterizedType) superType).getActualTypeArguments()[index];
+                    if (boundType instanceof Class) {
+                        return (Class<?>) boundType;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+        return getTypeParameterForSuperClass(targetClass.getGenericSuperclass(), superClass, index);
+    }
+
+    private static <T> Class<?> getTypeParameterForSuperInterface(Type target, Class<T> superClass, int index) {
+        Class targetClass = getClassOfType(target);
+        for (Type superType : targetClass.getGenericInterfaces()) {
+            if (superType instanceof ParameterizedType) {
+                if (((ParameterizedType) superType).getRawType().equals(superClass)) {
+                    Type boundType = ((ParameterizedType) superType).getActualTypeArguments()[index];
+                    if (boundType instanceof Class) {
+                        return (Class<?>) boundType;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+        return getTypeParameterForSuperInterface(targetClass.getGenericSuperclass(), superClass, index);
+    }
+
 }

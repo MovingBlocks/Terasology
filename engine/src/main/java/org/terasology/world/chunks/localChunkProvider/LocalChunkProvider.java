@@ -39,7 +39,6 @@ import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.block.BeforeDeactivateBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -60,6 +59,7 @@ import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -563,9 +563,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                             }
                             preparingChunks.remove(getPosition());
                             if (chunk.getChunkState() == ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
-                                InternalLightProcessor.generateInternalLighting(chunk);
-                                chunk.deflate();
-                                chunk.setChunkState(ChunkImpl.State.COMPLETE);
+                                chunk.lock();
+                                try {
+                                    InternalLightProcessor.generateInternalLighting(chunk);
+                                    chunk.deflate();
+                                    chunk.setChunkState(ChunkImpl.State.COMPLETE);
+                                } finally {
+                                    chunk.unlock();
+                                }
                                 readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
                             } else {
                                 pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));

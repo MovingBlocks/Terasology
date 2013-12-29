@@ -43,6 +43,14 @@ public class UIList<T> extends CoreWidget {
     private List<ListEventListener<T>> eventListeners = Lists.newArrayList();
 
 
+    public UIList() {
+
+    }
+
+    public UIList(String id) {
+        super(id);
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         updateItemListeners();

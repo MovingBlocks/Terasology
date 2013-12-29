@@ -48,7 +48,7 @@ public class ReflectionProvider<T> implements PropertyProvider<T> {
     public ReflectionProvider(T target) {
         try {
             ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
-            CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
+            CopyStrategyLibrary copyStrategies = CoreRegistry.get(CopyStrategyLibrary.class);
             ClassMetadata<T, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), (Class<T>) target.getClass(), reflectFactory, copyStrategies);
             for (Field field : getAllFields(target.getClass(), and(withAnnotation(EditorRange.class), or(withType(Float.TYPE), withType(Float.class))))) {
                 EditorRange range = field.getAnnotation(EditorRange.class);

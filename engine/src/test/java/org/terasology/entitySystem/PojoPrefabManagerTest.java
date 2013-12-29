@@ -60,7 +60,7 @@ public class PojoPrefabManagerTest {
     @Before
     public void setup() {
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(reflectFactory);
+        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         lib.add(Vector3f.class, new Vector3fTypeHandler());
         lib.add(Quat4f.class, new Quat4fTypeHandler());
