@@ -362,16 +362,16 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
                     if (counter++ % 2 == 1) {
                         int lineNumberInt = Integer.valueOf(m.group());
 
-                        Scanner reader = new Scanner(shader.toString());
-                        for (int i = 0; i < lineNumberInt - 1; ++i) {
-                            reader.nextLine();
+                        try (Scanner reader = new Scanner(shader.toString())) {
+                            for (int i = 0; i < lineNumberInt - 1; ++i) {
+                                reader.nextLine();
+                            }
+    
+                            errorLine = reader.nextLine();
+                            errorLine = "Error prone line: '" + errorLine + "'";
+    
+                            logger.warn("{} \n Line: {}", error, errorLine);
                         }
-
-                        errorLine = reader.nextLine();
-                        errorLine = "Error prone line: '" + errorLine + "'";
-
-                        logger.warn("{} \n Line: {}", error, errorLine);
-
                         break;
                     }
                 }

@@ -57,11 +57,11 @@ public final class EntityDataJSONFormat {
     private EntityDataJSONFormat() {
     }
 
-    public static void write(EntityData.GlobalStore world, BufferedWriter writer) throws IOException {
+    public static void write(EntityData.GlobalStore world, BufferedWriter writer) {
         newGson().toJson(world, writer);
     }
 
-    public static void write(EntityData.Prefab prefab, BufferedWriter writer) throws IOException {
+    public static void write(EntityData.Prefab prefab, BufferedWriter writer) {
         newGson().toJson(prefab, writer);
     }
 

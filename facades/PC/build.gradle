@@ -205,6 +205,21 @@ idea {
     }
 }
 
+task copyEclipseLauncher(type: Copy) {
+	from "$rootDir/config/eclipse"
+	into projectDir
+	include("*.launch")
+}
+
+tasks.eclipse {
+	dependsOn copyEclipseLauncher
+	dependsOn rootProject.extractNatives
+}
+
+cleanEclipse.doLast {
+    new File(projectDir, "Terasology.launch").delete()
+}
+
 checkstyle {
     ignoreFailures = true
     configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')

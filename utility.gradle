@@ -113,6 +113,7 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
                 // Copy in some template stuff for the new module
                 doLast {
                     new File(destination, 'build.gradle') << new File(rootDir, 'modules/Core/build.gradle').text
+                    // TODO : Add in the logback.groovy from engine\src\test\resources\logback.groovy ? Local dev only, Jenkins will use the one inside engine-tests.jar. Also add to .gitignore
                     def moduleManifest = new File (destination, 'module.txt')
                     def moduleText = new File(templatesDir, 'module.txt').text
                     moduleManifest << moduleText.replaceAll('MODULENAME', repo)

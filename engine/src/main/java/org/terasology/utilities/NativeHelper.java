@@ -38,6 +38,7 @@ public final class NativeHelper {
     public static void addLibraryPath(Path libPath) {
         try {
             String envPath = System.getProperty("java.library.path");
+
             if (envPath == null || envPath.isEmpty()) {
                 System.setProperty("java.library.path", libPath.toAbsolutePath().toString());
             } else {
@@ -48,11 +49,9 @@ public final class NativeHelper {
             usrPathsField.setAccessible(true);
 
             List<String> paths = Lists.newArrayList((String[]) usrPathsField.get(null));
-
             if (paths.contains(libPath.toAbsolutePath().toString())) {
                 return;
             }
-
             paths.add(0, libPath.toAbsolutePath().toString()); // Add to beginning, to override system libraries
 
             usrPathsField.set(null, paths.toArray(new String[paths.size()]));
