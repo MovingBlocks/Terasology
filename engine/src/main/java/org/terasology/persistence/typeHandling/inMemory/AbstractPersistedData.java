@@ -21,8 +21,6 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius

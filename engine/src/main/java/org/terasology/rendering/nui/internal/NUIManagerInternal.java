@@ -29,6 +29,7 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -60,12 +61,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
 
     private Deque<UIScreen> screens = Queues.newArrayDeque();
-    private CanvasInternal canvas = new LwjglCanvas(this);
+    private CanvasInternal canvas;
     private ClassLibrary<UIWidget> elementsLibrary;
     private UIWidget focus;
 
     public NUIManagerInternal(AssetManager assetManager) {
         this.assetManager = assetManager;
+        this.canvas = new LwjglCanvas(this, CoreRegistry.get(Time.class));
     }
 
     public void refreshElementsLibrary() {
@@ -95,8 +97,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreen screen) {
-        inject(screen);
-        screen.initialise();
+        prepare(screen);
         screens.push(screen);
     }
 
@@ -126,8 +127,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void setScreen(UIScreen screen) {
         screens.clear();
-        inject(screen);
-        screen.initialise();
+        prepare(screen);
         screens.push(screen);
     }
 
@@ -227,6 +227,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+    }
+
+    private void prepare(UIScreen screen) {
+        inject(screen);
+        screen.getContents();
+        screen.initialise();
     }
 
     private void inject(Object object) {

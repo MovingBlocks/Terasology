@@ -111,7 +111,7 @@ public class UIDropdown<T> extends CoreWidget {
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         canvas.setPart(BOX);
         if (selection.get() != null) {
-            return optionRenderer.getPreferredSize(selection.get(), canvas);
+            return canvas.getCurrentStyle().getMargin().grow(optionRenderer.getPreferredSize(selection.get(), canvas));
         }
         return Vector2i.zero();
     }

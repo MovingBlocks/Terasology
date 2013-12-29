@@ -18,13 +18,19 @@ package org.terasology.rendering.nui.mainMenu.selectGame;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
+import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
+import org.terasology.rendering.nui.baseWidgets.ListEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIList;
 
@@ -45,16 +51,53 @@ import java.util.SortedMap;
  */
 public class SelectGameScreen extends UIScreen {
 
-    private static Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
-    private static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @In
     private NUIManager nuiManager;
+
+    private boolean loadingAsServer;
 
     @Override
     public void initialise() {
         UIList<GameInfo> gameList = find("gameList", UIList.class);
 
+        refreshList(gameList);
+        gameList.subscribe(new ListEventListener<GameInfo>() {
+            @Override
+            public void onItemActivated(GameInfo item) {
+                try {
+                    GameManifest manifest = item.manifest;
+                    Config config = CoreRegistry.get(Config.class);
+
+                    config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
+                    config.getWorldGeneration().setWorldTitle(manifest.getTitle());
+                    CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
+                } catch (Exception e) {
+                    // TODO: Display error
+                    logger.error("Failed to load saved game", e);
+                }
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.popScreen();
+            }
+        });
+    }
+
+    public boolean isLoadingAsServer() {
+        return loadingAsServer;
+    }
+
+    public void setLoadingAsServer(boolean loadingAsServer) {
+        this.loadingAsServer = loadingAsServer;
+    }
+
+    private void refreshList(UIList<GameInfo> gameList) {
         gameList.getList().clear();
         Path savedGames = PathManager.getInstance().getSavesPath();
         SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
@@ -85,13 +128,6 @@ public class SelectGameScreen extends UIScreen {
                 logger.error("Failed reading world data object.", e);
             }
         }
-
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
-            }
-        });
     }
 
     private static class GameInfo {

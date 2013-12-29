@@ -96,4 +96,8 @@ public class Border {
     public Vector2i getTotals() {
         return new Vector2i(getTotalWidth(), getTotalHeight());
     }
+
+    public Vector2i grow(Vector2i size) {
+        return new Vector2i(size.x + getTotalWidth(), size.y + getTotalHeight());
+    }
 }

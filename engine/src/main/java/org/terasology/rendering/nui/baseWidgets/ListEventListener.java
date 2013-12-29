@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.itemRendering;
-
-import org.terasology.math.Rect2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.SubRegion;
+package org.terasology.rendering.nui.baseWidgets;
 
 /**
- *
+ * @author Immortius
  */
-public abstract class AbstractItemRenderer<T> implements ItemRenderer<T> {
+public interface ListEventListener<T> {
 
-    @Override
-    public void draw(T value, Canvas canvas, Rect2i subregion) {
-        try (SubRegion ignored = canvas.subRegion(subregion, false)) {
-            draw(value, canvas);
-        }
-    }
+    void onItemActivated(T item);
+
 }

@@ -26,8 +26,10 @@ import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
 import org.terasology.math.AABB;
+import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
@@ -40,14 +42,13 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -92,8 +93,11 @@ import static org.lwjgl.opengl.Util.checkGLError;
 public class LwjglCanvas implements CanvasInternal {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
+    private static final int MAX_DOUBLE_CLICK_DISTANCE = 5;
+    private static final int DOUBLE_CLICK_TIME = 200;
 
     private final NUIManager nuiManager;
+    private final Time time;
     private CanvasState state;
 
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -113,10 +117,15 @@ public class LwjglCanvas implements CanvasInternal {
     private Set<InteractionRegion> mouseOverRegions = Sets.newLinkedHashSet();
     private InteractionRegion clickedRegion;
 
+    private long lastClickTime;
+    private MouseInput lastClickButton;
+    private Vector2i lastClickPosition = new Vector2i();
+
     private Matrix4f modelView;
 
-    public LwjglCanvas(NUIManager nuiManager) {
+    public LwjglCanvas(NUIManager nuiManager, Time time) {
         this.nuiManager = nuiManager;
+        this.time = time;
     }
 
     @Override
@@ -216,11 +225,21 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
+        boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
+                && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
+        lastClickPosition.set(pos);
+        lastClickButton = button;
+        lastClickTime = time.getGameTimeInMs();
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.region.min());
-                if (next.listener.onMouseClick(button, relPos)) {
+                if (possibleDoubleClick && nuiManager.getFocus() == next.element) {
+                    if (next.listener.onMouseDoubleClick(button, relPos)) {
+                        clickedRegion = next;
+                        return true;
+                    }
+                } else if (next.listener.onMouseClick(button, relPos)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;

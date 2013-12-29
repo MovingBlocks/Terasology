@@ -16,10 +16,6 @@
 package org.terasology.persistence.typeHandling;
 
 import com.google.common.collect.Lists;
-import org.terasology.persistence.typeHandling.DeserializationContext;
-import org.terasology.persistence.typeHandling.PersistedData;
-import org.terasology.persistence.typeHandling.SerializationContext;
-import org.terasology.persistence.typeHandling.TypeHandler;
 
 import java.util.Collection;
 import java.util.List;

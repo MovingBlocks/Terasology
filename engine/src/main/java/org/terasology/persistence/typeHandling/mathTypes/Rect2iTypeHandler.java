@@ -17,7 +17,6 @@
 package org.terasology.persistence.typeHandling.mathTypes;
 
 import com.google.common.collect.Maps;
-import org.terasology.engine.module.UriUtil;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.persistence.typeHandling.DeserializationContext;

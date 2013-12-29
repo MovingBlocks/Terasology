@@ -31,6 +31,7 @@ import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
+import org.terasology.math.Border;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
@@ -48,7 +49,6 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.rendering.assets.TextureRegion;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -71,9 +71,12 @@ import java.util.List;
  * @author Immortius
  */
 public class UILoader implements AssetLoader<UIData> {
-    private static final Logger logger = LoggerFactory.getLogger(UILoader.class);
+
     public static final String CONTENTS_FIELD = "contents";
     public static final String LAYOUT_INFO_FIELD = "layoutInfo";
+
+    private static final Logger logger = LoggerFactory.getLogger(UILoader.class);
+
 
     @Override
     public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
@@ -145,7 +148,7 @@ public class UILoader implements AssetLoader<UIData> {
                     element = elementMetadata.newInstance();
                 }
             } else {
-                 element = elementMetadata.newInstance();
+                element = elementMetadata.newInstance();
             }
 
             for (FieldMetadata<? extends UIWidget, ?> field : elementMetadata.getFields()) {

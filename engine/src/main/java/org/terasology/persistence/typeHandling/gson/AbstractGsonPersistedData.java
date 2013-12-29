@@ -15,8 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.gson;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.BaseEncoding;
 import com.google.gson.JsonElement;
 import org.terasology.persistence.typeHandling.DeserializationException;
@@ -25,8 +23,6 @@ import org.terasology.persistence.typeHandling.PersistedDataArray;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius

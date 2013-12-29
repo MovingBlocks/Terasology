@@ -27,6 +27,37 @@
                 "right" : 4
             }
         },
+        "UIList" : {
+            "parts" : {
+                "item" : {
+                    "text-align-horizontal" : "center",
+                    "text-align-vertical" : "middle",
+                    "background" : "button",
+                    "background-border" : {
+                        "top" : 2,
+                        "bottom" : 2,
+                        "left" : 2,
+                        "right" : 2
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 2,
+                        "right" : 2
+                    },
+                    "texture-scale-mode" : "scale_fit",
+                    "modes" : {
+                        "hover" : {
+                            "background" : "buttonOver"
+                        },
+                        "active" : {
+                            "background" : "buttonDown",
+                            "text-color" : "FFFF00FF"
+                        }
+                    }
+                }
+            }
+        },
         "UIDropdown" : {
             "text-align-horizontal" : "left",
             "parts" : {

@@ -48,7 +48,8 @@
                     },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "close"
+                        "widget" : "close",
+                        "offset" : 16
                     }
                 }
             },

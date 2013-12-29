@@ -16,10 +16,7 @@
 package org.terasology.rendering.nui.baseLayouts.relative;
 
 import com.google.gson.annotations.SerializedName;
-import org.terasology.math.Rect2i;
-import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.LayoutHint;
-import org.terasology.rendering.nui.VerticalAlign;
 
 /**
  * @author Immortius

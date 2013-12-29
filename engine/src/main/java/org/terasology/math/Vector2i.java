@@ -23,15 +23,17 @@ import javax.vecmath.Vector2f;
 /**
  * A 2-element vector represented by signed integer x,y
  * coordinates.
+ *
  * @author Immortius
  */
 public class Vector2i extends Tuple2i {
-	
-	private static final long serialVersionUID = 3862467945178721785L;
+
+    private static final long serialVersionUID = 3862467945178721785L;
 
     /**
      * Constructs and initializes a Vector2i from the specified
      * x and y coordinates.
+     *
      * @param x the x coordinate
      * @param y the y coordinate
      */
@@ -41,26 +43,28 @@ public class Vector2i extends Tuple2i {
 
     /**
      * Constructs and initializes a Vector2i from the array of length 2.
+     *
      * @param values the array of length 2 containing x and y in order.
      */
     public Vector2i(int[] values) {
-    	super(values);
+        super(values);
     }
 
     /**
      * Constructs and initializes a Vector2i from the specified Vector2i.
-     * @param t1 the Vector2i containing the initialization x and y
-     * data.
+     *
+     * @param other the Vector2i containing the initialization x and y
+     *              data.
      */
     public Vector2i(Vector2i other) {
-    	super(other);
+        super(other);
     }
 
     /**
      * Constructs and initializes a Vector2i to (0,0).
      */
     public Vector2i() {
-    	super();
+        super();
     }
 
     /**
@@ -76,11 +80,24 @@ public class Vector2i extends Tuple2i {
     public Vector2d toVector2d() {
         return new Vector2d(x, y);
     }
-    
+
     /**
      * @return A <b>new</b> instance of (0, 0)
      */
     public static Vector2i zero() {
         return new Vector2i(0, 0);
+    }
+
+    /**
+     * Calculates the total distance in axis-aligned steps between this and
+     * other vector (manhattan distance). This is the distance that is traveled
+     * if movement is restricted to adjacent vectors.
+     *
+     * @param other the other vector to test
+     * @return the total distance in axis-aligned steps between this and
+     * other vector (manhattan distance)
+     */
+    public int gridDistance(Vector2i other) {
+        return Math.abs(other.x - x) + Math.abs(other.y - y);
     }
 }
