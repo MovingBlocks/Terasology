@@ -20,8 +20,6 @@ dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
 // Declare "extra properties" (variables) for the project - a Gradle thing that makes them special.
 ext {
-    //mainClassNameEditor = 'org.terasology.editor.TeraEd' // Actually need a new facade for this, maybe?
-
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
 
@@ -30,7 +28,6 @@ ext {
     // Stuff for our automatic version file setup
     startDateTimeString = dateTimeFormat.format(new Date())
     versionInfoFileDir = new File(buildDir, 'classes/org/terasology/version')
-    //println "versionInfoFileDir is $versionInfoFileDir"
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
@@ -208,7 +205,6 @@ jar.dependsOn createVersionInfoFile
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// For IntelliJ add a bunch of excluded directories. Or not so much a bunch in the engine version of this
 idea {
     module {
         // Add development "dev" dir

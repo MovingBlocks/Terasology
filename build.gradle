@@ -181,8 +181,6 @@ clean.doLast {
 
 // Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
-// TODO: This next piece broke when the root build had its java plugin removed
-//eclipseClasspath.dependsOn extractNatives
 
 // For IntelliJ add a bunch of excluded directories
 idea {
