@@ -93,6 +93,10 @@ public class Border {
                 region.width() - getTotalWidth(), region.height() - getTotalHeight());
     }
 
+    public Vector2i shrink(Vector2i size) {
+        return new Vector2i(size.x - getTotalWidth(), size.y - getTotalHeight());
+    }
+
     public Vector2i getTotals() {
         return new Vector2i(getTotalWidth(), getTotalHeight());
     }

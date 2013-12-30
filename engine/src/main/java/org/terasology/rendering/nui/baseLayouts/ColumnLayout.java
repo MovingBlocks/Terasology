@@ -136,6 +136,31 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Vector2i totalSize = new Vector2i();
+        Vector2i rowSize = new Vector2i();
+        int currentColumn = 0;
+        for (UIWidget widget : widgetList) {
+            Vector2i cellSize = new Vector2i(areaHint);
+            cellSize.x *= columnWidths[currentColumn];
+            cellSize = padding.shrink(cellSize);
+            Vector2i contentSize = canvas.calculateSize(widget, cellSize);
+            contentSize.x += padding.getTotalWidth();
+            contentSize.y += padding.getTotalHeight();
+            rowSize.x += contentSize.x;
+            rowSize.y = Math.max(rowSize.y, contentSize.y);
+
+            if (++currentColumn == columns) {
+                currentColumn = 0;
+                totalSize.x = Math.max(totalSize.x, rowSize.x);
+                totalSize.y += rowSize.y;
+                rowSize.set(0, 0);
+            }
+        }
+        return totalSize;
+    }
+
+    @Override
     public void update(float delta) {
         for (UIWidget widget : widgetList) {
             widget.update(delta);

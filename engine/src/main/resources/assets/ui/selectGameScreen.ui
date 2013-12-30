@@ -40,12 +40,43 @@
                     "id" : "gameList"
                 },
                 "layoutInfo" : {
-                    "width" : "300",
+                    "width" : 300,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
                         "widget" : "subtitle"
                     },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "actionButtons",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "RowLayout",
+                "id" : "actionButtons",
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "id" : "create",
+                        "text" : "Create"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "load",
+                        "text" : "Load"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "delete",
+                        "text" : "Delete"
+                    }
+                ],
+                "layoutInfo" : {
+                    "width" : 400,
+                    "height" : 48,
+                    "position-horizontal-center" : {},
                     "position-bottom" : {
                         "target" : "TOP",
                         "widget" : "close",

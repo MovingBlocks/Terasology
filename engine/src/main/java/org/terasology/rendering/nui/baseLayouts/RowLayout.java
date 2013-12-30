@@ -20,151 +20,128 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Border;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
-import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Immortius
  */
-public class RowLayout extends CoreLayout {
+public class RowLayout extends CoreLayout<RowLayoutHint> {
 
     private static final Logger logger = LoggerFactory.getLogger(RowLayout.class);
 
-    private List<Row> rows = Lists.newArrayList();
-    private Border padding = Border.ZERO;
+    private List<UIWidget> contents = Lists.newArrayList();
+    private TFloatList normalizedWidths;
+    private TFloatList relativeWidths = new TFloatArrayList();
 
     public RowLayout() {
+
     }
 
     public RowLayout(String id) {
         super(id);
     }
 
-    public Row addRow(UIWidget... widgets) {
-        Row row = new Row(widgets);
-        rows.add(row);
-        return row;
+    public RowLayout(UIWidget ... widgets) {
+        contents.addAll(Arrays.asList(widgets));
     }
 
-    public Border getPadding() {
-        return padding;
-    }
-
-    public void setPadding(Border padding) {
-        this.padding = padding;
+    @Override
+    public void addWidget(UIWidget element, RowLayoutHint hint) {
+        contents.add(element);
+        if (hint != null) {
+            relativeWidths.add(hint.getRelativeWidth());
+        } else {
+            relativeWidths.add(0);
+        }
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (!rows.isEmpty()) {
-            int yOffset = 0;
-            for (Row row : rows) {
-                yOffset += row.draw(canvas, yOffset);
+        if (normalizedWidths == null || normalizedWidths.size() != contents.size()) {
+            calcWidths();
+        }
+
+        Border padding = canvas.getCurrentStyle().getMargin();
+
+        if (!contents.isEmpty()) {
+            int xOffset = 0;
+            for (int i = 0; i < contents.size(); ++i) {
+                int itemWidth = TeraMath.floorToInt(canvas.size().x * normalizedWidths.get(i));
+                Rect2i region = Rect2i.createFromMinAndSize(xOffset + padding.getLeft(), padding.getTop(),
+                        itemWidth - padding.getTotalWidth(), canvas.size().y - padding.getTotalHeight());
+                canvas.drawElement(contents.get(i), region);
+                xOffset += itemWidth;
             }
         }
+    }
+
+    private void calcWidths() {
+        int column = 0;
+        float totalWidthUsed = 0;
+        normalizedWidths = new TFloatArrayList();
+
+        int skippedColumns = 0;
+        while (column < relativeWidths.size() && column < contents.size() - 1) {
+            if (relativeWidths.get(column) <= 0) {
+                skippedColumns++;
+            }
+            normalizedWidths.add(relativeWidths.get(column));
+            totalWidthUsed += relativeWidths.get(column);
+            column++;
+        }
+        if (totalWidthUsed >= 1.0f) {
+            logger.warn("Attempted to set column widths to a value exceeding 1.0f, ignoring");
+            column = 0;
+            totalWidthUsed = 0;
+            skippedColumns = 0;
+            normalizedWidths.clear();
+        }
+        float widthForRemaining = (1.0f - totalWidthUsed) / (contents.size() - column + skippedColumns);
+        for (int i = 0; i < column; ++i) {
+            if (normalizedWidths.get(i) <= 0) {
+                normalizedWidths.set(i, widthForRemaining);
+            }
+        }
+        while (column < contents.size()) {
+            normalizedWidths.add(widthForRemaining);
+            column++;
+        }
+
     }
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        Vector2i sizeHint = new Vector2i(areaHint.x, areaHint.y / rows.size());
-        int height = 0;
-        for (Row row : rows) {
-            height += row.calcRowHeight(canvas, sizeHint);
-            height += padding.getTotalHeight();
+        if (normalizedWidths == null || normalizedWidths.size() != contents.size()) {
+            calcWidths();
         }
-        return new Vector2i(areaHint.x, height);
-    }
 
-    public int getRowCount() {
-        return rows.size();
+        Vector2i result = new Vector2i(areaHint.x, 0);
+        for (int i = 0; i < contents.size(); ++i) {
+            Vector2i widgetSize = canvas.calculateSize(contents.get(i), new Vector2i(TeraMath.floorToInt(areaHint.x * normalizedWidths.get(i)), areaHint.y));
+            result.y = Math.max(result.y, widgetSize.y);
+        }
+        return result;
     }
 
     @Override
     public Iterator<UIWidget> iterator() {
-        List<UIWidget> widgets = Lists.newArrayList();
-        for (Row row : rows) {
-            widgets.addAll(row.items);
-        }
-        return widgets.iterator();
+        return contents.iterator();
     }
 
-    @Override
-    public void addWidget(UIWidget element, LayoutHint hint) {
-
+    public UIWidget setColumnRatios(float ... ratios) {
+        relativeWidths.clear();
+        relativeWidths.addAll(ratios);
+        calcWidths();
+        return this;
     }
-
-    public class Row {
-        private List<UIWidget> items;
-        private TFloatList columnWidths = new TFloatArrayList();
-
-        public Row(UIWidget... widgets) {
-            this.items = Lists.newArrayList(widgets);
-            if (widgets.length > 0) {
-                float equalWidth = 1.0f / widgets.length;
-                for (UIWidget widget : widgets) {
-                    columnWidths.add(equalWidth);
-                }
-            }
-        }
-
-        public int draw(Canvas canvas, int yOffset) {
-            if (!items.isEmpty()) {
-                int height = calcRowHeight(canvas, canvas.size());
-                int xOffset = 0;
-                for (int i = 0; i < items.size(); ++i) {
-                    int itemWidth = TeraMath.floorToInt(canvas.size().x * columnWidths.get(i));
-                    Rect2i region = Rect2i.createFromMinAndSize(xOffset + padding.getLeft(), yOffset + padding.getTop(),
-                            itemWidth - padding.getTotalWidth(), height);
-                    canvas.drawElement(items.get(i), region);
-                    xOffset += itemWidth;
-                }
-                return height + padding.getTotalHeight();
-            }
-            return 0;
-        }
-
-        public int calcRowHeight(Canvas canvas, Vector2i sizeHint) {
-            int height = 0;
-            for (UIWidget item : items) {
-                height = Math.max(height, canvas.calculateSize(item, sizeHint).y);
-            }
-            return height;
-        }
-
-        public Row setColumnRatios(float... columns) {
-            if (columns.length > items.size()) {
-                throw new IllegalArgumentException("Number of column ratios must not exceed number of elements in row.");
-            }
-            int column = 0;
-            float totalWidthUsed = 0;
-            TFloatList newColumnRatios = new TFloatArrayList();
-            while (column < columns.length && column < items.size() - 1) {
-                newColumnRatios.add(columns[column]);
-                totalWidthUsed += columns[column];
-                column++;
-            }
-            if (totalWidthUsed >= 1.0f) {
-                logger.warn("Attempted to set column widths to a value exceeding 1.0f, ignoring");
-            } else {
-                float widthForRemaining = (1.0f - totalWidthUsed) / (items.size() - column);
-                while (column < items.size()) {
-                    newColumnRatios.add(widthForRemaining);
-                    column++;
-                }
-                columnWidths = newColumnRatios;
-            }
-            return this;
-        }
-
-    }
-
 }

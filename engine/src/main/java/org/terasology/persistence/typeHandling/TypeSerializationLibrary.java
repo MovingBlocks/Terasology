@@ -16,6 +16,7 @@
 
 package org.terasology.persistence.typeHandling;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -115,6 +116,10 @@ public class TypeSerializationLibrary {
         coreTypeHandlers.add(type);
     }
 
+    public ImmutableSet<Class<?>> getCoreTypes() {
+        return ImmutableSet.copyOf(coreTypeHandlers);
+    }
+
     public void clear() {
         typeHandlers.clear();
         coreTypeHandlers.clear();
@@ -122,7 +127,7 @@ public class TypeSerializationLibrary {
 
     // TODO: Refactor
     @SuppressWarnings("unchecked")
-    private TypeHandler<?> getHandlerFor(Type genericType) {
+    public TypeHandler<?> getHandlerFor(Type genericType) {
         Class<?> typeClass = ReflectionUtil.getClassOfType(genericType);
         if (typeClass == null) {
             logger.error("Unabled to get class from type {}", genericType);

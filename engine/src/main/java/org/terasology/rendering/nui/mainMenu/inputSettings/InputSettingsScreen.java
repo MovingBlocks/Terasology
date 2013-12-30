@@ -28,6 +28,7 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Border;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIWidget;
@@ -70,15 +71,15 @@ public class InputSettingsScreen extends UIScreen {
     @Override
     public void initialise() {
 
-        RowLayout mainLayout = new RowLayout();
+        ColumnLayout mainLayout = new ColumnLayout();
         mainLayout.setPadding(new Border(4, 4, 4, 4));
         mainLayout.setFamily("option-grid");
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
-        mainLayout.addRow(new UILabel("mouseLabel", "heading-input", "Mouse"));
-        mainLayout.addRow(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f);
-        mainLayout.addRow(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f);
+        mainLayout.addWidget(new UILabel("mouseLabel", "heading-input", "Mouse"));
+        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f));
+        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f));
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -132,13 +133,13 @@ public class InputSettingsScreen extends UIScreen {
         setContents(layout);
     }
 
-    private void addInputSection(InputCategory category, RowLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
+    private void addInputSection(InputCategory category, ColumnLayout layout, Map<SimpleUri, RegisterBindButton> inputsById) {
         if (category != null) {
-            layout.addRow(new UISpace());
+            layout.addWidget(new UISpace(new Vector2i(0, 16)));
 
             UILabel categoryHeader = new UILabel(category.displayName());
             categoryHeader.setFamily("heading-input");
-            layout.addRow(categoryHeader);
+            layout.addWidget(categoryHeader);
 
             Set<SimpleUri> processedBinds = Sets.newHashSet();
 
@@ -167,12 +168,12 @@ public class InputSettingsScreen extends UIScreen {
         }
     }
 
-    private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, RowLayout layout) {
+    private void addInputBindRow(SimpleUri uri, RegisterBindButton bind, ColumnLayout layout) {
         UIInputBind inputBind = new UIInputBind();
         inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
         UIInputBind secondaryInputBind = new UIInputBind();
         secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
-        layout.addRow(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f);
+        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f));
     }
 
     @Override
