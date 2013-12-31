@@ -1,0 +1,51 @@
+/*
+ * Copyright 2013 MovingBlocks
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.terasology.logic.behavior;
+
+import com.google.common.collect.Lists;
+import org.terasology.entitySystem.Component;
+import org.terasology.rendering.nui.Color;
+
+import java.util.List;
+
+/**
+ * Defines a renderable node used to display behavior trees.
+ *
+ * @author synopia
+ */
+public class BehaviorNodeComponent implements Component {
+    public static final BehaviorNodeComponent DEFAULT = new BehaviorNodeComponent();
+
+    public String type;                         // fq class name to node type
+    public String name;
+    public String category;                     // for palette
+    public String shape = "diamond";            // diamond or rect
+    public List<Float> color = Lists.newArrayList(.7f, .7f, .7f);
+    public List<Float> textColor = Lists.newArrayList(0f, 0f, 0f);
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public Color getTextColor() {
+        return new Color(textColor.get(0), textColor.get(1), textColor.get(2));
+    }
+
+    public Color getColor() {
+        return new Color(color.get(0), color.get(1), color.get(2));
+    }
+}

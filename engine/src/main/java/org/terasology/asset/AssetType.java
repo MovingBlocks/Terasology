@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import com.google.common.collect.Table;
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
+import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
@@ -74,7 +75,8 @@ public enum AssetType {
     FONT("font", "fonts", "fnt", new FontLoader()),
     SUBTEXTURE("subtexture", new String[] {}, "", null),
     ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
-    UI_SKIN("skin", "skins", "skin", new UISkinLoader());
+    UI_SKIN("skin", "skins", "skin", new UISkinLoader()),
+    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader());
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;

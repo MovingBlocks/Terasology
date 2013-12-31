@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,6 +52,8 @@ import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
@@ -207,6 +209,13 @@ public class TerasologyEngine implements GameEngine {
                 return new UISkin(uri, data);
             }
         });
+        assetManager.setAssetFactory(AssetType.BEHAVIOR, new AssetFactory<BehaviorTreeData, BehaviorTree>() {
+            @Override
+            public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
+                return new BehaviorTree(uri, data);
+            }
+        });
+
     }
 
     private void initConfig() {
