@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,6 +84,7 @@ public interface Canvas {
 
     /**
      * Sets the part of the current skin/element/family selection to use for drawing operations
+     *
      * @param part
      */
     void setPart(String part);
@@ -363,4 +364,6 @@ public interface Canvas {
     void addInteractionRegion(InteractionListener listener);
 
     void addInteractionRegion(InteractionListener listener, Rect2i region);
+
+    void drawLine(int startX, int startY, int endX, int endY, Color color);
 }

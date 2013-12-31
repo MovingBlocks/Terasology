@@ -68,6 +68,7 @@ import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -708,6 +709,33 @@ public class LwjglCanvas implements CanvasInternal {
         }
     }
 
+    @Override
+    public void drawLine(int startX, int startY, int endX, int endY, Color color) {
+        if (state.drawOnTop) {
+            drawOnTopOperations.add(new DrawLineOperation(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color));
+        } else {
+            drawLineInternal(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color);
+        }
+    }
+
+    private void drawLineInternal(float x0, float y0, float x1, float y1, Color color) {
+        textureMat.setFloat2("scale", 1, 1);
+        textureMat.setFloat2("offset", 0, 0);
+        textureMat.setFloat2("texOffset", 0, 0);
+        textureMat.setFloat2("texSize", 1, 1);
+        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af());
+        textureMat.bindTextures();
+        glPushMatrix();
+        GL11.glLineWidth(1);
+        GL11.glBegin(GL_LINES);
+        GL11.glColor4f(color.rf(), color.gf(), color.bf(), color.af());
+        GL11.glVertex3f(x0, y0, 0);
+        GL11.glColor4f(color.rf(), color.gf(), color.bf(), color.af());
+        GL11.glVertex3f(x1, y1, 0);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+    }
+
     private void crop(Rect2i cropRegion) {
         textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
     }
@@ -969,6 +997,28 @@ public class LwjglCanvas implements CanvasInternal {
         @Override
         public void draw() {
             drawTextureInternal(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+        }
+    }
+
+    private final class DrawLineOperation implements DrawOperation {
+
+        private float x0;
+        private float y0;
+        private float x1;
+        private float y1;
+        private Color color;
+
+        private DrawLineOperation(float x0, float y0, float x1, float y1, Color color) {
+            this.x0 = x0;
+            this.y0 = y0;
+            this.x1 = x1;
+            this.y1 = y1;
+            this.color = color;
+        }
+
+        @Override
+        public void draw() {
+            drawLineInternal(x0, y0, x1, y1, color);
         }
     }
 
