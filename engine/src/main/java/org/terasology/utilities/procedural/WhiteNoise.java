@@ -23,87 +23,25 @@ import org.terasology.utilities.random.Random;
  *
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class WhiteNoise implements Noise {
+public class WhiteNoise implements Noise3D {
 
-    private static final double LACUNARITY = 2.1379201;
-    private static final double H = 0.836281;
-
-    private double[] spectralWeights;
-
-    private boolean recomputeSpectralWeights = true;
-    private int octaves = 9;
-    private Random rand;
-    private double amplitude;
+    private final Random rand;
 
     /**
-     * Init. a new generator with a given seed value.
+     * Initialize a new generator with a given seed value.
      *
      * @param seed The seed value
      */
-    public WhiteNoise(int seed, double amplitude1) {
+    public WhiteNoise(int seed) {
         rand = new FastRandom(seed);
-
-        if (amplitude > 1) {
-            amplitude = 1 / amplitude1;
-        }
-        if (amplitude < 0) {
-            amplitude = -amplitude1;
-        }
     }
 
     /**
-     * Returns the noise value at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value
+     * Generates noise in the range [-1..1] 
      */
+    @Override
     public double noise(double x, double y, double z) {
-        return (rand.nextDouble(-1.0f, 1.0f) % 256) * amplitude;
+        return rand.nextDouble(-1.0f, 1.0f);
     }
 
-    /**
-     * Returns Fractional Brownian Motion at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value
-     */
-    public double fBm(double x, double y, double z) {
-        double result = 0.0;
-
-        if (recomputeSpectralWeights) {
-            spectralWeights = new double[octaves];
-
-            for (int i = 0; i < octaves; i++) {
-                spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
-            }
-
-            recomputeSpectralWeights = false;
-        }
-
-        double workingX = x;
-        double workingY = y;
-        double workingZ = z;
-        for (int i = 0; i < octaves; i++) {
-            result += noise(workingX, workingY, workingZ) * spectralWeights[i];
-
-            workingX *= LACUNARITY;
-            workingY *= LACUNARITY;
-            workingZ *= LACUNARITY;
-        }
-
-        return result;
-    }
-
-    public void setOctaves(int octaves) {
-        this.octaves = octaves;
-        recomputeSpectralWeights = true;
-    }
-
-    public int getOctaves() {
-        return octaves;
-    }
 }
