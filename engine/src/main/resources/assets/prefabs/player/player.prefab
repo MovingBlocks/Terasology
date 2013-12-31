@@ -36,7 +36,7 @@
         "extents" : [1.5, 1.6, 1.5]
     },
     "Trigger" : {
-        "detectGroups" : ["engine:debris"]
+        "detectGroups" : ["engine:debris", "engine:sensor"]
     },
     "CharacterSound" : {
         "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"],
