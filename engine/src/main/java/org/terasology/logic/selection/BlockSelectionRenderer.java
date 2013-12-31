@@ -17,6 +17,7 @@ package org.terasology.logic.selection;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.engine.API;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -48,6 +49,7 @@ import static org.lwjgl.opengl.GL11.glTranslated;
  *
  * @author synopia
  */
+@API
 public class BlockSelectionRenderer {
     private Mesh overlayMesh;
     private Mesh overlayMesh2;

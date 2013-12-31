@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
+import org.terasology.engine.API;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
@@ -99,6 +100,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+@API
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
