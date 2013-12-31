@@ -36,7 +36,8 @@ import org.terasology.utilities.random.FastRandom;
  * 
  * msteiger: Introduced seed value 
  */
-public class SimplexNoise implements Noise {
+public class SimplexNoise implements Noise2D, Noise3D {
+    
     private static Grad[] grad3 = {
         new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0), 
         new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1), 
@@ -62,8 +63,6 @@ public class SimplexNoise implements Noise {
 
     private final short[] perm = new short[512];
     private final short[] permMod12 = new short[512];
-
-    private final BrownianNoise brown;
 
     /**
      * Initialize permutations with a given seed
@@ -92,8 +91,6 @@ public class SimplexNoise implements Noise {
             perm[i] = p[i & 255];
             permMod12[i] = (short) (perm[i] % 12);
         }
-        
-        brown = new BrownianNoise(this);
     }
     
     // This method is a *lot* faster than using (int)Math.floor(x)
@@ -120,6 +117,7 @@ public class SimplexNoise implements Noise {
      * @param yin the y input coordinate
      * @return a noise value in the interval [-1,1]
      */
+    @Override
     public double noise(double xin, double yin) {
         double n0;
         double n1;
@@ -508,21 +506,6 @@ public class SimplexNoise implements Noise {
         return 27.0 * (n0 + n1 + n2 + n3 + n4);
     }
 
-    @Override
-    public double fBm(double x, double y, double z) {
-        return brown.noise(x, y, z);
-    }
-
-    @Override
-    public void setOctaves(int octaves) {
-        brown.setOctaves(octaves);
-    }
-
-    @Override
-    public int getOctaves() {
-        return brown.getOctaves();
-    }
-    
     // Inner class to speed up gradient computations
     // (array access is a lot slower than member access)
     private static class Grad {
