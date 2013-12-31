@@ -32,7 +32,7 @@ import org.terasology.persistence.serializers.EntitySerializer;
  */
 public abstract class EntityRef implements MutableComponentContainer {
 
-    public static final NullEntityRef NULL = NullEntityRef.getInstance();
+    public static final EntityRef NULL = NullEntityRef.getInstance();
 
     /**
      * @return Does this entity exist - that is, is not deleted.

@@ -1,3 +1,6 @@
+# Force default for all text just in case - commit with LF, check out with OS-specific line endings
+* text=auto
+
 *.bat          text
 *.block        text
 *.command      text eol=lf

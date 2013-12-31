@@ -23,6 +23,8 @@ package org.terasology.network.exceptions;
  */
 public class HostingFailedException extends Exception {
 
+    private static final long serialVersionUID = -7936928340463418712L;
+
     public HostingFailedException() {
         super();
     }

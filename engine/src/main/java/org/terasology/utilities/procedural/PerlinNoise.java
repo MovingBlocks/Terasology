@@ -23,7 +23,7 @@ import org.terasology.utilities.random.FastRandom;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PerlinNoise implements Noise {
+public class PerlinNoise implements Noise, Noise3D {
 
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;
@@ -75,6 +75,7 @@ public class PerlinNoise implements Noise {
      * @param posZ Position on the z-axis
      * @return The noise value
      */
+    @Override
     public double noise(double posX, double posY, double posZ) {
         int xInt = (int) TeraMath.fastFloor(posX) & 255;
         int yInt = (int) TeraMath.fastFloor(posY) & 255;
@@ -112,6 +113,7 @@ public class PerlinNoise implements Noise {
      * @param posZ Position on the z-axis
      * @return The noise value
      */
+    @Override
     public double fBm(double posX, double posY, double posZ) {
         double result = 0.0;
 
@@ -154,11 +156,13 @@ public class PerlinNoise implements Noise {
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
+    @Override
     public void setOctaves(int octaves) {
         this.octaves = octaves;
         recomputeSpectralWeights = true;
     }
 
+    @Override
     public int getOctaves() {
         return octaves;
     }

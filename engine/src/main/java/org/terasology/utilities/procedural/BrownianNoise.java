@@ -22,49 +22,36 @@ package org.terasology.utilities.procedural;
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
  * @author Martin Steiger
  */
-public class BrownianNoise implements Noise {
-    private static final double LACUNARITY = 2.1379201;
-    private static final double H = 0.836281;
+public class BrownianNoise {
+
+    /**
+     * Default persistence value
+     */
+    public static final double DEFAULT_PERSISTENCE = 0.836281;
+
+    /**
+     * Default lacunarity value
+     */
+    public static final double DEFAULT_LACUNARITY = 2.1379201;
+
+    private double lacunarity = DEFAULT_LACUNARITY;
+    
+    private double persistence = DEFAULT_PERSISTENCE;
 
     private int octaves;
     private double[] spectralWeights;
-
-    private final Noise other;
     
     /**
-     * @param other the noise to use as a basis
+     * Initialize with 9 octaves - <b>this is insanely expensive, but backwards compatible</b>
      */
-    public BrownianNoise(Noise other) {
-        this.other = other;
+    public BrownianNoise() {
         setOctaves(9);
     }
 
     /**
-     * Returns Fractional Brownian Motion at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value in the range [-getScale()..getScale()]
+     * Values of noise() are in the range [-scale..scale]
+     * @return the scale
      */
-    @Override
-    public double noise(double x, double y, double z) {
-        double result = 0.0;
-
-        double workingX = x;
-        double workingY = y;
-        double workingZ = z;
-        for (int i = 0; i < octaves; i++) {
-            result += other.noise(workingX, workingY, workingZ) * spectralWeights[i];
-
-            workingX *= LACUNARITY;
-            workingY *= LACUNARITY;
-            workingZ *= LACUNARITY;
-        }
-
-        return result;
-    }
-    
     public double getScale() {
         double sum = 0;
         for (double weight : spectralWeights) {
@@ -73,7 +60,9 @@ public class BrownianNoise implements Noise {
         return sum;
     }
 
-    @Override
+    /**
+     * @param octaves the number of octaves used for computation
+     */
     public void setOctaves(int octaves) {
         this.octaves = octaves;
         
@@ -81,18 +70,58 @@ public class BrownianNoise implements Noise {
         spectralWeights = new double[octaves];
 
         for (int i = 0; i < octaves; i++) {
-            spectralWeights[i] = Math.pow(LACUNARITY, -H * i);
+            spectralWeights[i] = Math.pow(lacunarity, -persistence * i);
         }
-
    }
 
-    @Override
+    /**
+     * @return the number of octaves
+     */
     public int getOctaves() {
         return octaves;
     }
 
-    @Override
-    public double fBm(double x, double y, double z) {
-        return noise(x, y, z);
+    /**
+     * Lacunarity is what makes the frequency grow. Each octave 
+     * the frequency is multiplied by the lacunarity.
+     * @return the lacunarity
+     */
+    public double getLacunarity() {
+        return this.lacunarity;
     }
+
+    /**
+     * Lacunarity is what makes the frequency grow. Each octave 
+     * the frequency is multiplied by the lacunarity.
+     * @param lacunarity the lacunarity
+     */
+    public void setLacunarity(double lacunarity) {
+        this.lacunarity = lacunarity;
+    }
+
+    /**
+     * Persistence is what makes the amplitude shrink.
+     * More precicely the amplitude of octave i = lacunarity^(-persistence * i) 
+     * @return the persistance
+     */
+    public double getPersistance() {
+        return this.persistence;
+    }
+
+    /**
+     * Persistence is what makes the amplitude shrink.
+     * More precisely the amplitude of octave i = lacunarity^(-persistence * i) 
+     * @param persistence the persistence to set
+     */
+    public void setPersistence(double persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * @return the spectralWeights
+     */
+    protected double getSpectralWeight(int octave) {
+        return spectralWeights[octave];
+    }
+    
 }

@@ -10,7 +10,6 @@ apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 
 ext {
-
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
 }
@@ -59,6 +58,9 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
     testCompile group: 'org.jboss.shrinkwrap', name: 'shrinkwrap-depchain-java7', version: '1.1.3'
 
+    // For reading logback.groovy when running unit tests. Excessive just for a config file?
+    testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
+
     println "Dependencies for " + project.name + " will be engine and potentially more on any following lines:"
     moduleDepends.each {
         println " + module dependency " + it
@@ -66,22 +68,17 @@ dependencies {
 
     // Check to see if this module is not the root Gradle project - if so we are in a multi-project workspace
     if (project.name != project(':').name) {
-        //println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
-
-        // In multi-project mode we should always have an engine project to depend on. Also satisfies external libs
+        // Dependency on the engine itself (actually its built jar file)
         compile project(':engine')
 
-        // Added after Core had unit tests - only ever gets used by Core as other modules do not use the engine build
-        testCompile project(':engine').sourceSets.test.output
-
-        // Special case: Any module OTHER than the Core module needs to have the Core module on the classpath
-        if (project.name != 'Core') {
-            println "Adding Core module as a dependency for module $project.name"
-            compile project(':modules:Core')
-            //TODO: See about replacing this with an Artifactory dependency like other modules
-        }
+        // Unit tests for the engine have been split out into their own sub-project (eases some config)
+        testCompile project(':engine-tests')
 
         // If the module has dependencies on other modules we look in a few different spots to find them
+        if (moduleDepends.size() > 0) {
+            println "We're in a local multi-project workspace so will look for dependencies there first, then Artifactory"
+        }
+
         for (dependency in moduleDepends) {
 
             File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
@@ -89,20 +86,20 @@ dependencies {
             // TODO: module jars with version info (maybe supplied by user) won't match. Artifactory fetches get renamed
             File wouldBeModuleJar = new File(rootDir, 'modules/' + dependency + '.jar')
 
-            println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
-            println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
+            //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
+            //println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
 
             // First see if we have an actual source module project in the Gradle project tree (user addModule'ed it)
             if (wouldBeSrcPath.exists()) {
                 //TODO: This is fragile, of course, and will hit problems with corrupt module directories (empty dir)
 
-                println "Found dependency source module locally, setting a direct project dependency: " + dependency
+                println "Found " + wouldBeSrcPath.getAbsolutePath() + ", setting a direct project dependency"
                 compile project(':modules:' + dependency)
 
             } else if (wouldBeModuleJar.exists()) {
 
                 // Alternatively might find the dependency in the modules dir as a binary (manually placed or fetched)
-                println "Found dependency binary locally in /modules, it will be included via file dependency"
+                println "Found " + wouldBeModuleJar.getAbsoluteFile() + ", it will be included via file dependency"
 
                 compile files(wouldBeModuleJar)
 
@@ -135,7 +132,8 @@ dependencies {
         println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for everything"
 
         // In Jenkins we can expect to have a sort of "project harness" dumped into a libs dir (engine, engine libs ..)
-        compile fileTree(dir: 'libs', include: '*.jar')
+        compile fileTree(dir: 'libs', include: '*.jar', exclude: 'engine.tests-*.jar')
+        testCompile fileTree(dir: 'libs', include: 'engine.tests-*.jar')
 
         // To get Terasology module dependencies we simply declare them against Artifactory and wait - no runtime need
         moduleDepends.each {
@@ -219,6 +217,11 @@ test {
 
     // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
     testLogging.showStandardStreams = true
+
+    // Make sure the natives have been extracted, but only if we're in a multi-workspace setup
+    if (project.name != project(':').name) {
+        dependsOn rootProject.extractNatives
+    }
 }
 
 checkstyle {

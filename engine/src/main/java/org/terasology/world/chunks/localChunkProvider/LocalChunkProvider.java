@@ -20,11 +20,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -52,6 +54,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -496,7 +499,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
 
         for (ChunkImpl chunk : nearCache.values()) {
-            worldEntity.send(new BeforeChunkUnload(chunk.getPos()));
+            if (chunk.getChunkState() == ChunkImpl.State.COMPLETE && chunk.isReady()) {
+                worldEntity.send(new BeforeChunkUnload(chunk.getPos()));
+            }
             chunk.dispose();
             ChunkStore store = storageManager.createChunkStoreForSave(chunk);
             store.storeAllEntities();
@@ -504,6 +509,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
         nearCache.clear();
         storageManager.purgeChunks();
+        
+        worldEntity.send(new PurgeWorldEvent());
 
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);

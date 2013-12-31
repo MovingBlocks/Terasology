@@ -39,11 +39,20 @@ public interface Noise {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      * @return The noise value
+     * @deprecated Please use BrownianNoise3D.noise() instead
      */
+    @Deprecated
     double fBm(double x, double y, double z);
 
-
+    /**
+     * @deprecated Please use BrownianNoise3D.setOctaves() instead
+     */
+    @Deprecated
     void setOctaves(int octaves);
 
+    /**
+     * @deprecated Please use BrownianNoise3D.setOctaves() instead
+     */
+    @Deprecated
     int getOctaves();
 }

@@ -14,16 +14,18 @@ build/
 modules/Core/Core.iml
 facades/PC/PC.iml
 engine/engine.iml
+engine-tests/engine-tests.iml
 /*.iml
 /*.ipr
 /*.iws
 
-# Ignore Eclipse - the /.* ignores the . files in the root folder
-/.checkstyle
+# Ignore Eclipse
+.checkstyle
 .project
 .classpath
 .settings/
 bin/
+facades/PC/Terasology.launch
 
 # Ignore Linux
 *.directory

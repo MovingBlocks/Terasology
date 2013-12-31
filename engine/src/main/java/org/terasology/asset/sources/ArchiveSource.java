@@ -55,30 +55,35 @@ public class ArchiveSource extends AbstractSource {
             archive = new ZipFile(file);
         }
 
-        Enumeration<? extends ZipEntry> lister = archive.entries();
-
-        while (lister.hasMoreElements()) {
-            ZipEntry entry = lister.nextElement();
-            String entryPath = entry.getName();
-            logger.debug("Found {}", entryPath);
-
-            if (entryPath.startsWith(overridesPath)) {
-                String key = entryPath.substring(overridesPath.length() + 1);
-                int moduleIndex = key.indexOf('/');
-                String moduleName = key.substring(0, moduleIndex);
-                key = key.substring(moduleIndex + 1);
-
-                AssetUri uri = getUri(moduleName, key);
-                if (uri == null || !uri.isValid()) {
-                    continue;
+        try {
+            Enumeration<? extends ZipEntry> lister = archive.entries();
+    
+            while (lister.hasMoreElements()) {
+                ZipEntry entry = lister.nextElement();
+                String entryPath = entry.getName();
+                logger.debug("Found {}", entryPath);
+    
+                if (entryPath.startsWith(overridesPath)) {
+                    String key = entryPath.substring(overridesPath.length() + 1);
+                    int moduleIndex = key.indexOf('/');
+                    String moduleName = key.substring(0, moduleIndex);
+                    key = key.substring(moduleIndex + 1);
+    
+                    AssetUri uri = getUri(moduleName, key);
+                    if (uri == null || !uri.isValid()) {
+                        continue;
+                    }
+    
+                    logger.debug("Discovered override {} at {}", uri, entryPath);
+    
+                    // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                    URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
+                    addOverride(uri, url);
                 }
-
-                logger.debug("Discovered override {} at {}", uri, entryPath);
-
-                // Using a jar protocol for zip files, because cannot register new protocols for the applet
-                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
-                addOverride(uri, url);
             }
+        }
+        finally {
+            archive.close();
         }
     }
 
@@ -90,27 +95,32 @@ public class ArchiveSource extends AbstractSource {
         } else {
             archive = new ZipFile(file);
         }
-
-        Enumeration<? extends ZipEntry> lister = archive.entries();
-
-        while (lister.hasMoreElements()) {
-            ZipEntry entry = lister.nextElement();
-            String entryPath = entry.getName();
-            logger.debug("Found {}", entryPath);
-
-            if (entryPath.startsWith(assetsPath)) {
-                String key = entryPath.substring(assetsPath.length() + 1);
-                AssetUri uri = getUri(key);
-                if (uri == null || !uri.isValid()) {
-                    continue;
+    
+       try {
+            Enumeration<? extends ZipEntry> lister = archive.entries();
+    
+            while (lister.hasMoreElements()) {
+                ZipEntry entry = lister.nextElement();
+                String entryPath = entry.getName();
+                logger.debug("Found {}", entryPath);
+    
+                if (entryPath.startsWith(assetsPath)) {
+                    String key = entryPath.substring(assetsPath.length() + 1);
+                    AssetUri uri = getUri(key);
+                    if (uri == null || !uri.isValid()) {
+                        continue;
+                    }
+    
+                    logger.debug("Discovered resource {}", uri);
+    
+                    // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                    URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
+                    addItem(uri, url);
                 }
-
-                logger.debug("Discovered resource {}", uri);
-
-                // Using a jar protocol for zip files, because cannot register new protocols for the applet
-                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
-                addItem(uri, url);
             }
+        }
+        finally {
+            archive.close();
         }
     }
 }

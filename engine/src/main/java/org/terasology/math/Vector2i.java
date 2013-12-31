@@ -16,144 +16,51 @@
 
 package org.terasology.math;
 
+import javax.vecmath.Tuple2i;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector2f;
 
 /**
+ * A 2-element vector represented by signed integer x,y
+ * coordinates.
  * @author Immortius
  */
-public class Vector2i {
-    public int x;
-    public int y;
+public class Vector2i extends Tuple2i {
+	
+	private static final long serialVersionUID = 3862467945178721785L;
 
+    /**
+     * Constructs and initializes a Vector2i from the specified
+     * x and y coordinates.
+     * @param x the x coordinate
+     * @param y the y coordinate
+     */
     public Vector2i(int x, int y) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
     }
 
+    /**
+     * Constructs and initializes a Vector2i from the array of length 2.
+     * @param values the array of length 2 containing x and y in order.
+     */
     public Vector2i(int[] values) {
-        if (values == null) {
-            throw new IllegalArgumentException("Requires array of 2 ints, received null");
-        }
-        if (values.length != 2) {
-            throw new IllegalArgumentException("Requires array of 2 ints, received " + values.length);
-        }
-        this.x = values[0];
-        this.y = values[1];
+    	super(values);
     }
 
+    /**
+     * Constructs and initializes a Vector2i from the specified Vector2i.
+     * @param t1 the Vector2i containing the initialization x and y
+     * data.
+     */
     public Vector2i(Vector2i other) {
-        this.x = other.x;
-        this.y = other.y;
+    	super(other);
     }
 
+    /**
+     * Constructs and initializes a Vector2i to (0,0).
+     */
     public Vector2i() {
-    }
-
-    public final void set(int newX, int newY) {
-        this.x = newX;
-        this.y = newY;
-    }
-
-    public final void set(int[] values) {
-        if (values == null) {
-            throw new IllegalArgumentException("Requires array of 2 ints, received null");
-        }
-        if (values.length != 2) {
-            throw new IllegalArgumentException("Requires array of 2 ints, received " + values.length);
-        }
-        this.x = values[0];
-        this.y = values[1];
-    }
-
-    public final void set(Vector2i other) {
-        this.x = other.x;
-        this.y = other.y;
-    }
-
-    public final void get(int[] values) {
-        if (values == null || values.length < 2) {
-            throw new IllegalArgumentException("Values must not be null or less than length 2");
-        }
-        values[0] = x;
-        values[1] = y;
-    }
-
-    public final Vector2i add(Vector2i t1, Vector2i t2) {
-        x = t1.x + t2.x;
-        y = t1.y + t2.y;
-        return this;
-    }
-
-    public final Vector2i add(Vector2i other) {
-        x += other.x;
-        y += other.y;
-        return this;
-    }
-
-    public Vector2i sub(Vector2i other) {
-        x -= other.x;
-        y -= other.y;
-        return this;
-    }
-
-    public final Vector2i negate(Vector2i other) {
-        x = -other.x;
-        y = -other.y;
-        return this;
-    }
-
-    public final Vector2i negate() {
-        x = -x;
-        y = -y;
-        return this;
-    }
-
-    public final Vector2i mult(int amount) {
-        x *= amount;
-        y *= amount;
-        return this;
-    }
-
-    public final Vector2i mult(int multX, int multY) {
-        this.x *= multX;
-        this.y *= multY;
-        return this;
-    }
-
-    public final Vector2i mult(Vector2i other) {
-        this.x *= other.x;
-        this.y *= other.y;
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o instanceof Vector2i) {
-            Vector2i other = (Vector2i) o;
-            return x == other.x && y == other.y;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-
-        hash += (x - Integer.MIN_VALUE) & 0xFFFF;
-        hash <<= 16;
-        hash += (y - Integer.MIN_VALUE) & 0xFFFF;
-
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ")";
+    	super();
     }
 
     /**
@@ -169,7 +76,10 @@ public class Vector2i {
     public Vector2d toVector2d() {
         return new Vector2d(x, y);
     }
-
+    
+    /**
+     * @return A <b>new</b> instance of (0, 0)
+     */
     public static Vector2i zero() {
         return new Vector2i(0, 0);
     }
