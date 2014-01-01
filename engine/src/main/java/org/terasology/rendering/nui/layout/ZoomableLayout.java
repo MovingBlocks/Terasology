@@ -197,11 +197,9 @@ public class ZoomableLayout extends CoreLayout {
         }
 
         if ((windowSize.x > 0) && (windowSize.y > 0)) {
-            pixelSize.x = screenSize.x / windowSize.x;
-            pixelSize.y = screenSize.y / windowSize.y;
+            pixelSize = new Vector2f(screenSize.x / windowSize.x, screenSize.y / windowSize.y);
         } else {
-            pixelSize.x = 0;
-            pixelSize.y = 0;
+            pixelSize = new Vector2f();
         }
     }
 
