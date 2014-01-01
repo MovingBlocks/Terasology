@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,9 @@ import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LINES;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -76,7 +79,9 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glDisableClientState;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glLoadMatrix;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -115,6 +120,7 @@ public class LwjglCanvas implements CanvasInternal {
     private InteractionRegion clickedRegion;
 
     private Matrix4f modelView;
+    private Line line = new Line();
 
     public LwjglCanvas(NUIManager nuiManager) {
         this.nuiManager = nuiManager;
@@ -719,21 +725,14 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     private void drawLineInternal(float x0, float y0, float x1, float y1, Color color) {
-        textureMat.setFloat2("scale", 1, 1);
-        textureMat.setFloat2("offset", 0, 0);
-        textureMat.setFloat2("texOffset", 0, 0);
-        textureMat.setFloat2("texSize", 1, 1);
-        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af());
-        textureMat.bindTextures();
-        glPushMatrix();
-        GL11.glLineWidth(1);
-        GL11.glBegin(GL_LINES);
-        GL11.glColor4f(color.rf(), color.gf(), color.bf(), color.af());
-        GL11.glVertex3f(x0, y0, 0);
-        GL11.glColor4f(color.rf(), color.gf(), color.bf(), color.af());
-        GL11.glVertex3f(x1, y1, 0);
-        GL11.glEnd();
-        GL11.glPopMatrix();
+        GL20.glUseProgram(0);
+        GL11.glDisable(GL_CULL_FACE);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        line.draw(x0, y0, x1, y1, 2, color, color, 0);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        GL11.glEnable(GL_CULL_FACE);
     }
 
     private void crop(Rect2i cropRegion) {
