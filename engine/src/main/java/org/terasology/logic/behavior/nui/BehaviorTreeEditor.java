@@ -22,6 +22,7 @@ import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.SubRegion;
@@ -33,6 +34,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layout.MigLayout;
 import org.terasology.rendering.nui.layout.ZoomableLayout;
 
+import javax.vecmath.Vector2f;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,7 +48,7 @@ public class BehaviorTreeEditor extends UIScreen {
     public BehaviorTreeEditor() {
         nodeFactory = CoreRegistry.get(BehaviorNodeFactory.class);
         layout = new BTLayout();
-        layout.init(0, 0, 50, 50, 1200, 1000);
+        layout.init(new Vector2f(), new Vector2f(50,50), new Vector2i(1200, 1000));
         MigLayout treeSelectBar = new MigLayout();
         treeSelectBar.addElement(new UIDropdown<BehaviorTree>("tree"), "w 180!, h 40!");
         treeSelectBar.addElement(new UIDropdown<Interpreter>("entity"), "w 180!, h 40!");
@@ -137,15 +139,18 @@ public class BehaviorTreeEditor extends UIScreen {
                     if (widget instanceof RenderableNode) {
                         RenderableNode renderableNode = (RenderableNode) widget;
                         for (Port port : renderableNode.getPorts()) {
-                            int sx = worldToScreenX(renderableNode.getPosition().x + port.midX());
-                            int sy = worldToScreenY(renderableNode.getPosition().y + port.midY());
+                            Vector2f start = new Vector2f(renderableNode.getPosition());
+                            start.add(port.mid());
+
                             Port targetPort = port.getTargetPort();
                             if (port.isInput() || targetPort == null) {
                                 continue;
                             }
-                            int ex = worldToScreenX(targetPort.getSourceNode().getPosition().x + targetPort.midX());
-                            int ey = worldToScreenY(targetPort.getSourceNode().getPosition().y + targetPort.midY());
-                            canvas.drawLine(sx, sy, ex, ey, Color.WHITE);
+                            Vector2f end = new Vector2f(targetPort.getSourceNode().getPosition());
+                            end.add(targetPort.mid());
+                            Vector2i s = worldToScreen(start);
+                            Vector2i e = worldToScreen(end);
+                            canvas.drawLine(s.x, s.y, e.x, e.y, Color.WHITE);
                         }
                     }
                 }

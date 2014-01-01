@@ -48,8 +48,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private transient TreeAccessor<RenderableNode> withoutModel;
     private transient TreeAccessor<RenderableNode> withModel;
     private transient BehaviorNodeComponent data;
-    private transient int lastX;
-    private transient int lastY;
+    private transient Vector2i last;
     private transient ZoomableLayout layout;
 
     private transient InteractionListener moveListener = new BaseInteractionListener() {
@@ -59,20 +58,18 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            lastX = pos.x;
-            lastY = pos.y;
+            last = pos;
             return true;
         }
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            float diffX = -layout.screenToWorldX(lastX) + layout.screenToWorldX(pos.x);
-            float diffY = -layout.screenToWorldY(lastY) + layout.screenToWorldY(pos.y);
+            Vector2f diff = layout.screenToWorld(pos);
+            diff.sub(layout.screenToWorld(last));
 
-            move(diffX, diffY);
+            move(diff);
 
-            lastX = pos.x;
-            lastY = pos.y;
+            last = pos;
         }
     };
 
@@ -143,10 +140,11 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         position = new Vector2f(x, y);
     }
 
-    public void move(float dx, float dy) {
-        position = new Vector2f(position.x + dx, position.y + dy);
+    public void move(Vector2f diff) {
+        position = new Vector2f(position);
+        position.add(diff);
         for (RenderableNode child : children) {
-            child.move(dx, dy);
+            child.move(diff);
         }
     }
 

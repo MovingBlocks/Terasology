@@ -23,6 +23,8 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 
+import javax.vecmath.Vector2f;
+
 /**
  * @author synopia
  */
@@ -66,6 +68,13 @@ public abstract class Port extends CoreWidget {
         return rect;
     }
 
+    public Vector2f mid() {
+        Vector2f mid = new Vector2f(rect.size());
+        mid.scale(0.5f);
+        mid.add(rect.min());
+        return mid;
+
+    }
     public float midX() {
         return (rect.minX() + rect.maxX()) / 2;
     }
