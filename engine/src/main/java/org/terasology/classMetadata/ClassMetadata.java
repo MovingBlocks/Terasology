@@ -145,6 +145,10 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
         return ImmutableList.copyOf(fields.values());
     }
 
+    public boolean isConstructable() {
+        return constructor != null;
+    }
+
     /**
      * @return A new instance of this class.
      */

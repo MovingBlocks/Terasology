@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class ComponentMetadataTest {
 
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
+    private CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
 
     @Test
     public void staticFieldsIgnored() {

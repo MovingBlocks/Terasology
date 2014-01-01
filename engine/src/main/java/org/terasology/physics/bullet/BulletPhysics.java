@@ -408,7 +408,7 @@ public class BulletPhysics implements PhysicsEngine {
                 return true;
             }
         } else {
-            logger.warn("Tryig to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent. Entity: {}", entity);
+            logger.warn("Trying to create trigger for entity without ShapeComponent or without LocationComponent or without TriggerComponent. Entity: {}", entity);
             return false;
         }
     }

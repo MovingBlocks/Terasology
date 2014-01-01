@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 public class FieldMetadataTest {
 
     private ReflectFactory factory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(factory);
+    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
 
     @Test
     public void testOwnsAnnotationProcessed() throws NoSuchMethodException {

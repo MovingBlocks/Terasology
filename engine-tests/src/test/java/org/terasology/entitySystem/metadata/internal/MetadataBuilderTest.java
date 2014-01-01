@@ -34,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 public class MetadataBuilderTest {
 
     private ReflectFactory factory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(factory);
+    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
     private TypeSerializationLibrary metadataBuilder;
 
     @Before

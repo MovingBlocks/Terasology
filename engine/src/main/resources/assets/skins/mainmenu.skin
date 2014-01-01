@@ -12,6 +12,60 @@
         "UIImage" : {
             "texture-scale-mode" : "scale_fit"
         },
+        "RowLayout" : {
+            "margin" : {
+                "top" : 2,
+                "bottom" : 2,
+                "left" : 4,
+                "right" : 4
+            }
+        },
+        "UIBox" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            }
+        },
+        "UIList" : {
+            "parts" : {
+                "item" : {
+                    "text-align-horizontal" : "center",
+                    "text-align-vertical" : "middle",
+                    "background" : "button",
+                    "background-border" : {
+                        "top" : 2,
+                        "bottom" : 2,
+                        "left" : 2,
+                        "right" : 2
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 2,
+                        "right" : 2
+                    },
+                    "texture-scale-mode" : "scale_fit",
+                    "modes" : {
+                        "hover" : {
+                            "background" : "buttonOver"
+                        },
+                        "active" : {
+                            "background" : "buttonDown",
+                            "text-color" : "FFFF00FF"
+                        }
+                    }
+                }
+            }
+        },
         "UIDropdown" : {
             "text-align-horizontal" : "left",
             "parts" : {
@@ -104,10 +158,10 @@
                 "right" : 2
             },
             "margin" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 2,
-                "right" : 2
+                "top" : 6,
+                "bottom" : 6,
+                "left" : 4,
+                "right" : 4
             },
             "texture-scale-mode" : "scale_fit",
             "modes" : {
@@ -146,10 +200,10 @@
                 "right" : 4
             },
             "margin" : {
-                "top" : 6,
-                "bottom" : 6,
-                "left" : 6,
-                "right" : 6
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
             },
             "parts" : {
                 "scrollbar-slider" : {

@@ -26,8 +26,10 @@ import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
 import org.terasology.math.AABB;
+import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
@@ -40,15 +42,14 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.LineBuilder;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.TextLineBuilder;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
@@ -92,8 +93,11 @@ import static org.lwjgl.opengl.Util.checkGLError;
 public class LwjglCanvas implements CanvasInternal {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
+    private static final int MAX_DOUBLE_CLICK_DISTANCE = 5;
+    private static final int DOUBLE_CLICK_TIME = 200;
 
     private final NUIManager nuiManager;
+    private final Time time;
     private CanvasState state;
 
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
@@ -113,10 +117,15 @@ public class LwjglCanvas implements CanvasInternal {
     private Set<InteractionRegion> mouseOverRegions = Sets.newLinkedHashSet();
     private InteractionRegion clickedRegion;
 
+    private long lastClickTime;
+    private MouseInput lastClickButton;
+    private Vector2i lastClickPosition = new Vector2i();
+
     private Matrix4f modelView;
 
-    public LwjglCanvas(NUIManager nuiManager) {
+    public LwjglCanvas(NUIManager nuiManager, Time time) {
         this.nuiManager = nuiManager;
+        this.time = time;
     }
 
     @Override
@@ -216,11 +225,21 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public boolean processMouseClick(MouseInput button, Vector2i pos) {
+        boolean possibleDoubleClick = lastClickPosition.gridDistance(pos) < MAX_DOUBLE_CLICK_DISTANCE && lastClickButton == button
+                && time.getGameTimeInMs() - lastClickTime < DOUBLE_CLICK_TIME;
+        lastClickPosition.set(pos);
+        lastClickButton = button;
+        lastClickTime = time.getGameTimeInMs();
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);
                 relPos.sub(next.region.min());
-                if (next.listener.onMouseClick(button, relPos)) {
+                if (possibleDoubleClick && nuiManager.getFocus() == next.element) {
+                    if (next.listener.onMouseDoubleClick(button, relPos)) {
+                        clickedRegion = next;
+                        return true;
+                    }
+                } else if (next.listener.onMouseClick(button, relPos)) {
                     clickedRegion = next;
                     nuiManager.setFocus(next.element);
                     return true;
@@ -314,7 +333,7 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
-    public Vector2i calculateSize(UIElement element, Vector2i sizeHint) {
+    public Vector2i calculateSize(UIWidget element, Vector2i sizeHint) {
         if (element == null) {
             return sizeHint;
         }
@@ -322,30 +341,39 @@ public class LwjglCanvas implements CanvasInternal {
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i adjustedArea = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeHint), elementStyle);
-        return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), element.calcContentSize(elementStyle, adjustedArea.size())), elementStyle).size();
+        try (SubRegion ignored = subRegionForWidget(element, adjustedArea, false)) {
+            Vector2i preferredSize = element.calcContentSize(this, adjustedArea.size());
+            preferredSize.add(elementStyle.getMargin().getTotals());
+            return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), preferredSize), elementStyle).size();
+        }
     }
 
     @Override
-    public void drawElement(UIElement element, Rect2i region) {
-        if (element == null) {
+    public void drawElement(UIWidget element, Rect2i region) {
+        if (element == null || !element.isVisible()) {
             return;
         }
 
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea = applySizesToRegion(region, newStyle);
-        try (SubRegion ignored = subRegion(regionArea, false)) {
-            state.element = element;
-            if (element.getFamily() != null) {
-                setFamily(element.getFamily());
-            }
-            setPart("");
-            setMode(element.getMode());
+        try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
             }
             element.onDraw(this);
         }
+    }
+
+    private SubRegion subRegionForWidget(UIWidget widget, Rect2i region, boolean crop) {
+        SubRegion result = subRegion(region, crop);
+        state.element = widget;
+        if (widget.getFamily() != null) {
+            setFamily(widget.getFamily());
+        }
+        setPart("");
+        setMode(widget.getMode());
+        return result;
     }
 
     @Override
@@ -746,7 +774,7 @@ public class LwjglCanvas implements CanvasInternal {
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = LineBuilder.getLines(font, text, absoluteRegion.width());
+        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
         if (fontMesh == null) {
             fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
             cachedText.put(key, fontMesh);
@@ -781,7 +809,7 @@ public class LwjglCanvas implements CanvasInternal {
     private static class CanvasState {
         public UISkin skin;
         public String family = "";
-        public UIElement element;
+        public UIWidget element;
         public String part = "";
         public String mode = "";
 
@@ -915,9 +943,9 @@ public class LwjglCanvas implements CanvasInternal {
     private static class InteractionRegion {
         public InteractionListener listener;
         public Rect2i region;
-        public UIElement element;
+        public UIWidget element;
 
-        public InteractionRegion(Rect2i region, InteractionListener listener, UIElement element) {
+        public InteractionRegion(Rect2i region, InteractionListener listener, UIWidget element) {
             this.listener = listener;
             this.region = region;
             this.element = element;
@@ -1006,9 +1034,9 @@ public class LwjglCanvas implements CanvasInternal {
 
         private final Rect2i region;
         private final InteractionListener listener;
-        private final UIElement currentElement;
+        private final UIWidget currentElement;
 
-        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIElement currentElement) {
+        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIWidget currentElement) {
             this.region = region;
             this.listener = listener;
             this.currentElement = currentElement;

@@ -58,7 +58,7 @@ public class PojoEventSystemTests {
     @Before
     public void setup() {
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CopyStrategyLibrary copyStrategies = CopyStrategyLibrary.create(reflectFactory);
+        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(reflectFactory, copyStrategies);
 
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategies, serializationLibrary);

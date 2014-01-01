@@ -22,7 +22,6 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UIStyle;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -30,9 +29,8 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class UIScreen implements UIElement {
+public class UIScreen extends AbstractWidget {
 
-    private String family;
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
     private InteractionListener screenListener = new BaseInteractionListener() {
@@ -41,6 +39,13 @@ public class UIScreen implements UIElement {
             return true;
         }
     };
+
+    public UIScreen() {
+    }
+
+    public UIScreen(String id) {
+        super(id);
+    }
 
     public void initialise() {
 
@@ -56,7 +61,9 @@ public class UIScreen implements UIElement {
 
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(screenListener);
-        canvas.drawElement(contents, canvas.getRegion());
+        if (contents != null) {
+            canvas.drawElement(contents, canvas.getRegion());
+        }
     }
 
     public UISkin getSkin() {
@@ -68,7 +75,9 @@ public class UIScreen implements UIElement {
     }
 
     public void update(float delta) {
-        contents.update(delta);
+        if (contents != null) {
+            contents.update(delta);
+        }
     }
 
     @Override
@@ -92,7 +101,7 @@ public class UIScreen implements UIElement {
     }
 
     @Override
-    public Vector2i calcContentSize(UIStyle style, Vector2i areaHint) {
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         return areaHint;
     }
 
@@ -102,22 +111,8 @@ public class UIScreen implements UIElement {
     }
 
     @Override
-    public String getFamily() {
-        return family;
-    }
-
-    @Override
-    public void setFamily(String family) {
-        this.family = family;
-    }
-
-    @Override
     public String getMode() {
         return DEFAULT_MODE;
-    }
-
-    public <T extends UIWidget> T find(String id, Class<T> type) {
-        return contents.find(id, type);
     }
 
     @Override

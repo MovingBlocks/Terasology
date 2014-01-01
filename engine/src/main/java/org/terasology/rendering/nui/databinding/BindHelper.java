@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 public final class BindHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(BindHelper.class);
-    private static ReflectFactory bindingFactory = new ReflectionReflectFactory();
 
     private BindHelper() {
     }

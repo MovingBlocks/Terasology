@@ -44,6 +44,15 @@ public interface InteractionListener {
     boolean onMouseClick(MouseInput button, Vector2i pos);
 
     /**
+     * Called when the mouse is double-clicked over an interaction region associated with this listener.
+     * Double clicks occur if the same mouse button is clicked twice with minimal movement and over the same region in a short period.
+     * @param button The mouse button that was double clicked
+     * @param pos The relative position of the mouse
+     * @return Whether the input should be consumed, and thus not propagated to other interaction regions
+     */
+    boolean onMouseDoubleClick(MouseInput button, Vector2i pos);
+
+    /**
      * Called when the mouse is moved after clicking on the interaction region
      * @param pos The relative position of the mouse
      */

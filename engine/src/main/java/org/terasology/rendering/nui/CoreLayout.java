@@ -22,7 +22,7 @@ import org.terasology.input.events.MouseWheelEvent;
 /**
  * @author Immortius
  */
-public abstract class CoreLayout extends AbstractWidget {
+public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
 
     public CoreLayout() {
     }

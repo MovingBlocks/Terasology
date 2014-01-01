@@ -20,12 +20,16 @@ import com.google.common.collect.Queues;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.classMetadata.DefaultClassLibrary;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
+import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -40,8 +44,9 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.asset.UIData;
 
 import java.lang.reflect.Field;
 import java.util.Deque;
@@ -53,26 +58,46 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
+    private AssetManager assetManager;
+
     private Deque<UIScreen> screens = Queues.newArrayDeque();
-    private CanvasInternal canvas = new LwjglCanvas(this);
-    private ClassLibrary<UIElement> elementsLibrary;
-    private UIElement focus;
+    private CanvasInternal canvas;
+    private ClassLibrary<UIWidget> elementsLibrary;
+    private UIWidget focus;
+
+    public NUIManagerInternal(AssetManager assetManager) {
+        this.assetManager = assetManager;
+        this.canvas = new LwjglCanvas(this, CoreRegistry.get(Time.class));
+    }
 
     public void refreshElementsLibrary() {
         elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
-            for (Class<? extends UIElement> elementType : module.getReflections().getSubTypesOf(UIElement.class)) {
-                if (!elementType.isInterface()) {
-                    elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
-                }
+            for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
+                elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
             }
         }
     }
 
     @Override
+    public void pushScreen(AssetUri screenUri) {
+        UIData data = assetManager.loadAssetData(screenUri, UIData.class);
+        if (data != null && data.getRootElement() instanceof UIScreen) {
+            pushScreen((UIScreen) data.getRootElement());
+        }
+    }
+
+    @Override
+    public void pushScreen(String screenUri) {
+        AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
+        if (assetUri != null) {
+            pushScreen(assetUri);
+        }
+    }
+
+    @Override
     public void pushScreen(UIScreen screen) {
-        inject(screen);
-        screen.initialise();
+        prepare(screen);
         screens.push(screen);
     }
 
@@ -84,10 +109,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
+    public void setScreen(AssetUri screenUri) {
+        UIData data = assetManager.loadAssetData(screenUri, UIData.class);
+        if (data != null && data.getRootElement() instanceof UIScreen) {
+            setScreen((UIScreen) data.getRootElement());
+        }
+    }
+
+    @Override
+    public void setScreen(String screenUri) {
+        AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
+        if (assetUri != null) {
+            setScreen(assetUri);
+        }
+    }
+
+    @Override
     public void setScreen(UIScreen screen) {
         screens.clear();
-        inject(screen);
-        screen.initialise();
+        prepare(screen);
         screens.push(screen);
     }
 
@@ -114,12 +154,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIElement> getElementMetadataLibrary() {
+    public ClassLibrary<UIWidget> getElementMetadataLibrary() {
         return elementsLibrary;
     }
 
     @Override
-    public void setFocus(UIElement widget) {
+    public void setFocus(UIWidget widget) {
         if (!Objects.equal(widget, focus)) {
             if (focus != null) {
                 focus.onLoseFocus();
@@ -132,7 +172,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIElement getFocus() {
+    public UIWidget getFocus() {
         return focus;
     }
 
@@ -187,6 +227,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+    }
+
+    private void prepare(UIScreen screen) {
+        inject(screen);
+        screen.getContents();
+        screen.initialise();
     }
 
     private void inject(Object object) {
