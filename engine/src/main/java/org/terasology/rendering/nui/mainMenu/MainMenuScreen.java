@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.mainMenu;
 import org.terasology.asset.Assets;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.logic.behavior.nui.BehaviorTreeEditor;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Border;
@@ -51,6 +52,7 @@ public class MainMenuScreen extends UIScreen {
         grid.addWidget(new UIButton("multiplayer", "Host Game"));
         grid.addWidget(new UIButton("join", "Join Game"));
         grid.addWidget(new UIButton("settings", "Settings"));
+        grid.addWidget(new UIButton("behavior_editor", "Behavior Editor"));
         grid.addWidget(new UISpace());
         grid.addWidget(new UIButton("exit", "Exit"));
         grid.setPadding(new Border(0, 0, 4, 4));
@@ -84,6 +86,14 @@ public class MainMenuScreen extends UIScreen {
                 UIScreen settings = new SettingsMenuScreen();
                 settings.setSkin(getSkin());
                 nuiManager.pushScreen(settings);
+            }
+        });
+        find("behavior_editor", UIButton.class).subscribe(new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                UIScreen editor = new BehaviorTreeEditor();
+                editor.setSkin(getSkin());
+                nuiManager.pushScreen(editor);
             }
         });
         find("exit", UIButton.class).subscribe(new ButtonEventListener() {

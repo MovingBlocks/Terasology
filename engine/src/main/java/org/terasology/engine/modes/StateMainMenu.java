@@ -101,8 +101,8 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        guiManager.openWindow("main");
-        //openMainMenu();
+//        guiManager.openWindow("main");
+        openMainMenu();
         if (!messageOnLoad.isEmpty()) {
             guiManager.showMessage("", messageOnLoad);
         }
