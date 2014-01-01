@@ -37,22 +37,17 @@ import java.util.List;
  */
 public class ZoomableLayout extends CoreLayout {
     private List<PositionalWidget> widgets = Lists.newArrayList();
-    private float pixelSizeX;
-    private float pixelSizeY;
-    private int screenSizeX;
-    private int screenSizeY;
-    private float windowPositionX;
-    private float windowPositionY;
-    private float windowSizeX;
-    private float windowSizeY;
+    private Vector2f pixelSize;
+    private Vector2i screenSize;
+    private Vector2f windowPosition;
+    private Vector2f windowSize;
 
-    private int lastX;
-    private int lastY;
+    private Vector2i last;
+
     private InteractionListener dragListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(Vector2i pos, boolean topMostElement) {
-            lastX = pos.x;
-            lastY = pos.y;
+            last = new Vector2i(pos);
         }
 
         @Override
@@ -62,10 +57,11 @@ public class ZoomableLayout extends CoreLayout {
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            float windowPosX = screenToWorldX(lastX) - screenToWorldX(pos.x) + getWindowPositionX();
-            float windowPosY = screenToWorldY(lastY) - screenToWorldY(pos.y) + getWindowPositionY();
+            Vector2f p = screenToWorld(last);
+            p.sub(screenToWorld(pos));
+            p.add(windowPosition);
 
-            setWindowPosition(windowPosX, windowPosY);
+            setWindowPosition(p);
         }
     };
 
@@ -90,13 +86,11 @@ public class ZoomableLayout extends CoreLayout {
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(dragListener);
         for (PositionalWidget widget : widgets) {
-            Vector2f position = widget.getPosition();
-            Vector2f size = widget.getSize();
-            int sx = worldToScreenX(position.x);
-            int sy = worldToScreenY(position.y);
-            int ex = worldToScreenX(position.x + size.x);
-            int ey = worldToScreenY(position.y + size.y);
-            canvas.drawElement(widget, Rect2i.createFromMinAndMax(sx, sy, ex, ey));
+            Vector2i screenStart = worldToScreen(widget.getPosition());
+            Vector2f worldEnd = new Vector2f(widget.getPosition());
+            worldEnd.add(widget.getSize());
+            Vector2i screenEnd = worldToScreen(worldEnd);
+            canvas.drawElement(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
         }
     }
 
@@ -133,141 +127,96 @@ public class ZoomableLayout extends CoreLayout {
         };
     }
 
-    public float screenToWorldX(int screenPosX) {
-        return screenPosX / pixelSizeX + windowPositionX;
+    public Vector2f screenToWorld(Vector2i screenPos) {
+        Vector2f world = new Vector2f(screenPos.x/pixelSize.x, screenPos.y/pixelSize.y);
+        world.add(windowPosition);
+        return world;
     }
 
-    public float screenToWorldY(int screenPosY) {
-        return screenPosY / pixelSizeY + windowPositionY;
+    public Vector2i worldToScreen(Vector2f world) {
+        return new Vector2i((int)((world.x-windowPosition.x)*pixelSize.x), (int)((world.y-windowPosition.y)*pixelSize.y) );
     }
 
-    public int worldToScreenX(float worldX) {
-        return (int) ((worldX - windowPositionX) * pixelSizeX);
+    public Vector2i screenUnit(Vector2f world) {
+        Vector2i screen = new Vector2i( (int) (pixelSize.x * world.x), (int)(pixelSize.y*world.y));
+        screen.absolute();
+        screen.clamp(0,1);
+        return screen;
     }
 
-    public int worldToScreenY(float worldY) {
-        return (int) ((worldY - windowPositionY) * pixelSizeY);
+    public void setWindowPosition(Vector2f pos) {
+        windowPosition = pos;
     }
 
-    public int screenUnitX(float x) {
-        int dx = (int) (pixelSizeX * x);
-
-        return Math.max(1, Math.abs(dx));
-    }
-
-    public int screenUnitY(float y) {
-        int dy = (int) (pixelSizeY * y);
-
-        return Math.max(1, Math.abs(dy));
-    }
-
-    public void setWindowPosition(float x, float y) {
-        this.windowPositionX = x;
-        this.windowPositionY = y;
-    }
-
-    public void setWindowSize(float x, float y) {
-        this.windowSizeX = x;
-        this.windowSizeY = y;
+    public void setWindowSize(Vector2f size) {
+        windowSize = size;
     }
 
     public void setScreenSize(Vector2i size) {
-        this.screenSizeX = size.x;
-        this.screenSizeY = size.y;
+        screenSize = size;
     }
 
-    public float getPixelSizeX() {
-        return pixelSizeX;
+    public Vector2f getPixelSize() {
+        return pixelSize;
     }
 
-    public float getPixelSizeY() {
-        return pixelSizeY;
+    public Vector2i getScreenSize() {
+        return screenSize;
     }
 
-    public int getScreenSizeX() {
-        return screenSizeX;
+    public Vector2f getWindowPosition() {
+        return windowPosition;
     }
 
-    public int getScreenSizeY() {
-        return screenSizeY;
+    public Vector2f getWindowSize() {
+        return windowSize;
     }
 
-    public float getWindowSizeX() {
-        return windowSizeX;
-    }
-
-    public float getWindowSizeY() {
-        return windowSizeY;
-    }
-
-    public float getWindowPositionX() {
-        return windowPositionX;
-    }
-
-    public float getWindowPositionY() {
-        return windowPositionY;
-    }
-
-    public int getWindowStartX() {
-        return (int) windowPositionX;
-    }
-
-    public int getWindowStartY() {
-        return (int) windowPositionY;
-    }
-
-    public int getWindowEndX() {
-        return (int) (windowPositionX + windowSizeX);
-    }
-
-    public int getWindowEndY() {
-        return (int) (windowPositionY + windowSizeY);
-    }
-
-    public void init(float posX, float posY, float sizeX, float sizeY, int screenWidth, int screenHeight) {
-        setWindowPosition(posX, posY);
-        setWindowSize(sizeX, sizeY);
-        setScreenSize(new Vector2i(screenWidth, screenHeight));
+    public void init(Vector2f pos, Vector2f size, Vector2i screenSize) {
+        setWindowPosition(pos);
+        setWindowSize(size);
+        setScreenSize(screenSize);
         calculateSizes();
     }
 
     public void calculateSizes() {
-        if (windowSizeX > windowSizeY) {
-            windowSizeX = windowSizeY;
+        if (windowSize.x > windowSize.y) {
+            windowSize.x = windowSize.y;
         }
 
-        if (windowSizeX < windowSizeY) {
-            windowSizeY = windowSizeX;
+        if (windowSize.x < windowSize.y) {
+            windowSize.y = windowSize.x;
         }
 
-        if ((screenSizeX != 0) && (screenSizeY != 0)) {
-            if (screenSizeX > screenSizeY) {
-                windowSizeX *= (float) screenSizeX / screenSizeY;
+        if ((screenSize.x != 0) && (screenSize.y != 0)) {
+            if (screenSize.x > screenSize.y) {
+                windowSize.x *= (float) screenSize.x / screenSize.y;
             } else {
-                windowSizeY *= (float) screenSizeY / screenSizeX;
+                windowSize.y *= (float) screenSize.y / screenSize.x;
             }
         }
 
-        if ((windowSizeX > 0) && (windowSizeY > 0)) {
-            pixelSizeX = screenSizeX / windowSizeX;
-            pixelSizeY = screenSizeY / windowSizeY;
+        if ((windowSize.x > 0) && (windowSize.y > 0)) {
+            pixelSize.x = screenSize.x / windowSize.x;
+            pixelSize.y = screenSize.y / windowSize.y;
         } else {
-            pixelSizeX = 0;
-            pixelSizeY = 0;
+            pixelSize.x = 0;
+            pixelSize.y = 0;
         }
     }
 
     public void zoom(float zoomX, float zoomY, Vector2i mousePos) {
-        float midX = windowPositionX + windowSizeX / 2.f;
-        float midY = windowPositionY + windowSizeY / 2.f;
-        float posX = screenToWorldX(mousePos.x);
-        float posY = screenToWorldY(mousePos.y);
+        Vector2f mid = new Vector2f(windowSize);
+        mid.scale(0.5f);
+        mid.add(windowPosition);
+        Vector2f pos = screenToWorld(mousePos);
 
-        windowSizeX *= zoomX;
-        windowSizeY *= zoomY;
+        windowSize.x *= zoomX;
+        windowSize.y *= zoomY;
         calculateSizes();
-        windowPositionX += (posX - midX) * 0.1;
-        windowPositionY += (posY - midY) * 0.1;
+
+        windowPosition.x += (pos.x - mid.x) * 0.1;
+        windowPosition.y += (pos.y - mid.y) * 0.1;
     }
 
 
