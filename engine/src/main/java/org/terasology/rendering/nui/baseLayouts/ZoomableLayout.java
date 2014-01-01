@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layout;
+package org.terasology.rendering.nui.baseLayouts;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
 import javax.vecmath.Vector2f;
@@ -64,6 +65,14 @@ public class ZoomableLayout extends CoreLayout {
             setWindowPosition(p);
         }
     };
+
+    @Override
+    public void addWidget(UIWidget element, LayoutHint hint) {
+        if (element instanceof PositionalWidget) {
+            PositionalWidget positionalWidget = (PositionalWidget) element;
+            addWidget(positionalWidget);
+        }
+    }
 
     public void addWidget(PositionalWidget widget) {
         widgets.add(widget);
