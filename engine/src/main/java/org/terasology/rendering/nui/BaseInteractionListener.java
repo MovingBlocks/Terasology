@@ -41,6 +41,11 @@ public class BaseInteractionListener implements InteractionListener {
     }
 
     @Override
+    public boolean onMouseDoubleClick(MouseInput button, Vector2i pos) {
+        return onMouseClick(button, pos);
+    }
+
+    @Override
     public void onMouseDrag(Vector2i pos) {
 
     }

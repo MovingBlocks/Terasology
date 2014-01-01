@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 
@@ -23,7 +24,29 @@ import org.terasology.rendering.nui.CoreWidget;
  */
 public class UISpace extends CoreWidget {
 
+    private Vector2i size = new Vector2i();
+
+    public UISpace() {
+    }
+
+    public UISpace(Vector2i size) {
+        this.size.set(size);
+    }
+
+    public Vector2i getSize() {
+        return size;
+    }
+
+    public void setSize(Vector2i size) {
+        this.size.set(size);
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        return new Vector2i(size);
     }
 }

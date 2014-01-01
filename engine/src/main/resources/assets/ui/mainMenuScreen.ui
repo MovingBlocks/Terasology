@@ -1,0 +1,91 @@
+{
+    "type" : "engine:mainMenuScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "id" : "title",
+                "image" : "engine:terasology",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "subtitle",
+                "family" : "title",
+                "text" : "Pre Alpha",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "engine:columnLayout",
+                "layoutInfo" : {
+                    "width" : 280,
+                    "height" : 288,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "offset" : 32
+                    }
+                },
+                "columns" : 1,
+                "padding" : {
+                    "left" : 0,
+                    "right" : 0,
+                    "top" : 4,
+                    "bottom" : 4
+                },
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "id" : "singleplayer",
+                        "text" : "Single Player"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "multiplayer",
+                        "text" : "Host Game"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "join",
+                        "text" : "Join Game"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "settings",
+                        "text" : "Settings"
+                    },
+                    {
+                        "type" : "UISpace"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "exit",
+                        "text" : "Exit"
+                    }
+                ]
+            }
+        ]
+    }
+
+}

@@ -34,9 +34,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.mainMenu.MainMenuScreen;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -105,17 +103,11 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-//        guiManager.openWindow("main");
-        openMainMenu();
+        //guiManager.openWindow("main");
+        CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             guiManager.showMessage("", messageOnLoad);
         }
-    }
-
-    private void openMainMenu() {
-        UIScreen mainMenu = new MainMenuScreen();
-        mainMenu.setSkin(Assets.getSkin("engine:mainmenu"));
-        CoreRegistry.get(NUIManager.class).pushScreen(mainMenu);
     }
 
     @Override

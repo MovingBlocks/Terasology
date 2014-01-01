@@ -20,12 +20,6 @@ import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.copying.strategy.Color4fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Quat4fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector2fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector3fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector3iCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
@@ -85,8 +79,8 @@ import javax.vecmath.Vector4f;
 public class EntitySystemBuilder {
 
     public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
-        // Core reflection interaction libs.
-        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.put(CopyStrategyLibrary.class, buildCopyStrategyLibrary(reflectFactory));
+
+        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
 
         // Entity Manager
         PojoEntityManager entityManager = CoreRegistry.put(EntityManager.class, new PojoEntityManager());
@@ -94,7 +88,7 @@ public class EntitySystemBuilder {
 
         // Standard serialization library
         TypeSerializationLibrary typeSerializationLibrary = buildTypeLibrary(entityManager, reflectFactory, copyStrategyLibrary);
-        entityManager.setTypeSerializerLibrary(buildTypeLibrary(entityManager, reflectFactory, copyStrategyLibrary));
+        entityManager.setTypeSerializerLibrary(typeSerializationLibrary);
 
         // Entity System Library
         EntitySystemLibrary library = CoreRegistry.put(EntitySystemLibrary.class, new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, typeSerializationLibrary));
@@ -114,17 +108,6 @@ public class EntitySystemBuilder {
         registerComponents(library.getComponentLibrary(), moduleManager);
         registerEvents(entityManager.getEventSystem(), moduleManager);
         return entityManager;
-    }
-
-    private CopyStrategyLibrary buildCopyStrategyLibrary(ReflectFactory reflectFactory) {
-        CopyStrategyLibrary library = new CopyStrategyLibrary(reflectFactory);
-        library.register(Color4f.class, new Color4fCopyStrategy());
-        library.register(Quat4f.class, new Quat4fCopyStrategy());
-        library.register(Vector2f.class, new Vector2fCopyStrategy());
-        library.register(Vector3f.class, new Vector3fCopyStrategy());
-        library.register(Vector4f.class, new Vector4fCopyStrategy());
-        library.register(Vector3i.class, new Vector3iCopyStrategy());
-        return library;
     }
 
     private TypeSerializationLibrary buildTypeLibrary(PojoEntityManager entityManager, ReflectFactory factory, CopyStrategyLibrary copyStrategies) {

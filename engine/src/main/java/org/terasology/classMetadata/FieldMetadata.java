@@ -20,8 +20,10 @@ import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.reflect.FieldAccessor;
 import org.terasology.classMetadata.reflect.InaccessibleFieldException;
 import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * Provides information on a field, and the ability to set and get that field.
@@ -49,9 +51,19 @@ public class FieldMetadata<T, U> {
     public FieldMetadata(ClassMetadata<T, ?> owner, Field field, CopyStrategy<U> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         this.owner = owner;
         this.copyStrategy = copyStrategy;
-        this.type = (Class<U>) field.getType();
+        this.type = (Class<U>) determineType(field, owner.getType());
         this.accessor = factory.createFieldAccessor(owner.getType(), field, type);
         this.field = field;
+    }
+
+    private static Class<?> determineType(Field field, Class<?> ownerType) {
+        Method getter = ReflectionUtil.findGetter(field.getName(), ownerType);
+        if (getter != null && getter.getReturnType() != null) {
+            if (ReflectionUtil.findSetter(field.getName(), ownerType, getter.getReturnType()) != null) {
+                return getter.getReturnType();
+            }
+        }
+        return field.getType();
     }
 
     /**

@@ -55,7 +55,7 @@ public class ComponentSerializerTest {
     private static ModuleManager moduleManager;
     private ComponentSerializer componentSerializer;
     private ReflectFactory reflectFactory = new ReflectionReflectFactory();
-    private CopyStrategyLibrary copyStrategyLibrary = CopyStrategyLibrary.create(reflectFactory);
+    private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
 
     @BeforeClass
     public static void setupClass() {

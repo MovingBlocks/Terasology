@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -32,6 +32,7 @@ import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
 import org.terasology.rendering.md5.MD5AnimationLoader;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
+import org.terasology.rendering.nui.asset.UILoader;
 import org.terasology.rendering.nui.skin.UISkinLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
@@ -76,7 +77,9 @@ public enum AssetType {
     SUBTEXTURE("subtexture", new String[] {}, "", null),
     ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
     UI_SKIN("skin", "skins", "skin", new UISkinLoader()),
-    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader());
+    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader()),
+    UI_ELEMENT("ui", "ui", "ui", new UILoader());
+
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;

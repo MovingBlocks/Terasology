@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleIdentifier;
@@ -56,10 +57,7 @@ public class RegisterMods extends SingleStepLoadProcess {
             }
         }
 
-        moduleManager.applyActiveModules();
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.clear();
-        assetManager.applyOverrides();
+        ApplyModulesUtil.applyModules();
         return true;
     }
 }

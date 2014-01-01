@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
@@ -101,7 +102,7 @@ public interface Canvas {
      * @param sizeHint A hint as to the available area for the drawing the element
      * @return The "desired" size of the element
      */
-    Vector2i calculateSize(UIElement element, Vector2i sizeHint);
+    Vector2i calculateSize(UIWidget element, Vector2i sizeHint);
 
     /**
      * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
@@ -113,7 +114,7 @@ public interface Canvas {
      * @param element
      * @param region
      */
-    void drawElement(UIElement element, Rect2i region);
+    void drawElement(UIWidget element, Rect2i region);
 
     /**
      * Draws test, using the current style.

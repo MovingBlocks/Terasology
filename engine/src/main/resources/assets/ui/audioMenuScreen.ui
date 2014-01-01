@@ -1,0 +1,116 @@
+{
+    "type" : "AudioSettingsScreen",
+    "skin" : "mainmenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "text" : "Audio Settings",
+                "family" : "title",
+                "id" : "subtitle",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "layoutInfo" : {
+                    "width" : 400,
+                    "height" : 250,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
+                }
+            },
+            {
+                "type" : "ColumnLayout",
+                "family" : "option-grid",
+                "columns" : 2,
+                "columnWidths" : [0.35, 0.65],
+                "padding" : {
+                    "top" : 4,
+                    "bottom" : 4,
+                    "left" : 4,
+                    "right" : 4
+                },
+                "layoutInfo" : {
+                    "width" : 360,
+                    "height" : 192,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
+                },
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "Sound Volume:"
+                    },
+                    {
+                        "type" : "UISlider",
+                        "id" : "sound"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Music Volume:"
+                    },
+                    {
+                        "type" : "UISlider",
+                        "id" : "music"
+                    }
+                ]
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "width" : 280,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+
+            }
+
+        ]
+    }
+}

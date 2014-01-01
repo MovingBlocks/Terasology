@@ -311,7 +311,7 @@ public final class Assets {
             uri = assetManager.resolve(AssetType.SUBTEXTURE, simpleUri);
         }
         if (uri != null) {
-           return (TextureRegion) assetManager.loadAsset(uri);
+            return (TextureRegion) assetManager.loadAsset(uri);
         }
         return null;
     }

@@ -15,25 +15,13 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import org.terasology.asset.Assets;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.logic.behavior.nui.BehaviorTreeEditor;
-import org.terasology.math.Rect2f;
-import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.Border;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIImage;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UISpace;
-import org.terasology.rendering.nui.layout.ArbitraryLayout;
-import org.terasology.rendering.nui.layout.ColumnLayout;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
@@ -46,61 +34,33 @@ public class MainMenuScreen extends UIScreen {
     @In
     private NUIManager nuiManager;
 
-    public MainMenuScreen() {
-        ColumnLayout grid = new ColumnLayout();
-        grid.addWidget(new UIButton("singleplayer", "Single Player"));
-        grid.addWidget(new UIButton("multiplayer", "Host Game"));
-        grid.addWidget(new UIButton("join", "Join Game"));
-        grid.addWidget(new UIButton("settings", "Settings"));
-        grid.addWidget(new UIButton("behavior_editor", "Behavior Editor"));
-        grid.addWidget(new UISpace());
-        grid.addWidget(new UIButton("exit", "Exit"));
-        grid.setPadding(new Border(0, 0, 4, 4));
-
-        ArbitraryLayout layout = new ArbitraryLayout();
-        layout.addFixedWidget(new UIImage(Assets.getTexture("engine:terasology")), new Vector2i(512, 128), new Vector2f(0.5f, 0.2f));
-        layout.addFillWidget(new UILabel("version", "title", "Pre Alpha"), Rect2f.createFromMinAndSize(0.0f, 0.3f, 1.0f, 0.1f));
-        layout.addFixedWidget(grid, new Vector2i(280, 192), new Vector2f(0.5f, 0.7f));
-
-        setContents(layout);
-    }
-
     @Override
-    public void setContents(UIWidget contents) {
-        super.setContents(contents);
-        find("singleplayer", UIButton.class).subscribe(new ButtonEventListener() {
+    public void initialise() {
+        UIScreenUtil.trySubscribe(this, "singleplayer", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.pushScreen("engine:selectGameScreen");
+            }
+        });
+        UIScreenUtil.trySubscribe(this, "multiplayer", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 // Open
             }
         });
-        find("multiplayer", UIButton.class).subscribe(new ButtonEventListener() {
+        UIScreenUtil.trySubscribe(this, "settings", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                // Open
+                nuiManager.pushScreen("engine:settingsMenuScreen");
             }
         });
-        find("settings", UIButton.class).subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                UIScreen settings = new SettingsMenuScreen();
-                settings.setSkin(getSkin());
-                nuiManager.pushScreen(settings);
-            }
-        });
-        find("behavior_editor", UIButton.class).subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                UIScreen editor = new BehaviorTreeEditor();
-                editor.setSkin(getSkin());
-                nuiManager.pushScreen(editor);
-            }
-        });
-        find("exit", UIButton.class).subscribe(new ButtonEventListener() {
+
+        UIScreenUtil.trySubscribe(this, "exit", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 engine.shutdown();
             }
         });
     }
+
 }

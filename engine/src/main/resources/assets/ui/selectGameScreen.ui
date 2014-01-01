@@ -1,0 +1,103 @@
+{
+    "type" : "engine:selectGameScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "subtitle",
+                "family" : "title",
+                "text" : "Select World",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "UIList",
+                    "id" : "gameList"
+                },
+                "layoutInfo" : {
+                    "width" : 300,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "actionButtons",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "RowLayout",
+                "id" : "actionButtons",
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "id" : "create",
+                        "text" : "Create"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "load",
+                        "text" : "Load"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "delete",
+                        "text" : "Delete"
+                    }
+                ],
+                "layoutInfo" : {
+                    "width" : 400,
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "close",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "width" : 128,
+                    "height" : 32,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+            }
+        ]
+    }
+}

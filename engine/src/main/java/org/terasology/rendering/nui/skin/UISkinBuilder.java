@@ -21,11 +21,11 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.nui.Border;
+import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
-import org.terasology.rendering.nui.UIElement;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.utilities.ReflectionUtil;
 
@@ -47,7 +47,7 @@ public class UISkinBuilder {
 
     private UIStyleFragment currentStyle = new UIStyleFragment();
     private String currentFamily = "";
-    private Class<? extends UIElement> currentElement;
+    private Class<? extends UIWidget> currentElement;
     private String currentPart = "";
     private String currentMode = "";
 
@@ -73,7 +73,7 @@ public class UISkinBuilder {
         return this;
     }
 
-    public UISkinBuilder setElementClass(Class<? extends UIElement> widget) {
+    public UISkinBuilder setElementClass(Class<? extends UIWidget> widget) {
         saveStyle();
         currentElement = widget;
         currentMode = "";
@@ -200,12 +200,12 @@ public class UISkinBuilder {
             fragment.applyTo(baseStyle);
         }
 
-        Map<Class<? extends UIElement>, Table<String, String, UIStyle>> familyStyles = Maps.newHashMap();
+        Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> familyStyles = Maps.newHashMap();
         Map<StyleKey, UIStyleFragment> styleLookup = elementStyles.row(family);
         Map<StyleKey, UIStyleFragment> baseStyleLookup = (family.isEmpty()) ? Maps.<StyleKey, UIStyleFragment>newHashMap() : elementStyles.row("");
         for (StyleKey styleKey : Sets.union(styleLookup.keySet(), baseStyleKeys)) {
             UIStyle elementStyle = new UIStyle(baseStyle);
-            List<Class<? extends UIElement>> inheritanceTree = ReflectionUtil.getInheritanceTree(styleKey.element, UIElement.class);
+            List<Class<? extends UIWidget>> inheritanceTree = ReflectionUtil.getInheritanceTree(styleKey.element, UIWidget.class);
             applyStylesForInheritanceTree(inheritanceTree, "", "", elementStyle, styleLookup, baseStyleLookup);
 
             if (!styleKey.part.isEmpty()) {
@@ -226,9 +226,9 @@ public class UISkinBuilder {
         return new UIStyleFamily(baseStyle, familyStyles);
     }
 
-    private void applyStylesForInheritanceTree(List<Class<? extends UIElement>> inheritanceTree, String part, String mode, UIStyle elementStyle,
+    private void applyStylesForInheritanceTree(List<Class<? extends UIWidget>> inheritanceTree, String part, String mode, UIStyle elementStyle,
                                                Map<StyleKey, UIStyleFragment> styleLookup, Map<StyleKey, UIStyleFragment> baseStyleLookup) {
-        for (Class<? extends UIElement> element : inheritanceTree) {
+        for (Class<? extends UIWidget> element : inheritanceTree) {
             StyleKey key = new StyleKey(element, part, mode);
             UIStyleFragment baseElementStyle = baseStyleLookup.get(key);
             if (baseElementStyle != null) {
@@ -243,11 +243,11 @@ public class UISkinBuilder {
     }
 
     private static final class StyleKey {
-        private Class<? extends UIElement> element;
+        private Class<? extends UIWidget> element;
         private String part;
         private String mode;
 
-        private StyleKey(Class<? extends UIElement> element, String part, String mode) {
+        private StyleKey(Class<? extends UIWidget> element, String part, String mode) {
             this.element = element;
             this.part = part;
             this.mode = mode;

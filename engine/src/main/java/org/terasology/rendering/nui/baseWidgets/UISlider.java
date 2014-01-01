@@ -104,6 +104,18 @@ public class UISlider extends CoreWidget {
     }
 
     @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Vector2i result = new Vector2i();
+        result.x = areaHint.x;
+        canvas.setPart(SLIDER);
+        result.y = canvas.getCurrentStyle().getFixedHeight();
+
+        canvas.setPart(TICKER);
+        result.y = Math.max(result.y, canvas.getCurrentStyle().getFixedHeight());
+        return result;
+    }
+
+    @Override
     public String getMode() {
         if (active) {
             return ACTIVE_MODE;

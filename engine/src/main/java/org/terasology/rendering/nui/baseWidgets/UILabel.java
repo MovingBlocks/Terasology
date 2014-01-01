@@ -15,10 +15,15 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -69,5 +74,12 @@ public class UILabel extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawText(text.get());
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Font font = canvas.getCurrentStyle().getFont();
+        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
+        return font.getSize(lines);
     }
 }

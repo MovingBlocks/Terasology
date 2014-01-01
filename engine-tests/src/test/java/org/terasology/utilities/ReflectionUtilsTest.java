@@ -16,6 +16,7 @@
 package org.terasology.utilities;
 
 import org.junit.Test;
+import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 
@@ -29,6 +30,40 @@ public class ReflectionUtilsTest {
     @Test
     public void testGetParameterForField() throws Exception {
         assertEquals(EntityRef.class, ReflectionUtil.getTypeParameter(LocationComponent.class.getDeclaredField("children").getGenericType(), 0));
+    }
+
+    @Test
+    public void testGetParameterForGenericInterface() throws Exception {
+        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(ParameterisedInterfaceImplementor.class, CopyStrategy.class, 0));
+    }
+
+    @Test
+    public void testGetParameterForBuriedGenericInterface() throws Exception {
+        assertEquals(Integer.class, ReflectionUtil.getTypeParameterForSuper(Subclass.class, CopyStrategy.class, 0));
+    }
+
+    @Test
+    public void testGetParameterForUnboundGenericInterface() throws Exception {
+        assertEquals(null, ReflectionUtil.getTypeParameterForSuper(UnboundInterfaceImplementor.class, CopyStrategy.class, 0));
+    }
+
+    public static class ParameterisedInterfaceImplementor implements CopyStrategy<Integer> {
+
+        @Override
+        public Integer copy(Integer value) {
+            return null;
+        }
+    }
+
+    public static class Subclass extends ParameterisedInterfaceImplementor {
+    }
+
+    public static class UnboundInterfaceImplementor<T> implements CopyStrategy<T> {
+
+        @Override
+        public T copy(T value) {
+            return null;
+        }
     }
 
 }

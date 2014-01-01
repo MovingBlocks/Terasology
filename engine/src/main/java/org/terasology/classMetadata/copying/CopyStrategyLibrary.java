@@ -21,26 +21,15 @@ import org.slf4j.LoggerFactory;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.DefaultClassMetadata;
 import org.terasology.classMetadata.MappedContainer;
-import org.terasology.classMetadata.copying.strategy.Color4fCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.ListCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.MapCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.MappedContainerCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Quat4fCopyStrategy;
 import org.terasology.classMetadata.copying.strategy.SetCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector2fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector3fCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector3iCopyStrategy;
-import org.terasology.classMetadata.copying.strategy.Vector4fCopyStrategy;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.utilities.ReflectionUtil;
 
-import javax.vecmath.Color4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -61,34 +50,14 @@ import java.util.Set;
 public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
 
+    private ModuleManager moduleManager;
+
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
     private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy();
     private ReflectFactory reflectFactory;
 
-    /**
-     * Creates a new, empty strategy library.
-     *
-     * @param reflectFactory The reflection provider, used when generating copy strategies
-     */
     public CopyStrategyLibrary(ReflectFactory reflectFactory) {
         this.reflectFactory = reflectFactory;
-    }
-
-    /**
-     * Creates a library populated with a number of basic numeric types
-     *
-     * @param factory The reflection factory to use when generating copy strategies
-     * @return A new library.
-     */
-    public static CopyStrategyLibrary create(ReflectFactory factory) {
-        CopyStrategyLibrary library = new CopyStrategyLibrary(factory);
-        library.register(Color4f.class, new Color4fCopyStrategy());
-        library.register(Quat4f.class, new Quat4fCopyStrategy());
-        library.register(Vector2f.class, new Vector2fCopyStrategy());
-        library.register(Vector3f.class, new Vector3fCopyStrategy());
-        library.register(Vector4f.class, new Vector4fCopyStrategy());
-        library.register(Vector3i.class, new Vector3iCopyStrategy());
-        return library;
     }
 
     /**
@@ -100,6 +69,10 @@ public class CopyStrategyLibrary {
      */
     public <T> void register(Class<T> type, CopyStrategy<T> strategy) {
         strategies.put(type, strategy);
+    }
+
+    public void clear() {
+        strategies.clear();
     }
 
     // TODO: Consider CopyStrategyFactory system for Collections and similar

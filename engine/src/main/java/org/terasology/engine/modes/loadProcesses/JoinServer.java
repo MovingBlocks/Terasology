@@ -20,8 +20,10 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.Module;
@@ -97,10 +99,7 @@ public class JoinServer implements LoadProcess {
             }
 
             CoreRegistry.get(Game.class).load(gameManifest);
-            moduleManager.applyActiveModules();
-            AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-            assetManager.clear();
-            assetManager.applyOverrides();
+            ApplyModulesUtil.applyModules();
 
             return true;
         } else if (joinStatus.getStatus() == JoinStatus.Status.FAILED) {

@@ -307,7 +307,7 @@ public class AssetManager {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error loading asset: {}", e);
+            logger.error("Error loading asset: {}", uri, e);
         }
         return asset;
     }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,48 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.math.Vector2i;
+
 /**
  * @author Immortius
  */
-public interface UIWidget extends UIElement {
+public interface UIWidget extends Iterable<UIWidget> {
+
+    String DEFAULT_MODE = "";
+    String HOVER_MODE = "hover";
+    String ACTIVE_MODE = "active";
 
     String getId();
+
+    String getFamily();
+
+    void setFamily(String family);
+
+    String getMode();
+
+    boolean isVisible();
+
+    <T extends UIWidget> T find(String id, Class<T> type);
+
+    void onDraw(Canvas canvas);
+
+    void update(float delta);
+
+    void onGainFocus();
+
+    void onLoseFocus();
+
+    void onMouseButtonEvent(MouseButtonEvent event);
+
+    void onMouseWheelEvent(MouseWheelEvent event);
+
+    void onKeyEvent(KeyEvent event);
+
+    Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint);
+
+    boolean isSkinAppliedByCanvas();
 
 }

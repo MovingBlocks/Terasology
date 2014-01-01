@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.math.Rect2i;
+
 /**
  * @author Immortius
  */
@@ -54,4 +56,14 @@ public enum HorizontalAlign {
      * @return The horizontal offset that is needed to align the element
      */
     public abstract int getOffset(int elementWidth, int availableWidth);
+
+    /**
+     * Given a region, gets the start position for the alignment
+     * @param region
+     * @return
+     */
+    public int getStart(Rect2i region) {
+        return region.minX() + getOffset(0, region.width());
+    }
+
 }
