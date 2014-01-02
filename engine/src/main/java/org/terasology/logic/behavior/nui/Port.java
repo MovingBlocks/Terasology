@@ -16,7 +16,9 @@
 package org.terasology.logic.behavior.nui;
 
 import org.terasology.asset.Assets;
+import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2f;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -35,6 +37,11 @@ public abstract class Port extends CoreWidget {
     protected Rect2f rect;
 
     private InteractionListener connectListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            node.getEditor().portClicked(Port.this);
+            return true;
+        }
     };
 
     protected Port() {
@@ -74,13 +81,6 @@ public abstract class Port extends CoreWidget {
         mid.add(rect.min());
         return mid;
 
-    }
-    public float midX() {
-        return (rect.minX() + rect.maxX()) / 2;
-    }
-
-    public float midY() {
-        return (rect.minY() + rect.maxY()) / 2;
     }
 
     @Override
@@ -199,6 +199,11 @@ public abstract class Port extends CoreWidget {
 
         public void setTarget(OutputPort port) {
             this.outputPort = port;
+        }
+
+        @Override
+        public boolean isVisible() {
+            return true;
         }
 
         @Override

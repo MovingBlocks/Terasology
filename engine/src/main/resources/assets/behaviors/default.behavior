@@ -5,7 +5,20 @@
         "child": {
             "nodeType": "org.terasology.logic.behavior.tree.SequenceNode",
             "nodeId": 1,
-            "node": {}
+            "node": {
+                "children": [
+                    {
+                        "nodeType" : "org.terasology.logic.behavior.tree.CounterNode",
+                        "nodeId" : 2,
+                        "node" : {}
+                    },
+                    {
+                        "nodeType" : "org.terasology.logic.behavior.tree.CounterNode",
+                        "nodeId" : 3,
+                        "node" : {}
+                    }
+                ]
+            }
         }
     }
 }}

@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * @author synopia
  */
-public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget, Component, TreeAccessor<RenderableNode> {
+public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, Component, TreeAccessor<RenderableNode> {
     private transient TextureRegion texture = Assets.getTextureRegion("engine:button");
 
     private final List<RenderableNode> children = Lists.newArrayList();
@@ -49,7 +49,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private transient TreeAccessor<RenderableNode> withModel;
     private transient BehaviorNodeComponent data;
     private transient Vector2i last;
-    private transient ZoomableLayout layout;
+    private transient BehaviorEditor editor;
 
     private transient InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -64,8 +64,8 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
         @Override
         public void onMouseDrag(Vector2i pos) {
-            Vector2f diff = layout.screenToWorld(pos);
-            diff.sub(layout.screenToWorld(last));
+            Vector2f diff = editor.screenToWorld(pos);
+            diff.sub(editor.screenToWorld(last));
 
             move(diff);
 
@@ -107,13 +107,13 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     }
 
     @Override
-    public void onAdded(ZoomableLayout layout) {
-        this.layout = layout;
+    public void onAdded(BehaviorEditor layout) {
+        this.editor = layout;
     }
 
     @Override
-    public void onRemoved(ZoomableLayout layout) {
-        this.layout = null;
+    public void onRemoved(BehaviorEditor layout) {
+        this.editor = null;
     }
 
     public TreeAccessor<RenderableNode> withoutModel() {
@@ -148,8 +148,8 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         }
     }
 
-    public ZoomableLayout getLayout() {
-        return layout;
+    public BehaviorEditor getEditor() {
+        return editor;
     }
 
     public void setSize(Vector2f size) {
@@ -206,6 +206,10 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     public int getChildrenCount() {
         return children.size();
+    }
+
+    public List<RenderableNode> children() {
+        return children;
     }
 
     @Override

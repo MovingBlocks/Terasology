@@ -230,13 +230,13 @@ public class ZoomableLayout extends CoreLayout {
     }
 
 
-    public interface PositionalWidget extends UIWidget {
+    public interface PositionalWidget<L extends ZoomableLayout> extends UIWidget {
         Vector2f getPosition();
 
         Vector2f getSize();
 
-        void onAdded(ZoomableLayout layout);
+        void onAdded(L layout);
 
-        void onRemoved(ZoomableLayout layout);
+        void onRemoved(L layout);
     }
 }

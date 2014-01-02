@@ -103,8 +103,8 @@ public class StateMainMenu implements GameState {
 
         playBackgroundMusic();
 
-        guiManager.openWindow("main");
-//        CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
+//        guiManager.openWindow("main");
+        CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             guiManager.showMessage("", messageOnLoad);
         }

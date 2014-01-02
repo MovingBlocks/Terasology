@@ -17,8 +17,10 @@ package org.terasology.logic.behavior.nui;
 
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
@@ -29,6 +31,18 @@ import javax.vecmath.Vector2f;
  * Created by synopia on 02.01.14.
  */
 public class BehaviorEditor extends ZoomableLayout {
+    private Port activeConnectionStart;
+    private Vector2f mousePos;
+
+    private final InteractionListener moveOver = new BaseInteractionListener(){
+
+
+        @Override
+        public void onMouseOver(Vector2i pos, boolean topMostElement) {
+            mousePos = screenToWorld(pos);
+        }
+    };
+
     public BehaviorEditor() {
     }
 
@@ -46,28 +60,58 @@ public class BehaviorEditor extends ZoomableLayout {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.addInteractionRegion(moveOver);
         try (SubRegion subRegion = canvas.subRegion(canvas.getRegion(), false)) {
             canvas.setDrawOnTop(true);
             for (UIWidget widget : getWidgets()) {
                 if (widget instanceof RenderableNode) {
                     RenderableNode renderableNode = (RenderableNode) widget;
                     for (Port port : renderableNode.getPorts()) {
-                        Vector2f start = new Vector2f(renderableNode.getPosition());
-                        start.add(port.mid());
-
                         Port targetPort = port.getTargetPort();
-                        if (port.isInput() || targetPort == null) {
+                        if (port.isInput() || targetPort == null ) {
                             continue;
                         }
-                        Vector2f end = new Vector2f(targetPort.getSourceNode().getPosition());
-                        end.add(targetPort.mid());
-                        Vector2i s = worldToScreen(start);
-                        Vector2i e = worldToScreen(end);
-                        canvas.drawLine(s.x, s.y, e.x, e.y, Color.WHITE);
+                        drawConnection(canvas, port, targetPort, port==activeConnectionStart ? Color.BLACK : Color.GREY);
                     }
                 }
             }
+            if( activeConnectionStart!=null ) {
+                drawConnection(canvas, activeConnectionStart, mousePos, Color.WHITE);
+            }
+
             canvas.setDrawOnTop(false);
         }
+    }
+
+    public void portClicked(Port port) {
+        if( activeConnectionStart==null ) {
+            activeConnectionStart = port;
+        } else {
+            if( activeConnectionStart.isInput() && !port.isInput() ) {
+                ((Port.OutputPort)port).setTarget((Port.InputPort) activeConnectionStart);
+            } else if( !activeConnectionStart.isInput() && port.isInput() ) {
+                ((Port.OutputPort)activeConnectionStart).setTarget((Port.InputPort) port);
+            }
+            activeConnectionStart = null;
+        }
+    }
+
+    private void drawConnection( Canvas canvas, Vector2f from, Vector2f to, Color color) {
+        Vector2i s = worldToScreen(from);
+        Vector2i e = worldToScreen(to);
+        canvas.drawLine(s.x, s.y, e.x, e.y, color);
+
+    }
+    private void drawConnection( Canvas canvas, Port from, Vector2f to, Color color) {
+        Vector2f start = new Vector2f(from.node.getPosition());
+        start.add(from.mid());
+        drawConnection(canvas, start, to, color);
+    }
+    private void drawConnection( Canvas canvas, Port from, Port to, Color color) {
+        Vector2f start = new Vector2f(from.node.getPosition());
+        start.add(from.mid());
+        Vector2f end = new Vector2f(to.node.getPosition());
+        end.add(to.mid());
+        drawConnection(canvas, start, end, color);
     }
 }
