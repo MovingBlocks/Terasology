@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 import java.util.Iterator;
 
 /**
@@ -23,6 +25,7 @@ import java.util.Iterator;
  *
  * @author synopia
  */
+@API
 public class SequenceNode extends CompositeNode {
     @Override
     public SequenceTask create() {

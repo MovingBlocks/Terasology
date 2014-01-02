@@ -15,9 +15,12 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * @author synopia
  */
+@API
 public enum Status {
     INVALID,
     SUCCESS,

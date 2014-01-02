@@ -15,11 +15,14 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * Repeats the child node forever.
  *
  * @author synopia
  */
+@API
 public class RepeatNode extends DecoratorNode {
     public RepeatNode() {
     }

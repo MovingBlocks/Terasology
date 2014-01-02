@@ -40,8 +40,8 @@ public class ZoomableLayout extends CoreLayout {
     private List<PositionalWidget> widgets = Lists.newArrayList();
     private Vector2f pixelSize;
     private Vector2i screenSize;
-    private Vector2f windowPosition;
-    private Vector2f windowSize;
+    private Vector2f windowPosition = new Vector2f();
+    private Vector2f windowSize = new Vector2f(50,50);
 
     private Vector2i last;
 
@@ -65,6 +65,13 @@ public class ZoomableLayout extends CoreLayout {
             setWindowPosition(p);
         }
     };
+
+    public ZoomableLayout() {
+    }
+
+    public ZoomableLayout(String id) {
+        super(id);
+    }
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
@@ -93,6 +100,9 @@ public class ZoomableLayout extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
+        setScreenSize(canvas.size());
+        calculateSizes();
+
         canvas.addInteractionRegion(dragListener);
         for (PositionalWidget widget : widgets) {
             Vector2i screenStart = worldToScreen(widget.getPosition());
@@ -179,13 +189,6 @@ public class ZoomableLayout extends CoreLayout {
 
     public Vector2f getWindowSize() {
         return windowSize;
-    }
-
-    public void init(Vector2f pos, Vector2f size, Vector2i screenSize) {
-        setWindowPosition(pos);
-        setWindowSize(size);
-        setScreenSize(screenSize);
-        calculateSizes();
     }
 
     public void calculateSizes() {

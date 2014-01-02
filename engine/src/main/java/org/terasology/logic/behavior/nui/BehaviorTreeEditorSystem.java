@@ -33,23 +33,19 @@ import org.terasology.rendering.nui.NUIManager;
  */
 @RegisterSystem
 public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, UpdateSubscriberSystem {
-    private BehaviorTreeEditor editor;
     private boolean editorMode;
     private NUIManager nuiManager;
 
     @Override
     public void initialise() {
         nuiManager = CoreRegistry.get(NUIManager.class);
-
-        editor = new BehaviorTreeEditor();
-        editor.setSkin(Assets.getSkin("engine:mainmenu"));
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleConsole(BTEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             if (!editorMode) {
-                CoreRegistry.get(NUIManager.class).pushScreen(editor);
+                CoreRegistry.get(NUIManager.class).pushScreen("engine:behaviorEditorScreen");
                 editorMode = true;
                 Mouse.setGrabbed(false);
             } else {

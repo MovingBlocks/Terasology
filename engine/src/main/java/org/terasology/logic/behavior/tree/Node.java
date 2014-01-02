@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * Base class for nodes in a behavior tree. Each node must implement the create() method to create tasks, that are
  * evaluated by an interpreter.
@@ -24,6 +26,7 @@ package org.terasology.logic.behavior.tree;
  *
  * @author synopia
  */
+@API
 public abstract class Node implements TreeAccessor<Node> {
     public abstract Task create();
 

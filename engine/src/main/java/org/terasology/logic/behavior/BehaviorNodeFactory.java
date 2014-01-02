@@ -18,6 +18,8 @@ package org.terasology.logic.behavior;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
 
 import java.util.Collection;
@@ -36,11 +38,17 @@ public class BehaviorNodeFactory {
 
     public BehaviorNodeFactory(List<BehaviorNodeComponent> components) {
         for (BehaviorNodeComponent component : components) {
-            try {
-                Class<? extends Node> type = (Class<Node>) Class.forName(component.type);
-                nodes.put(type, component);
-            } catch (ClassNotFoundException e) {
-                logger.warn("Cannot find behavior node for class " + component.type + " name=" + component.name);
+            ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
+            for (ClassLoader classLoader : classLoaders) {
+                try {
+                    Class<? extends Node> type = (Class<? extends Node>) classLoader.loadClass(component.type);//(Class<Node>) Class.forName(component.type);
+                    nodes.put(type, component);
+                    logger.warn("Found behavior node for class " + component.type + " name=" + component.name);
+
+                    break;
+                } catch (ClassNotFoundException e) {
+                    logger.warn("Cannot find behavior node for class " + component.type + " name=" + component.name);
+                }
             }
         }
     }

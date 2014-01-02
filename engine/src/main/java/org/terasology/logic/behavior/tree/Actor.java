@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.tree;
 
 import com.google.common.collect.Maps;
+import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -31,6 +32,7 @@ import java.util.Map;
  *
  * @author synopia
  */
+@API
 public class Actor {
     private final EntityRef minion;
     private final Map<String, Object> blackboard;

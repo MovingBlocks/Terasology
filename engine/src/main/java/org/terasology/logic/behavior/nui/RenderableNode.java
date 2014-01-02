@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.layout.ZoomableLayout;
+import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
 
 import javax.vecmath.Vector2f;
 import java.util.List;

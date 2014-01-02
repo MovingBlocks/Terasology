@@ -15,11 +15,14 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * Counter node. Returns RUNNING as long as not counted down to zero.
  *
  * @author synopia
  */
+@API
 public class CounterNode extends Node {
     private int limit;
 

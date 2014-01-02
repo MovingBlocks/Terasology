@@ -1,0 +1,102 @@
+{
+    "type" : "engine:behaviorEditorScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "BehaviorEditor",
+                "id" : "tree",
+                "layoutInfo" : {
+                    "width" : 800,
+                    "height" : 600,
+                    "position-left" : {
+                        "target" : "LEFT",
+                        "offset" : 16
+                    },
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "engine:columnLayout",
+                "layoutInfo" : {
+                    "width" : 280,
+                    "height" : 96,
+                    "position-left" : {
+                        "target" : "LEFT",
+                        "offset" : 16
+                    },
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 16
+                    }
+                },
+                "columns" : 1,
+                "padding" : {
+                    "left" : 0,
+                    "right" : 0,
+                    "top" : 4,
+                    "bottom" : 4
+                },
+                "contents" : [
+                    {
+                        "type" : "RowLayout",
+                        "contents" : [
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "select_tree"
+                            },
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "select_entity"
+                            }
+                        ]
+                    },
+                    {
+                        "type" : "RowLayout",
+                        "contents" : [
+                            {
+                                "type" : "UIButton",
+                                "id" : "debug_stop",
+                                "text" : "[]"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "debug_pause",
+                                "text" : "||"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "debug_step",
+                                "text" : "|>"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "debug_run",
+                                "text" : ">>"
+                            }
+                        ]
+                    },
+                    {
+                        "type" : "RowLayout",
+                        "contents" : [
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "palette"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "create",
+                                "text" : "create"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+}

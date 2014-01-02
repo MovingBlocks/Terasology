@@ -15,9 +15,12 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * @author synopia
  */
+@API
 public class MonitorNode extends ParallelNode {
     public MonitorNode() {
         super(ParallelNode.Policy.RequireOne, ParallelNode.Policy.RequireOne);

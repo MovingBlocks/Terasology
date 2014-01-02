@@ -15,11 +15,14 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * Base class for decorator nodes, which have exactly one child (the decorated node).
  *
  * @author synopia
  */
+@API
 public abstract class DecoratorNode extends Node {
     protected Node child;
 

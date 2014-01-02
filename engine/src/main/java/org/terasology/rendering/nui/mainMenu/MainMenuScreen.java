@@ -54,6 +54,12 @@ public class MainMenuScreen extends UIScreen {
                 nuiManager.pushScreen("engine:settingsMenuScreen");
             }
         });
+        UIScreenUtil.trySubscribe(this, "behavior_editor", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.pushScreen("engine:behaviorEditorScreen");
+            }
+        });
 
         UIScreenUtil.trySubscribe(this, "exit", new ButtonEventListener() {
             @Override
