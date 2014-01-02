@@ -47,6 +47,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
         try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream))) {
+            write.setIndent("  ");
             write.beginObject().name("model");
             treeGson.saveTree(write, data.getRoot());
             if (data.hasRenderable()) {

@@ -40,6 +40,10 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
         return data.getRoot();
     }
 
+    public BehaviorTreeData getData() {
+        return data;
+    }
+
     public List<RenderableNode> getRenderableNodes() {
         if (!data.hasRenderable()) {
             data.createRenderable();

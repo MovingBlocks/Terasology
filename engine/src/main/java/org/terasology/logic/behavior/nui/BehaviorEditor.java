@@ -20,6 +20,7 @@ import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -32,6 +33,8 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
 
 import javax.vecmath.Vector2f;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Created by synopia on 02.01.14.
@@ -78,6 +81,17 @@ public class BehaviorEditor extends ZoomableLayout {
         removeAll();
         for (RenderableNode widget : tree.getRenderableNodes()) {
             addWidget(widget);
+        }
+    }
+
+    public String save() {
+        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        ByteArrayOutputStream baos =new ByteArrayOutputStream(10000);
+        try {
+            loader.save(baos, tree.getData());
+            return baos.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

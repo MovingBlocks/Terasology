@@ -21,6 +21,7 @@ import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
@@ -29,6 +30,9 @@ import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.databinding.Binding;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 import java.util.List;
 
@@ -92,6 +96,16 @@ public class BehaviorEditorScreen extends UIScreen {
             @Override
             public void onButtonActivated(UIButton button) {
                 find("tree", BehaviorEditor.class).createNode((BehaviorNodeComponent) find("palette", UIDropdown.class).getSelection());
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "copy", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                String tree = find("tree", BehaviorEditor.class).save();
+                StringSelection contents = new StringSelection(tree);
+                systemClipboard.setContents(contents, contents);
             }
         });
     }

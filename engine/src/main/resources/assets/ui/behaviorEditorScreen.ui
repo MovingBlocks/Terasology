@@ -23,7 +23,7 @@
             {
                 "type" : "engine:columnLayout",
                 "layoutInfo" : {
-                    "width" : 280,
+                    "width" : 380,
                     "height" : 96,
                     "position-left" : {
                         "target" : "LEFT",
@@ -45,6 +45,11 @@
                     {
                         "type" : "RowLayout",
                         "contents" : [
+                            {
+                                "type" : "UIButton",
+                                "id" : "copy",
+                                "text" : "copy"
+                            },
                             {
                                 "type" : "UIDropdown",
                                 "id" : "select_tree"
