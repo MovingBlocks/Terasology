@@ -15,7 +15,13 @@
  */
 package org.terasology.logic.behavior.nui;
 
+import org.terasology.engine.CoreRegistry;
+import org.terasology.input.MouseInput;
+import org.terasology.logic.behavior.BehaviorNodeComponent;
+import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.tree.Node;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -32,14 +38,31 @@ import javax.vecmath.Vector2f;
  */
 public class BehaviorEditor extends ZoomableLayout {
     private Port activeConnectionStart;
+    private RenderableNode selectedNode;
+    private RenderableNode newNode;
+    private BehaviorTree tree;
+
     private Vector2f mousePos;
 
     private final InteractionListener moveOver = new BaseInteractionListener(){
-
-
         @Override
         public void onMouseOver(Vector2i pos, boolean topMostElement) {
             mousePos = screenToWorld(pos);
+        }
+
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            if( newNode!=null ) {
+                newNode.setPosition(screenToWorld(pos));
+                addWidget(newNode);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onMouseRelease(MouseInput button, Vector2i pos) {
+            newNode = null;
         }
     };
 
@@ -51,6 +74,7 @@ public class BehaviorEditor extends ZoomableLayout {
     }
 
     public void setTree(BehaviorTree tree) {
+        this.tree = tree;
         removeAll();
         for (RenderableNode widget : tree.getRenderableNodes()) {
             addWidget(widget);
@@ -78,6 +102,27 @@ public class BehaviorEditor extends ZoomableLayout {
             if( activeConnectionStart!=null ) {
                 drawConnection(canvas, activeConnectionStart, mousePos, Color.WHITE);
             }
+            if( selectedNode!=null ) {
+                Vector2f size = selectedNode.getSize();
+                Vector2f topLeft = selectedNode.getPosition();
+                Vector2f topRight = new Vector2f(topLeft);
+                topRight.add(new Vector2f(size.x+.1f, 0));
+                Vector2f bottomLeft = new Vector2f(topLeft);
+                bottomLeft.add(new Vector2f(0, size.y+.1f));
+                Vector2f bottomRight = new Vector2f(topLeft);
+                bottomRight.add(new Vector2f(size.x+0.1f, size.y+0.1f));
+                drawConnection(canvas, topLeft, topRight, Color.GREEN);
+                drawConnection(canvas, topRight, bottomRight, Color.GREEN);
+                drawConnection(canvas, bottomRight, bottomLeft, Color.GREEN);
+                drawConnection(canvas, bottomLeft, topLeft, Color.GREEN);
+            }
+            if( newNode!=null ) {
+                Vector2i screenStart = worldToScreen(mousePos);
+                Vector2f worldEnd = new Vector2f(mousePos);
+                worldEnd.add(newNode.getSize());
+                Vector2i screenEnd = worldToScreen(worldEnd);
+                canvas.drawElement(newNode, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+            }
 
             canvas.setDrawOnTop(false);
         }
@@ -96,6 +141,10 @@ public class BehaviorEditor extends ZoomableLayout {
         }
     }
 
+    public void nodeClicked(RenderableNode node) {
+        selectedNode = node;
+    }
+
     private void drawConnection( Canvas canvas, Vector2f from, Vector2f to, Color color) {
         Vector2i s = worldToScreen(from);
         Vector2i e = worldToScreen(to);
@@ -107,11 +156,18 @@ public class BehaviorEditor extends ZoomableLayout {
         start.add(from.mid());
         drawConnection(canvas, start, to, color);
     }
+
     private void drawConnection( Canvas canvas, Port from, Port to, Color color) {
         Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
         Vector2f end = new Vector2f(to.node.getPosition());
         end.add(to.mid());
         drawConnection(canvas, start, end, color);
+    }
+
+    public RenderableNode createNode(BehaviorNodeComponent data) {
+        Node node = CoreRegistry.get(BehaviorNodeFactory.class).getNode(data);
+        newNode = tree.createNode(node);
+        return newNode;
     }
 }

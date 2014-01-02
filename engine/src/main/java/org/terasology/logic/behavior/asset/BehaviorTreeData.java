@@ -22,6 +22,7 @@ import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
 import org.terasology.asset.AssetData;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -49,19 +50,22 @@ public class BehaviorTreeData implements AssetData {
         this.renderableRoot = renderableRoot;
     }
 
-    public void createRenderable(final BehaviorNodeFactory factory) {
+    public RenderableNode createNode(Node node) {
+        BehaviorNodeComponent nodeComponent = CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node);
+        RenderableNode self = new RenderableNode(nodeComponent);
+        self.setNode(node);
+        renderableNodes.put(node, self);
+        return self;
+    }
 
+    public void createRenderable() {
         renderableRoot = root.visit(null, new Node.Visitor<RenderableNode>() {
             @Override
             public RenderableNode visit(RenderableNode parent, Node node) {
-                BehaviorNodeComponent nodeComponent = factory.getNodeComponent(node);
-                RenderableNode self = new RenderableNode(nodeComponent);
-                self.setNode(node);
+                RenderableNode self = createNode(node);
                 if (parent != null) {
                     parent.withoutModel().insertChild(-1, self);
                 }
-
-                renderableNodes.put(self.getNode(), self);
                 return self;
             }
         });

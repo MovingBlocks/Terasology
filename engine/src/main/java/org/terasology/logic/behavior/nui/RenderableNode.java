@@ -50,6 +50,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private transient BehaviorNodeComponent data;
     private transient Vector2i last;
     private transient BehaviorEditor editor;
+    private transient boolean dragged;
 
     private transient InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -59,14 +60,25 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             last = pos;
+            dragged = false;
             return true;
+        }
+
+        @Override
+        public void onMouseRelease(MouseInput button, Vector2i pos) {
+            if( !dragged ) {
+                editor.nodeClicked(RenderableNode.this);
+            }
+            dragged = false;
         }
 
         @Override
         public void onMouseDrag(Vector2i pos) {
             Vector2f diff = editor.screenToWorld(pos);
             diff.sub(editor.screenToWorld(last));
-
+            if( diff.lengthSquared()!=0 ) {
+                dragged = true;
+            }
             move(diff);
 
             last = pos;
@@ -94,7 +106,9 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         if (text != null) {
             canvas.drawText(text);
         }
-        canvas.addInteractionRegion(moveListener);
+        if( editor!=null ) {
+            canvas.addInteractionRegion(moveListener);
+        }
         portList.onDraw(canvas);
     }
 

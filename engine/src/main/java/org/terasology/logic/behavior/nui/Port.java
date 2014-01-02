@@ -115,9 +115,9 @@ public abstract class Port extends CoreWidget {
         @Override
         public void updateRect() {
             this.rect = Rect2f.createFromMinAndSize(
-                    index() + 0.3f,
+                    index() + 0.4f,
                     4.05f,
-                    0.7f, 0.9f);
+                    0.6f, 0.9f);
         }
 
         public void setTarget(InputPort inputPort) {
@@ -155,7 +155,7 @@ public abstract class Port extends CoreWidget {
             this.rect = Rect2f.createFromMinAndSize(
                     index(),
                     4.05f,
-                    0.3f, 0.9f);
+                    0.4f, 0.9f);
         }
 
         @Override

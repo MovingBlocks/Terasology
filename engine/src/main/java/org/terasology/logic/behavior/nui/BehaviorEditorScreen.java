@@ -23,6 +23,9 @@ import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
+import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.databinding.Binding;
 
@@ -82,6 +85,13 @@ public class BehaviorEditorScreen extends UIScreen {
             @Override
             public void set(List<BehaviorNodeComponent> value) {
 
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                find("tree", BehaviorEditor.class).createNode((BehaviorNodeComponent) find("palette", UIDropdown.class).getSelection());
             }
         });
     }
