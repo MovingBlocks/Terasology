@@ -332,7 +332,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         modButton = new UIButton(new Vector2f(128, 32), UIButton.ButtonType.NORMAL);
 //        modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
         modButton.setVisible(true);
-        modButton.getLabel().setText("Mods...");
+        modButton.getLabel().setText("Modules...");
         modButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {

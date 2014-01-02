@@ -173,6 +173,7 @@ configurations.all {
 // Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
 clean.doLast {
     new File(dirNatives).deleteDir()
+    println "Cleaned root - don't forget to re-extract the natives! 'gradlew extractNatives' or a dependent task"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
