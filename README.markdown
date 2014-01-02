@@ -130,13 +130,14 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
-* [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though)
+* [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
-* [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like 'generateNameList 10'
+* [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
+* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn creatures from the LASR model - get a portal from the console with `giveBlock "portal"`
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
