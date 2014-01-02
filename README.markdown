@@ -93,7 +93,7 @@ Press Tab to toggle the in-game console. Block names and some other things are n
 * ~~teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42~~
 * ~~fullHealth - Fully restores the player's health~~
 
-Building and running source
+Building and running from source
 --------
 
 Run any commands in the project root directory
@@ -104,9 +104,16 @@ Run any commands in the project root directory
 *  To run from the command line: `gradlew run`
 *  For more tasks: `gradlew tasks`
 
-You may also need to tweak IDE settings further for your convenience. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
+You may also need to tweak IDE settings further for your convenience, in particular for Eclipse. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
 Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows, even when running from source. Add `-homedir` to a run configuration to use the project dir instead.
+
+Running from source uses the local directory for everything. If you want to pull down the source code for a module you can easily do so via Gradle:
+
+* `gradlew fetchModuleSample`
+* `gradlew idea`
+
+This fetches the module source for the "Sample" module and the second command fetches any dependencies and updates the IntelliJ project structure so you can see it as a module. Likewise for Eclipse or any other setup you should run any one `gradlew` command to make sure the new module's dependencies have been fetched as well. See [Codebase Structure](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) in the wiki for more.
 
 Modules
 --------
