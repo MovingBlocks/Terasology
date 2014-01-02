@@ -49,4 +49,6 @@ public interface Font extends Asset<FontData> {
     int getLineHeight();
 
     Vector2i getSize(List<String> lines);
+
+    boolean hasCharacter(Character c);
 }

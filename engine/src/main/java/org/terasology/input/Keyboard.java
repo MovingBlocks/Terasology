@@ -13,33 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.input;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.engine.CoreRegistry;
 
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
-
-    public CoreLayout() {
+public final class Keyboard {
+    private Keyboard() {
     }
 
-    public CoreLayout(String id) {
-        super(id);
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
+    public static boolean isKeyDown(int key) {
+        return CoreRegistry.get(InputSystem.class).getKeyboard().isKeyDown(key);
     }
 }

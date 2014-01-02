@@ -1,5 +1,5 @@
 {
-    "type" : "engine:selectGameScreen",
+    "type" : "engine:createGameScreen",
     "skin" : "engine:mainMenu",
     "contents" : {
         "type" : "relativeLayout",
@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text" : "Select Game",
+                "text" : "Create Game",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -34,53 +34,87 @@
                 }
             },
             {
-                "type" : "ScrollableArea",
-                "content" : {
-                    "type" : "UIList",
-                    "id" : "gameList"
-                },
+                "type" : "UIBox",
                 "layoutInfo" : {
-                    "width" : 300,
+                    "width" : 500,
+                    "height" : 220,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
+                        "offset" : 16,
                         "widget" : "subtitle"
                     },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "actionButtons",
-                        "offset" : 16
+                        "offset" : 32,
+                        "widget" : "close"
                     }
                 }
             },
             {
-                "type" : "RowLayout",
-                "id" : "actionButtons",
+                "type" : "ColumnLayout",
+                "columns" : 1,
+                "family" : "create-world",
                 "contents" : [
                     {
-                        "type" : "UIButton",
-                        "id" : "create",
-                        "text" : "Create"
+                        "type" : "UILabel",
+                        "text" : "Enter a world name"
                     },
                     {
-                        "type" : "UIButton",
-                        "id" : "load",
-                        "text" : "Load"
+                        "type" : "UIText",
+                        "id" : "worldName"
                     },
                     {
-                        "type" : "UIButton",
-                        "id" : "delete",
-                        "text" : "Delete"
+                        "type" : "UISpace",
+                        "size" : [0, 16]
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Enter a seed (optional):"
+                    },
+                    {
+                        "type" : "RowLayout",
+                        "contents" : [
+                            {
+                                "type" : "UIText",
+                                "id" : "seed",
+                                "layoutInfo" : {
+                                    "relativeWidth" : 0.7
+                                }
+                            },
+                            {
+                                "type" : "UIButton",
+                                "text" : "Preview...",
+                                "id" : "previewSeed"
+                            }
+                        ]
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [0, 16]
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Choose World Generator:"
+                    },
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "worldGenerator"
                     }
                 ],
                 "layoutInfo" : {
-                    "width" : 400,
-                    "height" : 48,
+                    "width" : 480,
+                    "height" : 200,
                     "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "close",
-                        "offset" : 16
+                        "offset" : 32,
+                        "widget" : "close"
                     }
                 }
             },

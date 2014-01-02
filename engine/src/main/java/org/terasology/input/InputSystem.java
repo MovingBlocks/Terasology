@@ -17,7 +17,6 @@ package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.lwjgl.input.Keyboard;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
@@ -27,7 +26,9 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.device.InputAction;
+import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
+import org.terasology.input.device.nulldevices.NullKeyboardDevice;
 import org.terasology.input.device.nulldevices.NullMouseDevice;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
@@ -68,6 +69,7 @@ public class InputSystem implements ComponentSystem {
     private GameEngine engine;
 
     private MouseDevice mouse = new NullMouseDevice();
+    private KeyboardDevice keyboard = new NullKeyboardDevice();
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<SimpleUri, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -99,8 +101,16 @@ public class InputSystem implements ComponentSystem {
         this.mouse = mouseDevice;
     }
 
+    public void setKeyboardDevice(KeyboardDevice keyboardDevice) {
+        this.keyboard = keyboardDevice;
+    }
+
     public MouseDevice getMouseDevice() {
         return mouse;
+    }
+
+    public KeyboardDevice getKeyboard() {
+        return keyboard;
     }
 
     public BindableButton registerBindButton(SimpleUri bindId, String displayName) {
@@ -282,17 +292,14 @@ public class InputSystem implements ComponentSystem {
     }
 
     private void processKeyboardInput(float delta) {
-        while (Keyboard.next()) {
-            int key = Keyboard.getEventKey();
-
-            ButtonState state = getButtonState(Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-            boolean consumed = sendKeyEvent(key, state, delta);
+        for (InputAction action : keyboard.getInputQueue()) {
+            boolean consumed = sendKeyEvent(action.getInput().getId(), action.getState(), delta);
 
             // Update bind
-            BindableButtonImpl bind = keyBinds.get(key);
-            if (bind != null && !Keyboard.isRepeatEvent()) {
+            BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
+            if (bind != null && action.getState() != ButtonState.REPEAT) {
                 bind.updateBindState(
-                        Keyboard.getEventKeyState(),
+                        (action.getState() == ButtonState.DOWN),
                         delta, getInputEntities(),
                         targetSystem.getTarget(),
                         targetSystem.getTargetBlockPosition(),
@@ -317,13 +324,6 @@ public class InputSystem implements ComponentSystem {
             button.update(getInputEntities(), delta, targetSystem.getTarget(), targetSystem.getTargetBlockPosition(),
                     targetSystem.getHitPosition(), targetSystem.getHitNormal());
         }
-    }
-
-    private ButtonState getButtonState(boolean keyDown, boolean repeatEvent) {
-        if (repeatEvent) {
-            return ButtonState.REPEAT;
-        }
-        return (keyDown) ? ButtonState.DOWN : ButtonState.UP;
     }
 
     private boolean sendKeyEvent(int key, ButtonState state, float delta) {

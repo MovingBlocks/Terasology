@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.input.device.nulldevices;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+import com.google.common.collect.Queues;
+import org.terasology.input.device.InputAction;
+import org.terasology.input.device.KeyboardDevice;
+
+import java.util.Queue;
 
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
+public class NullKeyboardDevice implements KeyboardDevice {
 
-    public CoreLayout() {
-    }
-
-    public CoreLayout(String id) {
-        super(id);
+    @Override
+    public boolean isKeyDown(int button) {
+        return false;
     }
 
     @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
+    public Queue<InputAction> getInputQueue() {
+        return Queues.newArrayDeque();
     }
 }

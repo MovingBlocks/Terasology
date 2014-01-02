@@ -189,6 +189,11 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
+    public boolean hasCharacter(Character c) {
+        return c == '\n' || data.getCharacter(c) != null;
+    }
+
+    @Override
     public void reload(FontData newData) {
         this.data = newData;
     }

@@ -110,4 +110,11 @@ public abstract class AbstractWidget implements UIWidget {
     public boolean isSkinAppliedByCanvas() {
         return true;
     }
+
+    @Override
+    public void update(float delta) {
+        for (UIWidget item : this) {
+            item.update(delta);
+        }
+    }
 }

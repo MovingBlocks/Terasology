@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
+package org.terasology.rendering.nui.internal;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.MouseInput;
+import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.Canvas;
 
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
+public interface CanvasControl extends Canvas {
 
-    public CoreLayout() {
-    }
+    void preRender();
 
-    public CoreLayout(String id) {
-        super(id);
-    }
+    void postRender();
 
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
+    void processMousePosition(Vector2i position);
 
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
+    boolean processMouseClick(MouseInput button, Vector2i pos);
 
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-    }
+    boolean processMouseRelease(MouseInput button, Vector2i pos);
+
+    boolean processMouseWheel(int wheelTurns, Vector2i pos);
 }

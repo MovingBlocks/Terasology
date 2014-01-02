@@ -42,6 +42,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     private List<UIWidget> contents = Lists.newArrayList();
     private TFloatList normalizedWidths;
     private TFloatList relativeWidths = new TFloatArrayList();
+    private Border padding = Border.ZERO;
 
     public RowLayout() {
 
@@ -70,8 +71,6 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
         if (normalizedWidths == null || normalizedWidths.size() != contents.size()) {
             calcWidths();
         }
-
-        Border padding = canvas.getCurrentStyle().getMargin();
 
         if (!contents.isEmpty()) {
             int xOffset = 0;
@@ -127,10 +126,10 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
 
         Vector2i result = new Vector2i(areaHint.x, 0);
         for (int i = 0; i < contents.size(); ++i) {
-            Vector2i widgetSize = canvas.calculateSize(contents.get(i), new Vector2i(TeraMath.floorToInt(areaHint.x * normalizedWidths.get(i)), areaHint.y));
+            Vector2i widgetSize = canvas.calculateSize(contents.get(i), padding.shrink(new Vector2i(TeraMath.floorToInt(areaHint.x * normalizedWidths.get(i)), areaHint.y)));
             result.y = Math.max(result.y, widgetSize.y);
         }
-        return result;
+        return padding.grow(result);
     }
 
     @Override
@@ -138,10 +137,19 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
         return contents.iterator();
     }
 
-    public UIWidget setColumnRatios(float ... ratios) {
+    public RowLayout setColumnRatios(float ... ratios) {
         relativeWidths.clear();
         relativeWidths.addAll(ratios);
         calcWidths();
+        return this;
+    }
+
+    public Border getPadding() {
+        return padding;
+    }
+
+    public RowLayout setPadding(Border pad) {
+        this.padding = pad;
         return this;
     }
 }

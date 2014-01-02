@@ -13,33 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui;
-
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
+package org.terasology.rendering.nui.internal;
 
 /**
  * @author Immortius
  */
-public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget implements UILayout<T> {
-
-    public CoreLayout() {
-    }
-
-    public CoreLayout(String id) {
-        super(id);
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-    }
+public interface DrawOperation {
+    void draw();
 }

@@ -9,16 +9,27 @@
         "UILabel" : {
             "text-align-vertical" : "top"
         },
+        "UIText" : {
+            "text-align-horizontal" : "left",
+            "text-align-vertical" : "top",
+            "background" : "engine:box",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            }
+        },
         "UIImage" : {
             "texture-scale-mode" : "scale_fit"
         },
         "RowLayout" : {
-            "margin" : {
-                "top" : 2,
-                "bottom" : 2,
-                "left" : 4,
-                "right" : 4
-            }
         },
         "UIBox" : {
             "background" : "engine:area",
@@ -296,6 +307,14 @@
         "heading-input" : {
             "font" : "title",
             "text-align-horizontal" : "left"
+        },
+        "create-world" : {
+            "elements" : {
+                "UILabel" : {
+                    "text-align-vertical" : "bottom",
+                    "text-align-horizontal" : "left"
+                }
+            }
         }
     }
 }

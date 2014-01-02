@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.mainMenu.selectGame;
+package org.terasology.rendering.nui.mainMenu;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -25,7 +25,6 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
-import org.terasology.input.internal.BindCommands;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
@@ -34,7 +33,6 @@ import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.ListEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIList;
-import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.utilities.FilesUtil;
 
 import java.io.IOException;
@@ -74,6 +72,13 @@ public class SelectGameScreen extends UIScreen {
             }
         });
 
+        UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.pushScreen("engine:createGameScreen");
+            }
+        });
+
         UIScreenUtil.trySubscribe(this, "load", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
@@ -87,18 +92,18 @@ public class SelectGameScreen extends UIScreen {
         UIScreenUtil.trySubscribe(this, "delete", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                    GameInfo gameInfo = gameList.getSelection();
-                    if (gameInfo != null) {
-                        Path world = PathManager.getInstance().getSavePath(gameInfo.manifest.getTitle());
-                        try {
-                            FilesUtil.recursiveDelete(world);
-                            gameList.getList().remove(gameInfo);
-                            gameList.setSelection(null);
-                        } catch (Exception e) {
-                            logger.error("Failed to delete saved game", e);
-                            // TODO: show error
-                        }
+                GameInfo gameInfo = gameList.getSelection();
+                if (gameInfo != null) {
+                    Path world = PathManager.getInstance().getSavePath(gameInfo.manifest.getTitle());
+                    try {
+                        FilesUtil.recursiveDelete(world);
+                        gameList.getList().remove(gameInfo);
+                        gameList.setSelection(null);
+                    } catch (Exception e) {
+                        logger.error("Failed to delete saved game", e);
+                        // TODO: show error
                     }
+                }
             }
         });
 

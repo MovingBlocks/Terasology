@@ -50,16 +50,19 @@ public class TextLineBuilder {
         List<String> paragraphs = Arrays.asList(text.split("\\r?\\n"));
         for (String paragraph : paragraphs) {
             String remainder = paragraph;
-            while (!remainder.isEmpty()) {
+            while (remainder != null && !remainder.isEmpty()) {
                 String[] split = remainder.split(" ", 2);
                 String word = split[0];
                 if (split.length > 1) {
                     remainder = split[1];
                 } else {
-                    remainder = "";
+                    remainder = null;
                 }
 
                 addWord(word);
+            }
+            if (remainder != null) {
+                addWord(remainder);
             }
             endLine();
         }

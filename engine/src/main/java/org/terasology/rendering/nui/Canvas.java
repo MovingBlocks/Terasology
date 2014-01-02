@@ -138,12 +138,29 @@ public interface Canvas {
     void drawTexture(TextureRegion texture);
 
     /**
+     * Draws a texture filling the canvas using the current style.
+     *
+     * @param texture The texture to draw
+     * @param color
+     */
+    void drawTexture(TextureRegion texture, Color color);
+
+    /**
      * Draws a texture to the given region using the current style.
      *
      * @param texture The texture to draw
      * @param region  The area to draw the texture in, in pixels
      */
     void drawTexture(TextureRegion texture, Rect2i region);
+
+    /**
+     * Draws a texture to the given region using the current style.
+     *
+     * @param texture The texture to draw
+     * @param region  The area to draw the texture in, in pixels
+     * @param color   The color modifier for the texture
+     */
+    void drawTexture(TextureRegion texture, Rect2i region, Color color);
 
     /**
      * Draws the background of the current style, filling the entire canvas.
@@ -272,6 +289,16 @@ public interface Canvas {
     void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode);
 
     /**
+     * Draws a texture to the given area without using the current style. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
+     *
+     * @param texture The texture to draw
+     * @param region  The area to draw the texture in, in pixels
+     * @param color   The color modifier for drawing the texture
+     * @param mode    The method for adapting this texture to the region
+     */
+    void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode);
+
+    /**
      * Draws a sub-region of a texture to the given area. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
      *
      * @param texture The texture to draw
@@ -296,6 +323,20 @@ public interface Canvas {
      * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
      */
     void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh);
+
+    /**
+     * Draws a sub-region of a texture to the given area. If the texture is a different size to the area, it will be adapted according to the ScaleMode.
+     *
+     * @param texture The texture to draw
+     * @param region  The area to draw the texture in, in pixels
+     * @param color   The color modifier for drawing the texture
+     * @param mode    The method for adapting this texture to the region
+     * @param ux      The leftmost point of the sub-region of the texture to draw, between 0 and 1
+     * @param uy      The topmost pixel of the sub-region of the texture to draw, between 0 and 1
+     * @param uw      The width of the sub-region of the texture to draw, relative to the texture size
+     * @param uh      The height of the sub-region of the texture to draw, relative to the texture size
+     */
+    void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode, float ux, float uy, float uw, float uh);
 
     /**
      * Draws a texture with a border - allows the drawing of a texture to a wider area without distorting the edge of the texture.
