@@ -43,7 +43,7 @@ public class BrownianNoise {
     /**
      * Initialize with 9 octaves - <b>this is insanely expensive, but backwards compatible</b>
      */
-    public BrownianNoise() {
+    protected BrownianNoise() {
         setOctaves(9);
     }
 

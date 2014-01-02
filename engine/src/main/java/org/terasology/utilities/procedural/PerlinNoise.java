@@ -23,16 +23,9 @@ import org.terasology.utilities.random.FastRandom;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PerlinNoise implements Noise, Noise3D {
-
-    private static final double LACUNARITY = 2.1379201;
-    private static final double H = 0.836281;
-
-    private double[] spectralWeights;
+public class PerlinNoise implements Noise3D {
 
     private final int[] noisePermutations;
-    private boolean recomputeSpectralWeights = true;
-    private int octaves = 9;
 
     /**
      * Init. a new generator with a given seed value.
@@ -105,42 +98,6 @@ public class PerlinNoise implements Noise, Noise3D {
                                 grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1))));
     }
 
-    /**
-     * Returns Fractional Brownian Motion at the given position.
-     *
-     * @param posX Position on the x-axis
-     * @param posY Position on the y-axis
-     * @param posZ Position on the z-axis
-     * @return The noise value
-     */
-    @Override
-    public double fBm(double posX, double posY, double posZ) {
-        double result = 0.0;
-
-        if (recomputeSpectralWeights) {
-            spectralWeights = new double[octaves];
-
-            for (int i = 0; i < octaves; i++) {
-                spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
-            }
-
-            recomputeSpectralWeights = false;
-        }
-
-        double x = posX;
-        double y = posY;
-        double z = posZ;
-        for (int i = 0; i < octaves; i++) {
-            result += noise(x, y, z) * spectralWeights[i];
-
-            x *= LACUNARITY;
-            y *= LACUNARITY;
-            z *= LACUNARITY;
-        }
-
-        return result;
-    }
-
     private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
@@ -156,14 +113,4 @@ public class PerlinNoise implements Noise, Noise3D {
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
-    @Override
-    public void setOctaves(int octaves) {
-        this.octaves = octaves;
-        recomputeSpectralWeights = true;
-    }
-
-    @Override
-    public int getOctaves() {
-        return octaves;
-    }
 }
