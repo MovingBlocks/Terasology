@@ -16,9 +16,11 @@
 
 package org.terasology.core.world.internal;
 
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.math.TeraMath;
+import org.terasology.utilities.procedural.BrownianNoise3D;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.world.WorldBiomeProvider;
 
 /**
  * @author Immortius
@@ -26,25 +28,23 @@ import org.terasology.utilities.procedural.PerlinNoise;
 // TODO: Evolve this class into a world description provider (density, height, etc) to feed into the world generators
 public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
-    PerlinNoise temperatureNoise;
-    PerlinNoise humidityNoise;
-    PerlinNoise fogNoise;
+    private final Noise3D temperatureNoise;
+    private final Noise3D humidityNoise;
 
     public WorldBiomeProviderImpl(String worldSeed) {
-        temperatureNoise = new PerlinNoise(worldSeed.hashCode() + 5);
-        humidityNoise = new PerlinNoise(worldSeed.hashCode() + 6);
-        fogNoise = new PerlinNoise(worldSeed.hashCode() + 12);
+        temperatureNoise = new BrownianNoise3D(new PerlinNoise(worldSeed.hashCode() + 5));
+        humidityNoise = new BrownianNoise3D(new PerlinNoise(worldSeed.hashCode() + 6));
     }
 
     @Override
     public float getHumidityAt(int x, int z) {
-        double result = humidityNoise.fBm(x * 0.0005, 0, 0.0005 * z);
+        double result = humidityNoise.noise(x * 0.0005, 0, 0.0005 * z);
         return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 
     @Override
     public float getTemperatureAt(int x, int z) {
-        double result = temperatureNoise.fBm(x * 0.0005, 0, 0.0005 * z);
+        double result = temperatureNoise.noise(x * 0.0005, 0, 0.0005 * z);
         return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 

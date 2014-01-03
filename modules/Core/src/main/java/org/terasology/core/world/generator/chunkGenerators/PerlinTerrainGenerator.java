@@ -16,10 +16,18 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.world.WorldBiomeProvider;
+import java.util.Map;
+
+import javax.vecmath.Vector2f;
+
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.utilities.procedural.BrownianNoise;
+import org.terasology.utilities.procedural.BrownianNoise2D;
+import org.terasology.utilities.procedural.BrownianNoise3D;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -27,9 +35,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
-
-import javax.vecmath.Vector2f;
-import java.util.Map;
 
 /**
  * Terasology's legacy map generator. Still rocks!
@@ -40,12 +45,12 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
-    private PerlinNoise pGen1;
-    private PerlinNoise pGen2;
-    private PerlinNoise pGen3;
-    private PerlinNoise pGen4;
-    private PerlinNoise pGen5;
-    private PerlinNoise pGen8;
+    private Noise3D pGen1;
+    private Noise3D pGen2;
+    private Noise3D pGen3;
+    private Noise3D pGen4;
+    private Noise3D pGen5;
+    private Noise3D pGen8;
     private WorldBiomeProvider biomeProvider;
 
     private Block air;
@@ -74,18 +79,15 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
     @Override
     public void setWorldSeed(String seed) {
         if (seed != null) {
-            pGen1 = new PerlinNoise(seed.hashCode());
-            pGen1.setOctaves(8);
+            pGen1 = new BrownianNoise3D(new PerlinNoise(seed.hashCode()), 8);
 
-            pGen2 = new PerlinNoise(seed.hashCode() + 1);
-            pGen2.setOctaves(8);
+            pGen2 = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 1), 8);
 
-            pGen3 = new PerlinNoise(seed.hashCode() + 2);
-            pGen3.setOctaves(8);
+            pGen3 = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 2), 8);
 
-            pGen4 = new PerlinNoise(seed.hashCode() + 3);
-            pGen5 = new PerlinNoise(seed.hashCode() + 4);
-            pGen8 = new PerlinNoise(seed.hashCode() + 7);
+            pGen4 = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 3));
+            pGen5 = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 4));
+            pGen8 = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 7));
         }
     }
 
@@ -282,15 +284,15 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
     }
 
     private double calcBaseTerrain(double x, double z) {
-        return TeraMath.clamp((pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+        return TeraMath.clamp((pGen1.noise(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
     }
 
     private double calcOceanTerrain(double x, double z) {
-        return TeraMath.clamp(pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
+        return TeraMath.clamp(pGen2.noise(0.0009 * x, 0, 0.0009 * z) * 8.0);
     }
 
     private double calcRiverTerrain(double x, double z) {
-        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3.noise(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
     }
 
     private double calcMountainDensity(double x, double y, double z) {
@@ -298,7 +300,7 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
         double y1 = y * 0.001;
         double z1 = z * 0.002;
 
-        double result = pGen4.fBm(x1, y1, z1);
+        double result = pGen4.noise(x1, y1, z1);
         return result > 0.0 ? result : 0;
     }
 
@@ -307,12 +309,12 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
         double y1 = y * 0.006;
         double z1 = z * 0.008;
 
-        double result = pGen5.fBm(x1, y1, z1) - 0.1;
+        double result = pGen5.noise(x1, y1, z1) - 0.1;
         return result > 0.0 ? result : 0;
     }
 
     private double calcCaveDensity(double x, double y, double z) {
-        return pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
+        return pGen8.noise(x * 0.02, y * 0.02, z * 0.02);
     }
 
     @Override
