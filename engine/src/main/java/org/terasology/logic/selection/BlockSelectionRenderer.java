@@ -15,20 +15,6 @@
  */
 package org.terasology.logic.selection;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.Assets;
-import org.terasology.math.Vector3i;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -40,6 +26,23 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslated;
+
+import java.awt.Color;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
+import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureUtil;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 /**
  * Renders a selection. Is used by the BlockSelectionSystem.
@@ -55,7 +58,15 @@ public class BlockSelectionRenderer {
     private Material defaultTextured;
 
     public BlockSelectionRenderer() {
-        effectsTexture = Assets.getTexture("engine:selection");
+        this(Assets.getTexture("engine:selection"));
+    }
+
+    public BlockSelectionRenderer(Color color) {
+        this(Assets.get(TextureUtil.getTextureUriForColor(color), Texture.class));
+    }
+
+    public BlockSelectionRenderer(Texture effectsTexture) {
+        this.effectsTexture = effectsTexture;
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(1.f / effectsTexture.getWidth(), 1.f / effectsTexture.getHeight());
 

@@ -31,26 +31,26 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 
 /**
- * Reworked system to allow the use of BlockSelectionComponents.
- *
+ * This system updates block selections based on the sender's location and the state of the block selection.
+ * 
  * @author synopia, mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockSelectionSystem implements ComponentSystem {
     @ReceiveEvent(components = {LocationComponent.class})
     public void onStartSelectionAtEntity(BlockStartSelectionEvent event, EntityRef entity) {
-    	
-        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-    	if (null == locationComponent) {
-    		// entity isn't LocationComponent, which shouldn't ever be the case
-    		return;
-    	}
 
-    	BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
-    	if (null == blockSelectionComponent) {
-    		// event did not provide a BlockSelection component to modify
-    		return;
-    	}
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        if (null == locationComponent) {
+            // entity isn't LocationComponent, which shouldn't ever be the case
+            return;
+        }
+
+        BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
+        if (null == blockSelectionComponent) {
+            // event did not provide a BlockSelection component to modify
+            return;
+        }
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
@@ -58,43 +58,42 @@ public class BlockSelectionSystem implements ComponentSystem {
         blockSelectionComponent.startPosition = startPosition;
         Vector3i endPosition = startPosition;
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
-        
+
         entity.send(new BlockSelectionStartedEvent(entity, blockSelectionComponent));
     }
 
-
     @ReceiveEvent(components = {LocationComponent.class})
     public void onEndSelectionAtEntity(BlockEndSelectionEvent event, EntityRef entity) {
-    	
-        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-    	if (null == locationComponent) {
-    		// entity isn't LocationComponent, which shouldn't ever be the case
-    		return;
-    	}
 
-    	BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
-    	if (null == blockSelectionComponent) {
-    		// event did not provide a BlockSelection component to modify
-    		return;
-    	}
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        if (null == locationComponent) {
+            // entity isn't LocationComponent, which shouldn't ever be the case
+            return;
+        }
+
+        BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
+        if (null == blockSelectionComponent) {
+            // event did not provide a BlockSelection component to modify
+            return;
+        }
 
         Vector3f worldPosition = locationComponent.getWorldPosition();
 
         Vector3i endPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
         Vector3i startPosition = blockSelectionComponent.startPosition;
         if (null == startPosition) {
-        	startPosition = endPosition;
+            startPosition = endPosition;
         }
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
 
         entity.send(new BlockSelectionCompletedEvent(entity, blockSelectionComponent));
     }
 
-	@Override
-	public void initialise() {
-	}
+    @Override
+    public void initialise() {
+    }
 
-	@Override
-	public void shutdown() {
-	}
+    @Override
+    public void shutdown() {
+    }
 }
