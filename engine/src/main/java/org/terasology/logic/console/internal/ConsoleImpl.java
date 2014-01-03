@@ -189,6 +189,10 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public boolean execute(String command, EntityRef callingClient) {
+        if (command.length() == 0) {
+            return false;
+        }
+
         Client owner = networkSystem.getOwner(callingClient);
         if (owner != null && owner.isLocal()) {
             localCommandHistory.add(command);
