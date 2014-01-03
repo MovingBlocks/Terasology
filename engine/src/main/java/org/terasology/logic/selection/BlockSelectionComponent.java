@@ -17,6 +17,8 @@ package org.terasology.logic.selection;
 
 import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
 
 /**
  * Add this component to any item entity, to make the item to a selection item. When using such items, a temporary
@@ -29,4 +31,6 @@ import org.terasology.entitySystem.Component;
  */
 @API
 public class BlockSelectionComponent implements Component {
+    public Vector3i startPosition;
+    public Region3i currentSelection;
 }

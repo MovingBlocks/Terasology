@@ -15,122 +15,86 @@
  */
 package org.terasology.logic.selection;
 
-import org.terasology.engine.CoreRegistry;
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
-import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.selection.event.BlockEndSelectionEvent;
+import org.terasology.logic.selection.event.BlockSelectionCompletedEvent;
+import org.terasology.logic.selection.event.BlockSelectionStartedEvent;
+import org.terasology.logic.selection.event.BlockStartSelectionEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.physics.Physics;
-import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
 
 /**
- * System to allow the use of BlockSelectionComponents. This system is a client only system, though no other player
- * will see selections done by one player.
+ * Reworked system to allow the use of BlockSelectionComponents.
  *
- * @author synopia
+ * @author synopia, mkienenb@gmail.com
  */
-@RegisterSystem(RegisterMode.CLIENT)
-public class BlockSelectionSystem implements ComponentSystem, RenderSystem {
-    @In
-    private Physics physics;
-    @In
-    private LocalPlayer localPlayer;
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class BlockSelectionSystem implements ComponentSystem {
+    @ReceiveEvent(components = {LocationComponent.class})
+    public void onStartSelectionAtEntity(BlockStartSelectionEvent event, EntityRef entity) {
+    	
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+    	if (null == locationComponent) {
+    		// entity isn't LocationComponent, which shouldn't ever be the case
+    		return;
+    	}
 
-    private Vector3i startPos;
-    private Region3i currentSelection;
-    private BlockSelectionRenderer selectionRenderer;
+    	BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
+    	if (null == blockSelectionComponent) {
+    		// event did not provide a BlockSelection component to modify
+    		return;
+    	}
 
-    @ReceiveEvent(components = {BlockSelectionComponent.class})
-    public void onPlaced(ActivateEvent event, EntityRef itemEntity) {
-        if (event.getTargetLocation() == null) {
-            return;
-        }
-        if (startPos == null) {
-            Vector3f worldPosition = event.getTargetLocation();
-            startPos = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
-            currentSelection = Region3i.createBounded(startPos, startPos);
-        } else {
-            localPlayer.getCharacterEntity().send(new ApplyBlockSelectionEvent(itemEntity, currentSelection));
-            currentSelection = null;
-            startPos = null;
-        }
+        Vector3f worldPosition = locationComponent.getWorldPosition();
+
+        Vector3i startPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        blockSelectionComponent.startPosition = startPosition;
+        Vector3i endPosition = startPosition;
+        blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
+        
+        entity.send(new BlockSelectionStartedEvent(entity, blockSelectionComponent));
     }
+
 
     @ReceiveEvent(components = {LocationComponent.class})
-    public void onCamTargetChanged(CameraTargetChangedEvent event, EntityRef entity) {
-        if (startPos == null) {
-            return;
+    public void onEndSelectionAtEntity(BlockEndSelectionEvent event, EntityRef entity) {
+    	
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+    	if (null == locationComponent) {
+    		// entity isn't LocationComponent, which shouldn't ever be the case
+    		return;
+    	}
+
+    	BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
+    	if (null == blockSelectionComponent) {
+    		// event did not provide a BlockSelection component to modify
+    		return;
+    	}
+
+        Vector3f worldPosition = locationComponent.getWorldPosition();
+
+        Vector3i endPosition = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
+        Vector3i startPosition = blockSelectionComponent.startPosition;
+        if (null == startPosition) {
+        	startPosition = endPosition;
         }
-        EntityRef target = event.getNewTarget();
-        LocationComponent locationComponent = target.getComponent(LocationComponent.class);
-        if (locationComponent != null) {
-            Vector3f worldPosition = locationComponent.getWorldPosition();
-            Vector3i currentEndPos = new Vector3i(worldPosition.x, worldPosition.y, worldPosition.z);
-            currentSelection = Region3i.createBounded(startPos, currentEndPos);
-        }
+        blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
+
+        entity.send(new BlockSelectionCompletedEvent(entity, blockSelectionComponent));
     }
 
-    @Override
-    public void initialise() {
-        selectionRenderer = new BlockSelectionRenderer();
-    }
+	@Override
+	public void initialise() {
+	}
 
-    @Override
-    public void renderOverlay() {
-        selectionRenderer.beginRenderOverlay();
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-
-        if (startPos != null) {
-            selectionRenderer.beginRenderOverlay();
-            if (currentSelection == null) {
-                selectionRenderer.renderMark(startPos, cameraPosition);
-            } else {
-                Vector3i size = currentSelection.size();
-                Vector3i block = new Vector3i();
-                for (int z = 0; z < size.z; z++) {
-                    for (int y = 0; y < size.y; y++) {
-                        for (int x = 0; x < size.x; x++) {
-                            block.set(x, y, z);
-                            block.add(currentSelection.min());
-                            selectionRenderer.renderMark(block, cameraPosition);
-                        }
-                    }
-                }
-            }
-            selectionRenderer.endRenderOverlay();
-        }
-
-    }
-
-    @Override
-    public void renderFirstPerson() {
-    }
-
-    @Override
-    public void renderShadows() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @Override
-    public void renderOpaque() {
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-    }
-
+	@Override
+	public void shutdown() {
+	}
 }
