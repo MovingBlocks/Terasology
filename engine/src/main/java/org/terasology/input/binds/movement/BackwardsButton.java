@@ -16,16 +16,16 @@
 
 package org.terasology.input.binds.movement;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
 @RegisterBindButton(id = "backwards", description = "Backwards")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_S)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.S)
 public class BackwardsButton extends BindButtonEvent {
 }

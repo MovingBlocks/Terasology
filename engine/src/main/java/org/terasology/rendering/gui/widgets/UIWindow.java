@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
@@ -68,7 +69,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
             public void key(UIDisplayElement element, KeyEvent event) {
                 if (closeKeys != null) {
                     for (int key : closeKeys) {
-                        if (key == event.getKey() && event.isDown()) {
+                        if (key == Keyboard.KeyId.ESCAPE && event.isDown()) {
                             getGUIManager().closeWindow(getId());
                             event.consume();
 

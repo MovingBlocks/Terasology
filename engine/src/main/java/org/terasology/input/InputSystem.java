@@ -134,7 +134,7 @@ public class InputSystem implements ComponentSystem {
                 linkBindButtonToKey(input.getId(), bindId);
                 break;
             case MOUSE_BUTTON:
-                MouseInput button = MouseInput.getInputFor(input.getType(), input.getId());
+                MouseInput button = MouseInput.find(input.getType(), input.getId());
                 linkBindButtonToMouse(button, bindId);
                 break;
             case MOUSE_WHEEL:
@@ -145,7 +145,7 @@ public class InputSystem implements ComponentSystem {
 
     public void linkBindButtonToInput(InputEvent input, SimpleUri bindId) {
         if (input instanceof KeyEvent) {
-            linkBindButtonToKey(((KeyEvent) input).getKey(), bindId);
+            linkBindButtonToKey(((KeyEvent) input).getKey().getId(), bindId);
         } else if (input instanceof MouseButtonEvent) {
             linkBindButtonToMouse(((MouseButtonEvent) input).getButton(), bindId);
         } else if (input instanceof MouseWheelEvent) {
@@ -229,7 +229,7 @@ public class InputSystem implements ComponentSystem {
                 case MOUSE_BUTTON:
                     int id = action.getInput().getId();
                     if (id != -1) {
-                        MouseInput button = MouseInput.getInputFor(action.getInput().getType(), action.getInput().getId());
+                        MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
                         boolean consumed = sendMouseEvent(button, action.getState().isDown(), mouse.getPosition(), delta);
 
                         BindableButtonImpl bind = mouseButtonBinds.get(button);
@@ -293,7 +293,7 @@ public class InputSystem implements ComponentSystem {
 
     private void processKeyboardInput(float delta) {
         for (InputAction action : keyboard.getInputQueue()) {
-            boolean consumed = sendKeyEvent(action.getInput().getId(), action.getState(), delta);
+            boolean consumed = sendKeyEvent(action.getInput(), action.getInputChar(), action.getState(), delta);
 
             // Update bind
             BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
@@ -326,17 +326,17 @@ public class InputSystem implements ComponentSystem {
         }
     }
 
-    private boolean sendKeyEvent(int key, ButtonState state, float delta) {
+    private boolean sendKeyEvent(Input key, char keyChar, ButtonState state, float delta) {
         KeyEvent event;
         switch (state) {
             case UP:
-                event = KeyUpEvent.create(key, delta);
+                event = KeyUpEvent.create(key, keyChar, delta);
                 break;
             case DOWN:
-                event = KeyDownEvent.create(key, delta);
+                event = KeyDownEvent.create(key, keyChar, delta);
                 break;
             case REPEAT:
-                event = KeyRepeatEvent.create(key, delta);
+                event = KeyRepeatEvent.create(key, keyChar, delta);
                 break;
             default:
                 return false;
@@ -357,7 +357,7 @@ public class InputSystem implements ComponentSystem {
     private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
         MouseButtonEvent event;
         switch (button) {
-            case MOUSE_NONE:
+            case NONE:
                 return false;
             case MOUSE_LEFT:
                 event = (buttonDown) ? LeftMouseDownButtonEvent.create(position, delta) : LeftMouseUpButtonEvent.create(position, delta);

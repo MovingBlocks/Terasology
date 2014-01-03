@@ -44,7 +44,7 @@ public class LwjglKeyboardDevice implements KeyboardDevice {
             } else {
                 state = (Keyboard.getEventKeyState()) ? ButtonState.DOWN : ButtonState.UP;
             }
-            result.add(new InputAction(InputType.KEY, Keyboard.getEventKey(), state));
+            result.add(new InputAction(InputType.KEY.getInput(Keyboard.getEventKey()), state, Keyboard.getEventCharacter()));
         }
 
         return result;

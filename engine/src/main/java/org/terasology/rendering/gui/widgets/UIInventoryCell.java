@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.gui.widgets;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;
@@ -132,7 +132,7 @@ public class UIInventoryCell extends UIDisplayContainer {
     private KeyListener keyListener = new KeyListener() {
         @Override
         public void key(UIDisplayElement element, KeyEvent event) {
-            if (event.getKey() == Keyboard.KEY_LCONTROL) {
+            if (event.getKey() == Keyboard.Key.LEFT_CTRL) {
                 multiplierKeyPressed = event.isDown();
             }
         }

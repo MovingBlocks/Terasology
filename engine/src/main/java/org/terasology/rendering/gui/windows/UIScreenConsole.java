@@ -17,9 +17,9 @@
 package org.terasology.rendering.gui.windows;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleSubscriber;
@@ -60,7 +60,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         commandCursor = console.previousCommandSize();
 
-        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
+        setCloseKeys(new int[]{Keyboard.KeyId.ESCAPE});
         setCloseBinds(new String[]{"engine:console"});
         setId("chat");
         setModal(true);
@@ -78,20 +78,20 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
             public void key(UIDisplayElement element, KeyEvent event) {
                 if (event.isDown()) {
                     // submit message
-                    if (event.getKey() == Keyboard.KEY_RETURN) {
+                    if (event.getKey() == Keyboard.Key.ENTER) {
                         String message = inputBox.getText().trim();
                         inputBox.deleteText();
 
                         console.execute(message, localPlayer.getClientEntity());
                         commandCursor = console.previousCommandSize();
-                    } else if (event.getKey() == Keyboard.KEY_UP) {
+                    } else if (event.getKey() == Keyboard.Key.UP) {
                         //message history previous
                         if (commandCursor > 0) {
                             commandCursor--;
                             inputBox.setText(console.getPreviousCommand(commandCursor));
                             inputBox.setCursorEnd();
                         }
-                    } else if (event.getKey() == Keyboard.KEY_DOWN) {
+                    } else if (event.getKey() == Keyboard.Key.DOWN) {
                         //message history next
                         if (commandCursor < console.previousCommandSize()) {
                             commandCursor++;
@@ -102,7 +102,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                             }
                             inputBox.setCursorEnd();
                         }
-                    } else if (event.getKey() == Keyboard.KEY_TAB && !inputBox.getText().trim().isEmpty()) {
+                    } else if (event.getKey() == Keyboard.Key.TAB && !inputBox.getText().trim().isEmpty()) {
                         //guess command
                         String message = inputBox.getText().trim();
 

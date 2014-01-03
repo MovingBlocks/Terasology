@@ -22,7 +22,7 @@ import org.terasology.math.Vector2i;
 
 public class MouseDownButtonEvent extends MouseButtonEvent {
 
-    private static MouseDownButtonEvent event = new MouseDownButtonEvent(MouseInput.MOUSE_NONE, 0);
+    private static MouseDownButtonEvent event = new MouseDownButtonEvent(MouseInput.NONE, 0);
 
     protected MouseDownButtonEvent(MouseInput button, float delta) {
         super(button, ButtonState.DOWN, delta);

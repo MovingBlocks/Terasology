@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui.baseWidgets;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.math.Border;
@@ -130,8 +130,8 @@ public class UIText extends CoreWidget {
         if (event.isDown() && lastFont != null) {
             String fullText = text.get();
             cursorPosition = TeraMath.clamp(cursorPosition, 0, fullText.length());
-            switch (event.getKey()) {
-                case Keyboard.KEY_BACK: {
+            switch (event.getKey().getId()) {
+                case Keyboard.KeyId.BACKSPACE: {
                     if (cursorPosition > 0) {
                         String before = fullText.substring(0, cursorPosition - 1);
                         String after = fullText.substring(cursorPosition);
@@ -140,7 +140,7 @@ public class UIText extends CoreWidget {
                     }
                     break;
                 }
-                case Keyboard.KEY_DELETE: {
+                case Keyboard.KeyId.DELETE: {
                     if (cursorPosition < fullText.length()) {
                         String before = fullText.substring(0, cursorPosition);
                         String after = fullText.substring(cursorPosition + 1);
@@ -148,35 +148,35 @@ public class UIText extends CoreWidget {
                     }
                     break;
                 }
-                case Keyboard.KEY_LEFT: {
+                case Keyboard.KeyId.LEFT: {
                     if (cursorPosition > 0) {
                         cursorPosition--;
                     }
                     break;
                 }
-                case Keyboard.KEY_RIGHT: {
+                case Keyboard.KeyId.RIGHT: {
                     if (cursorPosition < fullText.length()) {
                         cursorPosition++;
                     }
                     break;
                 }
-                case Keyboard.KEY_HOME: {
+                case Keyboard.KeyId.HOME: {
                     cursorPosition = 0;
                     break;
                 }
-                case Keyboard.KEY_END: {
+                case Keyboard.KeyId.END: {
                     cursorPosition = fullText.length();
                     break;
                 }
-                case Keyboard.KEY_RETURN: {
+                case Keyboard.KeyId.ENTER: {
                     for (TextEventListener listener : listeners) {
                         listener.onEnterPressed(this);
                     }
                     break;
                 }
                 default: {
-                    if (org.terasology.input.Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || org.terasology.input.Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                        if (event.getKey() == Keyboard.KEY_V) {
+                    if (org.terasology.input.Keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL) || org.terasology.input.Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL)) {
+                        if (event.getKey() == Keyboard.Key.V) {
                             paste();
                             break;
                         }

@@ -26,21 +26,22 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public enum MouseInput {
-    MOUSE_NONE(InputType.MOUSE_BUTTON, -1, ""),
-    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left", "M_1"),
-    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right", "M_2"),
-    MOUSE_3(InputType.MOUSE_BUTTON, 2, "M_3"),
-    MOUSE_4(InputType.MOUSE_BUTTON, 3, "M_4"),
-    MOUSE_5(InputType.MOUSE_BUTTON, 4, "M_5"),
-    MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MWheel_Up"),
-    MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MWheel_Down");
+public enum MouseInput implements Input {
+    NONE(InputType.MOUSE_BUTTON, -1, "MOUSE_NONE", ""),
+    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "MOUSE_LEFT", "Left Click", "M_LEFT", "M_1"),
+    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "MOUSE_RIGHT", "Right Click", "M_2"),
+    MOUSE_3(InputType.MOUSE_BUTTON, 2, "MOUSE_3", "Mouse 3", "M_3"),
+    MOUSE_4(InputType.MOUSE_BUTTON, 3, "MOUSE_4", "Mouse 4", "M_4"),
+    MOUSE_5(InputType.MOUSE_BUTTON, 4, "MOUSE_5", "Mouse 5", "M_5"),
+    WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MOUSE_WHEEL_UP", "Mouse Wheel Up", "MWHEEL_UP"),
+    WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MOUSE_WHEEL_DOWN", "Mouse Wheel Down", "MWHEEL_DOWN");
 
     private static Map<String, MouseInput> lookup = Maps.newHashMap();
 
     private InputType type;
     private int id;
-    private String shortString;
+    private String displayName;
+    private String name;
     private Set<String> identifiers;
 
     static {
@@ -51,16 +52,14 @@ public enum MouseInput {
         }
     }
 
-    private MouseInput(InputType type, int id, String shortString, String... alternateStrings) {
+    private MouseInput(InputType type, int id, String name, String displayName, String... alternateStrings) {
         this.type = type;
         this.id = id;
-        this.shortString = shortString.toUpperCase(Locale.ENGLISH);
+        this.name = name.toUpperCase(Locale.ENGLISH);
+        this.displayName = displayName;
         this.identifiers = Sets.newHashSetWithExpectedSize(alternateStrings.length + 2);
-        this.identifiers.add(this.shortString);
+        this.identifiers.add(name);
         this.identifiers.add(toString().toUpperCase(Locale.ENGLISH));
-        for (String alternate : alternateStrings) {
-            this.identifiers.add(alternate.toUpperCase(Locale.ENGLISH));
-        }
     }
 
     public InputType getType() {
@@ -71,28 +70,25 @@ public enum MouseInput {
         return id;
     }
 
-    public Input getInput() {
-        return new Input(type, id);
+    public String getName() {
+        return name;
     }
 
-    public String toShortString() {
-        return shortString;
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public static MouseInput parse(String id) {
-        MouseInput result = lookup.get(id.toUpperCase(Locale.ENGLISH));
-        if (result != null) {
-            return result;
-        }
-        return MOUSE_NONE;
-    }
-
-    public static MouseInput getInputFor(InputType type, int id) {
+    public static MouseInput find(InputType type, int id) {
         for (MouseInput input : values()) {
             if (input.type == type && input.id == id) {
                 return input;
             }
         }
-        return MOUSE_NONE;
+        return NONE;
+    }
+
+    public static Input find(String name) {
+        return lookup.get(name.toUpperCase(Locale.ENGLISH));
     }
 }

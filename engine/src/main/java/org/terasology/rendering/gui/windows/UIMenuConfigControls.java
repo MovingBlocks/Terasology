@@ -109,7 +109,7 @@ public final class UIMenuConfigControls extends UIWindow {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
                 if (editButton != null) {
-                    changeButton(editButton, new Input(InputType.MOUSE_WHEEL, wheel));
+                    changeButton(editButton, InputType.MOUSE_WHEEL.getInput(wheel));
                     editButton = null;
                 }
             }
@@ -122,7 +122,7 @@ public final class UIMenuConfigControls extends UIWindow {
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (editButton != null) {
-                    changeButton(editButton, new Input(InputType.MOUSE_BUTTON, button));
+                    changeButton(editButton, InputType.MOUSE_BUTTON.getInput(button));
                     editButton = null;
                 }
             }
@@ -132,7 +132,7 @@ public final class UIMenuConfigControls extends UIWindow {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
                 if (editButton != null) {
-                    changeButton(editButton, new Input(InputType.KEY, event.getKey()));
+                    changeButton(editButton, InputType.KEY.getInput(event.getKey().getId()));
                     editButton = null;
                 }
             }
@@ -251,7 +251,7 @@ public final class UIMenuConfigControls extends UIWindow {
         String bindId = button.getUserData().toString();
         config.getInput().getBinds().setBinds(new SimpleUri(bindId), input);
 
-        editButton.getLabel().setText(input.toShortString());
+        editButton.getLabel().setText(input.getDisplayName());
     }
 
     public void setup() {
@@ -261,7 +261,7 @@ public final class UIMenuConfigControls extends UIWindow {
             Collection<Input> inputs = bindsConfig.getBinds(new SimpleUri(bindId));
             if (inputs.size() > 0) {
                 // TODO: Support multiple binds?
-                button.getLabel().setText(inputs.iterator().next().toShortString());
+                button.getLabel().setText(inputs.iterator().next().getDisplayName());
             } else {
                 button.getLabel().setText("");
             }

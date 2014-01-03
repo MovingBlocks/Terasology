@@ -45,8 +45,4 @@ public class BindButtonEvent extends ButtonEvent {
         return state;
     }
 
-    @Override
-    public String getButtonName() {
-        return id.toString();
-    }
 }

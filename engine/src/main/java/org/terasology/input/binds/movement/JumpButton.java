@@ -16,16 +16,16 @@
 
 package org.terasology.input.binds.movement;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
 @RegisterBindButton(id = "jump", description = "Jump", repeating = false)
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_SPACE)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.SPACE)
 public class JumpButton extends BindButtonEvent {
 }
