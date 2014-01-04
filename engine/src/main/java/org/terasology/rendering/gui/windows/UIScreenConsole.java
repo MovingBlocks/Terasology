@@ -16,7 +16,12 @@
 
 package org.terasology.rendering.gui.windows;
 
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.engine.CoreRegistry;
@@ -34,9 +39,8 @@ import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 
 /**
  * The in-game chat.
@@ -104,33 +108,35 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         }
                     } else if (event.getKey() == Keyboard.KEY_TAB && !inputBox.getText().trim().isEmpty()) {
                         //guess command
-                        String message = inputBox.getText().trim();
+                        String cmdQuery = inputBox.getText().trim();
 
-                        String commandName = message.substring(1);
                         List<CommandInfo> commands = console.getCommandList();
-                        List<CommandInfo> matches = Lists.newArrayList();
+                        
+                        // Explicitly create a map String->CommandInfo if the CommandInfo is required later
+                        Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
 
-                        //check for matching commands
-                        for (CommandInfo cmd : commands) {
-                            if (cmd.getName().regionMatches(0, commandName, 0, commandName.length())) {
-                                matches.add(cmd);
+                            @Override
+                            public String apply(CommandInfo input) {
+                                return input.getName();
                             }
-                        }
+                        });
+                        
+                        List<String> matches = CamelCaseMatcher.getMatches(cmdQuery, commandNames);
 
                         //one match found
                         if (matches.size() == 1) {
-                            inputBox.setText(matches.get(0).getName());
+                            inputBox.setText(matches.get(0));
                             inputBox.setCursorEnd();
                         } else if (matches.size() > 1) {
                             //multiple matches found
                             //add list of available commands
                             String commandMatches = "";
-                            for (CommandInfo cmd : matches) {
+                            for (String cmd : matches) {
                                 if (!commandMatches.isEmpty()) {
                                     commandMatches += " ";
                                 }
 
-                                commandMatches += cmd.getName();
+                                commandMatches += cmd;
                             }
                             console.addMessage(commandMatches);
 
