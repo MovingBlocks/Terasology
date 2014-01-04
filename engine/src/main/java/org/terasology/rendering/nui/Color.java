@@ -183,6 +183,10 @@ public class Color {
         return new Color(value | (representation & ALPHA_FILTER));
     }
 
+    public Color inverse() {
+        return new Color((~representation & ALPHA_FILTER) | a());
+    }
+
     public int rgba() {
         return representation;
     }
@@ -226,4 +230,5 @@ public class Color {
     public String toString() {
         return toHex();
     }
+
 }

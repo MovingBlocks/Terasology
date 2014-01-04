@@ -32,12 +32,14 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -59,7 +61,6 @@ public class UIText extends CoreWidget {
     private boolean multiline;
 
     private int cursorPosition;
-    private boolean selection;
     private int selectionStart;
 
     private Border lastMargin = Border.ZERO;
@@ -68,14 +69,33 @@ public class UIText extends CoreWidget {
 
     private List<TextEventListener> listeners = Lists.newArrayList();
 
+    private int offset = 0;
+
     private InteractionListener interactionListener = new BaseInteractionListener() {
+        boolean dragging = false;
+
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
-                moveCursor(pos);
+                moveCursor(pos, false);
+                dragging = true;
                 return true;
             }
             return false;
+        }
+
+        @Override
+        public void onMouseDrag(Vector2i pos) {
+            if (dragging) {
+                moveCursor(pos, true);
+            }
+        }
+
+        @Override
+        public void onMouseRelease(MouseInput button, Vector2i pos) {
+            if (button == MouseInput.MOUSE_LEFT) {
+                dragging = false;
+            }
         }
     };
 
@@ -97,51 +117,98 @@ public class UIText extends CoreWidget {
         lastFont = canvas.getCurrentStyle().getFont();
         lastWidth = canvas.size().x - lastMargin.getTotalWidth();
         canvas.addInteractionRegion(interactionListener);
-        canvas.drawText(text.get());
-        if (isFocused()) {
-            drawCursor(canvas);
+        correctCursor();
+
+        try (SubRegion ignored = canvas.subRegion(lastMargin.shrink(canvas.getRegion()), true)) {
+            try (SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
+                canvas.drawText(text.get(), canvas.getRegion());
+                if (isFocused()) {
+                    if (hasSelection()) {
+                        drawSelection(canvas);
+                    } else {
+                        drawCursor(canvas);
+                    }
+                }
+            }
         }
+    }
+
+    private void drawSelection(Canvas canvas) {
+        Font font = canvas.getCurrentStyle().getFont();
+
+        int start = Math.min(cursorPosition, selectionStart);
+        int end = Math.max(cursorPosition, selectionStart);
+
+        String beforeCursor = text.get().substring(0, start);
+        String selectionText = text.get().substring(start, end);
+
+        // TODO: Support multiline text boxes
+        // TODO: Support different text alignments
+        List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
+        int lastLineWidth = font.getWidth(lines.get(lines.size() - 1));
+
+        Vector2i selectionTopLeft = new Vector2i(lastLineWidth, (lines.size() - 1) * font.getLineHeight());
+        int selectionWidth = font.getWidth(selectionText);
+        Rect2i region = Rect2i.createFromMinAndSize(selectionTopLeft.x, selectionTopLeft.y, selectionWidth, font.getLineHeight());
+
+        canvas.drawTexture(cursorTexture, region, canvas.getCurrentStyle().getTextColor());
+        canvas.drawTextRaw(selectionText, font, canvas.getCurrentStyle().getTextColor().inverse(), region);
+
     }
 
     private void drawCursor(Canvas canvas) {
         if (blinkCounter < BLINK_RATE) {
-            Border margin = canvas.getCurrentStyle().getMargin();
             Font font = canvas.getCurrentStyle().getFont();
             String beforeCursor = text.get();
             if (cursorPosition < text.get().length()) {
                 beforeCursor = beforeCursor.substring(0, cursorPosition);
             }
-            List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x - margin.getTotalWidth());
+            List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
+
+            // TODO: Support multiline text boxes
+            // TODO: Support different alignments
+
             int lastLineWidth = font.getWidth(lines.get(lines.size() - 1));
-            Rect2i region = Rect2i.createFromMinAndSize(lastLineWidth + margin.getLeft(), (lines.size() - 1) * font.getLineHeight() + margin.getTop(), 1, font.getLineHeight());
+            Rect2i region = Rect2i.createFromMinAndSize(lastLineWidth, (lines.size() - 1) * font.getLineHeight(),
+                    1, font.getLineHeight());
             canvas.drawTexture(cursorTexture, region, canvas.getCurrentStyle().getTextColor());
         }
     }
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
-        return font.getSize(lines);
+        if (isMultiline()) {
+            Font font = canvas.getCurrentStyle().getFont();
+            List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
+            return font.getSize(lines);
+        } else {
+            return new Vector2i(lastFont.getWidth(getText()), lastFont.getLineHeight());
+        }
     }
 
     @Override
     public void onKeyEvent(KeyEvent event) {
+        correctCursor();
         if (event.isDown() && lastFont != null) {
             String fullText = text.get();
-            cursorPosition = TeraMath.clamp(cursorPosition, 0, fullText.length());
+
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.BACKSPACE: {
-                    if (cursorPosition > 0) {
+                    if (hasSelection()) {
+                        removeSelection();
+                    } else if (cursorPosition > 0) {
                         String before = fullText.substring(0, cursorPosition - 1);
                         String after = fullText.substring(cursorPosition);
                         setText(before + after);
                         cursorPosition--;
+                        selectionStart = cursorPosition;
                     }
                     break;
                 }
                 case Keyboard.KeyId.DELETE: {
-                    if (cursorPosition < fullText.length()) {
+                    if (hasSelection()) {
+                        removeSelection();
+                    } else if (cursorPosition < fullText.length()) {
                         String before = fullText.substring(0, cursorPosition);
                         String after = fullText.substring(cursorPosition + 1);
                         setText(before + after);
@@ -149,23 +216,43 @@ public class UIText extends CoreWidget {
                     break;
                 }
                 case Keyboard.KeyId.LEFT: {
-                    if (cursorPosition > 0) {
+                    if (hasSelection() && !isSelectionModifierActive()) {
+                        cursorPosition = Math.min(cursorPosition, selectionStart);
+                        selectionStart = cursorPosition;
+                    } else if (cursorPosition > 0) {
                         cursorPosition--;
+                        if (!isSelectionModifierActive()) {
+                            selectionStart = cursorPosition;
+                        }
                     }
                     break;
                 }
                 case Keyboard.KeyId.RIGHT: {
-                    if (cursorPosition < fullText.length()) {
+                    if (hasSelection() && !isSelectionModifierActive()) {
+                        cursorPosition = Math.max(cursorPosition, selectionStart);
+                        selectionStart = cursorPosition;
+                    } else if (cursorPosition < fullText.length()) {
                         cursorPosition++;
+                        if (!isSelectionModifierActive()) {
+                            selectionStart = cursorPosition;
+                        }
                     }
                     break;
                 }
                 case Keyboard.KeyId.HOME: {
                     cursorPosition = 0;
+                    offset = 0;
+                    if (!isSelectionModifierActive()) {
+                        selectionStart = cursorPosition;
+                    }
                     break;
                 }
                 case Keyboard.KeyId.END: {
                     cursorPosition = fullText.length();
+                    offset = lastFont.getWidth(fullText) - lastWidth + 1;
+                    if (!isSelectionModifierActive()) {
+                        selectionStart = cursorPosition;
+                    }
                     break;
                 }
                 case Keyboard.KeyId.ENTER: {
@@ -177,19 +264,66 @@ public class UIText extends CoreWidget {
                 default: {
                     if (org.terasology.input.Keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL) || org.terasology.input.Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL)) {
                         if (event.getKey() == Keyboard.Key.V) {
+                            removeSelection();
                             paste();
+                            break;
+                        } else if (event.getKey() == Keyboard.Key.C) {
+                            copySelection();
+                            break;
+                        } else if (event.getKey() == Keyboard.Key.X) {
+                            copySelection();
+                            removeSelection();
                             break;
                         }
                     }
                     if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                        String before = fullText.substring(0, cursorPosition);
-                        String after = fullText.substring(cursorPosition);
+                        String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
+                        String after = fullText.substring(Math.max(cursorPosition, selectionStart));
                         setText(before + event.getKeyCharacter() + after);
-                        cursorPosition++;
+                        cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
+                        selectionStart = cursorPosition;
                     }
                     break;
                 }
             }
+        }
+        updateOffset();
+    }
+
+    private void updateOffset() {
+        String before = getText().substring(0, cursorPosition);
+        int cursorDist = lastFont.getWidth(before);
+        if (cursorDist < offset) {
+            offset = cursorDist;
+        }
+        if (cursorDist > offset + lastWidth) {
+            offset = cursorDist - lastWidth + 1;
+        }
+    }
+
+    private boolean isSelectionModifierActive() {
+        return Keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT);
+    }
+
+    private boolean hasSelection() {
+        return cursorPosition != selectionStart;
+    }
+
+    private void removeSelection() {
+        if (hasSelection()) {
+            String before = getText().substring(0, Math.min(cursorPosition, selectionStart));
+            String after = getText().substring(Math.max(cursorPosition, selectionStart));
+            setText(before + after);
+            cursorPosition = Math.min(cursorPosition, selectionStart);
+            selectionStart = cursorPosition;
+        }
+    }
+
+    private void copySelection() {
+        if (hasSelection()) {
+            String fullText = getText();
+            String selection = fullText.substring(Math.min(selectionStart, cursorPosition), Math.max(selectionStart, cursorPosition));
+            setClipboardContents(selection);
         }
     }
 
@@ -200,7 +334,7 @@ public class UIText extends CoreWidget {
         String pasted = getClipboardContents();
         setText(before + pasted + after);
         cursorPosition += pasted.length();
-
+        selectionStart = cursorPosition;
     }
 
     private String getClipboardContents() {
@@ -217,11 +351,16 @@ public class UIText extends CoreWidget {
         return "";
     }
 
-    private void moveCursor(Vector2i pos) {
+    private void setClipboardContents(String str) {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(str), null);
+    }
+
+    private void moveCursor(Vector2i pos, boolean selecting) {
         if (lastFont != null) {
             pos.x -= lastMargin.getLeft();
+            pos.x += offset;
             pos.y -= lastMargin.getTop();
-            List<String> lines = TextLineBuilder.getLines(lastFont, getText(), lastWidth);
+            List<String> lines = TextLineBuilder.getLines(lastFont, getText(), Integer.MAX_VALUE);
             int lineIndex = TeraMath.clamp(pos.y / lastFont.getLineHeight(), 0, lines.size() - 1);
             int newCursorPos = 0;
             int totalWidth = 0;
@@ -237,6 +376,11 @@ public class UIText extends CoreWidget {
                 newCursorPos += lines.get(i).length() + 1;
             }
             cursorPosition = newCursorPos;
+            if (!isSelectionModifierActive() && !selecting) {
+                selectionStart = cursorPosition;
+            }
+
+            updateOffset();
         }
     }
 
@@ -276,5 +420,10 @@ public class UIText extends CoreWidget {
         while (blinkCounter > 2 * BLINK_RATE) {
             blinkCounter -= 2 * BLINK_RATE;
         }
+    }
+
+    private void correctCursor() {
+        cursorPosition = TeraMath.clamp(cursorPosition, 0, getText().length());
+        selectionStart = TeraMath.clamp(selectionStart, 0, getText().length());
     }
 }

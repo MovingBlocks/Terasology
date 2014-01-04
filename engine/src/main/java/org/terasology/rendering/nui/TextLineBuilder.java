@@ -34,6 +34,8 @@ public class TextLineBuilder {
     private int currentLineLength;
     private StringBuilder lineBuilder = new StringBuilder();
 
+    private boolean lineHasWord = false;
+
     public TextLineBuilder(Font font, int maxWidth) {
         this.font = font;
         this.spaceWidth = font.getWidth(' ');
@@ -81,17 +83,19 @@ public class TextLineBuilder {
                 }
                 lineBuilder.append(c);
                 currentLineLength += charWidth;
+                lineHasWord = true;
             }
         } else {
             if (currentLineLength > 0 && currentLineLength + spaceWidth + wordWidth > maxWidth) {
                 endLine();
             }
-            if (currentLineLength != 0) {
+            if (lineHasWord) {
                 lineBuilder.append(' ');
                 currentLineLength += spaceWidth;
             }
             lineBuilder.append(word);
             currentLineLength += wordWidth;
+            lineHasWord = true;
         }
     }
 
@@ -103,5 +107,6 @@ public class TextLineBuilder {
         currentLineLength = 0;
         lines.add(lineBuilder.toString());
         lineBuilder.setLength(0);
+        lineHasWord = false;
     }
 }

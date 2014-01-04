@@ -378,18 +378,17 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void drawText(String text) {
-        drawText(text, state.getRelativeRegion());
+        drawText(text, applyMarginToRegion(state.getRelativeRegion()));
     }
 
     @Override
     public void drawText(String text, Rect2i region) {
-        Rect2i drawRegion = applyMarginToRegion(region);
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getHorizontalTextAlignment(),
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), region, style.getHorizontalTextAlignment(),
                     style.getVerticalTextAlignment());
         } else {
-            drawTextRaw(text, style.getFont(), style.getTextColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
+            drawTextRaw(text, style.getFont(), style.getTextColor(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
     }
 

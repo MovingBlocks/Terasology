@@ -57,4 +57,9 @@ public class Rect2iTest {
         assertEquals(Rect2i.createFromMinAndSize(1, 2, 2, 3), sub.get(0));
     }
 
+    @Test
+    public void overlap() {
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 472, 17).overlaps(Rect2i.createFromMinAndSize(5, 5, 1, 16)));
+    }
+
 }
