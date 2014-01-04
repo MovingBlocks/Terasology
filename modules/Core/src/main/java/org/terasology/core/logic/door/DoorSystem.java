@@ -23,7 +23,6 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
