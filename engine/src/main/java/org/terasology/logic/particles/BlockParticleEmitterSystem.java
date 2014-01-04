@@ -236,6 +236,11 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         for (EntityRef entity : particleEntities) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
+
+            if (null == location) {
+                continue;
+            }
+
             Vector3f worldPos = location.getWorldPosition();
 
             if (!worldProvider.isBlockRelevant(worldPos)) {

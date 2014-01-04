@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,37 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.utilities.procedural;
 
 /**
- * noise interface for noise generators
- *
- * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * Provides or generates 2D noise
+ * @author Martin Steiger
  */
-public interface Noise {
+public interface Noise2D {
 
     /**
      * Returns the noise value at the given position.
      *
      * @param x Position on the x-axis
      * @param y Position on the y-axis
-     * @param z Position on the z-axis
      * @return The noise value
      */
-    double noise(double x, double y, double z);
+    double noise(double x, double y);
 
-    /**
-     * Returns Fractional Brownian Motion at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value
-     */
-    double fBm(double x, double y, double z);
-
-
-    void setOctaves(int octaves);
-
-    int getOctaves();
 }

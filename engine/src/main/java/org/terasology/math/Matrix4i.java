@@ -24,6 +24,8 @@ import java.util.Arrays;
  */
 public class Matrix4i implements Serializable {
 
+    private static final long serialVersionUID = 7818313294943678102L;
+
     public static final int M00 = 0;
     public static final int M01 = 1;
     public static final int M02 = 2;

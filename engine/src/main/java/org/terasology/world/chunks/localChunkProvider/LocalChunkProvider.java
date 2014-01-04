@@ -20,11 +20,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
@@ -51,6 +53,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -506,6 +509,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
         nearCache.clear();
         storageManager.purgeChunks();
+        
+        worldEntity.send(new PurgeWorldEvent());
 
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
@@ -558,22 +563,23 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                             ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                             ChunkImpl chunk = chunkStore.getChunk();
 
-                            if (nearCache.putIfAbsent(getPosition(), chunkStore.getChunk()) != null) {
-                                logger.warn("Chunk {} is already in the near cache", getPosition());
-                            }
-                            preparingChunks.remove(getPosition());
-                            if (chunk.getChunkState() == ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+                            try {
                                 chunk.lock();
-                                try {
+
+                                if (nearCache.putIfAbsent(getPosition(), chunkStore.getChunk()) != null) {
+                                    logger.warn("Chunk {} is already in the near cache", getPosition());
+                                }
+                                preparingChunks.remove(getPosition());
+                                if (chunk.getChunkState() == ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
                                     InternalLightProcessor.generateInternalLighting(chunk);
                                     chunk.deflate();
                                     chunk.setChunkState(ChunkImpl.State.COMPLETE);
-                                } finally {
-                                    chunk.unlock();
+                                    readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
+                                } else {
+                                    pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
                                 }
-                                readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
-                            } else {
-                                pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
+                            } finally {
+                                chunk.unlock();
                             }
                         }
                     });

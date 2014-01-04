@@ -21,6 +21,7 @@ import org.lwjgl.LWJGLUtil;
 import org.terasology.engine.paths.windows.SavedGamesPathFinder;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -63,19 +64,55 @@ public final class PathManager {
             Path codeLocation = Paths.get(urlToSource.toURI());
             System.out.println("codeLocation: " + codeLocation);
             if (Files.isRegularFile(codeLocation)) {
-                installPath = codeLocation.getParent().getParent();
-                System.out.println("Running from a file (jar). Setting installPath to: " + installPath);
+                installPath = findNativesHome(codeLocation.getParent(), 5);
+                if (installPath == null) {
+                    System.out.println("Failed to find the natives dir - unable to launch!");
+                    throw new RuntimeException("Failed to find natives from .jar launch");
+                }
             }
         } catch (URISyntaxException e) {
             // Can't use logger, because logger not set up when PathManager is used.
             System.out.println("Failed to convert code location to uri");
         }
-        // If terasology.jar's location could not be resolved (maybe running from an IDE) then fallback on working path
+        // We might be running from an IDE which can cause the installPath to be null. Try current working directory.
         if (installPath == null) {
             installPath = Paths.get("").toAbsolutePath();
             System.out.println("installPath was null, running from IDE. Setting it to: " + installPath);
+            installPath = findNativesHome(installPath, 5);
+            if (installPath == null) {
+                System.out.println("Failed to find the natives dir - unable to launch!");
+                throw new RuntimeException("Failed to find natives from likely IDE launch");
+            }
         }
         homePath = installPath;
+    }
+
+    /**
+     * Searches for a parent directory containing the natives directory
+     * @param startPath path to start from
+     * @param maxDepth max directory levels to search
+     * @return the adjusted path containing the natives directory or null if not found
+     */
+    private Path findNativesHome(Path startPath, int maxDepth) {
+        int levelsToSearch = maxDepth;
+        Path checkedPath = startPath;
+        while (levelsToSearch > 0) {
+            File dirToTest = new File(checkedPath.toFile(), NATIVES_DIR);
+            if (dirToTest.exists()) {
+                System.out.println("Found the natives dir: " + dirToTest);
+                return checkedPath;
+            }
+
+            checkedPath = checkedPath.getParent();
+            if (checkedPath.equals(startPath.getRoot())) {
+                System.out.println("Uh oh, reached the root path, giving up");
+                return null;
+            }
+            levelsToSearch--;
+        }
+
+        System.out.println("Failed to find the natives dir within " + maxDepth + " levels of " + startPath);
+        return null;
     }
 
     public static PathManager getInstance() {

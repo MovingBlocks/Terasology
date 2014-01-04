@@ -16,14 +16,18 @@
 
 package org.terasology.world.internal;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.procedural.BrownianNoise;
+import org.terasology.utilities.procedural.BrownianNoise3D;
+import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
@@ -42,8 +46,8 @@ import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius
@@ -58,7 +62,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private GeneratingChunkProvider chunkProvider;
     private WorldTime worldTime;
 
-    private PerlinNoise fogNoise;
+    private Noise3D fogNoise;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
@@ -70,8 +74,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
-        this.fogNoise = new PerlinNoise(seed.hashCode() + 42 * 42);
-        this.fogNoise.setOctaves(8);
+        this.fogNoise = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 42 * 42), 8);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -290,7 +293,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public float getFog(float x, float y, float z) {
-        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.fBm(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
+        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.noise(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
     }
 
     @Override

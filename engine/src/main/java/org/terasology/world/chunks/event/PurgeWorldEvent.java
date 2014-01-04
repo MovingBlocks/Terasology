@@ -13,23 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+
+package org.terasology.world.chunks.event;
+
+import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
+ * This {@link Event} is fired when the chunk provider purges
+ * all chunks. This can be triggered using the "purgeWorld" world command. 
+ * @author Martin Steiger
  */
-public class UnresolvedWorldGeneratorException extends Exception {
-
-    private static final long serialVersionUID = 2096504461776129337L;
-
-    public UnresolvedWorldGeneratorException() {
-    }
-
-    public UnresolvedWorldGeneratorException(String message) {
-        super(message);
-    }
-
-    public UnresolvedWorldGeneratorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public class PurgeWorldEvent implements Event {
+    // empty
 }

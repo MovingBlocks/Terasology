@@ -22,8 +22,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.slf4j.Logger;
@@ -82,7 +80,7 @@ import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
-import org.terasology.utilities.NativeHelper;
+import org.terasology.utilities.LWJGLHelper;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AlignToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -123,9 +121,10 @@ public abstract class TerasologyTestingEnvironment {
         final JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         final FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+
         if (!setup) {
             setup = true;
-            bindLwjgl();
+            LWJGLHelper.initNativeLibs();
 
             moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
             moduleManager.applyActiveModules();
@@ -265,34 +264,4 @@ public abstract class TerasologyTestingEnvironment {
     public EngineEntityManager getEntityManager() {
         return engineEntityManager;
     }
-
-    public static void bindLwjgl() throws LWJGLException {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
-                break;
-            case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("linux"));
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("openal64");
-                } else {
-                    System.loadLibrary("openal");
-                }
-                break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
-
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("OpenAL64");
-                } else {
-                    System.loadLibrary("OpenAL32");
-                }
-                break;
-            default:
-                logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
-                System.exit(1);
-        }
-    }
-
-
 }

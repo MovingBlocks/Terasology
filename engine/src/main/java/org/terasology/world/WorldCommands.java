@@ -40,7 +40,7 @@ public class WorldCommands implements ComponentSystem {
 
     }
 
-    @Command
+    @Command(shortDescription = "Purges all generated chunks which triggers re-generation")
     public void purgeWorld() {
         chunkProvider.purgeChunks();
     }

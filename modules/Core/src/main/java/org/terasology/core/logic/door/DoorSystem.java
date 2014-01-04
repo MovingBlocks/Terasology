@@ -25,6 +25,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -239,12 +240,10 @@ public class DoorSystem implements ComponentSystem {
         for (Vector3i blockPos : blockRegionComponent.region) {
             worldProvider.setBlock(blockPos, BlockManager.getAir());
         }
-        EntityInfoComponent entityInfo = entity.getComponent(EntityInfoComponent.class);
-        if (entityInfo != null) {
-            EntityRef doorItem = entityManager.create(entityInfo.parentPrefab);
-            if (!inventoryManager.giveItem(event.getInstigator(), doorItem)) {
-                doorItem.destroy();
-            }
+        Prefab prefab = entity.getParentPrefab();
+        EntityRef doorItem = entityManager.create(prefab);
+        if (!inventoryManager.giveItem(event.getInstigator(), doorItem)) {
+            doorItem.destroy();
         }
         entity.destroy();
         audioManager.playSound(Assets.getSound("engine:RemoveBlock"), 0.6f);

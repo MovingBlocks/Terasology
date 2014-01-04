@@ -5,6 +5,10 @@
  * - View tasks for this project: $ gradlew tasks
  */
 
+// Needed for extending the "clean" task to also delete custom stuff defined here like natives
+apply plugin: 'base'
+
+// For generating IntelliJ project files
 apply plugin: 'idea'
 
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
@@ -35,15 +39,13 @@ assert org.gradle.api.JavaVersion.current().isJava7Compatible()
 
 // Declare "extra properties" (variables) for the project (and subs) - a Gradle thing that makes them special.
 ext {
-    // Version levels for LWJGL
-    LWJGL_VERSION = '2.9.0'
-    JINPUT_VERSION = '2.0.5'
-
     dirNatives = 'natives'
     templatesDir = 'templates'
 
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
+
+    LwjglVersion = '2.9.0'
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
@@ -67,7 +69,7 @@ configurations {
 
 // For the "natives" configuration make it depend on the native files from LWJGL
 dependencies {
-    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LWJGL_VERSION
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -168,21 +170,27 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+// Include deletion of extracted natives in the global clean task. Without the doLast it runs on *every* execution ...
+clean.doLast {
+    new File(dirNatives).deleteDir()
+    println "Cleaned root - don't forget to re-extract the natives! 'gradlew extractNatives' or a dependent task"
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Make sure the IDE prep includes extraction of natives
 ideaModule.dependsOn extractNatives
-// TODO: This next piece broke when the root build had its java plugin removed
-//eclipseClasspath.dependsOn extractNatives
 
 // For IntelliJ add a bunch of excluded directories
 idea {
 
     // Exclude Eclipse dirs
+    // TODO: Update this as Eclipse bin dirs now generate in several deeper spots rather than at top-level
     module.excludeDirs += file('bin')
     module.excludeDirs += file('.settings')
+    // TODO: Add a single file exclude for facades/PC/Terasology.launch ?
 
     // Exclude special dirs
     module.excludeDirs += file('natives')

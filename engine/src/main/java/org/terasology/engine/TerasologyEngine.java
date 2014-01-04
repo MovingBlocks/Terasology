@@ -90,14 +90,13 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
-import org.terasology.utilities.NativeHelper;
+import org.terasology.utilities.LWJGLHelper;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
@@ -168,7 +167,7 @@ public class TerasologyEngine implements GameEngine {
 
             initConfig();
 
-            initNativeLibs();
+            LWJGLHelper.initNativeLibs();
             initTimer(); // Dependent on LWJGL
             initManagers();
             initDisplay();
@@ -350,40 +349,6 @@ public class TerasologyEngine implements GameEngine {
         return threadPool.getActiveCount();
     }
 
-    private void initNativeLibs() {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_MACOSX:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("macosx"));
-                break;
-            case LWJGLUtil.PLATFORM_LINUX:
-                NativeHelper.addLibraryPath((PathManager.getInstance().getNativesPath().resolve("linux")));
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("openal64");
-                } else {
-                    System.loadLibrary("openal");
-                }
-                break;
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                NativeHelper.addLibraryPath(PathManager.getInstance().getNativesPath().resolve("windows"));
-
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("OpenAL64");
-                } else {
-                    System.loadLibrary("OpenAL32");
-                }
-                try {
-                    OculusVrHelper.loadNatives();
-                } catch (UnsatisfiedLinkError e) {
-                    logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
-                }
-                break;
-            default:
-                logger.error("Unsupported operating system: {}", LWJGLUtil.getPlatformName());
-                System.exit(1);
-        }
-    }
-
-
     private void initOpenAL() {
         if (config.getAudio().isDisableSound()) {
             audioManager = new NullAudioManager();
@@ -552,20 +517,22 @@ public class TerasologyEngine implements GameEngine {
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
+        moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
         moduleSecurityManager.addAPIPackage("java.util.concurrent");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
         moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIClass(java.awt.Shape.class);
-        moduleSecurityManager.addAPIClass(java.awt.Rectangle.class);
-        moduleSecurityManager.addAPIClass(java.awt.Color.class);
         moduleSecurityManager.addAPIClass(java.awt.BasicStroke.class);
-        moduleSecurityManager.addAPIClass(java.awt.Stroke.class);
+        moduleSecurityManager.addAPIClass(java.awt.Color.class);
         moduleSecurityManager.addAPIClass(java.awt.Font.class);
         moduleSecurityManager.addAPIClass(java.awt.FontMetrics.class);
         moduleSecurityManager.addAPIClass(java.awt.Graphics.class);
         moduleSecurityManager.addAPIClass(java.awt.Graphics2D.class);
+        moduleSecurityManager.addAPIClass(java.awt.Point.class);
+        moduleSecurityManager.addAPIClass(java.awt.Rectangle.class);
+        moduleSecurityManager.addAPIClass(java.awt.Shape.class);
+        moduleSecurityManager.addAPIClass(java.awt.Stroke.class);
         moduleSecurityManager.addAPIPackage("java.awt.geom");
         moduleSecurityManager.addAPIPackage("java.awt.image");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
