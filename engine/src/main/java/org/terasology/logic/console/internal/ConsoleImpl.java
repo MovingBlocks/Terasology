@@ -75,11 +75,12 @@ public class ConsoleImpl implements Console {
     public ConsoleImpl() {
         addMessage("Welcome to the wonderful world of Terasology!\n" +
                 "\n" +
-                "Type 'help' to see a list with available commands.\n" +
-                "To see a detailed command description try '/help \"<commandName>\"'.\n" +
-                "Be sure to surround text type parameters in quotes.\n" +
-                "No commas needed for multiple parameters.\n" +
-                "Commands are case-sensitive, block names and such are not.");
+                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details.\n" +
+                "Text parameters should be in quotes, no commas needed between multiple parameters.\n" +
+                "Commands are case-sensitive, block names and such are not.\n" +
+                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:\n" +
+                "'gh' + 'tab' = 'ghost'\n" +
+                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)\n");
     }
 
     /**
