@@ -197,7 +197,7 @@ task createVersionInfoFile {
             ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
             ant.entry(key:'dateTime',value:startDateTimeString)
             ant.entry(key:'displayVersion',value:displayVersion)
-            ant.entry(key:'engineVersion',value:version)    // TODO: This new entry might have to be hooked into code / logging
+            ant.entry(key:'engineVersion',value:version)
         }
     }
 }
