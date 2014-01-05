@@ -51,8 +51,4 @@ public abstract class CoreWidget extends AbstractWidget {
     public void onKeyEvent(KeyEvent event) {
     }
 
-    @Override
-    public void update(float delta) {
-    }
-
 }

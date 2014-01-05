@@ -26,25 +26,28 @@ public final class InputAction {
     private final Input input;
     private final ButtonState state;
     private final int delta;
-
-    public InputAction(InputType inputType, int id, ButtonState state) {
-        this(new Input(inputType, id), state);
-    }
+    private final char inputChar;
 
     public InputAction(Input input, ButtonState state) {
-        this.input = input;
-        this.state = state;
-        this.delta = 0;
-    }
-
-    public InputAction(InputType inputType, int id, int delta) {
-        this(new Input(inputType, id), delta);
+        this(input, state, '\0');
     }
 
     public InputAction(Input input, int delta) {
+        this(input, delta, '\0');
+    }
+
+    public InputAction(Input input, ButtonState state, char inputChar) {
+        this.input = input;
+        this.state = state;
+        this.delta = 0;
+        this.inputChar = inputChar;
+    }
+
+    public InputAction(Input input, int delta, char inputChar) {
         this.input = input;
         this.state = ButtonState.DOWN;
         this.delta = delta;
+        this.inputChar = inputChar;
     }
 
     /**
@@ -73,5 +76,9 @@ public final class InputAction {
      */
     public int getTurns() {
         return delta;
+    }
+
+    public char getInputChar() {
+        return inputChar;
     }
 }

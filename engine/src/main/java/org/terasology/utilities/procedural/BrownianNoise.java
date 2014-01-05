@@ -1,18 +1,17 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.terasology.utilities.procedural;
@@ -22,49 +21,36 @@ package org.terasology.utilities.procedural;
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
  * @author Martin Steiger
  */
-public class BrownianNoise implements Noise {
-    private static final double LACUNARITY = 2.1379201;
-    private static final double H = 0.836281;
+public class BrownianNoise {
+
+    /**
+     * Default persistence value
+     */
+    public static final double DEFAULT_PERSISTENCE = 0.836281;
+
+    /**
+     * Default lacunarity value
+     */
+    public static final double DEFAULT_LACUNARITY = 2.1379201;
+
+    private double lacunarity = DEFAULT_LACUNARITY;
+    
+    private double persistence = DEFAULT_PERSISTENCE;
 
     private int octaves;
     private double[] spectralWeights;
-
-    private final Noise other;
     
     /**
-     * @param other the noise to use as a basis
+     * Initialize with 9 octaves - <b>this is insanely expensive, but backwards compatible</b>
      */
-    public BrownianNoise(Noise other) {
-        this.other = other;
+    protected BrownianNoise() {
         setOctaves(9);
     }
 
     /**
-     * Returns Fractional Brownian Motion at the given position.
-     *
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
-     * @return The noise value in the range [-getScale()..getScale()]
+     * Values of noise() are in the range [-scale..scale]
+     * @return the scale
      */
-    @Override
-    public double noise(double x, double y, double z) {
-        double result = 0.0;
-
-        double workingX = x;
-        double workingY = y;
-        double workingZ = z;
-        for (int i = 0; i < octaves; i++) {
-            result += other.noise(workingX, workingY, workingZ) * spectralWeights[i];
-
-            workingX *= LACUNARITY;
-            workingY *= LACUNARITY;
-            workingZ *= LACUNARITY;
-        }
-
-        return result;
-    }
-    
     public double getScale() {
         double sum = 0;
         for (double weight : spectralWeights) {
@@ -73,7 +59,9 @@ public class BrownianNoise implements Noise {
         return sum;
     }
 
-    @Override
+    /**
+     * @param octaves the number of octaves used for computation
+     */
     public void setOctaves(int octaves) {
         this.octaves = octaves;
         
@@ -81,18 +69,58 @@ public class BrownianNoise implements Noise {
         spectralWeights = new double[octaves];
 
         for (int i = 0; i < octaves; i++) {
-            spectralWeights[i] = Math.pow(LACUNARITY, -H * i);
+            spectralWeights[i] = Math.pow(lacunarity, -persistence * i);
         }
-
    }
 
-    @Override
+    /**
+     * @return the number of octaves
+     */
     public int getOctaves() {
         return octaves;
     }
 
-    @Override
-    public double fBm(double x, double y, double z) {
-        return noise(x, y, z);
+    /**
+     * Lacunarity is what makes the frequency grow. Each octave 
+     * the frequency is multiplied by the lacunarity.
+     * @return the lacunarity
+     */
+    public double getLacunarity() {
+        return this.lacunarity;
     }
+
+    /**
+     * Lacunarity is what makes the frequency grow. Each octave 
+     * the frequency is multiplied by the lacunarity.
+     * @param lacunarity the lacunarity
+     */
+    public void setLacunarity(double lacunarity) {
+        this.lacunarity = lacunarity;
+    }
+
+    /**
+     * Persistence is what makes the amplitude shrink.
+     * More precicely the amplitude of octave i = lacunarity^(-persistence * i) 
+     * @return the persistance
+     */
+    public double getPersistance() {
+        return this.persistence;
+    }
+
+    /**
+     * Persistence is what makes the amplitude shrink.
+     * More precisely the amplitude of octave i = lacunarity^(-persistence * i) 
+     * @param persistence the persistence to set
+     */
+    public void setPersistence(double persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * @return the spectralWeights
+     */
+    protected double getSpectralWeight(int octave) {
+        return spectralWeights[octave];
+    }
+    
 }

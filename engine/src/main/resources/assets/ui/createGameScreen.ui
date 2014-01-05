@@ -1,0 +1,137 @@
+{
+    "type" : "engine:createGameScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "subtitle",
+                "family" : "title",
+                "text" : "Create Game",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "layoutInfo" : {
+                    "width" : 500,
+                    "height" : 220,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
+                }
+            },
+            {
+                "type" : "ColumnLayout",
+                "columns" : 1,
+                "family" : "create-world",
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "Enter a world name"
+                    },
+                    {
+                        "type" : "UIText",
+                        "id" : "worldName"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [0, 16]
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Enter a seed (optional):"
+                    },
+                    {
+                        "type" : "RowLayout",
+                        "contents" : [
+                            {
+                                "type" : "UIText",
+                                "id" : "seed",
+                                "layoutInfo" : {
+                                    "relativeWidth" : 0.7
+                                }
+                            },
+                            {
+                                "type" : "UIButton",
+                                "text" : "Preview...",
+                                "id" : "previewSeed"
+                            }
+                        ]
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [0, 16]
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "Choose World Generator:"
+                    },
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "worldGenerator"
+                    }
+                ],
+                "layoutInfo" : {
+                    "width" : 480,
+                    "height" : 200,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
+                }
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "width" : 128,
+                    "height" : 32,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+            }
+        ]
+    }
+}

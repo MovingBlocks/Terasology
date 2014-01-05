@@ -17,40 +17,40 @@ package org.terasology.input.events;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
 
 public class KeyEvent extends ButtonEvent {
 
-    private int key;
+    private Input input;
+    private char keyChar;
     private ButtonState state;
 
-    public KeyEvent(int key, ButtonState state, float delta) {
+    public KeyEvent(Input input, char keyChar, ButtonState state, float delta) {
         super(delta);
-        this.key = key;
+        this.input = input;
+        this.keyChar = keyChar;
         this.state = state;
     }
 
-    public int getKey() {
-        return key;
+    public Input getKey() {
+        return input;
     }
 
     public ButtonState getState() {
         return state;
     }
 
-    public String getButtonName() {
-        return "key:" + getKeyName();
-    }
-
     public String getKeyName() {
-        return Keyboard.getKeyName(key);
+        return input.getName();
     }
 
     public char getKeyCharacter() {
-        return Keyboard.getEventCharacter();
+        return keyChar;
     }
 
-    protected void setKey(int key) {
-        this.key = key;
+    protected void setKey(Input newInput, char newKeyChar) {
+        this.input = newInput;
+        this.keyChar = newKeyChar;
     }
 
     public void reset() {

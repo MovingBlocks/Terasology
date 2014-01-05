@@ -61,7 +61,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
 
     private Deque<UIScreen> screens = Queues.newArrayDeque();
-    private CanvasInternal canvas;
+    private CanvasControl canvas;
     private ClassLibrary<UIWidget> elementsLibrary;
     private UIWidget focus;
 

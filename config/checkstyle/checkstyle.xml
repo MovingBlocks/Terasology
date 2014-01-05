@@ -22,12 +22,12 @@
     <!-- See http://checkstyle.sourceforge.net/config_header.html --> 
     <!-- ***************** --> 
     <!-- Checks that a source file begins with a specified header. --> 
-    <module name="Header"> 
-        <property name="severity" value="warning"/> 
-        <property name="header" value="/*\n * Copyright 2013 MovingBlocks\n *\n"/> 
-        <property name="fileExtensions" value="java"/> 
-    </module>
-
+	<module name="RegexpHeader">
+		<property name="severity" value="warning"/>
+		<property name="header" value="/*\n * Copyright 20\d\d MovingBlocks\n *\n * Licensed under the Apache License, Version 2.0"/>
+		<property name="fileExtensions" value="java"/>
+	</module>
+  
     <module name="TreeWalker">
         <!-- Checks for Naming Conventions -->
         <!-- See http://checkstyle.sourceforge.net/config_naming.html -->

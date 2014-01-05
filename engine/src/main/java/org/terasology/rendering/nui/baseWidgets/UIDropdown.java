@@ -113,7 +113,7 @@ public class UIDropdown<T> extends CoreWidget {
         if (selection.get() != null) {
             return canvas.getCurrentStyle().getMargin().grow(optionRenderer.getPreferredSize(selection.get(), canvas));
         }
-        return Vector2i.zero();
+        return canvas.getCurrentStyle().getMargin().grow(new Vector2i(0, canvas.getCurrentStyle().getFont().getLineHeight()));
     }
 
     @Override

@@ -22,7 +22,7 @@
                 "type" : "UILabel",
                 "id" : "subtitle",
                 "family" : "title",
-                "text" : "Select World",
+                "text" : "Select Game",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},

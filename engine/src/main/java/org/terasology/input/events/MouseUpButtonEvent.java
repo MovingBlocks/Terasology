@@ -22,7 +22,7 @@ import org.terasology.math.Vector2i;
 
 public class MouseUpButtonEvent extends MouseButtonEvent {
 
-    private static MouseUpButtonEvent event = new MouseUpButtonEvent(MouseInput.MOUSE_NONE, 0);
+    private static MouseUpButtonEvent event = new MouseUpButtonEvent(MouseInput.NONE, 0);
 
     protected MouseUpButtonEvent(MouseInput button, float delta) {
         super(button, ButtonState.UP, delta);

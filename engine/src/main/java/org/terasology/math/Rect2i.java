@@ -156,7 +156,17 @@ public final class Rect2i {
     }
 
     public boolean overlaps(Rect2i other) {
-        return !(isEmpty() || other.isEmpty()) && other.posX < posX + w && other.posX + other.w - 1 > posX && other.posY < posY + h && other.posY + other.h - 1 > posY;
+        if (!(isEmpty() || other.isEmpty())) {
+            int minX = Math.max(posX, other.posX);
+            int maxX = Math.min(posX + w - 1, other.posX + other.w - 1);
+            if (minX > maxX) {
+                return false;
+            }
+            int minY = Math.max(posY, other.posY);
+            int maxY = Math.min(posY + h - 1, other.posY + other.h - 1);
+            return minY <= maxY;
+        }
+        return false;
     }
 
     @Override

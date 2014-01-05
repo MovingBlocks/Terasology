@@ -32,10 +32,6 @@ public abstract class CoreLayout<T extends LayoutHint> extends AbstractWidget im
     }
 
     @Override
-    public void update(float delta) {
-    }
-
-    @Override
     public void onMouseButtonEvent(MouseButtonEvent event) {
     }
 

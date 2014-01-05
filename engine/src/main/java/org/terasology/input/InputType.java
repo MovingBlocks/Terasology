@@ -22,8 +22,108 @@ package org.terasology.input;
  * @author Immortius
  */
 public enum InputType {
-    NONE,
-    KEY,
-    MOUSE_BUTTON,
-    MOUSE_WHEEL
+    NONE {
+        private final UnknownInput noneNone = new UnknownInput(this, 0);
+
+        @Override
+        public Input getInput(int id) {
+            return noneNone;
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return null;
+        }
+    },
+    KEY {
+        @Override
+        public Input getInput(int id) {
+            return Keyboard.Key.find(id);
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return Keyboard.Key.find(name);
+        }
+    },
+    MOUSE_BUTTON {
+        @Override
+        public Input getInput(int id) {
+            return MouseInput.find(this, id);
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return MouseInput.find(name);
+        }
+    },
+    MOUSE_WHEEL {
+        @Override
+        public Input getInput(int id) {
+            return MouseInput.find(this, id);
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return MouseInput.find(name);
+        }
+    },
+    CONTROLLER_1 {
+        @Override
+        public Input getInput(int id) {
+            return null;
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return null;
+        }
+    },
+    CONTROLLER_2 {
+        @Override
+        public Input getInput(int id) {
+            return null;
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return null;
+        }
+    },
+    CONTROLLER_3 {
+        @Override
+        public Input getInput(int id) {
+            return null;
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return null;
+        }
+    },
+    CONTROLLER_4 {
+        @Override
+        public Input getInput(int id) {
+            return null;
+        }
+
+        @Override
+        public Input getInput(String name) {
+            return null;
+        }
+    };
+
+    public abstract Input getInput(int id);
+    public abstract Input getInput(String name);
+
+    public static Input parse(String inputName) {
+        for (InputType type : values()) {
+            Input result = type.getInput(inputName);
+            if (result != null) {
+                return result;
+            }
+        }
+        return UnknownInput.tryParse(inputName);
+    }
+
 }

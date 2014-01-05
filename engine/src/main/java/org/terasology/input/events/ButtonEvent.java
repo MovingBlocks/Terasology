@@ -29,8 +29,6 @@ public abstract class ButtonEvent extends InputEvent {
 
     public abstract ButtonState getState();
 
-    public abstract String getButtonName();
-
     public boolean isDown() {
         return getState() != ButtonState.UP;
     }

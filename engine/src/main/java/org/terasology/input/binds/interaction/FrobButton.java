@@ -16,16 +16,16 @@
 
 package org.terasology.input.binds.interaction;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
 @RegisterBindButton(id = "frob", description = "Use Target")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_E)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.E)
 public class FrobButton extends BindButtonEvent {
 }

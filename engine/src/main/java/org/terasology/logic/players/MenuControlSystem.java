@@ -16,7 +16,6 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -24,6 +23,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.binds.general.PauseButton;
@@ -82,8 +82,8 @@ public class MenuControlSystem implements ComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
-        switch (event.getKey()) {
-            case Keyboard.KEY_F12:
+        switch (event.getKey().getId()) {
+            case Keyboard.KeyId.F12:
                 DefaultRenderingProcess.getInstance().takeScreenshot();
                 break;
         }

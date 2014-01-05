@@ -16,13 +16,13 @@
 package org.terasology.rendering.gui.widgets;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -131,7 +131,7 @@ public class UIText extends UIDisplayContainerScrollable {
         public void key(UIDisplayElement element, KeyEvent event) {
             if (isFocused()) {
                 //delete
-                if (event.getKey() == Keyboard.KEY_BACK && event.isDown()) {
+                if (event.getKey() == Keyboard.Key.BACKSPACE && event.isDown()) {
                     if (text.getText().length() > 0) {
                         //delete selection
                         if (selectionStart != selectionEnd) {
@@ -148,7 +148,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     event.consume();
                 }
                 //delete
-                if (event.getKey() == Keyboard.KEY_DELETE && event.isDown()) {
+                if (event.getKey() == Keyboard.Key.DELETE && event.isDown()) {
                     if (text.getText().length() > 0) {
                         //delete selection
                         if (selectionStart != selectionEnd) {
@@ -163,15 +163,15 @@ public class UIText extends UIDisplayContainerScrollable {
                     }
 
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_HOME && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.HOME && event.isDown()) {
                     clearSelection();
                     setCursorToTextPosition(0);
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_END && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.END && event.isDown()) {
                     clearSelection();
                     setCursorToTextPosition(text.getText().length());
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.LEFT && event.isDown()) {
                     //move cursor left
                     clearSelection();
                     if (ctrlKeyPressed) {
@@ -181,7 +181,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     }
 
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.RIGHT && event.isDown()) {
                     //move cursor right
                     clearSelection();
                     if (ctrlKeyPressed) {
@@ -191,7 +191,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     }
 
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.UP && event.isDown()) {
                     //move cursor up
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
@@ -200,7 +200,7 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorToTextPosition(toTextPositionLocal(new Vector2f(cursorPos.x, cursorPos.y - cursor.getSize().y + 1)));
 
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
+                } else if (event.getKey() == Keyboard.Key.DOWN && event.isDown()) {
                     //move cursor down
                     //TODO better solution here the behavior is kinda wrong
                     clearSelection();
@@ -209,34 +209,34 @@ public class UIText extends UIDisplayContainerScrollable {
                     setCursorToTextPosition(toTextPositionLocal(new Vector2f(cursorPos.x, cursorPos.y + cursor.getSize().y + 1)));
 
                     event.consume();
-                } else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
+                } else if (event.getKey() == Keyboard.Key.LEFT_CTRL || event.getKey() == Keyboard.Key.RIGHT_CTRL) {
                     //left/right control pressed
                     ctrlKeyPressed = event.isDown();
 
                     event.consume();
-                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.Key.X && event.isDown()) {
                     //cut selection
                     cut();
 
                     event.consume();
-                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.Key.C && event.isDown()) {
                     //copy selection
                     copy();
 
                     event.consume();
-                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.Key.V && event.isDown()) {
                     //paste selection
                     paste();
 
                     event.consume();
-                } else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
+                } else if (ctrlKeyPressed && event.getKey() == Keyboard.Key.A && event.isDown()) {
                     //select all
                     setSelection(0, text.getText().length());
 
                     event.consume();
                 } else if (event.isDown()) {
                     //add character
-                    char c = Keyboard.getEventCharacter();
+                    char c = event.getKeyCharacter();
 
                     if (c == '\r') {
                         c = '\n';

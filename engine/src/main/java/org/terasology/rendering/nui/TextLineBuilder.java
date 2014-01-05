@@ -34,6 +34,8 @@ public class TextLineBuilder {
     private int currentLineLength;
     private StringBuilder lineBuilder = new StringBuilder();
 
+    private boolean lineHasWord = false;
+
     public TextLineBuilder(Font font, int maxWidth) {
         this.font = font;
         this.spaceWidth = font.getWidth(' ');
@@ -50,16 +52,19 @@ public class TextLineBuilder {
         List<String> paragraphs = Arrays.asList(text.split("\\r?\\n"));
         for (String paragraph : paragraphs) {
             String remainder = paragraph;
-            while (!remainder.isEmpty()) {
+            while (remainder != null && !remainder.isEmpty()) {
                 String[] split = remainder.split(" ", 2);
                 String word = split[0];
                 if (split.length > 1) {
                     remainder = split[1];
                 } else {
-                    remainder = "";
+                    remainder = null;
                 }
 
                 addWord(word);
+            }
+            if (remainder != null) {
+                addWord(remainder);
             }
             endLine();
         }
@@ -78,17 +83,19 @@ public class TextLineBuilder {
                 }
                 lineBuilder.append(c);
                 currentLineLength += charWidth;
+                lineHasWord = true;
             }
         } else {
             if (currentLineLength > 0 && currentLineLength + spaceWidth + wordWidth > maxWidth) {
                 endLine();
             }
-            if (currentLineLength != 0) {
+            if (lineHasWord) {
                 lineBuilder.append(' ');
                 currentLineLength += spaceWidth;
             }
             lineBuilder.append(word);
             currentLineLength += wordWidth;
+            lineHasWord = true;
         }
     }
 
@@ -100,5 +107,6 @@ public class TextLineBuilder {
         currentLineLength = 0;
         lines.add(lineBuilder.toString());
         lineBuilder.setLength(0);
+        lineHasWord = false;
     }
 }

@@ -16,7 +16,6 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
 import org.terasology.engine.CoreRegistry;
@@ -26,6 +25,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -88,20 +88,20 @@ public class DebugControlSystem implements ComponentSystem {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
         if (debugEnabled && event.isDown()) {
-            switch (event.getKey()) {
-                case Keyboard.KEY_UP:
+            switch (event.getKey().getId()) {
+                case Keyboard.KeyId.UP:
                     world.getTime().setDays(world.getTime().getDays() + 0.005f);
                     event.consume();
                     break;
-                case Keyboard.KEY_DOWN:
+                case Keyboard.KeyId.DOWN:
                     world.getTime().setDays(world.getTime().getDays() - 0.005f);
                     event.consume();
                     break;
-                case Keyboard.KEY_RIGHT:
+                case Keyboard.KeyId.RIGHT:
                     world.getTime().setDays(world.getTime().getDays() + 0.02f);
                     event.consume();
                     break;
-                case Keyboard.KEY_LEFT:
+                case Keyboard.KeyId.LEFT:
                     world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
                     break;
@@ -114,45 +114,45 @@ public class DebugControlSystem implements ComponentSystem {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
         if (debugEnabled) {
-            switch (event.getKey()) {
-                case Keyboard.KEY_R:
+            switch (event.getKey().getId()) {
+                case Keyboard.KeyId.R:
                     config.getRendering().getDebug().setWireframe(!config.getRendering().getDebug().isWireframe());
                     event.consume();
                     break;
-                case Keyboard.KEY_K:
+                case Keyboard.KeyId.K:
                     entity.send(new DoDamageEvent(9999, null));
                     break;
-                case Keyboard.KEY_F6:
+                case Keyboard.KeyId.F6:
                     config.getRendering().getDebug().setEnabled(!config.getRendering().getDebug().isEnabled());
                     event.consume();
                     break;
-                case Keyboard.KEY_F7:
+                case Keyboard.KeyId.F7:
                     config.getRendering().getDebug().cycleStage();
                     entity.send(new ConsoleMessageEvent("Set debug stage to: " + config.getRendering().getDebug().getStage()));
                     event.consume();
                     break;
-                case Keyboard.KEY_F8:
+                case Keyboard.KeyId.F8:
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
             }
         }
 
-        switch (event.getKey()) {
-            case Keyboard.KEY_F1:
+        switch (event.getKey().getId()) {
+            case Keyboard.KeyId.F1:
                 engine.setFocus(!engine.hasFocus());
                 Mouse.setGrabbed(engine.hasFocus());
                 event.consume();
                 break;
-            case Keyboard.KEY_F3:
+            case Keyboard.KeyId.F3:
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
-            case Keyboard.KEY_F:
+            case Keyboard.KeyId.F:
                 toggleViewingDistance();
                 event.consume();
                 break;
-            case Keyboard.KEY_F4:
+            case Keyboard.KeyId.F4:
                 metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
                 metrics.toggleMode();
                 event.consume();

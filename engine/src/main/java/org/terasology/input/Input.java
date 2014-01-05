@@ -27,20 +27,9 @@ import java.util.Objects;
  *
  * @author Immortius
  */
-public final class Input {
-    private InputType type;
-    private int id;
+public interface Input {
 
-    public Input() {
-        this.type = InputType.NONE;
-    }
-
-    public Input(InputType type, int id) {
-        this.type = type;
-        this.id = id;
-    }
-
-    public static Input parse(String inputString) {
+    /*static Input parse(String inputString) {
         String normalisedString = inputString.toUpperCase(Locale.ENGLISH);
         if (normalisedString.startsWith("KEY_")) {
             int id = Keyboard.getKeyIndex(normalisedString.substring(4));
@@ -54,39 +43,27 @@ public final class Input {
             }
         }
         return new Input();
-    }
+    }*/
 
-    public InputType getType() {
-        return type;
-    }
+    InputType getType();
 
-    public int getId() {
-        return id;
-    }
+    int getId();
 
-    public String toShortString() {
+    String getName();
+
+    String getDisplayName();
+    /*{
         switch (type) {
             case KEY:
                 return Keyboard.getKeyName(id);
             case MOUSE_BUTTON:
             case MOUSE_WHEEL:
-                return MouseInput.getInputFor(type, id).toShortString();
+                return MouseInput.find(type, id).toShortString();
         }
         return "";
-    }
+    } */
 
-    public String toString() {
-        switch (type) {
-            case KEY:
-                return "KEY_" + Keyboard.getKeyName(id);
-            case MOUSE_BUTTON:
-            case MOUSE_WHEEL:
-                return MouseInput.getInputFor(type, id).toString();
-        }
-        return "";
-    }
-
-    @Override
+    /*@Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -101,5 +78,5 @@ public final class Input {
     @Override
     public int hashCode() {
         return Objects.hash(type, id);
-    }
+    }*/
 }

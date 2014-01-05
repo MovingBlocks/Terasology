@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.mainMenu.selectGame;
+package org.terasology.rendering.nui.mainMenu;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.ListEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.utilities.FilesUtil;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -61,22 +62,47 @@ public class SelectGameScreen extends UIScreen {
 
     @Override
     public void initialise() {
-        UIList<GameInfo> gameList = find("gameList", UIList.class);
+        final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
         gameList.subscribe(new ListEventListener<GameInfo>() {
             @Override
             public void onItemActivated(GameInfo item) {
-                try {
-                    GameManifest manifest = item.manifest;
-                    Config config = CoreRegistry.get(Config.class);
+                loadGame(item);
+            }
+        });
 
-                    config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
-                    config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-                    CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
-                } catch (Exception e) {
-                    // TODO: Display error
-                    logger.error("Failed to load saved game", e);
+        UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.pushScreen("engine:createGameScreen");
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "load", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                GameInfo gameInfo = gameList.getSelection();
+                if (gameInfo != null) {
+                    loadGame(gameInfo);
+                }
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "delete", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                GameInfo gameInfo = gameList.getSelection();
+                if (gameInfo != null) {
+                    Path world = PathManager.getInstance().getSavePath(gameInfo.manifest.getTitle());
+                    try {
+                        FilesUtil.recursiveDelete(world);
+                        gameList.getList().remove(gameInfo);
+                        gameList.setSelection(null);
+                    } catch (Exception e) {
+                        logger.error("Failed to delete saved game", e);
+                        // TODO: show error
+                    }
                 }
             }
         });
@@ -87,6 +113,20 @@ public class SelectGameScreen extends UIScreen {
                 nuiManager.popScreen();
             }
         });
+    }
+
+    private void loadGame(GameInfo item) {
+        try {
+            GameManifest manifest = item.manifest;
+            Config config = CoreRegistry.get(Config.class);
+
+            config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
+            config.getWorldGeneration().setWorldTitle(manifest.getTitle());
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
+        } catch (Exception e) {
+            // TODO: Display error
+            logger.error("Failed to load saved game", e);
+        }
     }
 
     public boolean isLoadingAsServer() {

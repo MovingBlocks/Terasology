@@ -16,16 +16,16 @@
 
 package org.terasology.input.binds.inventory;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
 @RegisterBindButton(id = "toolbarSlot9", description = "Toolbar Slot 10")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_0)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.KEY_0)
 public class ToolbarSlot9Button extends ToolbarSlotButton {
     public ToolbarSlot9Button() {
         super(9);

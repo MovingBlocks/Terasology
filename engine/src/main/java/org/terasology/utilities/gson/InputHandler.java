@@ -24,6 +24,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.terasology.input.Input;
+import org.terasology.input.InputType;
 
 import java.lang.reflect.Type;
 
@@ -34,7 +35,7 @@ public class InputHandler implements JsonSerializer<Input>, JsonDeserializer<Inp
 
     @Override
     public Input deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return Input.parse(json.getAsString());
+        return InputType.parse(json.getAsString());
     }
 
     @Override

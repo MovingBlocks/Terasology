@@ -58,6 +58,8 @@ import java.util.Set;
  */
 public class InputSettingsScreen extends UIScreen {
 
+    private Border padding = new Border(2, 2, 4, 4);
+
     @In
     private NUIManager nuiManager;
 
@@ -77,9 +79,10 @@ public class InputSettingsScreen extends UIScreen {
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
+
         mainLayout.addWidget(new UILabel("mouseLabel", "heading-input", "Mouse"));
-        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f));
-        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f));
+        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f).setPadding(padding));
+        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f).setPadding(padding));
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -173,7 +176,7 @@ public class InputSettingsScreen extends UIScreen {
         inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
         UIInputBind secondaryInputBind = new UIInputBind();
         secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
-        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f));
+        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setPadding(padding));
     }
 
     @Override

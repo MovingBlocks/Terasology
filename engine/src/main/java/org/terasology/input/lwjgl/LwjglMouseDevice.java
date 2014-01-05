@@ -53,11 +53,11 @@ public class LwjglMouseDevice implements MouseDevice {
         while (Mouse.next()) {
             if (Mouse.getEventButton() != -1) {
                 ButtonState state = (Mouse.getEventButtonState()) ? ButtonState.DOWN : ButtonState.UP;
-                result.add(new InputAction(InputType.MOUSE_BUTTON, Mouse.getEventButton(), state));
+                result.add(new InputAction(InputType.MOUSE_BUTTON.getInput(Mouse.getEventButton()), state));
             }
             if (Mouse.getEventDWheel() != 0) {
                 int id = (Mouse.getEventDWheel() > 0) ? 1 : -1;
-                result.add(new InputAction(InputType.MOUSE_WHEEL, id, id * Mouse.getEventDWheel() / 120));
+                result.add(new InputAction(InputType.MOUSE_WHEEL.getInput(id), id * Mouse.getEventDWheel() / 120));
             }
         }
 

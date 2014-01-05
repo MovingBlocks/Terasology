@@ -96,7 +96,7 @@ import static org.lwjgl.opengl.Util.checkGLError;
 /**
  * @author Immortius
  */
-public class LwjglCanvas implements CanvasInternal {
+public class LwjglCanvas implements CanvasControl {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
     private static final int MAX_DOUBLE_CLICK_DISTANCE = 5;
@@ -385,29 +385,38 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawText(String text) {
-        drawText(text, state.getRelativeRegion());
+        drawText(text, applyMarginToRegion(state.getRelativeRegion()));
     }
 
     @Override
     public void drawText(String text, Rect2i region) {
-        Rect2i drawRegion = applyMarginToRegion(region);
         UIStyle style = getCurrentStyle();
         if (style.isTextShadowed()) {
-            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), drawRegion, style.getHorizontalTextAlignment(),
+            drawTextRawShadowed(text, style.getFont(), style.getTextColor(), style.getTextShadowColor(), region, style.getHorizontalTextAlignment(),
                     style.getVerticalTextAlignment());
         } else {
-            drawTextRaw(text, style.getFont(), style.getTextColor(), drawRegion, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
+            drawTextRaw(text, style.getFont(), style.getTextColor(), region, style.getHorizontalTextAlignment(), style.getVerticalTextAlignment());
         }
     }
 
     @Override
     public void drawTexture(TextureRegion texture) {
-        drawTexture(texture, state.getRelativeRegion());
+        drawTexture(texture, applyMarginToRegion(state.getRelativeRegion()));
+    }
+
+    @Override
+    public void drawTexture(TextureRegion texture, Color color) {
+        drawTexture(texture, applyMarginToRegion(state.getRelativeRegion()), color);
     }
 
     @Override
     public void drawTexture(TextureRegion texture, Rect2i region) {
-        drawTextureRaw(texture, applyMarginToRegion(region), getCurrentStyle().getTextureScaleMode());
+        drawTextureRaw(texture, region, getCurrentStyle().getTextureScaleMode());
+    }
+
+    @Override
+    public void drawTexture(TextureRegion texture, Rect2i region, Color color) {
+        drawTextureRaw(texture, region, color, getCurrentStyle().getTextureScaleMode());
     }
 
     private Rect2i applyMarginToRegion(Rect2i region) {
@@ -506,6 +515,11 @@ public class LwjglCanvas implements CanvasInternal {
     }
 
     @Override
+    public void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode) {
+        drawTextureRaw(texture, region, color, mode, 0f, 0f, 1f, 1f);
+    }
+
+    @Override
     public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, int ux, int uy, int uw, int uh) {
         drawTextureRaw(texture, region, mode,
                 (float) ux / texture.getWidth(), (float) uy / texture.getHeight(),
@@ -514,6 +528,11 @@ public class LwjglCanvas implements CanvasInternal {
 
     @Override
     public void drawTextureRaw(TextureRegion texture, Rect2i region, ScaleMode mode, float ux, float uy, float uw, float uh) {
+        drawTextureRaw(texture, region, Color.WHITE, mode, ux, uy, uw, uh);
+    }
+
+    @Override
+    public void drawTextureRaw(TextureRegion texture, Rect2i region, Color color, ScaleMode mode, float ux, float uy, float uw, float uh) {
         if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
@@ -524,9 +543,9 @@ public class LwjglCanvas implements CanvasInternal {
             Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
             if (!cropRegion.isEmpty()) {
                 if (state.drawOnTop) {
-                    drawOnTopOperations.add(new DrawTextureOperation(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
+                    drawOnTopOperations.add(new DrawTextureOperation(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
                 } else {
-                    drawTextureInternal(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha());
+                    drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha());
                 }
             }
         }
@@ -536,7 +555,6 @@ public class LwjglCanvas implements CanvasInternal {
         if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
             return;
         }
-        Util.checkGLError();
         int tileW = (int) (uw * texture.getWidth());
         int tileH = (int) (uh * texture.getHeight());
         if (tileW != 0 && tileH != 0) {
@@ -554,9 +572,7 @@ public class LwjglCanvas implements CanvasInternal {
                     }
                 }
             }
-
         }
-        Util.checkGLError();
     }
 
     @Override
@@ -771,7 +787,8 @@ public class LwjglCanvas implements CanvasInternal {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
     }
 
-    private void drawTextureInternal(TextureRegion texture, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+    private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion,
+                                     float ux, float uy, float uw, float uh, float alpha) {
         Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
         Rect2f textureArea = texture.getRegion();
         textureMat.setFloat2("scale", scale);
@@ -781,7 +798,7 @@ public class LwjglCanvas implements CanvasInternal {
         textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
         textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
         textureMat.setTexture("texture", texture.getTexture());
-        textureMat.setFloat4("color", 1.0f, 1.0f, 1.0f, alpha);
+        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
         textureMat.bindTextures();
         if (mode == ScaleMode.SCALE_FILL) {
             if (!cropRegion.equals(state.cropRegion)) {
@@ -993,12 +1010,9 @@ public class LwjglCanvas implements CanvasInternal {
         }
     }
 
-    private interface DrawOperation {
-        void draw();
-    }
-
     private final class DrawTextureOperation implements DrawOperation {
 
+        private Color color;
         private ScaleMode mode;
         private TextureRegion texture;
         private Rect2i absoluteRegion;
@@ -1009,7 +1023,9 @@ public class LwjglCanvas implements CanvasInternal {
         private float uh;
         private float alpha;
 
-        private DrawTextureOperation(TextureRegion texture, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+        private DrawTextureOperation(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
+                                     Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+            this.color = color;
             this.mode = mode;
             this.texture = texture;
             this.absoluteRegion = absoluteRegion;
@@ -1023,7 +1039,7 @@ public class LwjglCanvas implements CanvasInternal {
 
         @Override
         public void draw() {
-            drawTextureInternal(texture, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+            drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
         }
     }
 

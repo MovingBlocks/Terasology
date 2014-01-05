@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.mainMenu.inputSettings;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -64,7 +64,7 @@ public class UIInputBind extends CoreWidget {
     public void onDraw(Canvas canvas) {
         if (!capturingInput) {
             if (input.get() != null) {
-                canvas.drawText(input.get().toShortString());
+                canvas.drawText(input.get().getDisplayName());
             }
         } else {
             canvas.drawText("???");
@@ -79,7 +79,7 @@ public class UIInputBind extends CoreWidget {
         if (capturingInput) {
             text = "???";
         } else if (input.get() != null) {
-            text = input.get().toShortString();
+            text = input.get().getDisplayName();
         }
         List<String> lines = TextLineBuilder.getLines(font, text, areaHint.getX());
         Vector2i size = font.getSize(lines);
@@ -89,7 +89,7 @@ public class UIInputBind extends CoreWidget {
     @Override
     public void onMouseButtonEvent(MouseButtonEvent event) {
         if (capturingInput && event.isDown()) {
-            setInput(new Input(InputType.MOUSE_BUTTON, event.getButton().getId()));
+            setInput(InputType.MOUSE_BUTTON.getInput(event.getButton().getId()));
             capturingInput = false;
             event.consume();
         }
@@ -98,8 +98,8 @@ public class UIInputBind extends CoreWidget {
     @Override
     public void onMouseWheelEvent(MouseWheelEvent event) {
         if (capturingInput) {
-            MouseInput mouseInput = MouseInput.getInputFor(InputType.MOUSE_WHEEL, event.getWheelTurns());
-            setInput(new Input(InputType.MOUSE_WHEEL, mouseInput.getId()));
+            MouseInput mouseInput = MouseInput.find(InputType.MOUSE_WHEEL, event.getWheelTurns());
+            setInput(InputType.MOUSE_WHEEL.getInput(mouseInput.getId()));
             capturingInput = false;
             event.consume();
         }
@@ -108,10 +108,10 @@ public class UIInputBind extends CoreWidget {
     @Override
     public void onKeyEvent(KeyEvent event) {
         if (capturingInput && event.isDown()) {
-            if (event.getKey() == Keyboard.KEY_ESCAPE) {
+            if (event.getKey() == Keyboard.Key.ESCAPE) {
                 setInput(null);
             } else {
-                setInput(new Input(InputType.KEY, event.getKey()));
+                setInput(InputType.KEY.getInput(event.getKey().getId()));
             }
             capturingInput = false;
             event.consume();

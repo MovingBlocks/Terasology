@@ -150,7 +150,7 @@ public final class BindsConfig {
         for (Annotation annotation : buttonEvent.getAnnotations()) {
             if (annotation instanceof DefaultBinding) {
                 DefaultBinding defaultBinding = (DefaultBinding) annotation;
-                defaultInputs.add(new Input(defaultBinding.type(), defaultBinding.id()));
+                defaultInputs.add(defaultBinding.type().getInput(defaultBinding.id()));
             }
         }
         SimpleUri bindUri = new SimpleUri(moduleName, info.id());

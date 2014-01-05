@@ -53,6 +53,7 @@ import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.input.InputSystem;
+import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
@@ -489,6 +490,7 @@ public class TerasologyEngine implements GameEngine {
             Mouse.setGrabbed(false);
             InputSystem inputSystem = CoreRegistry.putPermanently(InputSystem.class, new InputSystem());
             inputSystem.setMouseDevice(new LwjglMouseDevice());
+            inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
         } catch (LWJGLException e) {
             logger.error("Could not initialize controls.", e);
             System.exit(1);
@@ -524,6 +526,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
+        moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
         moduleSecurityManager.addAPIPackage("java.util.concurrent");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
