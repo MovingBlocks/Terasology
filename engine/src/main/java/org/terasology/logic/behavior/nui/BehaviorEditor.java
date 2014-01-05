@@ -28,9 +28,20 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.baseLayouts.ColumnLayout;
+import org.terasology.rendering.nui.baseLayouts.RowLayout;
+import org.terasology.rendering.nui.baseLayouts.RowLayoutHint;
 import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
+import org.terasology.rendering.nui.baseLayouts.relative.RelativeLayout;
+import org.terasology.rendering.nui.baseLayouts.relative.RelativeLayoutHint;
+import org.terasology.rendering.nui.baseLayouts.relative.VerticalInfo;
+import org.terasology.rendering.nui.baseWidgets.UIButton;
+import org.terasology.rendering.nui.baseWidgets.UILabel;
+import org.terasology.rendering.nui.databinding.Binding;
 
 import javax.vecmath.Vector2f;
 import java.io.ByteArrayOutputStream;
@@ -44,8 +55,9 @@ public class BehaviorEditor extends ZoomableLayout {
     private RenderableNode selectedNode;
     private RenderableNode newNode;
     private BehaviorTree tree;
-
     private Vector2f mousePos;
+    private ColumnLayout properties;
+    private Binding<RenderableNode> selectionBinding;
 
     private final InteractionListener moveOver = new BaseInteractionListener(){
         @Override
@@ -157,6 +169,10 @@ public class BehaviorEditor extends ZoomableLayout {
 
     public void nodeClicked(RenderableNode node) {
         selectedNode = node;
+        properties = null;
+        if( selectionBinding!=null ) {
+            selectionBinding.set(node);
+        }
     }
 
     private void drawConnection( Canvas canvas, Vector2f from, Vector2f to, Color color) {
@@ -184,4 +200,22 @@ public class BehaviorEditor extends ZoomableLayout {
         newNode = tree.createNode(node);
         return newNode;
     }
+
+    public ColumnLayout getProperties() {
+        if( properties==null ) {
+            properties = new ColumnLayout();
+            properties.setColumns(2);
+            properties.addWidget(new UILabel("properties.label", selectedNode.toString()));
+            properties.addWidget(new UILabel("", ""));
+            properties.addWidget(new UILabel("", "X"));
+            properties.addWidget(new UIButton("x", "y"));
+
+        }
+        return properties;
+    }
+
+    public void bindSelection( Binding<RenderableNode> binding ) {
+        selectionBinding = binding;
+    }
+
 }

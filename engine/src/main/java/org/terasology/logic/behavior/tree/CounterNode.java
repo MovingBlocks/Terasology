@@ -16,6 +16,8 @@
 package org.terasology.logic.behavior.tree;
 
 import org.terasology.engine.API;
+import org.terasology.rendering.nui.properties.Checkbox;
+import org.terasology.rendering.nui.properties.Range;
 
 /**
  * Counter node. Returns RUNNING as long as not counted down to zero.
@@ -24,6 +26,7 @@ import org.terasology.engine.API;
  */
 @API
 public class CounterNode extends Node {
+    @Range(min = 0, max = 100)
     private int limit;
 
     public CounterNode() {

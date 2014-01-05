@@ -21,9 +21,26 @@
                 }
             },
             {
-                "type" : "engine:columnLayout",
+                "type" : "propertyLayout",
+                "id" : "properties",
                 "layoutInfo" : {
                     "width" : 380,
+                    "position-left" : {
+                        "target" : "LEFT",
+                        "offset" : 16
+                    },
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "controls",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "engine:columnLayout",
+                "id" : "controls",
+                "layoutInfo" : {
+                    "width" : 600,
                     "height" : 96,
                     "position-left" : {
                         "target" : "LEFT",
@@ -51,18 +68,38 @@
                                 "text" : "copy"
                             },
                             {
-                                "type" : "UIDropdown",
-                                "id" : "select_tree"
+                                "type" : "UIButton",
+                                "id" : "paste",
+                                "text" : "paste"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "layout",
+                                "text" : "layout"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "new",
+                                "text" : "new"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "id" : "assign",
+                                "text" : "assign"
                             },
                             {
                                 "type" : "UIDropdown",
-                                "id" : "select_entity"
+                                "id" : "select_tree"
                             }
                         ]
                     },
                     {
                         "type" : "RowLayout",
                         "contents" : [
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "select_entity"
+                            },
                             {
                                 "type" : "UIButton",
                                 "id" : "debug_stop",

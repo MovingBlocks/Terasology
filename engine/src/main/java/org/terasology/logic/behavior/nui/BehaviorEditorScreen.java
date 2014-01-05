@@ -21,14 +21,15 @@ import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -42,6 +43,19 @@ import java.util.List;
 public class BehaviorEditorScreen extends UIScreen {
     @Override
     public void initialise() {
+
+        find("tree", BehaviorEditor.class).bindSelection(new Binding<RenderableNode>() {
+            @Override
+            public RenderableNode get() {
+                return null;
+            }
+
+            @Override
+            public void set(RenderableNode value) {
+                PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
+                find("properties", PropertyLayout.class).setPropertyProvider(provider);
+            }
+        });
         find("select_tree", UIDropdown.class).bindSelection(new Binding<BehaviorTree>() {
             @Override
             public BehaviorTree get() {
