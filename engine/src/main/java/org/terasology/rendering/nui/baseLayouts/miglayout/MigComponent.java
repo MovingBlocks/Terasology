@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.baseLayouts.miglayout;
 import net.miginfocom.layout.ComponentWrapper;
 import net.miginfocom.layout.ContainerWrapper;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
@@ -38,6 +39,9 @@ public class MigComponent implements ComponentWrapper {
         this.parent = parent;
     }
 
+    public void calcPreferredSize(Canvas canvas, Vector2i sizeHint) {
+        preferredSize = canvas.calculateSize(widget, sizeHint);
+    }
     @Override
     public UIWidget getComponent() {
         return widget;
@@ -152,12 +156,12 @@ public class MigComponent implements ComponentWrapper {
 
     @Override
     public int getScreenWidth() {
-        return 800;
+        throw new IllegalAccessError("Not supported!");
     }
 
     @Override
     public int getScreenHeight() {
-        return 600;
+        throw new IllegalAccessError("Not supported!");
     }
 
     @Override

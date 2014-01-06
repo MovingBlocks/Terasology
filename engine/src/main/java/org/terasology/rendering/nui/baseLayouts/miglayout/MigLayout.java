@@ -29,6 +29,7 @@ import net.miginfocom.layout.LayoutCallback;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
@@ -61,6 +62,15 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     private boolean dirty;
     private MigComponent delegate = new MigComponent(null, null);
     private List<Rect2i> debugRects = Lists.newArrayList();
+    private boolean debug;
+
+    public MigLayout() {
+        this(null);
+    }
+
+    public MigLayout(String id) {
+        super(id);
+    }
 
     public void setLc(LC lc) {
         this.lc = lc;
@@ -84,6 +94,10 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         setCC(ConstraintParser.parseColumnConstraints(constraint));
     }
 
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
     public void setRc(AC rc) {
         this.rc = rc;
         dirty = true;
@@ -97,17 +111,23 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public void onDraw(Canvas canvas) {
-        layoutContainer(new int[]{0, 0, canvas.size().x, canvas.size().y});
+        int[] bounds = {0, 0, canvas.size().x, canvas.size().y};
+
+        layoutContainer(canvas, bounds);
 
         for (ComponentWrapper wrapper : ccMap.keySet()) {
             UIWidget component = (UIWidget) wrapper.getComponent();
             Rect2i region = Rect2i.createFromMinAndSize(wrapper.getX(), wrapper.getY(), wrapper.getWidth(), wrapper.getHeight());
             canvas.drawElement(component, region);
         }
-        for (ComponentWrapper wrapper : ccMap.keySet()) {
-            UIWidget component = (UIWidget) wrapper.getComponent();
-            Rect2i region = Rect2i.createFromMinAndSize(wrapper.getX(), wrapper.getY(), wrapper.getWidth(), wrapper.getHeight());
-//            canvas.drdrawElement(component, region);
+        if( debug ) {
+            grid.paintDebug();
+        }
+        for (Rect2i region : debugRects) {
+            canvas.drawLine(region.minX(), region.minY(), region.maxX(), region.minY(), Color.WHITE);
+            canvas.drawLine(region.maxX(), region.minY(), region.maxX(), region.maxY(), Color.WHITE);
+            canvas.drawLine(region.maxX(), region.maxY(), region.minX(), region.maxY(), Color.WHITE);
+            canvas.drawLine(region.minX(), region.maxY(), region.minX(), region.minY(), Color.WHITE);
         }
     }
 
@@ -123,7 +143,9 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
-        return null;
+        int[] bounds = {0, 0, canvas.size().x, canvas.size().y};
+        layoutContainer(canvas, bounds);
+        return new Vector2i(grid.getWidth()[1], grid.getHeight()[1]);
     }
 
     private ComponentWrapper getWrapper(UIWidget comp) {
@@ -151,18 +173,21 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         dirty = false;
     }
 
-    public void layoutContainer(int[] bounds) {
+    public void layoutContainer(Canvas canvas, int[] bounds) {
         for (ComponentWrapper wrapper : children) {
             if (wrapper instanceof MigLayout) {
                 MigLayout layout = (MigLayout) wrapper;
-                layout.layoutContainer(bounds);
+                layout.layoutContainer(canvas, bounds);
+            } else if (wrapper instanceof MigComponent) {
+                MigComponent migComponent = (MigComponent) wrapper;
+                migComponent.calcPreferredSize(canvas, canvas.size());
             }
         }
         checkCache();
-        if (grid.layout(bounds, lc.getAlignX(), lc.getAlignY(), false, true)) {
+        if (grid.layout(bounds, lc.getAlignX(), lc.getAlignY(), debug, true)) {
             grid = null;
             checkCache();
-            grid.layout(bounds, lc.getAlignX(), lc.getAlignY(), false, false);
+            grid.layout(bounds, lc.getAlignX(), lc.getAlignY(), debug, false);
         }
     }
 
@@ -188,7 +213,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public void paintDebugCell(int x, int y, int width, int height) {
-
+        debugRects.add(Rect2i.createFromMinAndSize(x,y,width,height));
     }
 
     @Override
@@ -302,12 +327,12 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public int getScreenWidth() {
-        return delegate.getScreenWidth();
+        throw new IllegalAccessError("Not supported!");
     }
 
     @Override
     public int getScreenHeight() {
-        return delegate.getScreenHeight();
+        throw new IllegalAccessError("Not supported!");
     }
 
     @Override

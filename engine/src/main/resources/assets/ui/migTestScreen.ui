@@ -6,6 +6,7 @@
         "layoutConstraints" : "",
         "colConstraints" : "[min][grow][min]",
         "rowConstraints" : "",
+        "debug" : true,
         "contents" : [
             {
                 "type" : "migLayout",
@@ -19,13 +20,13 @@
                     {
                         "type" : "UIDropdown",
                         "layoutInfo" : {
-                            "cc" : "w 180!, h 40!"
+                            //"cc" : "w 180!, h 40!"
                         }
                     },
                     {
                         "type" : "UIDropdown",
                         "layoutInfo" : {
-                            "cc" : "w 180!, h 40!"
+                            //"cc" : "w 180!, h 40!"
                         }
                     }
                 ]
@@ -43,28 +44,28 @@
                         "type" : "UIButton",
                         "text": "[]",
                         "layoutInfo" : {
-                            "cc" : "w 40!, h 40!"
+                            //"cc" : "w 40!, h 40!"
                         }
                     },
                     {
                         "type" : "UIButton",
                         "text": "||",
                         "layoutInfo" : {
-                            "cc" : "w 40!, h 40!"
+                            //"cc" : "w 40!, h 40!"
                         }
                     },
                     {
                         "type" : "UIButton",
                         "text": "|>",
                         "layoutInfo" : {
-                            "cc" : "w 40!, h 40!"
+                            //"cc" : "w 40!, h 40!"
                         }
                     },
                     {
                         "type" : "UIButton",
                         "text": ">>",
                         "layoutInfo" : {
-                            "cc" : "w 40!, h 40!"
+                           // "cc" : "w 40!, h 40!"
                         }
                     }
                 ]
