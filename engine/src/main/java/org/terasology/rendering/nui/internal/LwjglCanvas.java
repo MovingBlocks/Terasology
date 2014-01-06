@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,9 @@ import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
@@ -76,7 +80,9 @@ import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glDisableClientState;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnableClientState;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glLoadMatrix;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -122,6 +128,7 @@ public class LwjglCanvas implements CanvasControl {
     private Vector2i lastClickPosition = new Vector2i();
 
     private Matrix4f modelView;
+    private Line line = new Line();
 
     public LwjglCanvas(NUIManager nuiManager, Time time) {
         this.nuiManager = nuiManager;
@@ -752,6 +759,26 @@ public class LwjglCanvas implements CanvasControl {
         }
     }
 
+    @Override
+    public void drawLine(int startX, int startY, int endX, int endY, Color color) {
+        if (state.drawOnTop) {
+            drawOnTopOperations.add(new DrawLineOperation(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color));
+        } else {
+            drawLineInternal(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color);
+        }
+    }
+
+    private void drawLineInternal(float x0, float y0, float x1, float y1, Color color) {
+        GL20.glUseProgram(0);
+        GL11.glDisable(GL_CULL_FACE);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        line.draw(x0, y0, x1, y1, 2, color, color, 0);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        GL11.glEnable(GL_CULL_FACE);
+    }
+
     private void crop(Rect2i cropRegion) {
         textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
     }
@@ -1013,6 +1040,28 @@ public class LwjglCanvas implements CanvasControl {
         @Override
         public void draw() {
             drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+        }
+    }
+
+    private final class DrawLineOperation implements DrawOperation {
+
+        private float x0;
+        private float y0;
+        private float x1;
+        private float y1;
+        private Color color;
+
+        private DrawLineOperation(float x0, float y0, float x1, float y1, Color color) {
+            this.x0 = x0;
+            this.y0 = y0;
+            this.x1 = x1;
+            this.y1 = y1;
+            this.color = color;
+        }
+
+        @Override
+        public void draw() {
+            drawLineInternal(x0, y0, x1, y1, color);
         }
     }
 
