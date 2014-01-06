@@ -36,7 +36,8 @@ import java.util.Iterator;
  * Created by synopia on 03.01.14.
  */
 public class PropertyLayout extends CoreLayout<LayoutHint> {
-    private Border padding = new Border(0, 0, 0, 0);
+    private int gapX;
+    private int gapY;
 
     private Vector2i labelSize = new Vector2i(100,20);
     private PropertyProvider<?> propertyProvider;
@@ -46,14 +47,6 @@ public class PropertyLayout extends CoreLayout<LayoutHint> {
 
     public PropertyLayout(String id) {
         super(id);
-    }
-
-    public Border getPadding() {
-        return padding;
-    }
-
-    public void setPadding(Border padding) {
-        this.padding = padding;
     }
 
     @Override
@@ -67,17 +60,17 @@ public class PropertyLayout extends CoreLayout<LayoutHint> {
                 UILabel label = property.getLabel();
                 Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, labelSize.x, labelSize.y);
                 canvas.drawElement(label, drawRegion);
-                currentOffset.x += labelSize.x;
+                currentOffset.x += labelSize.x + gapX;
 
                 UIWidget editor = property.getEditor();
-                int editorWidth = size.x - labelSize.x;
+                int editorWidth = size.x - currentOffset.x;
 
                 Vector2i editorSize = canvas.calculateSize(editor, new Vector2i(editorWidth, heightRemaining));
-                drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, editorSize.x, editorSize.y);
+                drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, editorWidth, editorSize.y);
                 canvas.drawElement(editor, drawRegion);
                 currentOffset.x = 0;
-                currentOffset.y += editorSize.y;
-                heightRemaining -= editorSize.y;
+                currentOffset.y += editorSize.y + gapY;
+                heightRemaining -= editorSize.y + gapY;
             }
         }
     }
@@ -97,8 +90,10 @@ public class PropertyLayout extends CoreLayout<LayoutHint> {
 
     @Override
     public void update(float delta) {
-        for (Property<?, ?> property : propertyProvider.getProperties()) {
-            property.getEditor().update(delta);
+        if( propertyProvider!=null ) {
+            for (Property<?, ?> property : propertyProvider.getProperties()) {
+                property.getEditor().update(delta);
+            }
         }
     }
 

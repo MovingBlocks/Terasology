@@ -34,7 +34,9 @@
                         "widget" : "controls",
                         "offset" : 16
                     }
-                }
+                },
+                "gapX" : 5,
+                "gapY" : 5
             },
             {
                 "type" : "engine:columnLayout",

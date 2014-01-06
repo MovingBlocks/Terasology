@@ -182,7 +182,8 @@ public class UIText extends CoreWidget {
             List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
             return font.getSize(lines);
         } else {
-            return new Vector2i(lastFont.getWidth(getText()), lastFont.getLineHeight());
+            Font font = canvas.getCurrentStyle().getFont();
+            return new Vector2i(font.getWidth(getText()), font.getLineHeight());
         }
     }
 

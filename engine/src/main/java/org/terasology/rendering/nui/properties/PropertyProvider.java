@@ -26,6 +26,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.baseWidgets.UICheckbox;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
+import org.terasology.rendering.nui.baseWidgets.UIText;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -81,9 +82,33 @@ public class PropertyProvider<T> {
                 Property<String, UIDropdown<String>> property = createStringDropdownProperty(fieldMetadata, field.getName(), list.items());
                 properties.add(property);
             }
+            for (Field field : getAllFields(type, and(withAnnotation(TextField.class), withType(String.class)))) {
+                FieldMetadata<Object, String> fieldMetadata = (FieldMetadata<Object, String>) classMetadata.getField(field.getName());
+                TextField textField = field.getAnnotation(TextField.class);
+
+                Property<String, UIText> property = createStringTextProperty(fieldMetadata, field.getName());
+                properties.add(property);
+            }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Property<String, UIText> createStringTextProperty(final FieldMetadata<Object, String> fieldMetadata, String label) {
+        UIText text = new UIText();
+        Binding<String> binding = new Binding<String>() {
+            @Override
+            public String get() {
+                return fieldMetadata.getValueChecked(target);
+            }
+
+            @Override
+            public void set(String value) {
+                fieldMetadata.setValue(target, value);
+            }
+        };
+        text.bindText(binding);
+        return new Property<>(label, binding, text);
     }
 
     private Property<Boolean, UICheckbox> createCheckboxProperty(final FieldMetadata<Object, Boolean> fieldMetadata, String label) {
