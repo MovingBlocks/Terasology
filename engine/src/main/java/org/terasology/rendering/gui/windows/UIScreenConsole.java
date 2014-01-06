@@ -38,6 +38,7 @@ import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.utilities.CamelCaseMatcher;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;

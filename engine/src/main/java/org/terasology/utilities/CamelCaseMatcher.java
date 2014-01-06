@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.gui.windows;
+package org.terasology.utilities;
 
 import java.util.Collection;
 import java.util.Set;
