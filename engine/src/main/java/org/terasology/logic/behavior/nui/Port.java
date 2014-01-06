@@ -93,6 +93,11 @@ public abstract class Port extends CoreWidget {
     }
 
     @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
+    }
+
+    @Override
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(connectListener);
         if (getTargetPort() != null) {

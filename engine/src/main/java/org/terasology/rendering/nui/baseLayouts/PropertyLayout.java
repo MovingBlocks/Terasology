@@ -38,6 +38,7 @@ import java.util.Iterator;
 public class PropertyLayout extends CoreLayout<LayoutHint> {
     private int gapX;
     private int gapY;
+    private Vector2i gap;
 
     private Vector2i labelSize = new Vector2i(100,20);
     private PropertyProvider<?> propertyProvider;
@@ -73,6 +74,11 @@ public class PropertyLayout extends CoreLayout<LayoutHint> {
                 heightRemaining -= editorSize.y + gapY;
             }
         }
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
     }
 
     private void findLabelSize(Canvas canvas, Vector2i areaHint) {

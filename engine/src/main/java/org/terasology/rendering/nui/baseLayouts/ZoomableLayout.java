@@ -114,6 +114,11 @@ public class ZoomableLayout extends CoreLayout {
     }
 
     @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
+    }
+
+    @Override
     public void update(float delta) {
         for (PositionalWidget widget : widgets) {
             widget.update(delta);

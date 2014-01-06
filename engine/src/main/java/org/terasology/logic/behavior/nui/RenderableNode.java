@@ -112,6 +112,11 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         portList.onDraw(canvas);
     }
 
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
+    }
+
     public void update() {
         List<RenderableNode> all = Lists.newArrayList(children);
         children.clear();
