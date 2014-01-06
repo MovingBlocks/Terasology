@@ -29,7 +29,6 @@ public abstract class StringTextRenderer<T> extends AbstractItemRenderer<T> {
 
     @Override
     public void draw(T value, Canvas canvas) {
-        canvas.drawBackground();
         canvas.drawText(getString(value));
 
     }

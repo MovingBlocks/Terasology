@@ -63,7 +63,6 @@ public class UIText extends CoreWidget {
     private int cursorPosition;
     private int selectionStart;
 
-    private Border lastMargin = Border.ZERO;
     private int lastWidth;
     private Font lastFont;
 
@@ -113,13 +112,13 @@ public class UIText extends CoreWidget {
         if (text.get() == null) {
             text.set("");
         }
-        lastMargin = canvas.getCurrentStyle().getMargin();
         lastFont = canvas.getCurrentStyle().getFont();
-        lastWidth = canvas.size().x - lastMargin.getTotalWidth();
-        canvas.addInteractionRegion(interactionListener);
+        lastWidth = canvas.size().x;
+        canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         correctCursor();
 
-        try (SubRegion ignored = canvas.subRegion(lastMargin.shrink(canvas.getRegion()), true)) {
+        // TODO: Add a crop within margin option to UIWidget?
+        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true)) {
             try (SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
                 canvas.drawText(text.get(), canvas.getRegion());
                 if (isFocused()) {
@@ -357,9 +356,7 @@ public class UIText extends CoreWidget {
 
     private void moveCursor(Vector2i pos, boolean selecting) {
         if (lastFont != null) {
-            pos.x -= lastMargin.getLeft();
             pos.x += offset;
-            pos.y -= lastMargin.getTop();
             List<String> lines = TextLineBuilder.getLines(lastFont, getText(), Integer.MAX_VALUE);
             int lineIndex = TeraMath.clamp(pos.y / lastFont.getLineHeight(), 0, lines.size() - 1);
             int newCursorPos = 0;

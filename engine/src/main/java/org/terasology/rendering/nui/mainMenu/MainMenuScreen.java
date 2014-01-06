@@ -45,7 +45,16 @@ public class MainMenuScreen extends UIScreen {
         UIScreenUtil.trySubscribe(this, "multiplayer", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                // Open
+                UIScreen screen = nuiManager.pushScreen("engine:selectGameScreen");
+                if (screen instanceof SelectGameScreen) {
+                    ((SelectGameScreen) screen).setLoadingAsServer(true);
+                }
+            }
+        });
+        UIScreenUtil.trySubscribe(this, "join", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+
             }
         });
         UIScreenUtil.trySubscribe(this, "settings", new ButtonEventListener() {

@@ -81,9 +81,8 @@ public class UILabel extends CoreWidget {
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        Vector2i availableSize = canvas.getCurrentStyle().getMargin().shrink(areaHint);
         Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, getText(), availableSize.x);
+        List<String> lines = TextLineBuilder.getLines(font, getText(), areaHint.x);
         return font.getSize(lines);
     }
 }

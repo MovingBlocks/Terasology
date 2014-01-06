@@ -144,7 +144,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         int height = element.layoutHint.getHeight();
         if (height == 0) {
             if (element.layoutHint.isUsingContentHeight()) {
-                height = element.widget.calcContentSize(canvas, new Vector2i(width, bottom - top)).y;
+                height = canvas.calculateSize(element.widget, new Vector2i(width, bottom - top)).y;
             } else {
                 height = bottom - top;
             }

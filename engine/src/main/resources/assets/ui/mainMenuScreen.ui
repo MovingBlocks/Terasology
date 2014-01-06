@@ -49,6 +49,7 @@
                 },
                 "columns" : 1,
                 "verticalSpacing" : 8,
+                "family" : "menu-options",
                 "contents" : [
                     {
                         "type" : "UIButton",
@@ -76,7 +77,8 @@
                         "text" : "Behavior Editor"
                     },
                     {
-                        "type" : "UISpace"
+                        "type" : "UISpace",
+                        "size" : [1, 64]
                     },
                     {
                         "type" : "UIButton",

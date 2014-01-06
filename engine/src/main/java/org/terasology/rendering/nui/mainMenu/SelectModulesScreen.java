@@ -94,14 +94,12 @@ public class SelectModulesScreen extends UIScreen {
 
                 @Override
                 public void draw(Module value, Canvas canvas) {
-                    canvas.drawBackground();
-                    Border margin = canvas.getCurrentStyle().getMargin();
                     if (selection.contains(value.getId())) {
                         canvas.setMode("enabled");
                     } else {
                         canvas.setMode("disabled");
                     }
-                    canvas.drawText(getString(value), margin.shrink(canvas.getRegion()));
+                    canvas.drawText(getString(value), canvas.getRegion());
                 }
 
                 @Override

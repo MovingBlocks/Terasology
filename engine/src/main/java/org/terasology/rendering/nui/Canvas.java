@@ -96,7 +96,8 @@ public interface Canvas {
     UIStyle getCurrentStyle();
 
     /**
-     * Calculates the size an element would like to have. Skin settings are taken into account, unless element.isSkinAppliedByCanvas() returns false.
+     * Calculates the size an element would like to have. Skin settings are taken into account, unless element.isSkinAppliedByCanvas() returns false (in which case it
+     * is up to the element to apply any style settings it needs.
      *
      * @param element The element to get the size of
      * @param sizeHint A hint as to the available area for the drawing the element
@@ -104,6 +105,11 @@ public interface Canvas {
      */
     Vector2i calculateSize(UIWidget element, Vector2i sizeHint);
 
+    /**
+     * Draws a widget to fill the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false (in which case it is up to the element
+     * to apply any style settings it needs).
+     * @param element
+     */
     void drawElement(UIWidget element);
 
     /**
@@ -405,8 +411,18 @@ public interface Canvas {
 
     void drawMesh(Mesh mesh, Texture texture, Rect2i region, Quat4f rotation, Vector3f offset, float scale);
 
+    /**
+     * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the
+     * full area of the widget.
+     * @param listener
+     */
     void addInteractionRegion(InteractionListener listener);
 
+    /**
+     * Adds an interaction region filling the desired region.
+     * @param listener
+     * @param region
+     */
     void addInteractionRegion(InteractionListener listener, Rect2i region);
 
     void drawLine(int startX, int startY, int endX, int endY, Color color);
