@@ -24,17 +24,17 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface NUIManager extends ComponentSystem {
 
-    void pushScreen(AssetUri screenUri);
+    UIScreen pushScreen(AssetUri screenUri);
 
-    void pushScreen(String screenUri);
+    UIScreen pushScreen(String screenUri);
 
     void pushScreen(UIScreen screen);
 
     void popScreen();
 
-    void setScreen(AssetUri screenUri);
+    UIScreen setScreen(AssetUri screenUri);
 
-    void setScreen(String screenUri);
+    UIScreen setScreen(String screenUri);
 
     void setScreen(UIScreen screen);
 

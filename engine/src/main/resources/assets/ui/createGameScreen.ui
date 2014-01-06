@@ -43,11 +43,6 @@
                         "target" : "BOTTOM",
                         "offset" : 16,
                         "widget" : "subtitle"
-                    },
-                    "position-bottom" : {
-                        "target" : "TOP",
-                        "offset" : 32,
-                        "widget" : "close"
                     }
                 }
             },
@@ -74,6 +69,7 @@
                     },
                     {
                         "type" : "RowLayout",
+                        "horizontalSpacing" : 16,
                         "contents" : [
                             {
                                 "type" : "UIText",
@@ -110,20 +106,32 @@
                         "target" : "BOTTOM",
                         "offset" : 16,
                         "widget" : "subtitle"
-                    },
-                    "position-bottom" : {
-                        "target" : "TOP",
-                        "offset" : 32,
-                        "widget" : "close"
                     }
                 }
             },
             {
-                "type" : "UIButton",
-                "text" : "Back",
-                "id" : "close",
+                "type" : "RowLayout",
+                "id" : "actionsRow",
+                "horizontalSpacing" : 4,
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "text" : "Mods...",
+                        "id" : "mods"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Play",
+                        "id" : "play"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Back",
+                        "id" : "close"
+                    }
+                ],
                 "layoutInfo" : {
-                    "width" : 128,
+                    "width" : 400,
                     "height" : 32,
                     "position-horizontal-center" : {},
                     "position-bottom" : {

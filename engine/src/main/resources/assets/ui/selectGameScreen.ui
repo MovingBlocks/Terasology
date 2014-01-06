@@ -56,6 +56,7 @@
             {
                 "type" : "RowLayout",
                 "id" : "actionButtons",
+                "horizontalSpacing" : 8,
                 "contents" : [
                     {
                         "type" : "UIButton",

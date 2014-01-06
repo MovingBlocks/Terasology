@@ -27,7 +27,6 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
-import org.terasology.math.Border;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
@@ -58,7 +57,7 @@ import java.util.Set;
  */
 public class InputSettingsScreen extends UIScreen {
 
-    private Border padding = new Border(2, 2, 4, 4);
+    private int horizontalSpacing = 4;
 
     @In
     private NUIManager nuiManager;
@@ -74,15 +73,16 @@ public class InputSettingsScreen extends UIScreen {
     public void initialise() {
 
         ColumnLayout mainLayout = new ColumnLayout();
-        mainLayout.setPadding(new Border(4, 4, 4, 4));
+        mainLayout.setHorizontalSpacing(8);
+        mainLayout.setVerticalSpacing(8);
         mainLayout.setFamily("option-grid");
         UISlider mouseSensitivity = new UISlider("mouseSensitivity");
         mouseSensitivity.setIncrement(0.025f);
         mouseSensitivity.setPrecision(3);
 
         mainLayout.addWidget(new UILabel("mouseLabel", "heading-input", "Mouse"));
-        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f).setPadding(padding));
-        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f).setPadding(padding));
+        mainLayout.addWidget(new RowLayout(new UILabel("Mouse Sensitivity:"), mouseSensitivity).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
+        mainLayout.addWidget(new RowLayout(new UILabel("Invert Mouse:"), new UICheckbox("mouseYAxisInverted")).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
@@ -117,7 +117,7 @@ public class InputSettingsScreen extends UIScreen {
         footerGrid.setColumns(2);
         footerGrid.addWidget(new UIButton("reset", "Restore Defaults"));
         footerGrid.addWidget(new UIButton("close", "Back"));
-        footerGrid.setPadding(new Border(4, 4, 0, 0));
+        footerGrid.setHorizontalSpacing(8);
 
         RelativeLayout layout = new RelativeLayout();
         layout.addWidget(new UIImage("title", Assets.getTexture("engine:terasology")),
@@ -176,7 +176,7 @@ public class InputSettingsScreen extends UIScreen {
         inputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri));
         UIInputBind secondaryInputBind = new UIInputBind();
         secondaryInputBind.bindInput(new InputConfigBinding(config.getInput().getBinds(), uri, 1));
-        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setPadding(padding));
+        layout.addWidget(new RowLayout(new UILabel(bind.description()), inputBind, secondaryInputBind).setColumnRatios(0.4f).setHorizontalSpacing(horizontalSpacing));
     }
 
     @Override

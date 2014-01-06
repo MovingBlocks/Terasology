@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.assets;
+package org.terasology.rendering.nui.databinding;
 
-import org.terasology.math.Rect2f;
-import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.baseWidgets.UIList;
 
 /**
- * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
  * @author Immortius
  */
-public interface TextureRegion {
+public class ListSelectionBinding<T> implements Binding<T> {
 
-    Texture getTexture();
+    UIList<T> list;
 
-    /**
-     * @return The region of the texture represented by this asset
-     */
-    Rect2f getRegion();
+    public ListSelectionBinding(UIList list) {
+        this.list = list;
+    }
 
-    int getWidth();
+    @Override
+    public T get() {
+        return list.getSelection();
+    }
 
-    int getHeight();
-
-    Vector2i size();
+    @Override
+    public void set(T value) {
+        list.setSelection(value);
+    }
 }

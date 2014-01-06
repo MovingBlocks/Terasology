@@ -19,6 +19,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.databinding.Binding;
 
 /**
  * @author Immortius
@@ -34,6 +35,8 @@ public interface UIWidget extends Iterable<UIWidget> {
     String getFamily();
 
     void setFamily(String family);
+
+    void bindFamily(Binding<String> binding);
 
     String getMode();
 

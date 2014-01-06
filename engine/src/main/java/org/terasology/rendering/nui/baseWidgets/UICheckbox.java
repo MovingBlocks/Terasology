@@ -82,4 +82,8 @@ public class UICheckbox extends CoreWidget {
         this.active = binding;
     }
 
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
+    }
 }

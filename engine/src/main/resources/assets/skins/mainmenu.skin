@@ -203,7 +203,7 @@
             }
         },
         "ScrollableArea" : {
-            "background" : "engine:area",
+            "background" : "engine:box",
             "background-border" : {
                 "top" : 4,
                 "bottom" : 4,
@@ -304,6 +304,9 @@
         "title" : {
             "font" : "title"
         },
+        "error" : {
+            "text-color" : "FF4444FF"
+        },
         "heading-input" : {
             "font" : "title",
             "text-align-horizontal" : "left"
@@ -312,6 +315,32 @@
             "elements" : {
                 "UILabel" : {
                     "text-align-vertical" : "bottom",
+                    "text-align-horizontal" : "left"
+                }
+            }
+        },
+        "module-list" : {
+            "elements" : {
+                "UIList" : {
+                    "parts" : {
+                        "item" : {
+                            "modes" : {
+                                "enabled" : {
+                                    "text-color" : "FFFF00FF"
+                                },
+                                "disabled" : {
+                                    "text-color" : "AAAAAAFF"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "description" : {
+            "elements" : {
+                "UILabel" : {
+                    "text-align-vertical" : "top",
                     "text-align-horizontal" : "left"
                 }
             }

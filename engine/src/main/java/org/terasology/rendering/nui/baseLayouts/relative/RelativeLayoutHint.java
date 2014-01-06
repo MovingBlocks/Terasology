@@ -25,6 +25,10 @@ public class RelativeLayoutHint implements LayoutHint {
 
     private int width;
     private int height;
+    @SerializedName("use-content-width")
+    private boolean usingContentWidth;
+    @SerializedName("use-content-height")
+    private boolean usingContentHeight;
 
     @SerializedName("position-left")
     private HorizontalInfo positionLeft;
@@ -32,6 +36,7 @@ public class RelativeLayoutHint implements LayoutHint {
     private HorizontalInfo positionRight;
     @SerializedName("position-horizontal-center")
     private HorizontalInfo positionCenterHorizontal;
+
 
     @SerializedName("position-top")
     private VerticalInfo positionTop;
@@ -119,4 +124,19 @@ public class RelativeLayoutHint implements LayoutHint {
         this.positionCenterVertical = positionCenterVertical;
     }
 
+    public boolean isUsingContentWidth() {
+        return usingContentWidth;
+    }
+
+    public void setUsingContentWidth(boolean usingContentWidth) {
+        this.usingContentWidth = usingContentWidth;
+    }
+
+    public boolean isUsingContentHeight() {
+        return usingContentHeight;
+    }
+
+    public void setUsingContentHeight(boolean usingContentHeight) {
+        this.usingContentHeight = usingContentHeight;
+    }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -48,6 +49,11 @@ public class UIImage extends CoreWidget {
         if (image.get() != null) {
             canvas.drawTexture(image.get());
         }
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return image.get().size();
     }
 
     public TextureRegion getImage() {

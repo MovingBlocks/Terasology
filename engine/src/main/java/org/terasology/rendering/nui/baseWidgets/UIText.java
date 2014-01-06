@@ -111,7 +111,7 @@ public class UIText extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         if (text.get() == null) {
-            return;
+            text.set("");
         }
         lastMargin = canvas.getCurrentStyle().getMargin();
         lastFont = canvas.getCurrentStyle().getFont();
@@ -177,12 +177,11 @@ public class UIText extends CoreWidget {
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Font font = canvas.getCurrentStyle().getFont();
         if (isMultiline()) {
-            Font font = canvas.getCurrentStyle().getFont();
             List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
             return font.getSize(lines);
         } else {
-            Font font = canvas.getCurrentStyle().getFont();
             return new Vector2i(font.getWidth(getText()), font.getLineHeight());
         }
     }

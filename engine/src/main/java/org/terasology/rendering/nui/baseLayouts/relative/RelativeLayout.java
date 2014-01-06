@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.HorizontalAlign;
@@ -46,10 +47,14 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
 
     @Override
     public void addWidget(UIWidget element, RelativeLayoutHint hint) {
-        WidgetInfo info = new WidgetInfo(element, hint);
-        contents.add(info);
-        if (!element.getId().isEmpty()) {
-            contentLookup.put(element.getId(), info);
+        if (element != null && hint != null) {
+            WidgetInfo info = new WidgetInfo(element, hint);
+            contents.add(info);
+            if (!element.getId().isEmpty()) {
+                contentLookup.put(element.getId(), info);
+            }
+        } else if (element != null) {
+            logger.error("Attempted to add element '{}' of type '{}' with no layout hint", element.getId(), element.getClass().getSimpleName());
         }
     }
 
@@ -94,22 +99,6 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             right = align.getStart(targetRegion) - info.getOffset();
         }
 
-        int width = element.layoutHint.getWidth();
-        if (width == 0) {
-            width = right - left;
-        } else {
-            if (element.layoutHint.getPositionCenterHorizontal() != null) {
-                left = center - width / 2;
-            } else if (element.layoutHint.getPositionRight() != null) {
-                if (element.layoutHint.getPositionLeft() != null) {
-                    center = left + (right - left) / 2;
-                    left = center - width / 2;
-                } else {
-                    left = right - width;
-                }
-            }
-        }
-
         int top = 0;
         int bottom = canvas.size().y;
         int vcenter = canvas.size().y / 2;
@@ -132,9 +121,33 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             bottom = align.getStart(targetRegion) - info.getOffset();
         }
 
+        int width = element.layoutHint.getWidth();
+        if (width == 0) {
+            if (element.layoutHint.isUsingContentWidth()) {
+                width = element.widget.calcContentSize(canvas, new Vector2i(right - left, bottom - top)).x;
+            } else {
+                width = right - left;
+            }
+        } else {
+            if (element.layoutHint.getPositionCenterHorizontal() != null) {
+                left = center - width / 2;
+            } else if (element.layoutHint.getPositionRight() != null) {
+                if (element.layoutHint.getPositionLeft() != null) {
+                    center = left + (right - left) / 2;
+                    left = center - width / 2;
+                } else {
+                    left = right - width;
+                }
+            }
+        }
+
         int height = element.layoutHint.getHeight();
         if (height == 0) {
-            height = bottom - top;
+            if (element.layoutHint.isUsingContentHeight()) {
+                height = element.widget.calcContentSize(canvas, new Vector2i(width, bottom - top)).y;
+            } else {
+                height = bottom - top;
+            }
         } else {
             if (element.layoutHint.getPositionCenterVertical() != null) {
                 top = vcenter - height / 2;
@@ -168,6 +181,11 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         }
         loopDetectionId = "";
         return canvas.getRegion();
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
     }
 
     @Override

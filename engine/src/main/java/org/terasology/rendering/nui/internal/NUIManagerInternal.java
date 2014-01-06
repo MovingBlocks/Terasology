@@ -44,8 +44,8 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.lang.reflect.Field;
@@ -80,19 +80,23 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void pushScreen(AssetUri screenUri) {
+    public UIScreen pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootElement() instanceof UIScreen) {
-            pushScreen((UIScreen) data.getRootElement());
+            UIScreen result = (UIScreen) data.getRootElement();
+            pushScreen(result);
+            return result;
         }
+        return null;
     }
 
     @Override
-    public void pushScreen(String screenUri) {
+    public UIScreen pushScreen(String screenUri) {
         AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
         if (assetUri != null) {
-            pushScreen(assetUri);
+            return pushScreen(assetUri);
         }
+        return null;
     }
 
     @Override
@@ -109,19 +113,23 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void setScreen(AssetUri screenUri) {
+    public UIScreen setScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootElement() instanceof UIScreen) {
-            setScreen((UIScreen) data.getRootElement());
+            UIScreen result = (UIScreen) data.getRootElement();
+            setScreen(result);
+            return result;
         }
+        return null;
     }
 
     @Override
-    public void setScreen(String screenUri) {
+    public UIScreen setScreen(String screenUri) {
         AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
         if (assetUri != null) {
-            setScreen(assetUri);
+            return setScreen(assetUri);
         }
+        return null;
     }
 
     @Override

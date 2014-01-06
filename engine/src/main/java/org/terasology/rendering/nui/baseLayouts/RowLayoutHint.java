@@ -22,6 +22,14 @@ import org.terasology.rendering.nui.LayoutHint;
  */
 public class RowLayoutHint implements LayoutHint {
     private float relativeWidth;
+    private boolean useContentWidth;
+
+    public RowLayoutHint() {
+    }
+
+    public RowLayoutHint(float relativeWidth) {
+        this.relativeWidth = relativeWidth;
+    }
 
     public float getRelativeWidth() {
         return relativeWidth;
@@ -29,5 +37,13 @@ public class RowLayoutHint implements LayoutHint {
 
     public void setRelativeWidth(float relativeWidth) {
         this.relativeWidth = relativeWidth;
+    }
+
+    public boolean isUseContentWidth() {
+        return useContentWidth;
+    }
+
+    public void setUseContentWidth(boolean useContentWidth) {
+        this.useContentWidth = useContentWidth;
     }
 }

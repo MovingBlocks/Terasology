@@ -53,7 +53,8 @@
             {
                 "type" : "ColumnLayout",
                 "columns" : 4,
-                "padding" : { "top" : 4, "bottom" : 4, "left" : 4, "right" : 4},
+                "verticalSpacing" : 8,
+                "horizontalSpacing" : 8,
                 "family" : "option-grid",
                 "contents" : [
                     {
