@@ -70,6 +70,13 @@ public class MainMenuScreen extends UIScreen {
                 engine.shutdown();
             }
         });
+
+        UIScreenUtil.trySubscribe(this, "migtest", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.pushScreen("engine:migTestScreen");
+            }
+        });
     }
 
 }

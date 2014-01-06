@@ -72,6 +72,11 @@
                         "text" : "Settings"
                     },
                     {
+                        "type" : "UIButton",
+                        "id" : "migtest",
+                        "text" : "Mig Test"
+                    },
+                    {
                         "type" : "UISpace",
                         "size" : [1, 64]
                     },
