@@ -19,6 +19,7 @@ package org.terasology.utilities;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class CamelCaseMatcherTest
 				"MPRString", "MyPosResStr" , "M", "MyP*RString", "*PosResString", "My*String");
 		
 		for (String query : queries) {
-			List<String> matches = CamelCaseMatcher.getMatches(query, commands);
+			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
 			assertTrue("The query did not match the command",  matches.size() == 1);
 		}
 	}
@@ -59,21 +60,21 @@ public class CamelCaseMatcherTest
 		List<String> noHitQueries = ImmutableList.of("asdfd", "AvDS", "MPRString");
 
 		for (String query : noHitQueries) {
-			List<String> matches = CamelCaseMatcher.getMatches(query, commands);
+			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
 			assertTrue("The query '" + query + "' should not match any command",  matches.size() == 0);
 		}
 
 		List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
 		
 		for (String query : oneHitQueries) {
-			List<String> matches = CamelCaseMatcher.getMatches(query, commands);
+			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
 			assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
 		}
 
 		List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
 		
 		for (String query : multiHitQueries) {
-			List<String> matches = CamelCaseMatcher.getMatches(query, commands);
+			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
 			assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(),  matches.size() > 1);
 		}
 	}

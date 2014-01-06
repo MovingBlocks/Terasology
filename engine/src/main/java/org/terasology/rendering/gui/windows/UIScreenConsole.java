@@ -121,11 +121,11 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                             }
                         });
                         
-                        List<String> matches = CamelCaseMatcher.getMatches(cmdQuery, commandNames);
+                        Collection<String> matches = CamelCaseMatcher.getMatches(cmdQuery, commandNames);
 
                         //one match found
                         if (matches.size() == 1) {
-                            inputBox.setText(matches.get(0));
+                            inputBox.setText(matches.iterator().next());
                             inputBox.setCursorEnd();
                         } else if (matches.size() > 1) {
                             //multiple matches found
