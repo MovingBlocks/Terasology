@@ -75,7 +75,7 @@
                         "type" : "UIButton",
                         "id" : "behavior_editor",
                         "text" : "Behavior Editor"
-                    },
+                    },                    
                     {
                         "type" : "UISpace",
                         "size" : [1, 64]
