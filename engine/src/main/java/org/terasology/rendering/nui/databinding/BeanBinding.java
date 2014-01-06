@@ -62,7 +62,7 @@ public final class BeanBinding<T> implements Binding<T> {
     public void set(T value) {
         if (bean.get() != null) {
             try {
-                setter.invoke(bean, value);
+                setter.invoke(bean.get(), value);
             } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
                 logger.error("Failed to set value through setter", e);
             }

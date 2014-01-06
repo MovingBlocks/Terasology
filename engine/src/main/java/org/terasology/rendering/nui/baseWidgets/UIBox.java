@@ -15,10 +15,14 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import com.google.common.collect.Lists;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.utilities.collection.NullIterator;
+
+import java.util.Iterator;
 
 /**
  * @author Immortius
@@ -37,8 +41,24 @@ public class UIBox extends CoreWidget {
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
         if (content != null) {
-            return canvas.getCurrentStyle().getMargin().grow(canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(sizeHint)));
+            return canvas.calculateSize(content, sizeHint);
         }
         return sizeHint;
+    }
+
+    public UIWidget getContent() {
+        return content;
+    }
+
+    public void setContent(UIWidget content) {
+        this.content = content;
+    }
+
+    @Override
+    public Iterator<UIWidget> iterator() {
+        if (content != null) {
+            return Lists.newArrayList(content).iterator();
+        }
+        return NullIterator.newInstance();
     }
 }

@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.VerticalAlign;
 
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
+    private VerticalAlign rowAlignment = VerticalAlign.MIDDLE;
+
     @SerializedName("column-widths")
     private float[] columnWidths = new float[] {1.0f};
 
@@ -51,6 +54,14 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public ColumnLayout(String id) {
        super(id);
+    }
+
+    public VerticalAlign getRowAlignment() {
+        return rowAlignment;
+    }
+
+    public void setRowAlignment(VerticalAlign rowAlignment) {
+        this.rowAlignment = rowAlignment;
     }
 
     public void addWidget(UIWidget widget) {
@@ -107,58 +118,72 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             if (columns > 0) {
                 availableSize.x -= horizontalSpacing * (columns - 1);
             }
-            Vector2i rowSize = availableSize;
-            rowSize.y /= numRows;
 
-            Vector2i currentOffset = new Vector2i();
-            int currentColumn = 0;
-            for (UIWidget widget : widgetList) {
-                Vector2i cellSize = new Vector2i(rowSize);
-                cellSize.x *= columnWidths[currentColumn];
-                if (widget != null) {
-                    Vector2i drawSize = new Vector2i(cellSize);
-
-                    Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, drawSize.x, drawSize.y);
-                    canvas.drawElement(widget, drawRegion);
+            Iterator<List<UIWidget>> rows = getRowIterator();
+            int rowOffsetY = 0;
+            while (rows.hasNext()) {
+                List<UIWidget> row = rows.next();
+                RowInfo rowInfo = calculateRowSize(row, canvas, availableSize);
+                int cellOffsetX = 0;
+                for (int i = 0; i < row.size(); ++i) {
+                    UIWidget widget = row.get(i);
+                    Vector2i widgetSize = rowInfo.widgetSizes.get(i);
+                    if (widget != null) {
+                        int cellOffsetY = rowOffsetY + rowAlignment.getOffset(widgetSize.y, rowInfo.size.y);
+                        Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, cellOffsetY, widgetSize.x, widgetSize.y);
+                        canvas.drawElement(widget, drawRegion);
+                    }
+                    cellOffsetX += widgetSize.x + horizontalSpacing;
                 }
-
-                if (++currentColumn == columns) {
-                    currentColumn = 0;
-                    currentOffset.x = 0;
-                    currentOffset.y += cellSize.y + verticalSpacing;
-                } else {
-                    currentOffset.x += cellSize.x + horizontalSpacing;
-                }
+                rowOffsetY += rowInfo.size.y + verticalSpacing;
             }
         }
     }
 
-    @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        Vector2i totalSize = new Vector2i();
-        Vector2i rowSize = new Vector2i();
+    private RowInfo calculateRowSize(List<UIWidget> row, Canvas canvas, Vector2i areaHint) {
+        int availableWidth = areaHint.x - horizontalSpacing * (columns - 1);
 
-        int availableWidth = areaHint.getX() - horizontalSpacing * (columns - 1);
+        RowInfo rowInfo = new RowInfo();
+        rowInfo.size.x = availableWidth;
 
-        int currentColumn = 0;
-        for (UIWidget widget : widgetList) {
-            Vector2i cellSize = new Vector2i(availableWidth, areaHint.y - totalSize.y);
-            cellSize.x *= columnWidths[currentColumn];
-            Vector2i contentSize = canvas.calculateSize(widget, cellSize);
-            rowSize.x += contentSize.x;
-            rowSize.y = Math.max(rowSize.y, contentSize.y);
-
-            if (++currentColumn == columns) {
-                currentColumn = 0;
-                totalSize.x = Math.max(totalSize.x, rowSize.x);
-                totalSize.y += rowSize.y + verticalSpacing;
-                rowSize.set(0, 0);
+        for (int i = 0; i < columns && i < row.size(); ++i) {
+            UIWidget widget = row.get(i);
+            Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
+            cellSize.x *= columnWidths[i];
+            if (widget != null) {
+                Vector2i contentSize = canvas.calculateSize(widget, cellSize);
+                contentSize.x = cellSize.x;
+                rowInfo.widgetSizes.add(contentSize);
+                rowInfo.size.y = Math.max(rowInfo.size.y, contentSize.y);
             } else {
-                rowSize.x += horizontalSpacing;
+                rowInfo.widgetSizes.add(new Vector2i(cellSize.x, 0));
             }
         }
-        totalSize.y -= verticalSpacing;
-        return totalSize;
+        return rowInfo;
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Vector2i availableSize = canvas.size();
+        int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
+        if (numRows > 0) {
+            availableSize.y -= verticalSpacing * (numRows - 1);
+        }
+        if (columns > 0) {
+            availableSize.x -= horizontalSpacing * (columns - 1);
+        }
+
+        Iterator<List<UIWidget>> rows = getRowIterator();
+        int height = 0;
+        while (rows.hasNext()) {
+            List<UIWidget> row = rows.next();
+            RowInfo rowInfo = calculateRowSize(row, canvas, availableSize);
+            height += rowInfo.size.y;
+            if (rows.hasNext()) {
+                height += verticalSpacing;
+            }
+        }
+        return new Vector2i(areaHint.x, height);
     }
 
     @Override
@@ -204,5 +229,39 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public void setVerticalSpacing(int verticalSpacing) {
         this.verticalSpacing = verticalSpacing;
+    }
+
+    private Iterator<List<UIWidget>> getRowIterator() {
+        return new Iterator<List<UIWidget>>() {
+
+            Iterator<UIWidget> contentIterator = iterator();
+
+            @Override
+            public boolean hasNext() {
+                return contentIterator.hasNext();
+            }
+
+            @Override
+            public List<UIWidget> next() {
+                List<UIWidget> row = Lists.newArrayList();
+                for (int i = 0; i < columns; ++i) {
+                    if (contentIterator.hasNext()) {
+                        row.add(contentIterator.next());
+                    }
+                }
+                return row;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    private static class RowInfo {
+        private Vector2i size = new Vector2i();
+        private List<Vector2i> widgetSizes = Lists.newArrayList();
+
     }
 }

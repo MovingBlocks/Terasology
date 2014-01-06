@@ -40,10 +40,10 @@
                 "right" : 4
             },
             "margin" : {
-                "top" : 4,
-                "bottom" : 4,
-                "left" : 4,
-                "right" : 4
+                "top" : 12,
+                "bottom" : 12,
+                "left" : 12,
+                "right" : 12
             }
         },
         "UIList" : {
@@ -234,6 +234,9 @@
                  }
             }
         },
+        "ColumnLayout" : {
+            "align-vertical" : "TOP"
+        },
         "UIScrollbar" : {
             "fixed-width" : 16,
             "parts" : {
@@ -257,6 +260,7 @@
         "UISlider" : {
             "text-align-horizontal" : "center",
             "text-align-vertical" : "middle",
+            "fixed-height" : 32,
             "parts" : {
                 "slider" : {
                     "background" : "engine:sliderTrack",
@@ -293,6 +297,13 @@
         }
     },
     "families" : {
+        "menu-options" : {
+            "elements" : {
+                "UIButton" : {
+                    "min-height" : 32
+                }
+            }
+        },
         "option-grid" : {
             "elements" : {
                 "UILabel" : {

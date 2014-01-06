@@ -76,7 +76,7 @@
                 ],
                 "layoutInfo" : {
                     "width" : 400,
-                    "height" : 48,
+                    "height" : 32,
                     "position-horizontal-center" : {},
                     "position-bottom" : {
                         "target" : "TOP",

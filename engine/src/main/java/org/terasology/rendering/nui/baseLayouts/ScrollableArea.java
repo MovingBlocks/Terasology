@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.baseLayouts;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
@@ -49,18 +48,17 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(canvas.size())).y;
+        int contentHeight = canvas.calculateSize(content, canvas.size()).y;
         if (canvas.size().y < contentHeight) {
             int scrollbarWidth = canvas.calculateSize(scrollbar, canvas.size()).x;
-            Border margin = canvas.getCurrentStyle().getMargin();
-            contentHeight = canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y))).y;
+            contentHeight = canvas.calculateSize(content, new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y)).y;
 
             canvas.addInteractionRegion(scrollListener);
-            canvas.drawElement(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth - margin.getRight(), margin.getTop(),
-                    scrollbarWidth, canvas.size().y - margin.getTotalHeight()));
+            canvas.drawElement(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
+                    scrollbarWidth, canvas.size().y));
 
             // Draw content
-            Rect2i contentRegion = margin.shrink(Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y));
+            Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
             scrollbar.setRange(contentHeight - contentRegion.height());
             try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
                 canvas.drawElement(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));

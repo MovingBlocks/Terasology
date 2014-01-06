@@ -34,121 +34,121 @@
             },
             {
                 "type" : "UIBox",
+                "content" : {
+                "type" : "ColumnLayout",
+                    "columns" : 4,
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "family" : "option-grid",
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Graphics Quality:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "quality"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Environment Effects:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "environmentEffects"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Viewing Distance:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "viewDistance"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Reflections:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "reflections"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "FOV:"
+                        },
+                        {
+                            "type" : "UISlider",
+                            "id" : "fov"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Blur Intensity:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "blur"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Bobbing:"
+                        },
+                        {
+                            "type" : "UICheckbox",
+                            "id" : "bobbing"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Fullscreen:"
+                        },
+                        {
+                            "type" : "UICheckbox",
+                            "id" : "fullscreen"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Dynamic Shadows:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "shadows"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Outline:"
+                        },
+                        {
+                            "type" : "UICheckbox",
+                            "id" : "outline"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "VSync:"
+                        },
+                        {
+                            "type" : "UICheckbox",
+                            "id" : "vsync"
+                        }
+                    ],
+                    "layoutInfo" : {
+                        "width" : 720,
+                        "height" : 240,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    }
+                },
                 "layoutInfo" : {
                     "width" : 740,
-                    "height" : 280,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "offset" : 16,
-                        "widget" : "subtitle"
-                    },
-                    "position-bottom" : {
-                        "target" : "TOP",
-                        "offset" : 32,
-                        "widget" : "close"
-                    }
-                }
-            },
-            {
-                "type" : "ColumnLayout",
-                "columns" : 4,
-                "verticalSpacing" : 8,
-                "horizontalSpacing" : 8,
-                "family" : "option-grid",
-                "contents" : [
-                    {
-                        "type" : "UILabel",
-                        "text" : "Graphics Quality:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "quality"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Environment Effects"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "environmentEffects"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Viewing Distance:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "viewDistance"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Reflections:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "reflections"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "FOV:"
-                    },
-                    {
-                        "type" : "UISlider",
-                        "id" : "fov"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Blur Intensity:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "blur"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Bobbing:"
-                    },
-                    {
-                        "type" : "UICheckbox",
-                        "id" : "bobbing"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Fullscreen:"
-                    },
-                    {
-                        "type" : "UICheckbox",
-                        "id" : "fullscreen"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Dynamic Shadows:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "shadows"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Outline:"
-                    },
-                    {
-                        "type" : "UICheckbox",
-                        "id" : "outline"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "VSync:"
-                    },
-                    {
-                        "type" : "UICheckbox",
-                        "id" : "vsync"
-                    }
-                ],
-                "layoutInfo" : {
-                    "width" : 720,
-                    "height" : 240,
+                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",

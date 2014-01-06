@@ -35,72 +35,64 @@
             },
             {
                 "type" : "UIBox",
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "columns" : 1,
+                    "verticalSpacing" : 4,
+                    "horizontalSpacing" : 4,
+                    "family" : "create-world",
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Game name:"
+                        },
+                        {
+                            "type" : "UIText",
+                            "id" : "worldName"
+                        },
+                        {
+                            "type" : "UISpace",
+                            "size" : [1, 16]
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Seed:"
+                        },
+                        {
+                            "type" : "RowLayout",
+                            "horizontalSpacing" : 16,
+                            "contents" : [
+                                {
+                                    "type" : "UIText",
+                                    "id" : "seed",
+                                    "layoutInfo" : {
+                                        "relativeWidth" : 0.7
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "text" : "Preview...",
+                                    "id" : "previewSeed"
+                                }
+                            ]
+                        },
+                        {
+                            "type" : "UISpace",
+                            "size" : [1, 16]
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Choose World Generator:"
+                        },
+                        {
+                            "type" : "UIDropdown",
+                            "id" : "worldGenerator"
+                        }
+                    ]
+                },
                 "layoutInfo" : {
                     "width" : 500,
-                    "height" : 220,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "offset" : 16,
-                        "widget" : "subtitle"
-                    }
-                }
-            },
-            {
-                "type" : "ColumnLayout",
-                "columns" : 1,
-                "family" : "create-world",
-                "contents" : [
-                    {
-                        "type" : "UILabel",
-                        "text" : "Enter a world name"
-                    },
-                    {
-                        "type" : "UIText",
-                        "id" : "worldName"
-                    },
-                    {
-                        "type" : "UISpace",
-                        "size" : [0, 16]
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Enter a seed (optional):"
-                    },
-                    {
-                        "type" : "RowLayout",
-                        "horizontalSpacing" : 16,
-                        "contents" : [
-                            {
-                                "type" : "UIText",
-                                "id" : "seed",
-                                "layoutInfo" : {
-                                    "relativeWidth" : 0.7
-                                }
-                            },
-                            {
-                                "type" : "UIButton",
-                                "text" : "Preview...",
-                                "id" : "previewSeed"
-                            }
-                        ]
-                    },
-                    {
-                        "type" : "UISpace",
-                        "size" : [0, 16]
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Choose World Generator:"
-                    },
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "worldGenerator"
-                    }
-                ],
-                "layoutInfo" : {
-                    "width" : 480,
-                    "height" : 200,
+                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",

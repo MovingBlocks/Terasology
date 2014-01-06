@@ -70,7 +70,9 @@ public class UIList<T> extends CoreWidget {
 
             Vector2i preferredSize = canvas.getCurrentStyle().getMargin().grow(itemRenderer.getPreferredSize(item, canvas));
             Rect2i itemRegion = Rect2i.createFromMinAndSize(0, yOffset, canvas.size().x, preferredSize.y);
-            itemRenderer.draw(item, canvas, itemRegion);
+            canvas.drawBackground(itemRegion);
+
+            itemRenderer.draw(item, canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
             canvas.addInteractionRegion(listener, itemRegion);
 
             yOffset += preferredSize.getY();

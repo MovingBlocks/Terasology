@@ -104,4 +104,9 @@ public class Border {
     public Vector2i grow(Vector2i size) {
         return new Vector2i(size.x + getTotalWidth(), size.y + getTotalHeight());
     }
+
+    public Rect2i grow(Rect2i region) {
+        return Rect2i.createFromMinAndSize(region.minX() - getLeft(), region.minY() - getTop(),
+                region.width() + getTotalWidth(), region.height() + getTotalHeight());
+    }
 }

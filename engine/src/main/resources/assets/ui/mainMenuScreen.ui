@@ -49,6 +49,7 @@
                 },
                 "columns" : 1,
                 "verticalSpacing" : 8,
+                "family" : "menu-options",
                 "contents" : [
                     {
                         "type" : "UIButton",
@@ -71,7 +72,8 @@
                         "text" : "Settings"
                     },
                     {
-                        "type" : "UISpace"
+                        "type" : "UISpace",
+                        "size" : [1, 64]
                     },
                     {
                         "type" : "UIButton",

@@ -342,15 +342,15 @@ public class LwjglCanvas implements CanvasControl {
         UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i adjustedArea = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeHint), elementStyle);
         try (SubRegion ignored = subRegionForWidget(element, adjustedArea, false)) {
-            Vector2i preferredSize = element.calcContentSize(this, adjustedArea.size());
-            preferredSize.add(elementStyle.getMargin().getTotals());
+            Vector2i preferredSize = element.calcContentSize(this, elementStyle.getMargin().shrink(adjustedArea.size()));
+            preferredSize = elementStyle.getMargin().grow(preferredSize);
             return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), preferredSize), elementStyle).size();
         }
     }
 
     @Override
     public void drawElement(UIWidget element) {
-        drawElement(element, applyMarginToRegion(getRegion()));
+        drawElement(element, getRegion());
     }
 
     @Override
@@ -365,8 +365,12 @@ public class LwjglCanvas implements CanvasControl {
         try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
+                try (SubRegion withMargin = subRegionForWidget(element, newStyle.getMargin().shrink(Rect2i.createFromMinAndSize(Vector2i.zero(), regionArea.size())), false)) {
+                    element.onDraw(this);
+                }
+            } else {
+                element.onDraw(this);
             }
-            element.onDraw(this);
         }
     }
 
@@ -383,7 +387,7 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void drawText(String text) {
-        drawText(text, applyMarginToRegion(state.getRelativeRegion()));
+        drawText(text, state.getRelativeRegion());
     }
 
     @Override
@@ -399,12 +403,12 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void drawTexture(TextureRegion texture) {
-        drawTexture(texture, applyMarginToRegion(state.getRelativeRegion()));
+        drawTexture(texture, state.getRelativeRegion());
     }
 
     @Override
     public void drawTexture(TextureRegion texture, Color color) {
-        drawTexture(texture, applyMarginToRegion(state.getRelativeRegion()), color);
+        drawTexture(texture, state.getRelativeRegion(), color);
     }
 
     @Override
@@ -415,15 +419,6 @@ public class LwjglCanvas implements CanvasControl {
     @Override
     public void drawTexture(TextureRegion texture, Rect2i region, Color color) {
         drawTextureRaw(texture, region, color, getCurrentStyle().getTextureScaleMode());
-    }
-
-    private Rect2i applyMarginToRegion(Rect2i region) {
-        UIStyle style = getCurrentStyle();
-        if (!style.getMargin().isEmpty()) {
-            return Rect2i.createFromMinAndMax(region.minX() + style.getMargin().getLeft(), region.minY() + style.getMargin().getTop(),
-                    region.maxX() - style.getMargin().getRight(), region.maxY() - style.getMargin().getBottom());
-        }
-        return region;
     }
 
     @Override
@@ -742,7 +737,7 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(listener, applySizesToRegion(getRegion()));
+        addInteractionRegion(listener, getCurrentStyle().getMargin().grow(applySizesToRegion(getRegion())));
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.terasology.math.Border;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
@@ -71,11 +72,18 @@ public class UIDropdown<T> extends CoreWidget {
     }
 
     @Override
+    public boolean isSkinAppliedByCanvas() {
+        return false;
+    }
+
+    @Override
     public void onDraw(Canvas canvas) {
         canvas.setPart(BOX);
         canvas.drawBackground();
-        if (selection.get() != null) {
-            optionRenderer.draw(selection.get(), canvas);
+        try (SubRegion ignored = canvas.subRegion(canvas.getCurrentStyle().getMargin().shrink(canvas.getRegion()), false)) {
+            if (selection.get() != null) {
+                optionRenderer.draw(selection.get(), canvas);
+            }
         }
 
         if (opened) {
@@ -99,7 +107,7 @@ public class UIDropdown<T> extends CoreWidget {
                 }
                 Rect2i itemRegion = Rect2i.createFromMinAndSize(0, canvas.size().y + itemHeight * i, canvas.size().x, itemHeight);
                 canvas.drawBackground(itemRegion);
-                optionRenderer.draw(options.get().get(i), canvas, itemRegion);
+                optionRenderer.draw(options.get().get(i), canvas, itemMargin.shrink(itemRegion));
                 canvas.addInteractionRegion(optionListeners.get(i), itemRegion);
             }
         } else {
@@ -113,7 +121,7 @@ public class UIDropdown<T> extends CoreWidget {
         if (selection.get() != null) {
             return canvas.getCurrentStyle().getMargin().grow(optionRenderer.getPreferredSize(selection.get(), canvas));
         }
-        return canvas.getCurrentStyle().getMargin().grow(new Vector2i(0, canvas.getCurrentStyle().getFont().getLineHeight()));
+        return canvas.getCurrentStyle().getMargin().grow(new Vector2i(1, canvas.getCurrentStyle().getFont().getLineHeight()));
     }
 
     @Override

@@ -35,6 +35,7 @@
             {
                 "type" : "columnLayout",
                 "verticalSpacing" : 8,
+                "family" : "menu-options",
                 "layoutInfo" : {
                     "width" : 280,
                     "height" : 288,
@@ -65,10 +66,8 @@
                         "text" : "Input"
                     },
                     {
-                        "type" : "UISpace"
-                    },
-                    {
-                        "type" : "UISpace"
+                        "type" : "UISpace",
+                        "size" : [1, 104]
                     },
                     {
                         "type" : "UIButton",
