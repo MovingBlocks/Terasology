@@ -225,6 +225,9 @@ public class ConsoleImpl implements Console {
         if (cmd == null) {
             if (commandLookup.containsRow(commandName)) {
                 addMessage("Incorrect number of parameters");
+                for (CommandInfo ci : commandLookup.row(commandName).values()) {
+                    addMessage(ci.getUsageMessage());
+                }
             } else {
                 addMessage("Unknown command '" + commandName + "'");
             }
