@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2f;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -136,6 +137,11 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public Vector2i size() {
+        return new Vector2i(width, height);
     }
 
     public Texture.WrapMode getWrapMode() {

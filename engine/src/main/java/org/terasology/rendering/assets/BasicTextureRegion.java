@@ -17,6 +17,7 @@ package org.terasology.rendering.assets;
 
 import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 
 import javax.vecmath.Vector2f;
@@ -55,5 +56,10 @@ public class BasicTextureRegion implements TextureRegion {
     @Override
     public int getHeight() {
         return TeraMath.ceilToInt(texture.getHeight() * region.height());
+    }
+
+    @Override
+    public Vector2i size() {
+        return new Vector2i(getWidth(), getHeight());
     }
 }

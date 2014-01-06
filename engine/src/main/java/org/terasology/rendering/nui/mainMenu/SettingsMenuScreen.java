@@ -30,7 +30,6 @@ import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
  * @author Immortius
  */
 public class SettingsMenuScreen extends UIScreen {
-    private static final Logger logger = LoggerFactory.getLogger(SettingsMenuScreen.class);
 
     @In
     private NUIManager nuiManager;

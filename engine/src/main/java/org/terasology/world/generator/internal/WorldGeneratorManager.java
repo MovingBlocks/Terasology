@@ -73,6 +73,16 @@ public class WorldGeneratorManager {
         return generatorInfo;
     }
 
+    public WorldGeneratorInfo getWorldGeneratorInfo(SimpleUri uri) {
+        for (WorldGeneratorInfo info : generatorInfo) {
+            if (info.getUri().equals(uri)) {
+                return info;
+            }
+        }
+        return generatorInfo.get(0);
+
+    }
+
     /**
      * @param uri
      * @return The instantiated world generator.

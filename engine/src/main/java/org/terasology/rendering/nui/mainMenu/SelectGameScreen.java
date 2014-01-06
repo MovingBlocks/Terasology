@@ -33,6 +33,8 @@ import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.ListEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.FilesUtil;
 
 import java.io.IOException;
@@ -53,7 +55,6 @@ import java.util.SortedMap;
 public class SelectGameScreen extends UIScreen {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @In
     private NUIManager nuiManager;
@@ -75,7 +76,8 @@ public class SelectGameScreen extends UIScreen {
         UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:createGameScreen");
+                CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
+                createGameScreen.setLoadingAsServer(loadingAsServer);
             }
         });
 
@@ -94,7 +96,7 @@ public class SelectGameScreen extends UIScreen {
             public void onButtonActivated(UIButton button) {
                 GameInfo gameInfo = gameList.getSelection();
                 if (gameInfo != null) {
-                    Path world = PathManager.getInstance().getSavePath(gameInfo.manifest.getTitle());
+                    Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
                     try {
                         FilesUtil.recursiveDelete(world);
                         gameList.getList().remove(gameInfo);
@@ -117,7 +119,7 @@ public class SelectGameScreen extends UIScreen {
 
     private void loadGame(GameInfo item) {
         try {
-            GameManifest manifest = item.manifest;
+            GameManifest manifest = item.getManifest();
             Config config = CoreRegistry.get(Config.class);
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
@@ -138,49 +140,7 @@ public class SelectGameScreen extends UIScreen {
     }
 
     private void refreshList(UIList<GameInfo> gameList) {
-        gameList.getList().clear();
-        Path savedGames = PathManager.getInstance().getSavesPath();
-        SortedMap<FileTime, Path> savedGamePaths = Maps.newTreeMap(Collections.reverseOrder());
-        try (DirectoryStream<Path> stream =
-                     Files.newDirectoryStream(savedGames)) {
-            for (Path entry : stream) {
-                if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
-                    savedGamePaths.put(Files.getLastModifiedTime(entry), entry);
-                }
-            }
-        } catch (IOException e) {
-            logger.error("Failed to read saved games path", e);
-        }
-
-        for (Map.Entry<FileTime, Path> world : savedGamePaths.entrySet()) {
-            Path gameManifest = world.getValue().resolve(GameManifest.DEFAULT_FILE_NAME);
-
-            if (!Files.isRegularFile(gameManifest)) {
-                continue;
-            }
-            try {
-                GameManifest info = GameManifest.load(gameManifest);
-                if (!info.getTitle().isEmpty()) {
-                    Date date = new Date(world.getKey().toMillis());
-                    gameList.getList().add(new GameInfo(info, date));
-                }
-            } catch (IOException e) {
-                logger.error("Failed reading world data object.", e);
-            }
-        }
+        gameList.setList(GameProvider.getSavedGames());
     }
 
-    private static class GameInfo {
-        private Date timestamp;
-        private GameManifest manifest;
-
-        public GameInfo(GameManifest manifest, Date timestamp) {
-            this.manifest = manifest;
-            this.timestamp = timestamp;
-        }
-
-        public String toString() {
-            return manifest.getTitle() + "\n" + DATE_FORMAT.format(timestamp);
-        }
-    }
 }

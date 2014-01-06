@@ -38,7 +38,8 @@ import java.util.List;
 public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private int columns = 1;
-    private Border padding = new Border(0, 0, 0, 0);
+    private int horizontalSpacing;
+    private int verticalSpacing;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
@@ -58,10 +59,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public int getColumns() {
         return columns;
-    }
-
-    public Border getPadding() {
-        return padding;
     }
 
     public void setColumns(int columns) {
@@ -99,15 +96,18 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         }
     }
 
-    public void setPadding(Border padding) {
-        this.padding = padding;
-    }
-
     @Override
     public void onDraw(Canvas canvas) {
         if (!widgetList.isEmpty()) {
-            Vector2i rowSize = canvas.size();
+            Vector2i availableSize = canvas.size();
             int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
+            if (numRows > 0) {
+                availableSize.y -= verticalSpacing * (numRows - 1);
+            }
+            if (columns > 0) {
+                availableSize.x -= horizontalSpacing * (columns - 1);
+            }
+            Vector2i rowSize = availableSize;
             rowSize.y /= numRows;
 
             Vector2i currentOffset = new Vector2i();
@@ -117,19 +117,17 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 cellSize.x *= columnWidths[currentColumn];
                 if (widget != null) {
                     Vector2i drawSize = new Vector2i(cellSize);
-                    drawSize.x -= padding.getLeft() + padding.getRight();
-                    drawSize.y -= padding.getTop() + padding.getBottom();
 
-                    Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x + padding.getLeft(), currentOffset.y + padding.getTop(), drawSize.x, drawSize.y);
+                    Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, drawSize.x, drawSize.y);
                     canvas.drawElement(widget, drawRegion);
                 }
 
                 if (++currentColumn == columns) {
                     currentColumn = 0;
                     currentOffset.x = 0;
-                    currentOffset.y += cellSize.y;
+                    currentOffset.y += cellSize.y + verticalSpacing;
                 } else {
-                    currentOffset.x += cellSize.x;
+                    currentOffset.x += cellSize.x + horizontalSpacing;
                 }
             }
         }
@@ -139,24 +137,27 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i totalSize = new Vector2i();
         Vector2i rowSize = new Vector2i();
+
+        int availableWidth = areaHint.getX() - horizontalSpacing * (columns - 1);
+
         int currentColumn = 0;
         for (UIWidget widget : widgetList) {
-            Vector2i cellSize = new Vector2i(areaHint);
+            Vector2i cellSize = new Vector2i(availableWidth, areaHint.y - totalSize.y);
             cellSize.x *= columnWidths[currentColumn];
-            cellSize = padding.shrink(cellSize);
             Vector2i contentSize = canvas.calculateSize(widget, cellSize);
-            contentSize.x += padding.getTotalWidth();
-            contentSize.y += padding.getTotalHeight();
             rowSize.x += contentSize.x;
             rowSize.y = Math.max(rowSize.y, contentSize.y);
 
             if (++currentColumn == columns) {
                 currentColumn = 0;
                 totalSize.x = Math.max(totalSize.x, rowSize.x);
-                totalSize.y += rowSize.y;
+                totalSize.y += rowSize.y + verticalSpacing;
                 rowSize.set(0, 0);
+            } else {
+                rowSize.x += horizontalSpacing;
             }
         }
+        totalSize.y -= verticalSpacing;
         return totalSize;
     }
 
@@ -187,5 +188,21 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
         addWidget(element);
+    }
+
+    public int getHorizontalSpacing() {
+        return horizontalSpacing;
+    }
+
+    public void setHorizontalSpacing(int horizontalSpacing) {
+        this.horizontalSpacing = horizontalSpacing;
+    }
+
+    public int getVerticalSpacing() {
+        return verticalSpacing;
+    }
+
+    public void setVerticalSpacing(int verticalSpacing) {
+        this.verticalSpacing = verticalSpacing;
     }
 }

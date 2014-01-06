@@ -183,6 +183,10 @@ public class UILoader implements AssetLoader<UIData> {
                 id = jsonObject.get("id").getAsString();
             }
             ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager.getElementMetadataLibrary().resolve(type, ModuleContext.getContext());
+            if (elementMetadata == null) {
+                logger.error("Unknown UIWidget type {}", type);
+                return null;
+            }
             UIWidget element;
             if (id != null) {
                 try {

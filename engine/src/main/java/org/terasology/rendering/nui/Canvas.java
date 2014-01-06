@@ -103,6 +103,8 @@ public interface Canvas {
      */
     Vector2i calculateSize(UIWidget element, Vector2i sizeHint);
 
+    void drawElement(UIWidget element);
+
     /**
      * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
      *

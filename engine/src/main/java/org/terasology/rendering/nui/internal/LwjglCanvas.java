@@ -211,7 +211,7 @@ public class LwjglCanvas implements CanvasControl {
         }
 
         for (InteractionRegion region : mouseOverRegions) {
-            if (!newMouseOverRegions.contains(region) && interactionRegions.contains(region)) {
+            if (!newMouseOverRegions.contains(region)) {
                 region.listener.onMouseLeave();
             }
         }
@@ -346,6 +346,11 @@ public class LwjglCanvas implements CanvasControl {
             preferredSize.add(elementStyle.getMargin().getTotals());
             return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), preferredSize), elementStyle).size();
         }
+    }
+
+    @Override
+    public void drawElement(UIWidget element) {
+        drawElement(element, applyMarginToRegion(getRegion()));
     }
 
     @Override

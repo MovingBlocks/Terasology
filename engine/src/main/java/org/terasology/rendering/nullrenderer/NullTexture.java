@@ -18,6 +18,7 @@ package org.terasology.rendering.nullrenderer;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2f;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
@@ -47,6 +48,11 @@ public class NullTexture extends AbstractAsset<TextureData> implements Texture {
     @Override
     public int getHeight() {
         return height;
+    }
+
+    @Override
+    public Vector2i size() {
+        return new Vector2i(width, height);
     }
 
     @Override

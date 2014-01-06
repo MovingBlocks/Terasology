@@ -102,6 +102,11 @@ public class UIScrollbar extends CoreWidget {
         canvas.addInteractionRegion(handleListener, handleRegion);
     }
 
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
+    }
+
     private int pixelOffsetFor(int newValue) {
         return sliderSize * newValue / getRange();
     }

@@ -60,6 +60,9 @@ public class UILabel extends CoreWidget {
     }
 
     public String getText() {
+        if (text.get() == null) {
+            return "";
+        }
         return text.get();
     }
 
@@ -73,13 +76,14 @@ public class UILabel extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.drawText(text.get());
+        canvas.drawText(getText());
     }
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+        Vector2i availableSize = canvas.getCurrentStyle().getMargin().shrink(areaHint);
         Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);
+        List<String> lines = TextLineBuilder.getLines(font, getText(), availableSize.x);
         return font.getSize(lines);
     }
 }

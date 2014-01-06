@@ -588,7 +588,7 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
         
-        if (!Display.isFullscreen()) {
+        if (!Display.isFullscreen() && Display.isVisible()) {
             config.getRendering().setWindowPosX(Display.getX());
             config.getRendering().setWindowPosY(Display.getY());
         }

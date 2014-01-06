@@ -15,15 +15,30 @@
  */
 package org.terasology.rendering.nui.baseWidgets;
 
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
 public class UIBox extends CoreWidget {
 
+    private UIWidget content;
+
     @Override
     public void onDraw(Canvas canvas) {
+        if (content != null) {
+            canvas.drawElement(content);
+        }
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        if (content != null) {
+            return canvas.getCurrentStyle().getMargin().grow(canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(sizeHint)));
+        }
+        return sizeHint;
     }
 }

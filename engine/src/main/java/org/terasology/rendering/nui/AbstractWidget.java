@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 public abstract class AbstractWidget implements UIWidget {
 
     private final String id;
-    private String family;
+    private Binding<String> family = new DefaultBinding<>();
     private boolean focused;
 
     private Binding<Boolean> visible = new DefaultBinding<>(true);
@@ -50,12 +50,17 @@ public abstract class AbstractWidget implements UIWidget {
 
     @Override
     public final String getFamily() {
-        return family;
+        return family.get();
     }
 
     @Override
     public final void setFamily(String family) {
-        this.family = family;
+        this.family.set(family);
+    }
+
+    @Override
+    public void bindFamily(Binding<String> binding) {
+        this.family = binding;
     }
 
     @Override
@@ -67,9 +72,11 @@ public abstract class AbstractWidget implements UIWidget {
             return null;
         }
         for (UIWidget contents : this) {
-            T result = contents.find(targetId, type);
-            if (result != null) {
-                return result;
+            if (contents != null) {
+                T result = contents.find(targetId, type);
+                if (result != null) {
+                    return result;
+                }
             }
         }
         return null;
@@ -99,11 +106,6 @@ public abstract class AbstractWidget implements UIWidget {
 
     public final boolean isFocused() {
         return focused;
-    }
-
-    @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
-        return areaHint;
     }
 
     @Override

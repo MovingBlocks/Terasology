@@ -24,36 +24,48 @@ import java.lang.reflect.Method;
 /**
  * @author Immortius
  */
-public class BeanBinding<T> implements Binding<T> {
+public final class BeanBinding<T> implements Binding<T> {
     private static final Logger logger = LoggerFactory.getLogger(BeanBinding.class);
 
-    private Object bean;
+    private Binding<?> bean = new DefaultBinding<>();
     private Method getter;
     private Method setter;
 
-    public BeanBinding(Object bean, Method getter, Method setter) {
+    private BeanBinding(Binding<?> bean, Method getter, Method setter) {
         this.bean = bean;
         this.getter = getter;
         this.setter = setter;
     }
 
+    public static <T> BeanBinding<T> create(Object bean, Method getter, Method setter) {
+        return new BeanBinding<>(new DefaultBinding<>(bean), getter, setter);
+    }
+
+    public static <T> BeanBinding<T> createBound(Binding<?> binding, Method getter, Method setter) {
+        return new BeanBinding<>(binding, getter, setter);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public T get() {
-        try {
-            return (T) getter.invoke(bean);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            logger.error("Failed to retrieve value through getter", e);
+        if (bean.get() != null) {
+            try {
+                return (T) getter.invoke(bean.get());
+            } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+                logger.error("Failed to retrieve value through getter", e);
+            }
         }
         return null;
     }
 
     @Override
     public void set(T value) {
-        try {
-            setter.invoke(bean, value);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            logger.error("Failed to set value through setter", e);
+        if (bean.get() != null) {
+            try {
+                setter.invoke(bean, value);
+            } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+                logger.error("Failed to set value through setter", e);
+            }
         }
     }
 }

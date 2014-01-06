@@ -1,0 +1,213 @@
+{
+    "type" : "selectModulesScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIImage",
+                    "image" : "engine:terasology",
+                    "id" : "title",
+                    "layoutInfo" : {
+                        "width" : 512,
+                        "height" : 128,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "TOP",
+                            "offset" : 48
+                        }
+                    }
+                },
+                {
+                    "type" : "UILabel",
+                    "id" : "subtitle",
+                    "family" : "title",
+                    "text" : "Select Modules...",
+                    "layoutInfo" : {
+                        "height" : 48,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "title"
+                        }
+                    }
+                },
+                {
+                    "type" : "UIBox",
+                    "layoutInfo" : {
+                        "width" : 600,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "widget" : "close",
+                            "offset" : 16
+                        }
+                    }
+                },
+                {
+                    "type" : "ColumnLayout",
+                    "columns" : 2,
+                    "verticalSpacing" : 16,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 584,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle",
+                            "offset" : 8
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "widget" : "close",
+                            "offset" : 24
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "ScrollableArea",
+                            "content" : {
+                                "type" : "UIList",
+                                "id" : "moduleList",
+                                "family" : "module-list"
+                            }
+                        },
+                        {
+                            "type" : "RelativeLayout",
+                            "family" : "description",
+                            "contents" : [
+                                {
+                                    "type" : "RowLayout",
+                                    "id" : "nameRow",
+                                    "contents" : [
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Name:   ",
+                                            "layoutInfo" : {
+                                                "useContentWidth" : true
+                                            }
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "name",
+                                            "text" : "Module Name Goes Here"
+                                        }
+                                    ],
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "RowLayout",
+                                    "id" : "versionRow",
+                                    "contents" : [
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Version:   ",
+                                            "layoutInfo" : {
+                                                "useContentWidth" : true
+                                            }
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "version",
+                                            "text" : "Module Version Goes Here"
+                                        }
+                                    ],
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "nameRow",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "id" : "descriptionTitle",
+                                    "text" : "Description:",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "versionRow",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "ScrollableArea",
+                                    "content" : {
+                                        "type" : "UILabel",
+                                        "id" : "description",
+                                        "text" : "This is the description of a module. It can be quite long and even include new lines.\n\nLike this.\n\nI'm going to put in a lot more text to ensure the scrollable area fills up. Lorem ipsum and all that.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                                    },
+                                    "layoutInfo" : {
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "descriptionTitle",
+                                            "offset" : 8
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "toggleActivation",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "toggleActivation",
+                                    "text" : "Activate",
+                                    "layoutInfo" : {
+                                        "height" : 24,
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UILabel",
+                                    "id" : "errorMessage",
+                                    "text" : "Error",
+                                    "family" : "error",
+                                    "layoutInfo" : {
+                                        "height" : 24,
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type" : "UIButton",
+                    "text" : "Back",
+                    "id" : "close",
+                    "layoutInfo" : {
+                        "width" : 128,
+                        "height" : 32,
+                        "position-horizontal-center" : {},
+                        "position-bottom" : {
+                            "target" : "BOTTOM",
+                            "offset" : 48
+                        }
+                    }
+                }
+            ]
+    }
+}

@@ -34,12 +34,7 @@
             },
             {
                 "type" : "columnLayout",
-                "padding" : {
-                    "top" : 4,
-                    "bottom" : 4,
-                    "left" : 0,
-                    "right" : 0
-                },
+                "verticalSpacing" : 8,
                 "layoutInfo" : {
                     "width" : 280,
                     "height" : 288,

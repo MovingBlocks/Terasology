@@ -49,11 +49,13 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateSize(content, canvas.size()).y;
+        int contentHeight = canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(canvas.size())).y;
         if (canvas.size().y < contentHeight) {
-            canvas.addInteractionRegion(scrollListener);
-            Border margin = canvas.getCurrentStyle().getMargin();
             int scrollbarWidth = canvas.calculateSize(scrollbar, canvas.size()).x;
+            Border margin = canvas.getCurrentStyle().getMargin();
+            contentHeight = canvas.calculateSize(content, canvas.getCurrentStyle().getMargin().shrink(new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y))).y;
+
+            canvas.addInteractionRegion(scrollListener);
             canvas.drawElement(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth - margin.getRight(), margin.getTop(),
                     scrollbarWidth, canvas.size().y - margin.getTotalHeight()));
 
@@ -64,12 +66,17 @@ public class ScrollableArea extends CoreLayout {
                 canvas.drawElement(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));
             }
         } else {
-            canvas.drawElement(content, Rect2i.createFromMinAndSize(0, 0, canvas.size().x, contentHeight));
+            canvas.drawElement(content);
         }
     }
 
     public void setContent(UIWidget widget) {
         this.content = widget;
+    }
+
+    @Override
+    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.texture.Texture;
 
@@ -70,5 +71,10 @@ public class Subtexture extends AbstractAsset<SubtextureData> implements Texture
     @Override
     public int getHeight() {
         return TeraMath.ceilToInt(texture.getHeight() * subregion.height());
+    }
+
+    @Override
+    public Vector2i size() {
+        return new Vector2i(getWidth(), getHeight());
     }
 }
