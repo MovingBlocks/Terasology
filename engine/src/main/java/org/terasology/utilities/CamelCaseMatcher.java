@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.gui.windows;
+package org.terasology.utilities;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Inspired by
@@ -41,8 +41,8 @@ public final class CamelCaseMatcher {
      * @param commands
      * @return
      */
-    public static List<String> getMatches(String queryStr, Collection<String> commands) {
-        List<String> matches = Lists.newArrayList();
+    public static Set<String> getMatches(String queryStr, Collection<String> commands) {
+        Set<String> matches = Sets.newHashSet();
 
         String query = queryStr.replaceAll("\\*", ".*?");
         query = query.replaceFirst("\\b([a-z]+)", "$1[a-z]*");
