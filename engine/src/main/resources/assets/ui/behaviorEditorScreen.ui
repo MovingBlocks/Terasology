@@ -2,149 +2,121 @@
     "type" : "engine:behaviorEditorScreen",
     "skin" : "engine:mainMenu",
     "contents" : {
-        "type" : "relativeLayout",
+        "type" : "migLayout",
+        "layoutConstraints" : "",
+        "colConstraints" : "[min][grow][min]",
+        "rowConstraints" : "",
+        "debug" : true,
         "contents" : [
             {
                 "type" : "BehaviorEditor",
                 "id" : "tree",
                 "layoutInfo" : {
-                    "width" : 800,
-                    "height" : 600,
-                    "position-left" : {
-                        "target" : "LEFT",
-                        "offset" : 16
-                    },
-                    "position-top" : {
-                        "target" : "TOP",
-                        "offset" : 16
-                    }
+                    "cc" : "cell 1 3"
                 }
             },
             {
                 "type" : "propertyLayout",
                 "id" : "properties",
                 "layoutInfo" : {
-                    "width" : 380,
-                    "position-left" : {
-                        "target" : "LEFT",
-                        "offset" : 16
-                    },
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "widget" : "controls",
-                        "offset" : 16
-                    }
-                },
-                "gap" : {
-                    "x" : 4,
-                    "y" : 4
-                },
-                "gapX" : 5,
-                "gapY" : 5
+                    "cc" : "cell 2 3"
+                }
             },
             {
-                "type" : "engine:columnLayout",
-                "id" : "controls",
+                "type" : "migLayout",
+                "layoutConstraints" : "",
+                "colConstraints" : "",
+                "rowConstraints" : "",
                 "layoutInfo" : {
-                    "width" : 600,
-                    "height" : 96,
-                    "position-left" : {
-                        "target" : "LEFT",
-                        "offset" : 16
-                    },
-                    "position-top" : {
-                        "target" : "TOP",
-                        "offset" : 16
-                    }
-                },
-                "columns" : 1,
-                "padding" : {
-                    "left" : 0,
-                    "right" : 0,
-                    "top" : 4,
-                    "bottom" : 4
+                    "cc" : "cell 0 0 3"
                 },
                 "contents" : [
                     {
-                        "type" : "RowLayout",
-                        "contents" : [
-                            {
-                                "type" : "UIButton",
-                                "id" : "copy",
-                                "text" : "copy"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "paste",
-                                "text" : "paste"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "layout",
-                                "text" : "layout"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "new",
-                                "text" : "new"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "assign",
-                                "text" : "assign"
-                            },
-                            {
-                                "type" : "UIDropdown",
-                                "id" : "select_tree"
-                            }
-                        ]
+                        "type" : "UIDropdown",
+                        "id" : "select_tree"
                     },
                     {
-                        "type" : "RowLayout",
-                        "contents" : [
-                            {
-                                "type" : "UIDropdown",
-                                "id" : "select_entity"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "debug_stop",
-                                "text" : "[]"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "debug_pause",
-                                "text" : "||"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "debug_step",
-                                "text" : "|>"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "debug_run",
-                                "text" : ">>"
-                            }
-                        ]
+                        "type" : "UIButton",
+                        "id" : "copy",
+                        "text" : "copy"
                     },
                     {
-                        "type" : "RowLayout",
-                        "contents" : [
-                            {
-                                "type" : "UIDropdown",
-                                "id" : "palette"
-                            },
-                            {
-                                "type" : "UIButton",
-                                "id" : "create",
-                                "text" : "create"
-                            }
-                        ]
+                        "type" : "UIButton",
+                        "id" : "paste",
+                        "text" : "paste"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "layout",
+                        "text" : "layout"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "new",
+                        "text" : "new"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "assign",
+                        "text" : "assign"
+                    }
+                ]
+            },
+            {
+                "type" : "migLayout",
+                "layoutConstraints" : "",
+                "colConstraints" : "",
+                "rowConstraints" : "",
+                "layoutInfo" : {
+                    "cc" : "cell 0 1 3"
+                },
+                "contents" : [
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "select_entity"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_stop",
+                        "text" : "[]"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_pause",
+                        "text" : "||"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_step",
+                        "text" : "|>"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_run",
+                        "text" : ">>"
+                    }
+                ]
+            },
+            {
+                "type" : "migLayout",
+                "layoutConstraints" : "",
+                "colConstraints" : "",
+                "rowConstraints" : "",
+                "layoutInfo" : {
+                    "cc" : "cell 0 2 3"
+                },
+                "contents" : [
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "palette"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "create",
+                        "text" : "create"
                     }
                 ]
             }
         ]
     }
-
 }

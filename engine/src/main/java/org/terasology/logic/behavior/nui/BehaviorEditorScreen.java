@@ -43,6 +43,7 @@ import java.util.List;
 public class BehaviorEditorScreen extends UIScreen {
     @Override
     public void initialise() {
+/*
 
         find("tree", BehaviorEditor.class).bindSelection(new Binding<RenderableNode>() {
             @Override
@@ -122,5 +123,6 @@ public class BehaviorEditorScreen extends UIScreen {
                 systemClipboard.setContents(contents, contents);
             }
         });
+*/
     }
 }

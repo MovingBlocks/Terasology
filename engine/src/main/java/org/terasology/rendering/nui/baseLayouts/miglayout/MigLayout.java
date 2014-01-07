@@ -135,7 +135,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     public void addWidget(UIWidget element, CCHint hint) {
         ComponentWrapper cw = getWrapper(element);
 
-        String cStr = ConstraintParser.prepare(hint.cc);
+        String cStr = ConstraintParser.prepare(hint!=null?hint.cc:"");
         ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
         children.add(cw);
         dirty = true;
@@ -381,6 +381,6 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         };
     }
     public static class CCHint implements LayoutHint {
-        private String cc;
+        private String cc="";
     }
 }
