@@ -80,6 +80,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.assets.subtexture.SubtextureData;
 import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
+import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.NUIManager;
@@ -433,6 +434,7 @@ public class TerasologyEngine implements GameEngine {
             }
         });
         assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
+        assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();
