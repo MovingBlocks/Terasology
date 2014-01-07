@@ -29,14 +29,12 @@ import com.google.common.primitives.UnsignedBytes;
  * 
  * @author mkienenb
  */
-public class TextureDataFactory {
-
+public final class TextureDataFactory {
     // Lwjgl 2.x currently requires textures to be powers of 16, although this should change in 3.0.
     private static final int TEXTURE_WIDTH = 16;
     private static final int TEXTURE_HEIGHT = 16;
 
-    static public byte convertIntToByte(int value) {
-        return UnsignedBytes.checkedCast(value);
+    private TextureDataFactory() {
     }
 
     /**

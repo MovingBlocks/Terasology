@@ -21,8 +21,11 @@ import java.awt.Color;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
-public class TextureUtil {
+public final class TextureUtil {
     public static final String GENERATED_COLOR_NAME_PREFIX = "color";
+
+    private TextureUtil() {
+    }
 
     /**
      * Returns a AssetUri which represents a Texture of that color.
@@ -31,7 +34,7 @@ public class TextureUtil {
      * 
      * @return an asset Uri for the texture
      */
-    static public AssetUri getTextureUriForColor(Color color) {
+    public static AssetUri getTextureUriForColor(Color color) {
         StringBuilder sb = new StringBuilder(GENERATED_COLOR_NAME_PREFIX);
         sb.append(".");
 
@@ -50,7 +53,7 @@ public class TextureUtil {
      * 
      * @return hexColorName RRGGBBAA in lower-case hex notation
      */
-    static private void appendColorName(StringBuilder sb, Color color) {
+    private static void appendColorName(StringBuilder sb, Color color) {
         int red = color.getRed();
         if (red < 16) {
             sb.append('0');
