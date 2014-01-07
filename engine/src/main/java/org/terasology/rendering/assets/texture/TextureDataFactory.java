@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
 
+import com.google.common.primitives.UnsignedBytes;
+
 /**
  * Creates TextureData objects based on specific criteria
  * 
@@ -34,7 +36,7 @@ public class TextureDataFactory {
     private static final int TEXTURE_HEIGHT = 16;
 
     static public byte convertIntToByte(int value) {
-        return value < 128 ? (byte) value : (byte) (value - 256);
+        return UnsignedBytes.checkedCast(value);
     }
 
     /**
@@ -44,12 +46,10 @@ public class TextureDataFactory {
      */
     public static TextureData newInstance(Color color) {
 
-        // TODO: try this with UnsignedBytes.checkedCast() and see if it returns the same results.
-
-        byte red = convertIntToByte(color.getRed());
-        byte green = convertIntToByte(color.getGreen());
-        byte blue = convertIntToByte(color.getBlue());
-        byte alpha = convertIntToByte(color.getAlpha());
+        byte red = UnsignedBytes.checkedCast(color.getRed());
+        byte green = UnsignedBytes.checkedCast(color.getGreen());
+        byte blue = UnsignedBytes.checkedCast(color.getBlue());
+        byte alpha = UnsignedBytes.checkedCast(color.getAlpha());
 
         ByteBuffer data = ByteBuffer.allocateDirect(4 * TEXTURE_WIDTH * TEXTURE_HEIGHT);
         for (int width = 0; width < TEXTURE_WIDTH; width++) {
