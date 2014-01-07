@@ -18,7 +18,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -102,7 +101,6 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.io.IOException;
 import java.io.PrintStream;
