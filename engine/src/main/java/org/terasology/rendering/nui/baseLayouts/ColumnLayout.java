@@ -44,8 +44,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
-    private VerticalAlign rowAlignment = VerticalAlign.MIDDLE;
-
     @SerializedName("column-widths")
     private float[] columnWidths = new float[] {1.0f};
 
@@ -54,14 +52,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public ColumnLayout(String id) {
        super(id);
-    }
-
-    public VerticalAlign getRowAlignment() {
-        return rowAlignment;
-    }
-
-    public void setRowAlignment(VerticalAlign rowAlignment) {
-        this.rowAlignment = rowAlignment;
     }
 
     public void addWidget(UIWidget widget) {
@@ -129,8 +119,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                     UIWidget widget = row.get(i);
                     Vector2i widgetSize = rowInfo.widgetSizes.get(i);
                     if (widget != null) {
-                        int cellOffsetY = rowOffsetY + rowAlignment.getOffset(widgetSize.y, rowInfo.size.y);
-                        Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, cellOffsetY, widgetSize.x, widgetSize.y);
+                        Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, rowOffsetY, widgetSize.x, rowInfo.size.y);
                         canvas.drawElement(widget, drawRegion);
                     }
                     cellOffsetX += widgetSize.x + horizontalSpacing;

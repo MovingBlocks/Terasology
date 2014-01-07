@@ -150,7 +150,15 @@ public class CreateGameScreen extends UIScreen {
             }
         });
 
-        // TODO: Preview
+        UIScreenUtil.trySubscribe(this, "previewSeed", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                PreviewWorldScreen screen = nuiManager.pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
+                if (screen != null) {
+                    screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
+                }
+            }
+        });
         UIScreenUtil.trySubscribe(this, "mods", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {

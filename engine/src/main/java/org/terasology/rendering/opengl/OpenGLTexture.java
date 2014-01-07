@@ -50,9 +50,15 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     private FilterMode filterMode = FilterMode.Nearest;
     private Type textureType = Type.TEXTURE2D;
 
-    // TODO: Remove this when Icons can access TextureData directly.
+    // TODO: Make the retention of this dependent on a keep-in-memory setting
     private TextureData textureData;
 
+    /**
+     * Note: Generally should not be called directly. Instead use Assets.generateAsset().
+     * @param uri
+     * @param data
+     */
+    // TODO: Create lwjgl renderer subsystem, and make this package private
     public OpenGLTexture(AssetUri uri, TextureData data) {
         super(uri);
 
@@ -62,7 +68,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     @Override
     public void reload(TextureData data) {
         Util.checkGLError();
-        dispose();
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
@@ -71,9 +76,12 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
         this.textureType = data.getType();
         this.textureData = data;
 
+        if (id == 0) {
+            id = glGenTextures();
+        }
+
         switch (textureType) {
             case TEXTURE2D:
-                id = glGenTextures();
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL11.GL_TEXTURE_2D, id);
 
@@ -89,7 +97,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 }
                 break;
             case TEXTURE3D:
-                id = glGenTextures();
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL12.GL_TEXTURE_3D, id);
 

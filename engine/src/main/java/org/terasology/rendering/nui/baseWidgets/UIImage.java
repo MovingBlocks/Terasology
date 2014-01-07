@@ -53,7 +53,10 @@ public class UIImage extends CoreWidget {
 
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
-        return image.get().size();
+        if (image.get() != null) {
+            return image.get().size();
+        }
+        return Vector2i.zero();
     }
 
     public TextureRegion getImage() {
