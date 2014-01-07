@@ -54,7 +54,7 @@ public class Vector2i extends Tuple2i {
      * Constructs and initializes a Vector2i from the specified Vector2i.
      *
      * @param other the Vector2i containing the initialization x and y
-     *              data.
+     *           data.
      */
     public Vector2i(Vector2i other) {
         super(other);
@@ -86,18 +86,5 @@ public class Vector2i extends Tuple2i {
      */
     public static Vector2i zero() {
         return new Vector2i(0, 0);
-    }
-
-    /**
-     * Calculates the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance). This is the distance that is traveled
-     * if movement is restricted to adjacent vectors.
-     *
-     * @param other the other vector to test
-     * @return the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance)
-     */
-    public int gridDistance(Vector2i other) {
-        return Math.abs(other.x - x) + Math.abs(other.y - y);
     }
 }

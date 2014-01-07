@@ -16,14 +16,8 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.procedural.BrownianNoise;
-import org.terasology.utilities.procedural.BrownianNoise2D;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -35,6 +29,9 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import javax.vecmath.Vector2f;
+import java.util.Map;
 
 /**
  * Terasology's legacy map generator. Still rocks!

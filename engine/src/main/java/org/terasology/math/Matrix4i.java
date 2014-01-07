@@ -26,22 +26,22 @@ public class Matrix4i implements Serializable {
 
     private static final long serialVersionUID = 7818313294943678102L;
 
-    public static final int M00 = 0;
-    public static final int M01 = 1;
-    public static final int M02 = 2;
-    public static final int M03 = 3;
-    public static final int M10 = 4;
-    public static final int M11 = 5;
-    public static final int M12 = 6;
-    public static final int M13 = 7;
-    public static final int M20 = 8;
-    public static final int M21 = 9;
-    public static final int M22 = 10;
-    public static final int M23 = 11;
-    public static final int M30 = 12;
-    public static final int M31 = 13;
-    public static final int M32 = 14;
-    public static final int M33 = 15;
+    private static final int M00 = 0;
+    private static final int M01 = 1;
+    private static final int M02 = 2;
+    private static final int M03 = 3;
+    private static final int M10 = 4;
+    private static final int M11 = 5;
+    private static final int M12 = 6;
+    private static final int M13 = 7;
+    private static final int M20 = 8;
+    private static final int M21 = 9;
+    private static final int M22 = 10;
+    private static final int M23 = 11;
+    private static final int M30 = 12;
+    private static final int M31 = 13;
+    private static final int M32 = 14;
+    private static final int M33 = 15;
 
     public final int[] tmp = new int[16];
     public final int[] val = new int[16];
