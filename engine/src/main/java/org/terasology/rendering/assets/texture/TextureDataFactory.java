@@ -43,7 +43,7 @@ public class TextureDataFactory {
      * @return TextureData created using specified color
      */
     public static TextureData newInstance(Color color) {
-        
+
         // TODO: try this with UnsignedBytes.checkedCast() and see if it returns the same results.
 
         byte red = convertIntToByte(color.getRed());

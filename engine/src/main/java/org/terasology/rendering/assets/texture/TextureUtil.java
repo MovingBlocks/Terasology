@@ -34,9 +34,9 @@ public class TextureUtil {
     static public AssetUri getTextureUriForColor(Color color) {
         StringBuilder sb = new StringBuilder(GENERATED_COLOR_NAME_PREFIX);
         sb.append(".");
-        
+
         appendColorName(sb, color);
-        
+
         return new AssetUri(AssetType.TEXTURE, "engine", sb.toString());
     }
 
@@ -56,19 +56,19 @@ public class TextureUtil {
             sb.append('0');
         }
         sb.append(Integer.toHexString(red));
-        
+
         int green = color.getGreen();
         if (green < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(green));
-        
+
         int blue = color.getBlue();
         if (blue < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(blue));
-        
+
         int alpha = color.getAlpha();
         if (alpha < 16) {
             sb.append('0');
@@ -85,7 +85,7 @@ public class TextureUtil {
      * 
      * @return color represented by hexColorName
      */
-    static /* package-only */ Color getColorForColorName(String hexColorName) {
+    static/* package-only */Color getColorForColorName(String hexColorName) {
         if (hexColorName.length() != 8) {
             // TODO: we should probably log a warning in this case.
             return null;
@@ -95,7 +95,7 @@ public class TextureUtil {
         String greenString = hexColorName.substring(2, 4);
         String blueString = hexColorName.substring(4, 6);
         String alphaString = hexColorName.substring(6);
-        
+
         int red = Integer.parseInt(redString, 16);
         int green = Integer.parseInt(greenString, 16);
         int blue = Integer.parseInt(blueString, 16);

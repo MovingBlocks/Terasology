@@ -39,16 +39,16 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
         if (!"engine".equals(uri.getModuleName())) {
             return null;
         }
-        
+
         String[] parts = uri.getAssetName().split("\\.", 2);
         if (parts.length != 2) {
             return null;
         }
-        
+
         if (!TextureUtil.GENERATED_COLOR_NAME_PREFIX.equals(parts[0])) {
             return null;
         }
-        
+
         Color color = TextureUtil.getColorForColorName(parts[1]);
         TextureData textureData = TextureDataFactory.newInstance(color);
         return factory.buildAsset(uri, textureData);
