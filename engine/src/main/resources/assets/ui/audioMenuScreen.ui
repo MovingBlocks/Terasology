@@ -34,9 +34,50 @@
             },
             {
                 "type" : "UIBox",
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "columnWidths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 360,
+                        "height" : 192,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "offset" : 32,
+                            "widget" : "close"
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Sound Volume:"
+                        },
+                        {
+                            "type" : "UISlider",
+                            "id" : "sound"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Music Volume:"
+                        },
+                        {
+                            "type" : "UISlider",
+                            "id" : "music"
+                        }
+                    ]
+                },
                 "layoutInfo" : {
                     "width" : 400,
-                    "height" : 250,
+                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
@@ -51,53 +92,12 @@
                 }
             },
             {
-                "type" : "ColumnLayout",
-                "family" : "option-grid",
-                "columns" : 2,
-                "columnWidths" : [0.35, 0.65],
-                "verticalSpacing" : 8,
-                "horizontalSpacing" : 8,
-                "layoutInfo" : {
-                    "width" : 360,
-                    "height" : 192,
-                    "position-horizontal-center" : {},
-                    "position-top" : {
-                        "target" : "BOTTOM",
-                        "offset" : 16,
-                        "widget" : "subtitle"
-                    },
-                    "position-bottom" : {
-                        "target" : "TOP",
-                        "offset" : 32,
-                        "widget" : "close"
-                    }
-                },
-                "contents" : [
-                    {
-                        "type" : "UILabel",
-                        "text" : "Sound Volume:"
-                    },
-                    {
-                        "type" : "UISlider",
-                        "id" : "sound"
-                    },
-                    {
-                        "type" : "UILabel",
-                        "text" : "Music Volume:"
-                    },
-                    {
-                        "type" : "UISlider",
-                        "id" : "music"
-                    }
-                ]
-            },
-            {
                 "type" : "UIButton",
                 "text" : "Back",
                 "id" : "close",
                 "layoutInfo" : {
-                    "height" : 48,
-                    "width" : 280,
+                    "height" : 32,
+                    "width" : 200,
                     "position-horizontal-center" : {},
                     "position-bottom" : {
                         "target" : "BOTTOM",

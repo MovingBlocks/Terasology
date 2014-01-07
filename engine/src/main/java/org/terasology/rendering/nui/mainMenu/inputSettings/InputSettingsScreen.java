@@ -108,12 +108,14 @@ public class InputSettingsScreen extends UIScreen {
         for (InputCategory category : inputCategories.values()) {
             addInputSection(category, mainLayout, inputsById);
         }
+        mainLayout.addWidget(new UISpace(new Vector2i(1, 16)));
 
         ScrollableArea area = new ScrollableArea();
         area.setContent(mainLayout);
         //area.setContentHeight(mainLayout.getRowCount() * 32);
 
         ColumnLayout footerGrid = new ColumnLayout("footer");
+        footerGrid.setFamily("menu-options");
         footerGrid.setColumns(2);
         footerGrid.addWidget(new UIButton("reset", "Restore Defaults"));
         footerGrid.addWidget(new UIButton("close", "Back"));

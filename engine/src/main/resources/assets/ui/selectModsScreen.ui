@@ -82,40 +82,24 @@
                             "family" : "description",
                             "contents" : [
                                 {
-                                    "type" : "RowLayout",
-                                    "id" : "nameRow",
+                                    "type" : "ColumnLayout",
+                                    "id" : "simpleItems",
+                                    "columns" : 2,
+                                    "columnWidths" : [0.3, 0.7],
+                                    "verticalSpacing" : 8,
                                     "contents" : [
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Name:   ",
-                                            "layoutInfo" : {
-                                                "useContentWidth" : true
-                                            }
+                                            "text" : "Name: "
                                         },
                                         {
                                             "type" : "UILabel",
                                             "id" : "name",
                                             "text" : "Module Name Goes Here"
-                                        }
-                                    ],
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-horizontal-center" : {},
-                                        "position-top" : {
-                                            "target" : "TOP"
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "RowLayout",
-                                    "id" : "versionRow",
-                                    "contents" : [
+                                        },
                                         {
                                             "type" : "UILabel",
-                                            "text" : "Version:   ",
-                                            "layoutInfo" : {
-                                                "useContentWidth" : true
-                                            }
+                                            "text" : "Version: "
                                         },
                                         {
                                             "type" : "UILabel",
@@ -127,9 +111,7 @@
                                         "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "nameRow",
-                                            "offset" : 8
+                                            "target" : "TOP"
                                         }
                                     }
                                 },
@@ -141,7 +123,7 @@
                                         "use-content-height" : true,
                                         "position-top" : {
                                             "target" : "BOTTOM",
-                                            "widget" : "versionRow",
+                                            "widget" : "simpleItems",
                                             "offset" : 8
                                         }
                                     }
