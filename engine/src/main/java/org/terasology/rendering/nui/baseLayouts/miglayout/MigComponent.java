@@ -41,6 +41,7 @@ public class MigComponent implements ComponentWrapper {
 
     public void calcPreferredSize(Canvas canvas, Vector2i sizeHint) {
         preferredSize = canvas.calculateSize(widget, sizeHint);
+        minimumSize = canvas.calculateSize(widget, Vector2i.zero());
     }
     @Override
     public UIWidget getComponent() {

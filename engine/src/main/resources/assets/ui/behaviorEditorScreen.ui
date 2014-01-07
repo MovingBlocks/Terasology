@@ -4,29 +4,57 @@
     "contents" : {
         "type" : "migLayout",
         "layoutConstraints" : "",
-        "colConstraints" : "[min][grow][min]",
-        "rowConstraints" : "",
+        "colConstraints" : "[pref][grow][pref]",
+        "rowConstraints" : "[pref][pref][pref][grow]",
         "debug" : true,
         "contents" : [
             {
                 "type" : "BehaviorEditor",
                 "id" : "tree",
                 "layoutInfo" : {
-                    "cc" : "cell 1 3"
+                    "cc" : "cell 1 3, w 600!"
                 }
             },
             {
-                "type" : "propertyLayout",
+                "type" : "migLayout",
                 "id" : "properties",
+                "layoutConstraints" : "",
+                "colConstraints" : "[pref][grow]",
+                "rowConstraints" : "",
+                "debug" : true,
                 "layoutInfo" : {
-                    "cc" : "cell 2 3"
-                }
+                    "cc" : "cell 2 3, aligny top"
+                },
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "xyz"
+                    },
+                    {
+                        "type" : "UIText",
+                        "text" : "foo",
+                        "layoutInfo" : {
+                            "cc" : "grow"
+                        }
+                    },
+                    {
+                        "type" : "UILabel",
+                        "text" : "blub",
+                        "layoutInfo" : {
+                            "cc" : "newline"
+                        }
+                    },
+                    {
+                        "type" : "UISlider"
+                    }
+                ]
             },
             {
                 "type" : "migLayout",
                 "layoutConstraints" : "",
                 "colConstraints" : "",
                 "rowConstraints" : "",
+                "debug" : true,
                 "layoutInfo" : {
                     "cc" : "cell 0 0 3"
                 },
@@ -67,6 +95,7 @@
                 "layoutConstraints" : "",
                 "colConstraints" : "",
                 "rowConstraints" : "",
+                "debug" : true,
                 "layoutInfo" : {
                     "cc" : "cell 0 1 3"
                 },
@@ -102,6 +131,7 @@
                 "layoutConstraints" : "",
                 "colConstraints" : "",
                 "rowConstraints" : "",
+                "debug" : true,
                 "layoutInfo" : {
                     "cc" : "cell 0 2 3"
                 },

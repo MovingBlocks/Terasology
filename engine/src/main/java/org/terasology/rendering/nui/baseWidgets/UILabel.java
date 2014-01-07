@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -82,7 +83,6 @@ public class UILabel extends CoreWidget {
     @Override
     public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
-        List<String> lines = TextLineBuilder.getLines(font, getText(), areaHint.x);
-        return font.getSize(lines);
+        return font.getSize(Arrays.asList(getText()));
     }
 }
