@@ -16,11 +16,6 @@
 
 package org.terasology.input;
 
-import org.lwjgl.input.Keyboard;
-
-import java.util.Locale;
-import java.util.Objects;
-
 /**
  * The description of an input, whether key, mouse button or mouse wheel.
  * Immutable.

@@ -23,7 +23,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 import javax.vecmath.Color4f;
-import javax.vecmath.Vector4f;
 
 /**
  * @author Immortius

@@ -15,13 +15,11 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;

@@ -17,13 +17,10 @@ package org.terasology.rendering.nui.baseLayouts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -55,7 +52,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
         super(id);
     }
 
-    public RowLayout(UIWidget ... widgets) {
+    public RowLayout(UIWidget... widgets) {
         contents.addAll(Arrays.asList(widgets));
     }
 
@@ -75,7 +72,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
             int xOffset = 0;
             for (int i = 0; i < contents.size(); ++i) {
                 int itemWidth = widths.get(i);
-                Rect2i region = Rect2i.createFromMinAndSize(xOffset , 0, itemWidth, canvas.size().y);
+                Rect2i region = Rect2i.createFromMinAndSize(xOffset, 0, itemWidth, canvas.size().y);
                 canvas.drawElement(contents.get(i), region);
                 xOffset += itemWidth;
                 xOffset += horizontalSpacing;
@@ -153,7 +150,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
         return contents.iterator();
     }
 
-    public RowLayout setColumnRatios(float ... ratios) {
+    public RowLayout setColumnRatios(float... ratios) {
         hints.clear();
         for (int i = 0; i < ratios.length; ++i) {
             hints.put(contents.get(i), new RowLayoutHint(ratios[i]));
