@@ -3,7 +3,7 @@ Terasology
 
 ![Terasology](/engine/src/main/resources/assets/textures/menuBackground.jpg "Terasology")
 
-Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
+Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by aiming for the NPC-helper and caretaker focus from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
 Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft.
 
@@ -14,7 +14,7 @@ Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/lice
 Setup
 --------
 
-Terasology requires Java 7, the newer the better - [Java Virtual Machine (JVM)](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
+Terasology requires Java 7, the newer the better - [download it here](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
 
 For easy setup you can use our launcher - [download it here](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
@@ -29,7 +29,7 @@ Note that these instructions are meant for the stable release. The latest develo
 
 * [W,A,S,D] - Movement
 * [E] - Activate (Chest, TNT, etc)
-* [Q] - Throw held (block) item (hold down to charge for a longer throw!) OR start crafting (if placing object on ground with crafting module active)
+* [Q] - Throw held (block) item (hold down to charge for a longer throw!)
 * [Space] - Jump
 * [Shift] - Hold to run
 * [Left click] - Activate left click action (default = remove block)
@@ -74,13 +74,13 @@ May move slot or disappear as development continues
 Console Commands
 --------
 
-Press Tab to toggle the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before
+Press Tab to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting Tab again with a partially typed command will auto-complete it (including abbreviated camel case like rS for restoreSpeed)
 
+* help - Show in-game help (more thorough)
 * ghost - fly / no-clip mode (old double-jump for "god" mode)
 * hspeed - radically increase your horizontal move speed
 * hjump - jump really high. Almost like flying - but it isn't. Just jump good.
 * restoreSpeed - normalizes speed (both horizontal and vertical)
-* help - Show in-game help (more thorough)
 * help "giveBlock" - Shows detailed help on the "giveBlock" command
 * giveBlock "Water" - Gives 16 water blocks
 * giveBlock "Stone" "Slope" - Gives you 16 clay blocks in the "slope" shape
@@ -106,9 +106,9 @@ Run any commands in the project root directory
 
 You may also need to tweak IDE settings further for your convenience, in particular for Eclipse. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
-Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows, even when running from source. Add `-homedir` to a run configuration to use the project dir instead.
+Note that by default stored data (config, saves, etc) is sent to a user profile directory like Saved Games under Windows. Add `-homedir` to a run configuration or command line execution to use the project dir instead (this is done automatically in some cases including IntelliJ and `gradlew run`)
 
-Running from source uses the local directory for everything. If you want to pull down the source code for a module you can easily do so via Gradle:
+If you want to pull down the source code for a module you can easily do so via Gradle:
 
 * `gradlew fetchModuleSample`
 * `gradlew idea`
@@ -133,7 +133,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
-* [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between
+* [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
