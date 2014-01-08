@@ -82,6 +82,7 @@ public class BehaviorEditor extends ZoomableLayout {
     };
 
     public BehaviorEditor() {
+        super();
     }
 
     public BehaviorEditor(String id) {

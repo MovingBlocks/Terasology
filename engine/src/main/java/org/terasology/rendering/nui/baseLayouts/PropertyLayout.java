@@ -25,6 +25,9 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.baseLayouts.miglayout.MigLayout;
+import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
+import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyProvider;
@@ -35,12 +38,7 @@ import java.util.Iterator;
 /**
  * Created by synopia on 03.01.14.
  */
-public class PropertyLayout extends CoreLayout<LayoutHint> {
-    private int gapX;
-    private int gapY;
-    private Vector2i gap;
-
-    private Vector2i labelSize = new Vector2i(100,20);
+public class PropertyLayout extends MigLayout {
     private PropertyProvider<?> propertyProvider;
 
     public PropertyLayout() {
@@ -50,103 +48,29 @@ public class PropertyLayout extends CoreLayout<LayoutHint> {
         super(id);
     }
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (propertyProvider!=null && !propertyProvider.isEmpty()) {
-            Vector2i size = canvas.size();
-            findLabelSize(canvas, size);
-            Vector2i currentOffset = new Vector2i();
-            int heightRemaining = size.y;
-            for (Property<?, ?> property : propertyProvider.getProperties()) {
-                UILabel label = property.getLabel();
-                Rect2i drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, labelSize.x, labelSize.y);
-                canvas.drawElement(label, drawRegion);
-                currentOffset.x += labelSize.x + gapX;
-
-                UIWidget editor = property.getEditor();
-                int editorWidth = size.x - currentOffset.x;
-
-                Vector2i editorSize = canvas.calculateSize(editor, new Vector2i(editorWidth, heightRemaining));
-                drawRegion = Rect2i.createFromMinAndSize(currentOffset.x, currentOffset.y, editorWidth, editorSize.y);
-                canvas.drawElement(editor, drawRegion);
-                currentOffset.x = 0;
-                currentOffset.y += editorSize.y + gapY;
-                heightRemaining -= editorSize.y + gapY;
-            }
-        }
-    }
-
-    @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
-    }
-
-    private void findLabelSize(Canvas canvas, Vector2i areaHint) {
-        labelSize = new Vector2i();
-        for (Property<?, ?> property : propertyProvider.getProperties()) {
-            Vector2i size = canvas.calculateSize(property.getLabel(), areaHint);
-            if( size.x> labelSize.x) {
-                labelSize.x = size.x;
-            }
-            if( size.y> labelSize.y) {
-                labelSize.y = size.y;
-            }
-        }
-    }
-
-    @Override
-    public void update(float delta) {
-        if( propertyProvider!=null ) {
-            for (Property<?, ?> property : propertyProvider.getProperties()) {
-                property.getEditor().update(delta);
-            }
-        }
-    }
-
-    @Override
-    public void onMouseButtonEvent(MouseButtonEvent event) {
-    }
-
-    @Override
-    public void onMouseWheelEvent(MouseWheelEvent event) {
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-    }
-
-    @Override
-    public Iterator<UIWidget> iterator() {
-        if( propertyProvider!=null ) {
-            return new Iterator<UIWidget>() {
-                private Iterator<Property<?,?>> propertyIterator = propertyProvider.getProperties().iterator();
-
-                @Override
-                public boolean hasNext() {
-                    return propertyIterator.hasNext();
-                }
-
-                @Override
-                public UIWidget next() {
-                    return propertyIterator.next().getEditor();
-                }
-
-                @Override
-                public void remove() {
-                    throw new IllegalStateException("Not supported!");
-                }
-            };
-        } else {
-            return NullIterator.newInstance();
-        }
-    }
-
-    @Override
-    public void addWidget(UIWidget element, LayoutHint hint) {
-
-    }
-
-    public void setPropertyProvider(PropertyProvider<?> propertyProvider) {
+    public void addPropertyProvider(String label, final PropertyProvider<?> propertyProvider) {
         this.propertyProvider = propertyProvider;
+        final UIButton expand = new UIButton("", "+");
+        final UILabel headline = new UILabel(label);
+        final MigLayout layout = new MigLayout();
+
+        expand.subscribe(new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                if( "-".equals(button.getText())) {
+                    layout.clear();
+                    button.setText("+");
+                } else {
+                    for (Property<?, ?> property : propertyProvider.getProperties()) {
+                        layout.addWidget(property.getLabel(), new CCHint("newline"));
+                        layout.addWidget(property.getEditor(), new CCHint());
+                    }
+                    button.setText("-");
+                }
+            }
+        });
+        addWidget(expand, new CCHint("newline, grow"));
+        addWidget(headline, new CCHint());
+        addWidget(layout, new CCHint("newline, spanx 2, grow"));
     }
 }

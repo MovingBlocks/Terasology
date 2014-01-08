@@ -286,6 +286,7 @@ public class UIText extends CoreWidget {
                 }
             }
         }
+        correctCursor();
         updateOffset();
     }
 
@@ -416,6 +417,14 @@ public class UIText extends CoreWidget {
         blinkCounter += delta;
         while (blinkCounter > 2 * BLINK_RATE) {
             blinkCounter -= 2 * BLINK_RATE;
+        }
+    }
+
+    @Override
+    public void onLoseFocus() {
+        super.onLoseFocus();
+        for (TextEventListener listener : listeners) {
+            listener.onEnterPressed(this);
         }
     }
 

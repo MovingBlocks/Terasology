@@ -48,6 +48,7 @@ import java.util.Map;
  */
 public class MigLayout extends CoreLayout<MigLayout.CCHint> implements ContainerWrapper {
     private Map<ComponentWrapper, CC> ccMap = Maps.newHashMap();
+    private Map<UIWidget, ComponentWrapper> wrappers = Maps.newHashMap();
     private List<ComponentWrapper> children = Lists.newArrayList();
 
     private String layoutConstraints;
@@ -65,11 +66,16 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     private boolean debug;
 
     public MigLayout() {
-        this(null);
+        setLayoutConstraints("");
+        setRowConstraints("");
+        setColConstraints("");
     }
 
     public MigLayout(String id) {
         super(id);
+        setLayoutConstraints("");
+        setRowConstraints("");
+        setColConstraints("");
     }
 
     public void setLc(LC lc) {
@@ -115,11 +121,12 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
         layoutContainer(canvas, bounds);
 
-        for (ComponentWrapper wrapper : ccMap.keySet()) {
+        for (ComponentWrapper wrapper : wrappers.values()) {
             UIWidget component = (UIWidget) wrapper.getComponent();
             Rect2i region = Rect2i.createFromMinAndSize(wrapper.getX(), wrapper.getY(), wrapper.getWidth(), wrapper.getHeight());
             canvas.drawElement(component, region);
         }
+
         if( debug ) {
             grid.paintDebug();
         }
@@ -137,7 +144,22 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
         String cStr = ConstraintParser.prepare(hint!=null?hint.cc:"");
         ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
+        wrappers.put(element, cw);
         children.add(cw);
+        dirty = true;
+    }
+
+    public void removeWidget(UIWidget element) {
+        ComponentWrapper cw = wrappers.remove(element);
+        ccMap.remove(cw);
+        children.remove(cw);
+        dirty = true;
+    }
+
+    public void clear() {
+        wrappers.clear();
+        ccMap.clear();
+        children.clear();
         dirty = true;
     }
 
@@ -380,7 +402,15 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
             }
         };
     }
+
     public static class CCHint implements LayoutHint {
         private String cc="";
+
+        public CCHint() {
+        }
+
+        public CCHint(String cc) {
+            this.cc = cc;
+        }
     }
 }

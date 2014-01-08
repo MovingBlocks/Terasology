@@ -22,6 +22,8 @@ import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
@@ -43,8 +45,9 @@ import java.util.List;
 public class BehaviorEditorScreen extends UIScreen {
     @Override
     public void initialise() {
-/*
-
+        PropertyLayout entityProperties = find("entity_properties", PropertyLayout.class);
+        entityProperties.addPropertyProvider("Location", new PropertyProvider<>(new LocationComponent()));
+        entityProperties.addPropertyProvider("Movement", new PropertyProvider<>(new CharacterMovementComponent()));
         find("tree", BehaviorEditor.class).bindSelection(new Binding<RenderableNode>() {
             @Override
             public RenderableNode get() {
@@ -54,7 +57,9 @@ public class BehaviorEditorScreen extends UIScreen {
             @Override
             public void set(RenderableNode value) {
                 PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
-                find("properties", PropertyLayout.class).setPropertyProvider(provider);
+                PropertyLayout properties = find("properties", PropertyLayout.class);
+                properties.clear();
+                properties.addPropertyProvider("Behavior Node", provider);
             }
         });
         find("select_tree", UIDropdown.class).bindSelection(new Binding<BehaviorTree>() {
@@ -123,6 +128,5 @@ public class BehaviorEditorScreen extends UIScreen {
                 systemClipboard.setContents(contents, contents);
             }
         });
-*/
     }
 }
