@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection;
+package org.terasology.rendering.world.selection;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -27,8 +27,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslated;
 
-import java.awt.Color;
-
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -40,7 +38,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
@@ -59,10 +56,6 @@ public class BlockSelectionRenderer {
 
     public BlockSelectionRenderer() {
         this(Assets.getTexture("engine:selection"));
-    }
-
-    public BlockSelectionRenderer(Color color) {
-        this(Assets.get(TextureUtil.getTextureUriForColor(color), Texture.class));
     }
 
     public BlockSelectionRenderer(Texture effectsTexture) {

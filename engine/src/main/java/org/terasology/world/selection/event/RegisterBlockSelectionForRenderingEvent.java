@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection.event;
+package org.terasology.world.selection.event;
 
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.logic.selection.BlockSelectionComponent;
+import org.terasology.world.selection.BlockSelectionComponent;
 
 /**
- * Sent to BlockSelectionSystem to indicate that the current sender should be used as the selection starting position
+ * Sent to BlockSelectionRenderSystem to indicate that the current block selection should be rendered.
  */
-public class BlockStartSelectionEvent extends AbstractConsumableEvent {
+public class RegisterBlockSelectionForRenderingEvent extends AbstractConsumableEvent {
 
     private BlockSelectionComponent blockSelectionComponent;
 
-    public BlockStartSelectionEvent(BlockSelectionComponent blockSelectionComponent) {
+    public RegisterBlockSelectionForRenderingEvent(BlockSelectionComponent blockSelectionComponent) {
         this.blockSelectionComponent = blockSelectionComponent;
     }
 
     public BlockSelectionComponent getBlockSelectionComponent() {
         return blockSelectionComponent;
     }
-
 }

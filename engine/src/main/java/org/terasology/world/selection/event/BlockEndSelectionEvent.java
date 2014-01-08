@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection.event;
+package org.terasology.world.selection.event;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.logic.selection.BlockSelectionComponent;
+import org.terasology.world.selection.BlockSelectionComponent;
 
 /**
- * Sent from BlockSelectionSystem when a block component has specified both a starting and ending position and has a valid region
+ * Sent to BlockSelectionSystem to indicate that the current sender should be used as the selection ending position
  */
-public class BlockSelectionCompletedEvent extends AbstractConsumableEvent {
+public class BlockEndSelectionEvent extends AbstractConsumableEvent {
 
-    private EntityRef entity;
     private BlockSelectionComponent blockSelectionComponent;
 
-    public BlockSelectionCompletedEvent(EntityRef entity, BlockSelectionComponent blockSelectionComponent) {
+    public BlockEndSelectionEvent(BlockSelectionComponent blockSelectionComponent) {
         this.blockSelectionComponent = blockSelectionComponent;
-        this.entity = entity;
     }
 
     public BlockSelectionComponent getBlockSelectionComponent() {
         return blockSelectionComponent;
-    }
-
-    public EntityRef getEntity() {
-        return entity;
     }
 
 }

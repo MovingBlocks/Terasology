@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection;
+package org.terasology.rendering.world.selection;
 
-import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,10 +27,12 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.logic.selection.event.RegisterBlockSelectionForRenderingEvent;
-import org.terasology.logic.selection.event.UnregisterBlockSelectionForRenderingEvent;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.selection.BlockSelectionComponent;
+import org.terasology.world.selection.event.RegisterBlockSelectionForRenderingEvent;
+import org.terasology.world.selection.event.UnregisterBlockSelectionForRenderingEvent;
 
 /**
  * System to render registered BlockSelections.
@@ -45,42 +46,25 @@ public class BlockSelectionRenderSystem implements RenderSystem {
 
     private Map<BlockSelectionComponent, BlockSelectionRenderer> registeredBlockSelectionComponents = new HashMap<BlockSelectionComponent, BlockSelectionRenderer>();
 
-    private Color transparent(Color color) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), 200);
-    }
-    
-    private int colorIndex = -1;
-    private Color[] SELECTION_COLORS = new Color[] {
-        transparent(Color.YELLOW),
-        transparent(Color.BLUE),
-        transparent(Color.GREEN),
-        transparent(Color.RED),
-        transparent(Color.CYAN),
-        transparent(Color.ORANGE),
-        transparent(Color.MAGENTA)
-    };
-    
-    private Color getNextColor() {
-        colorIndex++;
-        if (colorIndex >= SELECTION_COLORS.length) {
-            colorIndex = 0;
-        }
-        return SELECTION_COLORS[colorIndex];
-    }
-    
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onRegisterBlockSelection(RegisterBlockSelectionForRenderingEvent event, EntityRef itemEntity) {
         // A future improvement might be to add different rendering options for different kinds of block selections
-        BlockSelectionRenderer selectionRenderer = new BlockSelectionRenderer(getNextColor());
         BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
-        
+        Texture texture = blockSelectionComponent.texture;
+        BlockSelectionRenderer selectionRenderer;
+        if (null == texture) {
+            selectionRenderer = new BlockSelectionRenderer();
+        } else {
+            selectionRenderer = new BlockSelectionRenderer(texture);
+        }
+
         if (!registeredBlockSelectionComponents.containsKey(blockSelectionComponent)) {
             // At some point, we might need to verify that both key and value are non-null
             registeredBlockSelectionComponents.put(blockSelectionComponent, selectionRenderer);
         }
     }
 
-    @ReceiveEvent()
+    @ReceiveEvent
     public void onUnregisterBlockSelection(UnregisterBlockSelectionForRenderingEvent event, EntityRef itemEntity) {
         BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
 
@@ -103,14 +87,14 @@ public class BlockSelectionRenderSystem implements RenderSystem {
 
     private void renderOverlayForOneBlockSelection(BlockSelectionComponent blockSelectionComponent,
                                                    BlockSelectionRenderer selectionRenderer) {
-        // TODO: why is there a second beginRenderOverlay here at the start with no matching endRenderOverlay?
+        // TODO: why is there a second beginRenderOverlay() call here at the start with no matching endRenderOverlay()?
         selectionRenderer.beginRenderOverlay();
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         if (blockSelectionComponent.startPosition != null) {
             selectionRenderer.beginRenderOverlay();
             if (blockSelectionComponent.currentSelection == null) {
-                selectionRenderer.renderMark( blockSelectionComponent.startPosition, cameraPosition);
+                selectionRenderer.renderMark(blockSelectionComponent.startPosition, cameraPosition);
             } else {
                 Vector3i size = blockSelectionComponent.currentSelection.size();
                 Vector3i block = new Vector3i();

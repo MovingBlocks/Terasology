@@ -1,7 +1,3 @@
-package org.terasology.logic.selection.event;
-
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
 /*
  * Copyright 2013 MovingBlocks
  *
@@ -17,17 +13,21 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.terasology.logic.selection.BlockSelectionComponent;
+package org.terasology.world.selection.event;
+
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.world.selection.BlockSelectionComponent;
 
 /**
- * Sent from BlockSelectionSystem when a block component has specified a starting position
+ * Sent from BlockSelectionSystem when a block component has specified both a starting and ending position and has a valid region
  */
-public class BlockSelectionStartedEvent extends AbstractConsumableEvent {
+public class BlockSelectionCompletedEvent extends AbstractConsumableEvent {
 
     private EntityRef entity;
     private BlockSelectionComponent blockSelectionComponent;
 
-    public BlockSelectionStartedEvent(EntityRef entity, BlockSelectionComponent blockSelectionComponent) {
+    public BlockSelectionCompletedEvent(EntityRef entity, BlockSelectionComponent blockSelectionComponent) {
         this.blockSelectionComponent = blockSelectionComponent;
         this.entity = entity;
     }

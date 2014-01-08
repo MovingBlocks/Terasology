@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection;
+package org.terasology.world.selection;
 
 import javax.vecmath.Vector3f;
 
@@ -23,12 +23,12 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.selection.event.BlockEndSelectionEvent;
-import org.terasology.logic.selection.event.BlockSelectionCompletedEvent;
-import org.terasology.logic.selection.event.BlockSelectionStartedEvent;
-import org.terasology.logic.selection.event.BlockStartSelectionEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.selection.event.BlockEndSelectionEvent;
+import org.terasology.world.selection.event.BlockSelectionCompletedEvent;
+import org.terasology.world.selection.event.BlockSelectionStartedEvent;
+import org.terasology.world.selection.event.BlockStartSelectionEvent;
 
 /**
  * This system updates block selections based on the sender's location and the state of the block selection.

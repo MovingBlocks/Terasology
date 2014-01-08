@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-@API package org.terasology.logic.selection;
+@API package org.terasology.world.selection.event;
 
 import org.terasology.engine.API;
