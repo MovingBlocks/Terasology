@@ -54,22 +54,30 @@ public class BlockSelectionRenderer {
     private Texture effectsTexture;
     private Material defaultTextured;
 
-    public BlockSelectionRenderer() {
-        this(Assets.getTexture("engine:selection"));
-    }
-
     public BlockSelectionRenderer(Texture effectsTexture) {
         this.effectsTexture = effectsTexture;
-        Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(1.f / effectsTexture.getWidth(), 1.f / effectsTexture.getHeight());
+        initialize(texWidth);
+    }
 
+    private void initialize(Vector2f effectsTextureWidth) {
+        Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:defaultTextured");
+    }
+
+    public void setEffectsTexture(Texture newEffectsTexture) {
+        if ((effectsTexture.getWidth() == newEffectsTexture.getWidth()) && (effectsTexture.getHeight() == newEffectsTexture.getHeight())) {
+            this.effectsTexture = newEffectsTexture;
+        } else {
+            // This should not be possible with the current BlockSelectionRenderSystem implementation
+            throw new RuntimeException("New effectsTexture must have same height and width as the original effectsTexture");
+        }
     }
 
     public void beginRenderOverlay() {

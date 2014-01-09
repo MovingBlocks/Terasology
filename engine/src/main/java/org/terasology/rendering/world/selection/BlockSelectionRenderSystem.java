@@ -15,8 +15,12 @@
  */
 package org.terasology.rendering.world.selection;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.vecmath.Vector3f;
 
+import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -24,6 +28,7 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.world.WorldRenderer;
@@ -41,22 +46,33 @@ public class BlockSelectionRenderSystem implements RenderSystem {
     @In
     private EntityManager entityManager;
 
+    /**
+     * This map will contain one reusable selection renderer per texture width/height pair.
+     * This should be a reasonable compromise between no caching and caching too many renderers.
+     * While it is possible that the number of cached renderers could grow out of control over time,
+     * in practice most textures should be a standard size.
+     */
+    private Map<Vector2i, BlockSelectionRenderer> cachedBlockSelectionRendererByTextureDimensionsMap = new HashMap<Vector2i, BlockSelectionRenderer>();
+
     @Override
     public void renderOverlay() {
-        ;
         for (EntityRef entity : entityManager.getEntitiesWith(BlockSelectionComponent.class)) {
             BlockSelectionComponent blockSelectionComponent = entity.getComponent(BlockSelectionComponent.class);
             if (blockSelectionComponent.shouldRender) {
                 Texture texture = blockSelectionComponent.texture;
-
-                // TODO: should we either cache the renderer, or reuse the same renderer for all selections?
-                // Recreating the renderer is probably too inefficient
-                BlockSelectionRenderer selectionRenderer;
                 if (null == texture) {
-                    selectionRenderer = new BlockSelectionRenderer();
-                } else {
-                    selectionRenderer = new BlockSelectionRenderer(texture);
+                    texture = Assets.getTexture("engine:selection");
                 }
+
+                Vector2i textureDimensions = new Vector2i(texture.getWidth(), texture.getHeight());
+                BlockSelectionRenderer selectionRenderer = cachedBlockSelectionRendererByTextureDimensionsMap.get(textureDimensions);
+                if (null == selectionRenderer) {
+                    selectionRenderer = new BlockSelectionRenderer(texture);
+                    cachedBlockSelectionRendererByTextureDimensionsMap.put(textureDimensions, selectionRenderer);
+                } else {
+                    selectionRenderer.setEffectsTexture(texture);
+                }
+
                 renderOverlayForOneBlockSelection(blockSelectionComponent, selectionRenderer);
             }
         }
