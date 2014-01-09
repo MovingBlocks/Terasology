@@ -15,22 +15,22 @@
  */
 package org.terasology.world.selection.event;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.world.selection.BlockSelectionComponent;
 
 /**
- * Sent to BlockSelectionSystem to indicate that the current sender should be used as the selection ending position
+ * Sent to BlockSelectionSystem to indicate that the current sender should be used as the selection starting position
  */
-public class BlockEndSelectionEvent extends AbstractConsumableEvent {
+public class SetBlockSelectionStartingPointEvent extends AbstractConsumableEvent {
 
-    private BlockSelectionComponent blockSelectionComponent;
+    private EntityRef blockSelectionComponentEntity;
 
-    public BlockEndSelectionEvent(BlockSelectionComponent blockSelectionComponent) {
-        this.blockSelectionComponent = blockSelectionComponent;
+    public SetBlockSelectionStartingPointEvent(EntityRef blockSelectionComponentEntity) {
+        this.blockSelectionComponentEntity = blockSelectionComponentEntity;
     }
 
     public BlockSelectionComponent getBlockSelectionComponent() {
-        return blockSelectionComponent;
+        return blockSelectionComponentEntity.getComponent(BlockSelectionComponent.class);
     }
-
 }

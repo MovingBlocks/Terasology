@@ -35,4 +35,5 @@ public class BlockSelectionComponent implements Component {
     public Vector3i startPosition;
     public Region3i currentSelection;
     public Texture texture;
+    public boolean shouldRender;
 }

@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.selection;
 
-import java.awt.Color;
-
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,54 +27,25 @@ import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.world.selection.BlockSelectionComponent;
-import org.terasology.world.selection.event.BlockEndSelectionEvent;
-import org.terasology.world.selection.event.BlockSelectionCompletedEvent;
-import org.terasology.world.selection.event.BlockStartSelectionEvent;
-import org.terasology.world.selection.event.RegisterBlockSelectionForRenderingEvent;
-import org.terasology.world.selection.event.UnregisterBlockSelectionForRenderingEvent;
+import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
+import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
 /**
  * System to allow the use of BlockSelectionComponents. This system is a client only system, though no other player
- * will see selections done by one player.  This system uses an item's activate event to start and end a selection,
+ * will see selections done by one player.  This system uses an item's activate event to both start and end a selection,
  * then triggers a ApplyBlockSelectionEvent event. 
  *
  * @author synopia
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
-    private static final Color[] SELECTION_COLORS = new Color[]{
-            transparent(Color.YELLOW),
-            transparent(Color.BLUE),
-            transparent(Color.GREEN),
-            transparent(Color.RED),
-            transparent(Color.CYAN),
-            transparent(Color.ORANGE),
-            transparent(Color.MAGENTA)
-    };
-
     @In
     private EntityManager entityManager;
     @In
     private LocalPlayer localPlayer;
 
-    private BlockSelectionComponent blockSelectionComponent;
-
-    private int colorIndex = -1;
-
-    private Color getNextColor() {
-        colorIndex++;
-        if (colorIndex >= SELECTION_COLORS.length) {
-            colorIndex = 0;
-        }
-        return SELECTION_COLORS[colorIndex];
-    }
-
-    private static Color transparent(Color color) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue(), 200);
-    }
+    private EntityRef blockSelectionComponentEntity;
 
     @ReceiveEvent(components = {BlockSelectionComponent.class})
     public void onPlaced(ActivateEvent event, EntityRef itemEntity) {
@@ -84,52 +53,41 @@ public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
             return;
         }
 
-        LocationComponent targetLocation = new LocationComponent();
-        targetLocation.setWorldPosition(event.getTargetLocation());
+        EntityRef targetLocationEntity = event.getTarget();
 
-        LocalPlayerBlockSelectionByItemSystemListener listener = new LocalPlayerBlockSelectionByItemSystemListener(itemEntity);
-
-        EntityRef targetLocationEntity = entityManager.create(targetLocation, listener);
-
-        this.blockSelectionComponent = itemEntity.getComponent(BlockSelectionComponent.class);
+        this.blockSelectionComponentEntity = itemEntity;
+        BlockSelectionComponent blockSelectionComponent = itemEntity.getComponent(BlockSelectionComponent.class);
 
         if (null == blockSelectionComponent.startPosition) {
             // on the first item click, we start selecting blocks
-            targetLocationEntity.send(new BlockStartSelectionEvent(blockSelectionComponent));
+            targetLocationEntity.send(new SetBlockSelectionStartingPointEvent(itemEntity));
 
-            // Original texture
-            // blockSelectionComponent.texture = Assets.getTexture("engine:selection");
-            // Varying colored textures as requested by Cervator :)  Yes, this probably needs to be removed.
-            blockSelectionComponent.texture = Assets.get(TextureUtil.getTextureUriForColor(getNextColor()), Texture.class);
-            targetLocationEntity.send(new RegisterBlockSelectionForRenderingEvent(blockSelectionComponent));
+            blockSelectionComponent.texture = Assets.getTexture("engine:selection");
+            blockSelectionComponent.shouldRender = true;
         } else {
-            // on the second item click, we will get a BlockSelectionCompletedEvent afterward with our listener component
-            targetLocationEntity.send(new BlockEndSelectionEvent(blockSelectionComponent));
-        }
-    }
+            // on the second item click, we will set the ending selection point and send an ApplyBlockSelectionEvent
+            targetLocationEntity.send(new SetBlockSelectionEndingPointEvent(itemEntity));
 
-    @ReceiveEvent(components = {LocalPlayerBlockSelectionByItemSystemListener.class})
-    public void onBlockSelectionCompleted(BlockSelectionCompletedEvent event, EntityRef targetLocationEntity) {
-        // This will only be reached with our listener component from a second item activate event
-        LocalPlayerBlockSelectionByItemSystemListener listener = targetLocationEntity.getComponent(LocalPlayerBlockSelectionByItemSystemListener.class);
-        localPlayer.getCharacterEntity().send(new ApplyBlockSelectionEvent(listener.getItemEntity(), event.getBlockSelectionComponent().currentSelection));
-        targetLocationEntity.send(new UnregisterBlockSelectionForRenderingEvent(event.getBlockSelectionComponent()));
-        blockSelectionComponent.currentSelection = null;
-        blockSelectionComponent.startPosition = null;
+            localPlayer.getCharacterEntity().send(new ApplyBlockSelectionEvent(itemEntity, blockSelectionComponent.currentSelection));
+            blockSelectionComponent.shouldRender = false;
+            blockSelectionComponent.currentSelection = null;
+            blockSelectionComponent.startPosition = null;
+        }
     }
 
     @ReceiveEvent(components = {LocationComponent.class})
     public void onCamTargetChanged(CameraTargetChangedEvent event, EntityRef entity) {
         // This method will update the block selection to whatever block is targeted in the players view
-        if (null == blockSelectionComponent) {
+        if (null == blockSelectionComponentEntity) {
             return;
         }
 
+        BlockSelectionComponent blockSelectionComponent = blockSelectionComponentEntity.getComponent(BlockSelectionComponent.class);
         if (blockSelectionComponent.startPosition == null) {
             return;
         }
         EntityRef target = event.getNewTarget();
-        target.send(new BlockEndSelectionEvent(blockSelectionComponent));
+        target.send(new SetBlockSelectionEndingPointEvent(blockSelectionComponentEntity));
     }
 
     @Override

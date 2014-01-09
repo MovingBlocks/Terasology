@@ -25,10 +25,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.selection.event.BlockEndSelectionEvent;
-import org.terasology.world.selection.event.BlockSelectionCompletedEvent;
-import org.terasology.world.selection.event.BlockSelectionStartedEvent;
-import org.terasology.world.selection.event.BlockStartSelectionEvent;
+import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
+import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
 /**
  * This system updates block selections based on the sender's location and the state of the block selection.
@@ -38,7 +36,7 @@ import org.terasology.world.selection.event.BlockStartSelectionEvent;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockSelectionSystem implements ComponentSystem {
     @ReceiveEvent(components = {LocationComponent.class})
-    public void onStartSelectionAtEntity(BlockStartSelectionEvent event, EntityRef entity) {
+    public void onStartSelectionAtEntity(SetBlockSelectionStartingPointEvent event, EntityRef entity) {
 
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         if (null == locationComponent) {
@@ -58,12 +56,10 @@ public class BlockSelectionSystem implements ComponentSystem {
         blockSelectionComponent.startPosition = startPosition;
         Vector3i endPosition = startPosition;
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
-
-        entity.send(new BlockSelectionStartedEvent(entity, blockSelectionComponent));
     }
 
     @ReceiveEvent(components = {LocationComponent.class})
-    public void onEndSelectionAtEntity(BlockEndSelectionEvent event, EntityRef entity) {
+    public void onEndSelectionAtEntity(SetBlockSelectionEndingPointEvent event, EntityRef entity) {
 
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         if (null == locationComponent) {
@@ -85,8 +81,6 @@ public class BlockSelectionSystem implements ComponentSystem {
             startPosition = endPosition;
         }
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
-
-        entity.send(new BlockSelectionCompletedEvent(entity, blockSelectionComponent));
     }
 
     @Override

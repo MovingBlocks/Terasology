@@ -15,15 +15,12 @@
  */
 package org.terasology.rendering.world.selection;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.vecmath.Vector3f;
 
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -31,8 +28,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.selection.BlockSelectionComponent;
-import org.terasology.world.selection.event.RegisterBlockSelectionForRenderingEvent;
-import org.terasology.world.selection.event.UnregisterBlockSelectionForRenderingEvent;
 
 /**
  * System to render registered BlockSelections.
@@ -43,45 +38,27 @@ import org.terasology.world.selection.event.UnregisterBlockSelectionForRendering
  */
 @RegisterSystem(RegisterMode.CLIENT)
 public class BlockSelectionRenderSystem implements RenderSystem {
-
-    private Map<BlockSelectionComponent, BlockSelectionRenderer> registeredBlockSelectionComponents = new HashMap<BlockSelectionComponent, BlockSelectionRenderer>();
-
-    @ReceiveEvent
-    public void onRegisterBlockSelection(RegisterBlockSelectionForRenderingEvent event, EntityRef itemEntity) {
-        // A future improvement might be to add different rendering options for different kinds of block selections
-        BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
-        Texture texture = blockSelectionComponent.texture;
-        BlockSelectionRenderer selectionRenderer;
-        if (null == texture) {
-            selectionRenderer = new BlockSelectionRenderer();
-        } else {
-            selectionRenderer = new BlockSelectionRenderer(texture);
-        }
-
-        if (!registeredBlockSelectionComponents.containsKey(blockSelectionComponent)) {
-            // At some point, we might need to verify that both key and value are non-null
-            registeredBlockSelectionComponents.put(blockSelectionComponent, selectionRenderer);
-        }
-    }
-
-    @ReceiveEvent
-    public void onUnregisterBlockSelection(UnregisterBlockSelectionForRenderingEvent event, EntityRef itemEntity) {
-        BlockSelectionComponent blockSelectionComponent = event.getBlockSelectionComponent();
-
-        // TODO: do we need to render anything at this point to void the current selection?
-        // BlockSelectionRenderer selectionRenderer =
-        registeredBlockSelectionComponents.remove(blockSelectionComponent);
-        // if (null != selectionRenderer) {
-        //     renderOverlayForOneBlockSelection(blockSelectionComponent, selectionRenderer);
-        // }
-    }
+    @In
+    private EntityManager entityManager;
 
     @Override
     public void renderOverlay() {
-        for (Entry<BlockSelectionComponent, BlockSelectionRenderer> entry : registeredBlockSelectionComponents.entrySet()) {
-            BlockSelectionComponent blockSelectionComponent = entry.getKey();
-            BlockSelectionRenderer selectionRenderer = entry.getValue();
-            renderOverlayForOneBlockSelection(blockSelectionComponent, selectionRenderer);
+        ;
+        for (EntityRef entity : entityManager.getEntitiesWith(BlockSelectionComponent.class)) {
+            BlockSelectionComponent blockSelectionComponent = entity.getComponent(BlockSelectionComponent.class);
+            if (blockSelectionComponent.shouldRender) {
+                Texture texture = blockSelectionComponent.texture;
+
+                // TODO: should we either cache the renderer, or reuse the same renderer for all selections?
+                // Recreating the renderer is probably too inefficient
+                BlockSelectionRenderer selectionRenderer;
+                if (null == texture) {
+                    selectionRenderer = new BlockSelectionRenderer();
+                } else {
+                    selectionRenderer = new BlockSelectionRenderer(texture);
+                }
+                renderOverlayForOneBlockSelection(blockSelectionComponent, selectionRenderer);
+            }
         }
     }
 
