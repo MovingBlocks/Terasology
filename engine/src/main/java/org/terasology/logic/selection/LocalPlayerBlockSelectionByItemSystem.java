@@ -62,7 +62,6 @@ public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
             // on the first item click, we start selecting blocks
             targetLocationEntity.send(new SetBlockSelectionStartingPointEvent(itemEntity));
 
-            blockSelectionComponent.texture = Assets.getTexture("engine:selection");
             blockSelectionComponent.shouldRender = true;
         } else {
             // on the second item click, we will set the ending selection point and send an ApplyBlockSelectionEvent
