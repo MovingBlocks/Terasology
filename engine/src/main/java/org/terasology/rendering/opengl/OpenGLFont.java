@@ -16,7 +16,9 @@
 package org.terasology.rendering.opengl;
 
 import com.google.common.collect.Maps;
+
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
@@ -31,6 +33,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.HorizontalAlign;
 
 import javax.vecmath.Vector3f;
+
 import java.util.List;
 import java.util.Map;
 
@@ -58,13 +61,15 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
     }
 
     // This function shouldn't be here, should be in a Canvas style class most likely.
-    public void drawString(int x, int y, String text, org.newdawn.slick.Color color) {
+    public void drawString(int x, int y, String text, Color baseColor) {
         if (isDisposed()) {
             return;
         }
         CoreRegistry.get(ShaderManager.class).enableDefaultTextured();
 
         Texture bound = null;
+        
+        Color color = baseColor;
 
         int posX = x;
         int posY = y;
@@ -98,6 +103,12 @@ public class OpenGLFont extends AbstractAsset<FontData> implements Font {
                     glPopMatrix();
 
                     posX += character.getxAdvance();
+                } else if (FontColor.isValid(c)) {
+                    if (c == FontColor.getReset()) {
+                        color = baseColor;
+                    } else {
+                        color = FontColor.toColor(c);
+                    }
                 }
             }
         }

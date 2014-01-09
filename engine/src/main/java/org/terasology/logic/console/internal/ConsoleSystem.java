@@ -27,6 +27,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.rendering.opengl.FontColor;
 
 import java.util.Collection;
 import java.util.List;
@@ -59,7 +60,11 @@ public class ConsoleSystem implements ComponentSystem {
             if (!msg.toString().isEmpty()) {
                 msg.append("\n");
             }
-            msg.append(cmd.getUsageMessage()).append(" - ").append(cmd.getShortDescription());
+            msg.append(FontColor.toChar(ConsoleColors.COMMAND));
+            msg.append(cmd.getUsageMessage());
+            msg.append(FontColor.getReset());
+            msg.append(" - ");
+            msg.append(cmd.getShortDescription());
         }
         return msg.toString();
     }
