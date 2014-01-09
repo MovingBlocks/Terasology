@@ -60,6 +60,15 @@ public final class FontColor {
     
     /**
      * Stores the color with (4 + 4 + 4) = 12 bit accuracy as Unicode char
+     * @param color the color
+     * @return the unicode char
+     */
+    public static char toChar(org.terasology.rendering.nui.Color color) {
+        return toChar(color.r(), color.g(), color.b());
+    }
+    
+    /**
+     * Stores the color with (4 + 4 + 4) = 12 bit accuracy as Unicode char
      * @param r red in [0..255]
      * @param g green in [0..255]
      * @param b blue in [0..255]
