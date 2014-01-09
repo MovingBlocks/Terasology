@@ -16,5 +16,5 @@
 package org.terasology.core.logic.tree.lsystem;
 
 public interface AxionElementReplacement {
-    String getReplacement(float random);
+    String getReplacement(float random, String currentAxion);
 }

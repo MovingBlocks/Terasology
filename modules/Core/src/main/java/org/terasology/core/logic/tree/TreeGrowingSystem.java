@@ -16,6 +16,8 @@
 package org.terasology.core.logic.tree;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.core.logic.tree.lsystem.AdvanceAxionElementGeneration;
 import org.terasology.core.logic.tree.lsystem.AdvancedLSystemTreeDefinition;
 import org.terasology.core.logic.tree.lsystem.AxionElementGeneration;
@@ -36,6 +38,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockUri;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,6 +49,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class TreeGrowingSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(TreeGrowingSystem.class);
     private static final int CHECK_INTERVAL = 1000;
     @In
     private WorldProvider worldProvider;
@@ -99,16 +103,28 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         final FastRandom rnd = new FastRandom();
 
         SimpleAxionElementReplacement trunkTop = new SimpleAxionElementReplacement("t");
-        trunkTop.addReplacement(0.5f,
+        trunkTop.addReplacement(0.6f,
                 new SimpleAxionElementReplacement.ReplacementGenerator() {
                     @Override
-                    public String generateReplacement() {
+                    public String generateReplacement(String currentAxion) {
                         // 137.5 degrees is a golden ratio
                         int deg = rnd.nextInt(130, 147);
                         return "W+(" + deg + ")[&Mb]Wt";
                     }
                 });
-        trunkTop.addReplacement(0.5f, "Wt");
+        trunkTop.addReplacement(0.4f,
+                new SimpleAxionElementReplacement.ReplacementGenerator() {
+                    @Override
+                    public String generateReplacement(String currentAxion) {
+                        // Always generate at least 2 branches
+                        if (currentAxion.split("b").length < 2) {
+                            // 137.5 degrees is a golden ratio
+                            int deg = rnd.nextInt(130, 147);
+                            return "W+(" + deg + ")[&Mb]Wt";
+                        }
+                        return "Wt";
+                    }
+                });
 
         SimpleAxionElementReplacement smallBranch = new SimpleAxionElementReplacement("b");
         smallBranch.addReplacement(0.8f, "Bb");
@@ -127,6 +143,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         Block oakSaplingGenerated = blockManager.getBlock("core:OakSaplingGenerated");
         Block greenLeaf = blockManager.getBlock("core:GreenLeaf");
         Block oakTrunk = blockManager.getBlock("core:OakTrunk");
+        Block oakBranch = blockManager.getBlock(new BlockUri("core", "OakBranch", "0"));
 
         float trunkAdvance = 0.2f;
         float branchAdvance = 0.25f;
@@ -143,9 +160,9 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
 
         // Branch building blocks
         blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.4f));
-        blockMap.put('B', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, branchAdvance, 2.1f));
+        blockMap.put('B', new SurroundAxionElementGeneration(oakBranch, greenLeaf, branchAdvance, 1.1f, 2.4f));
         blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
-        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, greenLeaf), (float) Math.PI / 4);
+        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, oakBranch, greenLeaf), (float) Math.PI / 4);
     }
 }

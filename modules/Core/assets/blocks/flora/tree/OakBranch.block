@@ -1,0 +1,38 @@
+{
+    "displayName": "Oak Branch",
+    "entity": {
+        "prefab": "core:OakBranch"
+    },
+
+    "rotation": "Core:branch",
+    "no_connections": {
+        "shape": "core:BranchNoCon"
+    },
+    "one_connection": {
+        "shape": "core:BranchOneCon"
+    },
+    "line_connection": {
+        "shape": "core:BranchTwoConLine"
+    },
+    "2d_corner": {
+        "shape": "core:BranchTwoConCorn"
+    },
+    "3d_corner": {
+        "shape": "core:BranchThreeConCorn"
+    },
+    "2d_t": {
+        "shape": "core:BranchThreeConTee"
+    },
+    "cross": {
+        "shape": "core:BranchFourConCross"
+    },
+    "3d_side": {
+        "shape": "core:BranchFourConTee"
+    },
+    "five_connections": {
+        "shape": "core:BranchFiveCon"
+    },
+    "all": {
+        "shape": "core:BranchSixCon"
+    }
+}

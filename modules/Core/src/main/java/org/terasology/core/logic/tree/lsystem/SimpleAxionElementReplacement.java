@@ -47,10 +47,10 @@ public class SimpleAxionElementReplacement implements AxionElementReplacement {
     }
 
     @Override
-    public String getReplacement(float random) {
+    public String getReplacement(float random, String currentAxiom) {
         for (int i = 0, size = probabilities.size(); i < size - 1; i++) {
             if (probabilities.get(i) > random && probabilities.get(i + 1) <= random) {
-                return replacements.get(i + 1).generateReplacement();
+                return replacements.get(i + 1).generateReplacement(currentAxiom);
             }
         }
         return defaultReplacement;
@@ -64,12 +64,12 @@ public class SimpleAxionElementReplacement implements AxionElementReplacement {
         }
 
         @Override
-        public String generateReplacement() {
+        public String generateReplacement(String currentAxiom) {
             return result;
         }
     }
 
     public interface ReplacementGenerator {
-        String generateReplacement();
+        String generateReplacement(String currentAxion);
     }
 }

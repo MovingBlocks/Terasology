@@ -162,21 +162,21 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         final Vector3i origin = Vector3i.zero();
 
         for (Map.Entry<Vector3i, Block> newTreeBlock : nextTree.entrySet()) {
-            Vector3i location = newTreeBlock.getKey();
-            Block oldBlock = currentTree.remove(location);
+            Vector3i relativeLocation = newTreeBlock.getKey();
+            Block oldBlock = currentTree.remove(relativeLocation);
             Block newBlock = newTreeBlock.getValue();
+            Vector3i blockLocation = new Vector3i(treeLocation.x + relativeLocation.x, treeLocation.y + relativeLocation.y, treeLocation.z + relativeLocation.z);
+            Block resultBlock = newBlock.getBlockFamily().getBlockForPlacement(worldProvider, blockEntityRegistry, blockLocation, null, null);
+
             if (oldBlock != null && oldBlock != newBlock) {
-                if (location.equals(origin)) {
-                    blockEntityRegistry.setBlockRetainComponent(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
-                            newBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
+                if (relativeLocation.equals(origin)) {
+                    blockEntityRegistry.setBlockRetainComponent(blockLocation, resultBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
                 } else {
-                    worldProvider.setBlock(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
-                            newBlock);
+                    worldProvider.setBlock(blockLocation, resultBlock);
                 }
                 replaceCount++;
             } else if (oldBlock == null) {
-                worldProvider.setBlock(new Vector3i(treeLocation.x + location.x, treeLocation.y + location.y, treeLocation.z + location.z),
-                        newBlock);
+                worldProvider.setBlock(blockLocation, resultBlock);
                 replaceCount++;
             }
         }
@@ -196,7 +196,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
         for (AxionElement axion : parseAxions(currentAxion)) {
             final AxionElementReplacement axionElementReplacement = axionElementReplacements.get(axion.key);
             if (axionElementReplacement != null) {
-                result.append(axionElementReplacement.getReplacement(rand.nextFloat()));
+                result.append(axionElementReplacement.getReplacement(rand.nextFloat(), currentAxion));
             } else {
                 result.append(axion.key);
                 if (axion.parameter != null) {
