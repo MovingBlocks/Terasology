@@ -17,9 +17,6 @@
             {
                 "type" : "propertyLayout",
                 "id" : "properties",
-                "layoutConstraints" : "",
-                "colConstraints" : "[pref][fill]",
-                "rowConstraints" : "",
                 "layoutInfo" : {
                     "cc" : "cell 2 3, aligny top, w 200!"
                 }
@@ -27,18 +24,12 @@
             {
                 "type" : "propertyLayout",
                 "id" : "entity_properties",
-                "layoutConstraints" : "",
-                "colConstraints" : "[pref][fill]",
-                "rowConstraints" : "",
                 "layoutInfo" : {
                     "cc" : "cell 2 4, aligny top, w 200!"
                 }
             },
             {
                 "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
                 "layoutInfo" : {
                     "cc" : "cell 0 0 3"
                 },
@@ -79,9 +70,6 @@
             },
             {
                 "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
                 "layoutInfo" : {
                     "cc" : "cell 0 1 3"
                 },
@@ -95,7 +83,7 @@
                     },
                     {
                         "type" : "UIButton",
-                        "id" : "debug_stop",
+                        "id" : "debug_reset",
                         "text" : "[]"
                     },
                     {
@@ -117,9 +105,6 @@
             },
             {
                 "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
                 "layoutInfo" : {
                     "cc" : "cell 0 2 3"
                 },

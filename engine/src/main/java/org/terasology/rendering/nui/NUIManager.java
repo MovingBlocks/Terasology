@@ -40,6 +40,8 @@ public interface NUIManager extends ComponentSystem {
 
     void closeScreens();
 
+    void setModal(boolean state);
+
     void render();
 
     void update(float delta);

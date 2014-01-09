@@ -15,31 +15,17 @@
  */
 package org.terasology.rendering.nui.baseLayouts;
 
-import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseButtonEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.Border;
-import org.terasology.math.Rect2i;
-import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.CoreLayout;
-import org.terasology.rendering.nui.LayoutHint;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyProvider;
-import org.terasology.utilities.collection.NullIterator;
-
-import java.util.Iterator;
 
 /**
  * Created by synopia on 03.01.14.
  */
 public class PropertyLayout extends MigLayout {
-    private PropertyProvider<?> propertyProvider;
 
     public PropertyLayout() {
     }
@@ -49,28 +35,32 @@ public class PropertyLayout extends MigLayout {
     }
 
     public void addPropertyProvider(String label, final PropertyProvider<?> propertyProvider) {
-        this.propertyProvider = propertyProvider;
-        final UIButton expand = new UIButton("", "+");
-        final UILabel headline = new UILabel(label);
-        final MigLayout layout = new MigLayout();
+        if (propertyProvider.getProperties().size() > 0) {
+            final UIButton expand = new UIButton("", "+");
+            final UILabel headline = new UILabel(label);
+            final MigLayout layout = new MigLayout();
+            layout.setColConstraints("[pref][fill]");
 
-        expand.subscribe(new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                if( "-".equals(button.getText())) {
-                    layout.clear();
-                    button.setText("+");
-                } else {
-                    for (Property<?, ?> property : propertyProvider.getProperties()) {
-                        layout.addWidget(property.getLabel(), new CCHint("newline"));
-                        layout.addWidget(property.getEditor(), new CCHint());
+            expand.subscribe(new ButtonEventListener() {
+                @Override
+                public void onButtonActivated(UIButton button) {
+                    if ("-".equals(button.getText())) {
+                        layout.clear();
+                        invalidate();
+                        button.setText("+");
+                    } else {
+                        for (Property<?, ?> property : propertyProvider.getProperties()) {
+                            layout.addWidget(property.getLabel(), new CCHint("newline"));
+                            layout.addWidget(property.getEditor(), new CCHint());
+                        }
+                        invalidate();
+                        button.setText("-");
                     }
-                    button.setText("-");
                 }
-            }
-        });
-        addWidget(expand, new CCHint("newline, grow"));
-        addWidget(headline, new CCHint());
-        addWidget(layout, new CCHint("newline, spanx 2, grow"));
+            });
+            addWidget(expand, new CCHint("newline, w 50!"));
+            addWidget(headline, new CCHint());
+            addWidget(layout, new CCHint("newline, spanx 2"));
+        }
     }
 }

@@ -21,6 +21,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.TreeAccessor;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
@@ -51,6 +52,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private transient Vector2i last;
     private transient BehaviorEditor editor;
     private transient boolean dragged;
+    private transient Status status;
 
     private transient InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -101,11 +103,9 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawTexture(texture);
-        String text = getData().name;
+        String text = getData().name + " "+(status!=null?status:"");
+        canvas.drawText(text);
 
-        if (text != null) {
-            canvas.drawText(text);
-        }
         if( editor!=null ) {
             canvas.addInteractionRegion(moveListener);
         }
@@ -256,6 +256,14 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         for (RenderableNode child : children) {
             child.visit(visitor);
         }
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
     }
 
     public interface Visitor {

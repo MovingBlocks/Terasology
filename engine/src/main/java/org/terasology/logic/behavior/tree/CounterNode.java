@@ -31,12 +31,6 @@ public class CounterNode extends Node {
     @Range(min = 0, max = 100)
     private int limit;
 
-    @TextField
-    private String aString="";
-
-    @OneOf.List(items = {"xyz", "abc"})
-    private String aList;
-
     public CounterNode() {
     }
 
@@ -58,7 +52,7 @@ public class CounterNode extends Node {
 
         @Override
         public void onInitialize() {
-            count = getNode().limit;
+            count = Math.max(1, getNode().limit);
         }
 
         @Override

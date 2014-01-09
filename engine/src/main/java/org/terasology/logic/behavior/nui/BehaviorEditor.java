@@ -19,9 +19,12 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
+import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.behavior.tree.Status;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -56,7 +59,6 @@ public class BehaviorEditor extends ZoomableLayout {
     private RenderableNode newNode;
     private BehaviorTree tree;
     private Vector2f mousePos;
-    private ColumnLayout properties;
     private Binding<RenderableNode> selectionBinding;
 
     private final InteractionListener moveOver = new BaseInteractionListener(){
@@ -95,6 +97,10 @@ public class BehaviorEditor extends ZoomableLayout {
         for (RenderableNode widget : tree.getRenderableNodes()) {
             addWidget(widget);
         }
+    }
+
+    public BehaviorTree getTree() {
+        return tree;
     }
 
     public String save() {
@@ -164,13 +170,13 @@ public class BehaviorEditor extends ZoomableLayout {
             } else if( !activeConnectionStart.isInput() && port.isInput() ) {
                 ((Port.OutputPort)activeConnectionStart).setTarget((Port.InputPort) port);
             }
+            CoreRegistry.get(BehaviorSystem.class).treeModified(tree);
             activeConnectionStart = null;
         }
     }
 
     public void nodeClicked(RenderableNode node) {
         selectedNode = node;
-        properties = null;
         if( selectionBinding!=null ) {
             selectionBinding.set(node);
         }
@@ -202,21 +208,7 @@ public class BehaviorEditor extends ZoomableLayout {
         return newNode;
     }
 
-    public ColumnLayout getProperties() {
-        if( properties==null ) {
-            properties = new ColumnLayout();
-            properties.setColumns(2);
-            properties.addWidget(new UILabel("properties.label", selectedNode.toString()));
-            properties.addWidget(new UILabel("", ""));
-            properties.addWidget(new UILabel("", "X"));
-            properties.addWidget(new UIButton("x", "y"));
-
-        }
-        return properties;
-    }
-
     public void bindSelection( Binding<RenderableNode> binding ) {
         selectionBinding = binding;
     }
-
 }

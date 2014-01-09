@@ -16,7 +16,15 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
+import org.lwjgl.input.Mouse;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.input.Input;
+import org.terasology.input.Keyboard;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -24,8 +32,10 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreen;
 import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
@@ -43,37 +53,52 @@ import java.util.List;
  * @author synopia
  */
 public class BehaviorEditorScreen extends UIScreen {
+
+    private PropertyLayout entityProperties;
+    private BehaviorEditor behaviorEditor;
+    private PropertyLayout properties;
+    private UIDropdown<BehaviorTree> selectTree;
+    private UIDropdown<Interpreter> selectEntity;
+    private UIDropdown<BehaviorNodeComponent> palette;
+    private BehaviorTree selectedTree;
+    private Interpreter selectedInterpreter;
+    private RenderableNode selectedNode;
+    private BehaviorDebugger debugger;
+
+    @In
+    private NUIManager nuiManager;
+
+    private boolean grabbedBefore;
+
     @Override
     public void initialise() {
-        PropertyLayout entityProperties = find("entity_properties", PropertyLayout.class);
-        entityProperties.addPropertyProvider("Location", new PropertyProvider<>(new LocationComponent()));
-        entityProperties.addPropertyProvider("Movement", new PropertyProvider<>(new CharacterMovementComponent()));
-        find("tree", BehaviorEditor.class).bindSelection(new Binding<RenderableNode>() {
+        nuiManager.setModal(true);
+        grabbedBefore = Mouse.isGrabbed();
+        Mouse.setGrabbed(false);
+
+        entityProperties = find("entity_properties", PropertyLayout.class);
+        behaviorEditor = find("tree", BehaviorEditor.class);
+        properties = find("properties", PropertyLayout.class);
+        selectTree = find("select_tree", UIDropdown.class);
+        selectEntity = find("select_entity", UIDropdown.class);
+        palette = find("palette", UIDropdown.class);
+
+        behaviorEditor.bindSelection(new Binding<RenderableNode>() {
             @Override
             public RenderableNode get() {
-                return null;
+                return selectedNode;
             }
 
             @Override
             public void set(RenderableNode value) {
+                selectedNode = value;
                 PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
-                PropertyLayout properties = find("properties", PropertyLayout.class);
                 properties.clear();
                 properties.addPropertyProvider("Behavior Node", provider);
             }
         });
-        find("select_tree", UIDropdown.class).bindSelection(new Binding<BehaviorTree>() {
-            @Override
-            public BehaviorTree get() {
-                return null;
-            }
 
-            @Override
-            public void set(BehaviorTree value) {
-                find("tree", BehaviorEditor.class).setTree(value);
-            }
-        });
-        find("select_tree", UIDropdown.class).bindOptions(new Binding<List<BehaviorTree>>() {
+        selectTree.bindOptions(new Binding<List<BehaviorTree>>() {
             @Override
             public List<BehaviorTree> get() {
                 return Lists.newArrayList(CoreRegistry.get(BehaviorSystem.class).getTrees());
@@ -83,11 +108,23 @@ public class BehaviorEditorScreen extends UIScreen {
             public void set(List<BehaviorTree> value) {
             }
         });
+        selectTree.bindSelection(new Binding<BehaviorTree>() {
+            @Override
+            public BehaviorTree get() {
+                return behaviorEditor.getTree();
+            }
 
-        find("select_entity", UIDropdown.class).bindOptions(new Binding<List<Interpreter>>() {
+            @Override
+            public void set(BehaviorTree value) {
+                selectedTree = value;
+                behaviorEditor.setTree(value);
+            }
+        });
+
+        selectEntity.bindOptions(new Binding<List<Interpreter>>() {
             @Override
             public List<Interpreter> get() {
-                BehaviorTree selection = (BehaviorTree) find("select_tree", UIDropdown.class).getSelection();
+                BehaviorTree selection = selectTree.getSelection();
                 if (selection != null) {
                     return CoreRegistry.get(BehaviorSystem.class).getInterpreter(selection);
                 } else {
@@ -99,8 +136,26 @@ public class BehaviorEditorScreen extends UIScreen {
             public void set(List<Interpreter> value) {
             }
         });
+        selectEntity.bindSelection(new Binding<Interpreter>() {
+            @Override
+            public Interpreter get() {
+                return selectedInterpreter;
+            }
 
-        find("palette", UIDropdown.class).bindOptions(new Binding<List<BehaviorNodeComponent>>() {
+            @Override
+            public void set(Interpreter value) {
+                selectedInterpreter = value;
+                EntityRef minion = value.actor().minion();
+                entityProperties.clear();
+                for (Component component : minion.iterateComponents()) {
+                    entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                }
+                debugger = new BehaviorDebugger(selectedTree);
+                selectedInterpreter.setDebugger(debugger);
+            }
+        });
+
+        palette.bindOptions(new Binding<List<BehaviorNodeComponent>>() {
             @Override
             public List<BehaviorNodeComponent> get() {
                 return Lists.newArrayList(CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponents());
@@ -115,7 +170,7 @@ public class BehaviorEditorScreen extends UIScreen {
         UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                find("tree", BehaviorEditor.class).createNode((BehaviorNodeComponent) find("palette", UIDropdown.class).getSelection());
+                behaviorEditor.createNode(palette.getSelection());
             }
         });
 
@@ -123,10 +178,69 @@ public class BehaviorEditorScreen extends UIScreen {
             @Override
             public void onButtonActivated(UIButton button) {
                 Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                String tree = find("tree", BehaviorEditor.class).save();
-                StringSelection contents = new StringSelection(tree);
+                String data = behaviorEditor.save();
+                StringSelection contents = new StringSelection(data);
                 systemClipboard.setContents(contents, contents);
             }
         });
+
+        UIScreenUtil.trySubscribe(this, "layout", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                BehaviorTree selection = selectTree.getSelection();
+                if( selection!=null ) {
+                    selection.layout(selectedNode);
+                }
+            }
+        });
+
+        UIScreenUtil.trySubscribe(this, "debug_run", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                if( debugger!=null ) {
+                    debugger.run();
+                }
+            }
+        });
+        UIScreenUtil.trySubscribe(this, "debug_pause", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                if( debugger!=null ) {
+                    debugger.pause();
+                }
+            }
+        });
+        UIScreenUtil.trySubscribe(this, "debug_reset", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                if( selectedInterpreter!=null ) {
+                    selectedInterpreter.reset();
+                }
+            }
+        });
+        UIScreenUtil.trySubscribe(this, "debug_step", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                if( debugger!=null ) {
+                    debugger.step();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onKeyEvent(KeyEvent event) {
+        if( event.getKey() == Keyboard.Key.ESCAPE) {
+            nuiManager.popScreen();
+            nuiManager.setModal(false);
+            Mouse.setGrabbed(grabbedBefore);
+            event.consume();
+        }
+    }
+
+    @Override
+    public void update(float delta) {
+        CoreRegistry.get(BehaviorSystem.class).update(delta);
+        super.update(delta);
     }
 }

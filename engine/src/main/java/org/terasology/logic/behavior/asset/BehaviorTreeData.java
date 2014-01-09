@@ -69,7 +69,13 @@ public class BehaviorTreeData implements AssetData {
                 return self;
             }
         });
-        TreeLayout<RenderableNode> layout = new TreeLayout<>(new LayoutTree(renderableRoot), new FixedNodeExtentProvider(10,5), new DefaultConfiguration(4,2));
+    }
+
+    public void layout(RenderableNode start) {
+        if( start==null ) {
+            start = renderableRoot;
+        }
+        TreeLayout<RenderableNode> layout = new TreeLayout<>(new LayoutTree(start), new FixedNodeExtentProvider(10,5), new DefaultConfiguration(4,2));
         Map<RenderableNode,Rectangle2D.Double> bounds = layout.getNodeBounds();
         for (Map.Entry<RenderableNode, Rectangle2D.Double> entry : bounds.entrySet()) {
             RenderableNode node = entry.getKey();
@@ -92,6 +98,10 @@ public class BehaviorTreeData implements AssetData {
 
     public List<RenderableNode> getRenderableNodes() {
         return Lists.newArrayList(renderableNodes.values());
+    }
+
+    public RenderableNode getRenderableNode(Node node) {
+        return renderableNodes.get(node);
     }
 
     private static class LayoutTree implements TreeForTreeLayout<RenderableNode> {

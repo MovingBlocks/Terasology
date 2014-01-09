@@ -24,6 +24,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.PojoEntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -36,6 +37,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.rendering.logic.SkeletalMeshComponent;
 
 import java.util.Collection;
 import java.util.List;
@@ -76,7 +79,13 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             CoreRegistry.get(PrefabManager.class).getPrefab("engine:sequence");
             prefabs = CoreRegistry.get(PrefabManager.class).listPrefabs(BehaviorNodeComponent.class);
             BehaviorTree behaviorTree = CoreRegistry.get(AssetManager.class).resolveAndLoad(AssetType.BEHAVIOR, "engine:default", BehaviorTree.class);
-            interpreters.put(behaviorTree, Lists.newArrayList(new Interpreter(new Actor(null))));
+            EntityRef minion = CoreRegistry.get(EntityManager.class).create();
+            minion.addComponent(new LocationComponent());
+            minion.addComponent(new SkeletalMeshComponent());
+            Interpreter interpreter = new Interpreter(new Actor(minion));
+            interpreter.setRoot(behaviorTree.getRoot());
+            interpreter.start();
+            interpreters.put(behaviorTree, Lists.newArrayList(interpreter));
         }
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(prefab);
@@ -96,6 +105,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             behaviorComponent.tree = tree;
             interpreter.setRoot(tree.getRoot());
             entityRef.saveComponent(behaviorComponent);
+            interpreter.start();
             List<Interpreter> list = interpreters.get(tree);
             if (list == null) {
                 list = Lists.newArrayList();
@@ -133,6 +143,16 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     public List<Interpreter> getInterpreter(BehaviorTree tree) {
         return interpreters.get(tree);
+    }
+
+    public void treeModified( BehaviorTree tree ) {
+        List<Interpreter> list = interpreters.get(tree);
+        if( list==null || list.size()==0 ) {
+            return;
+        }
+        for (Interpreter interpreter : list) {
+            interpreter.reset();
+        }
     }
 
     @Override

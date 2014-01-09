@@ -42,23 +42,18 @@ public class Interpreter {
         }
     };
 
+    private Debugger debugger;
     private Actor actor;
     private Deque<Task> tasks = Queues.newLinkedBlockingDeque();
-    private boolean pause;
     private Node root;
-    private List<PauseListener> listeners = Lists.newArrayList();
 
     public Interpreter(Actor actor) {
         this.actor = actor;
         tasks.addLast(TERMINAL);
     }
 
-    public void addListener(PauseListener listener) {
-        this.listeners.add(listener);
-    }
-
-    public synchronized Deque<Task> tasks() {
-        return Queues.newArrayDeque(tasks);
+    public Actor actor() {
+        return actor;
     }
 
     public void reset() {
@@ -73,6 +68,9 @@ public class Interpreter {
 
     public void start() {
         start(root, null);
+        if( debugger!=null ) {
+            debugger.started();
+        }
     }
 
     public void start(Task task) {
@@ -100,11 +98,13 @@ public class Interpreter {
     }
 
     public void tick(float dt) {
-        if (pause) {
-            return;
-        }
-        while (!pause && step(dt)) {
-            continue;
+        if( debugger==null || debugger.beforeTick() ) {
+            while (step(dt)) {
+                continue;
+            }
+            if( debugger!=null ) {
+                debugger.afterTick();
+            }
         }
     }
 
@@ -117,37 +117,36 @@ public class Interpreter {
 
         current.tick(dt);
 
-
         if (current.getStatus() != Status.RUNNING && current.getObserver() != null) {
             logger.info("Finished " + current + " with status " + current.getStatus());
+            if( debugger!=null ) {
+                debugger.nodeFinished(current.getNode(), current.getStatus());
+            }
             current.getObserver().handle(current.getStatus());
         } else {
             tasks.addLast(current);
+            if( debugger!=null ) {
+                debugger.nodeUpdated(current.getNode(), current.getStatus());
+            }
         }
         return true;
     }
 
+    public void setDebugger(Debugger debugger) {
+        this.debugger = debugger;
+    }
+
     @Override
     public String toString() {
-        return actor.skeletalMesh().toString();
+        return actor.minion().toString();
     }
 
-    public void setPause(boolean pause) {
-        this.pause = pause;
-        for (PauseListener listener : listeners) {
-            listener.pauseChanged(pause);
-        }
-    }
+    public interface Debugger {
+        void nodeFinished( Node node, Status status );
+        void nodeUpdated( Node node, Status status );
+        void started();
 
-    public boolean isPause() {
-        return pause;
-    }
-
-    public boolean isRunning() {
-        return !isPause();
-    }
-
-    public interface PauseListener {
-        void pauseChanged(boolean pause);
+        boolean beforeTick();
+        void afterTick();
     }
 }

@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.properties;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.DefaultClassMetadata;
 import org.terasology.classMetadata.FieldMetadata;
@@ -23,41 +24,39 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.nui.baseWidgets.TextEventListener;
 import org.terasology.rendering.nui.baseWidgets.UICheckbox;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
-import org.terasology.rendering.nui.baseWidgets.UIText;
+import org.terasology.rendering.nui.baseWidgets.UITextEntry;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import javax.vecmath.Vector3f;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.or;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
-import static org.reflections.ReflectionUtils.withType;
 
 /**
  * @author synopia
  */
 public class PropertyProvider<T> {
-    private final static Pattern VECTOR_3F= Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");
+    private final static Pattern VECTOR_3F = Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");
     private T target;
-    private List<Property<?,?>> properties = Lists.newArrayList();
-    private NumberFormat floatFormat;
+    private List<Property<?, ?>> properties = Lists.newArrayList();
+
+    private Map<Class, PropertyFactory> factories = Maps.newHashMap();
 
     public PropertyProvider(T target) {
-        floatFormat = NumberFormat.getNumberInstance();
+        factories.put(Range.class, new RangePropertyFactory());
+        factories.put(Checkbox.class, new CheckboxPropertyFactory());
+        factories.put(OneOf.List.class, new OneOfListPropertyFactory());
+        factories.put(TextField.class, new TextPropertyFactory());
 
         try {
             this.target = target;
@@ -65,60 +64,28 @@ public class PropertyProvider<T> {
             ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
             CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
             ClassMetadata<?, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), type, reflectFactory, copyStrategies);
-            for (Field field : getAllFields(type, and(withAnnotation(Range.class), or(withType(Float.TYPE), withType(Float.class), withType(Integer.class), withType(Integer.TYPE))))) {
-                FieldMetadata<Object, ?> fieldMetadata = (FieldMetadata<Object, ?>) classMetadata.getField(field.getName());
-                Range range = field.getAnnotation(Range.class);
-
-                Property<Float, UISlider> property = createRangeProperty(fieldMetadata, field.getName(), range);
-                properties.add(property);
-            }
-            for (Field field : getAllFields(type, and(withAnnotation(Checkbox.class), or(withType(Boolean.TYPE), withType(Boolean.class))))) {
-                FieldMetadata<Object, Boolean> fieldMetadata = (FieldMetadata<Object, Boolean>) classMetadata.getField(field.getName());
-                Checkbox checkbox = field.getAnnotation(Checkbox.class);
-
-                Property<Boolean, UICheckbox> property = createCheckboxProperty(fieldMetadata, field.getName());
-                properties.add(property);
-            }
-            for (Field field : getAllFields(type, and(withAnnotation(OneOf.List.class), withType(String.class)))) {
-                FieldMetadata<Object, String> fieldMetadata = (FieldMetadata<Object, String>) classMetadata.getField(field.getName());
-                OneOf.List list = field.getAnnotation(OneOf.List.class);
-
-                Property<String, UIDropdown<String>> property = createStringDropdownProperty(fieldMetadata, field.getName(), list.items());
-                properties.add(property);
-            }
-            for (Field field : getAllFields(type, and(withAnnotation(TextField.class)))) {
-                FieldMetadata<Object, ?> fieldMetadata = (FieldMetadata<Object, ?>) classMetadata.getField(field.getName());
-                TextField textField = field.getAnnotation(TextField.class);
-
-                Property<String, UIText> property = createTextProperty(fieldMetadata, field.getName());
-                properties.add(property);
+            for (Field field : getAllFields(type)) {
+                Annotation annotation = getFactory(field);
+                if (annotation != null) {
+                    FieldMetadata<Object, ?> fieldMetadata = (FieldMetadata<Object, ?>) classMetadata.getField(field.getName());
+                    PropertyFactory factory = factories.get(annotation.annotationType());
+                    Property property = factory.create(fieldMetadata, field.getName(), annotation);
+                    properties.add(property);
+                }
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Property<String, UIText> createTextProperty(final FieldMetadata<Object, ?> fieldMetadata, String label) {
-        UIText text = new UIText();
-        StringBinding binding = createStringBinding(fieldMetadata);
-        text.bindText(binding);
-        text.subscribe(binding);
-        return new Property<>(label, binding, text);
-    }
-
-    private Property<Boolean, UICheckbox> createCheckboxProperty(final FieldMetadata<Object, Boolean> fieldMetadata, String label) {
-        UICheckbox checkbox = new UICheckbox();
-        Binding<Boolean> binding = createBooleanBinding(fieldMetadata);
-        checkbox.bindChecked(binding);
-        return new Property<>(label, binding, checkbox);
-    }
-
-    private Property<String, UIDropdown<String>> createStringDropdownProperty(final FieldMetadata<Object, String> fieldMetadata, String label, String[] items) {
-        UIDropdown<String> dropdown = new UIDropdown<>();
-        dropdown.bindOptions(new DefaultBinding<>(Arrays.asList(items)));
-        Binding<String> binding = createStringBinding(fieldMetadata);
-        dropdown.bindSelection(binding);
-        return new Property<>(label, binding, dropdown);
+    private Annotation getFactory(Field field) {
+        Annotation[] annotations = field.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (factories.containsKey(annotation.annotationType())) {
+                return annotation;
+            }
+        }
+        return null;
     }
 
     public List<Property<?, ?>> getProperties() {
@@ -129,106 +96,31 @@ public class PropertyProvider<T> {
         return properties.isEmpty();
     }
 
-    private Property<Float, UISlider> createRangeProperty(final FieldMetadata<Object, ?> fieldMetadata, String label, Range range) {
-        UISlider slider = new UISlider();
-        slider.setMinimum(range.min());
-        slider.setRange(range.max() - range.min());
-        slider.setPrecision(range.precision());
-        slider.setIncrement(range.increment());
-        Binding<Float> binding = createFloatBinding(fieldMetadata);
-        slider.bindValue(binding);
-        return new Property<>(label, binding, slider);
-    }
-
-    private StringBinding createStringBinding(final FieldMetadata<Object, ?> fieldMetadata) {
+    private <T> TextBinding<T> createTextBinding(final FieldMetadata<Object, T> fieldMetadata) {
         Class<?> type = fieldMetadata.getType();
-        Binding<String> converter;
-        if( type==String.class ) {
-            converter = new Binding<String>() {
-                @Override
-                public String get() {
-                    return (String) fieldMetadata.getValueChecked(target);
-                }
-
-                @Override
-                public void set(String value) {
-                    fieldMetadata.setValue(target, value);
-                }
-            };
-        } else if( type==Integer.TYPE || type==Integer.class) {
-            converter = new Binding<String>() {
-                @Override
-                public String get() {
-                    Integer result = (Integer) fieldMetadata.getValueChecked(target);
-                    return result!=null ? result.toString() : "";
-                }
-
-                @Override
-                public void set(String value) {
-                    int result = Integer.parseInt(value);
-                    fieldMetadata.setValue(target, result);
-                }
-            };
-        } else if( type==Float.TYPE || type==Float.class) {
-            converter = new Binding<String>() {
-                @Override
-                public String get() {
-                    Float result = (Float) fieldMetadata.getValueChecked(target);
-                    return result!=null ? result.toString() : "";
-                }
-
-                @Override
-                public void set(String value) {
-                    float result = Float.parseFloat(value);
-                    fieldMetadata.setValue(target, result);
-                }
-            };
-        } else if (type== Vector3f.class ) {
-            converter = new Binding<String>() {
-                @Override
-                public String get() {
-                    Vector3f vector = (Vector3f) fieldMetadata.getValueChecked(target);
-                    return vector!=null ? vector.toString() : "";
-                }
-
-                @Override
-                public void set(String value) {
-                    Matcher matcher = VECTOR_3F.matcher(value);
-                    if(matcher.matches()) {
-                        Vector3f result = new Vector3f(Float.parseFloat(matcher.group(1)), Float.parseFloat(matcher.group(2)), Float.parseFloat(matcher.group(3)) );
-                        fieldMetadata.setValue(target, result);
-                    } else {
-                        throw new IllegalArgumentException("Cannot parse "+value+ " to Vector3f");
-                    }
-                }
-            };
+        TextBinding<?> textBinding;
+        if (type == String.class) {
+            textBinding = new StringTextBinding((FieldMetadata<Object, String>) fieldMetadata);
+        } else if (type == Integer.TYPE || type == Integer.class) {
+            textBinding = new IntegerTextBinding((FieldMetadata<Object, Integer>) fieldMetadata);
+        } else if (type == Float.TYPE || type == Float.class) {
+            textBinding = new FloatTextBinding((FieldMetadata<Object, Float>) fieldMetadata);
+        } else if (type == Vector3f.class) {
+            textBinding = new Vector3fTextBinding((FieldMetadata<Object, Vector3f>) fieldMetadata);
         } else {
-            throw new IllegalArgumentException("Cannot create Binding<String> for a field of type "+type);
+            throw new IllegalArgumentException("Cannot create Binding<String> for a field of type " + type);
         }
-        return new StringBinding(converter);
+        return (TextBinding<T>) textBinding;
     }
 
-    private Binding<Boolean> createBooleanBinding(final FieldMetadata<Object, Boolean> fieldMetadata) {
-        return new Binding<Boolean>() {
-            @Override
-            public Boolean get() {
-                return fieldMetadata.getValueChecked(target);
-            }
-
-            @Override
-            public void set(Boolean value) {
-                fieldMetadata.setValue(target, value);
-            }
-        };
-    }
 
     private Binding<Float> createFloatBinding(final FieldMetadata<Object, ?> fieldMetadata) {
         Class<?> type = fieldMetadata.getType();
-        if( type==Integer.class || type==Integer.TYPE ) {
+        if (type == Integer.class || type == Integer.TYPE) {
             return new Binding<Float>() {
                 @Override
                 public Float get() {
-                    return (Float) fieldMetadata.getValueChecked(target);
+                    return ((Integer) fieldMetadata.getValueChecked(target)).floatValue();
                 }
 
                 @Override
@@ -236,7 +128,7 @@ public class PropertyProvider<T> {
                     fieldMetadata.setValue(target, value.intValue());
                 }
             };
-        } else if( type==Float.class || type==Float.TYPE ) {
+        } else if (type == Float.class || type == Float.TYPE) {
             return new Binding<Float>() {
                 @Override
                 public Float get() {
@@ -249,41 +141,164 @@ public class PropertyProvider<T> {
                 }
             };
         } else {
-            throw new IllegalArgumentException("Cannot create Binding<Float> for a field of type "+type);
+            throw new IllegalArgumentException("Cannot create Binding<Float> for a field of type " + type);
         }
     }
 
-    private static class StringBinding implements Binding<String>, TextEventListener {
-        private String tempValue;
-        private Binding<String> binding;
+    private interface PropertyFactory<T> {
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, T info);
+    }
 
-        private StringBinding(Binding<String> binding) {
-            this.binding = binding;
+    private class RangePropertyFactory implements PropertyFactory<Range> {
+        @Override
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, Range range) {
+            UISlider slider = new UISlider();
+            slider.setMinimum(range.min());
+            slider.setRange(range.max() - range.min());
+            slider.setPrecision(range.precision());
+            slider.setIncrement(range.increment());
+            Binding<Float> binding = createFloatBinding(fieldMetadata);
+            slider.bindValue(binding);
+            return new Property<>(label, binding, slider);
+        }
+    }
+
+    private class CheckboxPropertyFactory implements PropertyFactory<Checkbox> {
+        @Override
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, Checkbox info) {
+            UICheckbox checkbox = new UICheckbox();
+            Binding<Boolean> binding = new BooleanTextBinding((FieldMetadata<Object, Boolean>) fieldMetadata);
+            checkbox.bindChecked(binding);
+            return new Property<>(label, binding, checkbox);
+        }
+    }
+
+    private class OneOfListPropertyFactory implements PropertyFactory<OneOf.List> {
+        @Override
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, OneOf.List info) {
+            UIDropdown<String> dropdown = new UIDropdown<>();
+            dropdown.bindOptions(new DefaultBinding<>(Arrays.asList(info.items())));
+            Binding<String> binding = createTextBinding((FieldMetadata<Object, String>) fieldMetadata);
+            dropdown.bindSelection(binding);
+            return new Property<>(label, binding, dropdown);
+        }
+    }
+
+    private class TextPropertyFactory implements PropertyFactory<TextField> {
+        @Override
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, TextField info) {
+            UITextEntry<T> text = new UITextEntry<>();
+
+            TextBinding<T> textBinding = createTextBinding((FieldMetadata<Object, T>) fieldMetadata);
+            text.setFormatter(textBinding);
+            text.setParser(textBinding);
+            text.bindValue(textBinding);
+            return new Property<>(label, textBinding, text);
+        }
+    }
+
+    private abstract class TextBinding<T> implements UITextEntry.Formatter<T>, UITextEntry.Parser<T>, Binding<T> {
+        private FieldMetadata<Object, T> fieldMetadata;
+
+        protected TextBinding(FieldMetadata<Object, T> fieldMetadata) {
+            this.fieldMetadata = fieldMetadata;
         }
 
         @Override
-        public String get() {
-            if( tempValue==null ) {
-                return binding.get();
+        public T get() {
+            return fieldMetadata.getValueChecked(target);
+        }
+
+        @Override
+        public void set(T value) {
+            fieldMetadata.setValue(target, value);
+        }
+    }
+
+    private class StringTextBinding extends TextBinding<String> {
+        private StringTextBinding(FieldMetadata<Object, String> fieldMetadata) {
+            super(fieldMetadata);
+        }
+
+        @Override
+        public String toString(String value) {
+            return value;
+        }
+
+        @Override
+        public String parse(String value) {
+            return value;
+        }
+    }
+
+    private class IntegerTextBinding extends TextBinding<Integer> {
+        private IntegerTextBinding(FieldMetadata<Object, Integer> fieldMetadata) {
+            super(fieldMetadata);
+        }
+
+        @Override
+        public String toString(Integer value) {
+            return value != null ? value.toString() : "";
+        }
+
+        @Override
+        public Integer parse(String value) {
+            return Integer.parseInt(value);
+        }
+    }
+
+    private class FloatTextBinding extends TextBinding<Float> {
+
+        private FloatTextBinding(FieldMetadata<Object, Float> fieldMetadata) {
+            super(fieldMetadata);
+        }
+
+        @Override
+        public String toString(Float value) {
+            return value != null ? value.toString() : "";
+        }
+
+        @Override
+        public Float parse(String value) {
+            return Float.parseFloat(value);
+        }
+
+    }
+
+    private class BooleanTextBinding extends TextBinding<Boolean> {
+        private BooleanTextBinding(FieldMetadata<Object, Boolean> fieldMetadata) {
+            super(fieldMetadata);
+        }
+
+        @Override
+        public String toString(Boolean value) {
+            return value != null ? value.toString() : "";
+        }
+
+        @Override
+        public Boolean parse(String value) {
+            return Boolean.parseBoolean(value);
+        }
+    }
+
+    private class Vector3fTextBinding extends TextBinding<Vector3f> {
+
+        private Vector3fTextBinding(FieldMetadata<Object, Vector3f> fieldMetadata) {
+            super(fieldMetadata);
+        }
+
+        @Override
+        public String toString(Vector3f value) {
+            return value != null ? value.toString() : "";
+        }
+
+        @Override
+        public Vector3f parse(String value) {
+            Matcher matcher = VECTOR_3F.matcher(value);
+            if (matcher.matches()) {
+                return new Vector3f(Float.parseFloat(matcher.group(1)), Float.parseFloat(matcher.group(2)), Float.parseFloat(matcher.group(3)));
             }
-            return tempValue;
-        }
-
-        @Override
-        public void set(String value) {
-            tempValue = value;
-        }
-
-        @Override
-        public void onEnterPressed(UIText text) {
-            try {
-                if( tempValue!=null ) {
-                    binding.set(tempValue);
-                    tempValue = null;
-                }
-            } catch (IllegalArgumentException e) {
-                // ignore
-            }
+            throw new IllegalArgumentException("Cannot parse " + value + " to Vector3f");
         }
     }
 }

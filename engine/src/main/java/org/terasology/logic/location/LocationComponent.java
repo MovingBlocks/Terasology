@@ -53,7 +53,6 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @Replicate
     Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
-    @TextField
     float scale = 1.0f;
 
     public LocationComponent() {

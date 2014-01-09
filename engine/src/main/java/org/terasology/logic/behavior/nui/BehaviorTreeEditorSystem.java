@@ -19,13 +19,24 @@ import org.lwjgl.input.Mouse;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.events.MouseXAxisEvent;
+import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.nui.NUIManager;
 
 /**
@@ -33,35 +44,25 @@ import org.terasology.rendering.nui.NUIManager;
  */
 @RegisterSystem
 public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, UpdateSubscriberSystem {
-    private boolean editorMode;
+    @In
     private NUIManager nuiManager;
 
     @Override
     public void initialise() {
-        nuiManager = CoreRegistry.get(NUIManager.class);
+        nuiManager.closeScreens();
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleConsole(BTEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            if (!editorMode) {
-                CoreRegistry.get(NUIManager.class).pushScreen("engine:behaviorEditorScreen");
-                editorMode = true;
-                Mouse.setGrabbed(false);
-            } else {
-                CoreRegistry.get(NUIManager.class).popScreen();
-                editorMode = false;
-                Mouse.setGrabbed(true);
-            }
+            nuiManager.pushScreen("engine:behaviorEditorScreen");
             event.consume();
         }
     }
 
     @Override
     public void update(float delta) {
-        if (editorMode) {
-            nuiManager.update(delta);
-        }
+        nuiManager.update(delta);
     }
 
     @Override

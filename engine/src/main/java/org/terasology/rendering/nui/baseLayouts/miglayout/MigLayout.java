@@ -43,7 +43,7 @@ import java.util.Map;
  * MigLayout Binding
  * <p/>
  * see: http://www.miglayout.com/
- *
+ * <p/>
  * Created by synopia on 06.01.14.
  */
 public class MigLayout extends CoreLayout<MigLayout.CCHint> implements ContainerWrapper {
@@ -127,7 +127,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
             canvas.drawElement(component, region);
         }
 
-        if( debug ) {
+        if (debug) {
             grid.paintDebug();
         }
         for (Rect2i region : debugRects) {
@@ -142,7 +142,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     public void addWidget(UIWidget element, CCHint hint) {
         ComponentWrapper cw = getWrapper(element);
 
-        String cStr = ConstraintParser.prepare(hint!=null?hint.cc:"");
+        String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
         ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
         wrappers.put(element, cw);
         children.add(cw);
@@ -153,13 +153,17 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         ComponentWrapper cw = wrappers.remove(element);
         ccMap.remove(cw);
         children.remove(cw);
-        dirty = true;
+        invalidate();
     }
 
     public void clear() {
         wrappers.clear();
         ccMap.clear();
         children.clear();
+        invalidate();
+    }
+
+    public void invalidate() {
         dirty = true;
     }
 
@@ -235,7 +239,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public void paintDebugCell(int x, int y, int width, int height) {
-        debugRects.add(Rect2i.createFromMinAndSize(x,y,width,height));
+        debugRects.add(Rect2i.createFromMinAndSize(x, y, width, height));
     }
 
     @Override
@@ -404,7 +408,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     public static class CCHint implements LayoutHint {
-        private String cc="";
+        private String cc = "";
 
         public CCHint() {
         }

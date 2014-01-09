@@ -15,11 +15,14 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import org.terasology.engine.API;
+
 /**
  * A task run by an interpreter for an actor.
  *
  * @author synopia
  */
+@API
 public abstract class Task {
     private Interpreter interpreter;
     private Node node;
