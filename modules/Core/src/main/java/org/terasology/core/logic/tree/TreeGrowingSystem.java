@@ -109,7 +109,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
                     public String generateReplacement(String currentAxion) {
                         // 137.5 degrees is a golden ratio
                         int deg = rnd.nextInt(130, 147);
-                        return "W+(" + deg + ")[&Mb]Wt";
+                        return "+(" + deg + ")[&Mb]Wt";
                     }
                 });
         trunkTop.addReplacement(0.4f,
@@ -120,7 +120,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
                         if (currentAxion.split("b").length < 2) {
                             // 137.5 degrees is a golden ratio
                             int deg = rnd.nextInt(130, 147);
-                            return "W+(" + deg + ")[&Mb]Wt";
+                            return "+(" + deg + ")[&Mb]Wt";
                         }
                         return "Wt";
                     }
@@ -145,24 +145,28 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         Block oakTrunk = blockManager.getBlock("core:OakTrunk");
         Block oakBranch = blockManager.getBlock(new BlockUri("core", "OakBranch", "0"));
 
-        float trunkAdvance = 0.2f;
-        float branchAdvance = 0.25f;
+        float trunkAdvance = 0.3f;
+        float branchAdvance = 0.2f;
 
         Map<Character, AxionElementGeneration> blockMap = Maps.newHashMap();
         blockMap.put('s', new DefaultAxionElementGeneration(oakSapling, trunkAdvance));
         blockMap.put('g', new DefaultAxionElementGeneration(oakSaplingGenerated, trunkAdvance));
 
         // Trunk building blocks
-        blockMap.put('t', new DefaultAxionElementGeneration(greenLeaf, trunkAdvance));
+        blockMap.put('t', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, trunkAdvance, 2f));
         blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
         blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 1.4f));
+        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 2f));
 
         // Branch building blocks
-        blockMap.put('b', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 1.4f));
-        blockMap.put('B', new SurroundAxionElementGeneration(oakBranch, greenLeaf, branchAdvance, 1.1f, 2.4f));
+        SurroundAxionElementGeneration smallBranchGeneration = new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 2.6f);
+        smallBranchGeneration.setMaxZ(0);
+        SurroundAxionElementGeneration largeBranchGeneration = new SurroundAxionElementGeneration(oakBranch, greenLeaf, branchAdvance, 1.1f, 3.5f);
+        largeBranchGeneration.setMaxZ(0);
+        blockMap.put('b', smallBranchGeneration);
+        blockMap.put('B', largeBranchGeneration);
         blockMap.put('M', new AdvanceAxionElementGeneration(branchAdvance));
 
-        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, oakBranch, greenLeaf), (float) Math.PI / 4);
+        return new AdvancedLSystemTreeDefinition(replacementMap, blockMap, Arrays.asList(oakTrunk, oakBranch, greenLeaf), 1.5f);
     }
 }

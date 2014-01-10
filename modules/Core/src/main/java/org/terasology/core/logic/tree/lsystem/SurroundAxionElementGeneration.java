@@ -30,6 +30,7 @@ public class SurroundAxionElementGeneration implements AxionElementGeneration {
     private float advance;
     private float innerRange;
     private float range;
+    private int maxZ = Integer.MAX_VALUE;
 
     public SurroundAxionElementGeneration(Block baseBlock, Block surroundBlock, float advance, float range) {
         this(baseBlock, surroundBlock, advance, 0, range);
@@ -43,13 +44,17 @@ public class SurroundAxionElementGeneration implements AxionElementGeneration {
         this.range = range;
     }
 
+    public void setMaxZ(int maxZ) {
+        this.maxZ = maxZ;
+    }
+
     @Override
     public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter) {
         callback.setBlock(position, baseBlock);
         int rangeInt = (int) range;
         for (int x = -rangeInt; x <= rangeInt; x++) {
             for (int y = -rangeInt; y <= rangeInt; y++) {
-                for (int z = -rangeInt; z <= rangeInt; z++) {
+                for (int z = -rangeInt; z <= Math.min(rangeInt, maxZ); z++) {
                     double distance = Math.sqrt(x * x + y * y + z * z);
                     if (distance < innerRange) {
                         Vector3f v = new Vector3f(x, y, z);
