@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
+import org.terasology.rendering.opengl.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;
@@ -73,7 +75,7 @@ public class ConsoleImpl implements Console {
     private boolean commandsSorted;
 
     public ConsoleImpl() {
-        addMessage("Welcome to the wonderful world of Terasology!\n" +
+        addMessage("Welcome to the wonderful world of " + FontColor.toChar(ConsoleColors.TERASOLOGY) + "Terasology" + FontColor.getReset() + "!\n" +
                 "\n" +
                 "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details.\n" +
                 "Text parameters should be in quotes, no commas needed between multiple parameters.\n" +
@@ -224,7 +226,7 @@ public class ConsoleImpl implements Console {
         //check if the command is loaded
         if (cmd == null) {
             if (commandLookup.containsRow(commandName)) {
-                addMessage("Incorrect number of parameters");
+                addMessage("Incorrect number of parameters. Try:");
                 for (CommandInfo ci : commandLookup.row(commandName).values()) {
                     addMessage(ci.getUsageMessage());
                 }
