@@ -24,27 +24,27 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface NUIManager extends ComponentSystem {
 
-    UIScreen pushScreen(AssetUri screenUri);
+    UIScreenLayer pushScreen(AssetUri screenUri);
 
-    UIScreen pushScreen(String screenUri);
+    UIScreenLayer pushScreen(String screenUri);
 
-    <T extends UIScreen> T pushScreen(AssetUri screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreen> T  pushScreen(String screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T  pushScreen(String screenUri, Class<T> expectedType);
 
-    void pushScreen(UIScreen screen);
+    void pushScreen(UIScreenLayer screen);
 
     void popScreen();
 
-    UIScreen setScreen(AssetUri screenUri);
+    UIScreenLayer setScreen(AssetUri screenUri);
 
-    UIScreen setScreen(String screenUri);
+    UIScreenLayer setScreen(String screenUri);
 
-    <T extends UIScreen> T setScreen(AssetUri screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreen> T setScreen(String screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T setScreen(String screenUri, Class<T> expectedType);
 
-    void setScreen(UIScreen screen);
+    void setScreen(UIScreenLayer screen);
 
     void closeScreens();
 

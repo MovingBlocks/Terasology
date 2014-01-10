@@ -61,9 +61,6 @@ public class UIDropdown<T> extends CoreWidget {
 
     private boolean opened;
 
-    // TODO: Option -> display translation?
-    // TODO: Selection changed events
-
     public UIDropdown() {
     }
 

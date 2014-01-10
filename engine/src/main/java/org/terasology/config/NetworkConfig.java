@@ -53,4 +53,12 @@ public class NetworkConfig implements Iterable<ServerInfo> {
     public void remove(ServerInfo info) {
         servers.remove(info);
     }
+
+    public List<ServerInfo> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<ServerInfo> servers) {
+        this.servers = servers;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,53 +16,52 @@
 package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.config.Config;
+import org.terasology.config.ServerInfo;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
+import org.terasology.rendering.nui.baseWidgets.UIText;
 
 /**
  * @author Immortius
  */
-public class SettingsMenuScreen extends UIScreenLayer {
-
-    @In
-    private NUIManager nuiManager;
+public class AddServerPopup extends UIScreenLayer {
 
     @In
     private Config config;
 
+    @In
+    private NUIManager nuiManager;
+
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "video", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "ok", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:VideoMenuScreen");
-            }
-        });
-        UIScreenLayerUtil.trySubscribe(this, "audio", new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:AudioMenuScreen");
-            }
-        });
-        UIScreenLayerUtil.trySubscribe(this, "input", new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                UIScreenLayer inputScreen = new InputSettingsScreen();
-                inputScreen.setSkin(getSkin());
-                nuiManager.pushScreen(inputScreen);
-            }
-        });
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
-            @Override
-            public void onButtonActivated(UIButton button) {
-                config.save();
+
+                UIText name = find("name", UIText.class);
+                UIText address = find("address", UIText.class);
+                if (name != null && address != null) {
+                    ServerInfo result = new ServerInfo(name.getText(), address.getText());
+                    config.getNetwork().add(result);
+                }
                 nuiManager.popScreen();
             }
         });
+
+        UIScreenLayerUtil.trySubscribe(this, "cancel", new ButtonEventListener() {
+            @Override
+            public void onButtonActivated(UIButton button) {
+                nuiManager.popScreen();
+            }
+        });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return true;
     }
 }

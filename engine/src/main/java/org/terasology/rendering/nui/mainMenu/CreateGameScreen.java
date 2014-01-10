@@ -27,8 +27,8 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
@@ -47,7 +47,7 @@ import org.terasology.world.time.WorldTime;
 /**
  * @author Immortius
  */
-public class CreateGameScreen extends UIScreen {
+public class CreateGameScreen extends UIScreenLayer {
 
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
@@ -119,14 +119,14 @@ public class CreateGameScreen extends UIScreen {
         }
 
 
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.popScreen();
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "play", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "play", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 GameManifest gameManifest = new GameManifest();
@@ -148,7 +148,7 @@ public class CreateGameScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "previewSeed", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "previewSeed", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 PreviewWorldScreen screen = nuiManager.pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
@@ -157,7 +157,7 @@ public class CreateGameScreen extends UIScreen {
                 }
             }
         });
-        UIScreenUtil.trySubscribe(this, "mods", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "mods", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.pushScreen("engine:selectModsScreen");

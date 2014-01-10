@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class UIScreen extends AbstractWidget {
+public class UIScreenLayer extends AbstractWidget {
 
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
@@ -40,10 +40,10 @@ public class UIScreen extends AbstractWidget {
         }
     };
 
-    public UIScreen() {
+    public UIScreenLayer() {
     }
 
-    public UIScreen(String id) {
+    public UIScreenLayer(String id) {
         super(id);
     }
 
@@ -53,6 +53,10 @@ public class UIScreen extends AbstractWidget {
 
     public void setContents(UIWidget contents) {
         this.contents = contents;
+    }
+
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     public UIWidget getContents() {

@@ -24,8 +24,8 @@ import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
@@ -39,7 +39,7 @@ import java.util.Arrays;
 /**
  * @author Immortius
  */
-public class VideoSettingsScreen extends UIScreen {
+public class VideoSettingsScreen extends UIScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
 
     @In
@@ -119,11 +119,11 @@ public class VideoSettingsScreen extends UIScreen {
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
         }
 
-        UIScreenUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
-        UIScreenUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
-        UIScreenUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
-        UIScreenUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
+        UIScreenLayerUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
+        UIScreenLayerUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
+        UIScreenLayerUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 logger.info("Video Settings: " + config.getRendering().toString());

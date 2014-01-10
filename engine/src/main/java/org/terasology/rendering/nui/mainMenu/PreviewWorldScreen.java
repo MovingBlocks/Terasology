@@ -29,11 +29,11 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.UIImage;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UIDropdown;
@@ -53,7 +53,7 @@ import java.util.Objects;
 /**
  * @author Immortius
  */
-public class PreviewWorldScreen extends UIScreen {
+public class PreviewWorldScreen extends UIScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
 
@@ -122,7 +122,7 @@ public class PreviewWorldScreen extends UIScreen {
             }
         }
 
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.popScreen();

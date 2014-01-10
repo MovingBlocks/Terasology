@@ -40,7 +40,7 @@
                     "columns" : 1,
                     "verticalSpacing" : 4,
                     "horizontalSpacing" : 4,
-                    "family" : "create-world",
+                    "family" : "left-label",
                     "contents" : [
                         {
                             "type" : "UILabel",

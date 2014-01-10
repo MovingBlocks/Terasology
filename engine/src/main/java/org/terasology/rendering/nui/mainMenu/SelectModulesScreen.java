@@ -26,8 +26,8 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UILabel;
@@ -44,7 +44,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class SelectModulesScreen extends UIScreen {
+public class SelectModulesScreen extends UIScreenLayer {
 
     @In
     private NUIManager nuiManager;
@@ -197,7 +197,7 @@ public class SelectModulesScreen extends UIScreen {
         }
 
 
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 ModuleConfig moduleConfig = config.getDefaultModSelection();

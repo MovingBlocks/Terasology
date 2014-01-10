@@ -2,7 +2,7 @@
     "text-shadowed" : true,
     "font" : "default",
     "elements" : {
-        "UIScreen" : {
+        "UIScreenLayer" : {
             "background-scale-mode" : "scale_fill",
             "background" : "menuBackground"
         },
@@ -322,7 +322,7 @@
             "font" : "title",
             "text-align-horizontal" : "left"
         },
-        "create-world" : {
+        "left-label" : {
             "elements" : {
                 "UILabel" : {
                     "text-align-vertical" : "bottom",
