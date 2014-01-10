@@ -172,11 +172,14 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
                 if (relativeLocation.equals(origin)) {
                     blockEntityRegistry.setBlockRetainComponent(blockLocation, resultBlock, LSystemTreeComponent.class, LivingTreeComponent.class);
                 } else {
-                    worldProvider.setBlock(blockLocation, resultBlock);
+                    Block block = worldProvider.getBlock(blockLocation);
+                    if (block.isReplacementAllowed() || block.getBlockFamily() == oldBlock.getBlockFamily())
+                        worldProvider.setBlock(blockLocation, resultBlock);
                 }
                 replaceCount++;
             } else if (oldBlock == null) {
-                worldProvider.setBlock(blockLocation, resultBlock);
+                if (worldProvider.getBlock(blockLocation).isReplacementAllowed())
+                    worldProvider.setBlock(blockLocation, resultBlock);
                 replaceCount++;
             }
         }

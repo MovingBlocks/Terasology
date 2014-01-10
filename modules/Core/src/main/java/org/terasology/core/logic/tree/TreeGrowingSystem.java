@@ -160,7 +160,7 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
         blockMap.put('t', new SurroundAxionElementGeneration(greenLeaf, greenLeaf, trunkAdvance, 2f));
         blockMap.put('T', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
         blockMap.put('N', new DefaultAxionElementGeneration(oakTrunk, trunkAdvance));
-        blockMap.put('W', new SurroundAxionElementGeneration(oakTrunk, greenLeaf, trunkAdvance, 2f));
+        blockMap.put('W', new SurroundAxionElementGeneration(oakBranch, greenLeaf, trunkAdvance, 2f));
 
         // Branch building blocks
         SurroundAxionElementGeneration smallBranchGeneration = new SurroundAxionElementGeneration(greenLeaf, greenLeaf, branchAdvance, 2.6f);
