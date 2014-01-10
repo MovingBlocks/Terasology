@@ -106,28 +106,33 @@ public class BlockEntitySystem implements ComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(oldBlock.getBlockFamily(), 1);
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), oldBlock.getBlockFamily(), 1);
             entity.send(beforeBlockToItemEvent);
             if (!beforeBlockToItemEvent.isConsumed()) {
                 for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
-                    EntityRef item = blockItemFactory.newInstance(family, beforeBlockToItemEvent.getQuanityForItem(family));
+                    EntityRef item = blockItemFactory.newInstance(family, beforeBlockToItemEvent.getQuanityForBlock(family));
                     entity.send(new OnBlockToItem(item));
 
-                    if ((family.getArchetypeBlock().isDirectPickup())) {
-                        if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                            EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                            pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
-                        }
+                    if (family.getArchetypeBlock().isDirectPickup()) {
+                        if (!inventoryManager.giveItem(event.getInstigator(), item))
+                            processDropping(blockComp, item);
                     } else {
-                        /* PHYSICS */
-                        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
-                        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+                        processDropping(blockComp, item);
                     }
+                }
+                for (EntityRef item : beforeBlockToItemEvent.getItemsToDrop()) {
+                    processDropping(blockComp, item);
                 }
             }
         }
 
         worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
+    }
+
+    private void processDropping(BlockComponent blockComp, EntityRef item) {
+        /* PHYSICS */
+        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
+        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     @ReceiveEvent
