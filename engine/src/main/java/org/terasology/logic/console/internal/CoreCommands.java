@@ -108,7 +108,7 @@ public class CoreCommands implements ComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
-            clientComp.character.send(new NoHealthEvent(clientComp.character, EngineDamageTypes.DIRECT.get()));
+            clientComp.character.send(new NoHealthEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
         }
     }
 

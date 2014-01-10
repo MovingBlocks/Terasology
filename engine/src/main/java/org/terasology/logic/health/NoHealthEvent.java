@@ -26,15 +26,21 @@ import org.terasology.entitySystem.prefab.Prefab;
  */
 public class NoHealthEvent implements Event {
     private EntityRef instigator;
+    private EntityRef tool;
     private Prefab damageType;
 
-    public NoHealthEvent(EntityRef instigator, Prefab damageType) {
+    public NoHealthEvent(EntityRef instigator, EntityRef tool, Prefab damageType) {
         this.instigator = instigator;
+        this.tool = tool;
         this.damageType = damageType;
     }
 
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public EntityRef getTool() {
+        return tool;
     }
 
     public Prefab getDamageType() {

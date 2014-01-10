@@ -31,12 +31,24 @@ import java.util.List;
 public class BeforeBlockToItem extends AbstractConsumableEvent {
 
     private Prefab damageType;
+    private EntityRef instigator;
+    private EntityRef tool;
     private TObjectIntMap<BlockFamily> itemsToGenerate = new TObjectIntHashMap<>();
     private List<EntityRef> itemsToDrop = new LinkedList<EntityRef>();
 
-    public BeforeBlockToItem(Prefab damageType, BlockFamily blockFamily, int quantity) {
+    public BeforeBlockToItem(Prefab damageType, EntityRef instigator, EntityRef tool, BlockFamily blockFamily, int quantity) {
         this.damageType = damageType;
+        this.instigator = instigator;
+        this.tool = tool;
         itemsToGenerate.put(blockFamily, quantity);
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
+    }
+
+    public EntityRef getTool() {
+        return tool;
     }
 
     public void addItemToGenerate(EntityRef entityRef) {

@@ -95,7 +95,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
             if (modifiedAmount > 0) {
                 doHeal(entity, modifiedAmount, instigator, health);
             } else if (modifiedAmount < 0) {
-                doDamage(entity, -modifiedAmount, EngineDamageTypes.HEALING.get(), instigator, health);
+                doDamage(entity, -modifiedAmount, EngineDamageTypes.HEALING.get(), instigator, EntityRef.NULL, health);
             }
         }
     }
@@ -114,7 +114,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
     }
 
-    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, HealthComponent targetHealthComponent) {
+    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef tool, HealthComponent targetHealthComponent) {
         HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);
@@ -125,25 +125,21 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         entity.saveComponent(health);
         entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));
         if (health.currentHealth == 0) {
-            entity.send(new NoHealthEvent(instigator, damageType));
+            entity.send(new NoHealthEvent(instigator, tool, damageType));
         }
     }
 
     @ReceiveEvent(components = {HealthComponent.class})
     public void onDamage(DoDamageEvent event, EntityRef entity) {
-        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator());
+        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getTool(), null);
     }
 
-    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator) {
-        checkDamage(entity, amount, damageType, instigator, null);
-    }
-
-    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, HealthComponent health) {
-        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator));
+    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef tool, HealthComponent health) {
+        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, tool));
         if (!beforeDamage.isConsumed()) {
             int damageAmount = calculateTotal(beforeDamage.getBaseDamage(), beforeDamage.getMultipliers(), beforeDamage.getModifiers());
             if (damageAmount > 0) {
-                doDamage(entity, damageAmount, damageType, instigator, health);
+                doDamage(entity, damageAmount, damageType, instigator, tool, health);
             } else {
                 doHeal(entity, -damageAmount, instigator, health);
             }
@@ -184,7 +180,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
             int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
-                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
+                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL, health);
             }
         }
     }
@@ -200,7 +196,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         if (speed > health.horizontalDamageSpeedThreshold) {
             int damage = (int) ((speed - health.horizontalDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
-                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
+                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL, health);
             }
         }
     }

@@ -28,24 +28,31 @@ public class DoDamageEvent implements Event {
     private int amount;
     private Prefab damageType;
     private EntityRef instigator;
+    private EntityRef tool;
 
     public DoDamageEvent(int amount) {
-        this(amount, EngineDamageTypes.DIRECT.get(), EntityRef.NULL);
+        this(amount, EngineDamageTypes.DIRECT.get());
     }
 
     public DoDamageEvent(int amount, Prefab damageType) {
         this(amount, damageType, EntityRef.NULL);
     }
 
+    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator) {
+        this(amount, damageType, instigator, EntityRef.NULL);
+    }
+
     /**
      * @param amount     The amount of damage being caused
      * @param damageType The type of the damage being dealt
      * @param instigator The instigator of the damage (which entity caused it)
+     * @param tool       Tool used to cause the damage
      */
-    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator) {
+    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator, EntityRef tool) {
         this.amount = amount;
         this.damageType = damageType;
         this.instigator = instigator;
+        this.tool = tool;
     }
 
     public int getAmount() {
@@ -58,5 +65,9 @@ public class DoDamageEvent implements Event {
 
     public Prefab getDamageType() {
         return damageType;
+    }
+
+    public EntityRef getTool() {
+        return tool;
     }
 }

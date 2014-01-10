@@ -143,7 +143,7 @@ public class CharacterSystem implements ComponentSystem {
                 }
             }
 
-            result.getEntity().send(new DoDamageEvent(damage, damageType, character));
+            result.getEntity().send(new DoDamageEvent(damage, damageType, character, event.getItem()));
         }
     }
 

@@ -106,7 +106,7 @@ public class BlockEntitySystem implements ComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), oldBlock.getBlockFamily(), 1);
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), oldBlock.getBlockFamily(), 1);
             entity.send(beforeBlockToItemEvent);
             if (!beforeBlockToItemEvent.isConsumed()) {
                 for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
