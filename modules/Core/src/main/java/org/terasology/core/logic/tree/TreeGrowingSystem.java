@@ -82,8 +82,12 @@ public class TreeGrowingSystem implements UpdateSubscriberSystem {
             Iterable<EntityRef> treeRefs = entityManager.getEntitiesWith(LivingTreeComponent.class, BlockComponent.class);
             for (EntityRef treeRef : treeRefs) {
                 LivingTreeComponent tree = treeRef.getComponent(LivingTreeComponent.class);
-                TreeDefinition treeDefinition = treeDefinitions.get(tree.type);
-                treeDefinition.updateTree(worldProvider, blockEntityRegistry, treeRef);
+                if (tree != null) {
+                    TreeDefinition treeDefinition = treeDefinitions.get(tree.type);
+                    treeDefinition.updateTree(worldProvider, blockEntityRegistry, treeRef);
+                } else {
+                    logger.error("Got an entity without a component (LivingTreeComponent) even though a list of entities that do have it was requested");
+                }
             }
 
             lastCheckTime = gameTimeInMs;
