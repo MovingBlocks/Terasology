@@ -22,10 +22,13 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 import java.util.*;
 
+/**
+ * @author Marcin Sciesinski <marcins78@gmail.com>
+ */
 public class EntityBeingGeneratedFromPrefab implements Event {
     private Prefab prefab;
     private Iterable<Component> components;
-    private Set<Class<?>> componentsToRemove;
+    private Set<Class<?>> componentsToRemove = new HashSet<Class<?>>();
     private Map<Class, Component> componentsToAdd = new HashMap<Class, Component>();
 
     public EntityBeingGeneratedFromPrefab(Prefab prefab, Iterable<Component> components) {
@@ -51,7 +54,7 @@ public class EntityBeingGeneratedFromPrefab implements Event {
         return new Iterable<Component>() {
             @Override
             public Iterator<Component> iterator() {
-                return null;
+                return new IteratorImpl();
             }
         };
     }
@@ -65,6 +68,7 @@ public class EntityBeingGeneratedFromPrefab implements Event {
         private IteratorImpl() {
             sourceIterator = components.iterator();
             addedIterator = componentsToAdd.values().iterator();
+            next = getNext();
         }
 
         @Override
