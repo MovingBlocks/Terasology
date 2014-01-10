@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.gui.events.UIItemIconRendered;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.world.block.Block;
@@ -132,7 +133,7 @@ public class UIItemIcon extends UIDisplayContainer {
                 renderIcon(icon);
             }
         }
-
+        item.send(new UIItemIconRendered());
         super.render();
     }
 
