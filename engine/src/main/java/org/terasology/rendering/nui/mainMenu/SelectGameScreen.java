@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -37,17 +36,7 @@ import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
 import org.terasology.utilities.FilesUtil;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.SortedMap;
 
 /**
  * @author Immortius

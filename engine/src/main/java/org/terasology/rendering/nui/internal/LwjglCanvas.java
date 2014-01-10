@@ -439,6 +439,9 @@ public class LwjglCanvas implements CanvasControl {
     }
 
     private Rect2i applySizesToRegion(Rect2i region, UIStyle style) {
+        if (region.isEmpty()) {
+            return region;
+        }
         int width = region.width();
         if (style.getFixedWidth() != 0) {
             width = style.getFixedWidth();

@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 

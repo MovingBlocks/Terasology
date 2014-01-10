@@ -15,7 +15,6 @@
  */
 package org.terasology.input.events;
 
-import org.lwjgl.input.Keyboard;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 

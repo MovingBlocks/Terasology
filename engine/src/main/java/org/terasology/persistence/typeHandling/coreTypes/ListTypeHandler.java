@@ -21,7 +21,6 @@ import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**

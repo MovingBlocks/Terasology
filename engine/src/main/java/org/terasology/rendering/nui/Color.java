@@ -20,6 +20,7 @@ import org.terasology.engine.API;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -231,4 +232,7 @@ public class Color {
         return toHex();
     }
 
+    public void addToBuffer(ByteBuffer buffer) {
+        buffer.putInt(representation);
+    }
 }

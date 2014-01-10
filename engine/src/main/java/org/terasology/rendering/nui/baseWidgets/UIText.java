@@ -22,7 +22,6 @@ import org.terasology.asset.Assets;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -68,10 +67,10 @@ public class UIText extends CoreWidget {
 
     private List<TextEventListener> listeners = Lists.newArrayList();
 
-    private int offset = 0;
+    private int offset;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
-        boolean dragging = false;
+        boolean dragging;
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {

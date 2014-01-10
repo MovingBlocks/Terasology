@@ -104,6 +104,24 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
+    public <T extends UIScreen> T pushScreen(AssetUri screenUri, Class<T> expectedType) {
+        UIScreen result = pushScreen(screenUri);
+        if (expectedType.isInstance(result)) {
+            return expectedType.cast(result);
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends UIScreen> T pushScreen(String screenUri, Class<T> expectedType) {
+        UIScreen result = pushScreen(screenUri);
+        if (expectedType.isInstance(result)) {
+            return expectedType.cast(result);
+        }
+        return null;
+    }
+
+    @Override
     public void pushScreen(UIScreen screen) {
         prepare(screen);
         screens.push(screen);
@@ -132,6 +150,24 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
         if (assetUri != null) {
             return setScreen(assetUri);
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends UIScreen> T setScreen(AssetUri screenUri, Class<T> expectedType) {
+        UIScreen result = setScreen(screenUri);
+        if (expectedType.isInstance(result)) {
+            return expectedType.cast(result);
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends UIScreen> T setScreen(String screenUri, Class<T> expectedType) {
+        UIScreen result = setScreen(screenUri);
+        if (expectedType.isInstance(result)) {
+            return expectedType.cast(result);
         }
         return null;
     }

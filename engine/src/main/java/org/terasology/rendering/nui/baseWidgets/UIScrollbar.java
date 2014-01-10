@@ -95,11 +95,13 @@ public class UIScrollbar extends CoreWidget {
         canvas.setPart("handle");
         sliderSize = canvas.size().y - canvas.getCurrentStyle().getFixedHeight();
 
-        int drawLocation = pixelOffsetFor(getValue());
-        handleSize = canvas.getCurrentStyle().getFixedHeight();
-        Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
-        canvas.drawBackground(handleRegion);
-        canvas.addInteractionRegion(handleListener, handleRegion);
+        if (sliderSize > 0) {
+            int drawLocation = pixelOffsetFor(getValue());
+            handleSize = canvas.getCurrentStyle().getFixedHeight();
+            Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
+            canvas.drawBackground(handleRegion);
+            canvas.addInteractionRegion(handleListener, handleRegion);
+        }
     }
 
     @Override

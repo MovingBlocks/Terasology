@@ -34,7 +34,7 @@ public class TextLineBuilder {
     private int currentLineLength;
     private StringBuilder lineBuilder = new StringBuilder();
 
-    private boolean lineHasWord = false;
+    private boolean lineHasWord;
 
     public TextLineBuilder(Font font, int maxWidth) {
         this.font = font;

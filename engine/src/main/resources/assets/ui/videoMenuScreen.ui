@@ -167,8 +167,8 @@
                 "text" : "Back",
                 "id" : "close",
                 "layoutInfo" : {
-                    "height" : 48,
-                    "width" : 280,
+                    "height" : 32,
+                    "width" : 200,
                     "position-horizontal-center" : {},
                     "position-bottom" : {
                         "target" : "BOTTOM",

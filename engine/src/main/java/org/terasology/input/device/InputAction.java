@@ -17,7 +17,6 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.input.InputType;
 
 /**
  * @author Immortius

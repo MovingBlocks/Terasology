@@ -28,6 +28,10 @@ public interface NUIManager extends ComponentSystem {
 
     UIScreen pushScreen(String screenUri);
 
+    <T extends UIScreen> T pushScreen(AssetUri screenUri, Class<T> expectedType);
+
+    <T extends UIScreen> T  pushScreen(String screenUri, Class<T> expectedType);
+
     void pushScreen(UIScreen screen);
 
     void popScreen();
@@ -35,6 +39,10 @@ public interface NUIManager extends ComponentSystem {
     UIScreen setScreen(AssetUri screenUri);
 
     UIScreen setScreen(String screenUri);
+
+    <T extends UIScreen> T setScreen(AssetUri screenUri, Class<T> expectedType);
+
+    <T extends UIScreen> T setScreen(String screenUri, Class<T> expectedType);
 
     void setScreen(UIScreen screen);
 

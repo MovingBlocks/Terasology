@@ -16,7 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;

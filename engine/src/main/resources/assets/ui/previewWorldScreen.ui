@@ -1,0 +1,173 @@
+{
+    "type" : "engine:previewWorldScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "subtitle",
+                "family" : "title",
+                "text" : "Preview World...",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "layoutInfo" : {
+                    "width" : 600,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "close",
+                        "offset" : 16
+                    }
+                }
+            },
+            {
+                "type" : "ColumnLayout",
+                "columns" : 2,
+                "verticalSpacing" : 16,
+                "horizontalSpacing" : 8,
+                "column-widths" : [0.6, 0.4],
+                "layoutInfo" : {
+                    "width" : 584,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "subtitle",
+                        "offset" : 8
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "close",
+                        "offset" : 24
+                    }
+                },
+                "contents" : [
+                    {
+                        "type" : "UIImage",
+                        "id" : "preview"
+                    },
+                    {
+                        "type" : "RelativeLayout",
+                        "family" : "description",
+                        "contents" : [
+                            {
+                                "type" : "UILabel",
+                                "text" : "Zoom:",
+                                "id" : "zoomLabel",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-horizontal-center" : {},
+                                    "position-top" : {
+                                        "target" : "TOP"
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UISlider",
+                                "id" : "zoomSlider",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-horizontal-center" : {},
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget" : "zoomLabel"
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UILabel",
+                                "id" : "seedLabel",
+                                "text" : "Seed:",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget" : "zoomSlider",
+                                        "offset" : 8
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UIText",
+                                "id" : "seed",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget" : "seedLabel"
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UILabel",
+                                "id" : "displayLabel",
+                                "text" : "Display:",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget" : "seed",
+                                        "offset" : 8
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UIDropdown",
+                                "id" : "display",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget" : "displayLabel"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "width" : 128,
+                    "height" : 32,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+            }
+        ]
+    }
+}
