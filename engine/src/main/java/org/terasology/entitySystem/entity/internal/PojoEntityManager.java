@@ -31,11 +31,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
-import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.*;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -156,7 +152,16 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
+        return createImpl(null, components);
+    }
+
+    private EntityRef createImpl(Prefab prefab, Iterable<Component> components) {
         EntityRef entity = create();
+        if (prefab != null) {
+            final EntityBeingGeneratedFromPrefab generationEvent = new EntityBeingGeneratedFromPrefab(prefab, components);
+            entity.send(generationEvent);
+            components = generationEvent.getResultComponents();
+        }
         for (Component c : components) {
             store.put(entity.getId(), c);
         }
@@ -232,7 +237,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             components.add(componentLibrary.copy(component));
         }
         components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
-        return create(components);
+        return createImpl(prefab, components);
     }
 
     @Override
