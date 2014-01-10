@@ -13,21 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.selection;
-
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.Assets;
-import org.terasology.math.Vector3i;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+package org.terasology.rendering.world.selection;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -40,6 +26,20 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslated;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
+import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 /**
  * Renders a selection. Is used by the BlockSelectionSystem.
@@ -54,18 +54,30 @@ public class BlockSelectionRenderer {
     private Texture effectsTexture;
     private Material defaultTextured;
 
-    public BlockSelectionRenderer() {
-        effectsTexture = Assets.getTexture("engine:selection");
-        Vector2f texPos = new Vector2f(0.0f, 0.0f);
+    public BlockSelectionRenderer(Texture effectsTexture) {
+        this.effectsTexture = effectsTexture;
         Vector2f texWidth = new Vector2f(1.f / effectsTexture.getWidth(), 1.f / effectsTexture.getHeight());
+        initialize(texWidth);
+    }
 
+    private void initialize(Vector2f effectsTextureWidth) {
+        Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
         tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
+        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
         defaultTextured = Assets.getMaterial("engine:defaultTextured");
+    }
+
+    public void setEffectsTexture(Texture newEffectsTexture) {
+        if ((effectsTexture.getWidth() == newEffectsTexture.getWidth()) && (effectsTexture.getHeight() == newEffectsTexture.getHeight())) {
+            this.effectsTexture = newEffectsTexture;
+        } else {
+            // This should not be possible with the current BlockSelectionRenderSystem implementation
+            throw new RuntimeException("New effectsTexture must have same height and width as the original effectsTexture");
+        }
     }
 
     public void beginRenderOverlay() {
