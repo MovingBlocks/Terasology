@@ -15,25 +15,34 @@
  */
 package org.terasology.entitySystem.entity.lifecycleEvents;
 
-import com.google.common.collect.Iterables;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.world.block.BlockUri;
 
 import java.util.*;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class EntityBeingGeneratedFromPrefab implements Event {
-    private Prefab prefab;
+public class EntityBeingGenerated implements Event {
+    private String prefabName;
+    private BlockUri blockUri;
     private Iterable<Component> components;
     private Set<Class<?>> componentsToRemove = new HashSet<Class<?>>();
     private Map<Class, Component> componentsToAdd = new HashMap<Class, Component>();
 
-    public EntityBeingGeneratedFromPrefab(Prefab prefab, Iterable<Component> components) {
-        this.prefab = prefab;
+    public EntityBeingGenerated(String prefabName, BlockUri blockUri, Iterable<Component> components) {
+        this.prefabName = prefabName;
+        this.blockUri = blockUri;
         this.components = components;
+    }
+
+    public BlockUri getBlockUri() {
+        return blockUri;
+    }
+
+    public String getPrefabName() {
+        return prefabName;
     }
 
     public Iterable<Component> getOriginalComponents() {

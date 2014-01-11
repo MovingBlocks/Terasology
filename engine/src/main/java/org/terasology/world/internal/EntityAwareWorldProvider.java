@@ -294,7 +294,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab());
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
-        builder.addComponent(new BlockComponent(blockPosition));
+        builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
             builder.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
         }
@@ -305,7 +305,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         EntityRef blockEntity;
         if (isTemporary) {
-            blockEntity = builder.buildNoEvents();
+            blockEntity = builder.buildWithoutLifecycleEvents();
             temporaryBlockEntities.add(blockEntity);
         } else {
             blockEntity = builder.build();

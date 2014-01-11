@@ -89,4 +89,15 @@ public class PrefabData implements AssetData, MutableComponentContainer {
     public void setAlwaysRelevant(boolean alwaysRelevant) {
         this.alwaysRelevant = alwaysRelevant;
     }
+
+    public static PrefabData fromPrefab(Prefab prefab) {
+        PrefabData result = new PrefabData();
+        for (Component component : prefab.iterateComponents())
+            result.addComponent(component);
+
+        result.setAlwaysRelevant(prefab.isAlwaysRelevant());
+        result.setParent(prefab.getParent());
+        result.setPersisted(prefab.isPersisted());
+        return result;
+    }
 }
