@@ -133,8 +133,8 @@ public class UIItemIcon extends UIDisplayContainer {
                 renderIcon(icon);
             }
         }
-        item.send(new UIItemIconRendered());
         super.render();
+        item.send(new UIItemIconRendered());
     }
 
     private void renderIcon(Icon icon) {
