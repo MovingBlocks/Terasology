@@ -45,12 +45,7 @@ import org.terasology.world.block.BlockUri;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
@@ -166,7 +161,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
                     break;
             } else if (component instanceof BlockComponent) {
                 BlockComponent comp = (BlockComponent) component;
-                blockUri = comp.getBlock().getURI();
+                blockUri = comp.getBlock().getBlockFamily().getURI();
                 if (prefabName != null)
                     break;
             }
@@ -378,7 +373,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
                     break;
             } else if (component instanceof BlockComponent) {
                 BlockComponent comp = (BlockComponent) component;
-                blockUri = comp.getBlock().getURI();
+                blockUri = comp.getBlock().getBlockFamily().getURI();
                 if (prefabName != null)
                     break;
             }
