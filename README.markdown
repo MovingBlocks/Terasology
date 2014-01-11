@@ -137,6 +137,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
+* [Oreons](https://github.com/Terasology/Oreons) - little sentient cookie people! Don't do much yet. Place with `spawnPrefab "Oreons:OreonGuard"` in the console
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn creatures from the LASR model - get a portal from the console with `giveBlock "portal"`
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
