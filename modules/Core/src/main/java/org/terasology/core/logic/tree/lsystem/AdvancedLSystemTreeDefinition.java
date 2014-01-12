@@ -45,7 +45,7 @@ import java.util.Map;
 public class AdvancedLSystemTreeDefinition implements TreeDefinition {
     private static final Logger logger = LoggerFactory.getLogger(AdvancedLSystemTreeDefinition.class);
 
-    private static final int GROWTH_SAFE_DISTANCE = 15;
+    private static final int GROWTH_SAFE_DISTANCE = 25;
     private static final float MAX_ANGLE_OFFSET = (float) Math.PI / 18f;
     private static final int GROWTH_INTERVAL = 30 * 1000;
 
