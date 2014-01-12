@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console;
 
 import org.terasology.rendering.nui.Color;
 
@@ -33,6 +33,16 @@ public final class ConsoleColors {
      * Command color
      */
     public static final Color COMMAND = new Color(32, 32, 224);
+    
+    /**
+     * Player name color
+     */
+    public static final Color PLAYER = new Color(32, 32, 224);
+    
+    /**
+     * Area name color
+     */
+    public static final Color AREA = new Color(32, 32, 224);
 
 
     private ConsoleColors() {

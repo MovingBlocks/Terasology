@@ -24,10 +24,11 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.opengl.FontColor;
+import org.terasology.rendering.FontColor;
 
 import java.util.Collection;
 import java.util.List;
