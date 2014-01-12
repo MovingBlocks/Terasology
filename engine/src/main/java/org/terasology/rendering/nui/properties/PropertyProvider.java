@@ -56,6 +56,7 @@ public class PropertyProvider<T> {
         factories.put(Range.class, new RangePropertyFactory());
         factories.put(Checkbox.class, new CheckboxPropertyFactory());
         factories.put(OneOf.List.class, new OneOfListPropertyFactory());
+        factories.put(OneOf.Enum.class, new OneOfEnumPropertyFactory());
         factories.put(TextField.class, new TextPropertyFactory());
 
         try {
@@ -179,6 +180,29 @@ public class PropertyProvider<T> {
             UIDropdown<String> dropdown = new UIDropdown<>();
             dropdown.bindOptions(new DefaultBinding<>(Arrays.asList(info.items())));
             Binding<String> binding = createTextBinding((FieldMetadata<Object, String>) fieldMetadata);
+            dropdown.bindSelection(binding);
+            return new Property<>(label, binding, dropdown);
+        }
+    }
+
+    private class OneOfEnumPropertyFactory implements PropertyFactory<OneOf.Enum> {
+        @Override
+        public Property create(final FieldMetadata<Object, ?> fieldMetadata, String label, OneOf.Enum info) {
+            Class cls = fieldMetadata.getType();
+            Object[] items = cls.getEnumConstants();
+            UIDropdown dropdown = new UIDropdown();
+            dropdown.bindOptions(new DefaultBinding(Arrays.asList(items)));
+            Binding binding = new Binding() {
+                @Override
+                public Object get() {
+                    return fieldMetadata.getValueChecked(target);
+                }
+
+                @Override
+                public void set(Object value) {
+                    fieldMetadata.setValue(target, value);
+                }
+            };
             dropdown.bindSelection(binding);
             return new Property<>(label, binding, dropdown);
         }

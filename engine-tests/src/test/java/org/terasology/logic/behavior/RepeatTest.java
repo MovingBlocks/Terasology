@@ -34,6 +34,31 @@ import static org.mockito.Mockito.when;
  */
 public class RepeatTest {
     @Test
+    public void testRepeatEndless() {
+        Interpreter interpreter = new Interpreter(null);
+        RepeatNode repeat = new RepeatNode(create(new Mocker() {
+            @Override
+            public void mock(Task spy) {
+                when(spy.update(anyInt())).thenReturn(Status.SUCCESS);
+            }
+        }));
+
+        Task task = repeat.create();
+
+        interpreter.start(task);
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
+    }
+
+    @Test
     public void testRepeat() {
         Interpreter interpreter = new Interpreter(null);
         RepeatNode repeat = new RepeatNode(create(new Mocker() {

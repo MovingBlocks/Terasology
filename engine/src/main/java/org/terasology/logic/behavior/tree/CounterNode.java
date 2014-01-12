@@ -52,7 +52,7 @@ public class CounterNode extends Node {
 
         @Override
         public void onInitialize() {
-            count = Math.max(1, getNode().limit);
+            count = getNode().limit;
         }
 
         @Override

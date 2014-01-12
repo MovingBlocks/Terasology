@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.tree;
 
 import org.terasology.engine.API;
+import org.terasology.rendering.nui.properties.OneOf;
 
 /**
  * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in
@@ -32,7 +33,9 @@ public class ParallelNode extends CompositeNode {
         RequireAll
     }
 
+    @OneOf.Enum
     private Policy successPolicy;
+    @OneOf.Enum
     private Policy failurePolicy;
 
     public ParallelNode() {

@@ -17,11 +17,13 @@ package org.terasology.logic.behavior.tree;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Deque;
 import java.util.List;
+import java.util.Set;
 
 /**
  * An interpreter evaluates a behavior tree. This is done by creating tasks for an actor for the nodes of the BT.
@@ -46,6 +48,7 @@ public class Interpreter {
     private Actor actor;
     private Deque<Task> tasks = Queues.newLinkedBlockingDeque();
     private Node root;
+    private Set<Node> startedNodes = Sets.newHashSet();
 
     public Interpreter(Actor actor) {
         this.actor = actor;
@@ -95,10 +98,15 @@ public class Interpreter {
         if (observer != null) {
             observer.handle(result);
         }
+        tasks.remove(task);
+        if( debugger!=null ) {
+            debugger.nodeFinished(task.getNode(), result);
+        }
     }
 
     public void tick(float dt) {
         if( debugger==null || debugger.beforeTick() ) {
+            startedNodes.clear();
             while (step(dt)) {
                 continue;
             }
@@ -115,10 +123,15 @@ public class Interpreter {
             return false;
         }
 
+        if( startedNodes.contains(current.getNode())) {
+            tasks.addLast(current);
+            return true;
+        }
+        startedNodes.add(current.getNode());
+
         current.tick(dt);
 
         if (current.getStatus() != Status.RUNNING && current.getObserver() != null) {
-            logger.info("Finished " + current + " with status " + current.getStatus());
             if( debugger!=null ) {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }

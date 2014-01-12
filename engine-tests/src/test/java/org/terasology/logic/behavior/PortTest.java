@@ -16,7 +16,10 @@
 package org.terasology.logic.behavior;
 
 import junit.framework.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.terasology.asset.AssetManager;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;
@@ -25,10 +28,17 @@ import org.terasology.logic.behavior.tree.DecoratorNode;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Task;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * @author synopia
  */
 public class PortTest {
+    @Before
+    public void setup() {
+        AssetManager assetManager = mock(AssetManager.class);
+        CoreRegistry.put(AssetManager.class, assetManager);
+    }
     @Test
     public void testConnectDecorator() {
         RenderableNode one = new RenderableNode();

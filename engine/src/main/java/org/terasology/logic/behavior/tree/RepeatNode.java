@@ -43,7 +43,9 @@ public class RepeatNode extends DecoratorNode {
 
         @Override
         public void onInitialize() {
-            interpreter().start(getNode().child, this);
+            if( getNode().child!=null ) {
+                interpreter().start(getNode().child, this);
+            }
         }
 
         @Override
@@ -58,7 +60,9 @@ public class RepeatNode extends DecoratorNode {
                 return;
             }
 
-            interpreter().start(getNode().child, this);
+            if( getNode().child!=null ) {
+                interpreter().start(getNode().child, this);
+            }
         }
 
         @Override

@@ -25,10 +25,13 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.terasology.asset.AssetLoader;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
+import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
 
+import javax.vecmath.Vector2f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -182,6 +185,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             gsonNode = new GsonBuilder()
                     .setPrettyPrinting()
                     .registerTypeHierarchyAdapter(Node.class, new NodeTypeAdapter())
+                    .registerTypeHierarchyAdapter(RenderableNode.class, new RenderableNodeTypeAdapter())
                     .create();
 
         }
@@ -206,6 +210,52 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             public Node read(JsonReader in) throws IOException {
                 int id = in.nextInt();
                 return treeGson.getNode(id);
+            }
+        }
+
+        private class RenderableNodeTypeAdapter extends TypeAdapter<RenderableNode> {
+            @Override
+            public void write(JsonWriter out, RenderableNode value) throws IOException {
+                out.beginObject()
+                        .name("node").value(treeGson.getId(value.getNode()))
+                        .name("position").beginArray().value(value.getPosition().x).value(value.getPosition().y).endArray()
+                        .name("size").beginArray().value(value.getSize().x).value(value.getSize().y).endArray()
+                        .name("children");
+                gsonNode.toJson(value.children(), List.class, out);
+                out.endObject();
+            }
+
+            @Override
+            public RenderableNode read(JsonReader in) throws IOException {
+                in.beginObject();
+                nextName(in, "node");
+                int id = in.nextInt();
+                Node node = treeGson.getNode(id);
+                RenderableNode renderableNode = new RenderableNode(CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node));
+                renderableNode.setNode(node);
+                nextName(in, "position");
+                in.beginArray();
+                float x = (float) in.nextDouble();
+                float y = (float) in.nextDouble();
+                in.endArray();
+                renderableNode.setPosition(x, y);
+                nextName(in, "size");
+                in.beginArray();
+                x = (float) in.nextDouble();
+                y = (float) in.nextDouble();
+                in.endArray();
+                renderableNode.setSize(new Vector2f(x, y));
+                nextName(in, "children");
+                in.beginArray();
+                int i = 0;
+                while (in.hasNext()) {
+                    RenderableNode child = gsonNode.fromJson(in, RenderableNode.class );
+                    renderableNode.setChild(i, child);
+                    i++;
+                }
+                in.endArray();
+                in.endObject();
+                return renderableNode;
             }
         }
     }

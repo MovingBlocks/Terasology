@@ -43,6 +43,8 @@ public class FactoryTest {
     public void testSaveLoad() throws IOException {
         AssetManager assetManager = mock(AssetManager.class);
         CoreRegistry.put(AssetManager.class, assetManager);
+        BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
+        CoreRegistry.put(BehaviorNodeFactory.class, nodeFactory);
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
 
         BehaviorTreeData data = buildSample();
@@ -50,14 +52,12 @@ public class FactoryTest {
         OutputStream os = new ByteArrayOutputStream(10000);
         loader.save(os, data);
         String jsonExpected = os.toString();
-
         data = loader.load(null, new ByteArrayInputStream(jsonExpected.getBytes()), null);
         os = new ByteArrayOutputStream(10000);
         loader = new BehaviorTreeLoader();
         loader.save(os, data);
         String jsonActual = os.toString();
         Assert.assertEquals(jsonActual, jsonExpected);
-        System.out.println(jsonActual);
     }
 
     private BehaviorTreeData buildSample() {
@@ -71,6 +71,7 @@ public class FactoryTest {
         BehaviorTreeData tree = new BehaviorTreeData();
         tree.setRoot(sequence);
         tree.createRenderable();
+        tree.layout(null);
         return tree;
     }
 }
