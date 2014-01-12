@@ -131,7 +131,7 @@ public class BlockEntitySystem implements ComponentSystem {
 
     private void processDropping(BlockComponent blockComp, EntityRef item) {
         /* PHYSICS */
-        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 20);
+        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 60);
         pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
