@@ -98,7 +98,7 @@ public class AdvancedLSystemTreeDefinition implements TreeDefinition {
                     String nextAxion;
                     if (lSystemTree.generated) {
                         lSystemTree.generated = false;
-                        int generation = rand.nextInt(maxGenerations);
+                        int generation = 1 + rand.nextInt(maxGenerations - 1);
                         nextAxion = lSystemTree.axion;
                         for (int i = 0; i < generation; i++) {
                             nextAxion = generateNextAxion(rand, nextAxion);
