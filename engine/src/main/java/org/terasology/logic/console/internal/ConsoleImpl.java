@@ -32,13 +32,14 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.opengl.FontColor;
+import org.terasology.rendering.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;

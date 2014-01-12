@@ -22,6 +22,7 @@ import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.rendering.FontColor;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontCharacter;

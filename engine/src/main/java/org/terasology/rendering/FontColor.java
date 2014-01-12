@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.opengl;
+package org.terasology.rendering;
 
 import org.newdawn.slick.Color;
+import org.terasology.engine.API;
 
 /**
  * Defines a set of special characters that manipulate the font color of a rendered text string.
@@ -26,6 +27,7 @@ import org.newdawn.slick.Color;
  * <b>Note:</b> The resolution is only 4 bit per channel (not 8 as usual). 
  * @author Martin Steiger
  */
+@API
 public final class FontColor {
     private static final char FIRST_COLOR = 0xE000; // Unicode 6 specs: "Private Use Area: U+E000 -- U+F8FF"
     private static final char LAST_COLOR  = 0xEFFF; 
@@ -82,7 +84,17 @@ public final class FontColor {
         int ch = (rr << 8) | (rg << 4) | (rb << 0);
         return (char) (FIRST_COLOR + ch);
     }
-
+    
+    /**
+     * Returns a string with encoded color information
+     * @param str the text
+     * @param color the color
+     * @return the encoded string
+     */
+    public static String getColored(String str, org.terasology.rendering.nui.Color color) {
+        return toChar(color) + str + getReset();
+    }
+    
     /**
      * @return the color reset char
      */
