@@ -41,7 +41,7 @@ public final class InventoryComponent implements Component, ReplicationCheck {
 
     @Replicate
     @Owns
-    public List<EntityRef> itemSlots = Lists.newArrayList();
+    List<EntityRef> itemSlots = Lists.newArrayList();
 
     public InventoryComponent() {
     }

@@ -24,7 +24,6 @@ import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayInformationComponent;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.players.LocalPlayer;
@@ -235,10 +234,9 @@ public class UIInventoryCell extends UIDisplayContainer {
 
     private void swapItem() {
         if (ghost) {
-            InventoryComponent ghostInventory = inventoryEntity.getComponent(InventoryComponent.class);
-            EntityRef transferSlot = getTransferEntity().getComponent(InventoryComponent.class).itemSlots.get(0);
+            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            ghostInventory.itemSlots.set(slot, entityManager.copy(transferSlot));
+            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
         } else {
             if (getTransferItem().exists()) {
                 inventoryManager.moveItem(getTransferEntity(), 0, inventoryEntity, slot);
@@ -250,8 +248,7 @@ public class UIInventoryCell extends UIDisplayContainer {
 
     private void giveAmount(int amount) {
         if (ghost) {
-            InventoryComponent ghostInventory = inventoryEntity.getComponent(InventoryComponent.class);
-            ghostInventory.itemSlots.set(slot, EntityRef.NULL);
+            inventoryManager.putItemInSlot(inventoryEntity, slot, EntityRef.NULL);
         } else {
             inventoryManager.moveItemAmount(inventoryEntity, slot, getTransferEntity(), 0, amount);
         }
@@ -259,10 +256,9 @@ public class UIInventoryCell extends UIDisplayContainer {
 
     private void takeAmount(int amount) {
         if (ghost) {
-            InventoryComponent ghostInventory = inventoryEntity.getComponent(InventoryComponent.class);
-            EntityRef transferSlot = getTransferEntity().getComponent(InventoryComponent.class).itemSlots.get(0);
+            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            ghostInventory.itemSlots.set(slot, entityManager.copy(transferSlot));
+            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
         } else {
             inventoryManager.moveItemAmount(getTransferEntity(), 0, inventoryEntity, slot, amount);
         }
