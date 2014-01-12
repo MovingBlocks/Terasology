@@ -22,6 +22,7 @@
  */
 {
 "hardness" : 6,
+"displayName": "Oak Log",
 
 "categories" : ["wood"],
 
