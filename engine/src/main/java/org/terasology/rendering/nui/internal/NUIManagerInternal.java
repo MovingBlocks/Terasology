@@ -178,6 +178,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void closeScreens() {
         screens.clear();
+        focus = null;
     }
 
     public void render() {

@@ -34,6 +34,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.nui.mainMenu.ErrorMessagePopup;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -53,7 +54,6 @@ public class StateMainMenu implements GameState {
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
     private ComponentSystemManager componentSystemManager;
-    private GUIManager guiManager;
     private NUIManager nuiManager;
     private InputSystem inputSystem;
 
@@ -74,7 +74,6 @@ public class StateMainMenu implements GameState {
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 
-        guiManager = CoreRegistry.get(GUIManager.class);
         nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshElementsLibrary();
 
@@ -85,7 +84,6 @@ public class StateMainMenu implements GameState {
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
-        eventSystem.registerEventHandler(guiManager);
         eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         inputSystem = CoreRegistry.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
@@ -102,7 +100,7 @@ public class StateMainMenu implements GameState {
         //guiManager.openWindow("main");
         CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            guiManager.showMessage("", messageOnLoad);
+            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error", messageOnLoad);
         }
     }
 
@@ -112,7 +110,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.shutdown();
         stopBackgroundMusic();
-        guiManager.closeAllWindows();
+        nuiManager.closeScreens();
 
         entityManager.clear();
         CoreRegistry.clear();
@@ -143,7 +141,6 @@ public class StateMainMenu implements GameState {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        renderUserInterface();
         nuiManager.render();
     }
 
@@ -152,12 +149,7 @@ public class StateMainMenu implements GameState {
         return true;
     }
 
-    public void renderUserInterface() {
-        guiManager.render();
-    }
-
     private void updateUserInterface(float delta) {
-        guiManager.update();
         nuiManager.update(delta);
     }
 }

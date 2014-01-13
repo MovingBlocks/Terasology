@@ -79,6 +79,7 @@
         },
         "UIDropdown" : {
             "text-align-horizontal" : "left",
+            "fixed-height" : 32,
             "parts" : {
                 "box" : {
                     "background" : "dropdown",
