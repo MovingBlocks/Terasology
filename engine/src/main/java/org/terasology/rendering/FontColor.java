@@ -101,4 +101,22 @@ public final class FontColor {
     public static char getReset() {
         return RESET_COLOR;
     }
+
+    /**
+     * @param the colored text
+     * @return the same text string, but without the color information
+     */
+    public static String stripColor(String text) {
+        
+        StringBuffer sb = new StringBuffer(text.length());
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+        
+            if (!isValid(c)) {
+                sb.append(c);
+            }
+        }
+        
+        return sb.toString();
+    }
 }
