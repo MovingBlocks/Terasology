@@ -140,7 +140,8 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public void addMessage(Message message) {
-        logger.info("[{}] {}", message.getType(), message.getMessage());
+        String uncoloredText = FontColor.stripColor(message.getMessage());
+        logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
