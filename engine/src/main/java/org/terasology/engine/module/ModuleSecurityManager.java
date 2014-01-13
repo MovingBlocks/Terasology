@@ -16,13 +16,15 @@
 
 package org.terasology.engine.module;
 
-import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.awt.AWTPermission;
 import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius
@@ -37,6 +39,7 @@ public class ModuleSecurityManager extends SecurityManager {
     private Set<String> apiPackages = Sets.newHashSet();
     private Set<String> loadablePackages = Sets.newHashSet();
     private Set<Class<? extends Permission>> allowedPermissions = Sets.newHashSet();
+    private Set<Permission> allowedInstances = Sets.newHashSet();
 
     private ThreadLocal<Boolean> calculatingPermission = new ThreadLocal<>();
 
@@ -51,6 +54,13 @@ public class ModuleSecurityManager extends SecurityManager {
         allowedPermissions.add(allowedPermission);
     }
 
+    public void addAllowedPermission(Permission allowedPermission) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
+        allowedInstances.add(allowedPermission);
+    }
+    
     public void addAPIClass(Class clazz) {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(ADD_API_CLASS);
@@ -65,6 +75,15 @@ public class ModuleSecurityManager extends SecurityManager {
         if (allowedPermissions.contains(perm.getClass())) {
             return;
         }
+
+        if (allowedInstances.contains(perm)) {
+            return;
+        }
+        
+        if (perm instanceof AWTPermission) {
+            throw new AccessControlException("No AWT permissions", perm);
+        }
+        
         calculatingPermission.set(true);
         try {
             Class[] classes = getClassContext();
@@ -87,10 +106,12 @@ public class ModuleSecurityManager extends SecurityManager {
         }
     }
 
+    @Override
     public void checkPermission(Permission perm) {
         checkModAccess(perm);
     }
 
+    @Override
     public void checkPermission(Permission perm, Object context) {
         checkModAccess(perm);
     }

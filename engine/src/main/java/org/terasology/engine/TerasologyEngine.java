@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -100,10 +101,14 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
+import sun.security.util.SecurityConstants;
+
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Set;
@@ -514,16 +519,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
         moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIClass(java.awt.BasicStroke.class);
-        moduleSecurityManager.addAPIClass(java.awt.Color.class);
-        moduleSecurityManager.addAPIClass(java.awt.Font.class);
-        moduleSecurityManager.addAPIClass(java.awt.FontMetrics.class);
-        moduleSecurityManager.addAPIClass(java.awt.Graphics.class);
-        moduleSecurityManager.addAPIClass(java.awt.Graphics2D.class);
-        moduleSecurityManager.addAPIClass(java.awt.Point.class);
-        moduleSecurityManager.addAPIClass(java.awt.Rectangle.class);
-        moduleSecurityManager.addAPIClass(java.awt.Shape.class);
-        moduleSecurityManager.addAPIClass(java.awt.Stroke.class);
+        moduleSecurityManager.addAPIPackage("java.awt");
         moduleSecurityManager.addAPIPackage("java.awt.geom");
         moduleSecurityManager.addAPIPackage("java.awt.image");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
@@ -553,9 +549,12 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
+        
+        moduleSecurityManager.addAllowedPermission(SecurityConstants.AWT.ACCESS_CLIPBOARD_PERMISSION);
 
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
+        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
         moduleSecurityManager.addAPIClass(Logger.class);
         for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
@@ -566,7 +565,7 @@ public class TerasologyEngine implements GameEngine {
                 moduleSecurityManager.addAPIClass(apiClass);
             }
         }
-
+        
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
     }
