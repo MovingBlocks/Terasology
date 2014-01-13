@@ -101,8 +101,6 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import sun.security.util.SecurityConstants;
-
 import javax.swing.*;
 
 import java.awt.*;
@@ -550,7 +548,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         
-        moduleSecurityManager.addAllowedPermission(SecurityConstants.AWT.ACCESS_CLIPBOARD_PERMISSION);
+        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
 
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
