@@ -34,12 +34,10 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
-import org.terasology.math.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -83,30 +81,18 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
-    public void onDestroyed(NoHealthEvent event, EntityRef entity) {
+    public void onBlockDestroy(DestroyBlockEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
-
         BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
 
-        // TODO: Better handling of "support required" blocks
-        Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
-        if (upperBlock.isSupportRequired()) {
-            worldProvider.setBlock(new Vector3i(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z), BlockManager.getAir());
-        }
-
-        // TODO: Configurable via block definition
-        if (blockDamageComponent == null || !blockDamageComponent.skipPerBlockEffects) {
-            entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
-        }
-
         float chanceOfBlockDrop = 1;
+
         if (blockDamageComponent != null) {
             chanceOfBlockDrop = 1 - blockDamageComponent.blockAnnihilationChance;
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), oldBlock.getBlockFamily(), 1);
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), blockComp.getBlock().getBlockFamily(), 1);
             entity.send(beforeBlockToItemEvent);
             if (!beforeBlockToItemEvent.isConsumed()) {
                 for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
@@ -127,6 +113,18 @@ public class BlockEntitySystem implements ComponentSystem {
         }
 
         worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class})
+    public void onBlockHasNoHealth(NoHealthEvent event, EntityRef entity) {
+        BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
+
+        // TODO: Configurable via block definition
+        if (blockDamageComponent == null || !blockDamageComponent.skipPerBlockEffects) {
+            entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
+        }
+
+        entity.send(new DestroyBlockEvent(event.getInstigator(), event.getTool(), event.getDamageType()));
     }
 
     private void processDropping(BlockComponent blockComp, EntityRef item) {
