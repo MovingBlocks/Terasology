@@ -1,7 +1,0 @@
-{
-    "basedOn": "core:plant",
-    "displayName": "Oak Sapling",
-    "entity": {
-        "prefab": "core:OakTree"
-    }
-}
