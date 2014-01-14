@@ -45,7 +45,6 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         } else {
             EntityRef worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
         }
         return true;
     }
