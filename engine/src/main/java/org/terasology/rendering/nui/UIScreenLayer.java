@@ -66,7 +66,7 @@ public class UIScreenLayer extends AbstractWidget {
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(screenListener);
         if (contents != null) {
-            canvas.drawElement(contents, canvas.getRegion());
+            canvas.drawWidget(contents, canvas.getRegion());
         }
     }
 

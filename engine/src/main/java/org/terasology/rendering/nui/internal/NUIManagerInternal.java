@@ -192,7 +192,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
         for (UIScreenLayer screen : screensToRender) {
             canvas.setSkin(screen.getSkin());
-            canvas.drawElement(screen, canvas.getRegion());
+            canvas.drawWidget(screen, canvas.getRegion());
         }
         canvas.postRender();
     }

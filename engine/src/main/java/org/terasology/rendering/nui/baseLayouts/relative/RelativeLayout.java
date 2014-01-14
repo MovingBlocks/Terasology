@@ -66,7 +66,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     public void onDraw(Canvas canvas) {
         for (WidgetInfo element : contents) {
             Rect2i drawRegion = getRegion(element, canvas);
-            canvas.drawElement(element.widget, drawRegion);
+            canvas.drawWidget(element.widget, drawRegion);
         }
         cachedRegions.clear();
     }
@@ -142,7 +142,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
 
         int height = element.layoutHint.getHeight();
         if (height == 0 && element.layoutHint.isUsingContentHeight()) {
-            height = canvas.calculateSize(element.widget, new Vector2i(width, bottom - top)).y;
+            height = canvas.calculateRestrictedSize(element.widget, new Vector2i(width, bottom - top)).y;
         }
         if (height == 0) {
             height = bottom - top;

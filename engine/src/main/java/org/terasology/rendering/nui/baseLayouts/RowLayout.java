@@ -73,7 +73,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
             for (int i = 0; i < contents.size(); ++i) {
                 int itemWidth = widths.get(i);
                 Rect2i region = Rect2i.createFromMinAndSize(xOffset, 0, itemWidth, canvas.size().y);
-                canvas.drawElement(contents.get(i), region);
+                canvas.drawWidget(contents.get(i), region);
                 xOffset += itemWidth;
                 xOffset += horizontalSpacing;
             }
@@ -139,7 +139,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
 
         Vector2i result = new Vector2i(areaHint.x, 0);
         for (int i = 0; i < contents.size(); ++i) {
-            Vector2i widgetSize = canvas.calculateSize(contents.get(i), new Vector2i(TeraMath.floorToInt(widths.get(i)), areaHint.y));
+            Vector2i widgetSize = canvas.calculateRestrictedSize(contents.get(i), new Vector2i(TeraMath.floorToInt(widths.get(i)), areaHint.y));
             result.y = Math.max(result.y, widgetSize.y);
         }
         return result;
