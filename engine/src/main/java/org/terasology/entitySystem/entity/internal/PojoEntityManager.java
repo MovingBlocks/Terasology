@@ -40,8 +40,6 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.utilities.collection.NullIterator;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockUri;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -149,34 +147,23 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
+        EntityRef entity = createAndSendEvent(components);
+        if (eventSystem != null) {
+            eventSystem.send(entity, OnAddedComponent.newInstance());
+            eventSystem.send(entity, OnActivatedComponent.newInstance());
+        }
+        return entity;
+    }
+
+    private EntityRef createAndSendEvent(Iterable<Component> components) {
         EntityRef entity = create();
 
-        String prefabName = null;
-        BlockUri blockUri = null;
-        for (Component component : components) {
-            if (component instanceof EntityInfoComponent) {
-                EntityInfoComponent comp = (EntityInfoComponent) component;
-                prefabName = comp.parentPrefab;
-                if (blockUri != null)
-                    break;
-            } else if (component instanceof BlockComponent) {
-                BlockComponent comp = (BlockComponent) component;
-                blockUri = comp.getBlock().getBlockFamily().getURI();
-                if (prefabName != null)
-                    break;
-            }
-        }
-
-        EntityBeingGenerated event = new EntityBeingGenerated(prefabName, blockUri, components);
+        EntityBeingGenerated event = new EntityBeingGenerated(components);
         eventSystem.send(entity, event);
         components = event.getResultComponents();
 
         for (Component c : components) {
             store.put(entity.getId(), c);
-        }
-        if (eventSystem != null) {
-            eventSystem.send(entity, OnAddedComponent.newInstance());
-            eventSystem.send(entity, OnActivatedComponent.newInstance());
         }
         return entity;
     }
@@ -361,31 +348,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
-        EntityRef entity = create();
-
-        String prefabName = null;
-        BlockUri blockUri = null;
-        for (Component component : components) {
-            if (component instanceof EntityInfoComponent) {
-                EntityInfoComponent comp = (EntityInfoComponent) component;
-                prefabName = comp.parentPrefab;
-                if (blockUri != null)
-                    break;
-            } else if (component instanceof BlockComponent) {
-                BlockComponent comp = (BlockComponent) component;
-                blockUri = comp.getBlock().getBlockFamily().getURI();
-                if (prefabName != null)
-                    break;
-            }
-        }
-
-        EntityBeingGenerated event = new EntityBeingGenerated(prefabName, blockUri, components);
-        eventSystem.send(entity, event);
-        components = event.getResultComponents();
-
-        for (Component c : components) {
-            store.put(entity.getId(), c);
-        }
+        EntityRef entity = createAndSendEvent(components);
         return entity;
     }
 
