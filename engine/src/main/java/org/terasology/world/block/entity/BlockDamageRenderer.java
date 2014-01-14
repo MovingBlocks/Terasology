@@ -27,20 +27,15 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -55,7 +50,6 @@ public class BlockDamageRenderer implements RenderSystem {
     @In
     private WorldProvider worldProvider;
 
-    private Mesh overlayMesh;
     private Texture effectsTexture;
 
     @Override
@@ -63,12 +57,6 @@ public class BlockDamageRenderer implements RenderSystem {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.worldProvider = CoreRegistry.get(WorldProvider.class);
         this.effectsTexture = Assets.getTexture("engine:effects");
-        Vector2f texPos = new Vector2f(0.0f, 0.0f);
-        Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
-
-        Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
-        overlayMesh = tessellator.generateMesh();
     }
 
     @Override
