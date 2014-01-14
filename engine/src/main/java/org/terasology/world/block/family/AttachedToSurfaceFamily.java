@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class AlignToSurfaceFamily extends AbstractBlockFamily {
+public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
 
@@ -37,7 +37,7 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
      * @param uri    The uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+    public AttachedToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
         super(uri, categories);
         for (Side side : Side.values()) {
             Block block = blocks.get(side);
@@ -87,4 +87,12 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
         return blocks.values();
     }
 
+    public Side getSideAttachedTo(Block block) {
+        for (Map.Entry<Side, Block> sideBlockEntry : blocks.entrySet()) {
+            if (sideBlockEntry.getValue().equals(block)) {
+                return sideBlockEntry.getKey();
+            }
+        }
+        return null;
+    }
 }

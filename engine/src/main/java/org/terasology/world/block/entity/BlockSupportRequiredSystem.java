@@ -29,6 +29,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.AttachedToSurfaceFamily;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -47,6 +49,27 @@ public class BlockSupportRequiredSystem implements ComponentSystem {
     @Override
     public void shutdown() {
     }
+
+    @ReceiveEvent(components = {BlockComponent.class})
+    public void checkForAttachments(OnChangedBlock event, EntityRef entity) {
+        if (event.getNewType() == BlockManager.getAir()) {
+            for (Side side : Side.values()) {
+                Vector3i attachedBlockPosition = side.getAdjacentPos(event.getBlockPosition());
+                final Block attachedBlock = worldProvider.getBlock(attachedBlockPosition);
+                final BlockFamily blockFamily = attachedBlock.getBlockFamily();
+                if (blockFamily instanceof AttachedToSurfaceFamily) {
+                    AttachedToSurfaceFamily attachmentFamily = (AttachedToSurfaceFamily) blockFamily;
+                    final Side sideAttachedTo = attachmentFamily.getSideAttachedTo(attachedBlock);
+                    if (sideAttachedTo.reverse() == side) {
+                        // Block it was attached to was removed
+                        blockEntityRegistry.getBlockEntityAt(attachedBlockPosition).send(
+                                new DestroyBlockEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
+                    }
+                }
+            }
+        }
+    }
+
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
