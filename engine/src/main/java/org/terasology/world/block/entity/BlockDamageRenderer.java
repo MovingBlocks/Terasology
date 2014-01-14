@@ -34,6 +34,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
@@ -97,7 +98,7 @@ public class BlockDamageRenderer implements RenderSystem {
                 continue;
             }
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            renderHealth(blockComp.getPosition(), health, cameraPosition);
+            renderHealth(blockComp.getBlock(), blockComp.getPosition(), health, cameraPosition);
         }
         for (EntityRef entity : entityManager.getEntitiesWith(BlockRegionComponent.class, HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
@@ -106,7 +107,7 @@ public class BlockDamageRenderer implements RenderSystem {
             }
             BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
             for (Vector3i blockPos : blockRegion.region) {
-                renderHealth(blockPos, health, cameraPosition);
+                renderHealth(worldProvider.getBlock(blockPos), blockPos, health, cameraPosition);
             }
         }
 
@@ -115,7 +116,7 @@ public class BlockDamageRenderer implements RenderSystem {
         defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
-    private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
+    private void renderHealth(Block block, Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
         if (!worldProvider.isBlockRelevant(blockPos)) {
             return;
         }
@@ -130,7 +131,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glTranslatef(offset, 0f, 0f);
         glMatrixMode(GL_MODELVIEW);
 
-        overlayMesh.render();
+        block.getMesh().render();
 
         glPopMatrix();
 
