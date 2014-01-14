@@ -26,10 +26,6 @@
 
 "categories" : ["wood"],
 
-"entity" : {
-"prefab" : "core:OakTrunk"
-},
-
 // Graphics
 "tiles" : {
 "sides" : "OakBark"

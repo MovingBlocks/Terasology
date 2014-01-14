@@ -79,9 +79,6 @@ public abstract class DefaultGenerators {
             // Cactus
             TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("core:Cactus")).setGenerationProbability(0.05f);
 
-            // Oak
-            //TreeGenerator oakTree = new SeedTreeGenerator().setBlock(blockManager.getBlock("core:OakSaplingGenerated")).setGenerationProbability(0.08f);
-
             // Add the trees to the generator lists
             mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
             mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);

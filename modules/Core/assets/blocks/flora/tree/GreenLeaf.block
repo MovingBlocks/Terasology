@@ -19,9 +19,5 @@
  * However, more likely it will be used by reference by a Tree
  */
 {
-"basedOn" : "core:leaf",
-
-"entity" : {
-"prefab" : "core:GreenLeaf"
-}
+"basedOn" : "core:leaf"
 }
