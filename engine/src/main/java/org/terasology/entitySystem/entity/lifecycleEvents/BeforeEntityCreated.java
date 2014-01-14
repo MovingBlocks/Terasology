@@ -23,12 +23,12 @@ import java.util.*;
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class EntityBeingGenerated implements Event {
+public class BeforeEntityCreated implements Event {
     private Iterable<Component> components;
     private Set<Class<?>> componentsToRemove = new HashSet<Class<?>>();
     private Map<Class, Component> componentsToAdd = new HashMap<Class, Component>();
 
-    public EntityBeingGenerated(Iterable<Component> components) {
+    public BeforeEntityCreated(Iterable<Component> components) {
         this.components = components;
     }
 

@@ -158,7 +158,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     private EntityRef createAndSendEvent(Iterable<Component> components) {
         EntityRef entity = create();
 
-        EntityBeingGenerated event = new EntityBeingGenerated(components);
+        BeforeEntityCreated event = new BeforeEntityCreated(components);
         eventSystem.send(entity, event);
         components = event.getResultComponents();
 
