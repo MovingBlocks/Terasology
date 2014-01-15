@@ -33,6 +33,9 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(BlockFamilyUpdateSystem.class);
@@ -41,6 +44,9 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
     private WorldProvider worldProvider;
     @In
     private BlockEntityRegistry blockEntityRegistry;
+
+    private int largeBlockUpdateCount = 0;
+    private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = new HashSet<>();
 
     public BlockFamilyUpdateSystem() {
         logger.info("Creating system");
@@ -61,10 +67,51 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @ReceiveEvent
+    public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
+        largeBlockUpdateCount++;
+    }
+
+    @ReceiveEvent
+    public void largeBlockUpdateFinished(LargeBlockUpdateFinished event, EntityRef entity) {
+        largeBlockUpdateCount--;
+        if (largeBlockUpdateCount < 0)
+            throw new IllegalStateException("LargeBlockUpdateFinished invoked too many times");
+
+        if (largeBlockUpdateCount == 0) {
+            notifyNeighboursOfChangedBlocks();
+        }
+    }
+
+    private void notifyNeighboursOfChangedBlocks() {
+        // Invoke the updates in another large block change for this class only
+        largeBlockUpdateCount++;
+        while (!blocksUpdatedInLargeBlockUpdate.isEmpty()) {
+            Set<Vector3i> blocksToUpdate = blocksUpdatedInLargeBlockUpdate;
+
+            // Setup new collection for blocks changed in this pass
+            blocksUpdatedInLargeBlockUpdate = new HashSet<>();
+
+            for (Vector3i blockLocation : blocksToUpdate) {
+                processUpdateForBlockLocation(blockLocation);
+            }
+        }
+        largeBlockUpdateCount--;
+    }
+
     @ReceiveEvent(components = {BlockComponent.class})
     public void blockUpdate(OnChangedBlock event, EntityRef blockEntity) {
+        if (largeBlockUpdateCount > 0) {
+            blocksUpdatedInLargeBlockUpdate.add(event.getBlockPosition());
+        } else {
+            Vector3i blockLocation = event.getBlockPosition();
+            processUpdateForBlockLocation(blockLocation);
+        }
+    }
+
+    private void processUpdateForBlockLocation(Vector3i blockLocation) {
         for (Side side : Side.values()) {
-            Vector3i neighborLocation = new Vector3i(event.getBlockPosition());
+            Vector3i neighborLocation = new Vector3i(blockLocation);
             neighborLocation.add(side.getVector3i());
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
             Block neighborBlockAfterUpdate = neighborBlock.getBlockFamily().getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
