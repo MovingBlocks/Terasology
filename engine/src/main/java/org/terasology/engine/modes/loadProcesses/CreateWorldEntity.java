@@ -19,7 +19,6 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 
 import java.util.Iterator;
@@ -36,13 +35,10 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         // TODO: Move the world renderer bits elsewhere
-        if (worldEntityIterator.hasNext()) {
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
-        } else {
+        if (!worldEntityIterator.hasNext()) {
             EntityRef worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
         }

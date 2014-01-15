@@ -19,7 +19,11 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.StorageManagerInternal;
 
 import java.io.IOException;
 
@@ -40,7 +44,10 @@ public class LoadEntities extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
+        EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
+        StorageManager storageManager = CoreRegistry.put(StorageManager.class,
+                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class), entityManager));
+
         try {
             storageManager.loadGlobalStore();
         } catch (IOException e) {
