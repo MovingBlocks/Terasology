@@ -15,10 +15,12 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -213,5 +215,9 @@ public class UIWindow extends UIDisplayContainerScrollable {
 
     public void removeWindowListener(WindowListener listener) {
         windowListeners.remove(listener);
+    }
+
+    public Vector2i getDisplaySize() {
+        return new Vector2i(Display.getWidth(), Display.getHeight());
     }
 }
