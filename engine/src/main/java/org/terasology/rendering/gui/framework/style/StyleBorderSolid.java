@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.framework.style;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.internal.ColorUtil;
 
 import javax.vecmath.Vector4f;
 
@@ -50,10 +51,6 @@ public class StyleBorderSolid extends UIDisplayContainer implements Style {
         this.width = width;
         setColor(color);
         setCrop(false);
-    }
-
-    private float rgbToColor(int v) {
-        return (float) v / 255.0f;
     }
 
     @Override
@@ -113,25 +110,7 @@ public class StyleBorderSolid extends UIDisplayContainer implements Style {
     }
 
     public void setColor(String color) {
-        String normalisedColor = color.trim().toLowerCase();
-
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int a = 255;
-
-        if (normalisedColor.matches("^#[a-f0-9]{1,8}$")) {
-            normalisedColor = normalisedColor.replace("#", "");
-
-            int sum = Integer.parseInt(normalisedColor, 16);
-
-            a = (sum & 0xFF000000) >> 24;
-            r = (sum & 0x00FF0000) >> 16;
-            g = (sum & 0x0000FF00) >> 8;
-            b = sum & 0x000000FF;
-        }
-
-        this.color = new Color(rgbToColor(r), rgbToColor(g), rgbToColor(b), rgbToColor(a));
+        this.color = ColorUtil.getColorForColorHexString(color);
     }
 
     public Vector4f getWidth() {

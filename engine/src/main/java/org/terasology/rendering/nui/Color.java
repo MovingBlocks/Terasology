@@ -51,6 +51,9 @@ public class Color {
     public static final Color TRANSPARENT = new Color(0x00000000);
     public static final Color YELLOW = new Color(0xFFFF00FF);
 
+    public static final Color CYAN = new Color(0x00FFFFFF);
+    public static final Color MAGENTA = new Color(0xFF00FFFF);
+
     private static final int MAX = 255;
     private static final int RED_OFFSET = 24;
     private static final int GREEN_OFFSET = 16;
