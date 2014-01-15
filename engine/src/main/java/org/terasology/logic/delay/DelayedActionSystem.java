@@ -17,6 +17,7 @@ package org.terasology.logic.delay;
 
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
@@ -25,7 +26,6 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.world.time.WorldTime;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -37,7 +37,7 @@ import java.util.List;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class DelayedActionSystem implements UpdateSubscriberSystem {
     @In
-    private WorldTime worldTime;
+    private Time time;
 
     private TreeMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
@@ -51,7 +51,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        long currentWorldTime = worldTime.getMilliseconds();
+        long currentWorldTime = time.getGameTimeInMs();
         List<DelayedOperation> operationsToInvoke = new LinkedList<>();
         Iterator<Long> scheduledOperationsIterator = delayedOperationsSortedByTime.keySet().iterator();
         long time;
@@ -85,7 +85,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
         if (entity.hasComponent(DelayedActionComponent.class)) {
             throw new IllegalStateException("This component is already queued for delayed action");
         }
-        long scheduleTime = worldTime.getMilliseconds() + event.getDelay();
+        long scheduleTime = time.getGameTimeInMs() + event.getDelay();
         DelayedActionComponent delayedComponent = new DelayedActionComponent(scheduleTime, event.getActionId());
         entity.saveComponent(delayedComponent);
     }
