@@ -100,8 +100,9 @@ public class BlockEntitySystem implements ComponentSystem {
                     entity.send(new OnBlockToItem(item));
 
                     if (family.getArchetypeBlock().isDirectPickup()) {
-                        if (!inventoryManager.giveItem(event.getInstigator(), item))
+                        if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                             processDropping(blockComp, item);
+                        }
                     } else {
                         processDropping(blockComp, item);
                     }
