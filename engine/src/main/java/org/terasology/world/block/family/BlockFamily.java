@@ -52,8 +52,6 @@ public interface BlockFamily {
      */
     Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
 
-    Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock);
-
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours
      */

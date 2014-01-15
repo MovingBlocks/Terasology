@@ -15,10 +15,6 @@
  */
 package org.terasology.world.block;
 
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,13 +28,18 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
 
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Marcin Sciesinski <marcins78@gmail.com>
+ */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
-    private static final Logger logger = LoggerFactory.getLogger(BlockFamilyUpdateSystem.class);
+public class NeighbourBlockFamilyUpdateSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
     @In
     private WorldProvider worldProvider;
@@ -48,7 +49,7 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
     private int largeBlockUpdateCount = 0;
     private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = new HashSet<>();
 
-    public BlockFamilyUpdateSystem() {
+    public NeighbourBlockFamilyUpdateSystem() {
         logger.info("Creating system");
     }
 
@@ -114,9 +115,12 @@ public class BlockFamilyUpdateSystem implements UpdateSubscriberSystem {
             Vector3i neighborLocation = new Vector3i(blockLocation);
             neighborLocation.add(side.getVector3i());
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
-            Block neighborBlockAfterUpdate = neighborBlock.getBlockFamily().getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
-            if (neighborBlock != neighborBlockAfterUpdate) {
-                worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
+            final BlockFamily blockFamily = neighborBlock.getBlockFamily();
+            if (blockFamily instanceof UpdatesWithNeighboursFamily) {
+                Block neighborBlockAfterUpdate = ((UpdatesWithNeighboursFamily) blockFamily).getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
+                if (neighborBlock != neighborBlockAfterUpdate) {
+                    worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
+                }
             }
         }
     }

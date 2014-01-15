@@ -26,14 +26,14 @@ import org.terasology.world.block.BlockUri;
 
 import java.util.List;
 
-public class ConnectToSixSidesFamily extends AbstractBlockFamily {
+public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     private ConnectionCondition connectionCondition;
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
     private byte connectionSides;
 
-    public ConnectToSixSidesFamily(ConnectionCondition connectionCondition, BlockUri blockUri,
-                                   List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks, byte connectionSides) {
+    public UpdatesWithNeighboursFamily(ConnectionCondition connectionCondition, BlockUri blockUri,
+                                       List<String> categories, Block archetypeBlock, TByteObjectMap<Block> blocks, byte connectionSides) {
         super(blockUri, categories);
         this.connectionCondition = connectionCondition;
         this.archetypeBlock = archetypeBlock;
@@ -61,7 +61,6 @@ public class ConnectToSixSidesFamily extends AbstractBlockFamily {
         return blocks.get(connections);
     }
 
-    @Override
     public Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(connectionSides)) {
