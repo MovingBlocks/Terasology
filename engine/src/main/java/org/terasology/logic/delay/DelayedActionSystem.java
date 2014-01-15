@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.delay;
 
+import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -38,7 +39,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
     @In
     private WorldTime worldTime;
 
-    private TreeMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create();
+    private TreeMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
     @Override
     public void initialise() {
