@@ -24,12 +24,18 @@ import java.util.*;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class BeforeEntityCreated implements Event {
+    private String prefab;
     private Iterable<Component> components;
     private Set<Class<?>> componentsToRemove = new HashSet<Class<?>>();
     private Map<Class, Component> componentsToAdd = new HashMap<Class, Component>();
 
-    public BeforeEntityCreated(Iterable<Component> components) {
+    public BeforeEntityCreated(String prefab, Iterable<Component> components) {
+        this.prefab = prefab;
         this.components = components;
+    }
+
+    public String getPrefab() {
+        return prefab;
     }
 
     public Iterable<Component> getOriginalComponents() {

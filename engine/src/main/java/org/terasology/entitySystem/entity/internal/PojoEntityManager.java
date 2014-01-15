@@ -158,7 +158,16 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     private EntityRef createAndSendEvent(Iterable<Component> components) {
         EntityRef entity = create();
 
-        BeforeEntityCreated event = new BeforeEntityCreated(components);
+        String prefabName = null;
+        for (Component component : components) {
+            if (component instanceof EntityInfoComponent) {
+                EntityInfoComponent comp = (EntityInfoComponent) component;
+                prefabName = comp.parentPrefab;
+                break;
+            }
+        }
+
+        BeforeEntityCreated event = new BeforeEntityCreated(prefabName, components);
         eventSystem.send(entity, event);
         components = event.getResultComponents();
 
@@ -436,6 +445,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
      * @param componentClass
      * @return Whether the entity has a component of the given type
      */
+
     boolean hasComponent(int entityId, Class<? extends Component> componentClass) {
         return store.get(entityId, componentClass) != null;
     }
