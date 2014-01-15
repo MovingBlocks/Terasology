@@ -34,6 +34,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
+import org.terasology.math.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -44,6 +45,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BeforeBlockToItem;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
+import org.terasology.world.block.regions.BlockRegionComponent;
 
 /**
  * Event handler for events affecting block entities
@@ -113,7 +115,14 @@ public class BlockEntitySystem implements ComponentSystem {
             }
         }
 
-        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
+        BlockRegionComponent regionComponent = entity.getComponent(BlockRegionComponent.class);
+        if (regionComponent != null) {
+            for (Vector3i blockPosition : regionComponent.region) {
+                worldProvider.setBlock(blockPosition, BlockManager.getAir());
+            }
+        } else {
+            worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
+        }
     }
 
     @ReceiveEvent(components = {BlockComponent.class})
