@@ -17,6 +17,7 @@ package org.terasology.rendering.icons;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.engine.API;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
@@ -33,6 +34,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * Icon for rendering items in inventory.
  */
+@API
 public class Icon {
     private static Map<String, Icon> icons;
 
@@ -90,8 +92,29 @@ public class Icon {
         return element.getTexture();
     }
 
+    public static void registerIcon(String name, String textureUri, int x, int y) {
+        if (icons == null) {
+            loadIcons();
+        }
+
+        Icon icon = new Icon();
+
+        icon.element = new UIImage(Assets.getTexture(textureUri));
+        icon.blockFamily = null;
+
+        icon.element.setSize(new Vector2f(32, 32));
+        icon.element.setTextureSize(new Vector2f(16, 16));
+        icon.element.setVisible(true);
+        icon.element.setPosition(new Vector2f(-10f, -16f));
+
+        icon.setAtlasPosition(x, y);
+        icons.put(name, icon);
+    }
+
     private static void loadIcons() {
-        icons = new HashMap<String, Icon>();
+        if (null == icons) {
+            icons = new HashMap<String, Icon>();
+        }
 
         // TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
         // TODO: I'ld suggest an icon atlas asset
