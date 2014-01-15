@@ -26,6 +26,9 @@ public class DelayedActionComponent implements Component {
     private long worldTime;
     private String actionId;
 
+    public DelayedActionComponent() {
+    }
+
     public DelayedActionComponent(long worldTime, String actionId) {
         this.worldTime = worldTime;
         this.actionId = actionId;

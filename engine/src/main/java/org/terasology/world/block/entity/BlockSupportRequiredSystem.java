@@ -60,7 +60,7 @@ public class BlockSupportRequiredSystem implements ComponentSystem {
                 if (blockFamily instanceof AttachedToSurfaceFamily) {
                     AttachedToSurfaceFamily attachmentFamily = (AttachedToSurfaceFamily) blockFamily;
                     final Side sideAttachedTo = attachmentFamily.getSideAttachedTo(attachedBlock);
-                    if (sideAttachedTo.reverse() == side) {
+                    if (sideAttachedTo == side) {
                         // Block it was attached to was removed
                         blockEntityRegistry.getBlockEntityAt(attachedBlockPosition).send(
                                 new DestroyBlockEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
