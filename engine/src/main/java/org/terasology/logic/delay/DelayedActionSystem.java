@@ -15,19 +15,107 @@
  */
 package org.terasology.logic.delay;
 
-import org.terasology.entitySystem.systems.ComponentSystem;
+import com.google.common.collect.TreeMultimap;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.world.time.WorldTime;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-@RegisterSystem
-public class DelayedActionSystem implements ComponentSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class DelayedActionSystem implements UpdateSubscriberSystem {
+    @In
+    private WorldTime worldTime;
+
+    private TreeMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create();
+
     @Override
     public void initialise() {
     }
 
     @Override
     public void shutdown() {
+    }
+
+    @Override
+    public void update(float delta) {
+        long currentWorldTime = worldTime.getMilliseconds();
+        List<DelayedOperation> operationsToInvoke = new LinkedList<>();
+        Iterator<Long> scheduledOperationsIterator = delayedOperationsSortedByTime.keySet().iterator();
+        long time;
+        while (scheduledOperationsIterator.hasNext()
+                && (time = scheduledOperationsIterator.next()) <= currentWorldTime) {
+            operationsToInvoke.addAll(delayedOperationsSortedByTime.get(time));
+            scheduledOperationsIterator.remove();
+        }
+
+        for (DelayedOperation delayedOperation : operationsToInvoke) {
+            if (delayedOperation.entityRef.exists()) {
+                delayedOperation.entityRef.send(new DelayedActionTriggeredEvent(delayedOperation.operationId));
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {DelayedActionComponent.class})
+    public void componentActivated(OnActivatedComponent event, EntityRef entity) {
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        delayedOperationsSortedByTime.put(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
+    }
+
+    @ReceiveEvent(components = {DelayedActionComponent.class})
+    public void componentDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        delayedOperationsSortedByTime.remove(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
+    }
+
+    @ReceiveEvent
+    public void addDelayedAction(AddDelayedActionEvent event, EntityRef entity) {
+        if (entity.hasComponent(DelayedActionComponent.class)) {
+            throw new IllegalStateException("This component is already queued for delayed action");
+        }
+        long scheduleTime = worldTime.getMilliseconds() + event.getDelay();
+        DelayedActionComponent delayedComponent = new DelayedActionComponent(scheduleTime, event.getActionId());
+        entity.saveComponent(delayedComponent);
+    }
+
+    private class DelayedOperation {
+        private String operationId;
+        private EntityRef entityRef;
+
+        private DelayedOperation(EntityRef entityRef, String operationId) {
+            this.operationId = operationId;
+            this.entityRef = entityRef;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            DelayedOperation that = (DelayedOperation) o;
+
+            if (entityRef.getId() != that.entityRef.getId()) return false;
+            if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = operationId != null ? operationId.hashCode() : 0;
+            result = 31 * result + entityRef.getId();
+            return result;
+        }
     }
 }

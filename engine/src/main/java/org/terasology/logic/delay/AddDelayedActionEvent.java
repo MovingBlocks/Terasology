@@ -22,12 +22,18 @@ import org.terasology.entitySystem.event.Event;
  */
 public class AddDelayedActionEvent implements Event {
     private String actionId;
+    private long delay;
 
-    public AddDelayedActionEvent(String actionId) {
+    public AddDelayedActionEvent(String actionId, long delay) {
         this.actionId = actionId;
+        this.delay = delay;
     }
 
     public String getActionId() {
         return actionId;
+    }
+
+    public long getDelay() {
+        return delay;
     }
 }
