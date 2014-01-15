@@ -39,6 +39,7 @@ import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -82,9 +83,8 @@ public class BlockEntitySystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent
     public void onBlockDestroy(DestroyBlockEvent event, EntityRef entity) {
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
 
         float chanceOfBlockDrop = 1;
@@ -93,8 +93,12 @@ public class BlockEntitySystem implements ComponentSystem {
             chanceOfBlockDrop = 1 - blockDamageComponent.blockAnnihilationChance;
         }
 
+        Vector3i location = getBlockLocation(entity);
+
         if (random.nextFloat() < chanceOfBlockDrop) {
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), blockComp.getBlock().getBlockFamily(), 1);
+            Block block = worldProvider.getBlock(location);
+
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), block.getBlockFamily(), 1);
             entity.send(beforeBlockToItemEvent);
             if (!beforeBlockToItemEvent.isConsumed()) {
                 for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
@@ -103,106 +107,132 @@ public class BlockEntitySystem implements ComponentSystem {
 
                     if (family.getArchetypeBlock().isDirectPickup()) {
                         if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                            processDropping(blockComp, item);
+                            processDropping(item, location);
                         }
                     } else {
-                        processDropping(blockComp, item);
+                        processDropping(item, location);
                     }
                 }
                 for (EntityRef item : beforeBlockToItemEvent.getItemsToDrop()) {
-                    processDropping(blockComp, item);
+                    processDropping(item, location);
                 }
             }
         }
 
-        BlockRegionComponent regionComponent = entity.getComponent(BlockRegionComponent.class);
-        if (regionComponent != null) {
-            for (Vector3i blockPosition : regionComponent.region) {
+        BlockRegionComponent blockRegionComp = entity.getComponent(BlockRegionComponent.class);
+        if (blockRegionComp != null) {
+            for (Vector3i blockPosition : blockRegionComp.region) {
                 worldProvider.setBlock(blockPosition, BlockManager.getAir());
             }
+            entity.destroy();
         } else {
-            worldProvider.setBlock(blockComp.getPosition(), BlockManager.getAir());
+            worldProvider.setBlock(location, BlockManager.getAir());
         }
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent
     public void onBlockHasNoHealth(NoHealthEvent event, EntityRef entity) {
-        BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
+        if (isBlockOrBlockRegion(entity)) {
+            BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
 
-        // TODO: Configurable via block definition
-        if (blockDamageComponent == null || !blockDamageComponent.skipPerBlockEffects) {
-            entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
+            // TODO: Configurable via block definition
+            if (blockDamageComponent == null || !blockDamageComponent.skipPerBlockEffects) {
+                entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
+            }
+
+            entity.send(new DestroyBlockEvent(event.getInstigator(), event.getTool(), event.getDamageType()));
         }
-
-        entity.send(new DestroyBlockEvent(event.getInstigator(), event.getTool(), event.getDamageType()));
     }
 
-    private void processDropping(BlockComponent blockComp, EntityRef item) {
+    private boolean isBlockOrBlockRegion(EntityRef entity) {
+        return entity.hasComponent(BlockComponent.class) || entity.hasComponent(BlockRegionComponent.class);
+    }
+
+    private void processDropping(EntityRef item, Vector3i location) {
         /* PHYSICS */
-        EntityRef pickup = pickupBuilder.createPickupFor(item, blockComp.getPosition().toVector3f(), 60);
+        EntityRef pickup = pickupBuilder.createPickupFor(item, location.toVector3f(), 60);
         pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     @ReceiveEvent
-    public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComp) {
-        BlockFamily family = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
+    public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity) {
+        BlockFamily family = worldProvider.getBlock(getBlockLocation(blockEntity)).getBlockFamily();
         if (!family.getArchetypeBlock().isDestructible()) {
             event.consume();
         }
     }
 
-    @ReceiveEvent(components = {BlockComponent.class, BlockDamagedComponent.class})
+    @ReceiveEvent(components = {BlockDamagedComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
         entity.removeComponent(BlockDamagedComponent.class);
     }
 
-    @ReceiveEvent(components = {BlockComponent.class})
+    @ReceiveEvent
     public void onDamaged(OnDamagedEvent event, EntityRef entity) {
-        BlockDamageComponent blockDamageSettings = event.getType().getComponent(BlockDamageComponent.class);
-        boolean skipDamageEffects = false;
-        if (blockDamageSettings != null) {
-            skipDamageEffects = blockDamageSettings.skipPerBlockEffects;
-        }
-        if (!skipDamageEffects) {
-            entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
-        }
-        if (!entity.hasComponent(BlockDamagedComponent.class)) {
-            entity.addComponent(new BlockDamagedComponent());
+        if (isBlockOrBlockRegion(entity)) {
+            BlockDamageComponent blockDamageSettings = event.getType().getComponent(BlockDamageComponent.class);
+            boolean skipDamageEffects = false;
+            if (blockDamageSettings != null) {
+                skipDamageEffects = blockDamageSettings.skipPerBlockEffects;
+            }
+            if (!skipDamageEffects) {
+                entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
+            }
+            if (!entity.hasComponent(BlockDamagedComponent.class)) {
+                entity.addComponent(new BlockDamagedComponent());
+            }
         }
     }
 
     @ReceiveEvent
-    public void onPlayBlockDamage(PlayBlockDamagedEvent event, EntityRef entity, BlockComponent blockComp) {
-        BlockFamily family = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
+    public void onPlayBlockDamage(PlayBlockDamagedEvent event, EntityRef entity) {
+        final Vector3i location = getBlockLocation(entity);
+        BlockFamily family = worldProvider.getBlock(location).getBlockFamily();
 
         EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
-        builder.getComponent(LocationComponent.class).setWorldPosition(blockComp.getPosition().toVector3f());
+        builder.getComponent(LocationComponent.class).setWorldPosition(location.toVector3f());
         builder.getComponent(BlockParticleEffectComponent.class).blockType = family;
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
             EntityBuilder dustBuilder = entityManager.newBuilder("engine:dustEffect");
-            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(blockComp.getPosition().toVector3f());
+            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location.toVector3f());
             dustBuilder.build();
         }
 
         // TODO: Configurable via block definition
-        audioManager.playSound(Assets.getSound("engine:Dig"), blockComp.getPosition().toVector3f());
+        audioManager.playSound(Assets.getSound("engine:Dig"), location.toVector3f());
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void beforeDamage(BeforeDamagedEvent event, EntityRef entity, BlockComponent blockComp) {
-        if (event.getDamageType() != null) {
-            BlockDamageComponent blockDamage = event.getDamageType().getComponent(BlockDamageComponent.class);
-            if (blockDamage != null) {
-                BlockFamily block = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
-                for (String category : block.getCategories()) {
-                    if (blockDamage.materialDamageMultiplier.containsKey(category)) {
-                        event.multiply(blockDamage.materialDamageMultiplier.get(category));
+    public void beforeDamage(BeforeDamagedEvent event, EntityRef entity) {
+        if (isBlockOrBlockRegion(entity)) {
+            Block block = worldProvider.getBlock(getBlockLocation(entity));
+            if (event.getDamageType() != null) {
+                BlockDamageComponent blockDamage = event.getDamageType().getComponent(BlockDamageComponent.class);
+                if (blockDamage != null) {
+                    BlockFamily blockFamily = block.getBlockFamily();
+                    for (String category : blockFamily.getCategories()) {
+                        if (blockDamage.materialDamageMultiplier.containsKey(category)) {
+                            event.multiply(blockDamage.materialDamageMultiplier.get(category));
+                        }
                     }
                 }
             }
         }
     }
 
+    private Vector3i getBlockLocation(EntityRef entity) {
+        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+        BlockRegionComponent blockRegionComp = entity.getComponent(BlockRegionComponent.class);
+
+        if (blockComp != null) {
+            return blockComp.getPosition();
+        } else if (blockRegionComp != null) {
+            // Use first block as the representation of the block region
+            return blockRegionComp.region.iterator().next();
+        } else {
+            throw new IllegalArgumentException("Provided entity without BlockComponent or BlockRegionComponent");
+        }
+    }
 }
