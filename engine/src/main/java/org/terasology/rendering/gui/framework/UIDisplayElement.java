@@ -24,6 +24,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.gui.animation.Animation;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
@@ -568,6 +569,10 @@ public abstract class UIDisplayElement {
      */
     public EUnitType getUnitPositionY() {
         return unitPositionY;
+    }
+
+    public Vector2i getDisplaySize() {
+        return new Vector2i(Display.getWidth(), Display.getHeight());
     }
 
     /**
