@@ -225,6 +225,22 @@ public class Color {
         return builder.toString();
     }
 
+    
+    /**
+     * @param color
+     * @return Slick.Color format representation used in old GUI colorStrings.
+     * Remove after Slick.Color is removed or after colorString format changes.
+     */
+    public static String toColorString(Color color) {
+        String hex = color.toHex();
+        String rString = hex.substring(0, 2);
+        String gString = hex.substring(2, 4);
+        String bString = hex.substring(4, 6);
+        String aString = hex.substring(6);
+        return "#" + aString + rString + gString + bString;
+    }
+
+
     @Override
     public String toString() {
         return toHex();

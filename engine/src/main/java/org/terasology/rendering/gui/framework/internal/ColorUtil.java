@@ -44,9 +44,20 @@ public final class ColorUtil {
         if (normalisedColor.matches("^#[a-f0-9]{1,8}$")) {
             normalisedColor = normalisedColor.replace("#", "");
 
+            // Cannot parseInt something that will not fit into a signed int,
+            // so pull the alpha off the string
+            String normalisedColorA = null;
+            if (normalisedColor.length() > 6) {
+                normalisedColorA = normalisedColor.substring(0, normalisedColor.length() - 6);
+                normalisedColor = normalisedColor.substring(normalisedColor.length() - 6);
+            }
             int sum = Integer.parseInt(normalisedColor, 16);
 
-            a = (sum & 0xFF000000) >> 24;
+            if (null != normalisedColorA) {
+                int sumA = Integer.parseInt(normalisedColorA, 16);
+                a = sumA & 0x000000FF;
+            }
+
             r = (sum & 0x00FF0000) >> 16;
             g = (sum & 0x0000FF00) >> 8;
             b = sum & 0x000000FF;
