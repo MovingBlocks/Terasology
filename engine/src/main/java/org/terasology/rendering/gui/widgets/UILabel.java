@@ -26,6 +26,7 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.internal.ColorUtil;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -277,6 +278,16 @@ public class UILabel extends UIDisplayContainer {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+
+    /**
+     * Set the text color.
+     *
+     * @param color The color to set in hex format.
+     */
+    public void setColor(String colorString) {
+        this.color = ColorUtil.getColorForColorHexString(colorString);
     }
 
     /**

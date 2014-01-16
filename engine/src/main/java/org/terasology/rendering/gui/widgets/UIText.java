@@ -34,6 +34,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
+import org.terasology.rendering.gui.framework.internal.ColorUtil;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 import javax.vecmath.Vector2f;
@@ -978,6 +979,16 @@ public class UIText extends UIDisplayContainerScrollable {
         cursor.setColor(color);
     }
 
+    /**
+     * Set the text color.
+     *
+     * @param color The color to set.
+     */
+    public void setColor(String colorString) {
+        Color color = ColorUtil.getColorForColorHexString(colorString);
+        text.setColor(color);
+        cursor.setColor(color);
+    }
 
     /**
      * Set the text selection color.
