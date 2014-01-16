@@ -46,7 +46,7 @@ public class UISpace extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         return new Vector2i(size);
     }
 }

@@ -150,7 +150,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i availableSize = canvas.size();
         int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
         if (numRows > 0) {

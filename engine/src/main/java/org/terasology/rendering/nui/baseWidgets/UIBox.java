@@ -39,7 +39,7 @@ public class UIBox extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (content != null) {
             return canvas.calculateRestrictedSize(content, sizeHint);
         }

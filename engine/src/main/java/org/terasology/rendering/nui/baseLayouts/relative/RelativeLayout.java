@@ -123,7 +123,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
 
         int width = element.layoutHint.getWidth();
         if (width == 0 && element.layoutHint.isUsingContentWidth()) {
-            width = element.widget.calcContentSize(canvas, new Vector2i(right - left, bottom - top)).x;
+            width = element.widget.getPreferredContentSize(canvas, new Vector2i(right - left, bottom - top)).x;
         }
         if (width == 0) {
             width = right - left;
@@ -182,7 +182,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return sizeHint;
     }
 

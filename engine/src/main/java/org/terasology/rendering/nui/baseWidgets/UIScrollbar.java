@@ -105,7 +105,7 @@ public class UIScrollbar extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return new Vector2i(0, sizeHint.y);
     }
 

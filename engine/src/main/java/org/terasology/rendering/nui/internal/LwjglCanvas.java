@@ -350,7 +350,7 @@ public class LwjglCanvas implements CanvasControl {
         UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
         Rect2i region = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
-            Vector2i preferredSize = widget.calcContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
+            Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
             preferredSize = elementStyle.getMargin().grow(preferredSize);
             return applyStyleToSize(preferredSize, elementStyle);
         }

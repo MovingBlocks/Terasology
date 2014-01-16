@@ -111,7 +111,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
                         RowLayoutHint hint = hints.get(contents.get(i));
                         if (hint != null) {
                             if (hint.isUseContentWidth()) {
-                                Vector2i contentSize = contents.get(i).calcContentSize(canvas, new Vector2i(remainingWidthPerElement, canvas.size().y));
+                                Vector2i contentSize = contents.get(i).getPreferredContentSize(canvas, new Vector2i(remainingWidthPerElement, canvas.size().y));
                                 results.set(i, contentSize.x);
                                 totalWidthUsed += contentSize.x;
                                 unprocessedWidgets--;
@@ -134,7 +134,7 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         TIntList widths = calcWidths(canvas);
 
         Vector2i result = new Vector2i(areaHint.x, 0);
