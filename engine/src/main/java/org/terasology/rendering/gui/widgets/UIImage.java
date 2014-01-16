@@ -25,6 +25,7 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.internal.ColorUtil;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
@@ -191,25 +192,7 @@ public class UIImage extends UIDisplayContainer {
     }
 
     public void setColor(String value) {
-        String normalisedColor = value.trim().toLowerCase();
-
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int a = 255;
-
-        if (normalisedColor.matches("^#[a-f0-9]{1,8}$")) {
-            normalisedColor = normalisedColor.replace("#", "");
-
-            int sum = Integer.parseInt(normalisedColor, 16);
-
-            a = (sum & 0xFF000000) >> 24;
-            r = (sum & 0x00FF0000) >> 16;
-            g = (sum & 0x0000FF00) >> 8;
-            b = sum & 0x000000FF;
-        }
-
-        setColor(new Color(rbgToColor(r), rbgToColor(g), rbgToColor(b), rbgToColor(a)));
+        setColor(ColorUtil.getColorForColorHexString(value));
     }
 
     private void generateMesh() {
