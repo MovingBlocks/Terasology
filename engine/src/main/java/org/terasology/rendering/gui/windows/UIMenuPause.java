@@ -29,6 +29,7 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.version.TerasologyVersion;
 
 import javax.vecmath.Vector2f;
 
@@ -62,7 +63,7 @@ public class UIMenuPause extends UIWindow {
         title.setPosition(new Vector2f(0f, 128f));
         title.setVisible(true);
 
-        version = new UILabel("Pre Alpha");
+        version = new UILabel(TerasologyVersion.getInstance().getHumanVersion());
         version.setHorizontalAlign(EHorizontalAlign.CENTER);
         version.setPosition(new Vector2f(0f, 230f));
         version.setVisible(true);

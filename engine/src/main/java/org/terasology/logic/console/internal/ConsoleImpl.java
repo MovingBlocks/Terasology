@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,14 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;
+import org.terasology.rendering.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;
@@ -73,13 +76,14 @@ public class ConsoleImpl implements Console {
     private boolean commandsSorted;
 
     public ConsoleImpl() {
-        addMessage("Welcome to the wonderful world of Terasology!\n" +
+        addMessage("Welcome to the wonderful world of " + FontColor.toChar(ConsoleColors.TERASOLOGY) + "Terasology" + FontColor.getReset() + "!\n" +
                 "\n" +
-                "Type 'help' to see a list with available commands.\n" +
-                "To see a detailed command description try '/help \"<commandName>\"'.\n" +
-                "Be sure to surround text type parameters in quotes.\n" +
-                "No commas needed for multiple parameters.\n" +
-                "Commands are case-sensitive, block names and such are not.");
+                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details.\n" +
+                "Text parameters should be in quotes, no commas needed between multiple parameters.\n" +
+                "Commands are case-sensitive, block names and such are not.\n" +
+                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:\n" +
+                "'gh' + 'tab' = 'ghost'\n" +
+                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)\n");
     }
 
     /**
@@ -136,7 +140,8 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public void addMessage(Message message) {
-        logger.info("[{}] {}", message.getType(), message.getMessage());
+        String uncoloredText = FontColor.stripColor(message.getMessage());
+        logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
@@ -223,7 +228,10 @@ public class ConsoleImpl implements Console {
         //check if the command is loaded
         if (cmd == null) {
             if (commandLookup.containsRow(commandName)) {
-                addMessage("Incorrect number of parameters");
+                addMessage("Incorrect number of parameters. Try:");
+                for (CommandInfo ci : commandLookup.row(commandName).values()) {
+                    addMessage(ci.getUsageMessage());
+                }
             } else {
                 addMessage("Unknown command '" + commandName + "'");
             }

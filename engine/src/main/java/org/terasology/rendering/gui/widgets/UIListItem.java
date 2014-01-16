@@ -20,6 +20,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.framework.internal.ColorUtil;
 import org.terasology.rendering.gui.framework.style.Style;
 
 import javax.vecmath.Vector4f;
@@ -172,6 +173,11 @@ public class UIListItem extends UIDisplayContainer {
     public void setTextColor(Color color) {
         textColor = color;
         label.setColor(color);
+    }
+
+    public void setTextColor(String colorString) {
+        textColor = ColorUtil.getColorForColorHexString(colorString);
+        label.setColor(textColor);
     }
 
     public Color getTextSelectionColor() {

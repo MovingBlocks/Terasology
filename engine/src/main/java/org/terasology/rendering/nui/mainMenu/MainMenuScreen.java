@@ -17,11 +17,13 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
+import org.terasology.rendering.nui.baseWidgets.UILabel;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
+import org.terasology.version.TerasologyVersion;
 
 /**
  * @author Immortius
@@ -36,6 +38,7 @@ public class MainMenuScreen extends UIScreenLayer {
 
     @Override
     public void initialise() {
+        find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
         UIScreenLayerUtil.trySubscribe(this, "singleplayer", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {

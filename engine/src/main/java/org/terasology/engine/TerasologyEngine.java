@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -84,6 +85,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.assets.subtexture.SubtextureData;
 import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
+import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.NUIManager;
@@ -104,9 +106,11 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Set;
@@ -437,6 +441,7 @@ public class TerasologyEngine implements GameEngine {
             }
         });
         assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
+        assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();
@@ -523,16 +528,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
         moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
         moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIClass(java.awt.BasicStroke.class);
-        moduleSecurityManager.addAPIClass(java.awt.Color.class);
-        moduleSecurityManager.addAPIClass(java.awt.Font.class);
-        moduleSecurityManager.addAPIClass(java.awt.FontMetrics.class);
-        moduleSecurityManager.addAPIClass(java.awt.Graphics.class);
-        moduleSecurityManager.addAPIClass(java.awt.Graphics2D.class);
-        moduleSecurityManager.addAPIClass(java.awt.Point.class);
-        moduleSecurityManager.addAPIClass(java.awt.Rectangle.class);
-        moduleSecurityManager.addAPIClass(java.awt.Shape.class);
-        moduleSecurityManager.addAPIClass(java.awt.Stroke.class);
+        moduleSecurityManager.addAPIPackage("java.awt");
         moduleSecurityManager.addAPIPackage("java.awt.geom");
         moduleSecurityManager.addAPIPackage("java.awt.image");
         moduleSecurityManager.addAPIPackage("com.google.common.annotations");
@@ -562,9 +558,12 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
+        
+        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
 
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
+        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
         moduleSecurityManager.addAPIClass(Logger.class);
         for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
@@ -575,7 +574,7 @@ public class TerasologyEngine implements GameEngine {
                 moduleSecurityManager.addAPIClass(apiClass);
             }
         }
-
+        
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
     }

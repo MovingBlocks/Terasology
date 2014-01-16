@@ -83,6 +83,9 @@
         <module name="UnusedImports">
             <property name="severity" value="warning"/>
         </module>
+        <!-- Checks for banned packages, sun.* by default. -->
+        <!-- See http://checkstyle.sourceforge.net/config_imports.html#IllegalImport -->
+        <module name="IllegalImport"/>
 
         <!-- Checks for Size Violations -->
         <!-- See http://checkstyle.sourceforge.net/config_sizes.html -->
