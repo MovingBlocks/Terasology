@@ -93,7 +93,7 @@ public abstract class Port extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return sizeHint;
     }
 

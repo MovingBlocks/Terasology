@@ -33,8 +33,8 @@ import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
@@ -52,7 +52,7 @@ import java.util.List;
 /**
  * @author synopia
  */
-public class BehaviorEditorScreen extends UIScreen {
+public class BehaviorEditorScreen extends UIScreenLayer {
 
     private PropertyLayout entityProperties;
     private BehaviorEditor behaviorEditor;
@@ -167,14 +167,14 @@ public class BehaviorEditorScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "create", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 behaviorEditor.createNode(palette.getSelection());
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "copy", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "copy", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -184,7 +184,7 @@ public class BehaviorEditorScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "layout", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "layout", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 BehaviorTree selection = selectTree.getSelection();
@@ -194,7 +194,7 @@ public class BehaviorEditorScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "debug_run", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "debug_run", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 if( debugger!=null ) {
@@ -202,7 +202,7 @@ public class BehaviorEditorScreen extends UIScreen {
                 }
             }
         });
-        UIScreenUtil.trySubscribe(this, "debug_pause", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "debug_pause", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 if( debugger!=null ) {
@@ -210,7 +210,7 @@ public class BehaviorEditorScreen extends UIScreen {
                 }
             }
         });
-        UIScreenUtil.trySubscribe(this, "debug_reset", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "debug_reset", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 if( selectedInterpreter!=null ) {
@@ -218,7 +218,7 @@ public class BehaviorEditorScreen extends UIScreen {
                 }
             }
         });
-        UIScreenUtil.trySubscribe(this, "debug_step", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "debug_step", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 if( debugger!=null ) {

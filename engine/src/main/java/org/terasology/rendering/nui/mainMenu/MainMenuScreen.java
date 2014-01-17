@@ -66,7 +66,7 @@ public class MainMenuScreen extends UIScreenLayer {
                 nuiManager.pushScreen("engine:settingsMenuScreen");
             }
         });
-        UIScreenUtil.trySubscribe(this, "behavior_editor", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "behavior_editor", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.pushScreen("engine:behaviorEditorScreen");
@@ -80,7 +80,7 @@ public class MainMenuScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "migtest", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "migtest", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.pushScreen("engine:migTestScreen");

@@ -57,7 +57,7 @@ public class PropertyProvider<T> {
         factories.put(Checkbox.class, new CheckboxPropertyFactory());
         factories.put(OneOf.List.class, new OneOfListPropertyFactory());
         factories.put(OneOf.Enum.class, new OneOfEnumPropertyFactory());
-        factories.put(TextField.class, new TextPropertyFactory());
+        factories.put(Textfield.class, new TextPropertyFactory());
 
         try {
             this.target = target;
@@ -208,9 +208,9 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class TextPropertyFactory implements PropertyFactory<TextField> {
+    private class TextPropertyFactory implements PropertyFactory<Textfield> {
         @Override
-        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, TextField info) {
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, Textfield info) {
             UITextEntry<T> text = new UITextEntry<>();
 
             TextBinding<T> textBinding = createTextBinding((FieldMetadata<Object, T>) fieldMetadata);

@@ -124,7 +124,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         for (ComponentWrapper wrapper : wrappers.values()) {
             UIWidget component = (UIWidget) wrapper.getComponent();
             Rect2i region = Rect2i.createFromMinAndSize(wrapper.getX(), wrapper.getY(), wrapper.getWidth(), wrapper.getHeight());
-            canvas.drawElement(component, region);
+            canvas.drawWidget(component, region);
         }
 
         if (debug) {
@@ -168,7 +168,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         int[] bounds = {0, 0, canvas.size().x, canvas.size().y};
         layoutContainer(canvas, bounds);
         return new Vector2i(grid.getWidth()[1], grid.getHeight()[1]);

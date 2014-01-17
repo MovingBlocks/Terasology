@@ -41,14 +41,14 @@ public class PortList implements TreeAccessor<RenderableNode> {
     public void onDraw(Canvas canvas) {
         Rect2i region = canvas.getRegion();
         inputPort.updateRect();
-        canvas.drawElement(inputPort, Rect2i.createFromMinAndMax(
+        canvas.drawWidget(inputPort, Rect2i.createFromMinAndMax(
                 (int) (inputPort.rect.minX() / 10.f * region.width()),
                 (int) (inputPort.rect.minY() / 5.f * region.height()),
                 (int) (inputPort.rect.maxX() / 10.f * region.width()),
                 (int) (inputPort.rect.maxY() / 5.f * region.height())));
         for (Port port : ports) {
             port.updateRect();
-            canvas.drawElement(port, Rect2i.createFromMinAndMax(
+            canvas.drawWidget(port, Rect2i.createFromMinAndMax(
                     (int) (port.rect.minX() / 10.f * region.width()),
                     (int) (port.rect.minY() / 5.f * region.height()),
                     (int) (port.rect.maxX() / 10.f * region.width()),

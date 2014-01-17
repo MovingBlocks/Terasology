@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenLayer;
 
 /**
  * Created by synopia on 06.01.14.
  */
-public class MigTestScreen extends UIScreen {
+public class MigTestScreen extends UIScreenLayer {
 }

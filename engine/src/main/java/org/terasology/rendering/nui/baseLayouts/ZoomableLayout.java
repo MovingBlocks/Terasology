@@ -109,13 +109,13 @@ public class ZoomableLayout extends CoreLayout {
             Vector2f worldEnd = new Vector2f(widget.getPosition());
             worldEnd.add(widget.getSize());
             Vector2i screenEnd = worldToScreen(worldEnd);
-            canvas.drawElement(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+            canvas.drawWidget(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
         }
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
+        return sizeHint;
     }
 
     @Override

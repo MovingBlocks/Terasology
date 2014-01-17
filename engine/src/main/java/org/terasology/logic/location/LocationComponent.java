@@ -22,7 +22,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
-import org.terasology.rendering.nui.properties.TextField;
+import org.terasology.rendering.nui.properties.Textfield;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -48,7 +48,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     // Standard position/rotation
     @Replicate
-    @TextField
+    @Textfield
     Vector3f position = new Vector3f();
     @Replicate
     Quat4f rotation = new Quat4f(0, 0, 0, 1);

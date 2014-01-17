@@ -154,7 +154,7 @@ public class BehaviorEditor extends ZoomableLayout {
                 Vector2f worldEnd = new Vector2f(mousePos);
                 worldEnd.add(newNode.getSize());
                 Vector2i screenEnd = worldToScreen(worldEnd);
-                canvas.drawElement(newNode, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+                canvas.drawWidget(newNode, Rect2i.createFromMinAndMax(screenStart, screenEnd));
             }
 
             canvas.setDrawOnTop(false);
