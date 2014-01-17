@@ -31,13 +31,7 @@ import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector2f;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Displays an item as an icon with an optional stack count.
@@ -57,6 +51,7 @@ public class UIItemIcon extends UIDisplayContainer {
 
     private InventoryManager inventoryManager;
 
+    private Integer fixedItemCount;
 
     public UIItemIcon(InventoryManager inventoryManager) {
         this.inventoryManager = inventoryManager;
@@ -68,6 +63,10 @@ public class UIItemIcon extends UIDisplayContainer {
 
         addDisplayElement(itemCount);
         setVisible(false);
+    }
+
+    public void setFixedItemCount(int fixedItemCount) {
+        this.fixedItemCount = fixedItemCount;
     }
 
     public void setItem(EntityRef item) {
@@ -91,6 +90,9 @@ public class UIItemIcon extends UIDisplayContainer {
 
     private void updateCountLabel() {
         int stackSize = inventoryManager.getStackSize(item);
+        if (fixedItemCount != null) {
+            stackSize = fixedItemCount;
+        }
         if (stackSize > 1 && displayingItemCount) {
             itemCount.setVisible(true);
             itemCount.setText(Integer.toString(stackSize));
