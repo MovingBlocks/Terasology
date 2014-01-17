@@ -276,6 +276,7 @@
                 "ticker" : {
                     "background" : "engine:box",
                     "fixed-height" : 32,
+                    "fixed-width" : 32,
                     "background-border" : {
                         "top" : 4,
                         "bottom" : 4,

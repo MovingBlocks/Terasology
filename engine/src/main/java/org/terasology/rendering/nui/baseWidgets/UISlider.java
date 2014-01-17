@@ -93,7 +93,7 @@ public class UISlider extends CoreWidget {
         int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
 
-        sliderWidth = canvas.size().x - tickerWidth + canvas.getCurrentStyle().getMargin().getTotalWidth();
+        sliderWidth = canvas.size().x - tickerWidth;
         int drawLocation = pixelOffsetFor(getValue(), sliderWidth);
         Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
@@ -107,10 +107,13 @@ public class UISlider extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i result = new Vector2i();
         canvas.setPart(SLIDER);
+        result.x = canvas.getCurrentStyle().getFixedWidth();
         result.y = canvas.getCurrentStyle().getFixedHeight();
 
         canvas.setPart(TICKER);
+        result.x = Math.max(result.y, canvas.getCurrentStyle().getFixedWidth());
         result.y = Math.max(result.y, canvas.getCurrentStyle().getFixedHeight());
+
         return result;
     }
 
