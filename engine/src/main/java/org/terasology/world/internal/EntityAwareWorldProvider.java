@@ -226,6 +226,10 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             }
         }
 
+        BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
+        blockComponent.setBlock(type);
+        blockEntity.saveComponent(blockComponent);
+
         HealthComponent health = blockEntity.getComponent(HealthComponent.class);
         if (health == null && type.isDestructible()) {
             blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));

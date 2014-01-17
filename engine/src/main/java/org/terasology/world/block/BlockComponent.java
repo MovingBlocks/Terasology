@@ -48,6 +48,10 @@ public final class BlockComponent implements Component {
         position.set(pos);
     }
 
+    public void setBlock(Block block) {
+        this.block = block;
+    }
+
     public Block getBlock() {
         return block;
     }
