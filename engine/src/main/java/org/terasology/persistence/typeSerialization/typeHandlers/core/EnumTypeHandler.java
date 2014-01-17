@@ -44,11 +44,17 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
 
     @Override
     public EntityData.Value serialize(T value) {
+        if (null == value) {
+            return null;
+        }
         return EntityData.Value.newBuilder().addString(value.toString()).build();
     }
 
     @Override
     public T deserialize(EntityData.Value value) {
+        if (null == value) {
+            return null;
+        }
         if (value.getStringCount() > 0) {
             T result = caseInsensitiveLookup.get(value.getString(0).toLowerCase(Locale.ENGLISH));
             if (result == null) {
