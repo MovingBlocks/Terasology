@@ -52,6 +52,9 @@ public class Color {
     public static final Color TRANSPARENT = new Color(0x00000000);
     public static final Color YELLOW = new Color(0xFFFF00FF);
 
+    public static final Color CYAN = new Color(0x00FFFFFF);
+    public static final Color MAGENTA = new Color(0xFF00FFFF);
+
     private static final int MAX = 255;
     private static final int RED_OFFSET = 24;
     private static final int GREEN_OFFSET = 16;
@@ -226,6 +229,22 @@ public class Color {
         builder.append(hexString.toUpperCase(Locale.ENGLISH));
         return builder.toString();
     }
+
+    
+    /**
+     * @param color
+     * @return Slick.Color format representation used in old GUI colorStrings.
+     * Remove after Slick.Color is removed or after colorString format changes.
+     */
+    public static String toColorString(Color color) {
+        String hex = color.toHex();
+        String rString = hex.substring(0, 2);
+        String gString = hex.substring(2, 4);
+        String bString = hex.substring(4, 6);
+        String aString = hex.substring(6);
+        return "#" + aString + rString + gString + bString;
+    }
+
 
     @Override
     public String toString() {

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -34,6 +35,16 @@ public final class BindHelper {
     public static <T> Binding<T> bindBeanProperty(String property, Object source, Class<T> propertyType) {
         Method getter = ReflectionUtil.findGetter(property, source.getClass(), propertyType);
         Method setter = ReflectionUtil.findSetter(property, source.getClass(), propertyType);
+        if (getter == null || setter == null) {
+            logger.warn("Failed to resolve property {} of type {} - is the getter or setter missing?", property, source.getClass());
+            return new DefaultBinding<>();
+        }
+        return BeanBinding.create(source, getter, setter);
+    }
+
+    public static <T> Binding<List<T>> bindBeanListProperty(String property, Object source, Class<T> propertyType) {
+        Method getter = ReflectionUtil.findGetter(property, source.getClass(), List.class);
+        Method setter = ReflectionUtil.findSetter(property, source.getClass(), List.class);
         if (getter == null || setter == null) {
             logger.warn("Failed to resolve property {} of type {} - is the getter or setter missing?", property, source.getClass());
             return new DefaultBinding<>();

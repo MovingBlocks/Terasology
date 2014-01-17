@@ -1,0 +1,188 @@
+{
+    "type" : "joinGameScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIImage",
+                    "image" : "engine:terasology",
+                    "id" : "title",
+                    "layoutInfo" : {
+                        "width" : 512,
+                        "height" : 128,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "TOP",
+                            "offset" : 48
+                        }
+                    }
+                },
+                {
+                    "type" : "UILabel",
+                    "id" : "subtitle",
+                    "family" : "title",
+                    "text" : "Join Server",
+                    "layoutInfo" : {
+                        "height" : 48,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "offset" : 16,
+                            "widget" : "title"
+                        }
+                    }
+                },
+                {
+                    "type" : "UIBox",
+                    "layoutInfo" : {
+                        "width" : 600,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle"
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "widget" : "close",
+                            "offset" : 16
+                        }
+                    }
+                },
+                {
+                    "type" : "ColumnLayout",
+                    "columns" : 2,
+                    "verticalSpacing" : 16,
+                    "horizontalSpacing" : 8,
+                    "layoutInfo" : {
+                        "width" : 584,
+                        "position-horizontal-center" : {},
+                        "position-top" : {
+                            "target" : "BOTTOM",
+                            "widget" : "subtitle",
+                            "offset" : 8
+                        },
+                        "position-bottom" : {
+                            "target" : "TOP",
+                            "widget" : "close",
+                            "offset" : 24
+                        }
+                    },
+                    "contents" : [
+                        {
+                            "type" : "ScrollableArea",
+                            "content" : {
+                                "type" : "UIList",
+                                "id" : "serverList",
+                                "family" : "module-list"
+                            }
+                        },
+                        {
+                            "type" : "RelativeLayout",
+                            "family" : "description",
+                            "contents" : [
+                                {
+                                    "type" : "ColumnLayout",
+                                    "id" : "simpleItems",
+                                    "columns" : 2,
+                                    "columnWidths" : [0.3, 0.7],
+                                    "verticalSpacing" : 8,
+                                    "contents" : [
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Name: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "name",
+                                            "text" : "Server Name Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Address: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "address",
+                                            "text" : "Server Address Goes Here"
+                                        }
+                                    ],
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "add",
+                                    "text" : "Add",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "simpleItems",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "remove",
+                                    "text" : "Remove",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "add",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "join",
+                                    "text" : "Join",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "remove",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "joinDirect",
+                                    "text" : "Join Direct",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type" : "UIButton",
+                    "text" : "Back",
+                    "id" : "close",
+                    "layoutInfo" : {
+                        "width" : 128,
+                        "height" : 32,
+                        "position-horizontal-center" : {},
+                        "position-bottom" : {
+                            "target" : "BOTTOM",
+                            "offset" : 48
+                        }
+                    }
+                }
+            ]
+    }
+}

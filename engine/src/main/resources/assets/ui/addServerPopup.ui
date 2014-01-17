@@ -1,0 +1,87 @@
+{
+    "type" : "addServerPopup",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIBox",
+                    "layoutInfo" : {
+                        "width" : 500,
+                        "use-content-height" : true,
+                        "position-horizontal-center" : {},
+                        "position-vertical-center" : {}
+                    },
+                    "content" : {
+                        "type" : "ColumnLayout",
+                        "columns" : 1,
+                        "verticalSpacing" : 8,
+                        "contents" : [
+                            {
+                                "type" : "UILabel",
+                                "text" : "Add Server",
+                                "family" : "title"
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 16]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "Server Name: ",
+                                        "family" : "option-grid",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIText",
+                                        "id" : "name"
+                                    }
+                                ]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "Address: ",
+                                        "family" : "option-grid",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIText",
+                                        "id" : "address"
+                                    }
+                                ]
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 16]
+                            },
+                            {
+                                "type" : "RowLayout",
+                                "horizontalSpacing" : 16,
+                                "contents" : [
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "Ok",
+                                        "id" : "ok"
+                                    },
+                                    {
+                                        "type" : "UIButton",
+                                        "text" : "Cancel",
+                                        "id" : "cancel"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+    }
+}

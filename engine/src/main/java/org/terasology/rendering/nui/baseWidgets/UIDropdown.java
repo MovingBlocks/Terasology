@@ -61,9 +61,6 @@ public class UIDropdown<T> extends CoreWidget {
 
     private boolean opened;
 
-    // TODO: Option -> display translation?
-    // TODO: Selection changed events
-
     public UIDropdown() {
     }
 
@@ -116,7 +113,7 @@ public class UIDropdown<T> extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         canvas.setPart(BOX);
         if (selection.get() != null) {
             return canvas.getCurrentStyle().getMargin().grow(optionRenderer.getPreferredSize(selection.get(), canvas));

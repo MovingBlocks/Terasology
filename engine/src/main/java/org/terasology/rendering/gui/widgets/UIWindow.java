@@ -69,7 +69,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
             public void key(UIDisplayElement element, KeyEvent event) {
                 if (closeKeys != null) {
                     for (int key : closeKeys) {
-                        if (key == Keyboard.KeyId.ESCAPE && event.isDown()) {
+                        if (key == event.getKey().getId() && event.isDown()) {
                             getGUIManager().closeWindow(getId());
                             event.consume();
 

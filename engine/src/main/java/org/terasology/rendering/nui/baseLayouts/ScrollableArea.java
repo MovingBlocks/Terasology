@@ -48,23 +48,23 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateSize(content, canvas.size()).y;
+        int contentHeight = canvas.calculateRestrictedSize(content, canvas.size()).y;
         if (canvas.size().y < contentHeight) {
-            int scrollbarWidth = canvas.calculateSize(scrollbar, canvas.size()).x;
-            contentHeight = canvas.calculateSize(content, new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y)).y;
+            int scrollbarWidth = canvas.calculateRestrictedSize(scrollbar, canvas.size()).x;
+            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y)).y;
 
             canvas.addInteractionRegion(scrollListener);
-            canvas.drawElement(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
+            canvas.drawWidget(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
                     scrollbarWidth, canvas.size().y));
 
             // Draw content
             Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
             scrollbar.setRange(contentHeight - contentRegion.height());
             try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
-                canvas.drawElement(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));
+                canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));
             }
         } else {
-            canvas.drawElement(content);
+            canvas.drawWidget(content);
         }
     }
 
@@ -73,7 +73,7 @@ public class ScrollableArea extends CoreLayout {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return sizeHint;
     }
 

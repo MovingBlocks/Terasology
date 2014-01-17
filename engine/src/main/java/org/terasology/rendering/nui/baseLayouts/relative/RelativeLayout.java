@@ -66,7 +66,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     public void onDraw(Canvas canvas) {
         for (WidgetInfo element : contents) {
             Rect2i drawRegion = getRegion(element, canvas);
-            canvas.drawElement(element.widget, drawRegion);
+            canvas.drawWidget(element.widget, drawRegion);
         }
         cachedRegions.clear();
     }
@@ -122,12 +122,11 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         }
 
         int width = element.layoutHint.getWidth();
+        if (width == 0 && element.layoutHint.isUsingContentWidth()) {
+            width = element.widget.getPreferredContentSize(canvas, new Vector2i(right - left, bottom - top)).x;
+        }
         if (width == 0) {
-            if (element.layoutHint.isUsingContentWidth()) {
-                width = element.widget.calcContentSize(canvas, new Vector2i(right - left, bottom - top)).x;
-            } else {
-                width = right - left;
-            }
+            width = right - left;
         } else {
             if (element.layoutHint.getPositionCenterHorizontal() != null) {
                 left = center - width / 2;
@@ -142,12 +141,11 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
         }
 
         int height = element.layoutHint.getHeight();
+        if (height == 0 && element.layoutHint.isUsingContentHeight()) {
+            height = canvas.calculateRestrictedSize(element.widget, new Vector2i(width, bottom - top)).y;
+        }
         if (height == 0) {
-            if (element.layoutHint.isUsingContentHeight()) {
-                height = canvas.calculateSize(element.widget, new Vector2i(width, bottom - top)).y;
-            } else {
-                height = bottom - top;
-            }
+            height = bottom - top;
         } else {
             if (element.layoutHint.getPositionCenterVertical() != null) {
                 top = vcenter - height / 2;
@@ -184,7 +182,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return sizeHint;
     }
 

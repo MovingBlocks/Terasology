@@ -18,8 +18,8 @@ package org.terasology.rendering.nui.mainMenu;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
@@ -27,7 +27,7 @@ import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
 /**
  * @author Immortius
  */
-public class SettingsMenuScreen extends UIScreen {
+public class SettingsMenuScreen extends UIScreenLayer {
 
     @In
     private NUIManager nuiManager;
@@ -37,27 +37,27 @@ public class SettingsMenuScreen extends UIScreen {
 
     @Override
     public void initialise() {
-        UIScreenUtil.trySubscribe(this, "video", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "video", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.pushScreen("engine:VideoMenuScreen");
             }
         });
-        UIScreenUtil.trySubscribe(this, "audio", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "audio", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.pushScreen("engine:AudioMenuScreen");
             }
         });
-        UIScreenUtil.trySubscribe(this, "input", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "input", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
-                UIScreen inputScreen = new InputSettingsScreen();
+                UIScreenLayer inputScreen = new InputSettingsScreen();
                 inputScreen.setSkin(getSkin());
                 nuiManager.pushScreen(inputScreen);
             }
         });
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 config.save();

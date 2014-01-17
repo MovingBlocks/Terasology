@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public class UIScreen extends AbstractWidget {
+public class UIScreenLayer extends AbstractWidget {
 
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
@@ -40,10 +40,10 @@ public class UIScreen extends AbstractWidget {
         }
     };
 
-    public UIScreen() {
+    public UIScreenLayer() {
     }
 
-    public UIScreen(String id) {
+    public UIScreenLayer(String id) {
         super(id);
     }
 
@@ -55,6 +55,10 @@ public class UIScreen extends AbstractWidget {
         this.contents = contents;
     }
 
+    public boolean isLowerLayerVisible() {
+        return false;
+    }
+
     public UIWidget getContents() {
         return contents;
     }
@@ -62,7 +66,7 @@ public class UIScreen extends AbstractWidget {
     public void onDraw(Canvas canvas) {
         canvas.addInteractionRegion(screenListener);
         if (contents != null) {
-            canvas.drawElement(contents, canvas.getRegion());
+            canvas.drawWidget(contents, canvas.getRegion());
         }
     }
 
@@ -101,7 +105,7 @@ public class UIScreen extends AbstractWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         return areaHint;
     }
 

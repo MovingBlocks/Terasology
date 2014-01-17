@@ -34,16 +34,16 @@ public class UIBox extends CoreWidget {
     @Override
     public void onDraw(Canvas canvas) {
         if (content != null) {
-            canvas.drawElement(content);
+            canvas.drawWidget(content);
         }
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i sizeHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         if (content != null) {
-            return canvas.calculateSize(content, sizeHint);
+            return canvas.calculateRestrictedSize(content, sizeHint);
         }
-        return sizeHint;
+        return Vector2i.zero();
     }
 
     public UIWidget getContent() {

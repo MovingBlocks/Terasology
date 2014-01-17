@@ -104,9 +104,8 @@ public class UISlider extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i result = new Vector2i();
-        result.x = areaHint.x;
         canvas.setPart(SLIDER);
         result.y = canvas.getCurrentStyle().getFixedHeight();
 

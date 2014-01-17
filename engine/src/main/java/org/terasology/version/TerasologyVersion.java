@@ -40,6 +40,8 @@ public final class TerasologyVersion {
     private static final String GIT_BRANCH = "gitBranch";
     private static final String GIT_COMMIT = "gitCommit";
     private static final String DATE_TIME = "dateTime";
+    private static final String DISPLAY_VERSION = "displayVersion";
+    private static final String ENGINE_VERSION = "engineVersion";
 
     private static final String DEFAULT_VALUE = "";
 
@@ -51,6 +53,8 @@ public final class TerasologyVersion {
     private final String gitCommit;
     private final String dateTime;
     private final String toString;
+    private final String displayVersion;
+    private final String engineVersion;
 
     private TerasologyVersion() {
         final Properties properties = new Properties();
@@ -69,6 +73,8 @@ public final class TerasologyVersion {
         gitBranch = properties.getProperty(GIT_BRANCH, DEFAULT_VALUE);
         gitCommit = properties.getProperty(GIT_COMMIT, DEFAULT_VALUE);
         dateTime = properties.getProperty(DATE_TIME, DEFAULT_VALUE);
+        displayVersion = properties.getProperty(DISPLAY_VERSION, DEFAULT_VALUE);
+        engineVersion = properties.getProperty(ENGINE_VERSION, DEFAULT_VALUE);
 
         final StringBuilder toStringBuilder = new StringBuilder();
         toStringBuilder.append("[");
@@ -99,6 +105,14 @@ public final class TerasologyVersion {
         toStringBuilder.append(DATE_TIME);
         toStringBuilder.append("=");
         toStringBuilder.append(dateTime);
+        toStringBuilder.append(", ");
+        toStringBuilder.append(DISPLAY_VERSION);
+        toStringBuilder.append("=");
+        toStringBuilder.append(displayVersion);
+        toStringBuilder.append(", ");
+        toStringBuilder.append(ENGINE_VERSION);
+        toStringBuilder.append("=");
+        toStringBuilder.append(engineVersion);
         toStringBuilder.append("]");
         toString = toStringBuilder.toString();
     }
@@ -136,6 +150,41 @@ public final class TerasologyVersion {
 
     public String getDateTime() {
         return dateTime;
+    }
+
+    public String getDisplayVersion() {
+        return displayVersion;
+    }
+
+    public String getengineVersion() {
+        return engineVersion;
+    }
+
+    /**
+     * Makes a pretty version string for displaying to human users
+     * @return prettified version String
+     */
+    public String getHumanVersion() {
+        // TODO replace with a nicer version later with full version numbering in place
+        String humanVersion = "";
+        TerasologyVersion ver = getInstance();
+
+        // MOAR CAPS!
+        if (!ver.getDisplayVersion().trim().equals("")) {
+            humanVersion = displayVersion.toUpperCase();
+        }
+
+        // Expect tag to start with "jenkins-" and remove that
+        if (ver.getBuildTag().trim().length() > 8) {
+            humanVersion += " " + ver.getBuildTag().substring(8);
+        }
+
+        // Expect a date string but ignore time of day
+        if (ver.getDateTime().trim().length() > 10) {
+            humanVersion += " " + ver.getDateTime().substring(0, 10);
+        }
+
+        return humanVersion;
     }
 
     @Override

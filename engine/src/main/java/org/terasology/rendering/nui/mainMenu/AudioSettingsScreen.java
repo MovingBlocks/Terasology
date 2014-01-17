@@ -18,8 +18,8 @@ package org.terasology.rendering.nui.mainMenu;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
 import org.terasology.rendering.nui.baseWidgets.UISlider;
@@ -28,7 +28,7 @@ import org.terasology.rendering.nui.databinding.BindHelper;
 /**
  * @author Immortius
  */
-public class AudioSettingsScreen extends UIScreen {
+public class AudioSettingsScreen extends UIScreenLayer {
 
     @In
     private NUIManager nuiManager;
@@ -56,7 +56,7 @@ public class AudioSettingsScreen extends UIScreen {
             music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
         }
 
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.popScreen();

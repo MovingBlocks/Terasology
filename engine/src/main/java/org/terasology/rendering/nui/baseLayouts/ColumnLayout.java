@@ -118,7 +118,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                     Vector2i widgetSize = rowInfo.widgetSizes.get(i);
                     if (widget != null) {
                         Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, rowOffsetY, widgetSize.x, rowInfo.size.y);
-                        canvas.drawElement(widget, drawRegion);
+                        canvas.drawWidget(widget, drawRegion);
                     }
                     cellOffsetX += widgetSize.x + horizontalSpacing;
                 }
@@ -138,7 +138,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
             cellSize.x *= columnWidths[i];
             if (widget != null) {
-                Vector2i contentSize = canvas.calculateSize(widget, cellSize);
+                Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
                 contentSize.x = cellSize.x;
                 rowInfo.widgetSizes.add(contentSize);
                 rowInfo.size.y = Math.max(rowInfo.size.y, contentSize.y);
@@ -150,7 +150,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i availableSize = canvas.size();
         int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
         if (numRows > 0) {

@@ -96,21 +96,32 @@ public interface Canvas {
     UIStyle getCurrentStyle();
 
     /**
-     * Calculates the size an element would like to have. Skin settings are taken into account, unless element.isSkinAppliedByCanvas() returns false (in which case it
-     * is up to the element to apply any style settings it needs.
+     * Calculates the size an widget will take, given no space restrictions.
+     * Skin settings are automatically taken into account, unless widget.isSkinAppliedByCanvas() returns false (in which case it
+     * is up to the widget to apply any style settings it needs).
      *
-     * @param element The element to get the size of
-     * @param sizeHint A hint as to the available area for the drawing the element
-     * @return The "desired" size of the element
+     * @param widget The widget to get the size of
+     * @return The preferred size of the widget - given no restrictions.
      */
-    Vector2i calculateSize(UIWidget element, Vector2i sizeHint);
+    Vector2i calculatePreferredSize(UIWidget widget);
 
     /**
-     * Draws a widget to fill the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false (in which case it is up to the element
-     * to apply any style settings it needs).
-     * @param element
+     * Calculates the size an widget will take, given space restrictions. May still extend pass the restrictions if it has a minimum size, or simply cannot fit.
+     * Skin settings are automatically taken into account, unless widget.isSkinAppliedByCanvas() returns false (in which case it
+     * is up to the widget to apply any style settings it needs).
+     *
+     * @param widget The widget to get the size of
+     * @param sizeRestrictions A hint as to the available area for the drawing the widget
+     * @return The restricted size of the widget
      */
-    void drawElement(UIWidget element);
+    Vector2i calculateRestrictedSize(UIWidget widget, Vector2i sizeRestrictions);
+
+    /**
+     * Draws a widget to fill the current canvas. Skin settings are applied, unless widget.isSkinAppliedByCanvas() returns false (in which case it is up to the widget
+     * to apply any style settings it needs).
+     * @param widget
+     */
+    void drawWidget(UIWidget widget);
 
     /**
      * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
@@ -122,7 +133,7 @@ public interface Canvas {
      * @param element
      * @param region
      */
-    void drawElement(UIWidget element, Rect2i region);
+    void drawWidget(UIWidget element, Rect2i region);
 
     /**
      * Draws test, using the current style.

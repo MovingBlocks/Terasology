@@ -102,6 +102,9 @@ public class LwjglCanvas implements CanvasControl {
     private static final int MAX_DOUBLE_CLICK_DISTANCE = 5;
     private static final int DOUBLE_CLICK_TIME = 200;
 
+    // A sufficiently large value for "unbounded" regions, without risking overflow.
+    private static final int LARGE_INT = Integer.MAX_VALUE / 2;
+
     private final NUIManager nuiManager;
     private final Time time;
     private CanvasState state;
@@ -340,28 +343,33 @@ public class LwjglCanvas implements CanvasControl {
     }
 
     @Override
-    public Vector2i calculateSize(UIWidget element, Vector2i sizeHint) {
-        if (element == null) {
-            return sizeHint;
+    public Vector2i calculatePreferredSize(UIWidget widget) {
+        return calculateRestrictedSize(widget, new Vector2i(LARGE_INT, LARGE_INT));
+    }
+
+    @Override
+    public Vector2i calculateRestrictedSize(UIWidget widget, Vector2i sizeRestrictions) {
+        if (widget == null) {
+            return sizeRestrictions;
         }
 
-        String family = (element.getFamily() != null) ? element.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
-        Rect2i adjustedArea = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeHint), elementStyle);
-        try (SubRegion ignored = subRegionForWidget(element, adjustedArea, false)) {
-            Vector2i preferredSize = element.calcContentSize(this, elementStyle.getMargin().shrink(adjustedArea.size()));
+        String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        Rect2i region = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
+        try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
+            Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
             preferredSize = elementStyle.getMargin().grow(preferredSize);
-            return applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), preferredSize), elementStyle).size();
+            return applyStyleToSize(preferredSize, elementStyle);
         }
     }
 
     @Override
-    public void drawElement(UIWidget element) {
-        drawElement(element, getRegion());
+    public void drawWidget(UIWidget widget) {
+        drawWidget(widget, getRegion());
     }
 
     @Override
-    public void drawElement(UIWidget element, Rect2i region) {
+    public void drawWidget(UIWidget element, Rect2i region) {
         if (element == null || !element.isVisible()) {
             return;
         }
@@ -438,28 +446,33 @@ public class LwjglCanvas implements CanvasControl {
         return applySizesToRegion(region, getCurrentStyle());
     }
 
+    private Vector2i applyStyleToSize(Vector2i size, UIStyle style) {
+        Vector2i result = new Vector2i(size);
+        if (style.getFixedWidth() != 0) {
+            result.x = style.getFixedWidth();
+        } else {
+            result.x = TeraMath.clamp(result.x, style.getMinWidth(), style.getMaxWidth());
+        }
+
+        if (style.getFixedHeight() != 0) {
+            result.y = style.getFixedHeight();
+        } else {
+            result.y = TeraMath.clamp(result.y, style.getMinHeight(), style.getMaxHeight());
+        }
+
+        return result;
+    }
+
     private Rect2i applySizesToRegion(Rect2i region, UIStyle style) {
         if (region.isEmpty()) {
             return region;
         }
-        int width = region.width();
-        if (style.getFixedWidth() != 0) {
-            width = style.getFixedWidth();
-        } else {
-            width = TeraMath.clamp(width, style.getMinWidth(), style.getMaxWidth());
-        }
+        Vector2i size = applyStyleToSize(region.size(), style);
 
-        int height = region.height();
-        if (style.getFixedHeight() != 0) {
-            height = style.getFixedHeight();
-        } else {
-            height = TeraMath.clamp(height, style.getMinHeight(), style.getMaxHeight());
-        }
+        int minX = region.minX() + style.getHorizontalAlignment().getOffset(size.x, region.width());
+        int minY = region.minY() + style.getVerticalAlignment().getOffset(size.y, region.height());
 
-        int minX = region.minX() + style.getHorizontalAlignment().getOffset(width, region.width());
-        int minY = region.minY() + style.getVerticalAlignment().getOffset(height, region.height());
-
-        return Rect2i.createFromMinAndSize(minX, minY, width, height);
+        return Rect2i.createFromMinAndSize(minX, minY, size.x, size.y);
     }
 
     @Override

@@ -26,8 +26,8 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
-import org.terasology.rendering.nui.UIScreenUtil;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.ListEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
@@ -41,12 +41,15 @@ import java.nio.file.Path;
 /**
  * @author Immortius
  */
-public class SelectGameScreen extends UIScreen {
+public class SelectGameScreen extends UIScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
     @In
     private NUIManager nuiManager;
+
+    @In
+    private Config config;
 
     private boolean loadingAsServer;
 
@@ -62,7 +65,7 @@ public class SelectGameScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "create", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "create", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
@@ -70,7 +73,7 @@ public class SelectGameScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "load", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "load", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 GameInfo gameInfo = gameList.getSelection();
@@ -80,7 +83,7 @@ public class SelectGameScreen extends UIScreen {
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "delete", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "delete", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 GameInfo gameInfo = gameList.getSelection();
@@ -92,13 +95,13 @@ public class SelectGameScreen extends UIScreen {
                         gameList.setSelection(null);
                     } catch (Exception e) {
                         logger.error("Failed to delete saved game", e);
-                        // TODO: show error
+                        nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
                     }
                 }
             }
         });
 
-        UIScreenUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
             @Override
             public void onButtonActivated(UIButton button) {
                 nuiManager.popScreen();
@@ -109,14 +112,13 @@ public class SelectGameScreen extends UIScreen {
     private void loadGame(GameInfo item) {
         try {
             GameManifest manifest = item.getManifest();
-            Config config = CoreRegistry.get(Config.class);
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
-            // TODO: Display error
             logger.error("Failed to load saved game", e);
+            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
         }
     }
 

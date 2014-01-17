@@ -29,7 +29,7 @@ import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.baseLayouts.ColumnLayout;
@@ -55,7 +55,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class InputSettingsScreen extends UIScreen {
+public class InputSettingsScreen extends UIScreenLayer {
 
     private int horizontalSpacing = 4;
 

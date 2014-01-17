@@ -25,14 +25,14 @@ import org.terasology.rendering.nui.databinding.Binding;
 /**
  * @author Immortius
  */
-public final class UIScreenUtil {
+public final class UIScreenLayerUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(UIScreenUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(UIScreenLayerUtil.class);
 
-    private UIScreenUtil() {
+    private UIScreenLayerUtil() {
     }
 
-    public static void trySubscribe(UIScreen screen, String id, ButtonEventListener listener) {
+    public static void trySubscribe(UIScreenLayer screen, String id, ButtonEventListener listener) {
         UIButton button = screen.find(id, UIButton.class);
         if (button != null) {
             button.subscribe(listener);
@@ -41,7 +41,7 @@ public final class UIScreenUtil {
         }
     }
 
-    public static void tryBindCheckbox(UIScreen screen, String id, Binding<Boolean> binding) {
+    public static void tryBindCheckbox(UIScreenLayer screen, String id, Binding<Boolean> binding) {
         UICheckbox checkbox = screen.find(id, UICheckbox.class);
         if (checkbox != null) {
             checkbox.bindChecked(binding);

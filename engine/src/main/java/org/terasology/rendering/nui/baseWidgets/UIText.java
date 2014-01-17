@@ -174,7 +174,7 @@ public class UIText extends CoreWidget {
     }
 
     @Override
-    public Vector2i calcContentSize(Canvas canvas, Vector2i areaHint) {
+    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         if (isMultiline()) {
             List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.x);

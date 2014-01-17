@@ -47,7 +47,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreen;
+import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
@@ -63,7 +63,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private AssetManager assetManager;
 
-    private Deque<UIScreen> screens = Queues.newArrayDeque();
+    private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> elementsLibrary;
     private UIWidget focus;
@@ -84,10 +84,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreen pushScreen(AssetUri screenUri) {
+    public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreen) {
-            UIScreen result = (UIScreen) data.getRootElement();
+        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
             pushScreen(result);
             return result;
         }
@@ -95,7 +95,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreen pushScreen(String screenUri) {
+    public UIScreenLayer pushScreen(String screenUri) {
         AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
         if (assetUri != null) {
             return pushScreen(assetUri);
@@ -104,8 +104,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreen> T pushScreen(AssetUri screenUri, Class<T> expectedType) {
-        UIScreen result = pushScreen(screenUri);
+    public <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType) {
+        UIScreenLayer result = pushScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
         }
@@ -113,8 +113,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreen> T pushScreen(String screenUri, Class<T> expectedType) {
-        UIScreen result = pushScreen(screenUri);
+    public <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
+        UIScreenLayer result = pushScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
         }
@@ -122,7 +122,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void pushScreen(UIScreen screen) {
+    public void pushScreen(UIScreenLayer screen) {
         prepare(screen);
         screens.push(screen);
     }
@@ -135,10 +135,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreen setScreen(AssetUri screenUri) {
+    public UIScreenLayer setScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreen) {
-            UIScreen result = (UIScreen) data.getRootElement();
+        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
             setScreen(result);
             return result;
         }
@@ -146,7 +146,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public UIScreen setScreen(String screenUri) {
+    public UIScreenLayer setScreen(String screenUri) {
         AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
         if (assetUri != null) {
             return setScreen(assetUri);
@@ -155,8 +155,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreen> T setScreen(AssetUri screenUri, Class<T> expectedType) {
-        UIScreen result = setScreen(screenUri);
+    public <T extends UIScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType) {
+        UIScreenLayer result = setScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
         }
@@ -164,8 +164,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreen> T setScreen(String screenUri, Class<T> expectedType) {
-        UIScreen result = setScreen(screenUri);
+    public <T extends UIScreenLayer> T setScreen(String screenUri, Class<T> expectedType) {
+        UIScreenLayer result = setScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
         }
@@ -173,7 +173,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void setScreen(UIScreen screen) {
+    public void setScreen(UIScreenLayer screen) {
         screens.clear();
         prepare(screen);
         screens.push(screen);
@@ -182,6 +182,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public void closeScreens() {
         screens.clear();
+        focus = null;
     }
 
     @Override
@@ -191,9 +192,16 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     public void render() {
         canvas.preRender();
-        if (!screens.isEmpty()) {
-            canvas.setSkin(screens.peek().getSkin());
-            canvas.drawElement(screens.peek(), canvas.getRegion());
+        Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
+        for (UIScreenLayer layer : screens) {
+            screensToRender.push(layer);
+            if (!layer.isLowerLayerVisible()) {
+                break;
+            }
+        }
+        for (UIScreenLayer screen : screensToRender) {
+            canvas.setSkin(screen.getSkin());
+            canvas.drawWidget(screen, canvas.getRegion());
         }
         canvas.postRender();
     }
@@ -201,7 +209,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void update(float delta) {
         canvas.processMousePosition(Mouse.getPosition());
 
-        for (UIScreen screen : screens) {
+        for (UIScreenLayer screen : screens) {
             screen.update(delta);
         }
     }
@@ -311,7 +319,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    private void prepare(UIScreen screen) {
+    private void prepare(UIScreenLayer screen) {
         inject(screen);
         screen.getContents();
         screen.initialise();

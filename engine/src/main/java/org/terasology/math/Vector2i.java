@@ -93,4 +93,3 @@ public class Vector2i extends Tuple2i {
     }
 }
 
-
