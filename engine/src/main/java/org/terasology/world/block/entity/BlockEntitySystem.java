@@ -96,9 +96,13 @@ public class BlockEntitySystem implements ComponentSystem {
         Vector3i location = getBlockLocation(entity);
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            Block block = worldProvider.getBlock(location);
+            BlockFamily blockFamily = null;
 
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), block.getBlockFamily(), 1);
+            if (entity.hasComponent(BlockComponent.class)) {
+                blockFamily = entity.getComponent(BlockComponent.class).getBlock().getBlockFamily();
+            }
+
+            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), blockFamily, 1);
             entity.send(beforeBlockToItemEvent);
             if (!beforeBlockToItemEvent.isConsumed()) {
                 for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {

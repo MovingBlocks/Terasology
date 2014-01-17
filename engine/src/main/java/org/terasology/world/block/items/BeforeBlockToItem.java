@@ -33,6 +33,7 @@ public class BeforeBlockToItem extends AbstractConsumableEvent {
     private Prefab damageType;
     private EntityRef instigator;
     private EntityRef tool;
+    private BlockFamily blockFamily;
     private TObjectIntMap<BlockFamily> itemsToGenerate = new TObjectIntHashMap<>();
     private List<EntityRef> itemsToDrop = new LinkedList<>();
 
@@ -40,7 +41,14 @@ public class BeforeBlockToItem extends AbstractConsumableEvent {
         this.damageType = damageType;
         this.instigator = instigator;
         this.tool = tool;
-        itemsToGenerate.put(blockFamily, quantity);
+        this.blockFamily = blockFamily;
+        if (blockFamily != null) {
+            itemsToGenerate.put(blockFamily, quantity);
+        }
+    }
+
+    public void removeDefaultBlock() {
+        removeBlockFromGeneration(blockFamily);
     }
 
     public EntityRef getInstigator() {
