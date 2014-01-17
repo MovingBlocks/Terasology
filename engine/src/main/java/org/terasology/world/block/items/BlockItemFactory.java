@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -45,6 +46,15 @@ public class BlockItemFactory {
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             builder.addComponent(new LightComponent());
         }
+
+        // Copy the components from block prefab into the block item
+        final EntityRef entity = entityManager.create(blockFamily.getArchetypeBlock().getPrefab());
+        for (Component component : entity.iterateComponents()) {
+            if (component.getClass().getAnnotation(RetainWhenBlockDetached.class) != null) {
+                builder.addComponent(component);
+            }
+        }
+        entity.destroy();
 
         ItemComponent item = builder.getComponent(ItemComponent.class);
         item.name = blockFamily.getDisplayName();

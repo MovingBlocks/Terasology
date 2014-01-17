@@ -21,6 +21,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -41,6 +42,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
+import org.terasology.world.block.items.OnBlockToItem;
 
 import javax.vecmath.Vector3f;
 
@@ -113,6 +115,19 @@ public class ItemPickupSystem implements ComponentSystem {
         }
     }
 
+    @ReceiveEvent(components = {InventoryComponent.class})
+    public void copyBlockInventory(OnBlockToItem event, EntityRef blockEntity) {
+        if (blockEntity.hasComponent(RetainBlockInventoryComponent.class)) {
+            EntityRef inventoryItem = event.getItem();
+            inventoryItem.addComponent(new InventoryComponent(((SlotBasedInventoryManager) CoreRegistry.get(SlotBasedInventoryManager.class)).getNumSlots(blockEntity)));
+            inventoryManager.moveAll(blockEntity, inventoryItem);
+            ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
+            if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
+                itemComponent.stackId = "";
+                inventoryItem.saveComponent(itemComponent);
+            }
+        }
+    }
 
     @Override
     public void shutdown() {
