@@ -216,55 +216,44 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param type        The new type of the block
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
-        Prefab oldPrefab = (!oldType.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(oldType.getPrefab()) : null;
-        Prefab newPrefab = (!type.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(type.getPrefab()) : null;
+        EntityRef oldEntitySample = (!oldType.getPrefab().isEmpty()) ? entityManager.create(oldType.getPrefab()) : EntityRef.NULL;
+        EntityRef newEntitySample = (!type.getPrefab().isEmpty()) ? entityManager.create(type.getPrefab()) : EntityRef.NULL;
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
-                    && (newPrefab == null || !newPrefab.hasComponent(metadata.getType())) && !retainComponents.contains(metadata.getType())) {
-                blockEntity.removeComponent(metadata.getType());
-            }
-        }
-
-        BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
-        blockComponent.setBlock(type);
-        blockEntity.saveComponent(blockComponent);
-
-        HealthComponent health = blockEntity.getComponent(HealthComponent.class);
-        if (health == null && type.isDestructible()) {
-            blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
-        } else if (health != null && !type.isDestructible()) {
-            blockEntity.removeComponent(HealthComponent.class);
-        } else if (health != null && type.isDestructible()) {
-            health.maxHealth = type.getHardness();
-            health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
-            blockEntity.saveComponent(health);
-        }
-
-        if (Objects.equal(newPrefab, oldPrefab)) {
-            return;
-        }
-
-        if (newPrefab != null) {
-            for (Component comp : newPrefab.iterateComponents()) {
-                copyIntoPrefab(blockEntity, comp, retainComponents);
+        try {
+            for (Component component : blockEntity.iterateComponents()) {
+                if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass()) && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
+                        && !newEntitySample.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
+                    blockEntity.removeComponent(component.getClass());
+                }
             }
 
-            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
-            if (entityInfo == null) {
-                entityInfo = new EntityInfoComponent();
-                entityInfo.parentPrefab = newPrefab.getName();
-                blockEntity.addComponent(entityInfo);
-            } else if (!entityInfo.parentPrefab.equals(newPrefab.getName())) {
-                entityInfo.parentPrefab = newPrefab.getName();
-                blockEntity.saveComponent(entityInfo);
+            BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
+            blockComponent.setBlock(type);
+            blockEntity.saveComponent(blockComponent);
+
+            HealthComponent health = blockEntity.getComponent(HealthComponent.class);
+            if (health == null && type.isDestructible()) {
+                blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
+            } else if (health != null && !type.isDestructible()) {
+                blockEntity.removeComponent(HealthComponent.class);
+            } else if (health != null && type.isDestructible()) {
+                health.maxHealth = type.getHardness();
+                health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
+                blockEntity.saveComponent(health);
             }
-        } else if (oldPrefab != null) {
-            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
-            if (entityInfo != null) {
-                entityInfo.parentPrefab = "";
-                blockEntity.saveComponent(entityInfo);
+
+            if (Objects.equal(oldEntitySample, newEntitySample)) {
+                return;
             }
+
+            if (newEntitySample.exists()) {
+                for (Component comp : newEntitySample.iterateComponents()) {
+                    copyIntoPrefab(blockEntity, comp, retainComponents);
+                }
+            }
+        } finally {
+            oldEntitySample.destroy();
+            newEntitySample.destroy();
         }
     }
 
