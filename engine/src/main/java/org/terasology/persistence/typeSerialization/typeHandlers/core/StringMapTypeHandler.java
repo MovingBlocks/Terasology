@@ -49,7 +49,7 @@ public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
 
     @Override
     public Map<String, T> deserialize(EntityData.Value value) {
-        Map<String, T> result = Maps.newHashMap();
+        Map<String, T> result = Maps.newLinkedHashMap();
         for (EntityData.NameValue entry : value.getNameValueList()) {
             result.put(entry.getName(), contentsHandler.deserialize(entry.getValue()));
         }
