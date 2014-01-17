@@ -46,7 +46,7 @@ public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
 
     private EntityRef blockSelectionComponentEntity;
 
-    @ReceiveEvent(components = {BlockSelectionComponent.class})
+    @ReceiveEvent(components = {OnItemActivateSelectionComponent.class})
     public void onPlaced(ActivateEvent event, EntityRef itemEntity) {
         if (event.getTargetLocation() == null) {
             return;
