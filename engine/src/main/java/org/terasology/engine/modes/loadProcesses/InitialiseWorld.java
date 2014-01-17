@@ -23,20 +23,20 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
@@ -68,9 +68,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
-        EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
-
+        StorageManager storageManager = CoreRegistry.put(StorageManager.class,
+                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
@@ -92,9 +91,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         }
 
         // Init. a new world
-        EntityRef worldEntity = entityManager.getEntitiesWith(WorldComponent.class).iterator().next();
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, worldGenerator);
-        chunkProvider.setWorldEntity(worldEntity);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
