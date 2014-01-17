@@ -119,11 +119,17 @@ public class UIMenuSelectWorld extends UIWindow {
                     return;
                 }
 
+                int selectionIndex = list.getSelectionIndex();
+                if ( (selectionIndex < 0) || (selectionIndex >= list.getItemCount()) ) {
+                    getGUIManager().showMessage("Error", "Please choose a saved game first.");
+                    return;
+                }
+
                 try {
                     GameManifest gameManifest = (GameManifest) list.getSelection().getValue();
                     Path world = PathManager.getInstance().getSavePath(gameManifest.getTitle());
                     FilesUtil.recursiveDelete(world);
-                    list.removeItem(list.getSelectionIndex());
+                    list.removeItem(selectionIndex);
                 } catch (Exception e) {
                     logger.error("Failed to delete saved game", e);
                     getGUIManager().showMessage("Error", "Failed to remove saved game - sorry.");
