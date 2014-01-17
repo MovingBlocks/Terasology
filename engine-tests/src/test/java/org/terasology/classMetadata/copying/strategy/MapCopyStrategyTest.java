@@ -49,13 +49,13 @@ public class MapCopyStrategyTest {
     public void testOrderedMapCopyStrategy() throws NoSuchMethodException {
         ReturnAsIsStrategy<String> keyStrategy = new ReturnAsIsStrategy<String>();
         ReturnAsIsStrategy<Long> valueStrategy = new ReturnAsIsStrategy<Long>();
-        
-        Map<String,Long> originalOrderedMap = Maps.newLinkedHashMap();
+
+        Map<String, Long> originalOrderedMap = Maps.newLinkedHashMap();
         originalOrderedMap.put("one", 1L);
         originalOrderedMap.put("two", 2L);
         originalOrderedMap.put("three", 3L);
         originalOrderedMap.put("four", 4L);
-        
+
         MapCopyStrategy<String, Long> strategy = new MapCopyStrategy<String, Long>(keyStrategy, valueStrategy);
         Map<String, Long> copiedMap = strategy.copy(originalOrderedMap);
         Set<String> keySet = copiedMap.keySet();
