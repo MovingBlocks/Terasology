@@ -59,7 +59,11 @@ public class BehaviorTreeData implements AssetData {
     }
 
     public void createRenderable() {
-        renderableRoot = root.visit(null, new Node.Visitor<RenderableNode>() {
+        renderableRoot = createRenderable(root);
+    }
+
+    public RenderableNode createRenderable(Node root) {
+        return root.visit(null, new Node.Visitor<RenderableNode>() {
             @Override
             public RenderableNode visit(RenderableNode parent, Node node) {
                 RenderableNode self = createNode(node);

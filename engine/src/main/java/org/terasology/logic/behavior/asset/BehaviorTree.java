@@ -78,6 +78,8 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
     }
 
     public RenderableNode createNode(Node node) {
-        return data.createNode(node);
+        RenderableNode renderable = data.createRenderable(node);
+        data.layout(renderable);
+        return renderable;
     }
 }

@@ -100,6 +100,7 @@ public abstract class Task {
         return observer;
     }
 
+    @API
     public interface Observer {
         void handle(Status result);
     }

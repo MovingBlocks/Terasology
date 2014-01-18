@@ -20,6 +20,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.API;
 
 import java.util.Deque;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Set;
  *
  * @author synopia
  */
+@API
 public class Interpreter {
     private static final Logger logger = LoggerFactory.getLogger(Interpreter.class);
 

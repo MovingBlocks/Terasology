@@ -21,11 +21,13 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -38,6 +40,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
 
 /**
  * @author synopia
@@ -47,6 +50,8 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
     @In
     private NUIManager nuiManager;
 
+    private boolean editorVisible;
+
     @Override
     public void initialise() {
         nuiManager.closeScreens();
@@ -55,8 +60,17 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleConsole(BTEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            nuiManager.pushScreen("engine:behaviorEditorScreen");
-            event.consume();
+            if( !editorVisible ) {
+                nuiManager.pushScreen("engine:behaviorEditorScreen");
+                event.consume();
+                editorVisible = true;
+                Mouse.setGrabbed(false);
+            } else {
+                nuiManager.popScreen();
+                event.consume();
+                editorVisible = false;
+                Mouse.setGrabbed(true);
+            }
         }
     }
 
@@ -94,4 +108,54 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
     public void renderShadows() {
 
     }
+
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            ((NUIManagerInternal)nuiManager).mouseButtonEvent(event, entity);
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            ((NUIManagerInternal)nuiManager).mouseWheelEvent(event, entity);
+            event.consume();
+        }
+    }
+        //mouse movement events
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            event.consume();
+        }
+    }
+
+    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            if (event instanceof BTEditorButton) {
+                BTEditorButton editorButton = (BTEditorButton) event;
+                onToggleConsole(editorButton, entity);
+            }
+            event.consume();
+        }
+    }
+    //raw input events
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void keyEvent(KeyEvent event, EntityRef entity) {
+        if( editorVisible ) {
+            ((NUIManagerInternal)nuiManager).keyEvent(event,entity);
+        }
+    }
+
 }

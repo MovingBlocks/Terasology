@@ -18,24 +18,17 @@ package org.terasology.logic.behavior.nui;
 import com.google.common.collect.Lists;
 import org.lwjgl.input.Mouse;
 import org.terasology.engine.CoreRegistry;
-import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.input.Input;
-import org.terasology.input.Keyboard;
-import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
 import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
 import org.terasology.rendering.nui.baseWidgets.UIButton;
@@ -68,14 +61,8 @@ public class BehaviorEditorScreen extends UIScreenLayer {
     @In
     private NUIManager nuiManager;
 
-    private boolean grabbedBefore;
-
     @Override
     public void initialise() {
-        nuiManager.setModal(true);
-        grabbedBefore = Mouse.isGrabbed();
-        Mouse.setGrabbed(false);
-
         entityProperties = find("entity_properties", PropertyLayout.class);
         behaviorEditor = find("tree", BehaviorEditor.class);
         properties = find("properties", PropertyLayout.class);
@@ -226,16 +213,6 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                 }
             }
         });
-    }
-
-    @Override
-    public void onKeyEvent(KeyEvent event) {
-        if( event.getKey() == Keyboard.Key.ESCAPE) {
-            nuiManager.popScreen();
-            nuiManager.setModal(false);
-            Mouse.setGrabbed(grabbedBefore);
-            event.consume();
-        }
     }
 
     @Override

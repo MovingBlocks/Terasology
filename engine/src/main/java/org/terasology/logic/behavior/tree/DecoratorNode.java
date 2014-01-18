@@ -75,6 +75,7 @@ public abstract class DecoratorNode extends Node {
         this.child = child;
     }
 
+    @API
     public abstract static class DecoratorTask extends Task {
         protected DecoratorTask(Node node) {
             super(node);

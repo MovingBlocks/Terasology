@@ -71,7 +71,7 @@ public class BehaviorEditor extends ZoomableLayout {
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if( newNode!=null ) {
                 newNode.setPosition(screenToWorld(pos));
-                addWidget(newNode);
+                addNode(newNode);
                 return true;
             }
             return false;
@@ -82,6 +82,13 @@ public class BehaviorEditor extends ZoomableLayout {
             newNode = null;
         }
     };
+
+    private void addNode(RenderableNode node) {
+        addWidget(node);
+        for (int i = 0; i < node.getChildrenCount(); i++) {
+             addWidget(node.getChild(i));
+        }
+    }
 
     public BehaviorEditor() {
         super();

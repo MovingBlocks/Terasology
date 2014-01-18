@@ -19,7 +19,6 @@ package org.terasology.rendering.nui.properties;
  * Created by synopia on 03.01.14.
  */
 
-import com.google.common.collect.Lists;
 import org.terasology.engine.API;
 
 import java.lang.annotation.ElementType;
@@ -30,15 +29,18 @@ import java.lang.annotation.Target;
 public interface OneOf {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @API
     public @interface Enum {
     }
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @API
     public @interface List {
         String[] items();
     }
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
+    @API
     public @interface Provider {
     }
 }

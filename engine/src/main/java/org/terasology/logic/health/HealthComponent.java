@@ -17,6 +17,7 @@ package org.terasology.logic.health;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
+import org.terasology.rendering.nui.properties.Textfield;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -39,6 +40,7 @@ public final class HealthComponent implements Component {
     public float excessSpeedDamageMultiplier = 10f;
 
     @Replicate
+    @Textfield
     public int currentHealth = 20;
 
     // Regen info

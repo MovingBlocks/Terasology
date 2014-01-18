@@ -24,9 +24,11 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import org.reflections.Reflections;
 import org.terasology.asset.AssetLoader;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
@@ -47,6 +49,7 @@ import java.util.Map;
 public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     private BehaviorTreeGson treeGson = new BehaviorTreeGson();
     private RenderableBehaviorTreeGson renderableTreeGson = new RenderableBehaviorTreeGson();
+    private Reflections reflections;
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
         try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream))) {
@@ -155,20 +158,24 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             in.beginObject();
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
-                            try {
-                                Class cls = Class.forName(nodeType);
-                                TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
-                                nextName(in, "nodeId");
-                                int id = in.nextInt();
-                                nextName(in, "node");
-                                T read = delegateAdapter.read(in);
-                                idNodes.put(id, (Node) read);
-                                nodeIds.put((Node) read, id);
-                                in.endObject();
-                                return read;
-                            } catch (ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                            ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
+                            Class cls = null;
+                            for (ClassLoader classLoader : classLoaders) {
+                                try {
+                                    cls = (Class<? extends Node>) classLoader.loadClass(nodeType);
+                                    break;
+                                } catch (ClassNotFoundException e) {
+                                }
                             }
+                            TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
+                            nextName(in, "nodeId");
+                            int id = in.nextInt();
+                            nextName(in, "node");
+                            T read = delegateAdapter.read(in);
+                            idNodes.put(id, (Node) read);
+                            nodeIds.put((Node) read, id);
+                            in.endObject();
+                            return read;
                         } else {
                             return delegate.read(in);
                         }

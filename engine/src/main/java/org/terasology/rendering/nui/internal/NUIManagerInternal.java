@@ -67,7 +67,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> elementsLibrary;
     private UIWidget focus;
-    private boolean uiModal;
 
     public NUIManagerInternal(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -185,11 +184,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         focus = null;
     }
 
-    @Override
-    public void setModal(boolean state) {
-        uiModal = state;
-    }
-
     public void render() {
         canvas.preRender();
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
@@ -260,9 +254,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
-        if( uiModal ) {
-            event.consume();
-        }
     }
 
     //mouse wheel events
@@ -277,9 +268,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
-        if( uiModal ) {
-            event.consume();
-        }
     }
 
     //raw input events
@@ -288,35 +276,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (focus != null) {
             focus.onKeyEvent(event);
         }
-        if( !event.isConsumed() && screens.size()>0 ) {
-            screens.peek().onKeyEvent(event);
-        }
-        if( uiModal ) {
-            event.consume();
-        }
-    }
-
-    //mouse movement events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        if( uiModal ) {
-            event.consume();
-        }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        if( uiModal ) {
-            event.consume();
-        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
-        if( uiModal ) {
-            event.consume();
-        }
     }
 
     private void prepare(UIScreenLayer screen) {
