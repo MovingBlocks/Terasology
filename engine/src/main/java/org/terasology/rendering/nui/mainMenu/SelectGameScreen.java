@@ -25,10 +25,9 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -44,9 +43,6 @@ import java.nio.file.Path;
 public class SelectGameScreen extends UIScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private Config config;
@@ -68,7 +64,7 @@ public class SelectGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "create", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
+                CreateGameScreen createGameScreen = getManager().pushScreen("engine:createGameScreen", CreateGameScreen.class);
                 createGameScreen.setLoadingAsServer(loadingAsServer);
             }
         });
@@ -95,7 +91,7 @@ public class SelectGameScreen extends UIScreenLayer {
                         gameList.setSelection(null);
                     } catch (Exception e) {
                         logger.error("Failed to delete saved game", e);
-                        nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
+                        getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
                     }
                 }
             }
@@ -104,7 +100,7 @@ public class SelectGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }
@@ -118,7 +114,7 @@ public class SelectGameScreen extends UIScreenLayer {
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
+            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
         }
     }
 

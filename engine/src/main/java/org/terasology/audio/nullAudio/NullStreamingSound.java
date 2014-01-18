@@ -69,4 +69,12 @@ public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> 
     public int getBufferSize() {
         return 0;
     }
+
+    @Override
+    public void play() {
+    }
+
+    @Override
+    public void play(float volume) {
+    }
 }

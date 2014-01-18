@@ -43,6 +43,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -54,7 +55,7 @@ import java.util.Deque;
 /**
  * @author Immortius
  */
-public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
+public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, FocusManager {
 
     private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
@@ -283,6 +284,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private void prepare(UIScreenLayer screen) {
         inject(screen);
+        screen.setManager(this);
         screen.getContents();
         screen.initialise();
     }

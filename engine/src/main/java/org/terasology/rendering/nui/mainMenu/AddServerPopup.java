@@ -18,10 +18,9 @@ package org.terasology.rendering.nui.mainMenu;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -32,9 +31,6 @@ public class AddServerPopup extends UIScreenLayer {
 
     @In
     private Config config;
-
-    @In
-    private NUIManager nuiManager;
 
     @Override
     public void initialise() {
@@ -48,14 +44,14 @@ public class AddServerPopup extends UIScreenLayer {
                     ServerInfo result = new ServerInfo(name.getText(), address.getText());
                     config.getNetwork().add(result);
                 }
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
 
         WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

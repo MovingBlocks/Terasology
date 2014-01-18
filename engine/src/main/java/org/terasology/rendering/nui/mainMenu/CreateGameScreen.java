@@ -26,10 +26,9 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -51,9 +50,6 @@ public class CreateGameScreen extends UIScreenLayer {
 
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -122,7 +118,7 @@ public class CreateGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
 
@@ -151,7 +147,7 @@ public class CreateGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                PreviewWorldScreen screen = nuiManager.pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
+                PreviewWorldScreen screen = getManager().pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
                 if (screen != null) {
                     screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
                 }
@@ -160,7 +156,7 @@ public class CreateGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.pushScreen("engine:selectModsScreen");
+                getManager().pushScreen("engine:selectModsScreen");
             }
         });
     }

@@ -55,6 +55,14 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
     }
 
     @Override
+    public void play() {
+    }
+
+    @Override
+    public void play(float volume) {
+    }
+
+    @Override
     public void reload(StaticSoundData data) {
         this.channels = data.getChannels();
         this.sampleRate = data.getSampleRate();

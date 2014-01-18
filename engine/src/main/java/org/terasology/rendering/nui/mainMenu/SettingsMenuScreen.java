@@ -17,10 +17,9 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
@@ -30,9 +29,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 public class SettingsMenuScreen extends UIScreenLayer {
 
     @In
-    private NUIManager nuiManager;
-
-    @In
     private Config config;
 
     @Override
@@ -40,13 +36,13 @@ public class SettingsMenuScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "video", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.pushScreen("engine:VideoMenuScreen");
+                getManager().pushScreen("engine:VideoMenuScreen");
             }
         });
         WidgetUtil.trySubscribe(this, "audio", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.pushScreen("engine:AudioMenuScreen");
+                getManager().pushScreen("engine:AudioMenuScreen");
             }
         });
         WidgetUtil.trySubscribe(this, "input", new ActivateEventListener() {
@@ -54,14 +50,14 @@ public class SettingsMenuScreen extends UIScreenLayer {
             public void onActivated(UIWidget button) {
                 UIScreenLayer inputScreen = new InputSettingsScreen();
                 inputScreen.setSkin(getSkin());
-                nuiManager.pushScreen(inputScreen);
+                getManager().pushScreen(inputScreen);
             }
         });
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

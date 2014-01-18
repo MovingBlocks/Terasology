@@ -23,7 +23,13 @@ import org.terasology.math.Vector2i;
  */
 public class BaseInteractionListener implements InteractionListener {
 
+    protected FocusManager focusManager;
     private boolean mouseOver;
+
+    @Override
+    public void setFocusManager(FocusManager focusManager) {
+        this.focusManager = focusManager;
+    }
 
     @Override
     public void onMouseOver(Vector2i pos, boolean topMostElement) {

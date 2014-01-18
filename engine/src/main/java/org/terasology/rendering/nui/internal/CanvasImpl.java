@@ -704,6 +704,7 @@ public class CanvasImpl implements CanvasControl {
     public void addInteractionRegion(InteractionListener listener, Rect2i region) {
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
         if (!finalRegion.isEmpty()) {
+            listener.setFocusManager(nuiManager);
             if (state.drawOnTop) {
                 drawOnTopOperations.add(new DrawInteractionRegionOperation(finalRegion, listener, state.element));
             } else {

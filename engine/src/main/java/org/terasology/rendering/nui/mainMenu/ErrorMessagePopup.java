@@ -15,11 +15,9 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 
@@ -28,15 +26,12 @@ import org.terasology.rendering.nui.widgets.UILabel;
  */
 public class ErrorMessagePopup extends UIScreenLayer {
 
-    @In
-    private NUIManager nuiManager;
-
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

@@ -16,6 +16,8 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+import org.terasology.asset.Assets;
+import org.terasology.audio.Sound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.TextureRegion;
@@ -38,6 +40,8 @@ public class UIButton extends CoreWidget {
 
     private Binding<TextureRegion> image = new DefaultBinding<>();
     private Binding<String> text = new DefaultBinding<>("");
+    private Binding<Sound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click"));
+    private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
     private boolean down;
 
@@ -58,6 +62,9 @@ public class UIButton extends CoreWidget {
         public void onMouseRelease(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
                 if (isMouseOver()) {
+                    if (getClickSound() != null) {
+                        getClickSound().play(getClickVolume());
+                    }
                     activate();
                 }
                 down = false;
@@ -136,6 +143,30 @@ public class UIButton extends CoreWidget {
 
     public TextureRegion getImage() {
         return image.get();
+    }
+
+    public void bindClickSound(Binding<Sound> binding) {
+        clickSound = binding;
+    }
+
+    public Sound getClickSound() {
+        return clickSound.get();
+    }
+
+    public void setClickSound(Sound val) {
+        clickSound.set(val);
+    }
+
+    public void bindClickVolume(Binding<Float> binding) {
+        clickVolume = binding;
+    }
+
+    public float getClickVolume() {
+        return clickVolume.get();
+    }
+
+    public void setClickVolume(float val) {
+        clickVolume.set(val);
     }
 
     public void subscribe(ActivateEventListener listener) {

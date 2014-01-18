@@ -39,6 +39,7 @@ public class UIScreenLayer extends AbstractWidget {
             return true;
         }
     };
+    private NUIManager manager;
 
     public UIScreenLayer() {
     }
@@ -82,6 +83,14 @@ public class UIScreenLayer extends AbstractWidget {
         if (contents != null) {
             contents.update(delta);
         }
+    }
+
+    public NUIManager getManager() {
+        return manager;
+    }
+
+    public void setManager(NUIManager manager) {
+        this.manager = manager;
     }
 
     @Override

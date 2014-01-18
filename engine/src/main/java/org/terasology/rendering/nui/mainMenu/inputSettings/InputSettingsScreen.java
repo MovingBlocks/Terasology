@@ -28,7 +28,6 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
@@ -58,9 +57,6 @@ import java.util.Set;
 public class InputSettingsScreen extends UIScreenLayer {
 
     private int horizontalSpacing = 4;
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private Config config;
@@ -195,7 +191,7 @@ public class InputSettingsScreen extends UIScreenLayer {
         find("close", UIButton.class).subscribe(new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

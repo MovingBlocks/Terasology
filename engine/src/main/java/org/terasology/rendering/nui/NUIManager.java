@@ -22,7 +22,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
+public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer pushScreen(AssetUri screenUri);
 

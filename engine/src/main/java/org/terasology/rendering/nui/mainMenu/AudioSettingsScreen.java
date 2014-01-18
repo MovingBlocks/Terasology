@@ -17,10 +17,9 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -29,9 +28,6 @@ import org.terasology.rendering.nui.widgets.UISlider;
  * @author Immortius
  */
 public class AudioSettingsScreen extends UIScreenLayer {
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private Config config;
@@ -59,7 +55,7 @@ public class AudioSettingsScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

@@ -23,10 +23,9 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -39,9 +38,6 @@ import org.terasology.rendering.nui.widgets.UIList;
  * @author Immortius
  */
 public class JoinGameScreen extends UIScreenLayer {
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private Config config;
@@ -81,7 +77,7 @@ public class JoinGameScreen extends UIScreenLayer {
             WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    nuiManager.pushScreen("engine:addServerPopup");
+                    getManager().pushScreen("engine:addServerPopup");
                 }
             });
             WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
@@ -107,7 +103,7 @@ public class JoinGameScreen extends UIScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();
-                nuiManager.pushScreen("engine:joinServerPopup");
+                getManager().pushScreen("engine:joinServerPopup");
             }
         });
 
@@ -116,7 +112,7 @@ public class JoinGameScreen extends UIScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }
@@ -126,7 +122,7 @@ public class JoinGameScreen extends UIScreenLayer {
         if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
             engine.changeState(new StateLoading(joinStatus));
         } else {
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
+            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
                     .setError("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
         }
     }

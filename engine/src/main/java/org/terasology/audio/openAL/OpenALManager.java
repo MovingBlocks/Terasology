@@ -250,7 +250,7 @@ public class OpenALManager implements AudioManager {
         return new AssetFactory<StaticSoundData, StaticSound>() {
             @Override
             public StaticSound buildAsset(AssetUri uri, StaticSoundData data) {
-                return new OpenALSound(uri, data);
+                return new OpenALSound(uri, data, OpenALManager.this);
             }
         };
     }
@@ -260,7 +260,7 @@ public class OpenALManager implements AudioManager {
         return new AssetFactory<StreamingSoundData, StreamingSound>() {
             @Override
             public StreamingSound buildAsset(AssetUri uri, StreamingSoundData data) {
-                return new OpenALStreamingSound(uri, data);
+                return new OpenALStreamingSound(uri, data, OpenALManager.this);
             }
         };
     }

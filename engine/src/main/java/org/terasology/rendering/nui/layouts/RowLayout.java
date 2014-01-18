@@ -28,7 +28,6 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.UIWidget;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +52,16 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
     }
 
     public RowLayout(UIWidget... widgets) {
-        contents.addAll(Arrays.asList(widgets));
+        for (UIWidget widget : widgets) {
+            addWidget(widget, null);
+        }
     }
 
     @Override
-    public void addWidget(UIWidget element, RowLayoutHint hint) {
-        contents.add(element);
+    public void addWidget(UIWidget widget, RowLayoutHint hint) {
+        contents.add(widget);
         if (hint != null) {
-            hints.put(element, hint);
+            hints.put(widget, hint);
         }
     }
 

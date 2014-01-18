@@ -46,15 +46,15 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
     private String loopDetectionId = "";
 
     @Override
-    public void addWidget(UIWidget element, RelativeLayoutHint hint) {
-        if (element != null && hint != null) {
-            WidgetInfo info = new WidgetInfo(element, hint);
+    public void addWidget(UIWidget widget, RelativeLayoutHint hint) {
+        if (widget != null && hint != null) {
+            WidgetInfo info = new WidgetInfo(widget, hint);
             contents.add(info);
-            if (!element.getId().isEmpty()) {
-                contentLookup.put(element.getId(), info);
+            if (!widget.getId().isEmpty()) {
+                contentLookup.put(widget.getId(), info);
             }
-        } else if (element != null) {
-            logger.error("Attempted to add element '{}' of type '{}' with no layout hint", element.getId(), element.getClass().getSimpleName());
+        } else if (widget != null) {
+            logger.error("Attempted to add widget '{}' of type '{}' with no layout hint", widget.getId(), widget.getClass().getSimpleName());
         }
     }
 

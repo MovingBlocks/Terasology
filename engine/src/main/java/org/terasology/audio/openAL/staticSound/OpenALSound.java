@@ -18,6 +18,7 @@ package org.terasology.audio.openAL.staticSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
@@ -32,14 +33,17 @@ import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALSound extends AbstractAsset<StaticSoundData> implements StaticSound {
 
+
     protected float length;
+    private final AudioManager audioManager;
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
 
-    public OpenALSound(AssetUri uri, StaticSoundData data) {
+    public OpenALSound(AssetUri uri, StaticSoundData data, AudioManager audioManager) {
         super(uri);
+        this.audioManager = audioManager;
         reload(data);
     }
 
@@ -69,6 +73,16 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     @Override
     public int getBufferSize() {
         return alGetBufferi(bufferId, AL_SIZE);
+    }
+
+    @Override
+    public void play() {
+        audioManager.playSound(this);
+    }
+
+    @Override
+    public void play(float volume) {
+        audioManager.playSound(this, volume);
     }
 
     @Override

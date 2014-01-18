@@ -35,4 +35,15 @@ public interface Sound<T extends AssetData> extends Asset<T> {
      */
     int getBufferSize();
 
+    /**
+     * Plays the sound at full volume.
+     */
+    void play();
+
+    /**
+     * Plays the sound at the given volume.
+     * @param volume
+     */
+    void play(float volume);
+
 }

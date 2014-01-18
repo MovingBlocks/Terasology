@@ -30,10 +30,9 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -56,9 +55,6 @@ import java.util.Objects;
 public class PreviewWorldScreen extends UIScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private ModuleManager moduleManager;
@@ -125,7 +121,7 @@ public class PreviewWorldScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

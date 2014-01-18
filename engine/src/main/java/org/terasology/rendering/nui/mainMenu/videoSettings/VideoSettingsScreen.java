@@ -23,10 +23,9 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -41,9 +40,6 @@ import java.util.Arrays;
  */
 public class VideoSettingsScreen extends UIScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private GameEngine engine;
@@ -128,7 +124,7 @@ public class VideoSettingsScreen extends UIScreenLayer {
             public void onActivated(UIWidget button) {
                 logger.info("Video Settings: " + config.getRendering().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

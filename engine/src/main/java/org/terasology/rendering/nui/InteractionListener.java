@@ -23,6 +23,8 @@ import org.terasology.math.Vector2i;
  */
 public interface InteractionListener {
 
+    void setFocusManager(FocusManager focusManager);
+
     /**
      * Called every frame the mouse is over the interaction region
      *

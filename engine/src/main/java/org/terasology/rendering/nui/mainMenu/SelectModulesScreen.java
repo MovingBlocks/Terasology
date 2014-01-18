@@ -25,10 +25,9 @@ import org.terasology.engine.module.ModuleSelection;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -46,9 +45,6 @@ import java.util.List;
  * @author Immortius
  */
 public class SelectModulesScreen extends UIScreenLayer {
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private ModuleManager moduleManager;
@@ -207,7 +203,7 @@ public class SelectModulesScreen extends UIScreenLayer {
                     moduleConfig.addModule(module.getId());
                 }
                 config.save();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }
