@@ -22,12 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldChangeListener;
+import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -44,6 +47,7 @@ import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +87,15 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider) {
         this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider);
+    }
+
+    @Override
+    public EntityRef getWorldEntity() {
+        Iterator<EntityRef> iterator = CoreRegistry.get(EntityManager.class).getEntitiesWith(WorldComponent.class).iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return EntityRef.NULL;
     }
 
     @Override

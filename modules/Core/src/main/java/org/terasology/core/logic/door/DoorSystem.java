@@ -24,12 +24,10 @@ import org.terasology.audio.Sound;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
@@ -42,10 +40,12 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.PlaceBlocks;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Vector3f;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -136,24 +136,30 @@ public class DoorSystem implements ComponentSystem {
         }
 
         Block newBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
-        worldProvider.setBlock(bottomBlockPos, newBottomBlock);
         Block newTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, bottomBlockPos, closedSide, Side.TOP);
-        worldProvider.setBlock(topBlockPos, newTopBlock);
 
-        EntityRef newDoor = entityManager.copy(entity);
-        newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
-        Vector3f doorCenter = bottomBlockPos.toVector3f();
-        doorCenter.y += 0.5f;
-        newDoor.addComponent(new LocationComponent(doorCenter));
-        DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
-        newDoorComp.closedSide = closedSide;
-        newDoorComp.openSide = attachSide.reverse();
-        newDoorComp.isOpen = false;
-        newDoor.saveComponent(newDoorComp);
-        newDoor.removeComponent(ItemComponent.class);
-        audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
-        logger.info("Closed Side: {}", newDoorComp.closedSide);
-        logger.info("Open Side: {}", newDoorComp.openSide);
+        Map<Vector3i, Block> blockMap = new HashMap<>();
+        blockMap.put(bottomBlockPos, newBottomBlock);
+        blockMap.put(topBlockPos, newTopBlock);
+        PlaceBlocks blockEvent = new PlaceBlocks(blockMap);
+        worldProvider.getWorldEntity().send(blockEvent);
+
+        if (!blockEvent.isConsumed()) {
+            EntityRef newDoor = entityManager.copy(entity);
+            newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
+            Vector3f doorCenter = bottomBlockPos.toVector3f();
+            doorCenter.y += 0.5f;
+            newDoor.addComponent(new LocationComponent(doorCenter));
+            DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
+            newDoorComp.closedSide = closedSide;
+            newDoorComp.openSide = attachSide.reverse();
+            newDoorComp.isOpen = false;
+            newDoor.saveComponent(newDoorComp);
+            newDoor.removeComponent(ItemComponent.class);
+            audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
+            logger.info("Closed Side: {}", newDoorComp.closedSide);
+            logger.info("Open Side: {}", newDoorComp.openSide);
+        }
     }
 
     private Side determineAttachSide(Side facingDir, Side offsetDir, Vector3i bottomBlockPos, Vector3i topBlockPos) {
@@ -231,20 +237,5 @@ public class DoorSystem implements ComponentSystem {
         particlesEntity.addComponent(particleEffect);
 
         audioManager.playSound(Assets.getSound("engine:Dig"), 1.0f);
-    }
-
-    @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class})
-    public void onOutOfHealth(NoHealthEvent event, EntityRef entity) {
-        BlockRegionComponent blockRegionComponent = entity.getComponent(BlockRegionComponent.class);
-        for (Vector3i blockPos : blockRegionComponent.region) {
-            worldProvider.setBlock(blockPos, BlockManager.getAir());
-        }
-        Prefab prefab = entity.getParentPrefab();
-        EntityRef doorItem = entityManager.create(prefab);
-        if (!inventoryManager.giveItem(event.getInstigator(), doorItem)) {
-            doorItem.destroy();
-        }
-        entity.destroy();
-        audioManager.playSound(Assets.getSound("engine:RemoveBlock"), 0.6f);
     }
 }

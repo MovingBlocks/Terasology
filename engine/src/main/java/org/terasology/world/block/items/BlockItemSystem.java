@@ -38,6 +38,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -94,12 +95,12 @@ public class BlockItemSystem implements ComponentSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             // TODO: Fix this for changes.
             if (networkSystem.getMode().isAuthority()) {
-                if (worldProvider.setBlock(placementPos, block) == null) {
-                    // Something changed the block on another thread, cancel
-                    event.consume();
-                    return;
-                } else {
+                PlaceBlocks placeBlocks = new PlaceBlocks(placementPos, block);
+                worldProvider.getWorldEntity().send(placeBlocks);
+                if (!placeBlocks.isConsumed()) {
                     item.send(new OnBlockItemPlaced(placementPos, blockEntityRegistry.getBlockEntityAt(placementPos)));
+                } else {
+                    event.consume();
                 }
             }
             event.getInstigator().send(new PlaySoundEvent(event.getInstigator(), Assets.getSound("engine:PlaceBlock"), 0.5f));

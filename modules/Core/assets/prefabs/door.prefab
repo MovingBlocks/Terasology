@@ -1,23 +1,26 @@
 {
-    "parent" : "engine:iconItem",
-    "Item" : {
-        "name" : "Door",
-        "icon" : "door",
-        "renderWithIcon" : true,
-        "stackId" : "door",
-        "consumedOnUse" : true,
-        "usage" : "ON_BLOCK"
+    "parent": "engine:iconItem",
+    "Item": {
+        "name": "Door",
+        "icon": "door",
+        "renderWithIcon": true,
+        "stackId": "door",
+        "consumedOnUse": true,
+        "usage": "ON_BLOCK"
     },
-    "Door" : {
-        "topBlockFamily" : "DoorTop",
-        "bottomBlockFamily" : "DoorBottom",
-        "openSound" : "DoorOpen",
-        "closeSound" : "DoorClose"
+    "Door": {
+        "topBlockFamily": "DoorTop",
+        "bottomBlockFamily": "DoorBottom",
+        "openSound": "DoorOpen",
+        "closeSound": "DoorClose"
     },
-    "Health" : {
-        "currentHealth" : 5,
-        "maxHealth" : 5,
-        "regenRate" : 1,
-        "waitBeforeRegen" : 2
+    "Health": {
+        "currentHealth": 5,
+        "maxHealth": 5,
+        "regenRate": 1,
+        "waitBeforeRegen": 2
+    },
+    "BlockDropGrammar": {
+        "itemDrops": ["Core:door"]
     }
 }
