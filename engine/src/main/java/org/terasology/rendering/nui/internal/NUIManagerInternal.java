@@ -62,19 +62,19 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private CanvasControl canvas;
-    private ClassLibrary<UIWidget> elementsLibrary;
+    private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
 
     public NUIManagerInternal(AssetManager assetManager) {
         this.assetManager = assetManager;
-        this.canvas = new LwjglCanvas(this, CoreRegistry.get(Time.class));
+        this.canvas = new CanvasImpl(this, CoreRegistry.get(Time.class), new LwjglCanvasRenderer());
     }
 
-    public void refreshElementsLibrary() {
-        elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+    public void refreshWidgetsLibrary() {
+        widgetsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
             for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
-                elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
+                widgetsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
             }
         }
     }
@@ -206,8 +206,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIWidget> getElementMetadataLibrary() {
-        return elementsLibrary;
+    public ClassLibrary<UIWidget> getWidgetMetadataLibrary() {
+        return widgetsLibrary;
     }
 
     @Override

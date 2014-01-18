@@ -19,19 +19,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
-import org.terasology.math.AABB;
 import org.terasology.math.Border;
-import org.terasology.math.MatrixUtils;
-import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -40,7 +33,6 @@ import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
@@ -54,12 +46,10 @@ import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.nio.FloatBuffer;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
@@ -67,66 +57,57 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glLoadMatrix;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.Util.checkGLError;
-
 /**
  * @author Immortius
  */
-public class LwjglCanvas implements CanvasControl {
+public class CanvasImpl implements CanvasControl {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglCanvas.class);
+    private static final Logger logger = LoggerFactory.getLogger(CanvasImpl.class);
+
+    /**
+     * The maximum distance the cursor can move between clicks and still be counted as double clicking
+     */
     private static final int MAX_DOUBLE_CLICK_DISTANCE = 5;
+    /**
+     * The maximum time (in milliseconds) between clicks that will still be counted as double clicking
+     */
     private static final int DOUBLE_CLICK_TIME = 200;
 
-    // A sufficiently large value for "unbounded" regions, without risking overflow.
+    /**
+     * A sufficiently large value for "unbounded" regions, without risking overflow.
+     */
     private static final int LARGE_INT = Integer.MAX_VALUE / 2;
 
     private final NUIManager nuiManager;
     private final Time time;
+
     private CanvasState state;
-
-    private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
-    private Set<TextCacheKey> usedText = Sets.newHashSet();
-
     private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
-
-    private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
     private Material meshMat = Assets.getMaterial("engine:UILitMesh");
 
-    private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+    private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
+    // Text mesh caching
+    private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
+    private Set<TextCacheKey> usedText = Sets.newHashSet();
+
+    // Interaction region handling
     private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
     private Set<InteractionRegion> mouseOverRegions = Sets.newLinkedHashSet();
     private InteractionRegion clickedRegion;
 
+    // Double click handling
     private long lastClickTime;
     private MouseInput lastClickButton;
     private Vector2i lastClickPosition = new Vector2i();
 
-    private Matrix4f modelView;
+    private CanvasRenderer renderer;
 
-    public LwjglCanvas(NUIManager nuiManager, Time time) {
+    public CanvasImpl(NUIManager nuiManager, Time time, CanvasRenderer renderer) {
+        this.renderer = renderer;
         this.nuiManager = nuiManager;
         this.time = time;
     }
@@ -134,27 +115,9 @@ public class LwjglCanvas implements CanvasControl {
     @Override
     public void preRender() {
         interactionRegions.clear();
-        state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight()));
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        checkGLError();
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-
-        modelView = new Matrix4f();
-        modelView.setIdentity();
-        modelView.setTranslation(new Vector3f(0, 0, -1024f));
-
-        MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
-        glLoadMatrix(matrixBuffer);
-        matrixBuffer.rewind();
-
+        Vector2i size = renderer.getTargetSize();
+        state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
+        renderer.preRender();
         crop(state.cropRegion);
     }
 
@@ -165,7 +128,6 @@ public class LwjglCanvas implements CanvasControl {
         }
         drawOnTopOperations.clear();
 
-        Util.checkGLError();
         if (!subregionStack.isEmpty()) {
             logger.error("UI Subregions are not being correctly ended");
             while (!subregionStack.isEmpty()) {
@@ -183,14 +145,8 @@ public class LwjglCanvas implements CanvasControl {
             }
         }
         usedText.clear();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-        checkGLError();
+
+        renderer.postRender();
     }
 
     @Override
@@ -705,16 +661,13 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void drawMaterial(Material material, Rect2i region) {
-        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
+        Rect2i drawRegion = relativeToAbsolute(region);
+        if (!state.cropRegion.overlaps(drawRegion)) {
             return;
         }
         material.setFloat("alpha", state.getAlpha());
         material.bindTextures();
-        glPushMatrix();
-        glTranslatef(state.drawRegion.minX() + region.minX(), state.drawRegion.minY() + region.minY(), 0f);
-        glScalef(region.width(), region.height(), 1);
-        billboard.render();
-        glPopMatrix();
+        renderer.drawMaterialAt(material, drawRegion);
     }
 
     @Override
@@ -728,52 +681,12 @@ public class LwjglCanvas implements CanvasControl {
             return;
         }
 
-        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
+        Rect2i drawRegion = relativeToAbsolute(region);
+        if (!state.cropRegion.overlaps(drawRegion)) {
             return;
         }
 
-        AABB meshAABB = mesh.getAABB();
-        Vector3f meshExtents = meshAABB.getExtents();
-        float fitScale = 0.35f * Math.min(region.width(), region.height()) / Math.max(meshExtents.x, Math.max(meshExtents.y, meshExtents.z));
-        Vector3f centerOffset = meshAABB.getCenter();
-        centerOffset.scale(-1.0f);
-
-        Matrix4f centerTransform = new Matrix4f(Quat4fUtil.IDENTITY, centerOffset, 1.0f);
-        Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(Quat4fUtil.IDENTITY,
-                new Vector3f(state.drawRegion.minX() + region.minX() + region.width() / 2,
-                        state.drawRegion.minY() + region.minY() + region.height() / 2, 0), 1);
-
-        userTransform.mul(centerTransform);
-        translateTransform.mul(userTransform);
-
-        Matrix4f finalMat = new Matrix4f(modelView);
-        finalMat.mul(translateTransform);
-        MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
-
-        Rect2i cropRegion = relativeToAbsolute(region).intersect(state.cropRegion);
-        material.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
-        material.setMatrix4("posMatrix", translateTransform);
-        glEnable(GL11.GL_DEPTH_TEST);
-        glClear(GL11.GL_DEPTH_BUFFER_BIT);
-        glMatrixMode(GL11.GL_MODELVIEW);
-        glPushMatrix();
-        glLoadMatrix(matrixBuffer);
-        matrixBuffer.rewind();
-
-        boolean matrixStackSupported = material.supportsFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        if (matrixStackSupported) {
-            material.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        }
-        material.setFloat("alpha", state.getAlpha());
-        material.bindTextures();
-        mesh.render();
-        if (matrixStackSupported) {
-            material.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
-        }
-
-        glPopMatrix();
-        glDisable(GL11.GL_DEPTH_TEST);
+        renderer.drawMesh(mesh, material, drawRegion, drawRegion.intersect(state.cropRegion), rotation, offset, scale, state.getAlpha());
     }
 
     @Override
@@ -953,7 +866,6 @@ public class LwjglCanvas implements CanvasControl {
         @Override
         public void close() {
             if (!disposed) {
-                Util.checkGLError();
                 disposed = true;
                 LwjglSubRegion region = subregionStack.pop();
                 while (!region.equals(this)) {
@@ -1028,6 +940,10 @@ public class LwjglCanvas implements CanvasControl {
         public int hashCode() {
             return listener.hashCode();
         }
+    }
+
+    private interface DrawOperation {
+        void draw();
     }
 
     private final class DrawTextureOperation implements DrawOperation {

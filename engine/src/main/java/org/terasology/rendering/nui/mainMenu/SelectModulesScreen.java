@@ -27,7 +27,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -198,7 +198,7 @@ public class SelectModulesScreen extends UIScreenLayer {
         }
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 ModuleConfig moduleConfig = config.getDefaultModSelection();

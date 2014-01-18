@@ -32,7 +32,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -122,7 +122,7 @@ public class PreviewWorldScreen extends UIScreenLayer {
             }
         }
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();

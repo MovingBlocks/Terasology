@@ -25,24 +25,24 @@ import org.terasology.rendering.nui.widgets.UICheckbox;
 /**
  * @author Immortius
  */
-public final class UIScreenLayerUtil {
+public final class WidgetUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(UIScreenLayerUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(WidgetUtil.class);
 
-    private UIScreenLayerUtil() {
+    private WidgetUtil() {
     }
 
-    public static void trySubscribe(UIScreenLayer screen, String id, ActivateEventListener listener) {
-        UIButton button = screen.find(id, UIButton.class);
+    public static void trySubscribe(UIWidget widget, String id, ActivateEventListener listener) {
+        UIButton button = widget.find(id, UIButton.class);
         if (button != null) {
             button.subscribe(listener);
         } else {
-            logger.warn("Contents of {} missing button with id '{}'", screen, id);
+            logger.warn("Contents of {} missing button with id '{}'", widget, id);
         }
     }
 
-    public static void tryBindCheckbox(UIScreenLayer screen, String id, Binding<Boolean> binding) {
-        UICheckbox checkbox = screen.find(id, UICheckbox.class);
+    public static void tryBindCheckbox(UIWidget widget, String id, Binding<Boolean> binding) {
+        UICheckbox checkbox = widget.find(id, UICheckbox.class);
         if (checkbox != null) {
             checkbox.bindChecked(binding);
         }

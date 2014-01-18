@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.mainMenu;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -33,7 +33,7 @@ public class ErrorMessagePopup extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "ok", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();

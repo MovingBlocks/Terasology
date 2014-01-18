@@ -52,7 +52,7 @@ public interface NUIManager extends ComponentSystem {
 
     void update(float delta);
 
-    ClassLibrary<UIWidget> getElementMetadataLibrary();
+    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
 
     void setFocus(UIWidget element);
 

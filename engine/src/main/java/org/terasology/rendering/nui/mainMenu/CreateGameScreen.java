@@ -28,7 +28,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -119,14 +119,14 @@ public class CreateGameScreen extends UIScreenLayer {
         }
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "play", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "play", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 GameManifest gameManifest = new GameManifest();
@@ -148,7 +148,7 @@ public class CreateGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 PreviewWorldScreen screen = nuiManager.pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
@@ -157,7 +157,7 @@ public class CreateGameScreen extends UIScreenLayer {
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "mods", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:selectModsScreen");

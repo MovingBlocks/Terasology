@@ -25,7 +25,7 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
@@ -78,13 +78,13 @@ public class JoinGameScreen extends UIScreenLayer {
             UILabel address = find("address", UILabel.class);
             address.bindText(BindHelper.bindBoundBeanProperty("address", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
 
-            UIScreenLayerUtil.trySubscribe(this, "add", new ActivateEventListener() {
+            WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
                     nuiManager.pushScreen("engine:addServerPopup");
                 }
             });
-            UIScreenLayerUtil.trySubscribe(this, "remove", new ActivateEventListener() {
+            WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
                     if (serverList.getSelection() != null) {
@@ -93,7 +93,7 @@ public class JoinGameScreen extends UIScreenLayer {
                     }
                 }
             });
-            UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
+            WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
                     config.save();
@@ -103,7 +103,7 @@ public class JoinGameScreen extends UIScreenLayer {
                 }
             });
         }
-        UIScreenLayerUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();
@@ -112,7 +112,7 @@ public class JoinGameScreen extends UIScreenLayer {
         });
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();

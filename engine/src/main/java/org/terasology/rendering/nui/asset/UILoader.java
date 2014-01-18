@@ -187,7 +187,7 @@ public class UILoader implements AssetLoader<UIData> {
             JsonObject jsonObject = json.getAsJsonObject();
 
             String type = jsonObject.get("type").getAsString();
-            ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager.getElementMetadataLibrary().resolve(type, ModuleContext.getContext());
+            ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager.getWidgetMetadataLibrary().resolve(type, ModuleContext.getContext());
             if (elementMetadata == null) {
                 logger.error("Unknown UIWidget type {}", type);
                 return null;

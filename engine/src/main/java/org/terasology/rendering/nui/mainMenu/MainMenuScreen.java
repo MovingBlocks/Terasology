@@ -20,7 +20,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -40,13 +40,13 @@ public class MainMenuScreen extends UIScreenLayer {
     @Override
     public void initialise() {
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-        UIScreenLayerUtil.trySubscribe(this, "singleplayer", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "singleplayer", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:selectGameScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "multiplayer", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "multiplayer", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 UIScreenLayer screen = nuiManager.pushScreen("engine:selectGameScreen");
@@ -55,20 +55,20 @@ public class MainMenuScreen extends UIScreenLayer {
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 UIScreenLayer screen = nuiManager.pushScreen("engine:joinGameScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "settings", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "settings", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:settingsMenuScreen");
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "exit", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "exit", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 engine.shutdown();

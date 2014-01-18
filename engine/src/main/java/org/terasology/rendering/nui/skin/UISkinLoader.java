@@ -125,7 +125,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             super.apply(builder);
             if (elements != null) {
                 for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
-                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
+                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
                     ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
                         builder.setElementClass(metadata.getType());

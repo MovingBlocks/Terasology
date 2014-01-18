@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -37,19 +37,19 @@ public class SettingsMenuScreen extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "video", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "video", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:VideoMenuScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "audio", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "audio", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:AudioMenuScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "input", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "input", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 UIScreenLayer inputScreen = new InputSettingsScreen();
@@ -57,7 +57,7 @@ public class SettingsMenuScreen extends UIScreenLayer {
                 nuiManager.pushScreen(inputScreen);
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 config.save();

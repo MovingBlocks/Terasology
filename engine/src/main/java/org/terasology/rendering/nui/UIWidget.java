@@ -28,6 +28,7 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     String DEFAULT_MODE = "";
     String HOVER_MODE = "hover";
+    String FOCUSED_MODE = "focused";
     String ACTIVE_MODE = "active";
 
     String getId();
@@ -40,8 +41,18 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     String getMode();
 
+    /**
+     * @return Whether the widget is currently visible and should be rendered
+     */
     boolean isVisible();
 
+    /**
+     * Finds a widget with the given id and type, within the current widget and its contents.
+     * @param id
+     * @param type
+     * @param <T>
+     * @return The widget with the given id and type, or null.
+     */
     <T extends UIWidget> T find(String id, Class<T> type);
 
     void onDraw(Canvas canvas);

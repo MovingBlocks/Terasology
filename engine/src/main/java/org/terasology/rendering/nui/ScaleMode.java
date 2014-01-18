@@ -20,6 +20,7 @@ import org.terasology.math.Rect2i;
 import javax.vecmath.Vector2f;
 
 /**
+ * Describes the possible methods drawing to a region of a different size to the image being drawn.
  * @author Immortius
  */
 public enum ScaleMode {
@@ -65,5 +66,12 @@ public enum ScaleMode {
         }
     };
 
+    /**
+     * Provides the final size to draw the  when drawing with this ScaleMode to the given region.
+     * @param region
+     * @param actualWidth
+     * @param actualHeight
+     * @return The relative scale to draw the
+     */
     public abstract Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight);
 }

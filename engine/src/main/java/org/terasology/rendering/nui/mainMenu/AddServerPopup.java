@@ -20,7 +20,7 @@ import org.terasology.config.ServerInfo;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -38,7 +38,7 @@ public class AddServerPopup extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "ok", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
 
@@ -52,7 +52,7 @@ public class AddServerPopup extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();

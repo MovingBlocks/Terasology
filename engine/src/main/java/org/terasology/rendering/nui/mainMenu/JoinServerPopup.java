@@ -24,7 +24,7 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -48,7 +48,7 @@ public class JoinServerPopup extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
@@ -63,7 +63,7 @@ public class JoinServerPopup extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();

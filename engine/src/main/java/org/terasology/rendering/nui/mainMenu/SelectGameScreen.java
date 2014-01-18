@@ -27,7 +27,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
@@ -65,7 +65,7 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "create", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "create", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
@@ -73,7 +73,7 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "load", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "load", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
@@ -83,7 +83,7 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "delete", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "delete", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
@@ -101,7 +101,7 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
