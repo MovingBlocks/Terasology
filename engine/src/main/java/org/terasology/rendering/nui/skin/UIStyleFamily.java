@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.ReflectionUtil;
+import org.terasology.utilities.collection.NullIterator;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,26 @@ public class UIStyleFamily {
 
     public UIStyle getBaseStyle() {
         return baseStyle;
+    }
+
+    public Iterable<Class<? extends UIWidget>> getWidgets() {
+        return elementStyleLookup.keySet();
+    }
+
+    public Iterable<String> getPartsFor(Class<? extends UIWidget> widget) {
+        Table<String, String, UIStyle> styles = elementStyleLookup.get(widget);
+        if (styles == null) {
+            return NullIterator.newInstance();
+        }
+        return styles.rowKeySet();
+    }
+
+    public Iterable<String> getModesFor(Class<? extends UIWidget> widget, String part) {
+        Table<String, String, UIStyle> styles = elementStyleLookup.get(widget);
+        if (styles == null) {
+            return NullIterator.newInstance();
+        }
+        return styles.row(part).keySet();
     }
 
     public UIStyle getElementStyle(Class<? extends UIWidget> element) {

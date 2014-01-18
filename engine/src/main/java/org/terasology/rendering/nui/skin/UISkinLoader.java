@@ -98,10 +98,17 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     private static class DefaultInfo extends FamilyInfo {
+        public String inherit;
         public Map<String, FamilyInfo> families;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
+            if (inherit != null) {
+                UISkin skin = Assets.getSkin(inherit);
+                if (skin != null) {
+                    builder.setBaseSkin(skin);
+                }
+            }
             if (families != null) {
                 for (Map.Entry<String, FamilyInfo> entry : families.entrySet()) {
                     builder.setFamily(entry.getKey());

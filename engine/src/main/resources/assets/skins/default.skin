@@ -28,7 +28,7 @@
         "RowLayout" : {
         },
         "UIBox" : {
-            "background" : "engine:box",
+            "background" : "engine:area",
             "background-border" : {
                 "top" : 4,
                 "bottom" : 4,
@@ -75,6 +75,7 @@
         },
         "UIDropdown" : {
             "text-align-horizontal" : "left",
+            "fixed-height" : 32,
             "parts" : {
                 "box" : {
                     "background" : "dropdown",
@@ -140,8 +141,8 @@
             "margin" : {
                 "top" : 2,
                 "bottom" : 2,
-                "left" : 2,
-                "right" : 2
+                "left" : 10,
+                "right" : 10
             },
             "texture-scale-mode" : "scale_fit",
             "modes" : {
