@@ -54,10 +54,13 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
         long currentWorldTime = time.getGameTimeInMs();
         List<DelayedOperation> operationsToInvoke = new LinkedList<>();
         Iterator<Long> scheduledOperationsIterator = delayedOperationsSortedByTime.keySet().iterator();
-        long time;
-        while (scheduledOperationsIterator.hasNext()
-                && (time = scheduledOperationsIterator.next()) <= currentWorldTime) {
-            operationsToInvoke.addAll(delayedOperationsSortedByTime.get(time));
+        long processedTime;
+        while (scheduledOperationsIterator.hasNext()) {
+            processedTime = scheduledOperationsIterator.next();
+            if (processedTime > currentWorldTime) {
+                break;
+            }
+            operationsToInvoke.addAll(delayedOperationsSortedByTime.get(processedTime));
             scheduledOperationsIterator.remove();
         }
 
@@ -90,7 +93,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
         entity.saveComponent(delayedComponent);
     }
 
-    private class DelayedOperation {
+    private final class DelayedOperation {
         private String operationId;
         private EntityRef entityRef;
 
@@ -101,13 +104,21 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             DelayedOperation that = (DelayedOperation) o;
 
-            if (entityRef.getId() != that.entityRef.getId()) return false;
-            if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null) return false;
+            if (entityRef.getId() != that.entityRef.getId()) {
+                return false;
+            }
+            if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null) {
+                return false;
+            }
 
             return true;
         }

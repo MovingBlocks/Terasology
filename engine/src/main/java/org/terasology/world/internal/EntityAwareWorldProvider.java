@@ -221,7 +221,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         try {
             for (Component component : blockEntity.iterateComponents()) {
-                if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass()) && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
+                if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass())
+                        && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
                         && !newEntitySample.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
                     blockEntity.removeComponent(component.getClass());
                 }

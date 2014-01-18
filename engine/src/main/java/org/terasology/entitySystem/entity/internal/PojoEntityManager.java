@@ -31,7 +31,12 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.lifecycleEvents.*;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
@@ -43,7 +48,12 @@ import org.terasology.utilities.collection.NullIterator;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
@@ -169,9 +179,9 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
         BeforeEntityCreated event = new BeforeEntityCreated(prefabName, components);
         eventSystem.send(entity, event);
-        components = event.getResultComponents();
+        Iterable<Component> resultComponents = event.getResultComponents();
 
-        for (Component c : components) {
+        for (Component c : resultComponents) {
             store.put(entity.getId(), c);
         }
         return entity;

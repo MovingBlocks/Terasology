@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
@@ -38,7 +38,7 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class NeighbourBlockFamilyUpdateSystem implements UpdateSubscriberSystem {
+public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
     @In
@@ -46,26 +46,15 @@ public class NeighbourBlockFamilyUpdateSystem implements UpdateSubscriberSystem 
     @In
     private BlockEntityRegistry blockEntityRegistry;
 
-    private int largeBlockUpdateCount = 0;
+    private int largeBlockUpdateCount;
     private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = new HashSet<>();
-
-    public NeighbourBlockFamilyUpdateSystem() {
-        logger.info("Creating system");
-    }
-
-    @Override
-    public void update(float delta) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     @Override
     public void initialise() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void shutdown() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @ReceiveEvent
@@ -76,8 +65,9 @@ public class NeighbourBlockFamilyUpdateSystem implements UpdateSubscriberSystem 
     @ReceiveEvent
     public void largeBlockUpdateFinished(LargeBlockUpdateFinished event, EntityRef entity) {
         largeBlockUpdateCount--;
-        if (largeBlockUpdateCount < 0)
+        if (largeBlockUpdateCount < 0) {
             throw new IllegalStateException("LargeBlockUpdateFinished invoked too many times");
+        }
 
         if (largeBlockUpdateCount == 0) {
             notifyNeighboursOfChangedBlocks();
@@ -117,7 +107,8 @@ public class NeighbourBlockFamilyUpdateSystem implements UpdateSubscriberSystem 
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
             final BlockFamily blockFamily = neighborBlock.getBlockFamily();
             if (blockFamily instanceof UpdatesWithNeighboursFamily) {
-                Block neighborBlockAfterUpdate = ((UpdatesWithNeighboursFamily) blockFamily).getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
+                UpdatesWithNeighboursFamily neighboursFamily = (UpdatesWithNeighboursFamily) blockFamily;
+                Block neighborBlockAfterUpdate = neighboursFamily.getBlockForNeighborUpdate(worldProvider, blockEntityRegistry, neighborLocation, neighborBlock);
                 if (neighborBlock != neighborBlockAfterUpdate) {
                     worldProvider.setBlock(neighborLocation, neighborBlockAfterUpdate);
                 }

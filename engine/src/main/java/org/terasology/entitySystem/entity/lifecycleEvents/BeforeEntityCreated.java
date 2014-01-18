@@ -18,7 +18,11 @@ package org.terasology.entitySystem.entity.lifecycleEvents;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -43,8 +47,9 @@ public class BeforeEntityCreated implements Event {
     }
 
     public void addComponent(Component component) {
-        if (componentsToAdd.containsKey(component.getClass()))
+        if (componentsToAdd.containsKey(component.getClass())) {
             throw new IllegalArgumentException("Tried adding the same component multiple times");
+        }
         componentsToAdd.put(component.getClass(), component);
     }
 
@@ -61,7 +66,7 @@ public class BeforeEntityCreated implements Event {
         };
     }
 
-    private class IteratorImpl implements Iterator<Component> {
+    private final class IteratorImpl implements Iterator<Component> {
         private Iterator<Component> sourceIterator;
         private Iterator<Component> addedIterator;
 
@@ -88,16 +93,19 @@ public class BeforeEntityCreated implements Event {
         private Component getNext() {
             while (sourceIterator.hasNext()) {
                 final Component result = sourceIterator.next();
-                if (componentsToAdd.containsKey(result.getClass()))
+                if (componentsToAdd.containsKey(result.getClass())) {
                     throw new IllegalStateException("Requested to add component that was already defined for this entity");
-                if (componentsToRemove.contains(result.getClass()))
+                }
+                if (componentsToRemove.contains(result.getClass())) {
                     continue;
+                }
                 return result;
             }
             while (addedIterator.hasNext()) {
                 final Component result = addedIterator.next();
-                if (componentsToRemove.contains(result.getClass()))
+                if (componentsToRemove.contains(result.getClass())) {
                     continue;
+                }
                 return result;
             }
             return null;

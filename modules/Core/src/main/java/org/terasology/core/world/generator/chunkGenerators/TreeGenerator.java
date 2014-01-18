@@ -70,9 +70,9 @@ public abstract class TreeGenerator {
      * Checks if a tree can grow at the given position
      *
      * @param view Chunk view
-     * @param x Position on the x-axis
-     * @param y Position on the y-axis
-     * @param z Position on the z-axis
+     * @param x    Position on the x-axis
+     * @param y    Position on the y-axis
+     * @param z    Position on the z-axis
      */
     public boolean canGenerateAt(ChunkView view, int x, int y, int z) {
         Block posBlock = view.getBlock(x, y - 1, z);
