@@ -76,6 +76,11 @@
                         "text" : "Behavior Editor"
                     },                    
                     {
+                        "type" : "UIButton",
+                        "id" : "migtest",
+                        "text" : "Layout Test"
+                    },
+                    {
                         "type" : "UISpace",
                         "size" : [1, 64]
                     },

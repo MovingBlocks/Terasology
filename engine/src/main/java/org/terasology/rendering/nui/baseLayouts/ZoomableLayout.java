@@ -115,7 +115,7 @@ public class ZoomableLayout extends CoreLayout {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sizeHint;
+        return Vector2i.zero();
     }
 
     @Override

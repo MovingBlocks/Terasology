@@ -29,7 +29,9 @@ public abstract class DecoratorNode extends Node {
     @Override
     public <T> T visit(T item, Visitor<T> visitor) {
         T visit = super.visit(item, visitor);
-        child.visit(visit, visitor);
+        if( child!=null ) {
+            child.visit(visit, visitor);
+        }
         return visit;
     }
 

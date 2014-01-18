@@ -1,122 +1,334 @@
 {
-    "type" : "engine:behaviorEditorScreen",
+    "type" : "engine:migTestScreen",
     "skin" : "engine:mainMenu",
     "contents" : {
         "type" : "migLayout",
         "layoutConstraints" : "",
-        "colConstraints" : "[min][grow][min]",
-        "rowConstraints" : "",
+        "colConstraints" : "[min][min][pref][grow]",
+        "rowConstraints" : "[min]",
         "debug" : true,
         "contents" : [
             {
-                "type" : "BehaviorEditor",
-                "id" : "tree",
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "",
                 "layoutInfo" : {
-                    "cc" : "cell 1 3"
+                    "cc" : ""
                 }
             },
             {
-                "type" : "propertyLayout",
-                "id" : "properties",
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "min",
                 "layoutInfo" : {
-                    "cc" : "cell 2 3"
+                    "cc" : ""
                 }
             },
             {
-                "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
-                "layoutInfo" : {
-                    "cc" : "cell 0 0 3"
-                },
-                "contents" : [
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "select_tree"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "copy",
-                        "text" : "copy"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "paste",
-                        "text" : "paste"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "layout",
-                        "text" : "layout"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "new",
-                        "text" : "new"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "assign",
-                        "text" : "assign"
-                    }
-                ]
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "pref",
+                 "layoutInfo" : {
+                     "cc" : ""
+                 }
             },
             {
-                "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "grow",
                 "layoutInfo" : {
-                    "cc" : "cell 0 1 3"
-                },
-                "contents" : [
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "select_entity"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "debug_stop",
-                        "text" : "[]"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "debug_pause",
-                        "text" : "||"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "debug_step",
-                        "text" : "|>"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "debug_run",
-                        "text" : ">>"
-                    }
-                ]
+                    "cc" : "grow"
+                }
             },
             {
-                "type" : "migLayout",
-                "layoutConstraints" : "",
-                "colConstraints" : "",
-                "rowConstraints" : "",
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIButton",
                 "layoutInfo" : {
-                    "cc" : "cell 0 2 3"
-                },
-                "contents" : [
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "palette"
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "create",
-                        "text" : "create"
-                    }
-                ]
-            }
-        ]
+                    "cc" : "newline"
+                }
+            },
+            {
+                "type" : "UIButton",
+                "id" : "",
+                "text" : "A1",
+                "layoutInfo" : {
+                    "cc" : "w min, h min"
+                }
+            },
+            {
+                "type" : "UIButton",
+                "id" : "",
+                "text" : "A2",
+                 "layoutInfo" : {
+                     "cc" : ""
+                 }
+            },
+            {
+                "type" : "UIButton",
+                "id" : "",
+                "text" : "A3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UISlider",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UISlider",
+                "id" : "",
+                "text" : "B1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UISlider",
+                "id" : "",
+                "text" : "B2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UISlider",
+                "id" : "",
+                "text" : "B3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIText",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIText",
+                "id" : "",
+                "text" : "C1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIText",
+                "id" : "",
+                "text" : "C2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIText",
+                "id" : "",
+                "text" : "C3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIDropdown",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIDropdown",
+                "id" : "",
+                "text" : "D1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIDropdown",
+                "id" : "",
+                "text" : "D2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIDropdown",
+                "id" : "",
+                "text" : "D3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UICheckbox",
+                "layoutInfo" : {
+                    "cc" : "newline"
+                }
+            },
+            {
+                "type" : "UICheckbox",
+                "id" : "",
+                "text" : "E1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UICheckbox",
+                "id" : "",
+                "text" : "E2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UICheckbox",
+                "id" : "",
+                "text" : "E3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIList",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIList",
+                "id" : "list1",
+                "text" : "F1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIList",
+                "id" : "list2",
+                "text" : "F2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIList",
+                "id" : "list3",
+                "text" : "F3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIBox",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIBox",
+                "id" : "",
+                "text" : "G1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIBox",
+                "id" : "",
+                "text" : "G2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIBox",
+                "id" : "",
+                "text" : "G3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UIScrollbar",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIScrollbar",
+                "id" : "",
+                "text" : "H1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIScrollbar",
+                "id" : "",
+                "text" : "H2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIScrollbar",
+                "id" : "",
+                "text" : "H3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
+                "text" : "UISpace",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UISpace",
+                "id" : "",
+                "text" : "H1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UISpace",
+                "id" : "",
+                "text" : "H2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UISpace",
+                "id" : "",
+                "text" : "H3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+
+       ]
     }
 }

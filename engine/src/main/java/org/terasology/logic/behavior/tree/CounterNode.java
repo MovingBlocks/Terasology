@@ -26,15 +26,16 @@ import org.terasology.rendering.nui.properties.Range;
  * @author synopia
  */
 @API
-public class CounterNode extends Node {
+public class CounterNode extends DecoratorNode {
     @Range(min = 0, max = 100)
     private int limit;
 
     public CounterNode() {
     }
 
-    public CounterNode(int limit) {
+    public CounterNode(int limit, Node child) {
         this.limit = limit;
+        this.child = child;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class CounterNode extends Node {
         return new CounterTask(this);
     }
 
-    public static class CounterTask extends Task {
+    public static class CounterTask extends DecoratorTask implements Task.Observer {
         private int count;
 
         public CounterTask(CounterNode node) {
@@ -60,8 +61,16 @@ public class CounterNode extends Node {
                 count--;
                 return Status.RUNNING;
             } else {
-                return Status.SUCCESS;
+                if( getNode().child!=null ) {
+                    interpreter().start(getNode().child, this);
+                }
+                return Status.RUNNING;
             }
+        }
+
+        @Override
+        public void handle(Status result) {
+            interpreter().stop(this, result);
         }
 
         @Override

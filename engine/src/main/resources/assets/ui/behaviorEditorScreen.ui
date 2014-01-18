@@ -4,8 +4,8 @@
     "contents" : {
         "type" : "migLayout",
         "layoutConstraints" : "",
-        "colConstraints" : "[pref][grow, fill][pref]",
-        "rowConstraints" : "[pref][pref][pref][grow, fill][grow, fill]",
+        "colConstraints" : "[min][grow, fill][min]",
+        "rowConstraints" : "[min][min][min][grow, fill][grow, fill]",
         "contents" : [
             {
                 "type" : "BehaviorEditor",

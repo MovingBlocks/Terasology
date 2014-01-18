@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.baseLayouts.miglayout;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.annotations.SerializedName;
 import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.ComponentWrapper;
@@ -206,7 +205,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
                 layout.layoutContainer(canvas, bounds);
             } else if (wrapper instanceof MigComponent) {
                 MigComponent migComponent = (MigComponent) wrapper;
-                migComponent.calcPreferredSize(canvas, canvas.size());
+                migComponent.calculatePreferredSize(canvas, canvas.size());
             }
         }
         checkCache();
