@@ -348,11 +348,24 @@ public class LwjglCanvas implements CanvasControl {
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
         UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
-        Rect2i region = applySizesToRegion(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
+        Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
             Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
             preferredSize = elementStyle.getMargin().grow(preferredSize);
             return applyStyleToSize(preferredSize, elementStyle);
+        }
+    }
+
+    @Override
+    public Vector2i calculateMaximumSize(UIWidget widget) {
+        if (widget == null) {
+            return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        }
+
+        String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        try (SubRegion ignored = subRegionForWidget(widget, getRegion(), false)) {
+            return applyStyleToSize(elementStyle.getMargin().grow(widget.getMaxContentSize(this)), elementStyle);
         }
     }
 
@@ -369,7 +382,11 @@ public class LwjglCanvas implements CanvasControl {
 
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
-        Rect2i regionArea = applySizesToRegion(region, newStyle);
+        Rect2i regionArea;
+        try (SubRegion ignored = subRegionForWidget(element, region, false)) {
+            regionArea = applyStyleToSize(region, newStyle, element.getMaxContentSize(this));
+        }
+
         try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {
             if (element.isSkinAppliedByCanvas()) {
                 drawBackground();
@@ -431,12 +448,26 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void drawBackground() {
-        Rect2i region = applySizesToRegion(getRegion());
+        Rect2i region = applyStyleToSize(getRegion());
         drawBackground(region);
     }
 
-    private Rect2i applySizesToRegion(Rect2i region) {
-        return applySizesToRegion(region, getCurrentStyle());
+    private Rect2i applyStyleToSize(Rect2i region) {
+        return applyStyleToSize(region, getCurrentStyle());
+    }
+
+    private Rect2i applyStyleToSize(Rect2i region, UIStyle style, Vector2i maxSize) {
+        if (region.isEmpty()) {
+            return region;
+        }
+        Vector2i size = applyStyleToSize(region.size(), style);
+        size.x = Math.min(size.x, maxSize.x);
+        size.y = Math.min(size.y, maxSize.y);
+
+        int minX = region.minX() + style.getHorizontalAlignment().getOffset(size.x, region.width());
+        int minY = region.minY() + style.getVerticalAlignment().getOffset(size.y, region.height());
+
+        return Rect2i.createFromMinAndSize(minX, minY, size.x, size.y);
     }
 
     private Vector2i applyStyleToSize(Vector2i size, UIStyle style) {
@@ -456,7 +487,7 @@ public class LwjglCanvas implements CanvasControl {
         return result;
     }
 
-    private Rect2i applySizesToRegion(Rect2i region, UIStyle style) {
+    private Rect2i applyStyleToSize(Rect2i region, UIStyle style) {
         if (region.isEmpty()) {
             return region;
         }
@@ -753,7 +784,7 @@ public class LwjglCanvas implements CanvasControl {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(listener, getCurrentStyle().getMargin().grow(applySizesToRegion(getRegion())));
+        addInteractionRegion(listener, getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
     }
 
     @Override

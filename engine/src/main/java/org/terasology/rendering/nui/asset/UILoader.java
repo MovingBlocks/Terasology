@@ -206,7 +206,7 @@ public class UILoader implements AssetLoader<UIData> {
             }
 
             for (FieldMetadata<? extends UIWidget, ?> field : elementMetadata.getFields()) {
-                if (jsonObject.has(field.getName())) {
+                if (jsonObject.has(field.getSerializationName())) {
                     if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
                         continue;
                     }
@@ -215,14 +215,14 @@ public class UILoader implements AssetLoader<UIData> {
                             Type contentType = ReflectionUtil.getTypeParameter(field.getField().getGenericType(), 0);
                             if (contentType != null) {
                                 List result = Lists.newArrayList();
-                                JsonArray list = jsonObject.getAsJsonArray(field.getName());
+                                JsonArray list = jsonObject.getAsJsonArray(field.getSerializationName());
                                 for (JsonElement item : list) {
                                     result.add(context.deserialize(item, contentType));
                                 }
                                 field.setValue(element, result);
                             }
                         } else {
-                            field.setValue(element, context.deserialize(jsonObject.get(field.getName()), field.getType()));
+                            field.setValue(element, context.deserialize(jsonObject.get(field.getSerializationName()), field.getType()));
                         }
                     } catch (Throwable e) {
                         logger.error("Failed to deserialize field {} of {}", field.getName(), type, e);

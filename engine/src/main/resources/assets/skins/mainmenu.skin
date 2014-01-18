@@ -145,8 +145,8 @@
             "margin" : {
                 "top" : 2,
                 "bottom" : 2,
-                "left" : 2,
-                "right" : 2
+                "left" : 10,
+                "right" : 10
             },
             "texture-scale-mode" : "scale_fit",
             "modes" : {

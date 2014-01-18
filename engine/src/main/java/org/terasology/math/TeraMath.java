@@ -34,6 +34,11 @@ public final class TeraMath {
     private TeraMath() {
     }
 
+    public static int addClampAtMax(int a, int b) {
+        long result = (long) a + (long) b;
+        return (int) Math.min(result, Integer.MAX_VALUE);
+    }
+
     /**
      * Returns the absolute value.
      *

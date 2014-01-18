@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "id" : "subtitle",
+                "id" : "version",
                 "family" : "title",
                 "text" : "Pre Alpha",
                 "layoutInfo" : {
@@ -35,13 +35,13 @@
             {
                 "type" : "engine:columnLayout",
                 "layoutInfo" : {
-                    "width" : 280,
-                    "height" : 288,
+                    "use-content-width" : true,
+                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
                         "offset" : 16,
-                        "widget" : "subtitle"
+                        "widget" : "version"
                     },
                     "position-bottom" : {
                         "offset" : 32

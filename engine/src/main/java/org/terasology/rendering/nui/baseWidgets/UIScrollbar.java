@@ -106,7 +106,16 @@ public class UIScrollbar extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return new Vector2i(0, sizeHint.y);
+        canvas.setPart("handle");
+        int x = canvas.getCurrentStyle().getFixedWidth();
+        if (x == 0) {
+            x = canvas.getCurrentStyle().getMinWidth();
+        }
+        int y = canvas.getCurrentStyle().getFixedHeight();
+        if (y == 0) {
+            y = canvas.getCurrentStyle().getMinHeight();
+        }
+        return new Vector2i(x, y);
     }
 
     private int pixelOffsetFor(int newValue) {

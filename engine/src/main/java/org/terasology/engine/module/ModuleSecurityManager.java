@@ -80,10 +80,6 @@ public class ModuleSecurityManager extends SecurityManager {
             return;
         }
         
-        if (perm instanceof AWTPermission) {
-            throw new AccessControlException("No AWT permissions", perm);
-        }
-        
         calculatingPermission.set(true);
         try {
             Class[] classes = getClassContext();

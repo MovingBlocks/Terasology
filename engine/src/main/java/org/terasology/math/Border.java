@@ -15,6 +15,8 @@
  */
 package org.terasology.math;
 
+import com.google.common.math.IntMath;
+
 import java.util.Objects;
 
 /**
@@ -102,11 +104,13 @@ public class Border {
     }
 
     public Vector2i grow(Vector2i size) {
-        return new Vector2i(size.x + getTotalWidth(), size.y + getTotalHeight());
+        // Note protection against overflow
+        return new Vector2i(TeraMath.addClampAtMax(size.x, getTotalWidth()), TeraMath.addClampAtMax(size.y, getTotalHeight()));
     }
 
     public Rect2i grow(Rect2i region) {
+        // Note protection against overflow of the size
         return Rect2i.createFromMinAndSize(region.minX() - getLeft(), region.minY() - getTop(),
-                region.width() + getTotalWidth(), region.height() + getTotalHeight());
+                TeraMath.addClampAtMax(region.width(), getTotalWidth()), TeraMath.addClampAtMax(region.height(), getTotalHeight()));
     }
 }

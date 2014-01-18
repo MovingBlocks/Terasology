@@ -93,7 +93,7 @@ public class UISlider extends CoreWidget {
         int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
 
-        sliderWidth = canvas.size().x - tickerWidth + canvas.getCurrentStyle().getMargin().getTotalWidth();
+        sliderWidth = canvas.size().x - tickerWidth;
         int drawLocation = pixelOffsetFor(getValue(), sliderWidth);
         Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
@@ -107,10 +107,26 @@ public class UISlider extends CoreWidget {
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i result = new Vector2i();
         canvas.setPart(SLIDER);
+        result.x = canvas.getCurrentStyle().getFixedWidth();
+        if (result.x == 0) {
+            result.x = canvas.getCurrentStyle().getMinWidth();
+        }
         result.y = canvas.getCurrentStyle().getFixedHeight();
+        if (result.y == 0) {
+            result.y = canvas.getCurrentStyle().getMinHeight();
+        }
 
         canvas.setPart(TICKER);
-        result.y = Math.max(result.y, canvas.getCurrentStyle().getFixedHeight());
+        if (canvas.getCurrentStyle().getFixedWidth() != 0) {
+            result.x = Math.max(result.x, canvas.getCurrentStyle().getFixedWidth());
+        } else {
+            result.x = Math.max(result.x, canvas.getCurrentStyle().getMinWidth());
+        }
+        if (canvas.getCurrentStyle().getFixedHeight() != 0) {
+            result.y = Math.max(result.y, canvas.getCurrentStyle().getFixedHeight());
+        } else {
+            result.y = Math.max(result.y, canvas.getCurrentStyle().getMinHeight());
+        }
         return result;
     }
 
