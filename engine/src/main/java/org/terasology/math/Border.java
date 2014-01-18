@@ -15,8 +15,6 @@
  */
 package org.terasology.math;
 
-import com.google.common.math.IntMath;
-
 import java.util.Objects;
 
 /**

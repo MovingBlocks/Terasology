@@ -27,7 +27,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
@@ -143,7 +142,6 @@ public class BindableButtonImpl implements BindableButton {
     /**
      * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
      * state, so that the overall state of the bind can be tracked.
-     *
      *
      * @param pressed            Is the changing
      * @param delta              The length of the current frame
