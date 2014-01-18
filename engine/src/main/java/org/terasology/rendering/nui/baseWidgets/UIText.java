@@ -247,7 +247,6 @@ public class UIText extends CoreWidget {
                 }
                 case Keyboard.KeyId.END: {
                     cursorPosition = fullText.length();
-                    offset = lastFont.getWidth(fullText) - lastWidth + 1;
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
