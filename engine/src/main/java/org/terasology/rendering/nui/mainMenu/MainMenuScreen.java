@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
 /**
@@ -40,37 +40,37 @@ public class MainMenuScreen extends UIScreenLayer {
     @Override
     public void initialise() {
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-        UIScreenLayerUtil.trySubscribe(this, "singleplayer", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "singleplayer", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:selectGameScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "multiplayer", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "multiplayer", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 UIScreenLayer screen = nuiManager.pushScreen("engine:selectGameScreen");
                 if (screen instanceof SelectGameScreen) {
                     ((SelectGameScreen) screen).setLoadingAsServer(true);
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "join", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 UIScreenLayer screen = nuiManager.pushScreen("engine:joinGameScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "settings", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "settings", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.pushScreen("engine:settingsMenuScreen");
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "exit", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "exit", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 engine.shutdown();
             }
         });

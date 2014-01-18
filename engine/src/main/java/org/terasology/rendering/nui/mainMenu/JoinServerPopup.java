@@ -25,9 +25,9 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIText;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIText;
 
 /**
  * @author Immortius
@@ -48,9 +48,9 @@ public class JoinServerPopup extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "join", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
                 UIText address = find("address", UIText.class);
                 JoinStatus status = networkSystem.join(address.getText(), TerasologyConstants.DEFAULT_PORT);
@@ -63,9 +63,9 @@ public class JoinServerPopup extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "cancel", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
             }
         });

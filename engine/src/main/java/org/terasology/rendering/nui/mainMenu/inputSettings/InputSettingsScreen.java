@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,20 +32,20 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
-import org.terasology.rendering.nui.baseLayouts.ColumnLayout;
-import org.terasology.rendering.nui.baseLayouts.RowLayout;
-import org.terasology.rendering.nui.baseLayouts.ScrollableArea;
-import org.terasology.rendering.nui.baseLayouts.relative.HorizontalHint;
-import org.terasology.rendering.nui.baseLayouts.relative.RelativeLayout;
-import org.terasology.rendering.nui.baseLayouts.relative.VerticalHint;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UICheckbox;
-import org.terasology.rendering.nui.baseWidgets.UIImage;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UISlider;
-import org.terasology.rendering.nui.baseWidgets.UISpace;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.layouts.ColumnLayout;
+import org.terasology.rendering.nui.layouts.RowLayout;
+import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.layouts.relative.HorizontalHint;
+import org.terasology.rendering.nui.layouts.relative.RelativeLayout;
+import org.terasology.rendering.nui.layouts.relative.VerticalHint;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UISpace;
 
 import java.util.Collections;
 import java.util.List;
@@ -186,15 +186,15 @@ public class InputSettingsScreen extends UIScreenLayer {
         super.setContents(contents);
         find("mouseSensitivity", UISlider.class).bindValue(BindHelper.bindBeanProperty("mouseSensitivity", config.getInput(), Float.TYPE));
         find("mouseYAxisInverted", UICheckbox.class).bindChecked(BindHelper.bindBeanProperty("mouseYAxisInverted", config.getInput(), Boolean.TYPE));
-        find("reset", UIButton.class).subscribe(new ButtonEventListener() {
+        find("reset", UIButton.class).subscribe(new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 config.getInput().reset();
             }
         });
-        find("close", UIButton.class).subscribe(new ButtonEventListener() {
+        find("close", UIButton.class).subscribe(new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
             }
         });

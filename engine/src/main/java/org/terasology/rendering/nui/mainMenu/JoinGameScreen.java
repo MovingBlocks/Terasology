@@ -26,14 +26,14 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.ListEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
 
 /**
  * @author Immortius
@@ -65,9 +65,9 @@ public class JoinGameScreen extends UIScreenLayer {
                     return value.getName();
                 }
             });
-            serverList.subscribe(new ListEventListener<ServerInfo>() {
+            serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
                 @Override
-                public void onItemActivated(ServerInfo item) {
+                public void onItemActivated(UIWidget widget, ServerInfo item) {
                     join(item.getAddress());
                 }
             });
@@ -78,24 +78,24 @@ public class JoinGameScreen extends UIScreenLayer {
             UILabel address = find("address", UILabel.class);
             address.bindText(BindHelper.bindBoundBeanProperty("address", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
 
-            UIScreenLayerUtil.trySubscribe(this, "add", new ButtonEventListener() {
+            UIScreenLayerUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
-                public void onButtonActivated(UIButton button) {
+                public void onActivated(UIWidget button) {
                     nuiManager.pushScreen("engine:addServerPopup");
                 }
             });
-            UIScreenLayerUtil.trySubscribe(this, "remove", new ButtonEventListener() {
+            UIScreenLayerUtil.trySubscribe(this, "remove", new ActivateEventListener() {
                 @Override
-                public void onButtonActivated(UIButton button) {
+                public void onActivated(UIWidget button) {
                     if (serverList.getSelection() != null) {
                         config.getNetwork().remove(serverList.getSelection());
                         serverList.setSelection(null);
                     }
                 }
             });
-            UIScreenLayerUtil.trySubscribe(this, "join", new ButtonEventListener() {
+            UIScreenLayerUtil.trySubscribe(this, "join", new ActivateEventListener() {
                 @Override
-                public void onButtonActivated(UIButton button) {
+                public void onActivated(UIWidget button) {
                     config.save();
                     if (serverList.getSelection() != null) {
                         join(serverList.getSelection().getAddress());
@@ -103,18 +103,18 @@ public class JoinGameScreen extends UIScreenLayer {
                 }
             });
         }
-        UIScreenLayerUtil.trySubscribe(this, "joinDirect", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 config.save();
                 nuiManager.pushScreen("engine:joinServerPopup");
             }
         });
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 config.save();
                 nuiManager.popScreen();
             }

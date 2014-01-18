@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
+        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
             pushScreen(result);
             return result;
         }
@@ -133,8 +133,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer setScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
+        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
             setScreen(result);
             return result;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
@@ -40,7 +40,7 @@ public class UIList<T> extends CoreWidget {
 
     private ItemRenderer<T> itemRenderer = new ToStringTextRenderer<>();
     private List<ItemInteractionListener> itemListeners = Lists.newArrayList();
-    private List<ListEventListener<T>> eventListeners = Lists.newArrayList();
+    private List<ItemActivateEventListener<T>> eventListeners = Lists.newArrayList();
 
 
     public UIList() {
@@ -124,11 +124,11 @@ public class UIList<T> extends CoreWidget {
         selection.set(val);
     }
 
-    public void subscribe(ListEventListener<T> eventListener) {
+    public void subscribe(ItemActivateEventListener<T> eventListener) {
         eventListeners.add(eventListener);
     }
 
-    public void unsubscribe(ListEventListener<T> eventListener) {
+    public void unsubscribe(ItemActivateEventListener<T> eventListener) {
         eventListeners.remove(eventListener);
     }
 
@@ -142,8 +142,8 @@ public class UIList<T> extends CoreWidget {
     public void activate(int index) {
         if (index < list.get().size()) {
             T item = list.get().get(index);
-            for (ListEventListener<T> listener : eventListeners) {
-                listener.onItemActivated(item);
+            for (ItemActivateEventListener<T> listener : eventListeners) {
+                listener.onItemActivated(this, item);
             }
         }
     }

@@ -29,18 +29,18 @@ import org.terasology.entitySystem.systems.In;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.UIImage;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIDropdown;
-import org.terasology.rendering.nui.baseWidgets.UISlider;
-import org.terasology.rendering.nui.baseWidgets.UIText;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
@@ -122,9 +122,9 @@ public class PreviewWorldScreen extends UIScreenLayer {
             }
         }
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
             }
         });

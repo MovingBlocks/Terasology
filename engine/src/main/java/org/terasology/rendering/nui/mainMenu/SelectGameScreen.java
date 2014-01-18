@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,12 @@ import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.ListEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
 import java.nio.file.Path;
@@ -58,24 +58,24 @@ public class SelectGameScreen extends UIScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
-        gameList.subscribe(new ListEventListener<GameInfo>() {
+        gameList.subscribe(new ItemActivateEventListener<GameInfo>() {
             @Override
-            public void onItemActivated(GameInfo item) {
+            public void onItemActivated(UIWidget widget, GameInfo item) {
                 loadGame(item);
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "create", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "create", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
                 createGameScreen.setLoadingAsServer(loadingAsServer);
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "load", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "load", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
                 if (gameInfo != null) {
                     loadGame(gameInfo);
@@ -83,9 +83,9 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "delete", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "delete", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
                 if (gameInfo != null) {
                     Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
@@ -101,9 +101,9 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 nuiManager.popScreen();
             }
         });

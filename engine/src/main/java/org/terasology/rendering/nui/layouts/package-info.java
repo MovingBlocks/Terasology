@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
 
 /**
- * @author Immortius
+ * A selection of basic layouts. Each layout can be used to describe how to position a set of nested widgets.
  */
-public interface ButtonEventListener {
+@API package org.terasology.rendering.nui.layouts;
 
-    void onButtonActivated(UIButton button);
-}
+import org.terasology.engine.API;

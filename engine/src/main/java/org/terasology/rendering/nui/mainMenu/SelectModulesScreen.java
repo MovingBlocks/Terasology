@@ -28,14 +28,15 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -151,9 +152,9 @@ public class SelectModulesScreen extends UIScreenLayer {
 
             UIButton toggle = find("toggleActivation", UIButton.class);
             if (toggle != null) {
-                toggle.subscribe(new ButtonEventListener() {
+                toggle.subscribe(new ActivateEventListener() {
                     @Override
-                    public void onButtonActivated(UIButton button) {
+                    public void onActivated(UIWidget button) {
                         if (moduleList.getSelection() != null) {
                             String id = moduleList.getSelection().getId();
                             if (selection.contains(id)) {
@@ -197,9 +198,9 @@ public class SelectModulesScreen extends UIScreenLayer {
         }
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        UIScreenLayerUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 ModuleConfig moduleConfig = config.getDefaultModSelection();
                 moduleConfig.clear();
                 for (Module module : selection.getSelection()) {

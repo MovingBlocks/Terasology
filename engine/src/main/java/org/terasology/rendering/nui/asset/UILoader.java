@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,6 +95,8 @@ import java.net.URL;
 import java.util.List;
 
 /**
+ * The UILoader handles loading UI widgets from json format files.
+ *
  * @author Immortius
  */
 public class UILoader implements AssetLoader<UIData> {
@@ -139,7 +141,7 @@ public class UILoader implements AssetLoader<UIData> {
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-                .registerTypeAdapter(UIData.class, new UIDataTypeAdapter(nuiManager))
+                .registerTypeAdapter(UIData.class, new UIDataTypeAdapter())
                 .registerTypeHierarchyAdapter(UIWidget.class, new UIWidgetTypeAdapter(nuiManager));
         for (Class<?> handledType : library.getCoreTypes()) {
             gsonBuilder.registerTypeAdapter(handledType, new JsonTypeHandlerAdapter<>(library.getHandlerFor(handledType)));
@@ -152,13 +154,10 @@ public class UILoader implements AssetLoader<UIData> {
         }
     }
 
+    /**
+     * Load UIData with a single, root widget
+     */
     private static final class UIDataTypeAdapter implements JsonDeserializer<UIData> {
-
-        private NUIManager nuiManager;
-
-        public UIDataTypeAdapter(NUIManager nuiManager) {
-            this.nuiManager = nuiManager;
-        }
 
         @Override
         public UIData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -166,6 +165,15 @@ public class UILoader implements AssetLoader<UIData> {
         }
     }
 
+    /**
+     * Loads a widget. This requires the following custom handling:
+     * <ul>
+     * <li>The class of the widget is determined through a URI in the "type" attribute</li>
+     * <li>If the "id" attribute is present, it is passed to the constructor</li>
+     * <li>If the widget is a layout, then a "contents" attribute provides a list of widgets for content.
+     * Each contained widget may have a "layoutInfo" attribute providing the layout hint for its container.</li>
+     * </ul>
+     */
     private static final class UIWidgetTypeAdapter implements JsonDeserializer<UIWidget> {
 
         private NUIManager nuiManager;
@@ -177,16 +185,19 @@ public class UILoader implements AssetLoader<UIData> {
         @Override
         public UIWidget deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject jsonObject = json.getAsJsonObject();
+
             String type = jsonObject.get("type").getAsString();
-            String id = null;
-            if (jsonObject.has("id")) {
-                id = jsonObject.get("id").getAsString();
-            }
             ClassMetadata<? extends UIWidget, ?> elementMetadata = nuiManager.getElementMetadataLibrary().resolve(type, ModuleContext.getContext());
             if (elementMetadata == null) {
                 logger.error("Unknown UIWidget type {}", type);
                 return null;
             }
+
+            String id = null;
+            if (jsonObject.has("id")) {
+                id = jsonObject.get("id").getAsString();
+            }
+
             UIWidget element;
             if (id != null) {
                 try {
@@ -205,6 +216,7 @@ public class UILoader implements AssetLoader<UIData> {
                 element = elementMetadata.newInstance();
             }
 
+            // Deserialize normal fields.
             for (FieldMetadata<? extends UIWidget, ?> field : elementMetadata.getFields()) {
                 if (jsonObject.has(field.getSerializationName())) {
                     if (field.getName().equals(CONTENTS_FIELD) && UILayout.class.isAssignableFrom(elementMetadata.getType())) {
@@ -229,6 +241,8 @@ public class UILoader implements AssetLoader<UIData> {
                     }
                 }
             }
+
+            // Deserialize contents and layout hints
             if (UILayout.class.isAssignableFrom(elementMetadata.getType())) {
                 UILayout layout = (UILayout) element;
 

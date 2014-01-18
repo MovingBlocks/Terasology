@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public interface NUIManager extends ComponentSystem {
 
     <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T  pushScreen(String screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
 
     void pushScreen(UIScreenLayer screen);
 

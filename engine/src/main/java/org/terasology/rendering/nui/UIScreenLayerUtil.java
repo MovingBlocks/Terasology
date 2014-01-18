@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package org.terasology.rendering.nui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UICheckbox;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UICheckbox;
 
 /**
  * @author Immortius
@@ -32,7 +32,7 @@ public final class UIScreenLayerUtil {
     private UIScreenLayerUtil() {
     }
 
-    public static void trySubscribe(UIScreenLayer screen, String id, ButtonEventListener listener) {
+    public static void trySubscribe(UIScreenLayer screen, String id, ActivateEventListener listener) {
         UIButton button = screen.find(id, UIButton.class);
         if (button != null) {
             button.subscribe(listener);

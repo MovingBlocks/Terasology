@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.layouts;
 
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -24,7 +24,7 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.baseWidgets.UIScrollbar;
+import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Arrays;
 import java.util.Iterator;

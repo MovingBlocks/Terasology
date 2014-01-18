@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.databinding;
 
 /**
- * @author Immortius
+ * This package contains the RelativeLayout and related classes. This layout allows contents to be positioned relative to each other or the area in which it is rendered.
  */
-public interface Binding<T> {
+@API package org.terasology.rendering.nui.layouts.relative;
 
-    T get();
-
-    void set(T value);
-}
+import org.terasology.engine.API;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class UIText extends CoreWidget {
     private int lastWidth;
     private Font lastFont;
 
-    private List<TextEventListener> listeners = Lists.newArrayList();
+    private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     private int offset;
 
@@ -253,8 +253,8 @@ public class UIText extends CoreWidget {
                     break;
                 }
                 case Keyboard.KeyId.ENTER: {
-                    for (TextEventListener listener : listeners) {
-                        listener.onEnterPressed(this);
+                    for (ActivateEventListener listener : listeners) {
+                        listener.onActivated(this);
                     }
                     break;
                 }
@@ -399,11 +399,11 @@ public class UIText extends CoreWidget {
         this.multiline = multiline;
     }
 
-    public void subscribe(TextEventListener listener) {
+    public void subscribe(ActivateEventListener listener) {
         listeners.add(listener);
     }
 
-    public void unsubscribe(TextEventListener listener) {
+    public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
     }
 

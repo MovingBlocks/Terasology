@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui.skin;
 
 import org.terasology.asset.Assets;
+import org.terasology.math.Border;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
@@ -123,6 +123,7 @@ public class UIStyle {
     /**
      * The margin is a gap between the outside of an element and the contents. Often this should be the same or a little more than the border.
      * For instance, a window's contents should sit inside the border.
+     *
      * @return The margin between the edges of an element and its contents
      */
     public Border getMargin() {
@@ -216,6 +217,7 @@ public class UIStyle {
 
     /**
      * The width to draw the element - if non-zero.
+     *
      * @return The fixed width to draw the element
      */
     public int getFixedWidth() {
@@ -228,6 +230,7 @@ public class UIStyle {
 
     /**
      * The height to draw the element - if non-zero.
+     *
      * @return The fixed height to draw the element
      */
     public int getFixedHeight() {
@@ -240,6 +243,7 @@ public class UIStyle {
 
     /**
      * If the element does not use the full width of the available to it, how should it be aligned
+     *
      * @return The horizontal alignment of the element
      */
     public HorizontalAlign getHorizontalAlignment() {
@@ -252,6 +256,7 @@ public class UIStyle {
 
     /**
      * If the element does not use the full height of the available to it, how should it be aligned
+     *
      * @return The vertical alignment of the element
      */
     public VerticalAlign getVerticalAlignment() {

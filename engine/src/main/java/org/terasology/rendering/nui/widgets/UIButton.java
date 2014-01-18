@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseWidgets;
+package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
@@ -41,7 +41,7 @@ public class UIButton extends CoreWidget {
 
     private boolean down;
 
-    private List<ButtonEventListener> listeners = Lists.newArrayList();
+    private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
@@ -109,8 +109,8 @@ public class UIButton extends CoreWidget {
     }
 
     private void activate() {
-        for (ButtonEventListener listener : listeners) {
-            listener.onButtonActivated(this);
+        for (ActivateEventListener listener : listeners) {
+            listener.onActivated(this);
         }
     }
 
@@ -138,11 +138,11 @@ public class UIButton extends CoreWidget {
         return image.get();
     }
 
-    public void subscribe(ButtonEventListener listener) {
+    public void subscribe(ActivateEventListener listener) {
         listeners.add(listener);
     }
 
-    public void unsubscribe(ButtonEventListener listener) {
+    public void unsubscribe(ActivateEventListener listener) {
         listeners.remove(listener);
     }
 }
