@@ -16,6 +16,7 @@
 package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
@@ -25,11 +26,13 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
+import org.terasology.input.Input;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
@@ -43,7 +46,7 @@ public class BindableButtonImpl implements BindableButton {
     private SimpleUri id;
     private String displayName;
     private BindButtonEvent buttonEvent;
-    private int activeInputs;
+    private Set<Input> activeInputs = Sets.newHashSet();
 
     private List<BindButtonSubscriber> subscribers = Lists.newArrayList();
     private ActivateMode mode = ActivateMode.BOTH;
@@ -113,7 +116,7 @@ public class BindableButtonImpl implements BindableButton {
 
     @Override
     public ButtonState getState() {
-        return (activeInputs > 0) ? ButtonState.DOWN : ButtonState.UP;
+        return (activeInputs.isEmpty()) ? ButtonState.UP : ButtonState.DOWN;
     }
 
     /**
@@ -140,14 +143,14 @@ public class BindableButtonImpl implements BindableButton {
      * Updates this bind with the new state of a bound button. This should be done whenever a bound button changes
      * state, so that the overall state of the bind can be tracked.
      *
-     *
      * @param pressed            Is the changing
      * @param delta              The length of the current frame
      * @param target             The current camera target
      * @param initialKeyConsumed Has the changing button's event already been consumed
      * @return Whether the button's event has been consumed
      */
-    public boolean updateBindState(boolean pressed,
+    public boolean updateBindState(Input input,
+                                   boolean pressed,
                                    float delta,
                                    EntityRef[] inputEntities,
                                    EntityRef target,
@@ -157,8 +160,9 @@ public class BindableButtonImpl implements BindableButton {
                                    boolean initialKeyConsumed) {
         boolean keyConsumed = initialKeyConsumed;
         if (pressed) {
-            activeInputs++;
-            if (activeInputs == 1 && mode.isActivatedOnPress()) {
+            boolean previouslyEmpty = activeInputs.isEmpty();
+            activeInputs.add(input);
+            if (previouslyEmpty && mode.isActivatedOnPress()) {
                 lastActivateTime = time.getGameTimeInMs();
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
@@ -175,9 +179,9 @@ public class BindableButtonImpl implements BindableButton {
                     keyConsumed = buttonEvent.isConsumed();
                 }
             }
-        } else if (activeInputs != 0) {
-            activeInputs--;
-            if (activeInputs == 0 && mode.isActivatedOnRelease()) {
+        } else if (!activeInputs.isEmpty()) {
+            activeInputs.remove(input);
+            if (activeInputs.isEmpty() && mode.isActivatedOnRelease()) {
                 if (!keyConsumed) {
                     keyConsumed = triggerOnRelease(delta, target);
                 }

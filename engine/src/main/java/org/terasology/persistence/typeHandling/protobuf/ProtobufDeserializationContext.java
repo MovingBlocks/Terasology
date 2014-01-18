@@ -17,7 +17,6 @@ package org.terasology.persistence.typeHandling.protobuf;
 
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -28,11 +27,11 @@ public class ProtobufDeserializationContext implements DeserializationContext {
 
     @Override
     public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> List<T> deserializeCollection(PersistedData data, Class<T> type) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 }

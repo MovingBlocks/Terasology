@@ -16,15 +16,13 @@
 
 package org.terasology.engine.module;
 
-import java.awt.AWTPermission;
-import java.security.AccessControlException;
-import java.security.Permission;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import java.security.AccessControlException;
+import java.security.Permission;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -60,7 +58,7 @@ public class ModuleSecurityManager extends SecurityManager {
         }
         allowedInstances.add(allowedPermission);
     }
-    
+
     public void addAPIClass(Class clazz) {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(ADD_API_CLASS);
@@ -79,11 +77,7 @@ public class ModuleSecurityManager extends SecurityManager {
         if (allowedInstances.contains(perm)) {
             return;
         }
-        
-        if (perm instanceof AWTPermission) {
-            throw new AccessControlException("No AWT permissions", perm);
-        }
-        
+
         calculatingPermission.set(true);
         try {
             Class[] classes = getClassContext();

@@ -124,6 +124,17 @@ public class InputSystem implements ComponentSystem {
         return bind;
     }
 
+    public void clearBinds() {
+        buttonLookup.clear();
+        buttonBinds.clear();
+        axisLookup.clear();
+        axisBinds.clear();
+        keyBinds.clear();
+        mouseButtonBinds.clear();
+        mouseWheelUpBind = null;
+        mouseWheelDownBind = null;
+    }
+
     public BindableButton getBindButton(SimpleUri bindId) {
         return buttonLookup.get(bindId);
     }
@@ -235,6 +246,7 @@ public class InputSystem implements ComponentSystem {
                         BindableButtonImpl bind = mouseButtonBinds.get(button);
                         if (bind != null) {
                             bind.updateBindState(
+                                    action.getInput(),
                                     action.getState().isDown(),
                                     delta,
                                     getInputEntities(),
@@ -256,6 +268,7 @@ public class InputSystem implements ComponentSystem {
                         if (bind != null) {
                             for (int i = 0; i < action.getTurns(); ++i) {
                                 bind.updateBindState(
+                                        action.getInput(),
                                         true,
                                         delta,
                                         getInputEntities(),
@@ -266,6 +279,7 @@ public class InputSystem implements ComponentSystem {
                                         consumed
                                 );
                                 bind.updateBindState(
+                                        action.getInput(),
                                         false,
                                         delta,
                                         getInputEntities(),
@@ -299,6 +313,7 @@ public class InputSystem implements ComponentSystem {
             BindableButtonImpl bind = keyBinds.get(action.getInput().getId());
             if (bind != null && action.getState() != ButtonState.REPEAT) {
                 bind.updateBindState(
+                        action.getInput(),
                         (action.getState() == ButtonState.DOWN),
                         delta, getInputEntities(),
                         targetSystem.getTarget(),

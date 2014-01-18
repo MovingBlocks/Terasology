@@ -183,7 +183,12 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sizeHint;
+        return new Vector2i();
+    }
+
+    @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Override

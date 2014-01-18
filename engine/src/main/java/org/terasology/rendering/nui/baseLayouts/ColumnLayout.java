@@ -39,6 +39,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     private int columns = 1;
     private int horizontalSpacing;
     private int verticalSpacing;
+    @SerializedName("auto-size-columns")
+    private boolean autoSizeColumns;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
@@ -107,22 +109,60 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 availableSize.x -= horizontalSpacing * (columns - 1);
             }
 
-            Iterator<List<UIWidget>> rows = getRowIterator();
+            List<List<UIWidget>> rows = Lists.newArrayList(getRowIterator());
+            List<RowInfo> rowInfos = Lists.newArrayList();
+            for (List<UIWidget> row : rows) {
+                rowInfos.add(calculateRowSize(row, canvas, availableSize));
+            }
+
+            int[] minWidths = new int[columns];
+            int minRowWidth = 0;
+            int rowOffsetX = 0;
+            if (autoSizeColumns) {
+                for (RowInfo row : rowInfos) {
+                    for (int column = 0; column < row.widgetSizes.size(); column++) {
+                        minWidths[column] = Math.max(minWidths[column], row.widgetSizes.get(column).getX());
+                    }
+                }
+
+                for (int width : minWidths) {
+                    minRowWidth += width;
+                }
+
+                minRowWidth += (columns - 1) * horizontalSpacing;
+
+                rowOffsetX = (canvas.size().x - minRowWidth) / 2;
+            } else {
+                minRowWidth = canvas.size().x;
+                for (int i = 0; i < columns; ++i) {
+                    minWidths[i] = TeraMath.floorToInt((minRowWidth - (columns - 1) * horizontalSpacing) * columnWidths[i]);
+                }
+            }
+
             int rowOffsetY = 0;
-            while (rows.hasNext()) {
-                List<UIWidget> row = rows.next();
-                RowInfo rowInfo = calculateRowSize(row, canvas, availableSize);
-                int cellOffsetX = 0;
+            int usedHeight = 0;
+            for (RowInfo row : rowInfos) {
+                usedHeight += row.height;
+            }
+            usedHeight += (rowInfos.size() - 1) * verticalSpacing;
+            int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
+            for (RowInfo row : rowInfos) {
+                row.height += extraSpacePerRow;
+            }
+            for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
+                List<UIWidget> row = rows.get(rowIndex);
+                RowInfo rowInfo = rowInfos.get(rowIndex);
+                int cellOffsetX = rowOffsetX;
                 for (int i = 0; i < row.size(); ++i) {
                     UIWidget widget = row.get(i);
-                    Vector2i widgetSize = rowInfo.widgetSizes.get(i);
+                    int rowHeight = rowInfo.height;
                     if (widget != null) {
-                        Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, rowOffsetY, widgetSize.x, rowInfo.size.y);
+                        Rect2i drawRegion = Rect2i.createFromMinAndSize(cellOffsetX, rowOffsetY, minWidths[i], rowHeight);
                         canvas.drawWidget(widget, drawRegion);
                     }
-                    cellOffsetX += widgetSize.x + horizontalSpacing;
+                    cellOffsetX += minWidths[i] + horizontalSpacing;
                 }
-                rowOffsetY += rowInfo.size.y + verticalSpacing;
+                rowOffsetY += rowInfo.height + verticalSpacing;
             }
         }
     }
@@ -131,7 +171,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         int availableWidth = areaHint.x - horizontalSpacing * (columns - 1);
 
         RowInfo rowInfo = new RowInfo();
-        rowInfo.size.x = availableWidth;
 
         for (int i = 0; i < columns && i < row.size(); ++i) {
             UIWidget widget = row.get(i);
@@ -139,11 +178,10 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
             cellSize.x *= columnWidths[i];
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
-                contentSize.x = cellSize.x;
                 rowInfo.widgetSizes.add(contentSize);
-                rowInfo.size.y = Math.max(rowInfo.size.y, contentSize.y);
+                rowInfo.height = Math.max(rowInfo.height, contentSize.y);
             } else {
-                rowInfo.widgetSizes.add(new Vector2i(cellSize.x, 0));
+                rowInfo.widgetSizes.add(new Vector2i(0, 0));
             }
         }
         return rowInfo;
@@ -151,7 +189,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
-        Vector2i availableSize = canvas.size();
+        Vector2i availableSize = new Vector2i(areaHint);
         int numRows = TeraMath.ceilToInt((float) widgetList.size() / columns);
         if (numRows > 0) {
             availableSize.y -= verticalSpacing * (numRows - 1);
@@ -161,16 +199,68 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         }
 
         Iterator<List<UIWidget>> rows = getRowIterator();
-        int height = 0;
+        Vector2i size = new Vector2i();
+        int[] columnSizes = new int[columns];
         while (rows.hasNext()) {
             List<UIWidget> row = rows.next();
             RowInfo rowInfo = calculateRowSize(row, canvas, availableSize);
-            height += rowInfo.size.y;
+            size.y += rowInfo.height;
             if (rows.hasNext()) {
-                height += verticalSpacing;
+                size.y += verticalSpacing;
+            }
+            for (int i = 0; i < rowInfo.widgetSizes.size(); ++i) {
+                columnSizes[i] = Math.max(columnSizes[i], rowInfo.widgetSizes.get(i).getX());
             }
         }
-        return new Vector2i(areaHint.x, height);
+        for (int columnSize : columnSizes) {
+            size.x += columnSize;
+        }
+
+        if (!autoSizeColumns) {
+            for (int i = 0; i < columns; ++i) {
+                size.x = Math.max(size.x, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
+            }
+        }
+
+        size.x += horizontalSpacing * (columns - 1);
+
+        return size;
+    }
+
+    @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        Iterator<List<UIWidget>> rows = getRowIterator();
+        Vector2i size = new Vector2i();
+        int[] columnSizes = new int[columns];
+        while (rows.hasNext()) {
+            List<UIWidget> row = rows.next();
+            int rowHeight = 0;
+            for (int i = 0; i < row.size(); ++i) {
+                Vector2i maxSize = canvas.calculateMaximumSize(row.get(i));
+                columnSizes[i] = Math.max(columnSizes[i], maxSize.x);
+                rowHeight = Math.max(rowHeight, maxSize.y);
+            }
+            size.y = TeraMath.addClampAtMax(size.y, rowHeight);
+            if (rows.hasNext()) {
+                size.y = TeraMath.addClampAtMax(size.y, verticalSpacing);
+            }
+        }
+
+        long width = 0;
+        for (int columnSize : columnSizes) {
+            width += columnSize;
+        }
+
+        if (!autoSizeColumns) {
+            for (int i = 0; i < columns; ++i) {
+                width = Math.min(width, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
+            }
+        }
+
+        width += horizontalSpacing * (columns - 1);
+
+        size.x = (int) Math.min(Integer.MAX_VALUE, width);
+        return size;
     }
 
     @Override
@@ -218,6 +308,14 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         this.verticalSpacing = verticalSpacing;
     }
 
+    public boolean isAutoSizeColumns() {
+        return autoSizeColumns;
+    }
+
+    public void setAutoSizeColumns(boolean autoSizeColumns) {
+        this.autoSizeColumns = autoSizeColumns;
+    }
+
     private Iterator<List<UIWidget>> getRowIterator() {
         return new Iterator<List<UIWidget>>() {
 
@@ -247,7 +345,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     }
 
     private static class RowInfo {
-        private Vector2i size = new Vector2i();
+        private int height;
         private List<Vector2i> widgetSizes = Lists.newArrayList();
 
     }

@@ -78,6 +78,11 @@ public class ScrollableArea extends CoreLayout {
     }
 
     @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    @Override
     public Iterator<UIWidget> iterator() {
         return Arrays.asList(content).iterator();
     }

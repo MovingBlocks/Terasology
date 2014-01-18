@@ -46,6 +46,6 @@ public class SetTypeHandler<T> extends SimpleTypeHandler<Set<T>> {
 
     @Override
     public Set<T> deserialize(PersistedData data, DeserializationContext context) {
-        return Sets.newHashSet(contentsHandler.deserializeCollection(data, context));
+        return Sets.newLinkedHashSet(contentsHandler.deserializeCollection(data, context));
     }
 }

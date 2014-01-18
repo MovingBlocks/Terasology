@@ -67,6 +67,7 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
         InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
+        inputSystem.clearBinds();
         for (Module module : moduleManager.getActiveModules()) {
             if (module.isCodeModule()) {
                 registerButtonBinds(inputSystem, module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);

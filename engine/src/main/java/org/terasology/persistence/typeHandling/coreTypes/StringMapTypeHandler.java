@@ -51,7 +51,7 @@ public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
 
     @Override
     public Map<String, T> deserialize(PersistedData data, DeserializationContext context) {
-        Map<String, T> result = Maps.newHashMap();
+        Map<String, T> result = Maps.newLinkedHashMap();
         if (data.isValueMap()) {
             for (Map.Entry<String, PersistedData> item : data.getAsValueMap().entrySet()) {
                 result.put(item.getKey(), contentsHandler.deserialize(item.getValue(), context));

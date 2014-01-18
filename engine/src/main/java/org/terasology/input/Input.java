@@ -24,22 +24,6 @@ package org.terasology.input;
  */
 public interface Input {
 
-    /*static Input parse(String inputString) {
-        String normalisedString = inputString.toUpperCase(Locale.ENGLISH);
-        if (normalisedString.startsWith("KEY_")) {
-            int id = Keyboard.getKeyIndex(normalisedString.substring(4));
-            if (id != Keyboard.KEY_NONE) {
-                return new Input(InputType.KEY, id);
-            }
-        } else {
-            MouseInput mouseInput = MouseInput.parse(normalisedString);
-            if (mouseInput != MouseInput.MOUSE_NONE) {
-                return mouseInput.getInput();
-            }
-        }
-        return new Input();
-    }*/
-
     InputType getType();
 
     int getId();
@@ -47,31 +31,4 @@ public interface Input {
     String getName();
 
     String getDisplayName();
-    /*{
-        switch (type) {
-            case KEY:
-                return Keyboard.getKeyName(id);
-            case MOUSE_BUTTON:
-            case MOUSE_WHEEL:
-                return MouseInput.find(type, id).toShortString();
-        }
-        return "";
-    } */
-
-    /*@Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj instanceof Input) {
-            Input other = (Input) obj;
-            return Objects.equals(type, other.type) && Objects.equals(id, other.id);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, id);
-    }*/
 }

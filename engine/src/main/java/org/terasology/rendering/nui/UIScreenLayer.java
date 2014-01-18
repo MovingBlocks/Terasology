@@ -110,6 +110,11 @@ public class UIScreenLayer extends AbstractWidget {
     }
 
     @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    @Override
     public boolean isSkinAppliedByCanvas() {
         return true;
     }

@@ -60,6 +60,8 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint);
 
+    Vector2i getMaxContentSize(Canvas canvas);
+
     boolean isSkinAppliedByCanvas();
 
 }

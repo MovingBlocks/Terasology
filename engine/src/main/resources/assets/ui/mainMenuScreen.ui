@@ -34,8 +34,8 @@
             {
                 "type" : "engine:columnLayout",
                 "layoutInfo" : {
-                    "width" : 280,
-                    "height" : 288,
+                    "use-content-width" : true,
+                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",

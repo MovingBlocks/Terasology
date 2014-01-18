@@ -96,7 +96,7 @@ public interface Canvas {
     UIStyle getCurrentStyle();
 
     /**
-     * Calculates the size an widget will take, given no space restrictions.
+     * Calculates the minimum size a widget will take, given no space restrictions.
      * Skin settings are automatically taken into account, unless widget.isSkinAppliedByCanvas() returns false (in which case it
      * is up to the widget to apply any style settings it needs).
      *
@@ -106,7 +106,7 @@ public interface Canvas {
     Vector2i calculatePreferredSize(UIWidget widget);
 
     /**
-     * Calculates the size an widget will take, given space restrictions. May still extend pass the restrictions if it has a minimum size, or simply cannot fit.
+     * Calculates the minimum size a widget will take, given space restrictions. May still extend pass the restrictions if it has a minimum size, or simply cannot fit.
      * Skin settings are automatically taken into account, unless widget.isSkinAppliedByCanvas() returns false (in which case it
      * is up to the widget to apply any style settings it needs).
      *
@@ -115,6 +115,13 @@ public interface Canvas {
      * @return The restricted size of the widget
      */
     Vector2i calculateRestrictedSize(UIWidget widget, Vector2i sizeRestrictions);
+
+    /**
+     * Calcualtes the maximum size a widget can take. A dimension will be Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE) if unbounded
+     * @param widget The widget to get the maximum size of.
+     * @return The maximum size of the widget.
+     */
+    Vector2i calculateMaximumSize(UIWidget widget);
 
     /**
      * Draws a widget to fill the current canvas. Skin settings are applied, unless widget.isSkinAppliedByCanvas() returns false (in which case it is up to the widget

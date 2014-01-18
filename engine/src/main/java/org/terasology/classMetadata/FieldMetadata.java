@@ -16,6 +16,7 @@
 package org.terasology.classMetadata;
 
 import com.google.common.base.Objects;
+import com.google.gson.annotations.SerializedName;
 import org.terasology.classMetadata.copying.CopyStrategy;
 import org.terasology.classMetadata.reflect.FieldAccessor;
 import org.terasology.classMetadata.reflect.InaccessibleFieldException;
@@ -39,6 +40,8 @@ public class FieldMetadata<T, U> {
     private final FieldAccessor<T, U> accessor;
     private final CopyStrategy<U> copyStrategy;
 
+    private final String serializationName;
+
     private byte id;
 
     /**
@@ -54,6 +57,13 @@ public class FieldMetadata<T, U> {
         this.type = (Class<U>) determineType(field, owner.getType());
         this.accessor = factory.createFieldAccessor(owner.getType(), field, type);
         this.field = field;
+        SerializedName name = field.getAnnotation(SerializedName.class);
+        if (name != null) {
+            serializationName = name.value();
+        } else {
+            serializationName = field.getName();
+        }
+
     }
 
     private static Class<?> determineType(Field field, Class<?> ownerType) {
@@ -78,6 +88,13 @@ public class FieldMetadata<T, U> {
      */
     public String getName() {
         return field.getName();
+    }
+
+    /**
+     * @return The serialization name of the field
+     */
+    public String getSerializationName() {
+        return serializationName;
     }
 
     /**
