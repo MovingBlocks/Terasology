@@ -301,7 +301,9 @@
         "menu-options" : {
             "elements" : {
                 "UIButton" : {
+                    "min-width" : 192,
                     "min-height" : 32
+
                 }
             }
         },
