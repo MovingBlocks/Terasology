@@ -39,7 +39,8 @@ public class PropertyLayout extends MigLayout {
             final UIButton expand = new UIButton("", "+");
             final UILabel headline = new UILabel(label);
             final MigLayout layout = new MigLayout();
-            layout.setColConstraints("[pref][fill]");
+            layout.setColConstraints("[min][fill]");
+            layout.setRowConstraints("[min]");
 
             expand.subscribe(new ButtonEventListener() {
                 @Override

@@ -173,6 +173,11 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         return new Vector2i(grid.getWidth()[1], grid.getHeight()[1]);
     }
 
+    @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        return getPreferredContentSize(canvas, Vector2i.zero());
+    }
+
     private ComponentWrapper getWrapper(UIWidget comp) {
         ComponentWrapper cw;
         if (comp instanceof MigLayout) {

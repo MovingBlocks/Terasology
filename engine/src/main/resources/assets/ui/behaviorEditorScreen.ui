@@ -17,6 +17,7 @@
             {
                 "type" : "propertyLayout",
                 "id" : "properties",
+                "rowConstraints" : "[min]",
                 "layoutInfo" : {
                     "cc" : "cell 2 3, aligny top, w 200!"
                 }
@@ -24,6 +25,7 @@
             {
                 "type" : "propertyLayout",
                 "id" : "entity_properties",
+                "rowConstraints" : "[min]",
                 "layoutInfo" : {
                     "cc" : "cell 2 4, aligny top, w 200!"
                 }
