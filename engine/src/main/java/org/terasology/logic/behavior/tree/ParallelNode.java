@@ -98,10 +98,6 @@ public class ParallelNode extends CompositeNode {
         }
 
         @Override
-        public void onTerminate(Status result) {
-        }
-
-        @Override
         public ParallelNode getNode() {
             return (ParallelNode) super.getNode();
         }

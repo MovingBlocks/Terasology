@@ -92,6 +92,8 @@ public class SequenceTest {
         Assert.assertEquals(Status.RUNNING, selector.getStatus());
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, selector.getStatus());
+        interpreter.tick(0);
+        Assert.assertEquals(Status.RUNNING, selector.getStatus());
 
         verify(spies[0]).onTerminate(Status.SUCCESS);
         verify(spies[1]).onInitialize();
@@ -125,6 +127,7 @@ public class SequenceTest {
     }
 
     private Node create(final Mocker mocker) {
+        final Node node = new DebugNode(1);
         return new Node() {
             @Override
             public Task create() {
@@ -132,6 +135,11 @@ public class SequenceTest {
                     @Override
                     public Status update(float dt) {
                         return null;
+                    }
+
+                    @Override
+                    public Node getNode() {
+                        return node;
                     }
                 });
                 mocker.mock(spy);

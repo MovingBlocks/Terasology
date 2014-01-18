@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.behavior;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
@@ -35,6 +36,83 @@ public class InterpreterTest {
     private Status result = Status.RUNNING;
     private Node node;
     private Task task;
+
+    @Test
+    public void test0() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(0);
+
+        interpreter.setRoot(debugNode);
+        interpreter.start();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask first = debugNode.lastTask;
+        Assert.assertTrue(first.updateCalled);
+        Assert.assertTrue(first.initializeCalled);
+        Assert.assertTrue(first.terminateCalled);
+
+        Assert.assertTrue(interpreter.tick(0) == 0);
+    }
+
+    @Test
+    public void test1() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(1);
+
+        interpreter.setRoot(debugNode);
+        interpreter.start();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask first = debugNode.lastTask;
+        Assert.assertTrue(first.updateCalled);
+        Assert.assertTrue(first.initializeCalled);
+        Assert.assertTrue(!first.terminateCalled);
+        first.reset();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask last = debugNode.lastTask;
+        Assert.assertTrue(last.updateCalled);
+        Assert.assertTrue(!last.initializeCalled);
+        Assert.assertTrue(last.terminateCalled);
+        Assert.assertSame(first, last);
+
+        Assert.assertTrue(interpreter.tick(0) == 0);
+    }
+
+    @Test
+    public void testX() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(10);
+
+        interpreter.setRoot(debugNode);
+        interpreter.start();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask first = debugNode.lastTask;
+        Assert.assertTrue(first.updateCalled);
+        Assert.assertTrue(first.initializeCalled);
+        Assert.assertTrue(!first.terminateCalled);
+        first.reset();
+
+        for (int i = 0; i < 9; i++) {
+            Assert.assertTrue(interpreter.tick(0) > 0);
+            DebugNode.DebugTask current = debugNode.lastTask;
+            Assert.assertSame(first, current);
+            Assert.assertTrue(current.updateCalled);
+            Assert.assertTrue(!current.initializeCalled);
+            Assert.assertTrue(!current.terminateCalled);
+            current.reset();
+        }
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask last = debugNode.lastTask;
+        Assert.assertTrue(last.updateCalled);
+        Assert.assertTrue(!last.initializeCalled);
+        Assert.assertTrue(last.terminateCalled);
+        Assert.assertSame(first, last);
+
+        Assert.assertTrue(interpreter.tick(0) == 0);
+    }
 
     @Test
     public void testInit() {

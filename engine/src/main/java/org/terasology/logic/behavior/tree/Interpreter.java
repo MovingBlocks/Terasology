@@ -104,7 +104,7 @@ public class Interpreter {
         }
     }
 
-    public void tick(float dt) {
+    public int tick(float dt) {
         if( debugger==null || debugger.beforeTick() ) {
             startedNodes.clear();
             while (step(dt)) {
@@ -114,6 +114,7 @@ public class Interpreter {
                 debugger.afterTick();
             }
         }
+        return startedNodes.size();
     }
 
     public boolean step(float dt) {
@@ -131,11 +132,13 @@ public class Interpreter {
 
         current.tick(dt);
 
-        if (current.getStatus() != Status.RUNNING && current.getObserver() != null) {
+        if (current.getStatus() != Status.RUNNING ) {
             if( debugger!=null ) {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }
-            current.getObserver().handle(current.getStatus());
+            if( current.getObserver() != null ) {
+                current.getObserver().handle(current.getStatus());
+            }
         } else {
             tasks.addLast(current);
             if( debugger!=null ) {

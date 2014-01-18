@@ -34,6 +34,63 @@ import static org.mockito.Mockito.when;
  */
 public class RepeatTest {
     @Test
+    public void test0() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(0);
+        RepeatNode repeatNode = new RepeatNode(debugNode);
+        interpreter.setRoot(repeatNode);
+        interpreter.start();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask first = debugNode.lastTask2;
+        Assert.assertTrue(first.updateCalled);
+        Assert.assertTrue(first.initializeCalled);
+        Assert.assertTrue(first.terminateCalled);
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask second = debugNode.lastTask2;
+        Assert.assertTrue(second.updateCalled);
+        Assert.assertTrue(second.initializeCalled);
+        Assert.assertTrue(second.terminateCalled);
+        Assert.assertNotSame(first, second);
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+    }
+
+    @Test
+    public void test1() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(1);
+        RepeatNode repeatNode = new RepeatNode(debugNode);
+
+        interpreter.setRoot(repeatNode);
+        interpreter.start();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask first = debugNode.lastTask;
+        Assert.assertTrue(first.updateCalled);
+        Assert.assertTrue(first.initializeCalled);
+        Assert.assertTrue(!first.terminateCalled);
+        first.reset();
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask last = debugNode.lastTask2;
+        Assert.assertTrue(last.updateCalled);
+        Assert.assertTrue(!last.initializeCalled);
+        Assert.assertTrue(last.terminateCalled);
+        Assert.assertSame(first, last);
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+        DebugNode.DebugTask second = debugNode.lastTask;
+        Assert.assertTrue(second.updateCalled);
+        Assert.assertTrue(second.initializeCalled);
+        Assert.assertTrue(!second.terminateCalled);
+        Assert.assertNotSame(first, second);
+
+        Assert.assertTrue(interpreter.tick(0) > 0);
+    }
+
+    @Test
     public void testRepeatEndless() {
         Interpreter interpreter = new Interpreter(null);
         RepeatNode repeat = new RepeatNode(create(new Mocker() {
@@ -95,7 +152,7 @@ public class RepeatTest {
 
         ParallelNode move = new ParallelNode(ParallelNode.Policy.RequireOne, ParallelNode.Policy.RequireOne);
 
-        move.children().add(new CounterNode(3));
+        move.children().add(new DebugNode(3));
         move.children().add(mock);
         Task task = move.create();
 
@@ -112,6 +169,7 @@ public class RepeatTest {
 
 
     private Node create(final Mocker mocker) {
+        final Node node = new DebugNode(1);
         return new Node() {
             @Override
             public Task create() {
@@ -119,6 +177,11 @@ public class RepeatTest {
                     @Override
                     public Status update(float dt) {
                         return null;
+                    }
+
+                    @Override
+                    public Node getNode() {
+                        return node;
                     }
                 });
                 mocker.mock(spy);

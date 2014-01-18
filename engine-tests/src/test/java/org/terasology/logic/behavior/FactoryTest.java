@@ -62,12 +62,12 @@ public class FactoryTest {
 
     private BehaviorTreeData buildSample() {
         SequenceNode sequence = new SequenceNode();
-        sequence.children().add(new CounterNode(1));
-        sequence.children().add(new RepeatNode(new CounterNode(2)));
+        sequence.children().add(new DebugNode(1));
+        sequence.children().add(new RepeatNode(new DebugNode(2)));
         ParallelNode parallel = new ParallelNode(ParallelNode.Policy.RequireAll, ParallelNode.Policy.RequireAll);
         sequence.children().add(parallel);
         parallel.children().add(new MonitorNode());
-        parallel.children().add(new CounterNode(3));
+        parallel.children().add(new DebugNode(3));
         BehaviorTreeData tree = new BehaviorTreeData();
         tree.setRoot(sequence);
         tree.createRenderable();

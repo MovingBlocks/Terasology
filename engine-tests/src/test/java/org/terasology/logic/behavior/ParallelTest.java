@@ -149,6 +149,7 @@ public class ParallelTest {
     }
 
     private Node create(final Mocker mocker) {
+        final Node node = new DebugNode(1);
         return new Node() {
             @Override
             public Task create() {
@@ -156,6 +157,11 @@ public class ParallelTest {
                     @Override
                     public Status update(float dt) {
                         return null;
+                    }
+
+                    @Override
+                    public Node getNode() {
+                        return node;
                     }
                 });
                 mocker.mock(spy);

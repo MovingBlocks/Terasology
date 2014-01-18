@@ -59,13 +59,13 @@ public class CounterNode extends DecoratorNode {
         public Status update(float dt) {
             if (count > 0) {
                 count--;
-                return Status.RUNNING;
-            } else {
+            } else if( count==0 ) {
                 if( getNode().child!=null ) {
                     interpreter().start(getNode().child, this);
                 }
-                return Status.RUNNING;
+                count--;
             }
+            return Status.RUNNING;
         }
 
         @Override
