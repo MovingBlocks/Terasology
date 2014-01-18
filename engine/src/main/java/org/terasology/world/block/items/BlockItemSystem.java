@@ -79,7 +79,13 @@ public class BlockItemSystem implements ComponentSystem {
         Side surfaceSide = Side.inDirection(event.getHitNormal());
         Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
-        Vector3i targetBlock = event.getTarget().getComponent(BlockComponent.class).getPosition();
+        BlockComponent blockComponent = event.getTarget().getComponent(BlockComponent.class);
+        if (blockComponent == null) {
+            // If there is no block there (i.e. it's a BlockGroup, we don't allow placing block, try somewhere else)
+            event.consume();
+            return;
+        }
+        Vector3i targetBlock = blockComponent.getPosition();
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceSide.getVector3i());
 
