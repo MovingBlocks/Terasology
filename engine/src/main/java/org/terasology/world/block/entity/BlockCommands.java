@@ -227,13 +227,6 @@ public class BlockCommands implements ComponentSystem {
         return giveBlock(uri, 16, client);
     }
 
-    @Command(shortDescription = "Adds a block to your inventory",
-            helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory",
-            runOnServer = true)
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, EntityRef client) {
-        return giveBlock(uri, shapeUri, 16, client);
-    }
-
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory", runOnServer = true)
     public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity, EntityRef client) {
         List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
