@@ -61,10 +61,11 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             write.setIndent("  ");
             write.beginObject().name("model");
             treeGson.saveTree(write, data.getRoot());
-            if (data.hasRenderable()) {
-                write.name("renderer");
-                renderableTreeGson.saveTree(write, data.getRenderableRoot());
-            }
+//            do not write out renderables, they are positioned when loaded
+//            if (data.hasRenderable()) {
+//                write.name("renderer");
+//                renderableTreeGson.saveTree(write, data.getRenderableRoot());
+//            }
             write.endObject();
         }
     }
