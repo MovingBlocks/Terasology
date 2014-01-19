@@ -28,11 +28,9 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
-import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
@@ -211,31 +209,5 @@ public class DoorSystem implements ComponentSystem {
 
         door.isOpen = !door.isOpen;
         entity.saveComponent(door);
-    }
-
-    @ReceiveEvent(components = {DoorComponent.class, LocationComponent.class})
-    public void onDamaged(OnDamagedEvent event, EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        DoorComponent doorComponent = entity.getComponent(DoorComponent.class);
-        Vector3f center = location.getWorldPosition();
-        EntityRef particlesEntity = entityManager.create();
-        particlesEntity.addComponent(new LocationComponent(center));
-
-        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-        particleEffect.spawnCount = 64;
-        particleEffect.blockType = doorComponent.bottomBlockFamily;
-        particleEffect.initialVelocityRange.set(4, 4, 4);
-        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
-        particleEffect.destroyEntityOnCompletion = true;
-        particleEffect.minSize = 0.05f;
-        particleEffect.maxSize = 0.1f;
-        particleEffect.minLifespan = 1f;
-        particleEffect.maxLifespan = 1.5f;
-        particleEffect.targetVelocity.set(0, -5, 0);
-        particleEffect.acceleration.set(2f, 2f, 2f);
-        particleEffect.collideWithBlocks = true;
-        particlesEntity.addComponent(particleEffect);
-
-        audioManager.playSound(Assets.getSound("engine:Dig"), 1.0f);
     }
 }
