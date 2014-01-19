@@ -76,7 +76,7 @@ public class StateMainMenu implements GameState {
         eventSystem = CoreRegistry.get(EventSystem.class);
 
         nuiManager = CoreRegistry.get(NUIManager.class);
-        ((NUIManagerInternal) nuiManager).refreshElementsLibrary();
+        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

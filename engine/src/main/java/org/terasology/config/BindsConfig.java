@@ -43,6 +43,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,6 +96,15 @@ public final class BindsConfig {
 
     public void setBinds(SimpleUri bindUri, Iterable<Input> inputs) {
         Set<Input> uniqueInputs = Sets.newLinkedHashSet(inputs);
+
+        // Clear existing usages of the given inputs
+        Iterator<Input> iterator = data.values().iterator();
+        while (iterator.hasNext()) {
+            Input i = iterator.next();
+            if (uniqueInputs.contains(i)) {
+                iterator.remove();
+            }
+        }
         data.replaceValues(bindUri, uniqueInputs);
     }
 
@@ -150,7 +160,10 @@ public final class BindsConfig {
         for (Annotation annotation : buttonEvent.getAnnotations()) {
             if (annotation instanceof DefaultBinding) {
                 DefaultBinding defaultBinding = (DefaultBinding) annotation;
-                defaultInputs.add(defaultBinding.type().getInput(defaultBinding.id()));
+                Input input = defaultBinding.type().getInput(defaultBinding.id());
+                if (!data.values().contains(input)) {
+                    defaultInputs.add(input);
+                }
             }
         }
         SimpleUri bindUri = new SimpleUri(moduleName, info.id());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 /**
  * @author Immortius
  */
-public interface NUIManager extends ComponentSystem {
+public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer pushScreen(AssetUri screenUri);
 
@@ -30,7 +30,7 @@ public interface NUIManager extends ComponentSystem {
 
     <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T  pushScreen(String screenUri, Class<T> expectedType);
+    <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
 
     void pushScreen(UIScreenLayer screen);
 
@@ -52,7 +52,7 @@ public interface NUIManager extends ComponentSystem {
 
     void update(float delta);
 
-    ClassLibrary<UIWidget> getElementMetadataLibrary();
+    ClassLibrary<UIWidget> getWidgetMetadataLibrary();
 
     void setFocus(UIWidget element);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ import org.terasology.rendering.nui.Canvas;
 
 /**
  * An item renderer draws an object of a given type as part of a UI.
+ *
  * @author Immortius
  */
 public interface ItemRenderer<T> {
 
     /**
-     * @param value The object to format.
+     * @param value  The object to format.
      * @param canvas The canvas to draw the item with.
      */
     void draw(T value, Canvas canvas);

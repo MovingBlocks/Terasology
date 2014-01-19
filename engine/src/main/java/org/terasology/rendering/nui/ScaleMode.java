@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import org.terasology.math.Rect2i;
 import javax.vecmath.Vector2f;
 
 /**
+ * Describes the possible methods drawing to a region of a different size to the image being drawn.
  * @author Immortius
  */
 public enum ScaleMode {
@@ -65,5 +66,12 @@ public enum ScaleMode {
         }
     };
 
+    /**
+     * Provides the final size to draw the  when drawing with this ScaleMode to the given region.
+     * @param region
+     * @param actualWidth
+     * @param actualHeight
+     * @return The relative scale to draw the
+     */
     public abstract Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight);
 }

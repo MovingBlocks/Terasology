@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ public interface UILayout<T extends LayoutHint> extends UIWidget {
 
     /**
      * Adds a widget with an optional layout hint
+     *
      * @param element
-     * @param hint A hint as to how the widget should be laid out - may be null (and null values should be handled).
+     * @param hint    A hint as to how the widget should be laid out - may be null (and null values should be handled).
      */
     void addWidget(UIWidget element, T hint);
 }

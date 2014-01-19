@@ -18,6 +18,7 @@ package org.terasology.audio.openAL.streamingSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 import org.terasology.audio.openAL.OpenALException;
@@ -34,11 +35,13 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     protected int[] buffers = new int[0];
     protected int lastUpdatedBuffer;
 
+    private AudioManager audioManager;
     private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
-    public OpenALStreamingSound(AssetUri uri, StreamingSoundData data) {
+    public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, AudioManager audioManager) {
         super(uri);
+        this.audioManager = audioManager;
         reload(data);
     }
 
@@ -85,6 +88,16 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
 
     public int getBufferSize() {
         return alGetBufferi(lastUpdatedBuffer, AL_SIZE);
+    }
+
+    @Override
+    public void play() {
+        audioManager.playSound(this);
+    }
+
+    @Override
+    public void play(float volume) {
+        audioManager.playSound(this, volume);
     }
 
     public int getBufferId() {

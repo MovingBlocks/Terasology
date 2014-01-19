@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,17 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UISlider;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UISlider;
 
 /**
  * @author Immortius
  */
 public class AudioSettingsScreen extends UIScreenLayer {
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private Config config;
@@ -56,10 +52,10 @@ public class AudioSettingsScreen extends UIScreenLayer {
             music.bindValue(BindHelper.bindBeanProperty("musicVolume", config.getAudio(), Float.TYPE));
         }
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
             }
         });
     }

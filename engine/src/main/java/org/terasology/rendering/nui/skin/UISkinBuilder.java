@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import org.terasology.math.Border;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
@@ -39,6 +39,7 @@ import java.util.Set;
  */
 public class UISkinBuilder {
 
+    private UISkin baseSkin;
     private Set<String> families = Sets.newLinkedHashSet();
     private Set<StyleKey> baseStyleKeys = Sets.newLinkedHashSet();
 
@@ -61,6 +62,11 @@ public class UISkinBuilder {
             baseStyles.put(currentFamily, currentStyle);
         }
         currentStyle = new UIStyleFragment();
+    }
+
+    public UISkinBuilder setBaseSkin(UISkin skin) {
+        this.baseSkin = skin;
+        return this;
     }
 
     public UISkinBuilder setFamily(String family) {
@@ -184,13 +190,75 @@ public class UISkinBuilder {
         saveStyle();
         Map<String, UIStyleFamily> skinFamilies = Maps.newHashMap();
 
-        UIStyle rootStyle = new UIStyle();
-        baseStyles.get("").applyTo(rootStyle);
-        skinFamilies.put("", buildFamily("", rootStyle));
-        for (String family : families) {
-            skinFamilies.put(family, buildFamily(family, rootStyle));
+        if (baseSkin != null) {
+            UIStyle rootStyle = new UIStyle(baseSkin.getDefaultStyle());
+            baseStyles.get("").applyTo(rootStyle);
+            skinFamilies.put("", buildFamily("", baseSkin));
+            for (String family : families) {
+                skinFamilies.put(family, buildFamily(family, baseSkin));
+            }
+            for (String family : baseSkin.getFamilies()) {
+                if (!skinFamilies.containsKey(family)) {
+                    skinFamilies.put(family, baseSkin.getFamily(family));
+                }
+            }
+            return new UISkinData(skinFamilies);
+        } else {
+            UIStyle rootStyle = new UIStyle();
+            baseStyles.get("").applyTo(rootStyle);
+            skinFamilies.put("", buildFamily("", rootStyle));
+            for (String family : families) {
+                skinFamilies.put(family, buildFamily(family, rootStyle));
+            }
+            return new UISkinData(skinFamilies);
         }
-        return new UISkinData(skinFamilies);
+    }
+
+    private UIStyleFamily buildFamily(String family, UISkin skin) {
+        UIStyleFamily baseFamily = skin.getFamily(family);
+        UIStyle baseStyle = new UIStyle(skin.getDefaultStyleFor(family));
+        if (!family.isEmpty()) {
+            UIStyleFragment fragment = baseStyles.get(family);
+            fragment.applyTo(baseStyle);
+        }
+
+        Set<StyleKey> inheritedStyleKey = Sets.newLinkedHashSet();
+        for (Class<? extends UIWidget> widget : baseFamily.getWidgets()) {
+            inheritedStyleKey.add(new StyleKey(widget, "", ""));
+            for (String part : baseFamily.getPartsFor(widget)) {
+                inheritedStyleKey.add(new StyleKey(widget, part, ""));
+                for (String mode : baseFamily.getModesFor(widget, part)) {
+                    inheritedStyleKey.add(new StyleKey(widget, part, mode));
+                }
+            }
+        }
+
+        Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> familyStyles = Maps.newHashMap();
+        Map<StyleKey, UIStyleFragment> styleLookup = elementStyles.row(family);
+        Map<StyleKey, UIStyleFragment> baseStyleLookup = (family.isEmpty()) ? Maps.<StyleKey, UIStyleFragment>newHashMap() : elementStyles.row("");
+        for (StyleKey styleKey : Sets.union(Sets.union(styleLookup.keySet(), baseStyleKeys), inheritedStyleKey)) {
+            UIStyle elementStyle = new UIStyle(baseSkin.getStyleFor(family, styleKey.element, styleKey.part, styleKey.mode));
+            baseStyles.get("").applyTo(elementStyle);
+            baseStyles.get(family).applyTo(elementStyle);
+            List<Class<? extends UIWidget>> inheritanceTree = ReflectionUtil.getInheritanceTree(styleKey.element, UIWidget.class);
+            applyStylesForInheritanceTree(inheritanceTree, "", "", elementStyle, styleLookup, baseStyleLookup);
+
+            if (!styleKey.part.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, "", elementStyle, styleLookup, baseStyleLookup);
+            }
+
+            if (!styleKey.mode.isEmpty()) {
+                applyStylesForInheritanceTree(inheritanceTree, styleKey.part, styleKey.mode, elementStyle, styleLookup, baseStyleLookup);
+            }
+
+            Table<String, String, UIStyle> elementTable = familyStyles.get(styleKey.element);
+            if (elementTable == null) {
+                elementTable = HashBasedTable.create();
+                familyStyles.put(styleKey.element, elementTable);
+            }
+            elementTable.put(styleKey.part, styleKey.mode, elementStyle);
+        }
+        return new UIStyleFamily(baseStyle, familyStyles);
     }
 
     private UIStyleFamily buildFamily(String family, UIStyle defaultStyle) {

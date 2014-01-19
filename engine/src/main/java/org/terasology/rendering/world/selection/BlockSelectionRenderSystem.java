@@ -84,25 +84,23 @@ public class BlockSelectionRenderSystem implements RenderSystem {
         selectionRenderer.beginRenderOverlay();
         Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
-        if (blockSelectionComponent.startPosition != null) {
-            selectionRenderer.beginRenderOverlay();
-            if (blockSelectionComponent.currentSelection == null) {
-                selectionRenderer.renderMark(blockSelectionComponent.startPosition, cameraPosition);
-            } else {
-                Vector3i size = blockSelectionComponent.currentSelection.size();
-                Vector3i block = new Vector3i();
-                for (int z = 0; z < size.z; z++) {
-                    for (int y = 0; y < size.y; y++) {
-                        for (int x = 0; x < size.x; x++) {
-                            block.set(x, y, z);
-                            block.add(blockSelectionComponent.currentSelection.min());
-                            selectionRenderer.renderMark(block, cameraPosition);
-                        }
+        selectionRenderer.beginRenderOverlay();
+        if (blockSelectionComponent.currentSelection == null) {
+            selectionRenderer.renderMark(blockSelectionComponent.startPosition, cameraPosition);
+        } else {
+            Vector3i size = blockSelectionComponent.currentSelection.size();
+            Vector3i block = new Vector3i();
+            for (int z = 0; z < size.z; z++) {
+                for (int y = 0; y < size.y; y++) {
+                    for (int x = 0; x < size.x; x++) {
+                        block.set(x, y, z);
+                        block.add(blockSelectionComponent.currentSelection.min());
+                        selectionRenderer.renderMark(block, cameraPosition);
                     }
                 }
             }
-            selectionRenderer.endRenderOverlay();
         }
+        selectionRenderer.endRenderOverlay();
 
     }
 

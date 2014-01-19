@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@ package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.entitySystem.systems.In;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
 
 /**
  * @author Immortius
@@ -30,38 +29,35 @@ import org.terasology.rendering.nui.mainMenu.inputSettings.InputSettingsScreen;
 public class SettingsMenuScreen extends UIScreenLayer {
 
     @In
-    private NUIManager nuiManager;
-
-    @In
     private Config config;
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "video", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "video", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:VideoMenuScreen");
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:VideoMenuScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "audio", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "audio", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:AudioMenuScreen");
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:AudioMenuScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "input", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "input", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 UIScreenLayer inputScreen = new InputSettingsScreen();
                 inputScreen.setSkin(getSkin());
-                nuiManager.pushScreen(inputScreen);
+                getManager().pushScreen(inputScreen);
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 config.save();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

@@ -22,12 +22,11 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIText;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIText;
 
 /**
  * @author Immortius
@@ -38,9 +37,6 @@ public class JoinServerPopup extends UIScreenLayer {
     private Config config;
 
     @In
-    private NUIManager nuiManager;
-
-    @In
     private NetworkSystem networkSystem;
 
     @In
@@ -48,25 +44,25 @@ public class JoinServerPopup extends UIScreenLayer {
 
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "join", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
                 UIText address = find("address", UIText.class);
                 JoinStatus status = networkSystem.join(address.getText(), TerasologyConstants.DEFAULT_PORT);
                 if (status.getStatus() != JoinStatus.Status.FAILED) {
                     engine.changeState(new StateLoading(status));
                 } else {
-                    nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
+                    getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
                             .setError("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
                 }
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "cancel", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "cancel", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
             }
         });
     }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import com.google.common.base.Preconditions;
 import org.terasology.engine.API;
+import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -51,7 +52,6 @@ public class Color {
     public static final Color GREY = new Color(0x888888FF);
     public static final Color TRANSPARENT = new Color(0x00000000);
     public static final Color YELLOW = new Color(0xFFFF00FF);
-
     public static final Color CYAN = new Color(0x00FFFFFF);
     public static final Color MAGENTA = new Color(0xFF00FFFF);
 
@@ -79,6 +79,7 @@ public class Color {
 
     /**
      * Create a color with the given red/green/blue values. Alpha is initialised as max.
+     *
      * @param r
      * @param g
      * @param b
@@ -89,6 +90,7 @@ public class Color {
 
     /**
      * Creates a color with the given red/green/blue/alpha values.
+     *
      * @param r
      * @param g
      * @param b
@@ -100,6 +102,7 @@ public class Color {
 
     /**
      * Creates a color with the given red/green/blue values. Alpha is initialised as max.
+     *
      * @param r
      * @param g
      * @param b
@@ -110,6 +113,7 @@ public class Color {
 
     /**
      * Creates a color with the given red/green/blue/alpha values.
+     *
      * @param r
      * @param g
      * @param b
@@ -203,6 +207,14 @@ public class Color {
         return new Vector3f(rf(), gf(), bf());
     }
 
+    public Vector3i toVector3i() {
+        return new Vector3i(r(), g(), b());
+    }
+
+    public void addToBuffer(ByteBuffer buffer) {
+        buffer.putInt(representation);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -230,12 +242,12 @@ public class Color {
         return builder.toString();
     }
 
-    
     /**
      * @param color
      * @return Slick.Color format representation used in old GUI colorStrings.
      * Remove after Slick.Color is removed or after colorString format changes.
      */
+    // TODO: Remove
     public static String toColorString(Color color) {
         String hex = color.toHex();
         String rString = hex.substring(0, 2);
@@ -251,7 +263,4 @@ public class Color {
         return toHex();
     }
 
-    public void addToBuffer(ByteBuffer buffer) {
-        buffer.putInt(representation);
-    }
 }

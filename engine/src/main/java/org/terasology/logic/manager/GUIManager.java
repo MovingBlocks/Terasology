@@ -40,14 +40,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.windows.UIMenuConfig;
-import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
-import org.terasology.rendering.gui.windows.UIMenuConfigControls;
-import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
-import org.terasology.rendering.gui.windows.UIMenuJoinServer;
-import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
@@ -85,13 +78,6 @@ public class GUIManager implements ComponentSystem {
 
     private void registerWindows() {
         //TODO parser action here! this is temporary
-        registeredWindows.put("main", UIMenuMain.class);
-        registeredWindows.put("selectworld", UIMenuSelectWorld.class);
-        registeredWindows.put("joinserver", UIMenuJoinServer.class);
-        registeredWindows.put("config", UIMenuConfig.class);
-        registeredWindows.put("config:video", UIMenuConfigVideo.class);
-        registeredWindows.put("config:audio", UIMenuConfigAudio.class);
-        registeredWindows.put("config:controls", UIMenuConfigControls.class);
         registeredWindows.put("loading", UIScreenLoading.class);
         registeredWindows.put("container", UIScreenContainer.class);
         registeredWindows.put("metrics", UIScreenMetrics.class);

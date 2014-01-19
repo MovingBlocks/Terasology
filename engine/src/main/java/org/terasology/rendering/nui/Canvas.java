@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public interface Canvas {
      * Skin settings are automatically taken into account, unless widget.isSkinAppliedByCanvas() returns false (in which case it
      * is up to the widget to apply any style settings it needs).
      *
-     * @param widget The widget to get the size of
+     * @param widget           The widget to get the size of
      * @param sizeRestrictions A hint as to the available area for the drawing the widget
      * @return The restricted size of the widget
      */
@@ -118,6 +118,7 @@ public interface Canvas {
 
     /**
      * Calcualtes the maximum size a widget can take. A dimension will be Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE) if unbounded
+     *
      * @param widget The widget to get the maximum size of.
      * @return The maximum size of the widget.
      */
@@ -126,13 +127,14 @@ public interface Canvas {
     /**
      * Draws a widget to fill the current canvas. Skin settings are applied, unless widget.isSkinAppliedByCanvas() returns false (in which case it is up to the widget
      * to apply any style settings it needs).
+     *
      * @param widget
      */
     void drawWidget(UIWidget widget);
 
     /**
      * Draws a widget to the given region of the current canvas. Skin settings are applied, unless element.isSkinAppliedByCanvas() returns false.
-     *
+     * <p/>
      * This method will update the skin settings for the given element and its current mode.  Min/max and fixed size settings will be applied, along with horizontal
      * and vertical alignment as necessary. If element.isSkinAppliedByCanvas() returns true, any background will be drawn and margin applied to remaining region to
      * determine the region provided to the element for drawing content.
@@ -432,12 +434,14 @@ public interface Canvas {
     /**
      * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the
      * full area of the widget.
+     *
      * @param listener
      */
     void addInteractionRegion(InteractionListener listener);
 
     /**
      * Adds an interaction region filling the desired region.
+     *
      * @param listener
      * @param region
      */

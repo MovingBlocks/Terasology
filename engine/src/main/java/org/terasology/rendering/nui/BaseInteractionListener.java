@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,13 @@ import org.terasology.math.Vector2i;
  */
 public class BaseInteractionListener implements InteractionListener {
 
+    protected FocusManager focusManager;
     private boolean mouseOver;
+
+    @Override
+    public void setFocusManager(FocusManager focusManager) {
+        this.focusManager = focusManager;
+    }
 
     @Override
     public void onMouseOver(Vector2i pos, boolean topMostElement) {

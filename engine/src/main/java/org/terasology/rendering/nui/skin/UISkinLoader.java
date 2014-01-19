@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,10 +98,17 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     private static class DefaultInfo extends FamilyInfo {
+        public String inherit;
         public Map<String, FamilyInfo> families;
 
         public void apply(UISkinBuilder builder) {
             super.apply(builder);
+            if (inherit != null) {
+                UISkin skin = Assets.getSkin(inherit);
+                if (skin != null) {
+                    builder.setBaseSkin(skin);
+                }
+            }
             if (families != null) {
                 for (Map.Entry<String, FamilyInfo> entry : families.entrySet()) {
                     builder.setFamily(entry.getKey());
@@ -118,7 +125,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
             super.apply(builder);
             if (elements != null) {
                 for (Map.Entry<String, ElementInfo> entry : elements.entrySet()) {
-                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getElementMetadataLibrary();
+                    ClassLibrary<UIWidget> library = CoreRegistry.get(NUIManager.class).getWidgetMetadataLibrary();
                     ClassMetadata<? extends UIWidget, ?> metadata = library.resolve(entry.getKey(), ModuleContext.getContext());
                     if (metadata != null) {
                         builder.setElementClass(metadata.getType());

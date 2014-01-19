@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,14 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.ListEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIList;
 import org.terasology.utilities.FilesUtil;
 
 import java.nio.file.Path;
@@ -46,9 +45,6 @@ public class SelectGameScreen extends UIScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
     @In
-    private NUIManager nuiManager;
-
-    @In
     private Config config;
 
     private boolean loadingAsServer;
@@ -58,24 +54,24 @@ public class SelectGameScreen extends UIScreenLayer {
         final UIList<GameInfo> gameList = find("gameList", UIList.class);
 
         refreshList(gameList);
-        gameList.subscribe(new ListEventListener<GameInfo>() {
+        gameList.subscribe(new ItemActivateEventListener<GameInfo>() {
             @Override
-            public void onItemActivated(GameInfo item) {
+            public void onItemActivated(UIWidget widget, GameInfo item) {
                 loadGame(item);
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "create", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "create", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                CreateGameScreen createGameScreen = (CreateGameScreen) nuiManager.pushScreen("engine:createGameScreen");
+            public void onActivated(UIWidget button) {
+                CreateGameScreen createGameScreen = getManager().pushScreen("engine:createGameScreen", CreateGameScreen.class);
                 createGameScreen.setLoadingAsServer(loadingAsServer);
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "load", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "load", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
                 if (gameInfo != null) {
                     loadGame(gameInfo);
@@ -83,9 +79,9 @@ public class SelectGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "delete", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "delete", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 GameInfo gameInfo = gameList.getSelection();
                 if (gameInfo != null) {
                     Path world = PathManager.getInstance().getSavePath(gameInfo.getManifest().getTitle());
@@ -95,16 +91,16 @@ public class SelectGameScreen extends UIScreenLayer {
                         gameList.setSelection(null);
                     } catch (Exception e) {
                         logger.error("Failed to delete saved game", e);
-                        nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
+                        getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
                     }
                 }
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
             }
         });
     }
@@ -118,7 +114,7 @@ public class SelectGameScreen extends UIScreenLayer {
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
+            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
         }
     }
 

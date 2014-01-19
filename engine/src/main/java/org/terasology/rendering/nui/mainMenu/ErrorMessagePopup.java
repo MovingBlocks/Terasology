@@ -15,28 +15,23 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
-import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
-import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
  * @author Immortius
  */
 public class ErrorMessagePopup extends UIScreenLayer {
 
-    @In
-    private NUIManager nuiManager;
-
     @Override
     public void initialise() {
-        UIScreenLayerUtil.trySubscribe(this, "ok", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
             }
         });
     }

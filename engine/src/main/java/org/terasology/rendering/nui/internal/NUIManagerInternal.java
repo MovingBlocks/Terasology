@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -57,7 +58,7 @@ import java.util.Deque;
 /**
  * @author Immortius
  */
-public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
+public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, FocusManager {
 
     private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
@@ -65,19 +66,19 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private CanvasControl canvas;
-    private ClassLibrary<UIWidget> elementsLibrary;
+    private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
 
     public NUIManagerInternal(AssetManager assetManager) {
         this.assetManager = assetManager;
-        this.canvas = new LwjglCanvas(this, CoreRegistry.get(Time.class));
+        this.canvas = new CanvasImpl(this, CoreRegistry.get(Time.class), new LwjglCanvasRenderer());
     }
 
-    public void refreshElementsLibrary() {
-        elementsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+    public void refreshWidgetsLibrary() {
+        widgetsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
             for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
-                elementsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
+                widgetsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
             }
         }
     }
@@ -85,8 +86,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
+        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
             pushScreen(result);
             return result;
         }
@@ -136,8 +137,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer setScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootElement() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootElement();
+        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
+            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
             setScreen(result);
             return result;
         }
@@ -209,8 +210,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public ClassLibrary<UIWidget> getElementMetadataLibrary() {
-        return elementsLibrary;
+    public ClassLibrary<UIWidget> getWidgetMetadataLibrary() {
+        return widgetsLibrary;
     }
 
     @Override
@@ -285,6 +286,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private void prepare(UIScreenLayer screen) {
         inject(screen);
+        screen.setManager(this);
         screen.getContents();
         screen.initialise();
     }

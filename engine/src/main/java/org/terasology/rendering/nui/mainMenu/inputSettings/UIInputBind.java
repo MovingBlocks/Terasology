@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.mainMenu.inputSettings;
 
+import org.terasology.audio.Sound;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
@@ -44,12 +45,25 @@ public class UIInputBind extends CoreWidget {
     private boolean capturingInput;
 
     private Binding<Input> input = new DefaultBinding<>();
+    private Binding<Sound> clickSound = new DefaultBinding<>();
+    private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
 
         @Override
+        public void onMouseOver(Vector2i pos, boolean topMostElement) {
+            super.onMouseOver(pos, topMostElement);
+            if (topMostElement) {
+                focusManager.setFocus(UIInputBind.this);
+            }
+        }
+
+        @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
+                if (getClickSound() != null) {
+                    getClickSound().play(getClickVolume());
+                }
                 capturingInput = true;
                 return true;
             }
@@ -107,14 +121,15 @@ public class UIInputBind extends CoreWidget {
 
     @Override
     public void onKeyEvent(KeyEvent event) {
-        if (capturingInput && event.isDown()) {
-            if (event.getKey() == Keyboard.Key.ESCAPE) {
-                setInput(null);
-            } else {
+        if (event.isDown()) {
+            if (capturingInput) {
                 setInput(InputType.KEY.getInput(event.getKey().getId()));
+                capturingInput = false;
+                event.consume();
+            } else if (event.getKey() == Keyboard.Key.DELETE || event.getKey() == Keyboard.Key.BACKSPACE) {
+                setInput(null);
+                event.consume();
             }
-            capturingInput = false;
-            event.consume();
         }
     }
 
@@ -146,4 +161,27 @@ public class UIInputBind extends CoreWidget {
         input.set(val);
     }
 
+    public void bindClickSound(Binding<Sound> binding) {
+        clickSound = binding;
+    }
+
+    public Sound getClickSound() {
+        return clickSound.get();
+    }
+
+    public void setClickSound(Sound val) {
+        clickSound.set(val);
+    }
+
+    public void bindClickVolume(Binding<Float> binding) {
+        clickVolume = binding;
+    }
+
+    public float getClickVolume() {
+        return clickVolume.get();
+    }
+
+    public void setClickVolume(float val) {
+        clickVolume.set(val);
+    }
 }

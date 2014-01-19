@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,17 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIDropdown;
-import org.terasology.rendering.nui.baseWidgets.UIText;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -51,9 +50,6 @@ public class CreateGameScreen extends UIScreenLayer {
 
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -119,16 +115,16 @@ public class CreateGameScreen extends UIScreenLayer {
         }
 
 
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.popScreen();
+            public void onActivated(UIWidget button) {
+                getManager().popScreen();
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "play", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "play", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 GameManifest gameManifest = new GameManifest();
 
                 gameManifest.setTitle(worldName.getText());
@@ -148,19 +144,19 @@ public class CreateGameScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "previewSeed", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                PreviewWorldScreen screen = nuiManager.pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
+            public void onActivated(UIWidget button) {
+                PreviewWorldScreen screen = getManager().pushScreen("engine:previewWorldScreen", PreviewWorldScreen.class);
                 if (screen != null) {
                     screen.bindSeed(BindHelper.bindBeanProperty("text", seed, String.class));
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "mods", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:selectModsScreen");
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:selectModsScreen");
             }
         });
     }

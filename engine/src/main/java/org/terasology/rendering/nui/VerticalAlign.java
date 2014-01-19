@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.terasology.rendering.nui;
 import org.terasology.math.Rect2i;
 
 /**
+ * Possible vertical alignments. Provides support for determining where to position something vertically, given its size and the size of the space.
  * @author Immortius
  */
 public enum VerticalAlign {
@@ -41,8 +42,18 @@ public enum VerticalAlign {
         }
     };
 
+    /**
+     * @param elementHeight The height of the element to align
+     * @param availableHeight The space in which to place it
+     * @return The offset for the top of the element.
+     */
     public abstract int getOffset(int elementHeight, int availableHeight);
 
+    /**
+     * Provides the "start" edge for the alignment - so for TOP it is the top edge, for BOTTOM it is the bottom edge
+     * @param region
+     * @return Where placement in the region begins for the alignment.
+     */
     public int getStart(Rect2i region) {
         return region.minY() + getOffset(0, region.height());
     }

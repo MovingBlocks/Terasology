@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ public class UIScreenLayer extends AbstractWidget {
             return true;
         }
     };
+    private NUIManager manager;
 
     public UIScreenLayer() {
     }
@@ -82,6 +83,14 @@ public class UIScreenLayer extends AbstractWidget {
         if (contents != null) {
             contents.update(delta);
         }
+    }
+
+    public NUIManager getManager() {
+        return manager;
+    }
+
+    public void setManager(NUIManager manager) {
+        this.manager = manager;
     }
 
     @Override

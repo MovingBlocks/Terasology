@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,14 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIDropdown;
-import org.terasology.rendering.nui.baseWidgets.UISlider;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
@@ -41,9 +40,6 @@ import java.util.Arrays;
  */
 public class VideoSettingsScreen extends UIScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
-
-    @In
-    private NUIManager nuiManager;
 
     @In
     private GameEngine engine;
@@ -119,16 +115,16 @@ public class VideoSettingsScreen extends UIScreenLayer {
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
         }
 
-        UIScreenLayerUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
-        UIScreenLayerUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
-        UIScreenLayerUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
-        UIScreenLayerUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
-        UIScreenLayerUtil.trySubscribe(this, "close", new ButtonEventListener() {
+        WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 logger.info("Video Settings: " + config.getRendering().toString());
                 CoreRegistry.get(ShaderManager.class).recompileAllShaders();
-                nuiManager.popScreen();
+                getManager().popScreen();
             }
         });
     }

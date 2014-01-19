@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,11 @@ public class UISkin extends AbstractAsset<UISkinData> {
     }
 
     public UIStyle getDefaultStyle() {
-        return getStyleFamily("").getBaseStyle();
+        return getFamily("").getBaseStyle();
+    }
+
+    public UIStyle getDefaultStyleFor(String family) {
+        return getFamily(family).getBaseStyle();
     }
 
     public UIStyle getDefaultStyleFor(Class<? extends UIWidget> element, String mode) {
@@ -59,7 +63,7 @@ public class UISkin extends AbstractAsset<UISkinData> {
     }
 
     public UIStyle getStyleFor(String family, Class<? extends UIWidget> element, String mode) {
-        UIStyleFamily styleFamily = getStyleFamily(family);
+        UIStyleFamily styleFamily = getFamily(family);
         if (element == null) {
             return styleFamily.getBaseStyle();
         }
@@ -67,18 +71,22 @@ public class UISkin extends AbstractAsset<UISkinData> {
     }
 
     public UIStyle getStyleFor(String family, Class<? extends UIWidget> element, String part, String mode) {
-        UIStyleFamily styleFamily = getStyleFamily(family);
+        UIStyleFamily styleFamily = getFamily(family);
         if (element == null) {
             return styleFamily.getBaseStyle();
         }
         return styleFamily.getElementStyle(element, part, mode);
     }
 
-    private UIStyleFamily getStyleFamily(String family) {
+    public UIStyleFamily getFamily(String family) {
         UIStyleFamily styleFamily = skinData.getFamily(family);
         if (styleFamily == null) {
             return skinData.getFamily("");
         }
         return styleFamily;
+    }
+
+    public Iterable<? extends String> getFamilies() {
+        return skinData.skinFamilies.keySet();
     }
 }

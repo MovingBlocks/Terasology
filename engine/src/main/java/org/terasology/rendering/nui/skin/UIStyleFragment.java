@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.terasology.rendering.nui.skin;
 
 import com.google.gson.annotations.SerializedName;
+import org.terasology.math.Border;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
-import org.terasology.math.Border;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;

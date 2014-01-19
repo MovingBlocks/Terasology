@@ -98,8 +98,12 @@ public class ConsoleImpl implements Console {
         if (!commandMethods.isEmpty()) {
             for (Method method : commandMethods) {
                 CommandInfo command = new CommandInfo(method, provider);
-                commands.add(command);
-                commandLookup.put(command.getName(), command.getParameterCount(), command);
+                if (commandLookup.contains(command.getName(), command.getParameterCount())) {
+                    logger.warn("Command already registered with same name and param count: {} : {}, skipping", command.getName(), command.getParameterCount());
+                } else {
+                    commands.add(command);
+                    commandLookup.put(command.getName(), command.getParameterCount(), command);
+                }
             }
             commandsSorted = false;
         }

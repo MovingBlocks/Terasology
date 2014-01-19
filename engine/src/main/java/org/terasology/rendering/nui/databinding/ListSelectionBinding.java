@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.databinding;
 
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.widgets.UIList;
 
 /**
  * @author Immortius
