@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.widgets;
 
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
@@ -56,6 +57,9 @@ public class UIInventoryCell extends UIDisplayContainer {
     private final UIImage background;
     private final UILabel itemLabel;
     private UIItemIcon icon;
+
+    // Ghost inventory slot just stores the item (does not remove it from inventory) and you can't transfer it out
+    private boolean ghost;
 
     private boolean selected;
     private boolean selectOnMouseOver = true;
@@ -216,14 +220,6 @@ public class UIInventoryCell extends UIDisplayContainer {
         return "";
     }
 
-    private void swapItem() {
-        if (getTransferItem().exists()) {
-            inventoryManager.moveItem(getTransferEntity(), 0, inventoryEntity, slot);
-        } else {
-            inventoryManager.moveItem(inventoryEntity, slot, getTransferEntity(), 0);
-        }
-    }
-
     private EntityRef getTransferEntity() {
         return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
     }
@@ -236,12 +232,36 @@ public class UIInventoryCell extends UIDisplayContainer {
         return inventoryManager.getItemInSlot(inventoryEntity, slot);
     }
 
+    private void swapItem() {
+        if (ghost) {
+            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
+        } else {
+            if (getTransferItem().exists()) {
+                inventoryManager.moveItem(getTransferEntity(), 0, inventoryEntity, slot);
+            } else {
+                inventoryManager.moveItem(inventoryEntity, slot, getTransferEntity(), 0);
+            }
+        }
+    }
+
     private void giveAmount(int amount) {
-        inventoryManager.moveItemAmount(inventoryEntity, slot, getTransferEntity(), 0, amount);
+        if (ghost) {
+            inventoryManager.putItemInSlot(inventoryEntity, slot, EntityRef.NULL);
+        } else {
+            inventoryManager.moveItemAmount(inventoryEntity, slot, getTransferEntity(), 0, amount);
+        }
     }
 
     private void takeAmount(int amount) {
-        inventoryManager.moveItemAmount(getTransferEntity(), 0, inventoryEntity, slot, amount);
+        if (ghost) {
+            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
+        } else {
+            inventoryManager.moveItemAmount(getTransferEntity(), 0, inventoryEntity, slot, amount);
+        }
     }
 
     /**
@@ -279,5 +299,13 @@ public class UIInventoryCell extends UIDisplayContainer {
     public void setSelected(boolean enable) {
         selected = enable;
         selectionRectangle.setVisible(enable);
+    }
+
+    public boolean isGhost() {
+        return ghost;
+    }
+
+    public void setGhost(boolean ghost) {
+        this.ghost = ghost;
     }
 }

@@ -85,8 +85,6 @@ public class PlayerStartingInventorySystem implements ComponentSystem {
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, chest);
-        inventoryManager.giveItem(player, blockFactory.newInstance(blockManager.getBlockFamily("core:OakSapling"), 10));
-
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic.tree.lsystem;
+package org.terasology.logic.delay;
 
-
-import org.terasology.entitySystem.Component;
-import org.terasology.world.block.ForceBlockActive;
+import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-@ForceBlockActive
-public class LSystemTreeComponent implements Component {
-    public String axion;
-    public int generation;
-    public long lastGrowthTime;
-    public float branchAngle;
-    public float rotationAngle;
+public class DelayedActionTriggeredEvent implements Event {
+    private String actionId;
 
-    public boolean initialized;
-    public boolean generated;
+    public DelayedActionTriggeredEvent(String actionId) {
+        this.actionId = actionId;
+    }
+
+    public String getActionId() {
+        return actionId;
+    }
 }

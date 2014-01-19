@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic.tree.lsystem;
+package org.terasology.world.block;
 
+import org.terasology.entitySystem.Component;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class AdvanceAxionElementGeneration implements AxionElementGeneration {
-    private float advance;
-
-    public AdvanceAxionElementGeneration(float advance) {
-        this.advance = advance;
-    }
-
-    @Override
-    public void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter) {
-        callback.advance(advance);
-    }
+public class BlockDropGrammarComponent implements Component {
+    public List<String> blockDrops;
+    public List<String> itemDrops;
 }

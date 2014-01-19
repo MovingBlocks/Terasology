@@ -520,6 +520,11 @@ public class TerasologyEngine implements GameEngine {
     private ModuleManager initModuleManager() {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
+
+        // Temporary - until NUI comes in
+        moduleSecurityManager.addAPIPackage("org.lwjgl.opengl");
+        moduleSecurityManager.addAPIPackage("org.newdawn.slick");
+
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");

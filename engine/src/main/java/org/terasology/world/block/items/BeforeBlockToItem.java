@@ -17,29 +17,61 @@ package org.terasology.world.block.items;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.world.block.family.BlockFamily;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class BeforeBlockToItem extends AbstractConsumableEvent {
 
+    private Prefab damageType;
+    private EntityRef instigator;
+    private EntityRef tool;
+    private BlockFamily originalBlockFamily;
     private TObjectIntMap<BlockFamily> itemsToGenerate = new TObjectIntHashMap<>();
+    private List<EntityRef> itemsToDrop = new LinkedList<>();
 
-    public BeforeBlockToItem(BlockFamily blockFamily, int quantity) {
-        itemsToGenerate.put(blockFamily, quantity);
+    public BeforeBlockToItem(Prefab damageType, EntityRef instigator, EntityRef tool, BlockFamily originalBlockFamily, int quantity) {
+        this.damageType = damageType;
+        this.instigator = instigator;
+        this.tool = tool;
+        this.originalBlockFamily = originalBlockFamily;
+        if (originalBlockFamily != null) {
+            itemsToGenerate.put(originalBlockFamily, quantity);
+        }
     }
 
-    public void addItemToGenerate(BlockFamily blockFamily, int quantity) {
+    public void removeDefaultBlock() {
+        removeBlockFromGeneration(originalBlockFamily);
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
+    }
+
+    public EntityRef getTool() {
+        return tool;
+    }
+
+    public void addItemToGenerate(EntityRef entityRef) {
+        itemsToDrop.add(entityRef);
+    }
+
+    public void addBlockToGenerate(BlockFamily blockFamily, int quantity) {
         itemsToGenerate.adjustOrPutValue(blockFamily, quantity, quantity);
     }
 
-    public void setItemToGenerate(BlockFamily blockFamily, int quantity) {
+    public void setBlockToGenerate(BlockFamily blockFamily, int quantity) {
         itemsToGenerate.put(blockFamily, quantity);
     }
 
-    public void removeItemFromGeneration(BlockFamily blockFamily) {
+    public void removeBlockFromGeneration(BlockFamily blockFamily) {
         itemsToGenerate.remove(blockFamily);
     }
 
@@ -47,8 +79,15 @@ public class BeforeBlockToItem extends AbstractConsumableEvent {
         return itemsToGenerate.keySet();
     }
 
-    public int getQuanityForItem(BlockFamily blockFamily) {
+    public Iterable<EntityRef> getItemsToDrop() {
+        return itemsToDrop;
+    }
+
+    public int getQuanityForBlock(BlockFamily blockFamily) {
         return itemsToGenerate.get(blockFamily);
     }
 
+    public Prefab getDamageType() {
+        return damageType;
+    }
 }

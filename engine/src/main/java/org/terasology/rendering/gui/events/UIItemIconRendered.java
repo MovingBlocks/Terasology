@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic.tree.lsystem;
+package org.terasology.rendering.gui.events;
 
-import org.terasology.world.block.Block;
+import org.terasology.entitySystem.event.Event;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
+public class UIItemIconRendered implements Event {
 
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
-public interface AxionElementGeneration {
-    void generate(AxionElementGenerationCallback callback, Vector3f position, Matrix4f rotation, String axionParameter);
-
-    public interface AxionElementGenerationCallback {
-        void setBlock(Vector3f position, Block block);
-
-        void advance(float distance);
-    }
 }

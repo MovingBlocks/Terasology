@@ -25,8 +25,8 @@ import org.terasology.world.block.loader.BlockDefinition;
 
 import java.util.Map;
 
-@RegisterBlockFamilyFactory("alignToSurface")
-public class AlignToSurfaceFamilyFactory implements BlockFamilyFactory {
+@RegisterBlockFamilyFactory("attachedToSurface")
+public class AttachedToSurfaceFamilyFactory implements BlockFamilyFactory {
 
     private static final String TOP = "top";
     private static final String SIDES = "sides";
@@ -51,7 +51,7 @@ public class AlignToSurfaceFamilyFactory implements BlockFamilyFactory {
             block.setDirection(Side.BOTTOM);
             blockMap.put(Side.BOTTOM, block);
         }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
+        return new AttachedToSurfaceFamily(new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName()), blockMap, blockDefinition.categories);
     }
 
 }

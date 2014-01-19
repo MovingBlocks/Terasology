@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.gui.events.UIItemIconRendered;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.world.block.Block;
@@ -56,6 +57,7 @@ public class UIItemIcon extends UIDisplayContainer {
 
     private InventoryManager inventoryManager;
 
+    private Integer fixedItemCount;
 
     public UIItemIcon(InventoryManager inventoryManager) {
         this.inventoryManager = inventoryManager;
@@ -67,6 +69,10 @@ public class UIItemIcon extends UIDisplayContainer {
 
         addDisplayElement(itemCount);
         setVisible(false);
+    }
+
+    public void setFixedItemCount(int fixedItemCount) {
+        this.fixedItemCount = fixedItemCount;
     }
 
     public void setItem(EntityRef item) {
@@ -90,6 +96,9 @@ public class UIItemIcon extends UIDisplayContainer {
 
     private void updateCountLabel() {
         int stackSize = inventoryManager.getStackSize(item);
+        if (fixedItemCount != null) {
+            stackSize = fixedItemCount;
+        }
         if (stackSize > 1 && displayingItemCount) {
             itemCount.setVisible(true);
             itemCount.setText(Integer.toString(stackSize));
@@ -132,8 +141,8 @@ public class UIItemIcon extends UIDisplayContainer {
                 renderIcon(icon);
             }
         }
-
         super.render();
+        item.send(new UIItemIconRendered());
     }
 
     private void renderIcon(Icon icon) {

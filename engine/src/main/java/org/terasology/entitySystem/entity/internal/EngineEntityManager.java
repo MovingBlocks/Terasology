@@ -35,7 +35,7 @@ public interface EngineEntityManager extends EntityManager {
      * @param components
      * @return The newly created entity ref.
      */
-    EntityRef createEntityWithoutEvents(Iterable<Component> components);
+    EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components);
 
     /**
      * Destroys an entity without sending lifecycle events.

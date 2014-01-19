@@ -16,13 +16,13 @@
 package org.terasology.core.logic.generators;
 
 import com.google.common.collect.ImmutableMap;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.math.LSystemRule;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.BlockManager;
 
 import java.util.Map;
@@ -30,7 +30,6 @@ import java.util.Map;
 public abstract class DefaultGenerators {
 
     public static void addDefaultForestGenerators(ForestGenerator mngr) {
-
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
         Map<Character, LSystemRule> rules = ImmutableMap.<Character, LSystemRule>builder()
@@ -68,9 +67,6 @@ public abstract class DefaultGenerators {
 
         // Cactus
         TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("core:Cactus")).setGenerationProbability(0.05f);
-
-        // Oak
-        //TreeGenerator oakTree = new SeedTreeGenerator().setBlock(blockManager.getBlock("core:OakSaplingGenerated")).setGenerationProbability(0.08f);
 
         // Add the trees to the generator lists
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);

@@ -110,7 +110,7 @@ public class TunnelAction implements ComponentSystem {
                         }
                         if (random.nextInt(4) == 0) {
                             EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
-                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
+                            blockEntity.send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get()));
                         }
 
                         blockCounter--;

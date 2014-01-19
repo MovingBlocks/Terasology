@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.logic.tree;
+package org.terasology.logic.delay;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
+import org.terasology.entitySystem.event.Event;
 
-public interface TreeDefinition {
-    void updateTree(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, EntityRef treeRef);
+/**
+ * @author Marcin Sciesinski <marcins78@gmail.com>
+ */
+public class AddDelayedActionEvent implements Event {
+    private String actionId;
+    private long delay;
+
+    public AddDelayedActionEvent(String actionId, long delay) {
+        this.actionId = actionId;
+        this.delay = delay;
+    }
+
+    public String getActionId() {
+        return actionId;
+    }
+
+    public long getDelay() {
+        return delay;
+    }
 }

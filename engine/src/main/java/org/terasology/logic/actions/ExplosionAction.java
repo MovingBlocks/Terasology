@@ -104,7 +104,7 @@ public class ExplosionAction implements ComponentSystem {
 
                 /* PHYSICS */
                 if (currentBlock.isDestructible()) {
-                    blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get(), EntityRef.NULL));
+                    blockEntityRegistry.getEntityAt(blockPos).send(new DoDamageEvent(1000, EngineDamageTypes.EXPLOSIVE.get()));
                 }
             }
         }

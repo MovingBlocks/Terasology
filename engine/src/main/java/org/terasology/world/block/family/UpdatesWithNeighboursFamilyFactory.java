@@ -31,7 +31,7 @@ import org.terasology.world.block.loader.BlockDefinition;
 import java.util.Collection;
 import java.util.Set;
 
-public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFactory {
+public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyFactory {
     public static final String NO_CONNECTIONS = "no_connections";
     public static final String ONE_CONNECTION = "one_connection";
     public static final String TWO_CONNECTIONS_LINE = "line_connection";
@@ -46,7 +46,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
     private ConnectionCondition connectionCondition;
     private byte connectionSides;
 
-    protected ConnectToSixSidesFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides) {
+    protected UpdatesWithNeighboursFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides) {
         this.connectionCondition = connectionCondition;
         this.connectionSides = connectionSides;
     }
@@ -103,7 +103,7 @@ public abstract class ConnectToSixSidesFamilyFactory implements BlockFamilyFacto
         }
 
         final Block archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
-        return new ConnectToSixSidesFamily(connectionCondition, blockUri, blockDefinition.categories,
+        return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, blockDefinition.categories,
                 archetypeBlock, blocksForConnections, connectionSides);
     }
 
