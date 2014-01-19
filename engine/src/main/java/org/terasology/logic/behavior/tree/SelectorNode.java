@@ -28,7 +28,7 @@ import java.util.Iterator;
 @API
 public class SelectorNode extends CompositeNode {
     @Override
-    public SelectorTask create() {
+    public SelectorTask createTask() {
         return new SelectorTask(this);
     }
 

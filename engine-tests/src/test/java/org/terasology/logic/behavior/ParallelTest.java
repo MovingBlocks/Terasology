@@ -51,7 +51,7 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.create();
+        ParallelNode.ParallelTask behavior = parallel.createTask();
 
         interpreter.start(behavior);
         interpreter.tick(0);
@@ -81,7 +81,7 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.create();
+        ParallelNode.ParallelTask behavior = parallel.createTask();
 
         interpreter.start(behavior);
         interpreter.tick(0);
@@ -109,7 +109,7 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.create();
+        ParallelNode.ParallelTask behavior = parallel.createTask();
 
         interpreter.start(behavior);
         interpreter.tick(0);
@@ -139,7 +139,7 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.create();
+        ParallelNode.ParallelTask behavior = parallel.createTask();
 
         interpreter.start(behavior);
         interpreter.tick(0);
@@ -152,7 +152,7 @@ public class ParallelTest {
         final Node node = new DebugNode(1);
         return new Node() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 Task spy = spy(new Task(null) {
                     @Override
                     public Status update(float dt) {

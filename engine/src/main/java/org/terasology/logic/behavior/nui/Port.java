@@ -28,6 +28,14 @@ import org.terasology.rendering.nui.InteractionListener;
 import javax.vecmath.Vector2f;
 
 /**
+ * Represents a port at a RenderableNode. There are several types of ports:
+ * - InputPort (one per RenderableNode)
+ * - OutputPort (unlimited per RenderableNode, may be restricted by the type of the node)
+ * - InsertPort ("virtual" port, to allow connections placed between two existing ones)
+ *
+ * Input/Output ports may have a target. This is always of the opposite type.
+ * When setting a target to a port, the node of the InputPort is added to the child list of the node of the OutputPort.
+ *
  * @author synopia
  */
 public abstract class Port extends CoreWidget {

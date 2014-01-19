@@ -17,7 +17,6 @@ package org.terasology.logic.behavior;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.terasology.logic.behavior.tree.CounterNode;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.ParallelNode;
@@ -100,7 +99,7 @@ public class RepeatTest {
             }
         }));
 
-        Task task = repeat.create();
+        Task task = repeat.createTask();
 
         interpreter.start(task);
         interpreter.tick(0);
@@ -125,7 +124,7 @@ public class RepeatTest {
             }
         }));
 
-        Task task = repeat.create();
+        Task task = repeat.createTask();
 
         interpreter.start(task);
         interpreter.tick(0);
@@ -154,7 +153,7 @@ public class RepeatTest {
 
         move.children().add(new DebugNode(3));
         move.children().add(mock);
-        Task task = move.create();
+        Task task = move.createTask();
 
         interpreter.start(task);
         interpreter.tick(0);
@@ -172,7 +171,7 @@ public class RepeatTest {
         final Node node = new DebugNode(1);
         return new Node() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 Task spy = spy(new Task(null) {
                     @Override
                     public Status update(float dt) {

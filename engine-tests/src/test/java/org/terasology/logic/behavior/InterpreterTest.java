@@ -155,7 +155,7 @@ public class InterpreterTest {
     private void create() {
         node = new Node() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 task = spy(new Task(null) {
                     @Override
                     public Status update(float dt) {

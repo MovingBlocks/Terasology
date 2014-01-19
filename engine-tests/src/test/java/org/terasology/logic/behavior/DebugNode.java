@@ -32,7 +32,7 @@ public class DebugNode extends Node {
     }
 
     @Override
-    public Task create() {
+    public Task createTask() {
         lastTask2 = lastTask;
         lastTask = new DebugTask(this);
         return lastTask;

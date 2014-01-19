@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.API;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,7 +29,6 @@ import java.util.Set;
  * If a task returns RUNNING, the task is placed to the active list and asked next tick again.
  * Finished nodes may create new tasks, which are placed to the active list.
  * <p/>
- * TODO add a (synchronized) "debugger" interface, to allow access from gui or other services (instead of the blocking queue).
  *
  * @author synopia
  */
@@ -83,7 +80,7 @@ public class Interpreter {
     }
 
     public void start(Node node, Task.Observer observer) {
-        start(node.create(), observer);
+        start(node.createTask(), observer);
     }
 
     public void start(Task task, Task.Observer observer) {

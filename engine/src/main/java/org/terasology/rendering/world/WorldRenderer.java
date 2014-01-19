@@ -100,7 +100,6 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@API
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;

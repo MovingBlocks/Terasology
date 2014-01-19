@@ -66,27 +66,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @Override
     public void initialise() {
-        System.out.println("Initialize BehaviorSystem");
         CoreRegistry.put(BehaviorSystem.class, this);
         List<BehaviorNodeComponent> items = Lists.newArrayList();
         Collection<Prefab> prefabs = CoreRegistry.get(PrefabManager.class).listPrefabs(BehaviorNodeComponent.class);
-        if( prefabs.size()==0 ) {
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:counter");
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:monitor");
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:parallel");
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:repeat");
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:selector");
-            CoreRegistry.get(PrefabManager.class).getPrefab("engine:sequence");
-            prefabs = CoreRegistry.get(PrefabManager.class).listPrefabs(BehaviorNodeComponent.class);
-            BehaviorTree behaviorTree = CoreRegistry.get(AssetManager.class).resolveAndLoad(AssetType.BEHAVIOR, "engine:default", BehaviorTree.class);
-            EntityRef minion = CoreRegistry.get(EntityManager.class).create();
-            minion.addComponent(new LocationComponent());
-            minion.addComponent(new SkeletalMeshComponent());
-            Interpreter interpreter = new Interpreter(new Actor(minion));
-            interpreter.setRoot(behaviorTree.getRoot());
-            interpreter.start();
-            interpreters.put(behaviorTree, Lists.newArrayList(interpreter));
-        }
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(prefab);
             items.add(entityRef.getComponent(BehaviorNodeComponent.class));

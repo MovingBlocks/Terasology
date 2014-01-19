@@ -43,6 +43,10 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 
 /**
+ * Opens the bt editor screen. Catches all user input events and consumes them, when editor is opened.
+ *
+ * TODO this will become obsolete, once nui can handle ingame popup screens
+ *
  * @author synopia
  */
 @RegisterSystem

@@ -49,7 +49,7 @@ public class ParallelNode extends CompositeNode {
     }
 
     @Override
-    public ParallelTask create() {
+    public ParallelTask createTask() {
         return new ParallelTask(this);
     }
 

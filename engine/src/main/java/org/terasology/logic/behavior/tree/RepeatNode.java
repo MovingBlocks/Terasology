@@ -32,7 +32,7 @@ public class RepeatNode extends DecoratorNode {
     }
 
     @Override
-    public RepeatTask create() {
+    public RepeatTask createTask() {
         return new RepeatTask(this);
     }
 

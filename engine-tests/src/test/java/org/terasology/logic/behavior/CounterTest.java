@@ -17,8 +17,7 @@ package org.terasology.logic.behavior;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.terasology.asset.Asset;
-import org.terasology.logic.behavior.tree.CounterNode;
+import org.terasology.logic.behavior.tree.DelayNode;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.RepeatNode;
 import org.terasology.logic.behavior.tree.SequenceNode;
@@ -32,8 +31,8 @@ public class CounterTest {
     public void test0_0() {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
-        CounterNode counterNode = new CounterNode(0, debugNode);
-        interpreter.setRoot(counterNode);
+        DelayNode delayNode = new DelayNode(0, debugNode);
+        interpreter.setRoot(delayNode);
         interpreter.start();
 
         Assert.assertTrue(interpreter.tick(0) > 0);
@@ -49,9 +48,9 @@ public class CounterTest {
     public void test0_1() {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
-        CounterNode counterNode = new CounterNode(1, debugNode);
+        DelayNode delayNode = new DelayNode(1, debugNode);
 
-        interpreter.setRoot(counterNode);
+        interpreter.setRoot(delayNode);
         interpreter.start();
 
         Assert.assertTrue(interpreter.tick(0) > 0);
@@ -71,9 +70,9 @@ public class CounterTest {
     public void test1_1() {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(1);
-        CounterNode counterNode = new CounterNode(1, debugNode);
+        DelayNode delayNode = new DelayNode(1, debugNode);
 
-        interpreter.setRoot(counterNode);
+        interpreter.setRoot(delayNode);
         interpreter.start();
 
         Assert.assertTrue(interpreter.tick(0) > 0);

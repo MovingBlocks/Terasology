@@ -30,7 +30,6 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -102,7 +101,8 @@ public class UIButton extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
-        return font.getSize(Arrays.asList(text.get()));
+        List<String> lines = TextLineBuilder.getLines(font, text.get(), areaHint.getX());
+        return font.getSize(lines);
     }
 
     @Override

@@ -72,11 +72,6 @@
                     },
                     {
                         "type" : "UIButton",
-                        "id" : "behavior_editor",
-                        "text" : "Behavior Editor"
-                    },                    
-                    {
-                        "type" : "UIButton",
                         "id" : "migtest",
                         "text" : "Layout Test"
                     },

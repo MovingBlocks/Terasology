@@ -203,7 +203,7 @@ public class PortTest {
     private Node node() {
         return new Node() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 return null;
             }
         };
@@ -216,7 +216,7 @@ public class PortTest {
             }
 
             @Override
-            public Task create() {
+            public Task createTask() {
                 return null;
             }
         };
@@ -225,7 +225,7 @@ public class PortTest {
     private CompositeNode composite() {
         return new CompositeNode() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 return null;
             }
         };
@@ -236,7 +236,7 @@ public class PortTest {
         RenderableNode node = new RenderableNode();
         node.setNode(new CompositeNode() {
             @Override
-            public Task create() {
+            public Task createTask() {
                 return null;
             }
         });

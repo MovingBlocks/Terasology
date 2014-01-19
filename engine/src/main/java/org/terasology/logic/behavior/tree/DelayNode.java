@@ -16,37 +16,36 @@
 package org.terasology.logic.behavior.tree;
 
 import org.terasology.engine.API;
-import org.terasology.rendering.nui.properties.Checkbox;
-import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Counter node. Returns RUNNING as long as not counted down to zero.
+ * Delay node. Returns RUNNING as long as not counted down to zero. Once the countdown reach zero, the decorated node
+ * is started.
  *
  * @author synopia
  */
 @API
-public class CounterNode extends DecoratorNode {
+public class DelayNode extends DecoratorNode {
     @Range(min = 0, max = 100)
     private int limit;
 
-    public CounterNode() {
+    public DelayNode() {
     }
 
-    public CounterNode(int limit, Node child) {
+    public DelayNode(int limit, Node child) {
         this.limit = limit;
         this.child = child;
     }
 
     @Override
-    public CounterTask create() {
-        return new CounterTask(this);
+    public DelayTask createTask() {
+        return new DelayTask(this);
     }
 
-    public static class CounterTask extends DecoratorTask implements Task.Observer {
+    public static class DelayTask extends DecoratorTask implements Task.Observer {
         private int count;
 
-        public CounterTask(CounterNode node) {
+        public DelayTask(DelayNode node) {
             super(node);
         }
 
@@ -74,8 +73,8 @@ public class CounterNode extends DecoratorNode {
         }
 
         @Override
-        public CounterNode getNode() {
-            return (CounterNode) super.getNode();
+        public DelayNode getNode() {
+            return (DelayNode) super.getNode();
         }
 
     }

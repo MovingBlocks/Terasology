@@ -21,7 +21,6 @@ import org.terasology.asset.AssetManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
-import org.terasology.logic.behavior.tree.CounterNode;
 import org.terasology.logic.behavior.tree.MonitorNode;
 import org.terasology.logic.behavior.tree.ParallelNode;
 import org.terasology.logic.behavior.tree.RepeatNode;
@@ -31,7 +30,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 
 import static org.mockito.Mockito.mock;
 

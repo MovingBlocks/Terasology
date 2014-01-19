@@ -28,7 +28,7 @@ import org.terasology.engine.API;
  */
 @API
 public abstract class Node implements TreeAccessor<Node> {
-    public abstract Task create();
+    public abstract Task createTask();
 
     @Override
     public String toString() {

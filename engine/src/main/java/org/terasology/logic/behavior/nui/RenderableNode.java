@@ -35,26 +35,28 @@ import javax.vecmath.Vector2f;
 import java.util.List;
 
 /**
+ * A widget to render and process inputs for a node of a behavior tree. *
+ *
  * @author synopia
  */
 public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, Component, TreeAccessor<RenderableNode> {
-    private transient TextureRegion texture = Assets.getTextureRegion("engine:button");
+    private TextureRegion texture = Assets.getTextureRegion("engine:button");
 
     private final List<RenderableNode> children = Lists.newArrayList();
-    private transient PortList portList;
+    private PortList portList;
 
     private Node node;
     private Vector2f position;
     private Vector2f size;
-    private transient TreeAccessor<RenderableNode> withoutModel;
-    private transient TreeAccessor<RenderableNode> withModel;
-    private transient BehaviorNodeComponent data;
-    private transient Vector2i last;
-    private transient BehaviorEditor editor;
-    private transient boolean dragged;
-    private transient Status status;
+    private TreeAccessor<RenderableNode> withoutModel;
+    private TreeAccessor<RenderableNode> withModel;
+    private BehaviorNodeComponent data;
+    private Vector2i last;
+    private BehaviorEditor editor;
+    private boolean dragged;
+    private Status status;
 
-    private transient InteractionListener moveListener = new BaseInteractionListener() {
+    private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(Vector2i pos, boolean topMostElement) {
         }

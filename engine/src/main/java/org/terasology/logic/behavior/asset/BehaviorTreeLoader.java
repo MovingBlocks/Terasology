@@ -44,12 +44,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Loader for behavior assets. Can also save assets into json format.
+ *
+ * If there are both, Nodes and Renderables tree, both are loaded/saved. To ensure, the nodes get associated to
+ * the correct renderable, additional ids are introduced (only in the json file).
+ *
+ * TODO this may be rewritten, especially considering the save functionality
+ *
  * @author synopia
  */
 public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     private BehaviorTreeGson treeGson = new BehaviorTreeGson();
     private RenderableBehaviorTreeGson renderableTreeGson = new RenderableBehaviorTreeGson();
-    private Reflections reflections;
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
         try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream))) {

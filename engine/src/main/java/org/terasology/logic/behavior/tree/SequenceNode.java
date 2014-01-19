@@ -28,7 +28,7 @@ import java.util.Iterator;
 @API
 public class SequenceNode extends CompositeNode {
     @Override
-    public SequenceTask create() {
+    public SequenceTask createTask() {
         return new SequenceTask(this);
     }
 

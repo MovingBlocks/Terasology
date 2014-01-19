@@ -23,6 +23,11 @@ import org.terasology.logic.behavior.tree.Node;
 import java.util.List;
 
 /**
+ * Behavior tree asset. Can be loaded and saved into json.
+ *
+ * This asset keeps track of the tree of Nodes and the associated RenderableNodes. If there are no RenderableNodes,
+ * the helper class will generate and layout some.
+ *
  * @author synopia
  */
 public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {

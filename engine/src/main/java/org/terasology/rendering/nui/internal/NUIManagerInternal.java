@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Queues;
-import org.newdawn.slick.Input;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +42,6 @@ import org.terasology.input.Mouse;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
@@ -268,6 +265,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (canvas.processMouseWheel(event.getWheelTurns(), Mouse.getPosition())) {
                 event.consume();
             }
+
         }
     }
 

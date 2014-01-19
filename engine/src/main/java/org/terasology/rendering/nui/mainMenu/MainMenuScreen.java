@@ -64,13 +64,6 @@ public class MainMenuScreen extends UIScreenLayer {
                 getManager().pushScreen("engine:settingsMenuScreen");
             }
         });
-        WidgetUtil.trySubscribe(this, "behavior_editor", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:behaviorEditorScreen");
-            }
-        });
-
         WidgetUtil.trySubscribe(this, "exit", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

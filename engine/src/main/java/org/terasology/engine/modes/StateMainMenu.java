@@ -95,13 +95,10 @@ public class StateMainMenu implements GameState {
         localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
-        BehaviorSystem behaviorSystem = new BehaviorSystem();
-        CoreRegistry.put(BehaviorSystem.class, behaviorSystem);
-        behaviorSystem.initialise();
 
         playBackgroundMusic();
 
-//        guiManager.openWindow("main");
+        //guiManager.openWindow("main");
         CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
             nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error", messageOnLoad);
