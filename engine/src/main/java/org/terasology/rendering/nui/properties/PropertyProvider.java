@@ -46,7 +46,7 @@ import static org.reflections.ReflectionUtils.getAllFields;
  * @author synopia
  */
 public class PropertyProvider<T> {
-    private final static Pattern VECTOR_3F = Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");
+    private static final Pattern VECTOR_3F = Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");
     private T target;
     private List<Property<?, ?>> properties = Lists.newArrayList();
 
@@ -147,7 +147,7 @@ public class PropertyProvider<T> {
     }
 
     private interface PropertyFactory<T> {
-        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, T info);
+        Property create(FieldMetadata<Object, ?> fieldMetadata, String label, T info);
     }
 
     private class RangePropertyFactory implements PropertyFactory<Range> {
@@ -239,7 +239,7 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class StringTextBinding extends TextBinding<String> {
+    private final class StringTextBinding extends TextBinding<String> {
         private StringTextBinding(FieldMetadata<Object, String> fieldMetadata) {
             super(fieldMetadata);
         }
@@ -255,7 +255,7 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class IntegerTextBinding extends TextBinding<Integer> {
+    private final class IntegerTextBinding extends TextBinding<Integer> {
         private IntegerTextBinding(FieldMetadata<Object, Integer> fieldMetadata) {
             super(fieldMetadata);
         }
@@ -271,7 +271,7 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class FloatTextBinding extends TextBinding<Float> {
+    private final class FloatTextBinding extends TextBinding<Float> {
 
         private FloatTextBinding(FieldMetadata<Object, Float> fieldMetadata) {
             super(fieldMetadata);
@@ -289,7 +289,7 @@ public class PropertyProvider<T> {
 
     }
 
-    private class BooleanTextBinding extends TextBinding<Boolean> {
+    private final class BooleanTextBinding extends TextBinding<Boolean> {
         private BooleanTextBinding(FieldMetadata<Object, Boolean> fieldMetadata) {
             super(fieldMetadata);
         }
@@ -305,7 +305,7 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class Vector3fTextBinding extends TextBinding<Vector3f> {
+    private final class Vector3fTextBinding extends TextBinding<Vector3f> {
 
         private Vector3fTextBinding(FieldMetadata<Object, Vector3f> fieldMetadata) {
             super(fieldMetadata);

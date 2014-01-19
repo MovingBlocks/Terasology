@@ -28,12 +28,11 @@ import java.util.List;
 public class PortList implements TreeAccessor<RenderableNode> {
     private List<Port> ports = Lists.newLinkedList();
     private Port.InputPort inputPort;
-    private Port.InsertOutputPort addLastPortIns;
     private RenderableNode node;
 
     public PortList(RenderableNode node) {
         inputPort = new Port.InputPort(node);
-        addLastPortIns = new Port.InsertOutputPort(node);
+        Port.InsertOutputPort addLastPortIns = new Port.InsertOutputPort(node);
         ports.add(addLastPortIns);
         this.node = node;
     }
@@ -72,10 +71,6 @@ public class PortList implements TreeAccessor<RenderableNode> {
 
     int indexOfPort(Port port) {
         return ports.indexOf(port) / 2;
-    }
-
-    Port.OutputPort outputPortForIndex(int index) {
-        return (Port.OutputPort) ports.get(index * 2 + 1);
     }
 
     @Override

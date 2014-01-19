@@ -68,8 +68,8 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
     }
 
     @Override
-    public void reload(BehaviorTreeData data) {
-        this.data = data;
+    public void reload(BehaviorTreeData newData) {
+        this.data = newData;
     }
 
     @Override

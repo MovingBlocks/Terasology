@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 

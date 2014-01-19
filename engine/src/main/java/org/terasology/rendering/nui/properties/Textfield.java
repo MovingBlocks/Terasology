@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.properties;
 
 import org.terasology.engine.API;
-import org.terasology.rendering.nui.databinding.Binding;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

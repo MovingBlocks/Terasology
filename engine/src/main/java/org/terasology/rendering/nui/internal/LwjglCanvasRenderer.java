@@ -27,6 +27,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.nui.Color;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -62,6 +63,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
+    private Line line = new Line();
 
     @Override
     public void preRender() {
@@ -156,4 +158,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         billboard.render();
         glPopMatrix();
     }
+
+    @Override
+    public void drawLine(int sx, int sy, int ex, int ey, Color color) {
+        line.draw(sx, sy, ex, ey, 2, color, color, 0);
+    }
+
 }

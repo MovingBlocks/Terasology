@@ -30,6 +30,7 @@ import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -108,7 +109,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        selectEntity.bindOptions(new Binding<List<Interpreter>>() {
+        selectEntity.bindOptions(new ReadOnlyBinding<List<Interpreter>>() {
             @Override
             public List<Interpreter> get() {
                 BehaviorTree selection = selectTree.getSelection();
@@ -117,10 +118,6 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                 } else {
                     return Arrays.asList();
                 }
-            }
-
-            @Override
-            public void set(List<Interpreter> value) {
             }
         });
         selectEntity.bindSelection(new Binding<Interpreter>() {
@@ -135,7 +132,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                     selectedInterpreter.setDebugger(null);
                 }
                 selectedInterpreter = value;
-                if (selectedInterpreter!=null) {
+                if (selectedInterpreter != null) {
                     EntityRef minion = value.actor().minion();
                     entityProperties.clear();
                     for (Component component : minion.iterateComponents()) {
@@ -147,15 +144,10 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        palette.bindOptions(new Binding<List<BehaviorNodeComponent>>() {
+        palette.bindOptions(new ReadOnlyBinding<List<BehaviorNodeComponent>>() {
             @Override
             public List<BehaviorNodeComponent> get() {
                 return Lists.newArrayList(CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponents());
-            }
-
-            @Override
-            public void set(List<BehaviorNodeComponent> value) {
-
             }
         });
 

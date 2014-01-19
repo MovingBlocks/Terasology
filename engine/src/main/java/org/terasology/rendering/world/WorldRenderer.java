@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
-import org.terasology.engine.API;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;

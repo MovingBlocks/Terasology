@@ -84,19 +84,17 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     public void setLayoutConstraints(String constraint) {
         layoutConstraints = constraint;
-        constraint = ConstraintParser.prepare(constraint);
-        setLc(ConstraintParser.parseLayoutConstraint(constraint));
+        setLc(ConstraintParser.parseLayoutConstraint(ConstraintParser.prepare(constraint)));
     }
 
-    public void setCC(AC colConstraints) {
-        this.cc = colConstraints;
+    public void setCC(AC columnConstraint) {
+        this.cc = columnConstraint;
         dirty = true;
     }
 
     public void setColConstraints(String constraint) {
         colConstraints = constraint;
-        constraint = ConstraintParser.prepare(constraint);
-        setCC(ConstraintParser.parseColumnConstraints(constraint));
+        setCC(ConstraintParser.parseColumnConstraints(ConstraintParser.prepare(constraint)));
     }
 
     public void setDebug(boolean debug) {
@@ -110,8 +108,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     public void setRowConstraints(String constraint) {
         rowConstraints = constraint;
-        constraint = ConstraintParser.prepare(constraint);
-        setRc(ConstraintParser.parseColumnConstraints(constraint));
+        setRc(ConstraintParser.parseColumnConstraints(ConstraintParser.prepare(constraint)));
     }
 
     @Override

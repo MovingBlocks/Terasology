@@ -28,8 +28,6 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.behavior.BehaviorSystem;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;

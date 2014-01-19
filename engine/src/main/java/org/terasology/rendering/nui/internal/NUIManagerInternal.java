@@ -265,7 +265,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             if (canvas.processMouseWheel(event.getWheelTurns(), Mouse.getPosition())) {
                 event.consume();
             }
-
         }
     }
 

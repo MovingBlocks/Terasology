@@ -105,8 +105,7 @@ public class CanvasImpl implements CanvasControl {
     private Vector2i lastClickPosition = new Vector2i();
 
     private CanvasRenderer renderer;
-    private Line line = new Line();
-    
+
     public CanvasImpl(NUIManager nuiManager, Time time, CanvasRenderer renderer) {
         this.renderer = renderer;
         this.nuiManager = nuiManager;
@@ -716,15 +715,16 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawLine(int startX, int startY, int endX, int endY, Color color) {
-        if (state.drawOnTop) {
-            drawOnTopOperations.add(new DrawLineOperation(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color));
-        } else {
-            drawLineInternal(startX + state.drawRegion.minX(), startY + state.drawRegion.minY(), state.drawRegion.minX() + endX, state.drawRegion.minY() + endY, color);
-        }
-    }
+        int sx = startX + state.drawRegion.minX();
+        int sy = startY + state.drawRegion.minY();
+        int ex = state.drawRegion.minX() + endX;
+        int ey = state.drawRegion.minY() + endY;
 
-    private void drawLineInternal(float x0, float y0, float x1, float y1, Color color) {
-        line.draw(x0, y0, x1, y1, 2, color, color, 0);
+        if (state.drawOnTop) {
+            drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
+        } else {
+            renderer.drawLine(sx, sy, ex, ey, color);
+        }
     }
 
     private void crop(Rect2i cropRegion) {
@@ -996,13 +996,13 @@ public class CanvasImpl implements CanvasControl {
 
     private final class DrawLineOperation implements DrawOperation {
 
-        private float x0;
-        private float y0;
-        private float x1;
-        private float y1;
+        private int x0;
+        private int y0;
+        private int x1;
+        private int y1;
         private Color color;
 
-        private DrawLineOperation(float x0, float y0, float x1, float y1, Color color) {
+        private DrawLineOperation(int x0, int y0, int x1, int y1, Color color) {
             this.x0 = x0;
             this.y0 = y0;
             this.x1 = x1;
@@ -1012,7 +1012,7 @@ public class CanvasImpl implements CanvasControl {
 
         @Override
         public void draw() {
-            drawLineInternal(x0, y0, x1, y1, color);
+            renderer.drawLine(x0, y0, x1, y1, color);
         }
     }
 

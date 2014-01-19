@@ -23,6 +23,7 @@ import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -54,6 +55,8 @@ import java.util.Set;
 public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     @In
     private EntityManager entityManager;
+    @In
+    private PrefabManager prefabManager;
 
     private Map<BehaviorTree, List<Interpreter>> interpreters = Maps.newHashMap();
 
@@ -63,9 +66,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     public void initialise() {
         CoreRegistry.put(BehaviorSystem.class, this);
         List<BehaviorNodeComponent> items = Lists.newArrayList();
-        Collection<Prefab> prefabs = CoreRegistry.get(PrefabManager.class).listPrefabs(BehaviorNodeComponent.class);
+        Collection<Prefab> prefabs = prefabManager.listPrefabs(BehaviorNodeComponent.class);
         for (Prefab prefab : prefabs) {
-            EntityRef entityRef = CoreRegistry.get(EntityManager.class).create(prefab);
+            EntityRef entityRef = entityManager.create(prefab);
             items.add(entityRef.getComponent(BehaviorNodeComponent.class));
         }
         CoreRegistry.put(BehaviorNodeFactory.class, new BehaviorNodeFactory(items));
@@ -73,6 +76,10 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @ReceiveEvent
     public void onBehaviorAdded(OnAddedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        addEntity(entityRef, behaviorComponent);
+    }
+    @ReceiveEvent
+    public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
     }
 
@@ -91,10 +98,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             return;
         }
         speed = 0.1f;
-
-        for (EntityRef minion : entityManager.getEntitiesWith(BehaviorComponent.class)) {
-            addEntity(minion, minion.getComponent(BehaviorComponent.class));
-        }
 
         for (Map.Entry<BehaviorTree, List<Interpreter>> entry : interpreters.entrySet()) {
             for (Interpreter interpreter : entry.getValue()) {

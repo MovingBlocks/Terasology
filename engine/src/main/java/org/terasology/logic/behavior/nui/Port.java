@@ -39,10 +39,10 @@ import javax.vecmath.Vector2f;
  * @author synopia
  */
 public abstract class Port extends CoreWidget {
-    private TextureRegion active = Assets.getTextureRegion("engine:checkboxChecked");
-    private TextureRegion inactive = Assets.getTextureRegion("engine:checkbox");
     protected RenderableNode node;
     protected Rect2f rect;
+    private TextureRegion active = Assets.getTextureRegion("engine:checkboxChecked");
+    private TextureRegion inactive = Assets.getTextureRegion("engine:checkbox");
 
     private InteractionListener connectListener = new BaseInteractionListener() {
         @Override
@@ -51,9 +51,6 @@ public abstract class Port extends CoreWidget {
             return true;
         }
     };
-
-    protected Port() {
-    }
 
     protected Port(RenderableNode node) {
         this.node = node;
@@ -117,10 +114,6 @@ public abstract class Port extends CoreWidget {
 
     public static class OutputPort extends Port {
 
-        public OutputPort() {
-            super();
-        }
-
         public OutputPort(RenderableNode renderableNode) {
             super(renderableNode);
         }
@@ -155,10 +148,6 @@ public abstract class Port extends CoreWidget {
     }
 
     public static class InsertOutputPort extends OutputPort {
-        public InsertOutputPort() {
-            super();
-        }
-
         public InsertOutputPort(RenderableNode renderableNode) {
             super(renderableNode);
         }
@@ -196,10 +185,6 @@ public abstract class Port extends CoreWidget {
 
     public static class InputPort extends Port {
         private OutputPort outputPort;
-
-        public InputPort() {
-            super();
-        }
 
         public InputPort(RenderableNode node) {
             super(node);

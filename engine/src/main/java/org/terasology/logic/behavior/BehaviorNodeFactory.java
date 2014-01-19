@@ -41,7 +41,7 @@ public class BehaviorNodeFactory {
             ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
             for (ClassLoader classLoader : classLoaders) {
                 try {
-                    Class<? extends Node> type = (Class<? extends Node>) classLoader.loadClass(component.type);//(Class<Node>) Class.forName(component.type);
+                    Class<? extends Node> type = (Class<? extends Node>) classLoader.loadClass(component.type);
                     nodes.put(type, component);
                     logger.warn("Found behavior node for class " + component.type + " name=" + component.name);
 

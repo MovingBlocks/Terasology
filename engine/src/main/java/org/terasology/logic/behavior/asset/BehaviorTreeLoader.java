@@ -95,7 +95,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
         return name;
     }
 
-    private class BehaviorTreeGson {
+    private final class BehaviorTreeGson {
         private int currentId;
         private Map<Node, Integer> nodeIds = Maps.newHashMap();
         private Map<Integer, Node> idNodes = Maps.newHashMap();
@@ -174,9 +174,10 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             Class cls = null;
                             for (ClassLoader classLoader : classLoaders) {
                                 try {
-                                    cls = (Class<? extends Node>) classLoader.loadClass(nodeType);
+                                    cls = classLoader.loadClass(nodeType);
                                     break;
                                 } catch (ClassNotFoundException e) {
+                                    // ignore
                                 }
                             }
                             TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));

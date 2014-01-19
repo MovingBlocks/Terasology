@@ -21,7 +21,7 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Status;
 
 /**
- * Created by synopia on 08.01.14.
+ * @author synopia
  */
 public class BehaviorDebugger implements Interpreter.Debugger {
     private final BehaviorTree tree;

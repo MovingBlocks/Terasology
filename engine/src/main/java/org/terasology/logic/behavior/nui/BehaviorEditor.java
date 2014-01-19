@@ -39,7 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Created by synopia on 02.01.14.
+ * @author synopia
  */
 public class BehaviorEditor extends ZoomableLayout {
     private Port activeConnectionStart;
@@ -70,13 +70,6 @@ public class BehaviorEditor extends ZoomableLayout {
             newNode = null;
         }
     };
-
-    private void addNode(RenderableNode node) {
-        addWidget(node);
-        for (int i = 0; i < node.getChildrenCount(); i++) {
-            addWidget(node.getChild(i));
-        }
-    }
 
     public BehaviorEditor() {
         super();
@@ -206,5 +199,12 @@ public class BehaviorEditor extends ZoomableLayout {
 
     public void bindSelection(Binding<RenderableNode> binding) {
         selectionBinding = binding;
+    }
+
+    private void addNode(RenderableNode node) {
+        addWidget(node);
+        for (int i = 0; i < node.getChildrenCount(); i++) {
+            addWidget(node.getChild(i));
+        }
     }
 }

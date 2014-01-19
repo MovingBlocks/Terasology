@@ -29,7 +29,6 @@ import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
 
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +61,8 @@ public class BehaviorTreeData implements AssetData {
         renderableRoot = createRenderable(root);
     }
 
-    public RenderableNode createRenderable(Node root) {
-        return root.visit(null, new Node.Visitor<RenderableNode>() {
+    public RenderableNode createRenderable(Node node) {
+        return node.visit(null, new Node.Visitor<RenderableNode>() {
             @Override
             public RenderableNode visit(RenderableNode parent, Node node) {
                 RenderableNode self = createNode(node);
@@ -76,10 +75,13 @@ public class BehaviorTreeData implements AssetData {
     }
 
     public void layout(RenderableNode start) {
+        LayoutTree layoutTree;
         if (start == null) {
-            start = renderableRoot;
+            layoutTree = new LayoutTree(renderableRoot);
+        } else {
+            layoutTree = new LayoutTree(start);
         }
-        TreeLayout<RenderableNode> layout = new TreeLayout<>(new LayoutTree(start), new FixedNodeExtentProvider(10, 5), new DefaultConfiguration(4, 2));
+        TreeLayout<RenderableNode> layout = new TreeLayout<>(layoutTree, new FixedNodeExtentProvider<RenderableNode>(10, 5), new DefaultConfiguration<RenderableNode>(4, 2));
         Map<RenderableNode, Rectangle2D.Double> bounds = layout.getNodeBounds();
         for (Map.Entry<RenderableNode, Rectangle2D.Double> entry : bounds.entrySet()) {
             RenderableNode node = entry.getKey();
@@ -96,10 +98,6 @@ public class BehaviorTreeData implements AssetData {
         return root;
     }
 
-    public RenderableNode getRenderableRoot() {
-        return renderableRoot;
-    }
-
     public List<RenderableNode> getRenderableNodes() {
         return Lists.newArrayList(renderableNodes.values());
     }
@@ -108,7 +106,7 @@ public class BehaviorTreeData implements AssetData {
         return renderableNodes.get(node);
     }
 
-    private static class LayoutTree implements TreeForTreeLayout<RenderableNode> {
+    private static final class LayoutTree implements TreeForTreeLayout<RenderableNode> {
         private RenderableNode root;
 
         private LayoutTree(RenderableNode root) {
@@ -137,7 +135,7 @@ public class BehaviorTreeData implements AssetData {
 
         @Override
         public Iterable<RenderableNode> getChildrenReverse(RenderableNode parentNode) {
-            ArrayList<RenderableNode> list = Lists.newArrayList(parentNode.children());
+            List<RenderableNode> list = Lists.newArrayList(parentNode.children());
             Collections.reverse(list);
             return list;
         }

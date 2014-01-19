@@ -22,12 +22,12 @@ import org.terasology.rendering.nui.databinding.Binding;
 /**
  * Created by synopia on 03.01.14.
  */
-public class Property<PType, UIType extends UIWidget> {
-    private Binding<PType> binding;
-    private UIType editor;
+public class Property<P, UI extends UIWidget> {
+    private Binding<P> binding;
+    private UI editor;
     private UILabel label;
 
-    public Property(String labelText, Binding<PType> binding, UIType editor) {
+    public Property(String labelText, Binding<P> binding, UI editor) {
         this.binding = binding;
         this.editor = editor;
         label = new UILabel("", labelText);
@@ -37,11 +37,11 @@ public class Property<PType, UIType extends UIWidget> {
         return label;
     }
 
-    public Binding<PType> getBinding() {
+    public Binding<P> getBinding() {
         return binding;
     }
 
-    public UIType getEditor() {
+    public UI getEditor() {
         return editor;
     }
 }
