@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.properties;
 
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.databinding.Binding;
 
 /**

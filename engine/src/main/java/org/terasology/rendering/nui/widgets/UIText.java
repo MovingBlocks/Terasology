@@ -418,14 +418,6 @@ public class UIText extends CoreWidget {
         }
     }
 
-    @Override
-    public void onLoseFocus() {
-        super.onLoseFocus();
-        for (TextEventListener listener : listeners) {
-            listener.onEnterPressed(this);
-        }
-    }
-
     private void correctCursor() {
         cursorPosition = TeraMath.clamp(cursorPosition, 0, getText().length());
         selectionStart = TeraMath.clamp(selectionStart, 0, getText().length());

@@ -16,7 +16,6 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.input.Mouse;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,13 +27,14 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIScreenLayerUtil;
+import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UIDropdown;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.properties.PropertyProvider;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UIDropdown;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -154,16 +154,16 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "create", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "create", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 behaviorEditor.createNode(palette.getSelection());
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "copy", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "copy", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 String data = behaviorEditor.save();
                 StringSelection contents = new StringSelection(data);
@@ -171,9 +171,9 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "layout", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "layout", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 BehaviorTree selection = selectTree.getSelection();
                 if( selection!=null ) {
                     selection.layout(selectedNode);
@@ -181,33 +181,33 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "debug_run", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "debug_run", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 if( debugger!=null ) {
                     debugger.run();
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "debug_pause", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "debug_pause", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 if( debugger!=null ) {
                     debugger.pause();
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "debug_reset", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "debug_reset", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 if( selectedInterpreter!=null ) {
                     selectedInterpreter.reset();
                 }
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "debug_step", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "debug_step", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
+            public void onActivated(UIWidget button) {
                 if( debugger!=null ) {
                     debugger.step();
                 }

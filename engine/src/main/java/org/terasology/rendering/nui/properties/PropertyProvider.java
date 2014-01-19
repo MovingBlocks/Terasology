@@ -24,10 +24,10 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
-import org.terasology.rendering.nui.baseWidgets.UICheckbox;
-import org.terasology.rendering.nui.baseWidgets.UIDropdown;
-import org.terasology.rendering.nui.baseWidgets.UISlider;
-import org.terasology.rendering.nui.baseWidgets.UITextEntry;
+import org.terasology.rendering.nui.widgets.UICheckbox;
+import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.UITextEntry;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 

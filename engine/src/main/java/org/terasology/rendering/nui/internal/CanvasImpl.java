@@ -724,14 +724,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     private void drawLineInternal(float x0, float y0, float x1, float y1, Color color) {
-        GL20.glUseProgram(0);
-        GL11.glDisable(GL_CULL_FACE);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_COLOR_ARRAY);
         line.draw(x0, y0, x1, y1, 2, color, color, 0);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_COLOR_ARRAY);
-        GL11.glEnable(GL_CULL_FACE);
     }
 
     private void crop(Rect2i cropRegion) {

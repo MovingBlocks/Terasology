@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.internal;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.terasology.rendering.nui.Color;
 
 import java.nio.FloatBuffer;
@@ -26,6 +27,11 @@ import java.nio.FloatBuffer;
  */
 public class Line {
     public void draw( float x1, float y1, float x2, float y2, float width, Color color, Color background, float alpha) {
+        GL20.glUseProgram(0);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+        GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+
         float t = 0;
         float R = 0;
         float f = width - (int)width;
@@ -243,6 +249,11 @@ public class Line {
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 4, 4);
         }
+
+        GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+        GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+
     }
 
     private FloatBuffer wrap( float[] data ) {

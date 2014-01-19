@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.baseWidgets.UIList;
+import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Arrays;
 

@@ -22,6 +22,7 @@ import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.version.TerasologyVersion;
 
@@ -63,10 +64,10 @@ public class MainMenuScreen extends UIScreenLayer {
                 getManager().pushScreen("engine:settingsMenuScreen");
             }
         });
-        UIScreenLayerUtil.trySubscribe(this, "behavior_editor", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "behavior_editor", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:behaviorEditorScreen");
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:behaviorEditorScreen");
             }
         });
 
@@ -77,10 +78,10 @@ public class MainMenuScreen extends UIScreenLayer {
             }
         });
 
-        UIScreenLayerUtil.trySubscribe(this, "migtest", new ButtonEventListener() {
+        WidgetUtil.trySubscribe(this, "migtest", new ActivateEventListener() {
             @Override
-            public void onButtonActivated(UIButton button) {
-                nuiManager.pushScreen("engine:migTestScreen");
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:migTestScreen");
             }
         });
     }

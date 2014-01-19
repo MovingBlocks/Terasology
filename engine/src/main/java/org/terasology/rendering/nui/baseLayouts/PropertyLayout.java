@@ -15,10 +15,11 @@
  */
 package org.terasology.rendering.nui.baseLayouts;
 
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.baseLayouts.miglayout.MigLayout;
-import org.terasology.rendering.nui.baseWidgets.ButtonEventListener;
-import org.terasology.rendering.nui.baseWidgets.UIButton;
-import org.terasology.rendering.nui.baseWidgets.UILabel;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.properties.Property;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 
@@ -42,9 +43,10 @@ public class PropertyLayout extends MigLayout {
             layout.setColConstraints("[min][fill]");
             layout.setRowConstraints("[min]");
 
-            expand.subscribe(new ButtonEventListener() {
+            expand.subscribe(new ActivateEventListener() {
                 @Override
-                public void onButtonActivated(UIButton button) {
+                public void onActivated(UIWidget widget) {
+                    UIButton button = (UIButton) widget;
                     if ("-".equals(button.getText())) {
                         layout.clear();
                         invalidate();
