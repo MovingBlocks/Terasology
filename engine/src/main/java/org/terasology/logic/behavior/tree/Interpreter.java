@@ -80,6 +80,9 @@ public class Interpreter {
     }
 
     public void start(Node node, Task.Observer observer) {
+        if (node == null) {
+            return;
+        }
         start(node.createTask(), observer);
     }
 

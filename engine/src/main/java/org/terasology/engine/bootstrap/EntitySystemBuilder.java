@@ -52,6 +52,7 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Block
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.CollisionGroupTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Color4fTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.ColorTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.PrefabTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
@@ -66,6 +67,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -118,6 +120,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
         serializationLibrary.add(Block.class, new BlockTypeHandler());
         serializationLibrary.add(Color4f.class, new Color4fTypeHandler());
+        serializationLibrary.add(Color.class, new ColorTypeHandler());
         serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));

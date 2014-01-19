@@ -15,11 +15,8 @@
  */
 package org.terasology.logic.behavior;
 
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.nui.Color;
-
-import java.util.List;
 
 /**
  * Defines a renderable node used to display behavior trees.
@@ -33,19 +30,11 @@ public class BehaviorNodeComponent implements Component {
     public String name;
     public String category;                     // for palette
     public String shape = "diamond";            // diamond or rect
-    public List<Float> color = Lists.newArrayList(.7f, .7f, .7f);
-    public List<Float> textColor = Lists.newArrayList(0f, 0f, 0f);
+    public Color color = Color.GREY;
+    public Color textColor = Color.BLACK;
 
     @Override
     public String toString() {
         return name;
-    }
-
-    public Color getTextColor() {
-        return new Color(textColor.get(0), textColor.get(1), textColor.get(2));
-    }
-
-    public Color getColor() {
-        return new Color(color.get(0), color.get(1), color.get(2));
     }
 }
