@@ -76,15 +76,15 @@ public class BehaviorTreeData implements AssetData {
     }
 
     public void layout(RenderableNode start) {
-        if( start==null ) {
+        if (start == null) {
             start = renderableRoot;
         }
-        TreeLayout<RenderableNode> layout = new TreeLayout<>(new LayoutTree(start), new FixedNodeExtentProvider(10,5), new DefaultConfiguration(4,2));
-        Map<RenderableNode,Rectangle2D.Double> bounds = layout.getNodeBounds();
+        TreeLayout<RenderableNode> layout = new TreeLayout<>(new LayoutTree(start), new FixedNodeExtentProvider(10, 5), new DefaultConfiguration(4, 2));
+        Map<RenderableNode, Rectangle2D.Double> bounds = layout.getNodeBounds();
         for (Map.Entry<RenderableNode, Rectangle2D.Double> entry : bounds.entrySet()) {
             RenderableNode node = entry.getKey();
             Rectangle2D.Double rect = entry.getValue();
-            node.setPosition((float) rect.getX(), (float) rect.getY() );
+            node.setPosition((float) rect.getX(), (float) rect.getY());
         }
     }
 
@@ -122,7 +122,7 @@ public class BehaviorTreeData implements AssetData {
 
         @Override
         public boolean isLeaf(RenderableNode uiWidgets) {
-            return root.getMaxChildren()==0;
+            return root.getMaxChildren() == 0;
         }
 
         @Override
@@ -149,7 +149,7 @@ public class BehaviorTreeData implements AssetData {
 
         @Override
         public RenderableNode getLastChild(RenderableNode parentNode) {
-            return parentNode.getChild(Math.max(0,parentNode.getChildrenCount()-1));
+            return parentNode.getChild(Math.max(0, parentNode.getChildrenCount() - 1));
         }
     }
 }

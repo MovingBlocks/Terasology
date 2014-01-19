@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.layouts;
 
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.baseLayouts.miglayout.MigLayout;
+import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;

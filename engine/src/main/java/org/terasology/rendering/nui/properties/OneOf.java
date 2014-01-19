@@ -25,6 +25,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
 @API
 public interface OneOf {
     @Retention(RetentionPolicy.RUNTIME)
@@ -32,12 +33,14 @@ public interface OneOf {
     @API
     public @interface Enum {
     }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @API
     public @interface List {
         String[] items();
     }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @API

@@ -35,9 +35,11 @@ public class BehaviorDebugger implements Interpreter.Debugger {
     public void pause() {
         ticksToRun = 0;
     }
+
     public void run() {
         ticksToRun = -1;
     }
+
     public void step() {
         ticksToRun = 1;
     }
@@ -63,13 +65,13 @@ public class BehaviorDebugger implements Interpreter.Debugger {
 
     @Override
     public boolean beforeTick() {
-        return ticksToRun!=0;
+        return ticksToRun != 0;
     }
 
     @Override
     public void afterTick() {
-        if( ticksToRun>0 ) {
-            ticksToRun --;
+        if (ticksToRun > 0) {
+            ticksToRun--;
         }
     }
 

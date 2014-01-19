@@ -61,7 +61,7 @@ public class DebugNode extends Node {
         @Override
         public Status update(float dt) {
             updateCalled = true;
-            if( count>0 ) {
+            if (count > 0) {
                 count--;
                 return Status.RUNNING;
             } else {

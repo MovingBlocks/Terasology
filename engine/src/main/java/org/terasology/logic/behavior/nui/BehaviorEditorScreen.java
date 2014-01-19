@@ -29,11 +29,10 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.baseLayouts.PropertyLayout;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 
 import java.awt.*;
@@ -175,7 +174,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 BehaviorTree selection = selectTree.getSelection();
-                if( selection!=null ) {
+                if (selection != null) {
                     selection.layout(selectedNode);
                 }
             }
@@ -184,7 +183,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "debug_run", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                if( debugger!=null ) {
+                if (debugger != null) {
                     debugger.run();
                 }
             }
@@ -192,7 +191,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "debug_pause", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                if( debugger!=null ) {
+                if (debugger != null) {
                     debugger.pause();
                 }
             }
@@ -200,7 +199,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "debug_reset", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                if( selectedInterpreter!=null ) {
+                if (selectedInterpreter != null) {
                     selectedInterpreter.reset();
                 }
             }
@@ -208,7 +207,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "debug_step", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                if( debugger!=null ) {
+                if (debugger != null) {
                     debugger.step();
                 }
             }

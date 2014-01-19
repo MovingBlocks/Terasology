@@ -24,7 +24,6 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import org.reflections.Reflections;
 import org.terasology.asset.AssetLoader;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
@@ -45,10 +44,10 @@ import java.util.Map;
 
 /**
  * Loader for behavior assets. Can also save assets into json format.
- *
+ * <p/>
  * If there are both, Nodes and Renderables tree, both are loaded/saved. To ensure, the nodes get associated to
  * the correct renderable, additional ids are introduced (only in the json file).
- *
+ * <p/>
  * TODO this may be rewritten, especially considering the save functionality
  *
  * @author synopia
@@ -164,7 +163,13 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             in.beginObject();
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
-                            ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
+                            ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+                            ClassLoader[] classLoaders;
+                            if (moduleManager != null) {
+                                classLoaders = moduleManager.getActiveModuleReflections().getConfiguration().getClassLoaders();
+                            } else {
+                                classLoaders = new ClassLoader[]{getClass().getClassLoader()};
+                            }
                             Class cls = null;
                             for (ClassLoader classLoader : classLoaders) {
                                 try {
@@ -262,7 +267,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                 in.beginArray();
                 int i = 0;
                 while (in.hasNext()) {
-                    RenderableNode child = gsonNode.fromJson(in, RenderableNode.class );
+                    RenderableNode child = gsonNode.fromJson(in, RenderableNode.class);
                     renderableNode.setChild(i, child);
                     i++;
                 }

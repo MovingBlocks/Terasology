@@ -31,8 +31,8 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import javax.vecmath.Vector2f;
 import java.io.ByteArrayOutputStream;
@@ -49,7 +49,7 @@ public class BehaviorEditor extends ZoomableLayout {
     private Vector2f mousePos;
     private Binding<RenderableNode> selectionBinding;
 
-    private final InteractionListener moveOver = new BaseInteractionListener(){
+    private final InteractionListener moveOver = new BaseInteractionListener() {
         @Override
         public void onMouseOver(Vector2i pos, boolean topMostElement) {
             mousePos = screenToWorld(pos);
@@ -57,7 +57,7 @@ public class BehaviorEditor extends ZoomableLayout {
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            if( newNode!=null ) {
+            if (newNode != null) {
                 newNode.setPosition(screenToWorld(pos));
                 addNode(newNode);
                 return true;
@@ -74,7 +74,7 @@ public class BehaviorEditor extends ZoomableLayout {
     private void addNode(RenderableNode node) {
         addWidget(node);
         for (int i = 0; i < node.getChildrenCount(); i++) {
-             addWidget(node.getChild(i));
+            addWidget(node.getChild(i));
         }
     }
 
@@ -100,7 +100,7 @@ public class BehaviorEditor extends ZoomableLayout {
 
     public String save() {
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
-        ByteArrayOutputStream baos =new ByteArrayOutputStream(10000);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         try {
             loader.save(baos, tree.getData());
             return baos.toString();
@@ -120,31 +120,31 @@ public class BehaviorEditor extends ZoomableLayout {
                     RenderableNode renderableNode = (RenderableNode) widget;
                     for (Port port : renderableNode.getPorts()) {
                         Port targetPort = port.getTargetPort();
-                        if (port.isInput() || targetPort == null ) {
+                        if (port.isInput() || targetPort == null) {
                             continue;
                         }
-                        drawConnection(canvas, port, targetPort, port==activeConnectionStart ? Color.BLACK : Color.GREY);
+                        drawConnection(canvas, port, targetPort, port == activeConnectionStart ? Color.BLACK : Color.GREY);
                     }
                 }
             }
-            if( activeConnectionStart!=null ) {
+            if (activeConnectionStart != null) {
                 drawConnection(canvas, activeConnectionStart, mousePos, Color.WHITE);
             }
-            if( selectedNode!=null ) {
+            if (selectedNode != null) {
                 Vector2f size = selectedNode.getSize();
                 Vector2f topLeft = selectedNode.getPosition();
                 Vector2f topRight = new Vector2f(topLeft);
-                topRight.add(new Vector2f(size.x+.1f, 0));
+                topRight.add(new Vector2f(size.x + .1f, 0));
                 Vector2f bottomLeft = new Vector2f(topLeft);
-                bottomLeft.add(new Vector2f(0, size.y+.1f));
+                bottomLeft.add(new Vector2f(0, size.y + .1f));
                 Vector2f bottomRight = new Vector2f(topLeft);
-                bottomRight.add(new Vector2f(size.x+0.1f, size.y+0.1f));
+                bottomRight.add(new Vector2f(size.x + 0.1f, size.y + 0.1f));
                 drawConnection(canvas, topLeft, topRight, Color.GREEN);
                 drawConnection(canvas, topRight, bottomRight, Color.GREEN);
                 drawConnection(canvas, bottomRight, bottomLeft, Color.GREEN);
                 drawConnection(canvas, bottomLeft, topLeft, Color.GREEN);
             }
-            if( newNode!=null ) {
+            if (newNode != null) {
                 Vector2i screenStart = worldToScreen(mousePos);
                 Vector2f worldEnd = new Vector2f(mousePos);
                 worldEnd.add(newNode.getSize());
@@ -157,13 +157,13 @@ public class BehaviorEditor extends ZoomableLayout {
     }
 
     public void portClicked(Port port) {
-        if( activeConnectionStart==null ) {
+        if (activeConnectionStart == null) {
             activeConnectionStart = port;
         } else {
-            if( activeConnectionStart.isInput() && !port.isInput() ) {
-                ((Port.OutputPort)port).setTarget((Port.InputPort) activeConnectionStart);
-            } else if( !activeConnectionStart.isInput() && port.isInput() ) {
-                ((Port.OutputPort)activeConnectionStart).setTarget((Port.InputPort) port);
+            if (activeConnectionStart.isInput() && !port.isInput()) {
+                ((Port.OutputPort) port).setTarget((Port.InputPort) activeConnectionStart);
+            } else if (!activeConnectionStart.isInput() && port.isInput()) {
+                ((Port.OutputPort) activeConnectionStart).setTarget((Port.InputPort) port);
             }
             CoreRegistry.get(BehaviorSystem.class).treeModified(tree);
             activeConnectionStart = null;
@@ -172,24 +172,25 @@ public class BehaviorEditor extends ZoomableLayout {
 
     public void nodeClicked(RenderableNode node) {
         selectedNode = node;
-        if( selectionBinding!=null ) {
+        if (selectionBinding != null) {
             selectionBinding.set(node);
         }
     }
 
-    private void drawConnection( Canvas canvas, Vector2f from, Vector2f to, Color color) {
+    private void drawConnection(Canvas canvas, Vector2f from, Vector2f to, Color color) {
         Vector2i s = worldToScreen(from);
         Vector2i e = worldToScreen(to);
         canvas.drawLine(s.x, s.y, e.x, e.y, color);
 
     }
-    private void drawConnection( Canvas canvas, Port from, Vector2f to, Color color) {
+
+    private void drawConnection(Canvas canvas, Port from, Vector2f to, Color color) {
         Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
         drawConnection(canvas, start, to, color);
     }
 
-    private void drawConnection( Canvas canvas, Port from, Port to, Color color) {
+    private void drawConnection(Canvas canvas, Port from, Port to, Color color) {
         Vector2f start = new Vector2f(from.node.getPosition());
         start.add(from.mid());
         Vector2f end = new Vector2f(to.node.getPosition());
@@ -203,7 +204,7 @@ public class BehaviorEditor extends ZoomableLayout {
         return newNode;
     }
 
-    public void bindSelection( Binding<RenderableNode> binding ) {
+    public void bindSelection(Binding<RenderableNode> binding) {
         selectionBinding = binding;
     }
 }

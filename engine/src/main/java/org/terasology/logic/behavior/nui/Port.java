@@ -32,7 +32,7 @@ import javax.vecmath.Vector2f;
  * - InputPort (one per RenderableNode)
  * - OutputPort (unlimited per RenderableNode, may be restricted by the type of the node)
  * - InsertPort ("virtual" port, to allow connections placed between two existing ones)
- *
+ * <p/>
  * Input/Output ports may have a target. This is always of the opposite type.
  * When setting a target to a port, the node of the InputPort is added to the child list of the node of the OutputPort.
  *

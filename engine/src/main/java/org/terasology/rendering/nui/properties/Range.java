@@ -30,7 +30,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Range {
     float min() default 0;
+
     float max() default 1;
+
     int precision() default 1;
+
     float increment() default 0.1f;
 }

@@ -58,8 +58,8 @@ public class DelayNode extends DecoratorNode {
         public Status update(float dt) {
             if (count > 0) {
                 count--;
-            } else if( count==0 ) {
-                if( getNode().child!=null ) {
+            } else if (count == 0) {
+                if (getNode().child != null) {
                     interpreter().start(getNode().child, this);
                 }
                 count--;

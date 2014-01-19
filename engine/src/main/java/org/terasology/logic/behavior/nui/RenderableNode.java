@@ -29,7 +29,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.baseLayouts.ZoomableLayout;
+import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import javax.vecmath.Vector2f;
 import java.util.List;
@@ -70,7 +70,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
         @Override
         public void onMouseRelease(MouseInput button, Vector2i pos) {
-            if( !dragged ) {
+            if (!dragged) {
                 editor.nodeClicked(RenderableNode.this);
             }
             dragged = false;
@@ -80,7 +80,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         public void onMouseDrag(Vector2i pos) {
             Vector2f diff = editor.screenToWorld(pos);
             diff.sub(editor.screenToWorld(last));
-            if( diff.lengthSquared()!=0 ) {
+            if (diff.lengthSquared() != 0) {
                 dragged = true;
             }
             move(diff);
@@ -105,10 +105,10 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     @Override
     public void onDraw(Canvas canvas) {
         canvas.drawTexture(texture);
-        String text = getData().name + " "+(status!=null?status:"");
+        String text = getData().name + " " + (status != null ? status : "");
         canvas.drawText(text);
 
-        if( editor!=null ) {
+        if (editor != null) {
             canvas.addInteractionRegion(moveListener);
         }
         portList.onDraw(canvas);

@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Behavior tree asset. Can be loaded and saved into json.
- *
+ * <p/>
  * This asset keeps track of the tree of Nodes and the associated RenderableNodes. If there are no RenderableNodes,
  * the helper class will generate and layout some.
  *
@@ -46,7 +46,7 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
         return data;
     }
 
-    public RenderableNode getRenderableNode( Node node ) {
+    public RenderableNode getRenderableNode(Node node) {
         return data.getRenderableNode(node);
     }
 

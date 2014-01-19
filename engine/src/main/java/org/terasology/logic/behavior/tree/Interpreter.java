@@ -70,7 +70,7 @@ public class Interpreter {
 
     public void start() {
         start(root, null);
-        if( debugger!=null ) {
+        if (debugger != null) {
             debugger.started();
         }
     }
@@ -98,18 +98,18 @@ public class Interpreter {
             observer.handle(result);
         }
         tasks.remove(task);
-        if( debugger!=null ) {
+        if (debugger != null) {
             debugger.nodeFinished(task.getNode(), result);
         }
     }
 
     public int tick(float dt) {
-        if( debugger==null || debugger.beforeTick() ) {
+        if (debugger == null || debugger.beforeTick()) {
             startedNodes.clear();
             while (step(dt)) {
                 continue;
             }
-            if( debugger!=null ) {
+            if (debugger != null) {
                 debugger.afterTick();
             }
         }
@@ -123,7 +123,7 @@ public class Interpreter {
             return false;
         }
 
-        if( startedNodes.contains(current.getNode())) {
+        if (startedNodes.contains(current.getNode())) {
             tasks.addLast(current);
             return true;
         }
@@ -131,16 +131,16 @@ public class Interpreter {
 
         current.tick(dt);
 
-        if (current.getStatus() != Status.RUNNING ) {
-            if( debugger!=null ) {
+        if (current.getStatus() != Status.RUNNING) {
+            if (debugger != null) {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }
-            if( current.getObserver() != null ) {
+            if (current.getObserver() != null) {
                 current.getObserver().handle(current.getStatus());
             }
         } else {
             tasks.addLast(current);
-            if( debugger!=null ) {
+            if (debugger != null) {
                 debugger.nodeUpdated(current.getNode(), current.getStatus());
             }
         }
@@ -157,11 +157,14 @@ public class Interpreter {
     }
 
     public interface Debugger {
-        void nodeFinished( Node node, Status status );
-        void nodeUpdated( Node node, Status status );
+        void nodeFinished(Node node, Status status);
+
+        void nodeUpdated(Node node, Status status);
+
         void started();
 
         boolean beforeTick();
+
         void afterTick();
     }
 }

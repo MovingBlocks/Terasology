@@ -43,7 +43,7 @@ public class SelectorNode extends CompositeNode {
         @Override
         public void onInitialize() {
             iterator = getNode().children().iterator();
-            if( iterator.hasNext() ) {
+            if (iterator.hasNext()) {
                 current = iterator.next();
                 interpreter().start(current, this);
             }

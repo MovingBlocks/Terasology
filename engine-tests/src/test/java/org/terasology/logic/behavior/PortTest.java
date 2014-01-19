@@ -39,6 +39,7 @@ public class PortTest {
         AssetManager assetManager = mock(AssetManager.class);
         CoreRegistry.put(AssetManager.class, assetManager);
     }
+
     @Test
     public void testConnectDecorator() {
         RenderableNode one = new RenderableNode();

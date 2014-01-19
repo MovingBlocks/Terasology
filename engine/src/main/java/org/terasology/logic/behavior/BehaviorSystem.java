@@ -17,14 +17,11 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.entity.internal.PojoEntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -37,8 +34,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.rendering.logic.SkeletalMeshComponent;
 
 import java.util.Collection;
 import java.util.List;
@@ -127,9 +122,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         return interpreters.get(tree);
     }
 
-    public void treeModified( BehaviorTree tree ) {
+    public void treeModified(BehaviorTree tree) {
         List<Interpreter> list = interpreters.get(tree);
-        if( list==null || list.size()==0 ) {
+        if (list == null || list.size() == 0) {
             return;
         }
         for (Interpreter interpreter : list) {

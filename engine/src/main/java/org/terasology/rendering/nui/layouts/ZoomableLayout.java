@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.baseLayouts;
+package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
@@ -41,7 +41,7 @@ public class ZoomableLayout extends CoreLayout {
     private Vector2f pixelSize;
     private Vector2i screenSize;
     private Vector2f windowPosition = new Vector2f();
-    private Vector2f windowSize = new Vector2f(50,50);
+    private Vector2f windowSize = new Vector2f(50, 50);
 
     private Vector2i last;
 
@@ -157,19 +157,19 @@ public class ZoomableLayout extends CoreLayout {
     }
 
     public Vector2f screenToWorld(Vector2i screenPos) {
-        Vector2f world = new Vector2f(screenPos.x/pixelSize.x, screenPos.y/pixelSize.y);
+        Vector2f world = new Vector2f(screenPos.x / pixelSize.x, screenPos.y / pixelSize.y);
         world.add(windowPosition);
         return world;
     }
 
     public Vector2i worldToScreen(Vector2f world) {
-        return new Vector2i((int)((world.x-windowPosition.x)*pixelSize.x), (int)((world.y-windowPosition.y)*pixelSize.y) );
+        return new Vector2i((int) ((world.x - windowPosition.x) * pixelSize.x), (int) ((world.y - windowPosition.y) * pixelSize.y));
     }
 
     public Vector2i screenUnit(Vector2f world) {
-        Vector2i screen = new Vector2i( (int) (pixelSize.x * world.x), (int)(pixelSize.y*world.y));
+        Vector2i screen = new Vector2i((int) (pixelSize.x * world.x), (int) (pixelSize.y * world.y));
         screen.absolute();
-        screen.clamp(0,1);
+        screen.clamp(0, 1);
         return screen;
     }
 
