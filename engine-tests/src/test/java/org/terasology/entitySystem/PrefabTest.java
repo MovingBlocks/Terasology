@@ -37,11 +37,16 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.stubs.OrderedMapTestComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -92,6 +97,26 @@ public class PrefabTest {
     public void prefabHasDefinedComponents() {
         Prefab prefab = prefabManager.getPrefab("unittest:withComponent");
         assertTrue(prefab.hasComponent(StringComponent.class));
+    }
+
+    @Test
+    public void prefabHasDefinedComponentsWithOrderedMap() {
+        Prefab prefab = prefabManager.getPrefab("unittest:withComponentContainingOrderedMap");
+        assertTrue(prefab.hasComponent(OrderedMapTestComponent.class));
+        OrderedMapTestComponent component = prefab.getComponent(OrderedMapTestComponent.class);
+        assertNotNull(component);
+        Map<String, Long> orderedMap = component.orderedMap;
+        Set<String> keySet = orderedMap.keySet();
+        List<String> keyList = new ArrayList<String>(keySet);
+        assertEquals(4, keyList.size());
+        assertEquals("one", keyList.get(0));
+        assertEquals("two", keyList.get(1));
+        assertEquals("three", keyList.get(2));
+        assertEquals("four", keyList.get(3));
+        assertEquals(Long.valueOf(1), orderedMap.get("one"));
+        assertEquals(Long.valueOf(2), orderedMap.get("two"));
+        assertEquals(Long.valueOf(3), orderedMap.get("three"));
+        assertEquals(Long.valueOf(4), orderedMap.get("four"));
     }
 
     @Test
