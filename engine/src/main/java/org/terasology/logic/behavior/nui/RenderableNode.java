@@ -17,7 +17,6 @@ package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.Component;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.tree.Node;
@@ -35,11 +34,11 @@ import javax.vecmath.Vector2f;
 import java.util.List;
 
 /**
- * A widget to render and process inputs for a node of a behavior tree. *
+ * A widget to render and process inputs for a node of a behavior tree.
  *
  * @author synopia
  */
-public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, Component, TreeAccessor<RenderableNode> {
+public class RenderableNode extends CoreWidget implements ZoomableLayout.PositionalWidget<BehaviorEditor>, TreeAccessor<RenderableNode> {
     private TextureRegion texture = Assets.getTextureRegion("engine:button");
 
     private final List<RenderableNode> children = Lists.newArrayList();

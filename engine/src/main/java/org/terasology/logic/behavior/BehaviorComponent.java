@@ -25,9 +25,5 @@ import org.terasology.logic.behavior.tree.Interpreter;
  * @author synopia
  */
 public class BehaviorComponent implements Component {
-    public String behavior;
-
-    public transient BehaviorTree tree;
-    public transient Interpreter interpreter;
-
+    public BehaviorTree tree;
 }

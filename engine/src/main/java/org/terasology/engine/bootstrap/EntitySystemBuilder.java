@@ -41,11 +41,13 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.AssetTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.BehaviorTreeTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.CollisionGroupTypeHandler;
@@ -131,6 +133,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler(vector3iHandler));
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
+        serializationLibrary.add(BehaviorTree.class, new BehaviorTreeTypeHandler());
         return serializationLibrary;
     }
 

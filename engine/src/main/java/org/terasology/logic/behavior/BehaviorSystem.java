@@ -17,8 +17,6 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.Assets;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -59,6 +57,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     private PrefabManager prefabManager;
 
     private Map<BehaviorTree, List<Interpreter>> interpreters = Maps.newHashMap();
+    private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
 
     private float speed;
 
@@ -78,6 +77,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     public void onBehaviorAdded(OnAddedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
     }
+
     @ReceiveEvent
     public void onBehaviorActivated(OnActivatedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         addEntity(entityRef, behaviorComponent);
@@ -87,7 +87,8 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     public void onBehaviorRemoved(BeforeRemoveComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         if (behaviorComponent.tree != null) {
             BehaviorTree tree = behaviorComponent.tree;
-            interpreters.get(tree).remove(behaviorComponent.interpreter);
+            Interpreter interpreter = entityInterpreters.remove(entityRef);
+            interpreters.get(tree).remove(interpreter);
         }
     }
 
@@ -130,12 +131,11 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     private void addEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        Interpreter interpreter = behaviorComponent.interpreter;
+        Interpreter interpreter = entityInterpreters.get(entityRef);
         if (interpreter == null) {
             interpreter = new Interpreter(new Actor(entityRef));
-            BehaviorTree tree = Assets.get(AssetType.BEHAVIOR, behaviorComponent.behavior, BehaviorTree.class);
-
-            behaviorComponent.interpreter = interpreter;
+            BehaviorTree tree = behaviorComponent.tree;
+            entityInterpreters.put(entityRef, interpreter);
             behaviorComponent.tree = tree;
             interpreter.setRoot(tree.getRoot());
             entityRef.saveComponent(behaviorComponent);

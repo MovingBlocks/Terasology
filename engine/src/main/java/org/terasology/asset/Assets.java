@@ -19,6 +19,7 @@ package org.terasology.asset;
 import org.terasology.audio.Sound;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
@@ -278,6 +279,10 @@ public final class Assets {
 
     public static Prefab getPrefab(String simpleUri) {
         return get(AssetType.PREFAB, simpleUri, Prefab.class);
+    }
+
+    public static BehaviorTree getBehaviorTree(String simpleUri) {
+        return get(AssetType.BEHAVIOR, simpleUri, BehaviorTree.class);
     }
 
     public static UISkin getSkin(String uri) {
