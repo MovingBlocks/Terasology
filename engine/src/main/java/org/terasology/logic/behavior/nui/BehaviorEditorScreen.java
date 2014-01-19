@@ -104,6 +104,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             public void set(BehaviorTree value) {
                 selectedTree = value;
                 behaviorEditor.setTree(value);
+                selectEntity.setSelection(null);
             }
         });
 
@@ -130,14 +131,19 @@ public class BehaviorEditorScreen extends UIScreenLayer {
 
             @Override
             public void set(Interpreter value) {
-                selectedInterpreter = value;
-                EntityRef minion = value.actor().minion();
-                entityProperties.clear();
-                for (Component component : minion.iterateComponents()) {
-                    entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                if (selectedInterpreter != null) {
+                    selectedInterpreter.setDebugger(null);
                 }
-                debugger = new BehaviorDebugger(selectedTree);
-                selectedInterpreter.setDebugger(debugger);
+                selectedInterpreter = value;
+                if (selectedInterpreter!=null) {
+                    EntityRef minion = value.actor().minion();
+                    entityProperties.clear();
+                    for (Component component : minion.iterateComponents()) {
+                        entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                    }
+                    debugger = new BehaviorDebugger(selectedTree);
+                    selectedInterpreter.setDebugger(debugger);
+                }
             }
         });
 

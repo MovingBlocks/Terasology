@@ -73,23 +73,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @ReceiveEvent
     public void onBehaviorAdded(OnAddedComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
-        Interpreter interpreter = behaviorComponent.interpreter;
-        if (interpreter == null) {
-            interpreter = new Interpreter(new Actor(entityRef));
-            BehaviorTree tree = Assets.get(AssetType.BEHAVIOR, behaviorComponent.behavior, BehaviorTree.class);
-
-            behaviorComponent.interpreter = interpreter;
-            behaviorComponent.tree = tree;
-            interpreter.setRoot(tree.getRoot());
-            entityRef.saveComponent(behaviorComponent);
-            interpreter.start();
-            List<Interpreter> list = interpreters.get(tree);
-            if (list == null) {
-                list = Lists.newArrayList();
-                interpreters.put(tree, list);
-            }
-            list.add(interpreter);
-        }
+        addEntity(entityRef, behaviorComponent);
     }
 
     @ReceiveEvent
@@ -107,6 +91,11 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             return;
         }
         speed = 0.1f;
+
+        for (EntityRef minion : entityManager.getEntitiesWith(BehaviorComponent.class)) {
+            addEntity(minion, minion.getComponent(BehaviorComponent.class));
+        }
+
         for (Map.Entry<BehaviorTree, List<Interpreter>> entry : interpreters.entrySet()) {
             for (Interpreter interpreter : entry.getValue()) {
                 interpreter.tick(0.1f);
@@ -135,5 +124,25 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     @Override
     public void shutdown() {
 
+    }
+
+    private void addEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {
+        Interpreter interpreter = behaviorComponent.interpreter;
+        if (interpreter == null) {
+            interpreter = new Interpreter(new Actor(entityRef));
+            BehaviorTree tree = Assets.get(AssetType.BEHAVIOR, behaviorComponent.behavior, BehaviorTree.class);
+
+            behaviorComponent.interpreter = interpreter;
+            behaviorComponent.tree = tree;
+            interpreter.setRoot(tree.getRoot());
+            entityRef.saveComponent(behaviorComponent);
+            interpreter.start();
+            List<Interpreter> list = interpreters.get(tree);
+            if (list == null) {
+                list = Lists.newArrayList();
+                interpreters.put(tree, list);
+            }
+            list.add(interpreter);
+        }
     }
 }
