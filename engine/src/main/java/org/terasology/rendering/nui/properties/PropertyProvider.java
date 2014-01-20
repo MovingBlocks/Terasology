@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UITextEntry;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.DefaultBinding;
 
 import javax.vecmath.Vector3f;
 import java.lang.annotation.Annotation;
@@ -57,7 +57,7 @@ public class PropertyProvider<T> {
         factories.put(Checkbox.class, new CheckboxPropertyFactory());
         factories.put(OneOf.List.class, new OneOfListPropertyFactory());
         factories.put(OneOf.Enum.class, new OneOfEnumPropertyFactory());
-        factories.put(Textfield.class, new TextPropertyFactory());
+        factories.put(TextField2.class, new TextPropertyFactory());
 
         try {
             this.target = target;
@@ -208,9 +208,9 @@ public class PropertyProvider<T> {
         }
     }
 
-    private class TextPropertyFactory implements PropertyFactory<Textfield> {
+    private class TextPropertyFactory implements PropertyFactory<TextField2> {
         @Override
-        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, Textfield info) {
+        public Property create(FieldMetadata<Object, ?> fieldMetadata, String label, TextField2 info) {
             UITextEntry<T> text = new UITextEntry<>();
 
             TextBinding<T> textBinding = createTextBinding((FieldMetadata<Object, T>) fieldMetadata);

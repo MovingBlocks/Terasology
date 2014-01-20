@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
-import org.terasology.rendering.nui.properties.Textfield;
+import org.terasology.rendering.nui.properties.TextField2;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -48,7 +48,7 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     // Standard position/rotation
     @Replicate
-    @Textfield
+    @TextField2
     Vector3f position = new Vector3f();
     @Replicate
     Quat4f rotation = new Quat4f(0, 0, 0, 1);

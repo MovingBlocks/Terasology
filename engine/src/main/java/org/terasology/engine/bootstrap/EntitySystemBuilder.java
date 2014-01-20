@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,7 +47,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.AssetTypeHandler;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.BehaviorTreeTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.CollisionGroupTypeHandler;
@@ -136,7 +135,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler(vector3iHandler));
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
-        serializationLibrary.add(BehaviorTree.class, new BehaviorTreeTypeHandler());
+        serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(AssetType.BEHAVIOR, BehaviorTree.class));
         return serializationLibrary;
     }
 
