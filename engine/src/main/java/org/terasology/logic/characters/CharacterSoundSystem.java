@@ -32,8 +32,8 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DamageSoundComponent;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.utilities.random.FastRandom;
@@ -150,7 +150,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     }
 
     @ReceiveEvent
-    public void onDeath(NoHealthEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+    public void onDeath(DestroyEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.deathSounds.size() > 0) {
             Sound sound = random.nextItem(characterSounds.deathSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.deathVolume));

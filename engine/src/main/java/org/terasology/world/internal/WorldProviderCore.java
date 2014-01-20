@@ -15,6 +15,7 @@
  */
 package org.terasology.world.internal;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
@@ -27,6 +28,12 @@ import org.terasology.world.time.WorldTime;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface WorldProviderCore {
+    /**
+     * Returns the world entity.
+     *
+     * @return the entity of the world
+     */
+    public EntityRef getWorldEntity();
 
     /**
      * Returns the title of this world.

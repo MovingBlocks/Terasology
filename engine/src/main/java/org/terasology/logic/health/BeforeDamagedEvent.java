@@ -36,14 +36,16 @@ public class BeforeDamagedEvent implements ConsumableEvent {
     private int baseDamage;
     private Prefab damageType;
     private EntityRef instigator;
+    private EntityRef directCause;
 
     private TFloatList multipliers = new TFloatArrayList();
     private TIntList modifiers = new TIntArrayList();
 
-    public BeforeDamagedEvent(int baseDamage, Prefab damageType, EntityRef instigator) {
+    public BeforeDamagedEvent(int baseDamage, Prefab damageType, EntityRef instigator, EntityRef directCause) {
         this.baseDamage = baseDamage;
         this.damageType = damageType;
         this.instigator = instigator;
+        this.directCause = directCause;
     }
 
     public int getBaseDamage() {
@@ -56,6 +58,10 @@ public class BeforeDamagedEvent implements ConsumableEvent {
 
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public EntityRef getDirectCause() {
+        return directCause;
     }
 
     public TFloatList getMultipliers() {

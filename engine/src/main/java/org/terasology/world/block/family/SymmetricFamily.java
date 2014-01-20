@@ -51,11 +51,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
-        return oldBlock;
-    }
-
-    @Override
     public Block getArchetypeBlock() {
         return block;
     }

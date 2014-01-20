@@ -18,7 +18,7 @@
  * Torches catch on fire and stuff. On purpose!
  */
 {
-    "rotation" : "AlignToSurface",
+    "rotation" : "attachedToSurface",
     "sides" : {
         "shape" : "TorchWall"
     },

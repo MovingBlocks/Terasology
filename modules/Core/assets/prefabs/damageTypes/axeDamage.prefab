@@ -1,6 +1,6 @@
 {
     "parent" : "physicalDamage",
-    "blockDamage" : {
+    "blockDamageModifier" : {
         "materialDamageMultiplier" : {"wood" : 2}
     }
 }

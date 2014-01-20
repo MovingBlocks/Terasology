@@ -32,6 +32,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
@@ -156,13 +157,37 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
-        EntityRef entity = create();
-        for (Component c : components) {
-            store.put(entity.getId(), c);
-        }
+        EntityRef entity = createEntity(components);
         if (eventSystem != null) {
             eventSystem.send(entity, OnAddedComponent.newInstance());
             eventSystem.send(entity, OnActivatedComponent.newInstance());
+        }
+        return entity;
+    }
+
+    private EntityRef createEntity(Iterable<Component> components) {
+        EntityRef entity = create();
+
+        Prefab prefab = null;
+        for (Component component : components) {
+            if (component instanceof EntityInfoComponent) {
+                EntityInfoComponent comp = (EntityInfoComponent) component;
+                prefab = prefabManager.getPrefab(comp.parentPrefab);
+                break;
+            }
+        }
+
+        Iterable<Component> finalComponents;
+        if (eventSystem != null) {
+            BeforeEntityCreated event = new BeforeEntityCreated(prefab, components);
+            eventSystem.send(entity, event);
+            finalComponents = event.getResultComponents();
+        } else {
+            finalComponents = components;
+        }
+
+        for (Component c : finalComponents) {
+            store.put(entity.getId(), c);
         }
         return entity;
     }
@@ -346,12 +371,8 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     }
 
     @Override
-    public EntityRef createEntityWithoutEvents(Iterable<Component> components) {
-        EntityRef entity = create();
-        for (Component c : components) {
-            store.put(entity.getId(), c);
-        }
-        return entity;
+    public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
+        return createEntity(components);
     }
 
     @Override
@@ -438,6 +459,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
      * @param componentClass
      * @return Whether the entity has a component of the given type
      */
+
     boolean hasComponent(int entityId, Class<? extends Component> componentClass) {
         return store.get(entityId, componentClass) != null;
     }
@@ -619,7 +641,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     // For testing
     @Override
     @SafeVarargs
-    public final int getCountOfEntitiesWith(Class<? extends Component> ... componentClasses) {
+    public final int getCountOfEntitiesWith(Class<? extends Component>... componentClasses) {
         switch (componentClasses.length) {
             case 0:
                 return store.numEntities();

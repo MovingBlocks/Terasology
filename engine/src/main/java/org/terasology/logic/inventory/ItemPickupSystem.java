@@ -61,10 +61,12 @@ public class ItemPickupSystem implements ComponentSystem {
     public void onBump(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
         if (inventoryManager.giveItem(event.getOtherEntity(), pickupComponent.itemEntity)) {
+            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
+            event.getOtherEntity().send(new PickedUpItem(pickupComponent.itemEntity));
+
             pickupComponent.itemEntity = EntityRef.NULL;
             entity.saveComponent(pickupComponent);
             entity.destroy();
-            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
         }
     }
 
@@ -112,7 +114,6 @@ public class ItemPickupSystem implements ComponentSystem {
             }
         }
     }
-
 
     @Override
     public void shutdown() {

@@ -46,6 +46,8 @@ public final class HealthComponent implements Component {
     // Regen info
     public long nextRegenTick;
 
+    public boolean destroyEntityOnNoHealth = false;
+
     public HealthComponent() {
     }
 
