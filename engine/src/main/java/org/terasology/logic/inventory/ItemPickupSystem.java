@@ -21,7 +21,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -29,7 +28,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.inventory.block.RetainBlockInventoryComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
@@ -43,7 +41,6 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
-import org.terasology.world.block.items.OnBlockToItem;
 
 import javax.vecmath.Vector3f;
 
@@ -64,10 +61,12 @@ public class ItemPickupSystem implements ComponentSystem {
     public void onBump(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
         if (inventoryManager.giveItem(event.getOtherEntity(), pickupComponent.itemEntity)) {
+            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
+            event.getOtherEntity().send(new PickedUpItem(pickupComponent.itemEntity));
+
             pickupComponent.itemEntity = EntityRef.NULL;
             entity.saveComponent(pickupComponent);
             entity.destroy();
-            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
         }
     }
 
