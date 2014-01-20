@@ -19,6 +19,7 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.nui.Color;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -37,4 +38,6 @@ public interface CanvasRenderer {
     Vector2i getTargetSize();
 
     void drawMaterialAt(Material material, Rect2i drawRegion);
+
+    void drawLine(int sx, int sy, int ex, int ey, Color color);
 }

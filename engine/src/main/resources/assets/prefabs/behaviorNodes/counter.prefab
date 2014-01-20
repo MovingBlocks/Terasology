@@ -1,0 +1,10 @@
+{
+    "BehaviorNode" : {
+        "type"      : "org.terasology.logic.behavior.tree.DelayNode",
+        "name"      : "Counter",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

@@ -18,10 +18,7 @@ package org.terasology.rendering.world.selection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.In;
@@ -31,7 +28,6 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.selection.BlockSelectionComponent;
 
 /**
@@ -80,13 +76,11 @@ public class BlockSelectionRenderSystem implements RenderSystem {
 
     private void renderOverlayForOneBlockSelection(BlockSelectionComponent blockSelectionComponent,
                                                    BlockSelectionRenderer selectionRenderer) {
-        // TODO: why is there a second beginRenderOverlay() call here at the start with no matching endRenderOverlay()?
-        selectionRenderer.beginRenderOverlay();
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-
         selectionRenderer.beginRenderOverlay();
         if (blockSelectionComponent.currentSelection == null) {
-            selectionRenderer.renderMark(blockSelectionComponent.startPosition, cameraPosition);
+            if (blockSelectionComponent.startPosition != null) {
+                selectionRenderer.renderMark(blockSelectionComponent.startPosition);
+            }
         } else {
             Vector3i size = blockSelectionComponent.currentSelection.size();
             Vector3i block = new Vector3i();
@@ -95,7 +89,7 @@ public class BlockSelectionRenderSystem implements RenderSystem {
                     for (int x = 0; x < size.x; x++) {
                         block.set(x, y, z);
                         block.add(blockSelectionComponent.currentSelection.min());
-                        selectionRenderer.renderMark(block, cameraPosition);
+                        selectionRenderer.renderMark(block);
                     }
                 }
             }

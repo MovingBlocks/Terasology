@@ -446,4 +446,6 @@ public interface Canvas {
      * @param region
      */
     void addInteractionRegion(InteractionListener listener, Rect2i region);
+
+    void drawLine(int startX, int startY, int endX, int endY, Color color);
 }

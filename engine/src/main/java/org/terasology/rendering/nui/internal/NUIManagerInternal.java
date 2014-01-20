@@ -266,7 +266,6 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
-
     }
 
     //raw input events

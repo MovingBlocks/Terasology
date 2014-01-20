@@ -33,6 +33,8 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.engine.API;
+import org.terasology.engine.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -40,6 +42,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * Renders a selection. Is used by the BlockSelectionSystem.
@@ -48,6 +51,7 @@ import org.terasology.rendering.primitives.TessellatorHelper;
  *
  * @author synopia
  */
+@API
 public class BlockSelectionRenderer {
     private Mesh overlayMesh;
     private Mesh overlayMesh2;
@@ -100,7 +104,9 @@ public class BlockSelectionRenderer {
         defaultTextured.deactivateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
     }
 
-    public void renderMark(Vector3i blockPos, Vector3f cameraPos) {
+    public void renderMark(Vector3i blockPos) {
+        Vector3f cameraPos = getCameraPosition();
+
         glPushMatrix();
         glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
 
@@ -111,7 +117,9 @@ public class BlockSelectionRenderer {
         glPopMatrix();
     }
 
-    public void renderMark2(Vector3i blockPos, Vector3f cameraPos) {
+    public void renderMark2(Vector3i blockPos) {
+        Vector3f cameraPos = getCameraPosition();
+
         glPushMatrix();
         glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
 
@@ -120,6 +128,10 @@ public class BlockSelectionRenderer {
         overlayMesh2.render();
 
         glPopMatrix();
+    }
+
+    private Vector3f getCameraPosition() {
+        return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
     }
 
 }
