@@ -36,9 +36,9 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.PlaceBlocks;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Vector3f;
@@ -103,20 +103,14 @@ public class DoorSystem implements ComponentSystem {
         Block aboveBlock = worldProvider.getBlock(primePos.x, primePos.y + 1, primePos.z);
 
         // Determine top and bottom blocks
-        Vector3i bottomBlockPos = null;
-        Block bottomBlock = null;
-        Vector3i topBlockPos = null;
-        Block topBlock = null;
+        Vector3i bottomBlockPos;
+        Vector3i topBlockPos;
         if (belowBlock.isReplacementAllowed()) {
             bottomBlockPos = new Vector3i(primePos.x, primePos.y - 1, primePos.z);
-            bottomBlock = belowBlock;
             topBlockPos = primePos;
-            topBlock = primeBlock;
         } else if (aboveBlock.isReplacementAllowed()) {
             bottomBlockPos = primePos;
-            bottomBlock = primeBlock;
             topBlockPos = new Vector3i(primePos.x, primePos.y + 1, primePos.z);
-            topBlock = aboveBlock;
         } else {
             event.consume();
             return;
@@ -139,7 +133,7 @@ public class DoorSystem implements ComponentSystem {
         Map<Vector3i, Block> blockMap = new HashMap<>();
         blockMap.put(bottomBlockPos, newBottomBlock);
         blockMap.put(topBlockPos, newTopBlock);
-        PlaceBlocks blockEvent = new PlaceBlocks(blockMap);
+        PlaceBlocks blockEvent = new PlaceBlocks(blockMap, event.getInstigator());
         worldProvider.getWorldEntity().send(blockEvent);
 
         if (!blockEvent.isConsumed()) {
@@ -192,14 +186,11 @@ public class DoorSystem implements ComponentSystem {
     @ReceiveEvent(components = {DoorComponent.class, BlockRegionComponent.class, LocationComponent.class})
     public void onFrob(ActivateEvent event, EntityRef entity) {
         DoorComponent door = entity.getComponent(DoorComponent.class);
-        Side oldSide = (door.isOpen) ? door.openSide : door.closedSide;
         Side newSide = (door.isOpen) ? door.closedSide : door.openSide;
         BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
         Block bottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), newSide, Side.TOP);
-        Block oldBottomBlock = door.bottomBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.min(), oldSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
-        Block oldTopBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), oldSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
         Sound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {

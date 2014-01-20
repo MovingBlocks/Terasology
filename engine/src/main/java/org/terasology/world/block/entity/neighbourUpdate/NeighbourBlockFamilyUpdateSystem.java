@@ -13,32 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.entity.neighbourUpdate;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.UpdatesWithNeighboursFamily;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
+public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(NeighbourBlockFamilyUpdateSystem.class);
 
     @In
@@ -47,15 +50,7 @@ public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
     private BlockEntityRegistry blockEntityRegistry;
 
     private int largeBlockUpdateCount;
-    private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = new HashSet<>();
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+    private Set<Vector3i> blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
     @ReceiveEvent
     public void largeBlockUpdateStarting(LargeBlockUpdateStarting event, EntityRef entity) {
@@ -66,6 +61,7 @@ public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
     public void largeBlockUpdateFinished(LargeBlockUpdateFinished event, EntityRef entity) {
         largeBlockUpdateCount--;
         if (largeBlockUpdateCount < 0) {
+            largeBlockUpdateCount = 0;
             throw new IllegalStateException("LargeBlockUpdateFinished invoked too many times");
         }
 
@@ -74,6 +70,8 @@ public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
         }
     }
 
+
+
     private void notifyNeighboursOfChangedBlocks() {
         // Invoke the updates in another large block change for this class only
         largeBlockUpdateCount++;
@@ -81,7 +79,7 @@ public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
             Set<Vector3i> blocksToUpdate = blocksUpdatedInLargeBlockUpdate;
 
             // Setup new collection for blocks changed in this pass
-            blocksUpdatedInLargeBlockUpdate = new HashSet<>();
+            blocksUpdatedInLargeBlockUpdate = Sets.newHashSet();
 
             for (Vector3i blockLocation : blocksToUpdate) {
                 processUpdateForBlockLocation(blockLocation);
@@ -114,5 +112,13 @@ public class NeighbourBlockFamilyUpdateSystem implements ComponentSystem {
                 }
             }
         }
+    }
+
+    @Override
+    public void update(float delta) {
+        if (largeBlockUpdateCount > 0) {
+            logger.error("Unmatched LargeBlockUpdateStarted - LargeBlockUpdateFinished not invoked enough times");
+        }
+        largeBlockUpdateCount = 0;
     }
 }

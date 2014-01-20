@@ -20,54 +20,30 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * This event should be sent to cause damage to an entity.
+ * Sent to request the destruction of an entity.
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class DoDamageEvent implements Event {
-    private int amount;
-    private Prefab damageType;
+public class DestroyEvent implements Event {
     private EntityRef instigator;
     private EntityRef directCause;
+    private Prefab damageType;
 
-    public DoDamageEvent(int amount) {
-        this(amount, EngineDamageTypes.DIRECT.get());
-    }
-
-    public DoDamageEvent(int amount, Prefab damageType) {
-        this(amount, damageType, EntityRef.NULL);
-    }
-
-    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator) {
-        this(amount, damageType, instigator, EntityRef.NULL);
-    }
-
-    /**
-     * @param amount     The amount of damage being caused
-     * @param damageType The type of the damage being dealt
-     * @param instigator The instigator of the damage (which entity caused it)
-     * @param directCause       Tool used to cause the damage
-     */
-    public DoDamageEvent(int amount, Prefab damageType, EntityRef instigator, EntityRef directCause) {
-        this.amount = amount;
-        this.damageType = damageType;
+    public DestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
         this.directCause = directCause;
-    }
-
-    public int getAmount() {
-        return amount;
+        this.damageType = damageType;
     }
 
     public EntityRef getInstigator() {
         return instigator;
     }
 
-    public Prefab getDamageType() {
-        return damageType;
-    }
-
     public EntityRef getDirectCause() {
         return directCause;
+    }
+
+    public Prefab getDamageType() {
+        return damageType;
     }
 }

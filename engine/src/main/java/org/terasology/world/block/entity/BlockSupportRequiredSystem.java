@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
@@ -62,8 +63,7 @@ public class BlockSupportRequiredSystem implements ComponentSystem {
                     final Side sideAttachedTo = attachmentFamily.getSideAttachedTo(attachedBlock);
                     if (sideAttachedTo == side) {
                         // Block it was attached to was removed
-                        blockEntityRegistry.getBlockEntityAt(attachedBlockPosition).send(
-                                new DestroyBlockEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
+                        blockEntityRegistry.getBlockEntityAt(attachedBlockPosition).send(new DestroyEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
                     }
                 }
             }
@@ -77,8 +77,7 @@ public class BlockSupportRequiredSystem implements ComponentSystem {
             final Vector3i blockPosition = Side.TOP.getAdjacentPos(event.getBlockPosition());
             final Block block = worldProvider.getBlock(blockPosition);
             if (block.isSupportRequired()) {
-                blockEntityRegistry.getBlockEntityAt(blockPosition).send(
-                        new DestroyBlockEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
+                blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(EntityRef.NULL, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
             }
         }
     }

@@ -30,9 +30,9 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
@@ -82,7 +82,7 @@ public class CharacterSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    public void onDeath(DestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)

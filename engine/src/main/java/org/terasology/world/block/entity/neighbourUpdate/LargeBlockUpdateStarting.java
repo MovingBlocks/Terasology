@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.entity.neighbourUpdate;
 
 import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class LargeBlockUpdateFinished implements Event {
+public class LargeBlockUpdateStarting implements Event {
 }

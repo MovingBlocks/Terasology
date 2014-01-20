@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
 
-import org.terasology.entitySystem.Component;
+@API package org.terasology.world.block.entity.placement;
 
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
-public class RetainBlockInventoryComponent implements Component {
-}
+import org.terasology.engine.API;

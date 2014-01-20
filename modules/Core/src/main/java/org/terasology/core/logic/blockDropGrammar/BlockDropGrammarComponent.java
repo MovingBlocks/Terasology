@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.core.logic.blockDropGrammar;
 
 import org.terasology.entitySystem.Component;
 
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class BlockDropGrammarComponent implements Component {
+public final class BlockDropGrammarComponent implements Component {
     public List<String> blockDrops;
     public List<String> itemDrops;
 }

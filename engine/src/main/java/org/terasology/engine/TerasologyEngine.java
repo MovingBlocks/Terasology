@@ -522,6 +522,7 @@ public class TerasologyEngine implements GameEngine {
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
 
         // Temporary - until NUI comes in
+        // TODO: Remove
         moduleSecurityManager.addAPIPackage("org.lwjgl.opengl");
         moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 

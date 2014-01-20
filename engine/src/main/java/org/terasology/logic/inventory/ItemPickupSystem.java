@@ -29,6 +29,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.inventory.block.RetainBlockInventoryComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
@@ -111,20 +112,6 @@ public class ItemPickupSystem implements ComponentSystem {
                     itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, iconMeshUri), icon.getTexture(), icon.getX(), icon.getY());
                 }
                 builder.getComponent(MeshComponent.class).mesh = itemMesh;
-            }
-        }
-    }
-
-    @ReceiveEvent(components = {InventoryComponent.class})
-    public void copyBlockInventory(OnBlockToItem event, EntityRef blockEntity) {
-        if (blockEntity.hasComponent(RetainBlockInventoryComponent.class)) {
-            EntityRef inventoryItem = event.getItem();
-            inventoryItem.addComponent(new InventoryComponent(((SlotBasedInventoryManager) CoreRegistry.get(SlotBasedInventoryManager.class)).getNumSlots(blockEntity)));
-            inventoryManager.moveAll(blockEntity, inventoryItem);
-            ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
-            if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
-                itemComponent.stackId = "";
-                inventoryItem.saveComponent(itemComponent);
             }
         }
     }

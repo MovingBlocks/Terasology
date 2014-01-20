@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.world.block.entity.damage;
 
-package org.terasology.world.block.entity;
-
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.network.NetworkEvent;
+import org.terasology.entitySystem.Component;
+import org.terasology.world.block.ForceBlockActive;
 
 /**
  * @author Immortius
  */
-@BroadcastEvent(skipInstigator = true)
-public class PlayBlockDamagedEvent extends NetworkEvent {
-
-    protected PlayBlockDamagedEvent() {
-    }
-
-    public PlayBlockDamagedEvent(EntityRef instigator) {
-        super(instigator);
-    }
-
+@ForceBlockActive
+public class BlockDamagedComponent implements Component {
 }

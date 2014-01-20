@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.regions;
 
-import org.terasology.entitySystem.event.Event;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * An entity with this component will act as that block - producing block style damage effects, take damage as that block would.
+ * @author Immortius
  */
-public class LargeBlockUpdateStarting implements Event {
+public final class ActAsBlockComponent implements Component {
+    public BlockFamily block = BlockManager.getAirFamily();
 }

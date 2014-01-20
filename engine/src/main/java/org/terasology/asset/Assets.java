@@ -74,11 +74,17 @@ public final class Assets {
     }
 
     public static Asset get(AssetType type, String uri) {
-        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
+        if (uri != null && !uri.isEmpty()) {
+            return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
+        }
+        return null;
     }
 
     public static <T extends Asset> T get(AssetType type, String uri, Class<T> assetClass) {
-        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
+        if (uri != null && !uri.isEmpty()) {
+            return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
+        }
+        return null;
     }
 
     /**

@@ -36,6 +36,8 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.regions.ActAsBlockComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -114,7 +116,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
     }
 
-    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef tool, HealthComponent targetHealthComponent) {
+    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent targetHealthComponent) {
         HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);
@@ -125,23 +127,35 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         entity.saveComponent(health);
         entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));
         if (health.currentHealth == 0) {
-            entity.send(new NoHealthEvent(instigator, tool, damageType));
+            entity.send(new DestroyEvent(instigator, directCause, damageType));
         }
     }
 
     @ReceiveEvent(components = {HealthComponent.class})
     public void onDamage(DoDamageEvent event, EntityRef entity) {
-        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getTool(), null);
+        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getDirectCause(), null);
     }
 
-    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef tool, HealthComponent health) {
-        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, tool));
+    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent health) {
+        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
         if (!beforeDamage.isConsumed()) {
             int damageAmount = calculateTotal(beforeDamage.getBaseDamage(), beforeDamage.getMultipliers(), beforeDamage.getModifiers());
             if (damageAmount > 0) {
-                doDamage(entity, damageAmount, damageType, instigator, tool, health);
+                doDamage(entity, damageAmount, damageType, instigator, directCause, health);
             } else {
                 doHeal(entity, -damageAmount, instigator, health);
+            }
+        }
+    }
+
+    @ReceiveEvent
+    public void onDestroy(DestroyEvent event, EntityRef entity, HealthComponent healthComponent) {
+        BeforeDestroyEvent destroyCheck = new BeforeDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType());
+        entity.send(destroyCheck);
+        if (!destroyCheck.isConsumed()) {
+            entity.send(new DoDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType()));
+            if (healthComponent.destroyEntityOnNoHealth) {
+                entity.destroy();
             }
         }
     }

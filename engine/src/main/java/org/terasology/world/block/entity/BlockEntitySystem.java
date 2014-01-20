@@ -21,14 +21,15 @@ import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.BeforeDamagedEvent;
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.health.FullHealthEvent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
@@ -42,11 +43,15 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
+import org.terasology.world.block.entity.damage.BlockDamagedComponent;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.items.BeforeBlockToItem;
 import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
+import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
+
+import javax.vecmath.Vector3f;
 
 /**
  * Event handler for events affecting block entities
@@ -83,85 +88,84 @@ public class BlockEntitySystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent
-    public void onBlockDestroy(DestroyBlockEvent event, EntityRef entity) {
-        BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
+    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    public void doDestroy(DoDestroyEvent event, EntityRef entity, ActAsBlockComponent blockComponent) {
+        commonDestroyed(event, entity);
+    }
 
+    @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
+    public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
+        commonDestroyed(event, entity);
+        worldProvider.setBlock(blockComponent.getPosition(), BlockManager.getAir());
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, BlockComponent blockComponent) {
+        Vector3i location = blockComponent.getPosition();
+        commonDefaultDropsHandling(event, entity, location, blockComponent.getBlock());
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, LocationComponent locationComp) {
+        Vector3i location = new Vector3i(locationComp.getWorldPosition(), 0.5f);
+        commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
+    }
+
+    @ReceiveEvent(priority = EventPriority.PRIORITY_TRIVIAL)
+    public void defaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, ActAsBlockComponent blockComponent, BlockRegionComponent blockRegion) {
+        if (!entity.hasComponent(LocationComponent.class)) {
+            Vector3i location = new Vector3i(blockRegion.region.center(), 0.5f);
+            commonDefaultDropsHandling(event, entity, location, blockComponent.block.getArchetypeBlock());
+        }
+    }
+
+    public void commonDefaultDropsHandling(CreateBlockDropsEvent event, EntityRef entity, Vector3i location, Block block) {
+        BlockDamageModifierComponent blockDamageModifierComponent = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
         float chanceOfBlockDrop = 1;
 
-        if (blockDamageComponent != null) {
-            chanceOfBlockDrop = 1 - blockDamageComponent.blockAnnihilationChance;
+        if (blockDamageModifierComponent != null) {
+            chanceOfBlockDrop = 1 - blockDamageModifierComponent.blockAnnihilationChance;
         }
-
-        Vector3i location = getBlockLocation(entity);
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            BlockFamily blockFamily = null;
+            EntityRef item = blockItemFactory.newInstance(block.getBlockFamily(), 1);
+            entity.send(new OnBlockToItem(item));
 
-            if (entity.hasComponent(BlockComponent.class)) {
-                blockFamily = entity.getComponent(BlockComponent.class).getBlock().getBlockFamily();
-            }
-
-            BeforeBlockToItem beforeBlockToItemEvent = new BeforeBlockToItem(event.getDamageType(), event.getInstigator(), event.getTool(), blockFamily, 1);
-            entity.send(beforeBlockToItemEvent);
-            if (!beforeBlockToItemEvent.isConsumed()) {
-                for (BlockFamily family : beforeBlockToItemEvent.getBlockItemsToGenerate()) {
-                    EntityRef item = blockItemFactory.newInstance(family, beforeBlockToItemEvent.getQuanityForBlock(family));
-                    entity.send(new OnBlockToItem(item));
-
-                    if (family.getArchetypeBlock().isDirectPickup()) {
-                        if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                            processDropping(item, location);
-                        }
-                    } else {
-                        processDropping(item, location);
-                    }
-                }
-                for (EntityRef item : beforeBlockToItemEvent.getItemsToDrop()) {
+            if (block.isDirectPickup()) {
+                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     processDropping(item, location);
                 }
+            } else {
+                processDropping(item, location);
             }
-        }
-
-        BlockRegionComponent blockRegionComp = entity.getComponent(BlockRegionComponent.class);
-        if (blockRegionComp != null) {
-            for (Vector3i blockPosition : blockRegionComp.region) {
-                worldProvider.setBlock(blockPosition, BlockManager.getAir());
-            }
-            entity.destroy();
-        } else {
-            worldProvider.setBlock(location, BlockManager.getAir());
         }
     }
 
-    @ReceiveEvent
-    public void onBlockHasNoHealth(NoHealthEvent event, EntityRef entity) {
-        if (isBlockOrBlockRegion(entity)) {
-            BlockDamageComponent blockDamageComponent = event.getDamageType().getComponent(BlockDamageComponent.class);
+    private void commonDestroyed(DoDestroyEvent event, EntityRef entity) {
+        entity.send(new CreateBlockDropsEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType()));
 
-            // TODO: Configurable via block definition
-            if (blockDamageComponent == null || !blockDamageComponent.skipPerBlockEffects) {
-                entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
-            }
-
-            entity.send(new DestroyBlockEvent(event.getInstigator(), event.getTool(), event.getDamageType()));
+        BlockDamageModifierComponent blockDamageModifierComponent = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
+        // TODO: Configurable via block definition
+        if (blockDamageModifierComponent == null || !blockDamageModifierComponent.skipPerBlockEffects) {
+            entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
         }
-    }
-
-    private boolean isBlockOrBlockRegion(EntityRef entity) {
-        return entity.hasComponent(BlockComponent.class) || entity.hasComponent(BlockRegionComponent.class);
     }
 
     private void processDropping(EntityRef item, Vector3i location) {
-        /* PHYSICS */
         EntityRef pickup = pickupBuilder.createPickupFor(item, location.toVector3f(), 60);
         pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     @ReceiveEvent
-    public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity) {
-        BlockFamily family = worldProvider.getBlock(getBlockLocation(blockEntity)).getBlockFamily();
-        if (!family.getArchetypeBlock().isDestructible()) {
+    public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity, BlockComponent blockComp) {
+        if (!blockComp.getBlock().isDestructible()) {
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent
+    public void beforeDamaged(BeforeDamagedEvent event, EntityRef blockEntity, ActAsBlockComponent blockComp) {
+        if (!blockComp.block.getArchetypeBlock().isDestructible()) {
             event.consume();
         }
     }
@@ -172,71 +176,67 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     @ReceiveEvent
-    public void onDamaged(OnDamagedEvent event, EntityRef entity) {
-        if (isBlockOrBlockRegion(entity)) {
-            BlockDamageComponent blockDamageSettings = event.getType().getComponent(BlockDamageComponent.class);
-            boolean skipDamageEffects = false;
-            if (blockDamageSettings != null) {
-                skipDamageEffects = blockDamageSettings.skipPerBlockEffects;
-            }
-            if (!skipDamageEffects) {
-                entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
-            }
-            if (!entity.hasComponent(BlockDamagedComponent.class)) {
-                entity.addComponent(new BlockDamagedComponent());
-            }
+    public void onDamaged(OnDamagedEvent event, EntityRef entity, BlockComponent blockComponent, LocationComponent locComp) {
+        onDamagedCommon(event, entity, blockComponent.getBlock().getBlockFamily(), locComp.getWorldPosition());
+        if (!entity.hasComponent(BlockDamagedComponent.class)) {
+            entity.addComponent(new BlockDamagedComponent());
         }
     }
 
     @ReceiveEvent
-    public void onPlayBlockDamage(PlayBlockDamagedEvent event, EntityRef entity) {
-        final Vector3i location = getBlockLocation(entity);
-        BlockFamily family = worldProvider.getBlock(location).getBlockFamily();
+    public void onDamaged(OnDamagedEvent event, EntityRef entity, ActAsBlockComponent blockComponent, LocationComponent locComp) {
+        onDamagedCommon(event, entity, blockComponent.block, locComp.getWorldPosition());
 
+    }
+
+    public void onDamagedCommon(OnDamagedEvent event, EntityRef entity, BlockFamily blockFamily, Vector3f location) {
+        BlockDamageModifierComponent blockDamageSettings = event.getType().getComponent(BlockDamageModifierComponent.class);
+        boolean skipDamageEffects = false;
+        if (blockDamageSettings != null) {
+            skipDamageEffects = blockDamageSettings.skipPerBlockEffects;
+        }
+        if (!skipDamageEffects) {
+            onPlayBlockDamageCommon(blockFamily, location);
+        }
+    }
+
+    private void onPlayBlockDamageCommon(BlockFamily family, Vector3f location) {
         EntityBuilder builder = entityManager.newBuilder("engine:defaultBlockParticles");
-        builder.getComponent(LocationComponent.class).setWorldPosition(location.toVector3f());
+        builder.getComponent(LocationComponent.class).setWorldPosition(location);
         builder.getComponent(BlockParticleEffectComponent.class).blockType = family;
         builder.build();
 
         if (family.getArchetypeBlock().isDebrisOnDestroy()) {
             EntityBuilder dustBuilder = entityManager.newBuilder("engine:dustEffect");
-            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location.toVector3f());
+            dustBuilder.getComponent(LocationComponent.class).setWorldPosition(location);
             dustBuilder.build();
         }
 
         // TODO: Configurable via block definition
-        audioManager.playSound(Assets.getSound("engine:Dig"), location.toVector3f());
+        audioManager.playSound(Assets.getSound("engine:Dig"), location);
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
-    public void beforeDamage(BeforeDamagedEvent event, EntityRef entity) {
-        if (isBlockOrBlockRegion(entity)) {
-            Block block = worldProvider.getBlock(getBlockLocation(entity));
-            if (event.getDamageType() != null) {
-                BlockDamageComponent blockDamage = event.getDamageType().getComponent(BlockDamageComponent.class);
-                if (blockDamage != null) {
-                    BlockFamily blockFamily = block.getBlockFamily();
-                    for (String category : blockFamily.getCategories()) {
-                        if (blockDamage.materialDamageMultiplier.containsKey(category)) {
-                            event.multiply(blockDamage.materialDamageMultiplier.get(category));
-                        }
+    public void beforeDamage(BeforeDamagedEvent event, EntityRef entity, BlockComponent blockComp) {
+        beforeDamageCommon(event, blockComp.getBlock());
+    }
+
+    @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
+    public void beforeDamage(BeforeDamagedEvent event, EntityRef entity, ActAsBlockComponent blockComp) {
+        beforeDamageCommon(event, blockComp.block.getArchetypeBlock());
+    }
+
+    private void beforeDamageCommon(BeforeDamagedEvent event, Block block) {
+        if (event.getDamageType() != null) {
+            BlockDamageModifierComponent blockDamage = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
+            if (blockDamage != null) {
+                BlockFamily blockFamily = block.getBlockFamily();
+                for (String category : blockFamily.getCategories()) {
+                    if (blockDamage.materialDamageMultiplier.containsKey(category)) {
+                        event.multiply(blockDamage.materialDamageMultiplier.get(category));
                     }
                 }
             }
-        }
-    }
-
-    private Vector3i getBlockLocation(EntityRef entity) {
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        BlockRegionComponent blockRegionComp = entity.getComponent(BlockRegionComponent.class);
-
-        if (blockComp != null) {
-            return blockComp.getPosition();
-        } else if (blockRegionComp != null) {
-            // Use first block as the representation of the block region
-            return blockRegionComp.region.iterator().next();
-        } else {
-            throw new IllegalArgumentException("Provided entity without BlockComponent or BlockRegionComponent");
         }
     }
 }

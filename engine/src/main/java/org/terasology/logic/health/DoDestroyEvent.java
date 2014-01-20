@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,18 +20,16 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * Sent when an entity reaches zero health
- *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public class NoHealthEvent implements Event {
+public class DoDestroyEvent implements Event {
     private EntityRef instigator;
-    private EntityRef tool;
+    private EntityRef directCause;
     private Prefab damageType;
 
-    public NoHealthEvent(EntityRef instigator, EntityRef tool, Prefab damageType) {
+    public DoDestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
-        this.tool = tool;
+        this.directCause = directCause;
         this.damageType = damageType;
     }
 
@@ -39,8 +37,8 @@ public class NoHealthEvent implements Event {
         return instigator;
     }
 
-    public EntityRef getTool() {
-        return tool;
+    public EntityRef getDirectCause() {
+        return directCause;
     }
 
     public Prefab getDamageType() {

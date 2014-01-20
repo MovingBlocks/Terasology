@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.core.logic.blockDropGrammar;
 
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -22,9 +23,18 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.block.items.BeforeBlockToItem;
+import org.terasology.utilities.random.Random;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.entity.CreateBlockDropsEvent;
+import org.terasology.world.block.items.BlockItemFactory;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -36,8 +46,15 @@ public class BlockDropGrammarSystem implements ComponentSystem {
     @In
     private BlockManager blockManager;
 
+    private BlockItemFactory blockItemFactory;
+    private PickupBuilder pickupBuilder;
+    private Random random;
+
     @Override
     public void initialise() {
+        blockItemFactory = new BlockItemFactory(entityManager);
+        pickupBuilder = new PickupBuilder();
+        random = new FastRandom();
     }
 
     @Override
@@ -46,12 +63,12 @@ public class BlockDropGrammarSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {BlockDropGrammarComponent.class})
-    public void whenBlockDropped(BeforeBlockToItem event, EntityRef blockEntity) {
-        BlockDropGrammarComponent blockDrop = blockEntity.getComponent(BlockDropGrammarComponent.class);
+    public void whenBlockDropped(CreateBlockDropsEvent event, EntityRef blockEntity) {
+        event.consume();
+    }
 
-        // Remove the "default" block drop
-        event.removeDefaultBlock();
-
+    @ReceiveEvent
+    public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockDropGrammarComponent blockDrop, LocationComponent locationComp) {
         FastRandom rnd = new FastRandom();
 
         if (blockDrop.blockDrops != null) {
@@ -68,7 +85,8 @@ public class BlockDropGrammarSystem implements ComponentSystem {
                 }
                 if (dropping) {
                     DropParser dropParser = new DropParser(rnd, dropResult).invoke();
-                    event.addBlockToGenerate(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
+                    EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
+                    createDrop(dropItem, locationComp.getWorldPosition());
                 }
             }
         }
@@ -87,15 +105,20 @@ public class BlockDropGrammarSystem implements ComponentSystem {
                 }
                 if (dropping) {
                     DropParser dropParser = new DropParser(rnd, dropResult).invoke();
-                    EntityRef entityRef = entityManager.create(dropParser.getDrop());
+                    EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
                     if (dropParser.getCount() > 1) {
-                        ItemComponent itemComponent = entityRef.getComponent(ItemComponent.class);
+                        ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
                         itemComponent.stackCount = (byte) dropParser.getCount();
                     }
-                    event.addItemToGenerate(entityRef);
+                    createDrop(dropEntity.build(), locationComp.getWorldPosition());
                 }
             }
         }
+    }
+
+    private void createDrop(EntityRef item, Vector3f location) {
+        EntityRef pickup = pickupBuilder.createPickupFor(item, location, 60);
+        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
     private class DropParser {

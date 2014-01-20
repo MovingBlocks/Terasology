@@ -157,7 +157,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef create(Iterable<Component> components) {
-        EntityRef entity = createAndSendEvent(components);
+        EntityRef entity = createEntity(components);
         if (eventSystem != null) {
             eventSystem.send(entity, OnAddedComponent.newInstance());
             eventSystem.send(entity, OnActivatedComponent.newInstance());
@@ -165,23 +165,28 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         return entity;
     }
 
-    private EntityRef createAndSendEvent(Iterable<Component> components) {
+    private EntityRef createEntity(Iterable<Component> components) {
         EntityRef entity = create();
 
-        String prefabName = null;
+        Prefab prefab = null;
         for (Component component : components) {
             if (component instanceof EntityInfoComponent) {
                 EntityInfoComponent comp = (EntityInfoComponent) component;
-                prefabName = comp.parentPrefab;
+                prefab = prefabManager.getPrefab(comp.parentPrefab);
                 break;
             }
         }
 
-        BeforeEntityCreated event = new BeforeEntityCreated(prefabName, components);
-        eventSystem.send(entity, event);
-        Iterable<Component> resultComponents = event.getResultComponents();
+        Iterable<Component> finalComponents;
+        if (eventSystem != null) {
+            BeforeEntityCreated event = new BeforeEntityCreated(prefab, components);
+            eventSystem.send(entity, event);
+            finalComponents = event.getResultComponents();
+        } else {
+            finalComponents = components;
+        }
 
-        for (Component c : resultComponents) {
+        for (Component c : finalComponents) {
             store.put(entity.getId(), c);
         }
         return entity;
@@ -367,8 +372,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
     @Override
     public EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components) {
-        EntityRef entity = createAndSendEvent(components);
-        return entity;
+        return createEntity(components);
     }
 
     @Override

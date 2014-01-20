@@ -28,6 +28,7 @@ import javax.vecmath.Vector3f;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface WorldProvider extends WorldProviderCore {
+
     /**
      * An active block is in a chunk that is available and fully generated.
      *

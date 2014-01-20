@@ -15,11 +15,12 @@
  */
 package org.terasology.entitySystem.entity.lifecycleEvents;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.prefab.Prefab;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -28,17 +29,17 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class BeforeEntityCreated implements Event {
-    private String prefab;
+    private Prefab prefab;
     private Iterable<Component> components;
-    private Set<Class<?>> componentsToRemove = new HashSet<Class<?>>();
-    private Map<Class, Component> componentsToAdd = new HashMap<Class, Component>();
+    private Set<Class<? extends Component>> componentsToRemove = Sets.newLinkedHashSet();
+    private Map<Class<? extends Component>, Component> componentsToAdd = Maps.newLinkedHashMap();
 
-    public BeforeEntityCreated(String prefab, Iterable<Component> components) {
+    public BeforeEntityCreated(Prefab prefab, Iterable<Component> components) {
         this.prefab = prefab;
         this.components = components;
     }
 
-    public String getPrefab() {
+    public Prefab getPrefab() {
         return prefab;
     }
 
@@ -53,7 +54,7 @@ public class BeforeEntityCreated implements Event {
         componentsToAdd.put(component.getClass(), component);
     }
 
-    public void prohibitComponent(Class<Component> componentClass) {
+    public void prohibitComponent(Class<? extends Component> componentClass) {
         componentsToRemove.add(componentClass);
     }
 

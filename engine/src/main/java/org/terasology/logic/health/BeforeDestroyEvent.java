@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block.entity;
+package org.terasology.logic.health;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 
-public class DestroyBlockEvent implements Event {
+/**
+ * @author Immortius
+ */
+public class BeforeDestroyEvent extends AbstractConsumableEvent {
     private EntityRef instigator;
-    private EntityRef tool;
+    private EntityRef directCause;
     private Prefab damageType;
 
-    public DestroyBlockEvent(EntityRef instigator, EntityRef tool, Prefab damageType) {
+    public BeforeDestroyEvent(EntityRef instigator, EntityRef directCause, Prefab damageType) {
         this.instigator = instigator;
-        this.tool = tool;
+        this.directCause = directCause;
         this.damageType = damageType;
     }
 
@@ -34,8 +37,8 @@ public class DestroyBlockEvent implements Event {
         return instigator;
     }
 
-    public EntityRef getTool() {
-        return tool;
+    public EntityRef getDirectCause() {
+        return directCause;
     }
 
     public Prefab getDamageType() {

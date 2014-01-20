@@ -16,6 +16,7 @@
 package org.terasology.logic.delay;
 
 import com.google.common.collect.Ordering;
+import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -30,6 +31,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -39,7 +41,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
     @In
     private Time time;
 
-    private TreeMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
+    private SortedSetMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
     @Override
     public void initialise() {
@@ -107,27 +109,16 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
+            if (o instanceof DelayedOperation) {
+                DelayedOperation other = (DelayedOperation) o;
+                return Objects.equals(other.entityRef, entityRef) && Objects.equals(other.operationId, operationId);
             }
-
-            DelayedOperation that = (DelayedOperation) o;
-
-            if (entityRef.getId() != that.entityRef.getId()) {
-                return false;
-            }
-            if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null) {
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
         @Override
         public int hashCode() {
-            int result = operationId != null ? operationId.hashCode() : 0;
-            result = 31 * result + entityRef.getId();
-            return result;
+            return Objects.hash(operationId, entityRef);
         }
     }
 }

@@ -18,9 +18,14 @@
         "currentHealth": 5,
         "maxHealth": 5,
         "regenRate": 1,
-        "waitBeforeRegen": 2
+        "waitBeforeRegen": 2,
+        "destroyEntityOnNoHealth" : true
+
     },
     "BlockDropGrammar": {
         "itemDrops": ["Core:door"]
+    },
+    "ActAsBlock" : {
+        "block" : "core:DoorTop"
     }
 }
