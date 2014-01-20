@@ -31,8 +31,8 @@ public class RenderingConfig {
     private PixelFormat pixelFormat = new PixelFormat().withDepthBits(24);
     private int windowPosX = -1;
     private int windowPosY = -1;
-    private int windowWidth = 1280;
-    private int windowHeight = 720;
+    private int windowWidth = 960;
+    private int windowHeight = 540;
     private boolean fullscreen;
     private ViewDistance viewDistance = ViewDistance.NEAR;
     private boolean flickeringLight = true;
