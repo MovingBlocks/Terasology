@@ -28,5 +28,5 @@ import java.lang.annotation.Target;
 @API
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface TextField2 {
+public @interface TextField {
 }
