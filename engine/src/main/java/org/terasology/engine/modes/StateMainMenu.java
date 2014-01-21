@@ -17,6 +17,7 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
+import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.CoreRegistry;
@@ -70,7 +71,8 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
 
         //lets get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
+                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
 
         nuiManager = CoreRegistry.get(NUIManager.class);

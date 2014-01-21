@@ -376,6 +376,26 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     }
 
     @Override
+    public EntityRef createEntityWithoutLifecycleEvents(String prefabName) {
+        return createEntityWithoutLifecycleEvents(getPrefabManager().getPrefab(prefabName));
+    }
+
+    @Override
+    public EntityRef createEntityWithoutLifecycleEvents(Prefab prefab) {
+        if (prefab != null) {
+            List<Component> components = Lists.newArrayList();
+            for (Component component : prefab.iterateComponents()) {
+                components.add(componentLibrary.copy(component));
+            }
+            components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+
+            return createEntityWithoutLifecycleEvents(components);
+        } else {
+            return createEntityWithoutLifecycleEvents(NullIterator.<Component>newInstance());
+        }
+    }
+
+    @Override
     public void destroyEntityWithoutEvents(EntityRef entity) {
         if (entity.isActive()) {
             destroy(entity);

@@ -82,9 +82,10 @@ import javax.vecmath.Vector4f;
 public class EntitySystemBuilder {
 
     public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
+        return build(moduleManager, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
+    }
 
-        CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
-
+    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         // Entity Manager
         PojoEntityManager entityManager = CoreRegistry.put(EntityManager.class, new PojoEntityManager());
         CoreRegistry.put(EngineEntityManager.class, entityManager);

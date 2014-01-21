@@ -145,7 +145,7 @@ public class BlockManagerImpl extends BlockManager {
     }
 
     private byte getNextId() {
-        if (nextId >= MAX_ID) {
+        if (nextId > MAX_ID) {
             return UNKNOWN_ID;
         }
         return (byte) nextId++;
