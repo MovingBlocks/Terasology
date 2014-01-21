@@ -48,10 +48,10 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateRestrictedSize(content, canvas.size()).y;
+        int contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x, Integer.MAX_VALUE)).y;
         if (canvas.size().y < contentHeight) {
             int scrollbarWidth = canvas.calculateRestrictedSize(scrollbar, canvas.size()).x;
-            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y)).y;
+            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, Integer.MAX_VALUE)).y;
 
             canvas.addInteractionRegion(scrollListener);
             canvas.drawWidget(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
@@ -74,7 +74,7 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sizeHint;
+        return canvas.calculatePreferredSize(content);
     }
 
     @Override
