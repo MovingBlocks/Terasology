@@ -35,6 +35,8 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.classMetadata.ClassLibrary;
+import org.terasology.classMetadata.ClassMetadata;
 import org.terasology.classMetadata.copying.CopyStrategyLibrary;
 import org.terasology.classMetadata.reflect.ReflectFactory;
 import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
@@ -47,6 +49,8 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.event.internal.EventSystem;
+import org.terasology.entitySystem.event.internal.EventSystemImpl;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -88,6 +92,7 @@ import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -108,10 +113,13 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import javax.swing.*;
 
 import java.awt.*;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
+import java.security.Permission;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -527,6 +535,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 
         moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
@@ -565,7 +574,12 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         
-        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
+        moduleSecurityManager.addAllowedPermission(UIText.class, new AWTPermission("accessClipboard"));
+        moduleSecurityManager.addAllowedPermission(org.terasology.rendering.nui.widgets.UIText.class, new AWTPermission("accessClipboard"));
+        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
+        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
+        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
 
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
@@ -578,6 +592,9 @@ public class TerasologyEngine implements GameEngine {
                 moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
             } else {
                 moduleSecurityManager.addAPIClass(apiClass);
+                for (Class<? extends Permission> permissionType : apiClass.getAnnotation(API.class).permissions()) {
+                    moduleSecurityManager.addAllowedPermission(apiClass, permissionType);
+                }
             }
         }
         

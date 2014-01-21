@@ -15,10 +15,15 @@
  */
 package org.terasology.engine;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.event.EventPriority;
+import org.terasology.entitySystem.systems.RegisterMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.security.Permission;
 
 /**
  * Types annotated with API are available for modules.
@@ -28,4 +33,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE, ElementType.PACKAGE})
 public @interface API {
+    /**
+     * @return The permissions which modules are granted when working through this API package/class.
+     */
+    Class<? extends Permission>[] permissions() default {};
 }
