@@ -22,7 +22,6 @@
                 "type" : "UILabel",
                 "id" : "version",
                 "family" : "title",
-                "text" : "Pre Alpha",
                 "layoutInfo" : {
                     "height" : 48,
                     "position-horizontal-center" : {},
@@ -70,6 +69,11 @@
                         "type" : "UIButton",
                         "id" : "settings",
                         "text" : "Settings"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "migtest",
+                        "text" : "Layout Test"
                     },
                     {
                         "type" : "UISpace",

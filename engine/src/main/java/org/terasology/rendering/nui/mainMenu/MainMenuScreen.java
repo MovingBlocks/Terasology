@@ -63,11 +63,17 @@ public class MainMenuScreen extends UIScreenLayer {
                 getManager().pushScreen("engine:settingsMenuScreen");
             }
         });
-
         WidgetUtil.trySubscribe(this, "exit", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 engine.shutdown();
+            }
+        });
+
+        WidgetUtil.trySubscribe(this, "migtest", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:migTestScreen");
             }
         });
     }

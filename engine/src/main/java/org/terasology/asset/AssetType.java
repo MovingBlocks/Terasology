@@ -23,6 +23,7 @@ import com.google.common.collect.Table;
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
+import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
@@ -76,7 +77,9 @@ public enum AssetType {
     SUBTEXTURE("subtexture", new String[] {}, "", null),
     ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
     UI_SKIN("skin", "skins", "skin", new UISkinLoader()),
+    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader()),
     UI_ELEMENT("ui", "ui", "ui", new UILoader());
+
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;

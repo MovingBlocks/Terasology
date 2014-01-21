@@ -713,6 +713,20 @@ public class CanvasImpl implements CanvasControl {
         }
     }
 
+    @Override
+    public void drawLine(int startX, int startY, int endX, int endY, Color color) {
+        int sx = startX + state.drawRegion.minX();
+        int sy = startY + state.drawRegion.minY();
+        int ex = state.drawRegion.minX() + endX;
+        int ey = state.drawRegion.minY() + endY;
+
+        if (state.drawOnTop) {
+            drawOnTopOperations.add(new DrawLineOperation(sx, sy, ex, ey, color));
+        } else {
+            renderer.drawLine(sx, sy, ex, ey, color);
+        }
+    }
+
     private void crop(Rect2i cropRegion) {
         textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
     }
@@ -977,6 +991,28 @@ public class CanvasImpl implements CanvasControl {
         @Override
         public void draw() {
             drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+        }
+    }
+
+    private final class DrawLineOperation implements DrawOperation {
+
+        private int x0;
+        private int y0;
+        private int x1;
+        private int y1;
+        private Color color;
+
+        private DrawLineOperation(int x0, int y0, int x1, int y1, Color color) {
+            this.x0 = x0;
+            this.y0 = y0;
+            this.x1 = x1;
+            this.y1 = y1;
+            this.color = color;
+        }
+
+        @Override
+        public void draw() {
+            renderer.drawLine(x0, y0, x1, y1, color);
         }
     }
 

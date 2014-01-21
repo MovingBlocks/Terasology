@@ -284,6 +284,7 @@ public class UIText extends CoreWidget {
                 }
             }
         }
+        correctCursor();
         updateOffset();
     }
 

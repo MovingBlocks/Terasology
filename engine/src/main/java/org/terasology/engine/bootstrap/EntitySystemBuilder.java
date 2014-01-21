@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
+import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -50,6 +51,7 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Block
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.BlockTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.CollisionGroupTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Color4fTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.ColorTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.PrefabTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
@@ -64,6 +66,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -116,6 +119,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
         serializationLibrary.add(Block.class, new BlockTypeHandler());
         serializationLibrary.add(Color4f.class, new Color4fTypeHandler());
+        serializationLibrary.add(Color.class, new ColorTypeHandler());
         serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
@@ -131,6 +135,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler(vector3iHandler));
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
+        serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(AssetType.BEHAVIOR, BehaviorTree.class));
         return serializationLibrary;
     }
 
