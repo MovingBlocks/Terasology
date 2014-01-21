@@ -140,8 +140,6 @@ public class BlockLoader implements BlockBuilderHelper {
                         }
                     }
                 }
-            } catch (JsonParseException | NullPointerException e) {
-                logger.error("Failed to load block '{}'", blockDefUri, e);
             } catch (Exception e) {
                 logger.error("Error loading block {}", blockDefUri, e);
             }
