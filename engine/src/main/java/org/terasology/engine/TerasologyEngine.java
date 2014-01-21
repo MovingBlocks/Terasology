@@ -583,6 +583,10 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         
+        moduleSecurityManager.addAllowedPermission(com.google.common.collect.Maps.class, java.lang.reflect.ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(com.google.common.cache.CacheBuilder.class, java.util.logging.LoggingPermission.class);
+        moduleSecurityManager.addAllowedPermission(java.awt.BasicStroke.class, java.lang.RuntimePermission.class);
+
         moduleSecurityManager.addAllowedPermission(UIText.class, new AWTPermission("accessClipboard"));
         moduleSecurityManager.addAllowedPermission(org.terasology.rendering.nui.widgets.UIText.class, new AWTPermission("accessClipboard"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
