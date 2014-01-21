@@ -110,7 +110,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {
-            try {
+            try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(blockDefUri.getModuleName())) {
                 JsonElement rawJson = readJson(blockDefUri);
                 if (rawJson != null) {
                     JsonObject blockDefJson = rawJson.getAsJsonObject();
@@ -142,6 +142,8 @@ public class BlockLoader implements BlockBuilderHelper {
                 }
             } catch (JsonParseException | NullPointerException e) {
                 logger.error("Failed to load block '{}'", blockDefUri, e);
+            } catch (Exception e) {
+                logger.error("Error loading block {}", blockDefUri, e);
             }
         }
         result.shapelessDefinitions.addAll(loadAutoBlocks());
