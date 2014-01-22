@@ -32,7 +32,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.utilities.collection.NullIterator;
 
-import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -44,7 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 
 // TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods
-@API(permissions = FilePermission.class)
+@API
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);

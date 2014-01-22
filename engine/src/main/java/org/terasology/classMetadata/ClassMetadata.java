@@ -33,6 +33,7 @@ import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.security.Permission;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +51,7 @@ import java.util.Map;
 public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassMetadata.class);
+    private static final Permission CREATE_CLASS_METADATA = new RuntimePermission("createClassMetadata");
 
     private final SimpleUri uri;
     private final Class<T> clazz;
@@ -68,6 +70,9 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      */
     public ClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary)
             throws NoSuchMethodException {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(CREATE_CLASS_METADATA);
+        }
 
         this.uri = uri;
         this.clazz = type;

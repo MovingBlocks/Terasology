@@ -40,17 +40,18 @@ public class ModuleSecurityManager extends SecurityManager {
 
     private Set<Class> apiClasses = Sets.newHashSet();
     private Set<String> apiPackages = Sets.newHashSet();
-    private Set<String> loadablePackages = Sets.newHashSet();
 
     private Set<Class<? extends Permission>> globallyAllowedPermissionsTypes = Sets.newHashSet();
     private Set<Permission> globallyAllowedPermissionsInstances = Sets.newHashSet();
     private SetMultimap<Class<? extends Permission>, Class> allowedPermissionsTypes = HashMultimap.create();
     private SetMultimap<Permission, Class> allowedPermissionInstances = HashMultimap.create();
+    private SetMultimap<Class<? extends Permission>, String> allowedPackagePermissionsTypes = HashMultimap.create();
+    private SetMultimap<Permission, String> allowedPackagePermissionInstances = HashMultimap.create();
 
     private ThreadLocal<Boolean> calculatingPermission = new ThreadLocal<>();
 
     public ModuleSecurityManager() {
-        loadablePackages.add("sun.reflect");
+        apiPackages.add("sun.reflect");
     }
 
     /**
@@ -58,6 +59,9 @@ public class ModuleSecurityManager extends SecurityManager {
      * @param permission
      */
     public void addAllowedPermission(Class<? extends Permission> permission) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
         globallyAllowedPermissionsTypes.add(permission);
     }
 
@@ -94,6 +98,30 @@ public class ModuleSecurityManager extends SecurityManager {
             System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
         }
         allowedPermissionInstances.put(allowedPermission, apiType);
+    }
+
+    /**
+     * Registers a permission that modules are granted when working (directly or indirectly) through the given package
+     * @param packageName
+     * @param allowedPermission
+     */
+    public void addAllowedPermission(String packageName, Class<? extends Permission> allowedPermission) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
+        allowedPackagePermissionsTypes.put(allowedPermission, packageName);
+    }
+
+    /**
+     * Registers a permission that modules are granted when working (directly or indirectly) through the given package
+     * @param packageName
+     * @param allowedPermission
+     */
+    public void addAllowedPermission(String packageName, Permission allowedPermission) {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
+        }
+        allowedPackagePermissionInstances.put(allowedPermission, packageName);
     }
 
     public void addAPIClass(Class clazz) {
@@ -140,8 +168,9 @@ public class ModuleSecurityManager extends SecurityManager {
 
     private void checkAPIPermissionsFor(Permission permission, int moduleDepth, Class[] stack) {
         Set<Class> allowed = Sets.union(allowedPermissionInstances.get(permission), allowedPermissionsTypes.get(permission.getClass()));
+        Set<String> allowedPackages = Sets.union(allowedPackagePermissionInstances.get(permission), allowedPackagePermissionsTypes.get(permission.getClass()));
         for (int i = moduleDepth - 1; i >= 0; i--) {
-            if (allowed.contains(stack[i])) {
+            if (allowed.contains(stack[i]) || allowedPackages.contains(stack[i].getPackage().getName())) {
                 return;
             }
         }
@@ -165,7 +194,7 @@ public class ModuleSecurityManager extends SecurityManager {
     }
 
     public boolean checkAccess(Class type) {
-        return apiClasses.contains(type) || apiPackages.contains(type.getPackage().getName()) || loadablePackages.contains(type.getPackage().getName());
+        return apiClasses.contains(type) || apiPackages.contains(type.getPackage().getName());
     }
 
     public void addAPIPackage(String packageName) {
