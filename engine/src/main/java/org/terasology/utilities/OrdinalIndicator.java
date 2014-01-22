@@ -15,26 +15,32 @@
  */
 package org.terasology.utilities;
 
+import org.terasology.engine.API;
+
 /**
  * @author DizzyDragon
- * Contains functions to get the ordinal indicator string for an integer.
+ *         Contains functions to get the ordinal indicator string for an integer.
  */
+@API
 public final class OrdinalIndicator {
+
+    private OrdinalIndicator() {
+    }
+
     /**
      * Returns the ordinal indicator of an integer.
-     *
+     * <p/>
      * Most readable when called with class name:
-     *  OrdinalIndicator.of(22) -> "nd"
+     * OrdinalIndicator.of(22) -> "nd"
      *
-     * @param x the integer
+     * @param number the integer
      * @return The ordinal indicator ("st", "nd", "rd" or "th").
      */
-    public static String of(int x) {
-        x = Math.abs(x);
+    public static String of(int number) {
+        int x = Math.abs(number);
         x %= 100;
 
-        switch (x)
-        {
+        switch (x) {
             case 11:
             case 12:
             case 13:
@@ -43,8 +49,7 @@ public final class OrdinalIndicator {
 
         x %= 10;
 
-        switch (x)
-        {
+        switch (x) {
             case 1:
                 return "st";
             case 2:
@@ -58,9 +63,9 @@ public final class OrdinalIndicator {
 
     /**
      * Returns the integer combined with it's ordinal indicator as String.
-     *
+     * <p/>
      * Most readable when called with class name:
-     *  OrdinalIndicator.addedTo(22) -> "22nd"
+     * OrdinalIndicator.addedTo(22) -> "22nd"
      *
      * @param x the integer
      * @return The integer with it's ordinal indicator attached.
