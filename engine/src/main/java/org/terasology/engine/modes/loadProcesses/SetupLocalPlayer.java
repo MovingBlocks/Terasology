@@ -17,7 +17,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkSystem;

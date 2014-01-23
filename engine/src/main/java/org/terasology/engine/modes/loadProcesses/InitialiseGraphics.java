@@ -17,7 +17,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.primitives.Tessellator;

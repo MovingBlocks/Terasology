@@ -26,9 +26,11 @@ import java.lang.annotation.Target;
  * class that is the value of the annotation - it is recommended this should be an interface.
  *
  * @author Immortius
+ * @deprecated Please use org.terasology.registry.Share instead. Support for this annotation will be dropped in the future.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Deprecated
 public @interface Share {
     Class<?>[] value();
 }

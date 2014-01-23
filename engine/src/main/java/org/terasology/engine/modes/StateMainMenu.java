@@ -17,10 +17,10 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;

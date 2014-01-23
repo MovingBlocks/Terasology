@@ -23,7 +23,7 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.UIScreenLayer;

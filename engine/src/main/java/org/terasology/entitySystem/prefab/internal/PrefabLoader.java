@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.PrefabData;

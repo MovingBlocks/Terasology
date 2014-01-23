@@ -16,7 +16,7 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3D;

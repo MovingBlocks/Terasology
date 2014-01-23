@@ -17,7 +17,7 @@ package org.terasology.input.internal;
 
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;

@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.ShaderManager;

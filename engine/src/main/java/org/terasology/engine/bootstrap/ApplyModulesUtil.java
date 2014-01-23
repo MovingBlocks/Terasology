@@ -18,9 +18,9 @@ package org.terasology.engine.bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
-import org.terasology.classMetadata.copying.CopyStrategy;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.utilities.ReflectionUtil;
 

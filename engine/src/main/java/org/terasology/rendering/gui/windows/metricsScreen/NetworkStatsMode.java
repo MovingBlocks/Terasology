@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.gui.windows.metricsScreen;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;

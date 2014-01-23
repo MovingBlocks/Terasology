@@ -18,7 +18,6 @@ package org.terasology.rendering.assets.texture;
 
 import org.terasology.asset.Asset;
 import org.terasology.math.Rect2f;
-import org.terasology.rendering.assets.TextureRegion;
 
 import static org.lwjgl.opengl.GL11.GL_CLAMP;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;

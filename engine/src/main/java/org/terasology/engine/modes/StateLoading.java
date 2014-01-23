@@ -21,7 +21,7 @@ import com.google.common.collect.Queues;
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;

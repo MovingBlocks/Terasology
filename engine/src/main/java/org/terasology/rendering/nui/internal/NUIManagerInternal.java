@@ -17,17 +17,10 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Queues;
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.classMetadata.ClassLibrary;
-import org.terasology.classMetadata.DefaultClassLibrary;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
@@ -36,28 +29,29 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.registry.InjectionHelper;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
-import java.lang.reflect.Field;
 import java.util.Deque;
 
 /**
  * @author Immortius
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, FocusManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
 
     private AssetManager assetManager;
 
@@ -282,24 +276,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     private void prepare(UIScreenLayer screen) {
-        inject(screen);
+        InjectionHelper.inject(screen);
         screen.setManager(this);
         screen.getContents();
         screen.initialise();
-    }
-
-    private void inject(Object object) {
-        for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-            Object value = CoreRegistry.get(field.getType());
-            if (value != null) {
-                try {
-                    field.setAccessible(true);
-                    field.set(object, value);
-                } catch (IllegalAccessException e) {
-                    logger.error("Failed to inject value {} into field {} of {}", value, field, object, e);
-                }
-            }
-        }
     }
 
 }

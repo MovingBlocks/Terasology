@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.classMetadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 /**

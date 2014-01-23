@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;

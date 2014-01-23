@@ -20,8 +20,8 @@ import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.rendering.assets.subtexture.Subtexture;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
+import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import java.util.Locale;
 import java.util.Map;

@@ -23,7 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;

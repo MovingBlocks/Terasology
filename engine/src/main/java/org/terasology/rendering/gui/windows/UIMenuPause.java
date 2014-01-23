@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.logic.players.LocalPlayer;

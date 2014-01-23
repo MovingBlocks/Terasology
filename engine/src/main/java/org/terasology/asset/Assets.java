@@ -17,17 +17,17 @@
 package org.terasology.asset;
 
 import org.terasology.audio.Sound;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.subtexture.Subtexture;
+import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.skin.UISkin;
 

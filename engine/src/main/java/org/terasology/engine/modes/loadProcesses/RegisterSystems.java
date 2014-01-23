@@ -20,7 +20,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;

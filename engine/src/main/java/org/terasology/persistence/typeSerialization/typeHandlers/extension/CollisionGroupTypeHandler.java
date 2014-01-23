@@ -17,7 +17,7 @@
 package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.CollisionGroupManager;

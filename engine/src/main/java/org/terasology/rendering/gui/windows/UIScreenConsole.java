@@ -23,7 +23,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.Console;

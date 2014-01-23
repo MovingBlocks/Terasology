@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence.typeHandling.extensionTypes;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;

@@ -18,7 +18,7 @@ package org.terasology.logic.behavior;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
 

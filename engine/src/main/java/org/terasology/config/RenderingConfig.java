@@ -18,7 +18,7 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.rendering.world.ViewDistance;

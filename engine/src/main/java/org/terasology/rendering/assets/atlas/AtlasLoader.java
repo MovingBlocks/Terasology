@@ -25,7 +25,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.module.Module;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.utilities.gson.Vector2iTypeAdapter;
 

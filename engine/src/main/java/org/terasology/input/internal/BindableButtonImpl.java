@@ -17,7 +17,7 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;

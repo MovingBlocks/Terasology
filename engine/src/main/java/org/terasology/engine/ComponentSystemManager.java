@@ -17,21 +17,20 @@ package org.terasology.engine;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.Share;
+import org.terasology.registry.InjectionHelper;
+import org.terasology.registry.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.network.NetworkMode;
+import org.terasology.registry.CoreRegistry;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +56,6 @@ public class ComponentSystemManager {
     private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
     private List<ComponentSystem> store = Lists.newArrayList();
-    private List<Class<?>> sharedSystems = Lists.newArrayList();
 
     private Console console;
 
@@ -80,13 +78,7 @@ public class ComponentSystemManager {
                 logger.debug("Registering system {}", id);
                 try {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();
-                    Share share = system.getAnnotation(Share.class);
-                    if (share != null && share.value() != null) {
-                        for (Class<?> interfaceType : share.value()) {
-                            sharedSystems.add(interfaceType);
-                            CoreRegistry.put((Class<Object>) interfaceType, newSystem);
-                        }
-                    }
+                    InjectionHelper.share(newSystem);
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -128,17 +120,7 @@ public class ComponentSystemManager {
     }
 
     private void initialiseSystem(ComponentSystem system) {
-        for (Field field : ReflectionUtils.getAllFields(system.getClass(), ReflectionUtils.withAnnotation(In.class))) {
-            Object value = CoreRegistry.get(field.getType());
-            if (value != null) {
-                try {
-                    field.setAccessible(true);
-                    field.set(system, value);
-                } catch (IllegalAccessException e) {
-                    logger.error("Failed to inject value {} into field {} of system {}", value, field, system, e);
-                }
-            }
-        }
+        InjectionHelper.inject(system);
         if (console != null) {
             console.registerCommandProvider(system);
         }
@@ -159,11 +141,10 @@ public class ComponentSystemManager {
     }
 
     private void clear() {
-        for (Class<?> sharedSystem : sharedSystems) {
-            CoreRegistry.remove(sharedSystem);
+        for (ComponentSystem system : store) {
+            InjectionHelper.unshare(system);
         }
         console = null;
-        sharedSystems.clear();
         namedLookup.clear();
         store.clear();
         updateSubscribers.clear();

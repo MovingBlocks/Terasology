@@ -16,7 +16,7 @@
 package org.terasology.editor.properties;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;

@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;

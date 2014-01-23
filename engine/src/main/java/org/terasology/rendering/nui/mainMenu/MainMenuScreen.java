@@ -17,7 +17,7 @@
 package org.terasology.rendering.nui.mainMenu;
 
 import org.terasology.engine.GameEngine;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;

@@ -22,7 +22,7 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleInfo;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleSelection;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIScreenLayer;

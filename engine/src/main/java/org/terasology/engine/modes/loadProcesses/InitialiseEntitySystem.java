@@ -16,9 +16,9 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.network.NetworkSystem;

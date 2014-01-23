@@ -17,7 +17,7 @@ package org.terasology.rendering.world;
 
 import com.google.common.collect.Sets;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.rendering.primitives.ChunkMesh;

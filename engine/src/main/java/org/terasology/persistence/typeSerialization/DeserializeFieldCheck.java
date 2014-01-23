@@ -15,8 +15,8 @@
  */
 package org.terasology.persistence.typeSerialization;
 
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 /**
  * @author Immortius

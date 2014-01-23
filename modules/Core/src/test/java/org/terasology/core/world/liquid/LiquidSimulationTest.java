@@ -20,7 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.internal.ChunkViewCoreImpl;

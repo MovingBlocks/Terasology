@@ -16,7 +16,7 @@
 package org.terasology.persistence.typeSerialization.typeHandlers.extension;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.block.Block;

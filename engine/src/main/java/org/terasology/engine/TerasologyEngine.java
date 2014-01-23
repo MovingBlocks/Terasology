@@ -24,7 +24,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
-import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -35,10 +34,11 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.registry.InjectionHelper;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
@@ -70,6 +70,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -87,13 +88,12 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.rendering.assets.subtexture.Subtexture;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
-import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
+import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -543,7 +543,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 
         moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
@@ -598,6 +597,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
+        moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
         // TODO: Create a cleaner clipboard access class, put permission on that
         moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
@@ -609,6 +609,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
 
         System.setSecurityManager(moduleSecurityManager);

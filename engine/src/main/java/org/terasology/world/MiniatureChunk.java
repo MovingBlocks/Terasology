@@ -16,7 +16,7 @@
 package org.terasology.world;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.internal.ChunkImpl;

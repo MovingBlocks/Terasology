@@ -16,8 +16,8 @@
 
 package org.terasology.persistence.serializers;
 
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
 import org.terasology.persistence.typeSerialization.DeserializeFieldCheck;
 

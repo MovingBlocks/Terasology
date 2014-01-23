@@ -17,7 +17,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.BlockManager;

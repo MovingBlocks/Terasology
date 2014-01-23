@@ -23,7 +23,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

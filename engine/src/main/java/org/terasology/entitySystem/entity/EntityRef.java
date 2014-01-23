@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;

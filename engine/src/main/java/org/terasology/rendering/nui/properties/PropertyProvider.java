@@ -17,12 +17,12 @@ package org.terasology.rendering.nui.properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.DefaultClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.DefaultClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;

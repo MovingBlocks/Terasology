@@ -19,7 +19,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.UIScreenLayer;

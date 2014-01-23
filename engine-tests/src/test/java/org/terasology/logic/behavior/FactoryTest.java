@@ -18,7 +18,7 @@ package org.terasology.logic.behavior;
 import org.junit.Assert;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.MonitorNode;
