@@ -19,7 +19,10 @@ import com.google.common.collect.Maps;
 import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 
 import java.util.Map;
@@ -59,16 +62,13 @@ public class Actor {
     }
 
     public <T extends Component> T component(Class<T> type) {
-        try {
-            T component = minion.getComponent(type);
-            if (component == null) {
-                component = type.newInstance();
-                minion.addComponent(component);
-            }
-            return component;
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
+        T component = minion.getComponent(type);
+        if (component == null) {
+            ComponentMetadata<T> metadata = CoreRegistry.get(ComponentLibrary.class).getMetadata(type);
+            component = metadata.newInstance();
+            minion.addComponent(component);
         }
+        return component;
     }
 
     public SkeletalMeshComponent skeletalMesh() {
