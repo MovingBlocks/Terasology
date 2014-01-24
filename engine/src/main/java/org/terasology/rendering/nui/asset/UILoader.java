@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.asset;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -92,6 +93,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -148,7 +150,7 @@ public class UILoader implements AssetLoader<UIData> {
         }
         Gson gson = gsonBuilder.create();
 
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
         }

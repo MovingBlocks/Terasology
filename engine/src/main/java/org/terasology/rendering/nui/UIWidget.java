@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -69,10 +70,13 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     void onKeyEvent(KeyEvent event);
 
+    void onBindEvent(BindButtonEvent event);
+
     Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint);
 
     Vector2i getMaxContentSize(Canvas canvas);
 
     boolean isSkinAppliedByCanvas();
+
 
 }

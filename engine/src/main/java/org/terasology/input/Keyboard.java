@@ -210,7 +210,7 @@ public final class Keyboard {
         L(KeyId.L, "KEY_L", "L"),
         SEMICOLON(KeyId.SEMICOLON, "KEY_SEMICOLON", ";"),
         APOSTROPHE(KeyId.APOSTROPHE, "KEY_APOSTROPHE", "'"),
-        GRAVE(KeyId.GRAVE, "KEY_GRAVE", "`"),
+        GRAVE(KeyId.GRAVE, "KEY_GRAVE", "Grave"),
         LEFT_SHIFT(KeyId.LEFT_SHIFT, "KEY_LSHIFT", "Left Shift"),
         BACKSLASH(KeyId.BACKSLASH, "KEY_BACKSLASH", "\\"),
         Z(KeyId.Z, "KEY_Z", "Z"),

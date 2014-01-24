@@ -543,6 +543,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 
         moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.lang.annotation");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
@@ -602,6 +603,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(AssetManager.class, FilePermission.class);
@@ -611,6 +613,8 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
+
+        moduleSecurityManager.addAllowedPermission(GUIManager.class, ReflectPermission.class);
 
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;

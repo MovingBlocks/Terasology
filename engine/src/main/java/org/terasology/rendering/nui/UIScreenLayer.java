@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.Assets;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -30,6 +31,7 @@ import java.util.Iterator;
  * @author Immortius
  */
 public class UIScreenLayer extends AbstractWidget {
+
 
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
@@ -46,6 +48,10 @@ public class UIScreenLayer extends AbstractWidget {
 
     public UIScreenLayer(String id) {
         super(id);
+    }
+
+    public void setId(String id) {
+        super.setId(id);
     }
 
     public void initialise() {
@@ -111,6 +117,10 @@ public class UIScreenLayer extends AbstractWidget {
 
     @Override
     public void onKeyEvent(KeyEvent event) {
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
     }
 
     @Override

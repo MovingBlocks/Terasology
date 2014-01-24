@@ -63,7 +63,7 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
     public UIScreenConsole() {
         console = CoreRegistry.get(Console.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        commandCursor = console.previousCommandSize();
+        commandCursor = console.getPreviousCommands().size();
 
         setCloseKeys(new int[]{Keyboard.KeyId.ESCAPE});
         setCloseBinds(new String[]{"engine:console"});
@@ -88,22 +88,22 @@ public class UIScreenConsole extends UIWindow implements ConsoleSubscriber {
                         inputBox.deleteText();
 
                         console.execute(message, localPlayer.getClientEntity());
-                        commandCursor = console.previousCommandSize();
+                        commandCursor = console.getPreviousCommands().size();
                     } else if (event.getKey() == Keyboard.Key.UP) {
                         //message history previous
                         if (commandCursor > 0) {
                             commandCursor--;
-                            inputBox.setText(console.getPreviousCommand(commandCursor));
+                            inputBox.setText(console.getPreviousCommands().get(commandCursor));
                             inputBox.setCursorEnd();
                         }
                     } else if (event.getKey() == Keyboard.Key.DOWN) {
                         //message history next
-                        if (commandCursor < console.previousCommandSize()) {
+                        if (commandCursor < console.getPreviousCommands().size()) {
                             commandCursor++;
-                            if (commandCursor == console.previousCommandSize()) {
+                            if (commandCursor == console.getPreviousCommands().size()) {
                                 inputBox.setText("");
                             } else {
-                                inputBox.setText(console.getPreviousCommand(commandCursor));
+                                inputBox.setText(console.getPreviousCommands().get(commandCursor));
                             }
                             inputBox.setCursorEnd();
                         }

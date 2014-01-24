@@ -1,0 +1,9 @@
+{
+    "inherit" : "default",
+    "elements" : {
+        "UILabel" : {
+            "text-align-horizontal" : "LEFT",
+            "text-align-vertical" : "top"
+        }
+    }
+}
