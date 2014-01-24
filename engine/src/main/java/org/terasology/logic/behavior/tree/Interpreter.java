@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.API;
+import org.terasology.registry.InjectionHelper;
 
 import java.util.Deque;
 import java.util.Set;
@@ -87,6 +88,7 @@ public class Interpreter {
     }
 
     public void start(Task task, Task.Observer observer) {
+        InjectionHelper.inject(task);
         task.setActor(actor);
         task.setInterpreter(this);
         task.setObserver(observer);
