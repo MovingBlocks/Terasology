@@ -603,6 +603,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(AssetManager.class, FilePermission.class);
