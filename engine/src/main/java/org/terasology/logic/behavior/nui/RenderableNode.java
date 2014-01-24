@@ -54,6 +54,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private BehaviorEditor editor;
     private boolean dragged;
     private Status status;
+    private boolean collapsed;
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -70,7 +71,14 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         @Override
         public void onMouseRelease(MouseInput button, Vector2i pos) {
             if (!dragged) {
-                editor.nodeClicked(RenderableNode.this);
+                if (button == MouseInput.MOUSE_RIGHT) {
+                    collapsed = !collapsed;
+                    for (RenderableNode child : children) {
+                        child.setVisible(!collapsed);
+                    }
+                } else {
+                    editor.nodeClicked(RenderableNode.this);
+                }
             }
             dragged = false;
         }
@@ -105,6 +113,9 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     public void onDraw(Canvas canvas) {
         canvas.drawTexture(texture);
         String text = getData().name + " " + (status != null ? status : "");
+        if (collapsed) {
+            text += "[+]";
+        }
         canvas.drawText(text);
 
         if (editor != null) {
@@ -265,6 +276,13 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     public Status getStatus() {
         return status;
+    }
+
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        for (RenderableNode child : children) {
+            child.setVisible(visible);
+        }
     }
 
     public interface Visitor {

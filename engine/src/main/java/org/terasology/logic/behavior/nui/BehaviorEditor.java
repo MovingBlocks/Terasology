@@ -109,11 +109,14 @@ public class BehaviorEditor extends ZoomableLayout {
         try (SubRegion subRegion = canvas.subRegion(canvas.getRegion(), false)) {
             canvas.setDrawOnTop(true);
             for (UIWidget widget : getWidgets()) {
+                if (!widget.isVisible()) {
+                    continue;
+                }
                 if (widget instanceof RenderableNode) {
                     RenderableNode renderableNode = (RenderableNode) widget;
                     for (Port port : renderableNode.getPorts()) {
                         Port targetPort = port.getTargetPort();
-                        if (port.isInput() || targetPort == null) {
+                        if (port.isInput() || targetPort == null || !targetPort.node.isVisible()) {
                             continue;
                         }
                         drawConnection(canvas, port, targetPort, port == activeConnectionStart ? Color.BLACK : Color.GREY);
