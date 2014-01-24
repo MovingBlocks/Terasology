@@ -77,6 +77,12 @@ public class ParallelNode extends CompositeNode {
 
         @Override
         public void handle(Status result) {
+            if (this.getStatus() != Status.RUNNING) {
+                // this happens, when this task is already stopped, because of a previously finished child task
+                // currently its not simple to correctly stop child tasks, so parallel children may continue (and finish)
+                // its work, even if this parallel is already finished
+                return;
+            }
             if (result == Status.SUCCESS) {
                 successCount++;
                 if (getNode().successPolicy == Policy.RequireOne) {
