@@ -25,8 +25,8 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -117,15 +117,14 @@ public class UIText extends CoreWidget {
         correctCursor();
 
         // TODO: Add a crop within margin option to UIWidget?
-        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true)) {
-            try (SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
-                canvas.drawText(text.get(), canvas.getRegion());
-                if (isFocused()) {
-                    if (hasSelection()) {
-                        drawSelection(canvas);
-                    } else {
-                        drawCursor(canvas);
-                    }
+        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
+            canvas.drawText(text.get(), canvas.getRegion());
+            if (isFocused()) {
+                if (hasSelection()) {
+                    drawSelection(canvas);
+                } else {
+                    drawCursor(canvas);
                 }
             }
         }

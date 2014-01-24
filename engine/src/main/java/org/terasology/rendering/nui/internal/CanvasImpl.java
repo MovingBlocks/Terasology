@@ -82,7 +82,6 @@ public class CanvasImpl implements CanvasControl {
     private final Time time;
 
     private CanvasState state;
-    private Deque<LwjglSubRegion> subregionStack = Queues.newArrayDeque();
 
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
     private Material textureMat = Assets.getMaterial("engine:UITexture");
@@ -128,12 +127,6 @@ public class CanvasImpl implements CanvasControl {
         }
         drawOnTopOperations.clear();
 
-        if (!subregionStack.isEmpty()) {
-            logger.error("UI Subregions are not being correctly ended");
-            while (!subregionStack.isEmpty()) {
-                subregionStack.pop().close();
-            }
-        }
         Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
         while (textIterator.hasNext()) {
             Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
@@ -238,7 +231,7 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public SubRegion subRegion(Rect2i region, boolean crop) {
-        return new LwjglSubRegion(region, crop);
+        return new SubRegionImpl(region, crop);
     }
 
     @Override
@@ -457,6 +450,9 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawBackground(Rect2i region) {
+        if (region.isEmpty()) {
+            return;
+        }
         UIStyle style = getCurrentStyle();
         if (style.getBackground() != null) {
             if (style.getBackgroundBorder().isEmpty()) {
@@ -847,15 +843,14 @@ public class CanvasImpl implements CanvasControl {
     /**
      * A SubRegion implementation for this canvas.
      */
-    private class LwjglSubRegion implements SubRegion {
+    private class SubRegionImpl implements SubRegion {
 
         public boolean croppingRegion;
         private CanvasState previousState;
         private boolean disposed;
 
-        public LwjglSubRegion(Rect2i region, boolean crop) {
+        public SubRegionImpl(Rect2i region, boolean crop) {
             previousState = state;
-            subregionStack.push(this);
 
             int left = region.minX() + state.drawRegion.minX();
             int right = region.maxX() + state.drawRegion.minX();
@@ -882,12 +877,6 @@ public class CanvasImpl implements CanvasControl {
         public void close() {
             if (!disposed) {
                 disposed = true;
-                LwjglSubRegion region = subregionStack.pop();
-                while (!region.equals(this)) {
-                    logger.error("UI SubRegions being closed in an incorrect order");
-                    region.close();
-                    region = subregionStack.pop();
-                }
                 if (croppingRegion) {
                     crop(previousState.cropRegion);
                 }
