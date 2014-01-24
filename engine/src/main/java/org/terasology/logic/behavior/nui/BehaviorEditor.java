@@ -249,4 +249,24 @@ public class BehaviorEditor extends ZoomableLayout {
             e.printStackTrace();
         }
     }
+
+    public void linkNode(RenderableNode node) {
+        BehaviorTreeData data = new BehaviorTreeData();
+        data.setRoot(node.getNode());
+        Port.OutputPort parent = node.getInputPort().getTargetPort();
+        data.createRenderable();
+        RenderableNode copyRenderable = data.getRenderableNode(data.getRoot());
+        addNode(copyRenderable);
+        RenderableNode nodeToLayout;
+        if (parent != null && copyRenderable.getInputPort() != null) {
+            parent.setTarget(copyRenderable.getInputPort());
+            nodeToLayout = parent.node;
+        } else {
+            nodeToLayout = copyRenderable;
+        }
+        Vector2f oldPos = nodeToLayout.getPosition();
+        tree.layout(nodeToLayout);
+        oldPos.sub(nodeToLayout.getPosition());
+        nodeToLayout.move(oldPos);
+    }
 }

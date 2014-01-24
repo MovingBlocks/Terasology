@@ -113,7 +113,11 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     public List<Interpreter> getInterpreter(BehaviorTree tree) {
-        return interpreters.get(tree);
+        List<Interpreter> result = interpreters.get(tree);
+        if (result == null) {
+            result = Lists.newArrayList();
+        }
+        return result;
     }
 
     public void treeModified(BehaviorTree tree) {
