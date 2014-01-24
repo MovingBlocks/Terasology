@@ -17,7 +17,6 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -27,12 +26,13 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 
 import java.util.Collection;
 import java.util.List;
@@ -58,8 +58,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     private Map<BehaviorTree, List<Interpreter>> interpreters = Maps.newHashMap();
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
-
-    private float speed;
 
     @Override
     public void initialise() {
@@ -94,15 +92,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
-        if (speed > 0) {
-            speed -= delta;
-            return;
-        }
-        speed = 0.1f;
-
         for (Map.Entry<BehaviorTree, List<Interpreter>> entry : interpreters.entrySet()) {
             for (Interpreter interpreter : entry.getValue()) {
-                interpreter.tick(0.1f);
+                interpreter.tick(delta);
             }
         }
     }

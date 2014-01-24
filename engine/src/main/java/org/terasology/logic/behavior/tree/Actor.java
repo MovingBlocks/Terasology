@@ -65,6 +65,9 @@ public class Actor {
         T component = minion.getComponent(type);
         if (component == null) {
             ComponentMetadata<T> metadata = CoreRegistry.get(ComponentLibrary.class).getMetadata(type);
+            if (metadata == null || !metadata.isConstructable()) {
+                throw new RuntimeException("Cannot create component for " + type);
+            }
             component = metadata.newInstance();
             minion.addComponent(component);
         }
