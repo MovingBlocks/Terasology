@@ -337,6 +337,11 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
+    public GameState getState() {
+        return currentState;
+    }
+
+    @Override
     public void changeState(GameState newState) {
         if (currentState != null) {
             pendingState = newState;
