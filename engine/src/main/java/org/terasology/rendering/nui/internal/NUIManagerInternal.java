@@ -16,11 +16,12 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Queues;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
@@ -35,11 +36,12 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
@@ -56,6 +58,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
+    private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
@@ -75,11 +78,66 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
+    public boolean isOpen(String screenUri) {
+        return isOpen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public boolean isOpen(AssetUri screenUri) {
+        return screenLookup.containsKey(screenUri);
+    }
+
+    @Override
+    public UIScreenLayer getScreen(AssetUri screenUri) {
+        return screenLookup.get(screenUri);
+    }
+
+    @Override
+    public UIScreenLayer getScreen(String screenUri) {
+        return getScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void closeScreen(String screenUri) {
+        closeScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void closeScreen(AssetUri screenUri) {
+        UIScreenLayer screen = screenLookup.remove(screenUri);;
+        if (screen != null) {
+            screens.remove(screen);
+        }
+    }
+
+    @Override
+    public void closeScreen(UIScreenLayer screen) {
+        if (screens.remove(screen)) {
+            screenLookup.inverse().remove(screen);
+        }
+    }
+
+    @Override
+    public void toggleScreen(String screenUri) {
+        toggleScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void toggleScreen(AssetUri screenUri) {
+        if (isOpen(screenUri)) {
+            closeScreen(screenUri);
+        } else {
+            pushScreen(screenUri);
+        }
+    }
+
+    @Override
     public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
             UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
-            pushScreen(result);
+            result.setId(screenUri.toNormalisedSimpleString());
+            pushScreen(result, screenUri);
             return result;
         }
         return null;
@@ -114,14 +172,22 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreenLayer screen) {
+        pushScreen(screen, null);
+    }
+
+    public void pushScreen(UIScreenLayer screen, AssetUri uri) {
         prepare(screen);
         screens.push(screen);
+        if (uri != null) {
+            screenLookup.put(uri, screen);
+        }
     }
 
     @Override
     public void popScreen() {
         if (!screens.isEmpty()) {
-            screens.pop();
+            UIScreenLayer popped = screens.pop();
+            screenLookup.inverse().remove(popped);
         }
     }
 
@@ -130,7 +196,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
             UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
-            setScreen(result);
+            result.setId(screenUri.toNormalisedSimpleString());
+            setScreen(result, screenUri);
             return result;
         }
         return null;
@@ -165,14 +232,18 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void setScreen(UIScreenLayer screen) {
-        screens.clear();
-        prepare(screen);
-        screens.push(screen);
+        setScreen(screen, null);
+    }
+
+    public void setScreen(UIScreenLayer screen, AssetUri uri) {
+        closeAllScreens();
+        pushScreen(screen, uri);
     }
 
     @Override
-    public void closeScreens() {
+    public void closeAllScreens() {
         screens.clear();
+        screenLookup.clear();
         focus = null;
     }
 
@@ -273,6 +344,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if (focus != null) {
+            focus.onBindEvent(event);
+            if (event.isConsumed()) {
+                return;
+            }
+        }
     }
 
     private void prepare(UIScreenLayer screen) {

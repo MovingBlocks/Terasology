@@ -200,6 +200,7 @@ public class UIText extends CoreWidget {
                         cursorPosition--;
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.DELETE: {
@@ -210,6 +211,7 @@ public class UIText extends CoreWidget {
                         String after = fullText.substring(cursorPosition + 1);
                         setText(before + after);
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.LEFT: {
@@ -222,6 +224,7 @@ public class UIText extends CoreWidget {
                             selectionStart = cursorPosition;
                         }
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.RIGHT: {
@@ -234,6 +237,7 @@ public class UIText extends CoreWidget {
                             selectionStart = cursorPosition;
                         }
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.HOME: {
@@ -242,6 +246,7 @@ public class UIText extends CoreWidget {
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.END: {
@@ -249,12 +254,14 @@ public class UIText extends CoreWidget {
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.ENTER: {
                     for (ActivateEventListener listener : listeners) {
                         listener.onActivated(this);
                     }
+                    event.consume();
                     break;
                 }
                 default: {
@@ -288,13 +295,15 @@ public class UIText extends CoreWidget {
     }
 
     private void updateOffset() {
-        String before = getText().substring(0, cursorPosition);
-        int cursorDist = lastFont.getWidth(before);
-        if (cursorDist < offset) {
-            offset = cursorDist;
-        }
-        if (cursorDist > offset + lastWidth) {
-            offset = cursorDist - lastWidth + 1;
+        if (lastFont != null) {
+            String before = getText().substring(0, cursorPosition);
+            int cursorDist = lastFont.getWidth(before);
+            if (cursorDist < offset) {
+                offset = cursorDist;
+            }
+            if (cursorDist > offset + lastWidth) {
+                offset = cursorDist - lastWidth + 1;
+            }
         }
     }
 
@@ -377,6 +386,15 @@ public class UIText extends CoreWidget {
 
             updateOffset();
         }
+    }
+
+    public void setCursorPosition(int position) {
+        this.cursorPosition = TeraMath.clamp(position, 0, getText().length());
+        this.selectionStart = cursorPosition;
+    }
+
+    public int getCursorPosition() {
+        return cursorPosition;
     }
 
     public void bindText(Binding<String> binding) {

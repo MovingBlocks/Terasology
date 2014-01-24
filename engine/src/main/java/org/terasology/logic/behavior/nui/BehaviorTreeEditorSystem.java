@@ -51,7 +51,7 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
 
     @Override
     public void initialise() {
-        nuiManager.closeScreens();
+        nuiManager.closeAllScreens();
     }
 
     @ReceiveEvent(components = ClientComponent.class)

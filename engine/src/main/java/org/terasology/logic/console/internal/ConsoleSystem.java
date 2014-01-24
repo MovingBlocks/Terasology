@@ -18,9 +18,10 @@ package org.terasology.logic.console.internal;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.ButtonState;
+import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
@@ -28,7 +29,9 @@ import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
+import org.terasology.rendering.nui.NUIManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,12 +48,23 @@ public class ConsoleSystem implements ComponentSystem {
     @In
     private NetworkSystem networkSystem;
 
+    @In
+    private NUIManager nuiManager;
+
     @Override
     public void initialise() {
     }
 
     @Override
     public void shutdown() {
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            nuiManager.toggleScreen("engine:console");
+            event.consume();
+        }
     }
 
     @Command(shortDescription = "General help", helpText = "Prints out short descriptions for all available commands.")

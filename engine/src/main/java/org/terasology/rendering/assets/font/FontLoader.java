@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.font;
 
+import com.google.common.base.Charsets;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -61,21 +62,22 @@ public class FontLoader implements AssetLoader<FontData> {
 
     @Override
     public FontData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        FontDataBuilder builder = new FontDataBuilder();
-        parseHeader(reader.readLine());
-        int numPages = parseCommon(builder, reader.readLine());
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
+            FontDataBuilder builder = new FontDataBuilder();
+            parseHeader(reader.readLine());
+            int numPages = parseCommon(builder, reader.readLine());
 
-        for (int i = 0; i < numPages; ++i) {
-            parsePage(builder, module.getId(), reader.readLine());
+            for (int i = 0; i < numPages; ++i) {
+                parsePage(builder, module.getId(), reader.readLine());
+            }
+
+            int charCount = getCharacterCount(reader.readLine());
+            for (int i = 0; i < charCount; ++i) {
+                parseCharacter(builder, reader.readLine());
+            }
+
+            return builder.build();
         }
-
-        int charCount = getCharacterCount(reader.readLine());
-        for (int i = 0; i < charCount; ++i) {
-            parseCharacter(builder, reader.readLine());
-        }
-
-        return builder.build();
     }
 
     private void parseCharacter(FontDataBuilder builder, String charInfo) throws IOException {
