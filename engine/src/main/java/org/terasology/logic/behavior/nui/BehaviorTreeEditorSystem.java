@@ -20,10 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.input.events.KeyEvent;
@@ -32,6 +29,7 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 
@@ -43,7 +41,7 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
  * @author synopia
  */
 @RegisterSystem
-public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, UpdateSubscriberSystem {
+public class BehaviorTreeEditorSystem implements ComponentSystem {
     @In
     private NUIManager nuiManager;
 
@@ -58,12 +56,12 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
     public void onToggleConsole(BTEditorButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             if (!editorVisible) {
-                nuiManager.pushScreen("engine:behaviorEditorScreen");
+                nuiManager.toggleScreen("engine:behaviorEditorScreen");
                 event.consume();
                 editorVisible = true;
                 Mouse.setGrabbed(false);
             } else {
-                nuiManager.popScreen();
+                nuiManager.toggleScreen("engine:behaviorEditorScreen");
                 event.consume();
                 editorVisible = false;
                 Mouse.setGrabbed(true);
@@ -72,37 +70,7 @@ public class BehaviorTreeEditorSystem implements ComponentSystem, RenderSystem, 
     }
 
     @Override
-    public void update(float delta) {
-        nuiManager.update(delta);
-    }
-
-    @Override
     public void shutdown() {
-
-    }
-
-    @Override
-    public void renderOpaque() {
-
-    }
-
-    @Override
-    public void renderAlphaBlend() {
-
-    }
-
-    @Override
-    public void renderOverlay() {
-        nuiManager.render();
-    }
-
-    @Override
-    public void renderFirstPerson() {
-
-    }
-
-    @Override
-    public void renderShadows() {
 
     }
 
