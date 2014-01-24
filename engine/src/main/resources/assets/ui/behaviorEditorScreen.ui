@@ -5,13 +5,13 @@
         "type" : "migLayout",
         "layoutConstraints" : "",
         "colConstraints" : "[min][grow, fill][min]",
-        "rowConstraints" : "[min][min][min][grow, fill][grow, fill]",
+        "rowConstraints" : "[min][min][grow, fill][grow, fill]",
         "contents" : [
             {
                 "type" : "BehaviorEditor",
                 "id" : "tree",
                 "layoutInfo" : {
-                    "cc" : "cell 1 3, spany 2"
+                    "cc" : "cell 1 2, spany 2"
                 }
             },
             {
@@ -19,7 +19,7 @@
                 "id" : "properties",
                 "rowConstraints" : "[min]",
                 "layoutInfo" : {
-                    "cc" : "cell 2 3, aligny top, w 200!"
+                    "cc" : "cell 2 2, aligny top, w 200!"
                 }
             },
             {
@@ -27,7 +27,7 @@
                 "id" : "entity_properties",
                 "rowConstraints" : "[min]",
                 "layoutInfo" : {
-                    "cc" : "cell 2 4, aligny top, w 200!"
+                    "cc" : "cell 2 3, aligny top, w 200!"
                 }
             },
             {
@@ -106,24 +106,11 @@
                 ]
             },
             {
-                "type" : "migLayout",
+                "type" : "UIList",
                 "layoutInfo" : {
-                    "cc" : "cell 0 2 3"
+                    "cc" : "cell 0 2"
                 },
-                "contents" : [
-                    {
-                        "type" : "UIDropdown",
-                        "id" : "palette",
-                        "layoutInfo" : {
-                            "cc" : "w 200!"
-                        }
-                    },
-                    {
-                        "type" : "UIButton",
-                        "id" : "create",
-                        "text" : "create"
-                    }
-                ]
+                "id" : "palette"
             }
         ]
     }

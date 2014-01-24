@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
@@ -25,6 +24,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -192,6 +192,9 @@ public class BehaviorEditor extends ZoomableLayout {
     }
 
     public RenderableNode createNode(BehaviorNodeComponent data) {
+        if (tree == null) {
+            return null;
+        }
         Node node = CoreRegistry.get(BehaviorNodeFactory.class).getNode(data);
         newNode = tree.createNode(node);
         return newNode;

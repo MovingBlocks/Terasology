@@ -17,6 +17,9 @@ package org.terasology.logic.behavior;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -37,7 +40,6 @@ import org.terasology.registry.In;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Behavior tree system
@@ -55,9 +57,12 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     private EntityManager entityManager;
     @In
     private PrefabManager prefabManager;
+    @In
+    private AssetManager assetManager;
 
     private Map<BehaviorTree, List<Interpreter>> interpreters = Maps.newHashMap();
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
+    private List<BehaviorTree> trees = Lists.newArrayList();
 
     @Override
     public void initialise() {
@@ -67,6 +72,10 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = entityManager.create(prefab);
             items.add(entityRef.getComponent(BehaviorNodeComponent.class));
+        }
+        for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
+            BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
+            trees.add(asset);
         }
         CoreRegistry.put(BehaviorNodeFactory.class, new BehaviorNodeFactory(items));
     }
@@ -99,8 +108,8 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
     }
 
-    public Set<BehaviorTree> getTrees() {
-        return interpreters.keySet();
+    public List<BehaviorTree> getTrees() {
+        return trees;
     }
 
     public List<Interpreter> getInterpreter(BehaviorTree tree) {
