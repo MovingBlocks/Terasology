@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.tree.Node;
@@ -55,6 +56,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private boolean dragged;
     private Status status;
     private boolean collapsed;
+    private boolean copyMode;
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -65,6 +67,10 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             last = pos;
             dragged = false;
+            copyMode = button == MouseInput.MOUSE_LEFT && (Keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
+            if (copyMode) {
+                editor.copyNode(RenderableNode.this);
+            }
             return true;
         }
 
