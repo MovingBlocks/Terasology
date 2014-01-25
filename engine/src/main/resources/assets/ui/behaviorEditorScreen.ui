@@ -108,7 +108,7 @@
             {
                 "type" : "UIList",
                 "layoutInfo" : {
-                    "cc" : "cell 0 2"
+                    "cc" : "cell 0 2, spany 2"
                 },
                 "id" : "palette"
             }
