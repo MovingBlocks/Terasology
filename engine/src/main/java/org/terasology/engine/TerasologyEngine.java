@@ -110,6 +110,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import sun.reflect.annotation.AnnotationParser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -620,6 +621,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
+        moduleSecurityManager.addAllowedPermission(AnnotationParser.class, new RuntimePermission("accessDeclaredMembers"));
 
         moduleSecurityManager.addAllowedPermission(GUIManager.class, ReflectPermission.class);
 
