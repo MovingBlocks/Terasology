@@ -19,13 +19,6 @@ package org.terasology.rendering.assets.texture;
 import org.terasology.asset.Asset;
 import org.terasology.math.Rect2f;
 
-import static org.lwjgl.opengl.GL11.GL_CLAMP;
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_REPEAT;
-
 /**
  * @author Immortius
  */
@@ -34,39 +27,13 @@ public interface Texture extends Asset<TextureData>, TextureRegion {
     Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
 
     public enum WrapMode {
-        Clamp(GL_CLAMP),
-        Repeat(GL_REPEAT);
-
-        private int glWrapEnum;
-
-        private WrapMode(int glEnum) {
-            this.glWrapEnum = glEnum;
-        }
-
-        public int getGLMode() {
-            return glWrapEnum;
-        }
+        Clamp(),
+        Repeat();
     }
 
     public enum FilterMode {
-        Nearest(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST),
-        Linear(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-
-        private int glMinFilter;
-        private int glMagFilter;
-
-        private FilterMode(int glMinFilter, int glMagFilter) {
-            this.glMinFilter = glMinFilter;
-            this.glMagFilter = glMagFilter;
-        }
-
-        public int getGlMinFilter() {
-            return glMinFilter;
-        }
-
-        public int getGlMagFilter() {
-            return glMagFilter;
-        }
+        Nearest(),
+        Linear();
     }
 
     WrapMode getWrapMode();

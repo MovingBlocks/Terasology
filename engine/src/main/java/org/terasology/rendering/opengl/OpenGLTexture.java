@@ -27,6 +27,12 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 
+import static org.lwjgl.opengl.GL11.GL_CLAMP;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
@@ -85,10 +91,10 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL11.GL_TEXTURE_2D, id);
 
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode.getGLMode());
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode.getGLMode());
-                GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filterMode.getGlMinFilter());
-                GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filterMode.getGlMagFilter());
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, getGLMode(wrapMode));
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, getGLMode(wrapMode));
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, getGlMinFilter(filterMode));
+                GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, getGlMagFilter(filterMode));
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, data.getBuffers().length - 1);
 
@@ -100,12 +106,12 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 logger.debug("Bound texture '{}' - {}", getURI(), id);
                 glBindTexture(GL12.GL_TEXTURE_3D, id);
 
-                glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrapMode.getGLMode());
-                glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrapMode.getGLMode());
-                glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, wrapMode.getGLMode());
+                glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, getGLMode(wrapMode));
+                glTexParameterf(GL12.GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, getGLMode(wrapMode));
+                glTexParameterf(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_WRAP_R, getGLMode(wrapMode));
 
-                GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, filterMode.getGlMinFilter());
-                GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, filterMode.getGlMagFilter());
+                GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MIN_FILTER, getGlMinFilter(filterMode));
+                GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL11.GL_TEXTURE_MAG_FILTER, getGlMagFilter(filterMode));
 
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
                 GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, data.getBuffers().length - 1);
@@ -117,6 +123,39 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 break;
         }
         Util.checkGLError();
+    }
+
+    private int getGLMode(WrapMode wrapMode) {
+        switch (wrapMode) {
+            case Clamp:
+                return GL_CLAMP;
+            case Repeat:
+                return GL_REPEAT;
+            default:
+                throw new RuntimeException("Unsupported WrapMode '" + wrapMode + "'");
+        }
+    }
+
+    private int getGlMinFilter(FilterMode filterMode) {
+        switch (filterMode) {
+            case Linear:
+                return GL_LINEAR_MIPMAP_LINEAR;
+            case Nearest:
+                return GL_NEAREST_MIPMAP_NEAREST;
+            default:
+                throw new RuntimeException("Unsupported FilterMode '" + filterMode + "'");
+        }
+    }
+
+    private int getGlMagFilter(FilterMode filterMode2) {
+        switch (filterMode) {
+            case Linear:
+                return GL_LINEAR;
+            case Nearest:
+                return GL_NEAREST;
+            default:
+                throw new RuntimeException("Unsupported FilterMode '" + filterMode + "'");
+        }
     }
 
     @Override
