@@ -32,7 +32,7 @@ public class SequenceNode extends CompositeNode {
         return new SequenceTask(this);
     }
 
-    public static class SequenceTask extends CompositeTask implements Task.Observer {
+    public static class SequenceTask extends CompositeTask {
         private Iterator<Node> iterator;
         private Node current;
 

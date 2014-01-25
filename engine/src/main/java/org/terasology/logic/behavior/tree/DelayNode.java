@@ -42,7 +42,7 @@ public class DelayNode extends DecoratorNode {
         return new DelayTask(this);
     }
 
-    public static class DelayTask extends DecoratorTask implements Task.Observer {
+    public static class DelayTask extends DecoratorTask {
         private int count;
 
         public DelayTask(DelayNode node) {

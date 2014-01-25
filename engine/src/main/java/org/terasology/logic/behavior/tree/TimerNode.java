@@ -56,6 +56,9 @@ public class TimerNode extends Node {
             return Status.RUNNING;
         }
 
+        @Override
+        public void handle(Status result) {
+        }
 
         @Override
         public TimerNode getNode() {

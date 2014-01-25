@@ -32,7 +32,7 @@ public class SelectorNode extends CompositeNode {
         return new SelectorTask(this);
     }
 
-    public static class SelectorTask extends CompositeTask implements Task.Observer {
+    public static class SelectorTask extends CompositeTask {
         private Iterator<Node> iterator;
         private Node current;
 
