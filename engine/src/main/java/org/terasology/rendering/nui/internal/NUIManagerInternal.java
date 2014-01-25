@@ -32,7 +32,9 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Mouse;
+import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
@@ -104,7 +106,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void closeScreen(AssetUri screenUri) {
-        UIScreenLayer screen = screenLookup.remove(screenUri);;
+        UIScreenLayer screen = screenLookup.remove(screenUri);
         if (screen != null) {
             screens.remove(screen);
         }
@@ -294,10 +296,22 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return focus;
     }
 
+    @Override
+    public boolean isReleasingMouse() {
+        return !screens.isEmpty() && screens.peek().isReleasingMouse();
+    }
+
     /*
       The following events will capture the mouse and keyboard inputs. They have high priority so the GUI will
       have first pick of input
     */
+
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    public void mouseAxisEvent(AxisEvent event, EntityRef entity) {
+        if (isReleasingMouse()) {
+            event.consume();
+        }
+    }
 
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)

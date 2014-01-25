@@ -59,12 +59,10 @@ public class BehaviorTreeEditorSystem implements ComponentSystem {
                 nuiManager.toggleScreen("engine:behaviorEditorScreen");
                 event.consume();
                 editorVisible = true;
-                Mouse.setGrabbed(false);
             } else {
                 nuiManager.toggleScreen("engine:behaviorEditorScreen");
                 event.consume();
-                editorVisible = false;
-                Mouse.setGrabbed(true);
+                editorVisible = false;;
             }
         }
     }

@@ -66,6 +66,10 @@ public class UIScreenLayer extends AbstractWidget {
         return false;
     }
 
+    public boolean isReleasingMouse() {
+        return true;
+    }
+
     public UIWidget getContents() {
         return contents;
     }

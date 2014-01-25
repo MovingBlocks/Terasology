@@ -195,8 +195,10 @@ public class StateIngame implements GameState {
     }
 
     public void renderUserInterface() {
-        nuiManager.render();
         guiManager.render();
+        PerformanceMonitor.startActivity("Rendering NUI");
+        nuiManager.render();
+        PerformanceMonitor.endActivity();
     }
 
     private void updateUserInterface(float delta) {

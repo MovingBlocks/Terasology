@@ -177,7 +177,6 @@ public class GUIManager implements ComponentSystem {
             logger.debug("Closed window by reference with ID \"{}\"", window.getId());
 
             removeWindow(window);
-            checkMouseGrabbing();
         }
     }
 
@@ -311,12 +310,8 @@ public class GUIManager implements ComponentSystem {
     /**
      * Check whether the mouse of the current focused window is visible and can be moved on the display.
      */
-    public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasMouseFocus()) {
-            Mouse.setGrabbed(false);
-        } else {
-            Mouse.setGrabbed(true);
-        }
+    public boolean isReleasingMouse() {
+        return isConsumingInput() || renderer.getWindowFocused() == null;
     }
 
     /**
