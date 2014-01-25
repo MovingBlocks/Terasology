@@ -122,4 +122,9 @@ public abstract class AbstractWidget implements UIWidget {
             item.update(delta);
         }
     }
+
+    @Override
+    public boolean canBeFocus() {
+        return true;
+    }
 }

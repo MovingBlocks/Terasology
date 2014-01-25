@@ -78,5 +78,7 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     boolean isSkinAppliedByCanvas();
 
+    boolean canBeFocus();
+
 
 }

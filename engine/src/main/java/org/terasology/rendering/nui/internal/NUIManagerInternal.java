@@ -31,6 +31,7 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
@@ -51,6 +52,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
+import java.util.Iterator;
 
 /**
  * @author Immortius
@@ -280,6 +282,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void setFocus(UIWidget widget) {
+        if (widget != null && !widget.canBeFocus()) {
+            return;
+        }
         if (!Objects.equal(widget, focus)) {
             if (focus != null) {
                 focus.onLoseFocus();
@@ -331,6 +336,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //mouse wheel events
@@ -345,6 +353,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //raw input events
@@ -353,6 +364,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (focus != null) {
             focus.onKeyEvent(event);
         }
+        if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (!screens.isEmpty() && screens.peek().isQuickCloseAllowed()) {
+                popScreen();
+                event.consume();
+            }
+        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
@@ -360,6 +377,19 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onBindEvent(event);
+        }
+        if (!event.isConsumed()) {
+            for (UIScreenLayer layer : screens) {
+                if (layer.isReleasingMouse()) {
+                    layer.onBindEvent(event);
+                    if (event.isConsumed() || !layer.isLowerLayerVisible()) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (isReleasingMouse()) {
+            event.consume();
         }
     }
 

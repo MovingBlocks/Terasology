@@ -15,10 +15,15 @@
  */
 package org.terasology.logic.console.ui;
 
+import org.terasology.input.MouseInput;
+import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -40,12 +45,24 @@ public class ConsoleScreen extends UIScreenLayer {
     @In
     private LocalPlayer localPlayer;
 
+    private UICommandEntry commandLine;
+
+    private InteractionListener screenListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            if (button == MouseInput.MOUSE_LEFT && commandLine != null) {
+                getManager().setFocus(commandLine);
+            }
+            return true;
+        }
+    };
+
     @Override
     public void initialise() {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
-        final UICommandEntry commandLine = find("commandLine", UICommandEntry.class);
+        commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);
         commandLine.setTabCompletionEngine(new ConsoleTabCompletionEngine(console));
         commandLine.bindCommandHistory(new ReadOnlyBinding<List<String>>() {
@@ -86,5 +103,15 @@ public class ConsoleScreen extends UIScreenLayer {
     @Override
     public boolean isLowerLayerVisible() {
         return true;
+    }
+
+    @Override
+    protected InteractionListener getScreenListener() {
+        return screenListener;
+    }
+
+    @Override
+    public boolean canBeFocus() {
+        return false;
     }
 }

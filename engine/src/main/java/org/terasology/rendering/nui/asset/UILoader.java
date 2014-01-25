@@ -200,22 +200,14 @@ public class UILoader implements AssetLoader<UIData> {
                 id = jsonObject.get("id").getAsString();
             }
 
-            UIWidget element;
+            UIWidget element = elementMetadata.newInstance();
             if (id != null) {
-                try {
-                    Constructor<? extends UIWidget> constructor = elementMetadata.getType().getConstructor(String.class);
-                    constructor.setAccessible(true);
-                    element = constructor.newInstance(id);
-
-                } catch (NoSuchMethodException e) {
-                    logger.warn("UIWidget type {} lacks id constructor", elementMetadata.getUri());
-                    element = elementMetadata.newInstance();
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                    logger.warn("Failed to construct {} with id", elementMetadata.getUri(), e);
-                    element = elementMetadata.newInstance();
+                FieldMetadata fieldMetadata = elementMetadata.getField("id");
+                if (fieldMetadata == null) {
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
+                } else {
+                    fieldMetadata.setValue(element, id);
                 }
-            } else {
-                element = elementMetadata.newInstance();
             }
 
             // Deserialize normal fields.

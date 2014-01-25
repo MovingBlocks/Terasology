@@ -59,7 +59,7 @@ public class ConsoleSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = ClientComponent.class)
+    @ReceiveEvent(components = ClientComponent.class, priority = 300)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             nuiManager.toggleScreen("engine:console");

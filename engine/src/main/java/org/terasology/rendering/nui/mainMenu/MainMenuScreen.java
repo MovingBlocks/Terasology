@@ -78,6 +78,10 @@ public class MainMenuScreen extends UIScreenLayer {
         });
     }
 
+    @Override
+    public boolean isQuickCloseAllowed() {
+        return false;
+    }
 }
 
 
