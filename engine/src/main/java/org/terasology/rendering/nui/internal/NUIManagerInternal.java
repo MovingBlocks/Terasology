@@ -35,7 +35,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
@@ -52,7 +51,6 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
-import java.util.Iterator;
 
 /**
  * @author Immortius
@@ -365,7 +363,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             focus.onKeyEvent(event);
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
-            if (!screens.isEmpty() && screens.peek().isQuickCloseAllowed()) {
+            if (!screens.isEmpty() && screens.peek().isEscapeToCloseAllowed()) {
                 popScreen();
                 event.consume();
             }
