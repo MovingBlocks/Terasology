@@ -197,6 +197,9 @@ public class Icon {
         Icon minionIcon8 = new Icon();
         Icon minionIcon9 = new Icon();
         Icon minioncommandIcon = new Icon();
+        Icon buildBlockJob = new Icon();
+        Icon removeBlockJob = new Icon();
+        Icon walkToJob = new Icon();
 
         questionMarkIcon.setAtlasPosition(4, 0);
 
@@ -275,6 +278,10 @@ public class Icon {
         minionIcon8.setAtlasPosition(15, 7);
         minionIcon9.setAtlasPosition(15, 8);
         minioncommandIcon.setAtlasPosition(13, 3);
+
+        buildBlockJob.setAtlasPosition(14, 4);
+        removeBlockJob.setAtlasPosition(14, 5);
+        walkToJob.setAtlasPosition(14, 6);
 
         icons.put("questionmark", questionMarkIcon);
 
@@ -357,6 +364,10 @@ public class Icon {
         icons.put("coal", coal);
         icons.put("stick", stick);
         icons.put("refinementrock", refinementrock);
+
+        icons.put("buildblockjob", buildBlockJob);
+        icons.put("removeblockjob", removeBlockJob);
+        icons.put("walktojob", walkToJob);
     }
 
     /**
