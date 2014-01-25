@@ -18,6 +18,9 @@ package org.terasology.logic.inventory.block;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.logic.health.DoDestroyEvent;
+import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -28,6 +31,8 @@ import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
 import org.terasology.world.block.items.OnBlockToItem;
 
+import javax.vecmath.Vector3f;
+
 /**
  * @author Immortius
  */
@@ -36,6 +41,8 @@ public class BlockInventorySystem extends BaseComponentSystem {
 
     @In
     private SlotBasedInventoryManager inventoryManager;
+
+    private PickupBuilder pickupBuilder = new PickupBuilder();
 
     @ReceiveEvent(components = {InventoryComponent.class, RetainBlockInventoryComponent.class})
     public void copyBlockInventory(OnBlockToItem event, EntityRef blockEntity) {
@@ -52,5 +59,19 @@ public class BlockInventorySystem extends BaseComponentSystem {
     @ReceiveEvent(components = {InventoryComponent.class, BlockItemComponent.class})
     public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
         inventoryManager.moveAll(itemEntity, event.getPlacedBlock());
+    }
+
+    @ReceiveEvent(components = {InventoryComponent.class, DropBlockInventoryComponent.class, LocationComponent.class})
+    public void dropContentsOfInventory(DoDestroyEvent event, EntityRef entity) {
+        Vector3f position = entity.getComponent(LocationComponent.class).getWorldPosition();
+
+        int slotCount = inventoryManager.getNumSlots(entity);
+        for (int i=0; i<slotCount; i++) {
+            EntityRef itemInSlot = inventoryManager.getItemInSlot(entity, 0);
+            if (itemInSlot.exists()) {
+                inventoryManager.removeItem(entity, itemInSlot);
+                pickupBuilder.createPickupFor(itemInSlot, position, 60);
+            }
+        }
     }
 }
