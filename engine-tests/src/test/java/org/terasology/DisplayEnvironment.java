@@ -73,8 +73,8 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
  */
 public class DisplayEnvironment extends HeadlessEnvironment {
     
-	@Override
-	protected void setupDisplay() {
+    @Override
+    protected void setupDisplay() {
         LWJGLHelper.initNativeLibs();
 
         try {
@@ -83,7 +83,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         } catch (LWJGLException e) {
             throw new IllegalStateException(e);
         }
-	}
+    }
 
     @Override
     protected void setupAssetManager() {

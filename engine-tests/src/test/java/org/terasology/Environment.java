@@ -35,8 +35,7 @@ public class Environment {
     public Environment() {
         try {
             reset();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Error", e);
             throw new RuntimeException(e);
         }

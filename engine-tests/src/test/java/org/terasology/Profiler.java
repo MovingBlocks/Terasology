@@ -126,7 +126,7 @@ public final class Profiler {
      * @param id an identifier object
      * @return the time in milliseconds as formatted string
      */
-    public static String getAsStrindAndReset(Object id) {
+    public static String getAsStringAndReset(Object id) {
         String str = getAsString(id);
         TIME_MAP.put(id, measure());
         return str;
