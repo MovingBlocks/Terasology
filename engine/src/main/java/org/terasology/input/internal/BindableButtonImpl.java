@@ -54,6 +54,8 @@ public class BindableButtonImpl implements BindableButton {
     private int repeatTime;
     private long lastActivateTime;
 
+    private boolean consumedActivation;
+
     private Time time;
 
     /**
@@ -164,6 +166,7 @@ public class BindableButtonImpl implements BindableButton {
             activeInputs.add(input);
             if (previouslyEmpty && mode.isActivatedOnPress()) {
                 lastActivateTime = time.getGameTimeInMs();
+                consumedActivation = keyConsumed;
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
                 }
@@ -206,14 +209,16 @@ public class BindableButtonImpl implements BindableButton {
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
             lastActivateTime = activateTime;
             if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
-                boolean consumed = triggerOnRepeat(delta, target);
-                if (!consumed) {
-                    buttonEvent.prepare(id, ButtonState.REPEAT, delta);
-                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
-                    for (EntityRef entity : inputEntities) {
-                        entity.send(buttonEvent);
-                        if (buttonEvent.isConsumed()) {
-                            break;
+                if (!consumedActivation) {
+                    boolean consumed = triggerOnRepeat(delta, target);
+                    if (!consumed) {
+                        buttonEvent.prepare(id, ButtonState.REPEAT, delta);
+                        buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
+                        for (EntityRef entity : inputEntities) {
+                            entity.send(buttonEvent);
+                            if (buttonEvent.isConsumed()) {
+                                break;
+                            }
                         }
                     }
                 }

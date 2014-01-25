@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.Assets;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
@@ -31,9 +32,10 @@ import java.util.Iterator;
  */
 public class UIScreenLayer extends AbstractWidget {
 
+
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
-    private InteractionListener screenListener = new BaseInteractionListener() {
+    private InteractionListener defaultScreenListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             return true;
@@ -48,8 +50,16 @@ public class UIScreenLayer extends AbstractWidget {
         super(id);
     }
 
+    public void setId(String id) {
+        super.setId(id);
+    }
+
     public void initialise() {
 
+    }
+
+    protected InteractionListener getScreenListener() {
+        return defaultScreenListener;
     }
 
     public void setContents(UIWidget contents) {
@@ -60,12 +70,20 @@ public class UIScreenLayer extends AbstractWidget {
         return false;
     }
 
+    public boolean isReleasingMouse() {
+        return true;
+    }
+
+    public boolean isQuickCloseAllowed() {
+        return true;
+    }
+
     public UIWidget getContents() {
         return contents;
     }
 
     public void onDraw(Canvas canvas) {
-        canvas.addInteractionRegion(screenListener);
+        canvas.addInteractionRegion(getScreenListener());
         if (contents != null) {
             canvas.drawWidget(contents, canvas.getRegion());
         }
@@ -111,6 +129,10 @@ public class UIScreenLayer extends AbstractWidget {
 
     @Override
     public void onKeyEvent(KeyEvent event) {
+    }
+
+    @Override
+    public void onBindEvent(BindButtonEvent event) {
     }
 
     @Override

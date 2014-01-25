@@ -151,6 +151,8 @@ public class InputSystem implements ComponentSystem {
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
                 break;
+            default:
+                break;
         }
     }
 

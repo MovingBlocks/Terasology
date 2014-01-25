@@ -16,21 +16,21 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.ConsoleButton;
-import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
 /**
@@ -54,14 +54,6 @@ public class MenuControlSystem implements ComponentSystem {
 
     @Override
     public void shutdown() {
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
-            guiManager.openWindow(CHAT);
-            event.consume();
-        }
     }
 
     @ReceiveEvent(components = ClientComponent.class)

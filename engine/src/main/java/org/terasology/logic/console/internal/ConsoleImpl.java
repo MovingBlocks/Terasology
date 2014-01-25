@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
@@ -28,6 +29,7 @@ import com.google.common.collect.Table;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
@@ -161,13 +163,8 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public int previousCommandSize() {
-        return localCommandHistory.size();
-    }
-
-    @Override
-    public String getPreviousCommand(int index) {
-        return localCommandHistory.get(index);
+    public List<String> getPreviousCommands() {
+        return ImmutableList.copyOf(localCommandHistory);
     }
 
     /**
@@ -203,7 +200,7 @@ public class ConsoleImpl implements Console {
         }
 
         Client owner = networkSystem.getOwner(callingClient);
-        if (owner != null && owner.isLocal()) {
+        if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {
             localCommandHistory.add(command);
         }
 

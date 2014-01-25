@@ -262,6 +262,7 @@
                 "slider" : {
                     "background" : "engine:sliderTrack",
                     "fixed-height" : 8,
+                    "min-width" : 8,
                     "background-border" : {
                         "top" : 0,
                         "bottom" : 0,

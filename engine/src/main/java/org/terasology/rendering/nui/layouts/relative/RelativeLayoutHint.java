@@ -64,79 +64,89 @@ public class RelativeLayoutHint implements LayoutHint {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public RelativeLayoutHint setWidth(int value) {
+        this.width = value;
+        return this;
     }
 
     public int getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
+    public RelativeLayoutHint setHeight(int value) {
+        this.height = value;
+        return this;
     }
 
     public HorizontalInfo getPositionLeft() {
         return positionLeft;
     }
 
-    public void setPositionLeft(HorizontalInfo positionLeft) {
-        this.positionLeft = positionLeft;
+    public RelativeLayoutHint setPositionLeft(HorizontalInfo value) {
+        this.positionLeft = value;
+        return this;
     }
 
     public HorizontalInfo getPositionRight() {
         return positionRight;
     }
 
-    public void setPositionRight(HorizontalInfo positionRight) {
-        this.positionRight = positionRight;
+    public RelativeLayoutHint setPositionRight(HorizontalInfo value) {
+        this.positionRight = value;
+        return this;
     }
 
     public HorizontalInfo getPositionCenterHorizontal() {
         return positionCenterHorizontal;
     }
 
-    public void setPositionCenterHorizontal(HorizontalInfo positionCenterHorizontal) {
-        this.positionCenterHorizontal = positionCenterHorizontal;
+    public RelativeLayoutHint setPositionCenterHorizontal(HorizontalInfo value) {
+        this.positionCenterHorizontal = value;
+        return this;
     }
 
     public VerticalInfo getPositionTop() {
         return positionTop;
     }
 
-    public void setPositionTop(VerticalInfo positionTop) {
-        this.positionTop = positionTop;
+    public RelativeLayoutHint setPositionTop(VerticalInfo value) {
+        this.positionTop = value;
+        return this;
     }
 
     public VerticalInfo getPositionBottom() {
         return positionBottom;
     }
 
-    public void setPositionBottom(VerticalInfo positionBottom) {
-        this.positionBottom = positionBottom;
+    public RelativeLayoutHint setPositionBottom(VerticalInfo value) {
+        this.positionBottom = value;
+        return this;
     }
 
     public VerticalInfo getPositionCenterVertical() {
         return positionCenterVertical;
     }
 
-    public void setPositionCenterVertical(VerticalInfo positionCenterVertical) {
-        this.positionCenterVertical = positionCenterVertical;
+    public RelativeLayoutHint setPositionCenterVertical(VerticalInfo value) {
+        this.positionCenterVertical = value;
+        return this;
     }
 
     public boolean isUsingContentWidth() {
         return usingContentWidth;
     }
 
-    public void setUsingContentWidth(boolean usingContentWidth) {
-        this.usingContentWidth = usingContentWidth;
+    public RelativeLayoutHint setUsingContentWidth(boolean value) {
+        this.usingContentWidth = value;
+        return this;
     }
 
     public boolean isUsingContentHeight() {
         return usingContentHeight;
     }
 
-    public void setUsingContentHeight(boolean usingContentHeight) {
-        this.usingContentHeight = usingContentHeight;
+    public RelativeLayoutHint setUsingContentHeight(boolean value) {
+        this.usingContentHeight = value;
+        return this;
     }
 }

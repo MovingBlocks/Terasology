@@ -16,11 +16,12 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Queues;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.Module;
@@ -30,16 +31,20 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
+import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
@@ -47,6 +52,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
+import java.util.Iterator;
 
 /**
  * @author Immortius
@@ -56,6 +62,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
+    private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
@@ -75,11 +82,66 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
+    public boolean isOpen(String screenUri) {
+        return isOpen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public boolean isOpen(AssetUri screenUri) {
+        return screenLookup.containsKey(screenUri);
+    }
+
+    @Override
+    public UIScreenLayer getScreen(AssetUri screenUri) {
+        return screenLookup.get(screenUri);
+    }
+
+    @Override
+    public UIScreenLayer getScreen(String screenUri) {
+        return getScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void closeScreen(String screenUri) {
+        closeScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void closeScreen(AssetUri screenUri) {
+        UIScreenLayer screen = screenLookup.remove(screenUri);
+        if (screen != null) {
+            screens.remove(screen);
+        }
+    }
+
+    @Override
+    public void closeScreen(UIScreenLayer screen) {
+        if (screens.remove(screen)) {
+            screenLookup.inverse().remove(screen);
+        }
+    }
+
+    @Override
+    public void toggleScreen(String screenUri) {
+        toggleScreen(new AssetUri(AssetType.UI_ELEMENT, screenUri));
+    }
+
+    @Override
+    public void toggleScreen(AssetUri screenUri) {
+        if (isOpen(screenUri)) {
+            closeScreen(screenUri);
+        } else {
+            pushScreen(screenUri);
+        }
+    }
+
+    @Override
     public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
             UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
-            pushScreen(result);
+            result.setId(screenUri.toNormalisedSimpleString());
+            pushScreen(result, screenUri);
             return result;
         }
         return null;
@@ -114,14 +176,22 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void pushScreen(UIScreenLayer screen) {
+        pushScreen(screen, null);
+    }
+
+    public void pushScreen(UIScreenLayer screen, AssetUri uri) {
         prepare(screen);
         screens.push(screen);
+        if (uri != null) {
+            screenLookup.put(uri, screen);
+        }
     }
 
     @Override
     public void popScreen() {
         if (!screens.isEmpty()) {
-            screens.pop();
+            UIScreenLayer popped = screens.pop();
+            screenLookup.inverse().remove(popped);
         }
     }
 
@@ -130,7 +200,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
             UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
-            setScreen(result);
+            result.setId(screenUri.toNormalisedSimpleString());
+            setScreen(result, screenUri);
             return result;
         }
         return null;
@@ -165,14 +236,18 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void setScreen(UIScreenLayer screen) {
-        screens.clear();
-        prepare(screen);
-        screens.push(screen);
+        setScreen(screen, null);
+    }
+
+    public void setScreen(UIScreenLayer screen, AssetUri uri) {
+        closeAllScreens();
+        pushScreen(screen, uri);
     }
 
     @Override
-    public void closeScreens() {
+    public void closeAllScreens() {
         screens.clear();
+        screenLookup.clear();
         focus = null;
     }
 
@@ -207,6 +282,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void setFocus(UIWidget widget) {
+        if (widget != null && !widget.canBeFocus()) {
+            return;
+        }
         if (!Objects.equal(widget, focus)) {
             if (focus != null) {
                 focus.onLoseFocus();
@@ -223,13 +301,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return focus;
     }
 
+    @Override
+    public boolean isReleasingMouse() {
+        return !screens.isEmpty() && screens.peek().isReleasingMouse();
+    }
+
     /*
       The following events will capture the mouse and keyboard inputs. They have high priority so the GUI will
       have first pick of input
     */
 
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    public void mouseAxisEvent(AxisEvent event, EntityRef entity) {
+        if (isReleasingMouse()) {
+            event.consume();
+        }
+    }
+
     //mouse button events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onMouseButtonEvent(event);
@@ -246,10 +336,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //mouse wheel events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onMouseWheelEvent(event);
@@ -260,19 +353,44 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //raw input events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onKeyEvent(event);
         }
+        if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (!screens.isEmpty() && screens.peek().isQuickCloseAllowed()) {
+                popScreen();
+                event.consume();
+            }
+        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if (focus != null) {
+            focus.onBindEvent(event);
+        }
+        if (!event.isConsumed()) {
+            for (UIScreenLayer layer : screens) {
+                if (layer.isReleasingMouse()) {
+                    layer.onBindEvent(event);
+                    if (event.isConsumed() || !layer.isLowerLayerVisible()) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     private void prepare(UIScreenLayer screen) {

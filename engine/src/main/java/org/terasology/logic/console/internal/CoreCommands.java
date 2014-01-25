@@ -17,6 +17,8 @@ package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.asset.Assets;
+import org.terasology.engine.modes.GameState;
+import org.terasology.engine.modes.StateIngame;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
