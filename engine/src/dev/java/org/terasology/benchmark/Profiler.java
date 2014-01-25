@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology;
+package org.terasology.benchmark;
 
 import java.util.Map;
 
