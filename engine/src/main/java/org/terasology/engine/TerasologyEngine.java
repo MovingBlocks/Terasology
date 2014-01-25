@@ -110,6 +110,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import sun.reflect.annotation.AnnotationParser;
 
 import javax.swing.*;
@@ -615,6 +616,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(AssetManager.class, FilePermission.class);
         moduleSecurityManager.addAllowedPermission(EnumMap.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(WorldGeneratorPluginLibrary.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
