@@ -16,7 +16,6 @@
 package org.terasology.logic.manager;
 
 import com.google.common.collect.Maps;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,6 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
@@ -84,7 +82,6 @@ public class GUIManager implements ComponentSystem {
         registeredWindows.put("death", UIScreenDeath.class);
         registeredWindows.put("pause", UIMenuPause.class);
         registeredWindows.put("inventory", UIScreenInventory.class);
-        registeredWindows.put("chat", UIScreenConsole.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }
 

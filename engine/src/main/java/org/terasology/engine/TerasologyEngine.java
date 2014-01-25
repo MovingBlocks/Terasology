@@ -704,9 +704,8 @@ public class TerasologyEngine implements GameEngine {
                 PerformanceMonitor.endActivity();
             }
 
-            if (hasMouseFocus()) {
-                Mouse.setGrabbed(!(nuiManager.isReleasingMouse() || guiManager.isReleasingMouse()));
-            }
+            Mouse.setGrabbed(hasMouseFocus() && !(nuiManager.isReleasingMouse() || guiManager.isReleasingMouse()));
+
 
             GameThread.processWaitingProcesses();
 
