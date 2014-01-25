@@ -74,7 +74,7 @@ public class UIScreenLayer extends AbstractWidget {
         return true;
     }
 
-    public boolean isQuickCloseAllowed() {
+    public boolean isEscapeToCloseAllowed() {
         return true;
     }
 

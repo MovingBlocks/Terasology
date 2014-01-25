@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory;
+package org.terasology.world.generator.plugin;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Immortius
  */
-public class PickedUpItem implements Event {
-    private EntityRef item;
-
-    public PickedUpItem(EntityRef item) {
-        this.item = item;
-    }
-
-    public EntityRef getItem() {
-        return item;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterPlugin {
 }

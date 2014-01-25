@@ -45,24 +45,10 @@ public class WorldGeneratorPluginLibrary {
         }
     }
 
-    public <T extends Annotation, U extends WorldGeneratorPlugin> List<U> instantiateAllWithAnnotation(Class<T> annotation, Class<U> ofType) {
-        List<U> result = Lists.newArrayList();
-
-        for (ClassMetadata classMetadata : library) {
-            if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable() && classMetadata.getType().getAnnotation(annotation) != null) {
-                U item = ofType.cast(classMetadata.newInstance());
-                if (item != null) {
-                    result.add(item);
-                }
-            }
-        }
-        return result;
-    }
-
     public <U extends WorldGeneratorPlugin> List<U> instantiateAllOfType(Class<U> ofType) {
         List<U> result = Lists.newArrayList();
         for (ClassMetadata classMetadata : library) {
-            if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable()) {
+            if (ofType.isAssignableFrom(classMetadata.getType()) && classMetadata.isConstructable() && classMetadata.getType().getAnnotation(RegisterPlugin.class) != null) {
                 U item = ofType.cast(classMetadata.newInstance());
                 if (item != null) {
                     result.add(item);

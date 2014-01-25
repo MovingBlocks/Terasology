@@ -861,10 +861,10 @@ public class CanvasImpl implements CanvasControl {
         public SubRegionImpl(Rect2i region, boolean crop) {
             previousState = state;
 
-            int left = region.minX() + state.drawRegion.minX();
-            int right = region.maxX() + state.drawRegion.minX();
-            int top = region.minY() + state.drawRegion.minY();
-            int bottom = region.maxY() + state.drawRegion.minY();
+            int left = TeraMath.addClampAtMax(region.minX(), state.drawRegion.minX());
+            int right = TeraMath.addClampAtMax(region.maxX(), state.drawRegion.minX());
+            int top = TeraMath.addClampAtMax(region.minY(), state.drawRegion.minY());
+            int bottom = TeraMath.addClampAtMax(region.maxY(), state.drawRegion.minY());
             Rect2i subRegion = Rect2i.createFromMinAndMax(left, top, right, bottom);
             if (crop) {
                 Rect2i cropRegion = subRegion.intersect(state.cropRegion);
