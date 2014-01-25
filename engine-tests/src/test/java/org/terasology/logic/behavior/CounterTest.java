@@ -32,8 +32,7 @@ public class CounterTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
         DelayNode delayNode = new DelayNode(0, debugNode);
-        interpreter.setRoot(delayNode);
-        interpreter.start();
+        interpreter.start(delayNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -50,8 +49,7 @@ public class CounterTest {
         DebugNode debugNode = new DebugNode(0);
         DelayNode delayNode = new DelayNode(1, debugNode);
 
-        interpreter.setRoot(delayNode);
-        interpreter.start();
+        interpreter.start(delayNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         Assert.assertNull(debugNode.lastTask);
@@ -72,8 +70,7 @@ public class CounterTest {
         DebugNode debugNode = new DebugNode(1);
         DelayNode delayNode = new DelayNode(1, debugNode);
 
-        interpreter.setRoot(delayNode);
-        interpreter.start();
+        interpreter.start(delayNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         Assert.assertNull(debugNode.lastTask);
@@ -100,8 +97,7 @@ public class CounterTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(10);
 
-        interpreter.setRoot(debugNode);
-        interpreter.start();
+        interpreter.start(debugNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -143,8 +139,7 @@ public class CounterTest {
         left.setChild(0, new DebugNode(1));
         left.setChild(1, new DebugNode(1));
 
-        interpreter.setRoot(root);
-        interpreter.start();
+        interpreter.start(root);
 
         for (int i = 0; i < 100; i++) {
             interpreter.tick(0);

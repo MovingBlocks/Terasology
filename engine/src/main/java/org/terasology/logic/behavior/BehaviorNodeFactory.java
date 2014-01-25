@@ -15,14 +15,17 @@
  */
 package org.terasology.logic.behavior;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.registry.CoreRegistry;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +38,8 @@ public class BehaviorNodeFactory {
     private final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
 
     private Map<Class<? extends Node>, BehaviorNodeComponent> nodes = Maps.newHashMap();
+    private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
+    private final List<String> categories;
 
     public BehaviorNodeFactory(List<BehaviorNodeComponent> components) {
         for (BehaviorNodeComponent component : components) {
@@ -45,11 +50,27 @@ public class BehaviorNodeFactory {
                     nodes.put(type, component);
                     logger.warn("Found behavior node for class " + component.type + " name=" + component.name);
 
+                    List<BehaviorNodeComponent> list = categoryComponents.get(component.category);
+                    if (list == null) {
+                        list = Lists.newArrayList();
+                        categoryComponents.put(component.category, list);
+                    }
+                    list.add(component);
                     break;
                 } catch (ClassNotFoundException e) {
-                    logger.warn("Cannot find behavior node for class " + component.type + " name=" + component.name);
+                    // ignore
                 }
             }
+        }
+        categories = Lists.newArrayList(categoryComponents.keySet());
+        Collections.sort(categories);
+        for (String category : categories) {
+            Collections.sort(categoryComponents.get(category), new Comparator<BehaviorNodeComponent>() {
+                @Override
+                public int compare(BehaviorNodeComponent o1, BehaviorNodeComponent o2) {
+                    return o1.name.compareTo(o2.name);
+                }
+            });
         }
     }
 
@@ -76,5 +97,13 @@ public class BehaviorNodeFactory {
 
     public Collection<BehaviorNodeComponent> getNodeComponents() {
         return nodes.values();
+    }
+
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public List<BehaviorNodeComponent> getNodesComponents(String category) {
+        return categoryComponents.get(category);
     }
 }

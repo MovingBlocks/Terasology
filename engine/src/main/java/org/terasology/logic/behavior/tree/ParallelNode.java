@@ -53,7 +53,7 @@ public class ParallelNode extends CompositeNode {
         return new ParallelTask(this);
     }
 
-    public static class ParallelTask extends CompositeTask implements Task.Observer {
+    public static class ParallelTask extends CompositeTask {
         private int successCount;
         private int failureCount;
 

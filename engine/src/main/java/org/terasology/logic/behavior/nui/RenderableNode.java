@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.nui;
 
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.tree.Node;
@@ -54,6 +55,8 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private BehaviorEditor editor;
     private boolean dragged;
     private Status status;
+    private boolean collapsed;
+    private boolean copyMode;
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -64,13 +67,24 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             last = pos;
             dragged = false;
+            copyMode = button == MouseInput.MOUSE_LEFT && (Keyboard.isKeyDown(Keyboard.KeyId.LEFT_SHIFT) || Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_SHIFT));
+            if (copyMode) {
+                editor.copyNode(RenderableNode.this);
+            }
             return true;
         }
 
         @Override
         public void onMouseRelease(MouseInput button, Vector2i pos) {
             if (!dragged) {
-                editor.nodeClicked(RenderableNode.this);
+                if (button == MouseInput.MOUSE_RIGHT) {
+                    collapsed = !collapsed;
+                    for (RenderableNode child : children) {
+                        child.setVisible(!collapsed);
+                    }
+                } else {
+                    editor.nodeClicked(RenderableNode.this);
+                }
             }
             dragged = false;
         }
@@ -105,6 +119,9 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     public void onDraw(Canvas canvas) {
         canvas.drawTexture(texture);
         String text = getData().name + " " + (status != null ? status : "");
+        if (collapsed) {
+            text += "[+]";
+        }
         canvas.drawText(text);
 
         if (editor != null) {
@@ -265,6 +282,13 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
 
     public Status getStatus() {
         return status;
+    }
+
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        for (RenderableNode child : children) {
+            child.setVisible(visible);
+        }
     }
 
     public interface Visitor {

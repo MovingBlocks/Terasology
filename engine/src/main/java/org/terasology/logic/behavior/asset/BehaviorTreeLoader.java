@@ -25,10 +25,10 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.terasology.asset.AssetLoader;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,16 +128,21 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                     @Override
                     public void write(JsonWriter out, T value) throws IOException {
                         if (value instanceof Node) {
-                            idNodes.put(currentId, (Node) value);
-                            nodeIds.put((Node) value, currentId);
+                            out.beginObject();
+                            if (nodeIds.containsKey(value)) {
+                                out.name("nodeType").value("ref")
+                                        .name("nodeId").value(nodeIds.get(value));
+                            } else {
+                                idNodes.put(currentId, (Node) value);
+                                nodeIds.put((Node) value, currentId);
 
-                            TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(value.getClass()));
-                            out.beginObject()
-                                    .name("nodeType").value(value.getClass().getCanonicalName())
-                                    .name("nodeId").value(currentId);
-                            currentId++;
-                            out.name("node");
-                            delegateAdapter.write(out, value);
+                                TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(value.getClass()));
+                                out.name("nodeType").value(value.getClass().getCanonicalName())
+                                        .name("nodeId").value(currentId);
+                                currentId++;
+                                out.name("node");
+                                delegateAdapter.write(out, value);
+                            }
                             out.endObject();
                         } else {
                             delegate.write(out, value);
@@ -151,31 +156,38 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             in.beginObject();
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
-                            ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-                            ClassLoader[] classLoaders;
-                            if (moduleManager != null) {
-                                classLoaders = moduleManager.getActiveModuleReflections().getConfiguration().getClassLoaders();
+                            T result;
+                            if ("ref".equals(nodeType)) {
+                                nextName(in, "nodeId");
+                                int id = in.nextInt();
+                                result = (T) idNodes.get(id);
                             } else {
-                                classLoaders = new ClassLoader[]{getClass().getClassLoader()};
-                            }
-                            Class cls = null;
-                            for (ClassLoader classLoader : classLoaders) {
-                                try {
-                                    cls = classLoader.loadClass(nodeType);
-                                    break;
-                                } catch (ClassNotFoundException e) {
-                                    // ignore
+                                ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+                                ClassLoader[] classLoaders;
+                                if (moduleManager != null) {
+                                    classLoaders = moduleManager.getActiveModuleReflections().getConfiguration().getClassLoaders();
+                                } else {
+                                    classLoaders = new ClassLoader[]{getClass().getClassLoader()};
                                 }
+                                Class cls = null;
+                                for (ClassLoader classLoader : classLoaders) {
+                                    try {
+                                        cls = classLoader.loadClass(nodeType);
+                                        break;
+                                    } catch (ClassNotFoundException e) {
+                                        // ignore
+                                    }
+                                }
+                                TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
+                                nextName(in, "nodeId");
+                                int id = in.nextInt();
+                                nextName(in, "node");
+                                result = delegateAdapter.read(in);
+                                idNodes.put(id, (Node) result);
+                                nodeIds.put((Node) result, id);
                             }
-                            TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
-                            nextName(in, "nodeId");
-                            int id = in.nextInt();
-                            nextName(in, "node");
-                            T read = delegateAdapter.read(in);
-                            idNodes.put(id, (Node) read);
-                            nodeIds.put((Node) read, id);
                             in.endObject();
-                            return read;
+                            return result;
                         } else {
                             return delegate.read(in);
                         }
