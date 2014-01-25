@@ -89,6 +89,8 @@ public class CanvasImpl implements CanvasControl {
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
+    private boolean focusDrawn;
+
     // Text mesh caching
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
@@ -118,6 +120,7 @@ public class CanvasImpl implements CanvasControl {
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
         renderer.preRender();
         crop(state.cropRegion);
+        focusDrawn = false;
     }
 
     @Override
@@ -140,6 +143,9 @@ public class CanvasImpl implements CanvasControl {
         usedText.clear();
 
         renderer.postRender();
+        if (!focusDrawn) {
+            nuiManager.setFocus(null);
+        }
     }
 
     @Override
@@ -329,6 +335,9 @@ public class CanvasImpl implements CanvasControl {
             return;
         }
 
+        if (nuiManager.getFocus() == element) {
+            focusDrawn = true;
+        }
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea;

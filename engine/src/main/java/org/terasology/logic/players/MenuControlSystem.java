@@ -56,14 +56,6 @@ public class MenuControlSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    //    @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
-            guiManager.openWindow(CHAT);
-            event.consume();
-        }
-    }
-
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {

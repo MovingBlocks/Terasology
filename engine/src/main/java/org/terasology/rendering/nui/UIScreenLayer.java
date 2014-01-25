@@ -35,7 +35,7 @@ public class UIScreenLayer extends AbstractWidget {
 
     private UIWidget contents;
     private UISkin skin = Assets.getSkin("engine:default");
-    private InteractionListener screenListener = new BaseInteractionListener() {
+    private InteractionListener defaultScreenListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             return true;
@@ -58,6 +58,10 @@ public class UIScreenLayer extends AbstractWidget {
 
     }
 
+    protected InteractionListener getScreenListener() {
+        return defaultScreenListener;
+    }
+
     public void setContents(UIWidget contents) {
         this.contents = contents;
     }
@@ -66,12 +70,20 @@ public class UIScreenLayer extends AbstractWidget {
         return false;
     }
 
+    public boolean isReleasingMouse() {
+        return true;
+    }
+
+    public boolean isQuickCloseAllowed() {
+        return true;
+    }
+
     public UIWidget getContents() {
         return contents;
     }
 
     public void onDraw(Canvas canvas) {
-        canvas.addInteractionRegion(screenListener);
+        canvas.addInteractionRegion(getScreenListener());
         if (contents != null) {
             canvas.drawWidget(contents, canvas.getRegion());
         }

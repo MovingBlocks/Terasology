@@ -31,8 +31,11 @@ import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
+import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
@@ -49,6 +52,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
+import java.util.Iterator;
 
 /**
  * @author Immortius
@@ -104,7 +108,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void closeScreen(AssetUri screenUri) {
-        UIScreenLayer screen = screenLookup.remove(screenUri);;
+        UIScreenLayer screen = screenLookup.remove(screenUri);
         if (screen != null) {
             screens.remove(screen);
         }
@@ -278,6 +282,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void setFocus(UIWidget widget) {
+        if (widget != null && !widget.canBeFocus()) {
+            return;
+        }
         if (!Objects.equal(widget, focus)) {
             if (focus != null) {
                 focus.onLoseFocus();
@@ -294,13 +301,25 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return focus;
     }
 
+    @Override
+    public boolean isReleasingMouse() {
+        return !screens.isEmpty() && screens.peek().isReleasingMouse();
+    }
+
     /*
       The following events will capture the mouse and keyboard inputs. They have high priority so the GUI will
       have first pick of input
     */
 
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    public void mouseAxisEvent(AxisEvent event, EntityRef entity) {
+        if (isReleasingMouse()) {
+            event.consume();
+        }
+    }
+
     //mouse button events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onMouseButtonEvent(event);
@@ -317,10 +336,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //mouse wheel events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onMouseWheelEvent(event);
@@ -331,24 +353,43 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        if (isReleasingMouse()) {
+            event.consume();
+        }
     }
 
     //raw input events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onKeyEvent(event);
         }
+        if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
+            if (!screens.isEmpty() && screens.peek().isQuickCloseAllowed()) {
+                popScreen();
+                event.consume();
+            }
+        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onBindEvent(event);
-            if (event.isConsumed()) {
-                return;
+        }
+        if (!event.isConsumed()) {
+            for (UIScreenLayer layer : screens) {
+                if (layer.isReleasingMouse()) {
+                    layer.onBindEvent(event);
+                    if (event.isConsumed() || !layer.isLowerLayerVisible()) {
+                        break;
+                    }
+                }
             }
+        }
+        if (isReleasingMouse()) {
+            event.consume();
         }
     }
 

@@ -141,7 +141,6 @@ public class DebugControlSystem implements ComponentSystem {
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F1:
                 engine.setFocus(!engine.hasFocus());
-                Mouse.setGrabbed(engine.hasFocus());
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:

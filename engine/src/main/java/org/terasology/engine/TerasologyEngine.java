@@ -149,6 +149,9 @@ public class TerasologyEngine implements GameEngine {
     private boolean disposed;
     private GameState pendingState;
 
+    private GUIManager guiManager;
+    private NUIManager nuiManager;
+
     private AudioManager audioManager;
     private Config config;
 
@@ -189,8 +192,8 @@ public class TerasologyEngine implements GameEngine {
             initAssets();
             initControls();
             updateInputConfig();
-            CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-            CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
+            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
@@ -334,6 +337,11 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public boolean isDisposed() {
         return disposed;
+    }
+
+    @Override
+    public GameState getState() {
+        return currentState;
     }
 
     @Override
@@ -499,7 +507,6 @@ public class TerasologyEngine implements GameEngine {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            Mouse.setGrabbed(false);
             InputSystem inputSystem = CoreRegistry.putPermanently(InputSystem.class, new InputSystem());
             inputSystem.setMouseDevice(new LwjglMouseDevice());
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
@@ -696,6 +703,9 @@ public class TerasologyEngine implements GameEngine {
                 currentState.update(delta);
                 PerformanceMonitor.endActivity();
             }
+
+            Mouse.setGrabbed(hasMouseFocus() && !(nuiManager.isReleasingMouse() || guiManager.isReleasingMouse()));
+
 
             GameThread.processWaitingProcesses();
 

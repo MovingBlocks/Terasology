@@ -16,7 +16,6 @@
 package org.terasology.logic.manager;
 
 import com.google.common.collect.Maps;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,6 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
@@ -84,7 +82,6 @@ public class GUIManager implements ComponentSystem {
         registeredWindows.put("death", UIScreenDeath.class);
         registeredWindows.put("pause", UIMenuPause.class);
         registeredWindows.put("inventory", UIScreenInventory.class);
-        registeredWindows.put("chat", UIScreenConsole.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }
 
@@ -177,7 +174,6 @@ public class GUIManager implements ComponentSystem {
             logger.debug("Closed window by reference with ID \"{}\"", window.getId());
 
             removeWindow(window);
-            checkMouseGrabbing();
         }
     }
 
@@ -311,12 +307,8 @@ public class GUIManager implements ComponentSystem {
     /**
      * Check whether the mouse of the current focused window is visible and can be moved on the display.
      */
-    public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null || !engine.hasMouseFocus()) {
-            Mouse.setGrabbed(false);
-        } else {
-            Mouse.setGrabbed(true);
-        }
+    public boolean isReleasingMouse() {
+        return isConsumingInput() || renderer.getWindowFocused() == null;
     }
 
     /**

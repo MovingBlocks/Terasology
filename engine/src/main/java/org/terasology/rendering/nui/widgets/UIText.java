@@ -269,13 +269,16 @@ public class UIText extends CoreWidget {
                         if (event.getKey() == Keyboard.Key.V) {
                             removeSelection();
                             paste();
+                            event.consume();
                             break;
                         } else if (event.getKey() == Keyboard.Key.C) {
                             copySelection();
+                            event.consume();
                             break;
                         } else if (event.getKey() == Keyboard.Key.X) {
                             copySelection();
                             removeSelection();
+                            event.consume();
                             break;
                         }
                     }
@@ -285,6 +288,7 @@ public class UIText extends CoreWidget {
                         setText(before + event.getKeyCharacter() + after);
                         cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
                         selectionStart = cursorPosition;
+                        event.consume();
                     }
                     break;
                 }

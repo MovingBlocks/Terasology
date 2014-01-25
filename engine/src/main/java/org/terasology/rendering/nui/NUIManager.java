@@ -75,4 +75,6 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setFocus(UIWidget element);
 
     UIWidget getFocus();
+
+    boolean isReleasingMouse();
 }
