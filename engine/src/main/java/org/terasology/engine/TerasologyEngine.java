@@ -551,7 +551,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 
         moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAPIPackage("java.lang.annotation");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
         moduleSecurityManager.addAPIPackage("java.util");
@@ -621,7 +620,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
-        moduleSecurityManager.addAllowedPermission(AnnotationParser.class, new RuntimePermission("accessDeclaredMembers"));
 
         moduleSecurityManager.addAllowedPermission(GUIManager.class, ReflectPermission.class);
 

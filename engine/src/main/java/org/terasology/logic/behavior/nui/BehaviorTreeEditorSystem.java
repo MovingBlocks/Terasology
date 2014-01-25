@@ -49,7 +49,6 @@ public class BehaviorTreeEditorSystem implements ComponentSystem {
 
     @Override
     public void initialise() {
-        nuiManager.closeAllScreens();
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -62,7 +61,7 @@ public class BehaviorTreeEditorSystem implements ComponentSystem {
             } else {
                 nuiManager.toggleScreen("engine:behaviorEditorScreen");
                 event.consume();
-                editorVisible = false;;
+                editorVisible = false;
             }
         }
     }
