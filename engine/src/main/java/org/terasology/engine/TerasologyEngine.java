@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -72,6 +73,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
@@ -111,9 +113,11 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
 import sun.reflect.annotation.AnnotationParser;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -468,7 +472,7 @@ public class TerasologyEngine implements GameEngine {
         });
         assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
         assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
-        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
+        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerLwjgl());
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();
 
