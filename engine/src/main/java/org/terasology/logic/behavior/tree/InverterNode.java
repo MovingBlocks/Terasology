@@ -24,7 +24,7 @@ public class InverterNode extends DecoratorNode {
         return new InverterTask(this);
     }
 
-    public static class InverterTask extends DecoratorTask implements Task.Observer {
+    public static class InverterTask extends DecoratorTask {
         public InverterTask(Node node) {
             super(node);
         }

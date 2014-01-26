@@ -70,6 +70,11 @@ public class DebugNode extends Node {
         }
 
         @Override
+        public void handle(Status result) {
+
+        }
+
+        @Override
         public void onTerminate(Status result) {
             terminateCalled = true;
         }

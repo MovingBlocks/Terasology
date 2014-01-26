@@ -15,16 +15,17 @@
  */
 package org.terasology.logic.behavior.nui;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
@@ -35,8 +36,10 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
 import javax.vecmath.Vector2f;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author synopia
@@ -109,11 +112,14 @@ public class BehaviorEditor extends ZoomableLayout {
         try (SubRegion subRegion = canvas.subRegion(canvas.getRegion(), false)) {
             canvas.setDrawOnTop(true);
             for (UIWidget widget : getWidgets()) {
+                if (!widget.isVisible()) {
+                    continue;
+                }
                 if (widget instanceof RenderableNode) {
                     RenderableNode renderableNode = (RenderableNode) widget;
                     for (Port port : renderableNode.getPorts()) {
                         Port targetPort = port.getTargetPort();
-                        if (port.isInput() || targetPort == null) {
+                        if (port.isInput() || targetPort == null || !targetPort.node.isVisible()) {
                             continue;
                         }
                         drawConnection(canvas, port, targetPort, port == activeConnectionStart ? Color.BLACK : Color.GREY);
@@ -192,6 +198,9 @@ public class BehaviorEditor extends ZoomableLayout {
     }
 
     public RenderableNode createNode(BehaviorNodeComponent data) {
+        if (tree == null) {
+            return null;
+        }
         Node node = CoreRegistry.get(BehaviorNodeFactory.class).getNode(data);
         newNode = tree.createNode(node);
         return newNode;
@@ -204,7 +213,60 @@ public class BehaviorEditor extends ZoomableLayout {
     private void addNode(RenderableNode node) {
         addWidget(node);
         for (int i = 0; i < node.getChildrenCount(); i++) {
-            addWidget(node.getChild(i));
+            addNode(node.getChild(i));
         }
+    }
+
+    /**
+     * copy the given node. the new copy replaces the given one, so you should manipulate the original node, instead of the copy.
+     * This is useful when in interaction listener, especially.
+     */
+    public void copyNode(RenderableNode node) {
+        BehaviorTreeData data = new BehaviorTreeData();
+        data.setRoot(node.getNode());
+        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        OutputStream os = new ByteArrayOutputStream(10000);
+
+        try {
+            loader.save(os, data);
+            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toString().getBytes()), null);
+            Port.OutputPort parent = node.getInputPort().getTargetPort();
+            copy.createRenderable();
+            RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());
+            addNode(copyRenderable);
+            RenderableNode nodeToLayout;
+            if (parent != null && copyRenderable.getInputPort() != null) {
+                parent.setTarget(copyRenderable.getInputPort());
+                nodeToLayout = parent.node;
+            } else {
+                nodeToLayout = copyRenderable;
+            }
+            Vector2f oldPos = nodeToLayout.getPosition();
+            tree.layout(nodeToLayout);
+            oldPos.sub(nodeToLayout.getPosition());
+            nodeToLayout.move(oldPos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void linkNode(RenderableNode node) {
+        BehaviorTreeData data = new BehaviorTreeData();
+        data.setRoot(node.getNode());
+        Port.OutputPort parent = node.getInputPort().getTargetPort();
+        data.createRenderable();
+        RenderableNode copyRenderable = data.getRenderableNode(data.getRoot());
+        addNode(copyRenderable);
+        RenderableNode nodeToLayout;
+        if (parent != null && copyRenderable.getInputPort() != null) {
+            parent.setTarget(copyRenderable.getInputPort());
+            nodeToLayout = parent.node;
+        } else {
+            nodeToLayout = copyRenderable;
+        }
+        Vector2f oldPos = nodeToLayout.getPosition();
+        tree.layout(nodeToLayout);
+        oldPos.sub(nodeToLayout.getPosition());
+        nodeToLayout.move(oldPos);
     }
 }

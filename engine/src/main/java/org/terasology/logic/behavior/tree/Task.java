@@ -28,7 +28,7 @@ public abstract class Task {
     private Node node;
     private Actor actor;
     private Status status = Status.INVALID;
-    private Observer observer;
+    private Task parent;
 
     protected Task(Node node) {
         this.node = node;
@@ -51,6 +51,11 @@ public abstract class Task {
     public void onTerminate(Status result) {
     }
 
+    /**
+     * Is called when a sub tasks finishes
+     */
+    public abstract void handle(Status result);
+
     public Status tick(float dt) {
         if (status == Status.INVALID) {
             onInitialize();
@@ -62,6 +67,10 @@ public abstract class Task {
             onTerminate(status);
         }
         return status;
+    }
+
+    public void start(Node child) {
+        interpreter().start(child, this);
     }
 
     public Status getStatus() {
@@ -84,8 +93,8 @@ public abstract class Task {
         this.status = status;
     }
 
-    void setObserver(Observer observer) {
-        this.observer = observer;
+    void setParent(Task parent) {
+        this.parent = parent;
     }
 
     void setActor(Actor actor) {
@@ -96,13 +105,8 @@ public abstract class Task {
         this.interpreter = interpreter;
     }
 
-    Observer getObserver() {
-        return observer;
-    }
-
-    @API
-    public interface Observer {
-        void handle(Status result);
+    Task getParent() {
+        return parent;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.behavior.nui;
+package org.terasology.rendering.nui;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.ButtonState;
-import org.terasology.network.ClientComponent;
+import org.terasology.entitySystem.systems.RenderSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.NUIManager;
 
 /**
- * Opens the bt editor screen.
- *
  * @author synopia
  */
 @RegisterSystem
-public class BehaviorTreeEditorSystem implements ComponentSystem {
+public class InGameNUIRenderSystem implements RenderSystem, UpdateSubscriberSystem {
     @In
     private NUIManager nuiManager;
+
+    @In
+    private EventSystem eventSystem;
 
     @Override
     public void initialise() {
         nuiManager.closeAllScreens();
+        eventSystem.registerEventHandler(nuiManager);
     }
 
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleConsole(BTEditorButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
-            nuiManager.toggleScreen("engine:behaviorEditorScreen");
-            event.consume();
-        }
+    @Override
+    public void renderOverlay() {
+        nuiManager.render();
+    }
+
+    @Override
+    public void update(float delta) {
+        nuiManager.update(delta);
+    }
+
+    @Override
+    public void renderOpaque() {
+
+    }
+
+    @Override
+    public void renderAlphaBlend() {
+
+    }
+
+    @Override
+    public void renderFirstPerson() {
+
+    }
+
+    @Override
+    public void renderShadows() {
+
     }
 
     @Override

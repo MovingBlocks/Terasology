@@ -51,15 +51,13 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.createTask();
-
-        interpreter.start(behavior);
+        Task task = interpreter.start(parallel);
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.SUCCESS, behavior.getStatus());
+        Assert.assertEquals(Status.SUCCESS, task.getStatus());
     }
 
     @Test
@@ -81,13 +79,11 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.createTask();
-
-        interpreter.start(behavior);
+        Task task = interpreter.start(parallel);
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.SUCCESS, behavior.getStatus());
+        Assert.assertEquals(Status.SUCCESS, task.getStatus());
     }
 
     @Test
@@ -109,15 +105,13 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.createTask();
-
-        interpreter.start(behavior);
+        Task task = interpreter.start(parallel);
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.FAILURE, behavior.getStatus());
+        Assert.assertEquals(Status.FAILURE, task.getStatus());
     }
 
     @Test
@@ -139,13 +133,11 @@ public class ParallelTest {
         parallel.children().add(one);
         parallel.children().add(two);
 
-        ParallelNode.ParallelTask behavior = parallel.createTask();
-
-        interpreter.start(behavior);
+        Task task = interpreter.start(parallel);
         interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, behavior.getStatus());
+        Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
-        Assert.assertEquals(Status.FAILURE, behavior.getStatus());
+        Assert.assertEquals(Status.FAILURE, task.getStatus());
     }
 
     private Node create(final Mocker mocker) {
@@ -162,6 +154,11 @@ public class ParallelTest {
                     @Override
                     public Node getNode() {
                         return node;
+                    }
+
+                    @Override
+                    public void handle(Status result) {
+
                     }
                 });
                 mocker.mock(spy);

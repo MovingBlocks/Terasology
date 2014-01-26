@@ -36,7 +36,7 @@ public class RepeatNode extends DecoratorNode {
         return new RepeatTask(this);
     }
 
-    public static class RepeatTask extends DecoratorTask implements Task.Observer {
+    public static class RepeatTask extends DecoratorTask {
         public RepeatTask(RepeatNode node) {
             super(node);
         }
