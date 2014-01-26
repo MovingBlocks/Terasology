@@ -15,13 +15,50 @@
  */
 package org.terasology.rendering.headless;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.rendering.base.BaseSkeletalMesh;
+import java.util.Collection;
 
-public class HeadlessSkeletalMesh extends BaseSkeletalMesh {
+import org.terasology.asset.AbstractAsset;
+import org.terasology.asset.AssetUri;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+
+public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
+
+    private SkeletalMeshData data;
 
     public HeadlessSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
-        super(uri, data);
+        super(uri);
+        reload(data);
+    }
+
+    @Override
+    public void reload(SkeletalMeshData data) {
+        this.data = data;
+    }
+
+    @Override
+    public void dispose() {
+        data = null;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return data == null;
+    }
+
+    @Override
+    public int getVertexCount() {
+        return data.getVertexCount();
+    }
+
+    @Override
+    public Collection<Bone> getBones() {
+        return data.getBones();
+    }
+
+    @Override
+    public Bone getBone(String boneName) {
+        return data.getBone(boneName);
     }
 }

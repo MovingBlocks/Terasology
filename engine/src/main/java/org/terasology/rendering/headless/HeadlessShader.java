@@ -15,18 +15,36 @@
  */
 package org.terasology.rendering.headless;
 
-import java.util.Iterator;
+import java.util.Collections;
 
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
-import org.terasology.rendering.base.BaseShader;
 
-public class HeadlessShader extends BaseShader implements Shader {
+public abstract class HeadlessShader extends AbstractAsset<ShaderData> implements Shader {
+
+    private ShaderData shaderProgramBase;
 
     public HeadlessShader(AssetUri uri, ShaderData data) {
-        super(uri, data);
+        super(uri);
+        reload(data);
+    }
+
+    @Override
+    public void reload(ShaderData data) {
+        shaderProgramBase = data;
+    }
+
+    @Override
+    public void dispose() {
+        shaderProgramBase = null;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return shaderProgramBase == null;
     }
 
     @Override
@@ -41,28 +59,6 @@ public class HeadlessShader extends BaseShader implements Shader {
 
     @Override
     public Iterable<ShaderParameterMetadata> listParameters() {
-        return new EmptyIterable();
+        return Collections.emptyList();
     }
-
-    private class EmptyIterable implements Iterable<ShaderParameterMetadata> {
-        @Override
-        public Iterator<ShaderParameterMetadata> iterator() {
-            return new Iterator<ShaderParameterMetadata>() {
-                @Override
-                public boolean hasNext() {
-                    return false;
-                }
-
-                @Override
-                public ShaderParameterMetadata next() {
-                    return null;
-                }
-
-                @Override
-                public void remove() {
-                    // do nothing
-                }
-            };
-        }
-    };
 }

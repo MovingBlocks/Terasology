@@ -15,18 +15,23 @@
  */
 package org.terasology.rendering.headless;
 
+import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.Rect2f;
+import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.base.BaseTexture;
 
-public class HeadlessTexture extends BaseTexture {
+public class HeadlessTexture extends AbstractAsset<TextureData> implements Texture {
 
     static int idCounter = 0;
 
-    int id;
+    private TextureData textureData;
+    private int id;
 
     public HeadlessTexture(AssetUri uri, TextureData textureData) {
-        super(uri, textureData);
+        super(uri);
+        reload(textureData);
 
         // TODO: this might need to be synchronized at some point
         id = idCounter++;
@@ -37,4 +42,58 @@ public class HeadlessTexture extends BaseTexture {
         return id;
     }
 
+    @Override
+    public void reload(TextureData textureData) {
+        this.textureData = textureData;
+    }
+
+    @Override
+    public TextureData getData() {
+        return textureData;
+    }
+
+    @Override
+    public void dispose() {
+        this.textureData = null;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return textureData == null;
+    }
+    
+    @Override
+    public Texture getTexture() {
+        return this;
+    }
+
+    @Override
+    public Rect2f getRegion() {
+        return FULL_TEXTURE_REGION;
+    }
+
+    @Override
+    public int getWidth() {
+        return textureData.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return textureData.getHeight();
+    }
+
+    @Override
+    public Vector2i size() {
+        return new Vector2i(getWidth(), getHeight());
+    }
+
+    @Override
+    public WrapMode getWrapMode() {
+        return textureData.getWrapMode();
+    }
+
+    @Override
+    public FilterMode getFilterMode() {
+        return textureData.getFilterMode();
+    }
 }

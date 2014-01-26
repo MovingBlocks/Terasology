@@ -28,8 +28,25 @@ import org.terasology.rendering.base.BaseMaterial;
 
 public class HeadlessMaterial extends BaseMaterial {
 
+    private MaterialData data;
+
     public HeadlessMaterial(AssetUri uri, MaterialData data) {
         super(uri, data);
+    }
+
+    @Override
+    public void reload(MaterialData data) {
+        this.data = data;
+    }
+
+    @Override
+    public void dispose() {
+        data = null;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return data == null;
     }
 
     @Override
