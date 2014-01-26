@@ -1,6 +1,6 @@
 {
     "BehaviorNode" : {
-        "type"      : "org.terasology.logic.behavior.tree.TimerNode",
+        "type"      : "TimerNode",
         "name"      : "Timer",
         "category"  : "logic",
         "shape"     : "rect",

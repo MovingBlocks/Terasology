@@ -230,8 +230,11 @@ public class HeadlessEnvironment extends Environment {
         }
     }
     
-    @Override
-    protected void activateAllModules() {
+    /**
+     * Activate all modules.
+     * Note: this requires that the {@link ModuleSecurityManager} gives permission to do that
+     */
+    public void activateAllModules() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         

@@ -1,7 +1,7 @@
 {
     "BehaviorNode" : {
-        "type"      : "InverterNode",
-        "name"      : "Inverter",
+        "type"      : "LookupNode",
+        "name"      : "Lookup",
         "category"  : "logic",
         "shape"     : "rect",
         "color"     : [0.7, 0.7, 0.7],

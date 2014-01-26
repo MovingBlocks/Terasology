@@ -16,18 +16,9 @@
 
 package org.terasology.engine.bootstrap;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.SetMultimap;
-import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
-import org.terasology.engine.module.DependencyInfo;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -48,6 +39,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -67,12 +59,16 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vecto
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3iTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector4fTypeHandler;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -81,8 +77,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -117,6 +111,12 @@ public class EntitySystemBuilder {
         // Event System
         entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+
+        CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
+
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
+        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        nodesClassLibrary.scan();
 
         registerComponents(library.getComponentLibrary(), moduleManager);
         registerEvents(entityManager.getEventSystem(), moduleManager);

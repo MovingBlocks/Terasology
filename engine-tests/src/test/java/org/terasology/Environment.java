@@ -70,10 +70,6 @@ public class Environment {
         loadPrefabs();
     }
 
-    protected void activateAllModules() {
-        // empty
-    }
-
     protected void loadPrefabs() {
         // empty
     }

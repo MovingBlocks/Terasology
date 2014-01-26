@@ -1,6 +1,6 @@
 {
     "BehaviorNode" : {
-        "type"      : "org.terasology.logic.behavior.tree.MonitorNode",
+        "type"      : "MonitorNode",
         "name"      : "Monitor",
         "category"  : "logic",
         "shape"     : "diamond",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,11 @@ import org.terasology.engine.API;
 import java.util.Iterator;
 
 /**
- * Evaluates the children one by one. As soon as a child returns SUCCESS, this node will return SUCCESS immediatly.
- * When all children are evaluated, this node fails.
+ * Evaluates the children one by one.
+ *
+ * Starts next child, if previous child finishes with FAILURE.
+ * Finishes with SUCCESS, as soon as a child finishes SUCCESS.
+ * Finishes with FAILURE, when all children finished with FAILURE
  *
  * @author synopia
  */
@@ -45,22 +48,22 @@ public class SelectorNode extends CompositeNode {
             iterator = getNode().children().iterator();
             if (iterator.hasNext()) {
                 current = iterator.next();
-                interpreter().start(current, this);
+                start(current);
             }
         }
 
         @Override
         public void handle(Status result) {
             if (result == Status.SUCCESS) {
-                interpreter().stop(this, Status.SUCCESS);
+                stop(Status.SUCCESS);
                 return;
             }
 
             if (iterator.hasNext()) {
                 current = iterator.next();
-                interpreter().start(current, this);
+                start(current);
             } else {
-                interpreter().stop(this, Status.FAILURE);
+                stop(Status.FAILURE);
             }
         }
 
