@@ -63,7 +63,7 @@ public class ComponentSystemManager {
     public ComponentSystemManager() {
     }
 
-    public void loadSystems(String packageName, Reflections reflections, NetworkMode netMode) {
+    public void loadSystems(String moduleName, Reflections reflections, NetworkMode netMode) {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
@@ -73,7 +73,7 @@ public class ComponentSystemManager {
 
             RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode, false)) {
-                String id = packageName + ":" + system.getSimpleName();
+                String id = moduleName + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();

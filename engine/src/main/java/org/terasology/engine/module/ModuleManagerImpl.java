@@ -16,9 +16,11 @@
 
 package org.terasology.engine.module;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -414,6 +417,29 @@ public class ModuleManagerImpl implements ModuleManager {
         return result;
     }
 
+    @Override
+    public List<Module> getActiveModulesOrderedByDependency() {
+        List<Module> result = Lists.newArrayList();
+        result.add(getActiveModule("engine"));
+        for (Module module : getActiveModules()) {
+            addModuleAfterDependencies(module, result);
+        }
+        return result;
+    }
+
+    private void addModuleAfterDependencies(Module module, List<Module> result) {
+        if (!result.contains(module)) {
+            for (DependencyInfo dependency : module.getModuleInfo().getDependencies()) {
+                Module dependencyModule = getActiveModule(dependency.getId());
+                if (dependencyModule != null) {
+                    addModuleAfterDependencies(dependencyModule, result);
+                } else {
+                    throw new IllegalStateException("Active modules missing dependency '" + dependency.getId() + "'");
+                }
+            }
+        }
+    }
+
     private List<ExtensionModule> getActiveExtensionCodeModules() {
         List<ExtensionModule> result = Lists.newArrayListWithCapacity(modules.size() + 1);
         for (Module module : activeModules.values()) {
@@ -471,5 +497,29 @@ public class ModuleManagerImpl implements ModuleManager {
             return engineModule;
         }
         return modules.get(moduleId, version);
+    }
+
+    @Override
+    public <T> ListMultimap<String, Class<? extends T>> findAllSubclassesOf(Class<? extends T> type) {
+        ListMultimap<String, Class<? extends T>> result = ArrayListMultimap.create();
+        List<Class<? extends T>> validSuperTypes = Lists.newArrayList();
+        validSuperTypes.add(type);
+
+        for (Module module : getActiveModulesOrderedByDependency()) {
+            List<Class<? extends T>> moduleTypes = Lists.newArrayList();
+            for (Class<? extends T> superType : validSuperTypes) {
+                for (Class<? extends T> subtype : module.getReflections().getSubTypesOf(superType)) {
+                    moduleTypes.add(subtype);
+                }
+            }
+            result.putAll(module.getId(), moduleTypes);
+            for (Class<? extends T> moduleType : moduleTypes) {
+                if (!Modifier.isFinal(moduleType.getModifiers())) {
+                    validSuperTypes.add(moduleType);
+                }
+            }
+        }
+
+        return result;
     }
 }

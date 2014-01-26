@@ -26,6 +26,7 @@ import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -36,11 +37,8 @@ public class WorldGeneratorPluginLibrary {
 
     public WorldGeneratorPluginLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         library = new DefaultClassLibrary<>(reflectFactory, copyStrategyLibrary);
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            for (Class<? extends WorldGeneratorPlugin> pluginType : module.getReflections().getSubTypesOf(WorldGeneratorPlugin.class)) {
-                String pluginName = pluginType.getSimpleName();
-                library.register(new SimpleUri(module.getId(), pluginName), pluginType);
-            }
+        for (Map.Entry<String, Class<? extends WorldGeneratorPlugin>> entry : moduleManager.findAllSubclassesOf(WorldGeneratorPlugin.class).entries()) {
+            library.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }
     }
 

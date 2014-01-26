@@ -15,8 +15,12 @@
  */
 package org.terasology.engine.module;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
@@ -65,6 +69,10 @@ public interface ModuleManager {
     Module getLatestModuleVersion(String id, Version minVersion, Version maxVersion);
 
     Iterable<Module> getActiveCodeModules();
+
+    List<Module> getActiveModulesOrderedByDependency();
+
+    <T> ListMultimap<String, Class<? extends T>> findAllSubclassesOf(Class<? extends T> type);
 
     boolean isEnabled(Module module);
 

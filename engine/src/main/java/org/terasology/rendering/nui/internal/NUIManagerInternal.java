@@ -51,6 +51,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -72,10 +73,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     public void refreshWidgetsLibrary() {
         widgetsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
-            for (Class<? extends UIWidget> elementType : module.getReflections().getSubTypesOf(UIWidget.class)) {
-                widgetsLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
-            }
+        for (Map.Entry<String, Class<? extends UIWidget>> entry : CoreRegistry.get(ModuleManager.class).findAllSubclassesOf(UIWidget.class).entries()) {
+            widgetsLibrary.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }
     }
 

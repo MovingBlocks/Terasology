@@ -16,9 +16,15 @@
 
 package org.terasology.engine.bootstrap;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.SetMultimap;
 import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
+import org.terasology.engine.module.DependencyInfo;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -75,6 +81,9 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -152,16 +161,12 @@ public class EntitySystemBuilder {
     }
 
     private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            registerEvents(module.getId(), eventSystem, module.getReflections());
-        }
-    }
-
-    private void registerEvents(String moduleName, EventSystem eventSystem, Reflections reflections) {
-        for (Class<? extends Event> eventType : reflections.getSubTypesOf(Event.class)) {
-            if (eventType.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(moduleName, eventType.getSimpleName()), eventType);
+        ListMultimap<String, Class<? extends Event>> allSubclassesOf = moduleManager.findAllSubclassesOf(Event.class);
+        for (Map.Entry<String, Class<? extends Event>> entry : allSubclassesOf.entries()) {
+            if (entry.getValue().getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
             }
         }
     }
+
 }
