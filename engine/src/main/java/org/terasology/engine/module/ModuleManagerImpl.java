@@ -298,7 +298,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Version version = Version.create(moduleInfo.getVersion());
         if (version != null) {
             if (!modules.contains(moduleId, version)) {
-                ExtensionModule module = new ExtensionModule(this, modulePath, moduleInfo, version, source);
+                ExtensionModule module = new ExtensionModule(modulePath, moduleInfo, version, source);
                 modules.put(moduleId, version, module);
                 logger.info("Discovered module: {}:{} (hasCode = {})", moduleInfo.getDisplayName(), moduleInfo.getVersion(), module.isCodeModule());
             } else {

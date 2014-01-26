@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.md5;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -106,7 +107,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
     }
 
     private MD5 parse(InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
         MD5 md5 = new MD5();
         String line = MD5ParserCommon.readToLine(reader, "MD5Version ");
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);

@@ -568,8 +568,6 @@ public class ChunkMonitorDisplay extends JPanel {
     private class MouseInputListener implements MouseWheelListener, MouseMotionListener, MouseListener {
 
         private Point leftPressed;
-        private int offsetXl;
-        private int offsetY;
 
         @Override
         public void mouseDragged(MouseEvent e) {

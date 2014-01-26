@@ -230,7 +230,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             return new ColliderInfo(offset, new SphereShape(radius));
         }
 
-        private class ColliderInfo {
+        private static class ColliderInfo {
             public Vector3f offset;
             public CollisionShape collisionShape;
 
