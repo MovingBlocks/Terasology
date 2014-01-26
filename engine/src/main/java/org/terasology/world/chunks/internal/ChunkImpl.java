@@ -221,12 +221,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Block getBlock(Vector3i pos) {
-        return blockManager.getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
+        return blockManager.getBlock((short) blockData.get(pos.x, pos.y, pos.z));
     }
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        return blockManager.getBlock((byte) blockData.get(x, y, z));
+        return blockManager.getBlock((short) blockData.get(x, y, z));
     }
 
     @Override
