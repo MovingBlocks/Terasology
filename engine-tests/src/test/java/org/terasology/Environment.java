@@ -68,8 +68,6 @@ public class Environment {
         setupComponentManager();
 
         loadPrefabs();
-
-        activateAllModules();
     }
 
     protected void activateAllModules() {

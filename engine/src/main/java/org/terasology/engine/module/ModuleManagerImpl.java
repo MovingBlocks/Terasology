@@ -406,7 +406,6 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public Iterable<Module> getActiveCodeModules() {
         List<Module> result = Lists.newArrayList();
-        result.add(engineModule);
         for (Module module : activeModules.values()) {
             if (module.isCodeModule()) {
                 result.add(module);
