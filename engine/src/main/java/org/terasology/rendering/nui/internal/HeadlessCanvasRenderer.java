@@ -3,12 +3,8 @@ package org.terasology.rendering.nui.internal;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-// import org.terasology.engine.GameEngine;
-// import org.terasology.engine.TerasologyEngine;
-// import org.terasology.engine.environment.Display;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-// import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.nui.Color;
@@ -32,9 +28,6 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
 
     @Override
     public Vector2i getTargetSize() {
-//        GameEngine engine = CoreRegistry.get(GameEngine.class);
-//        Display display = engine.getEnvironment().getDisplay();
-//        return new Vector2i(display.getWidth(), display.getHeight());
         return new Vector2i(0, 0);
     }
 

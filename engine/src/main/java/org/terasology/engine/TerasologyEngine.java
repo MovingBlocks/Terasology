@@ -199,7 +199,7 @@ public class TerasologyEngine implements GameEngine {
             initControls();
             updateInputConfig();
             guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class),new LwjglCanvasRenderer()));
+            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
