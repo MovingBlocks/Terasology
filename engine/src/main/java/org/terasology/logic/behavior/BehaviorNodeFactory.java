@@ -43,6 +43,7 @@ public class BehaviorNodeFactory {
 
     public BehaviorNodeFactory(List<BehaviorNodeComponent> components) {
         for (BehaviorNodeComponent component : components) {
+            // TODO: Use a ClassLibrary, otherwise stop requiring the use of full class names in prefabs.
             ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
             for (ClassLoader classLoader : classLoaders) {
                 try {

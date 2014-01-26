@@ -30,7 +30,6 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.io.IOException;
 import java.io.InputStream;

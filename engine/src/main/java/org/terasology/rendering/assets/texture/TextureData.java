@@ -30,8 +30,8 @@ public class TextureData implements AssetData {
     private int width;
     private int height;
     private int depth = 1;
-    private Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
-    private Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
+    private Texture.WrapMode wrapMode = Texture.WrapMode.CLAMP;
+    private Texture.FilterMode filterMode = Texture.FilterMode.NEAREST;
     private Texture.Type type = Texture.Type.TEXTURE2D;
     private ByteBuffer[] data;
 

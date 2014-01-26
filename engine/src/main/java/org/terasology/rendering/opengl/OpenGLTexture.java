@@ -52,8 +52,8 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     private int width;
     private int height;
     private int depth;
-    private WrapMode wrapMode = WrapMode.Clamp;
-    private FilterMode filterMode = FilterMode.Nearest;
+    private WrapMode wrapMode = WrapMode.CLAMP;
+    private FilterMode filterMode = FilterMode.NEAREST;
     private Type textureType = Type.TEXTURE2D;
 
     // TODO: Make the retention of this dependent on a keep-in-memory setting
@@ -125,33 +125,33 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
         Util.checkGLError();
     }
 
-    private int getGLMode(WrapMode wrapMode) {
-        switch (wrapMode) {
-            case Clamp:
+    private int getGLMode(WrapMode mode) {
+        switch (mode) {
+            case CLAMP:
                 return GL_CLAMP;
-            case Repeat:
+            case REPEAT:
                 return GL_REPEAT;
             default:
-                throw new RuntimeException("Unsupported WrapMode '" + wrapMode + "'");
+                throw new RuntimeException("Unsupported WrapMode '" + mode + "'");
         }
     }
 
-    private int getGlMinFilter(FilterMode filterMode) {
-        switch (filterMode) {
-            case Linear:
+    private int getGlMinFilter(FilterMode mode) {
+        switch (mode) {
+            case LINEAR:
                 return GL_LINEAR_MIPMAP_LINEAR;
-            case Nearest:
+            case NEAREST:
                 return GL_NEAREST_MIPMAP_NEAREST;
             default:
-                throw new RuntimeException("Unsupported FilterMode '" + filterMode + "'");
+                throw new RuntimeException("Unsupported FilterMode '" + mode + "'");
         }
     }
 
     private int getGlMagFilter(FilterMode filterMode2) {
         switch (filterMode) {
-            case Linear:
+            case LINEAR:
                 return GL_LINEAR;
-            case Nearest:
+            case NEAREST:
                 return GL_NEAREST;
             default:
                 throw new RuntimeException("Unsupported FilterMode '" + filterMode + "'");

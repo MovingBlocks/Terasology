@@ -168,7 +168,7 @@ public class PreviewWorldScreen extends UIScreenLayer {
 
         ByteBuffer[] data = new ByteBuffer[]{buf};
         AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.Clamp, Texture.FilterMode.Linear);
+        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
 
         return Assets.generateAsset(uri, texData, Texture.class);
     }

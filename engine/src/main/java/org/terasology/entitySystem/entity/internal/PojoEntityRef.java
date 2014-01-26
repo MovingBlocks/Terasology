@@ -23,7 +23,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Collections;
 

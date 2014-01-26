@@ -162,6 +162,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                                 int id = in.nextInt();
                                 result = (T) idNodes.get(id);
                             } else {
+                                // TODO: Use ClassLibrary or otherwise stop requiring full class names in components
                                 ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
                                 ClassLoader[] classLoaders;
                                 if (moduleManager != null) {

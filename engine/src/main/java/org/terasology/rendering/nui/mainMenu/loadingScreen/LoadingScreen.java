@@ -44,4 +44,9 @@ public class LoadingScreen extends UIScreenLayer {
             fillBar.setValue(v);
         }
     }
+
+    @Override
+    public boolean isEscapeToCloseAllowed() {
+        return false;
+    }
 }

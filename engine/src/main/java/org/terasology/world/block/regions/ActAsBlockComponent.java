@@ -17,12 +17,12 @@ package org.terasology.world.block.regions;
 
 
 import org.terasology.entitySystem.Component;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
  * An entity with this component will act as that block - producing block style damage effects, take damage as that block would.
+ *
  * @author Immortius
  */
 public final class ActAsBlockComponent implements Component {

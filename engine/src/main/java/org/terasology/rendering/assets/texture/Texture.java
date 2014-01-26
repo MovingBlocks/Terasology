@@ -27,13 +27,13 @@ public interface Texture extends Asset<TextureData>, TextureRegion {
     Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
 
     public enum WrapMode {
-        Clamp(),
-        Repeat();
+        CLAMP,
+        REPEAT
     }
 
     public enum FilterMode {
-        Nearest(),
-        Linear();
+        NEAREST,
+        LINEAR
     }
 
     WrapMode getWrapMode();

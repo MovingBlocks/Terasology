@@ -25,7 +25,6 @@ import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**

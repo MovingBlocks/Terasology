@@ -72,13 +72,13 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             int height = decoder.getHeight();
             int width = decoder.getWidth();
 
-            Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
-            Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
+            Texture.FilterMode filterMode = Texture.FilterMode.NEAREST;
+            Texture.WrapMode wrapMode = Texture.WrapMode.CLAMP;
             Texture.Type type = Texture.Type.TEXTURE2D;
 
             // TODO: Change asset loader setup so that the default filter mode can be set per asset location
             if (urls.get(0).toString().contains("/fonts/")) {
-                filterMode = Texture.FilterMode.Linear;
+                filterMode = Texture.FilterMode.LINEAR;
             }
 
             for (URL url : urls) {

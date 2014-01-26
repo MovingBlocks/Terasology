@@ -17,7 +17,6 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.world.block.BlockUri;
 
 import java.util.Collections;

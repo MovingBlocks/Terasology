@@ -108,7 +108,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
     @Override
     public void setActiveMaterial(Material material) {
         // TODO: is this the best way to convert the material to the lwjgl version?  Do we need more checks?
-        GLSLMaterial glslMaterial = (GLSLMaterial)material;
+        GLSLMaterial glslMaterial = (GLSLMaterial) material;
         if (!glslMaterial.equals(activeMaterial)) {
             activeMaterial = glslMaterial;
         }

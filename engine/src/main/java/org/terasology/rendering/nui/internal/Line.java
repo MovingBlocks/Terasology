@@ -214,10 +214,8 @@ public class Line {
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 8);
         }
 
-        //cap
-        if (width < 3) {
-            //do not draw cap
-        } else {
+        //cap (do not draw if too thin)
+        if (width >= 3) {
             //draw cap
             lineVertex = new float[]
                     {

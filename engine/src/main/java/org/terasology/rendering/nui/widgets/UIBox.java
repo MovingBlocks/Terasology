@@ -20,7 +20,6 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Collections;
 import java.util.Iterator;

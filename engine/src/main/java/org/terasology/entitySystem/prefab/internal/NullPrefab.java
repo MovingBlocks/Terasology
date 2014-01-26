@@ -21,7 +21,6 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Collections;
 import java.util.List;

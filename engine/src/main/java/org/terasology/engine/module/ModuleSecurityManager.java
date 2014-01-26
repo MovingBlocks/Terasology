@@ -17,7 +17,6 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -25,12 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import java.security.AccessControlException;
 import java.security.Permission;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
-  * @author Immortius
+ * @author Immortius
  */
 public class ModuleSecurityManager extends SecurityManager {
 
@@ -56,6 +53,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a global permission that all modules are granted
+     *
      * @param permission
      */
     public void addAllowedPermission(Class<? extends Permission> permission) {
@@ -67,6 +65,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a global permission that all modules are granted
+     *
      * @param allowedPermission
      */
     public void addAllowedPermission(Permission allowedPermission) {
@@ -78,6 +77,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a permission that modules are granted when working (directly or indirectly) through the given apiType
+     *
      * @param apiType
      * @param allowedPermission
      */
@@ -90,6 +90,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a permission that modules are granted when working (directly or indirectly) through the given apiType
+     *
      * @param apiType
      * @param allowedPermission
      */
@@ -102,6 +103,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a permission that modules are granted when working (directly or indirectly) through the given package
+     *
      * @param packageName
      * @param allowedPermission
      */
@@ -114,6 +116,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     /**
      * Registers a permission that modules are granted when working (directly or indirectly) through the given package
+     *
      * @param packageName
      * @param allowedPermission
      */
@@ -134,11 +137,12 @@ public class ModuleSecurityManager extends SecurityManager {
     /**
      * The process for this is:
      * <ol>
-     *     <li>If the permission is globally allowed, then permission is granted</li>
-     *     <li>Determine if a module is involved in the stack. If not, permission is granted</li>
-     *     <li>If a module is involved, determine whether it is calling through an API class that grants the necessary permission</li>
-     *     <li>If not, permission denied</li>
+     * <li>If the permission is globally allowed, then permission is granted</li>
+     * <li>Determine if a module is involved in the stack. If not, permission is granted</li>
+     * <li>If a module is involved, determine whether it is calling through an API class that grants the necessary permission</li>
+     * <li>If not, permission denied</li>
      * </ol>
+     *
      * @param perm
      */
     public void checkModAccess(Permission perm) {
@@ -177,7 +181,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
         if (moduleDepth - 1 > 0) {
             throw new AccessControlException(
-                String.format("Module class '%s' calling into '%s' requiring permission '%s'", stack[moduleDepth].getName(), stack[moduleDepth - 1].getName(), permission));
+                    String.format("Module class '%s' calling into '%s' requiring permission '%s'", stack[moduleDepth].getName(), stack[moduleDepth - 1].getName(), permission));
         } else {
             throw new AccessControlException(String.format("Module class '%s' requiring permission '%s'", stack[moduleDepth].getName(), permission));
         }

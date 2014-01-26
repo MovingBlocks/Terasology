@@ -177,13 +177,13 @@ public class WorldAtlas {
         ByteBuffer[] dataNormal = createAtlasMipmaps(numMipMaps, UNIT_Z_COLOR, tilesNormal, "tilesNormal.png");
         ByteBuffer[] dataHeight = createAtlasMipmaps(numMipMaps, BLACK_COLOR, tilesHeight, "tilesHeight.png");
 
-        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        TextureData terrainTexData = new TextureData(atlasSize, atlasSize, data, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         Texture terrainTex = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTexData, Texture.class);
 
-        TextureData terrainNormalData = new TextureData(atlasSize, atlasSize, dataNormal, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        TextureData terrainNormalData = new TextureData(atlasSize, atlasSize, dataNormal, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainNormal"), terrainNormalData, Texture.class);
 
-        TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        TextureData terrainHeightData = new TextureData(atlasSize, atlasSize, dataHeight, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
         Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:terrainHeight"), terrainHeightData, Texture.class);
 
         MaterialData terrainMatData = new MaterialData(Assets.getShader("engine:block"));

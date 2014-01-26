@@ -73,8 +73,8 @@ public class TextureDataFactoryTest {
 
         assertEquals(16, textureData.getWidth());
         assertEquals(16, textureData.getHeight());
-        assertEquals(FilterMode.Nearest, textureData.getFilterMode());
-        assertEquals(WrapMode.Repeat, textureData.getWrapMode());
+        assertEquals(FilterMode.NEAREST, textureData.getFilterMode());
+        assertEquals(WrapMode.REPEAT, textureData.getWrapMode());
         assertEquals(Texture.Type.TEXTURE2D, textureData.getType());
         assertEquals(1, textureData.getDepth());
     }
