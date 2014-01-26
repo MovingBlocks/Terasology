@@ -31,11 +31,15 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
+import org.terasology.logic.behavior.tree.Node;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +62,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     @In
     private AssetManager assetManager;
 
-    private Map<BehaviorTree, List<Interpreter>> interpreters = Maps.newHashMap();
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
@@ -88,18 +91,30 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     @ReceiveEvent
     public void onBehaviorRemoved(BeforeRemoveComponent event, EntityRef entityRef, BehaviorComponent behaviorComponent) {
         if (behaviorComponent.tree != null) {
-            BehaviorTree tree = behaviorComponent.tree;
-            Interpreter interpreter = entityInterpreters.remove(entityRef);
-            interpreters.get(tree).remove(interpreter);
+            entityInterpreters.remove(entityRef);
         }
     }
 
     @Override
     public void update(float delta) {
-        for (Map.Entry<BehaviorTree, List<Interpreter>> entry : interpreters.entrySet()) {
-            for (Interpreter interpreter : entry.getValue()) {
-                interpreter.tick(delta);
-            }
+        for (Interpreter interpreter : entityInterpreters.values()) {
+            interpreter.tick(delta);
+        }
+    }
+
+    public BehaviorTree createTree(String name, Node root) {
+        BehaviorTreeData data = new BehaviorTreeData();
+        data.setRoot(root);
+        BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, "Behaviors", name), data);
+        trees.add(behaviorTree);
+        saveAll();
+        return behaviorTree;
+    }
+
+    public void saveAll() {
+        for (BehaviorTree tree : trees) {
+            AssetUri uri = tree.getURI();
+            System.out.println(uri);
         }
     }
 
@@ -107,20 +122,20 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         return trees;
     }
 
-    public List<Interpreter> getInterpreter(BehaviorTree tree) {
-        List<Interpreter> result = interpreters.get(tree);
-        if (result == null) {
-            result = Lists.newArrayList();
-        }
-        return result;
+    public List<Interpreter> getInterpreter() {
+        List<Interpreter> interpreters = Lists.newArrayList();
+        interpreters.addAll(entityInterpreters.values());
+        Collections.sort(interpreters, new Comparator<Interpreter>() {
+            @Override
+            public int compare(Interpreter o1, Interpreter o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
+        return interpreters;
     }
 
     public void treeModified(BehaviorTree tree) {
-        List<Interpreter> list = interpreters.get(tree);
-        if (list == null || list.size() == 0) {
-            return;
-        }
-        for (Interpreter interpreter : list) {
+        for (Interpreter interpreter : entityInterpreters.values()) {
             interpreter.reset();
         }
     }
@@ -139,12 +154,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             behaviorComponent.tree = tree;
             entityRef.saveComponent(behaviorComponent);
             interpreter.start(tree.getRoot());
-            List<Interpreter> list = interpreters.get(tree);
-            if (list == null) {
-                list = Lists.newArrayList();
-                interpreters.put(tree, list);
-            }
-            list.add(interpreter);
         }
     }
 }

@@ -38,9 +38,9 @@
                 "contents" : [
                     {
                         "type" : "UIDropdown",
-                        "id" : "select_tree",
+                        "id" : "select_entity",
                         "layoutInfo" : {
-                            "cc" : "w 200!"
+                            "cc" : "w 300!"
                         }
                     },
                     {
@@ -78,9 +78,9 @@
                 "contents" : [
                     {
                         "type" : "UIDropdown",
-                        "id" : "select_entity",
+                        "id" : "select_tree",
                         "layoutInfo" : {
-                            "cc" : "w 200!"
+                            "cc" : "w 300!"
                         }
                     },
                     {

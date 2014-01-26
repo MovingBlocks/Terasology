@@ -40,7 +40,6 @@ import org.terasology.rendering.nui.widgets.UIList;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -100,7 +99,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         Binding<List<BehaviorTree>> treeBinding = new ReadOnlyBinding<List<BehaviorTree>>() {
             @Override
             public List<BehaviorTree> get() {
-                return Lists.newArrayList(behaviorSystem.getTrees());
+                return behaviorSystem.getTrees();
             }
         };
         selectTree.bindOptions(treeBinding);
@@ -116,21 +115,17 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             public void set(BehaviorTree value) {
                 selectedTree = value;
                 behaviorEditor.setTree(value);
-                selectEntity.setSelection(null);
+                updateDebugger();
             }
         });
 
         selectEntity.bindOptions(new ReadOnlyBinding<List<Interpreter>>() {
             @Override
             public List<Interpreter> get() {
-                BehaviorTree selection = selectTree.getSelection();
-                if (selection != null) {
-                    return behaviorSystem.getInterpreter(selection);
-                } else {
-                    return Arrays.asList();
-                }
+                return behaviorSystem.getInterpreter();
             }
         });
+
         selectEntity.bindSelection(new Binding<Interpreter>() {
             @Override
             public Interpreter get() {
@@ -149,9 +144,8 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                     for (Component component : minion.iterateComponents()) {
                         entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
                     }
-                    debugger = new BehaviorDebugger(selectedTree);
-                    selectedInterpreter.setDebugger(debugger);
                 }
+                updateDebugger();
             }
         });
 
@@ -212,6 +206,15 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
+        WidgetUtil.trySubscribe(this, "new", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                if (selectedNode != null) {
+                    behaviorSystem.createTree("xyz", selectedNode.getNode());
+                }
+            }
+        });
+
         WidgetUtil.trySubscribe(this, "debug_run", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -246,6 +249,13 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         });
 
         paletteItems = findPaletteItems();
+    }
+
+    private void updateDebugger() {
+        if (selectedInterpreter != null && selectedTree != null) {
+            debugger = new BehaviorDebugger(selectedTree);
+            selectedInterpreter.setDebugger(debugger);
+        }
     }
 
     private List<BehaviorNodeComponent> findPaletteItems() {

@@ -27,6 +27,8 @@ import com.google.gson.stream.JsonWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
 import org.terasology.engine.module.Module;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -96,6 +98,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             gsonNode = new GsonBuilder()
                     .setPrettyPrinting()
                     .registerTypeAdapterFactory(new NodeTypeAdapterFactory())
+                    .registerTypeAdapter(BehaviorTree.class, new BehaviorTreeTypeAdapterFactory())
                     .create();
         }
 
@@ -146,7 +149,6 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                         } else {
                             delegate.write(out, value);
                         }
-
                     }
 
                     @Override
@@ -173,11 +175,23 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             return delegate.read(in);
                         }
                     }
-
                     private TypeAdapter<T> getDelegateAdapter(Class cls) {
                         return (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
                     }
                 };
+            }
+
+        }
+
+        private class BehaviorTreeTypeAdapterFactory extends TypeAdapter<BehaviorTree> {
+            @Override
+            public void write(JsonWriter out, BehaviorTree value) throws IOException {
+                out.value(value.getURI().toString());
+            }
+
+            @Override
+            public BehaviorTree read(JsonReader in) throws IOException {
+                return (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, in.nextString());
             }
         }
     }
