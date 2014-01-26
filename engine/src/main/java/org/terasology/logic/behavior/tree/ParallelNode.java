@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import org.terasology.rendering.nui.properties.OneOf;
  * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in
  * which state.
  * <p/>
- * Default is to finish with SUCCESS, when all children finish successful. FAILURE as soon as one child fails.
+ * Finishes with SUCCESS, when success policy is fulfilled (one or all children SUCCESS).
+ * Finishes with FAILURE, when failure policy is fulfilled (one or all children FAILURE).
  *
  * @author synopia
  */
@@ -64,7 +65,7 @@ public class ParallelNode extends CompositeNode {
         @Override
         public void onInitialize() {
             for (Node child : getNode().children()) {
-                interpreter().start(child, this);
+                start(child);
             }
             successCount = 0;
             failureCount = 0;
@@ -86,20 +87,20 @@ public class ParallelNode extends CompositeNode {
             if (result == Status.SUCCESS) {
                 successCount++;
                 if (getNode().successPolicy == Policy.RequireOne) {
-                    interpreter().stop(this, Status.SUCCESS);
+                    stop(Status.SUCCESS);
                 }
             }
             if (result == Status.FAILURE) {
                 failureCount++;
                 if (getNode().failurePolicy == Policy.RequireOne) {
-                    interpreter().stop(this, Status.FAILURE);
+                    stop(Status.FAILURE);
                 }
             }
             if (getNode().failurePolicy == Policy.RequireAll && failureCount == getNode().children().size()) {
-                interpreter().stop(this, Status.FAILURE);
+                stop(Status.FAILURE);
             }
             if (getNode().successPolicy == Policy.RequireAll && successCount == getNode().children().size()) {
-                interpreter().stop(this, Status.SUCCESS);
+                stop(Status.SUCCESS);
             }
         }
 

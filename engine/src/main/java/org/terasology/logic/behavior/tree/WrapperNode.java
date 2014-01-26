@@ -15,32 +15,19 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.engine.API;
-
 /**
- * Repeats the child node forever.
- *
- * Never finishes with SUCCESS.
- * Finishes with FAILURE, as soon as decorated node finishes with FAILURE
+ * WrapperNode, always finishes with SUCCESS.
  *
  * @author synopia
  */
-@API
-public class RepeatNode extends DecoratorNode {
-    public RepeatNode() {
-    }
-
-    public RepeatNode(Node child) {
-        this.child = child;
-    }
-
+public class WrapperNode extends DecoratorNode {
     @Override
-    public RepeatTask createTask() {
-        return new RepeatTask(this);
+    public Task createTask() {
+        return new WrapperTask(this);
     }
 
-    public static class RepeatTask extends DecoratorTask {
-        public RepeatTask(RepeatNode node) {
+    public static class WrapperTask extends DecoratorTask {
+        public WrapperTask(Node node) {
             super(node);
         }
 
@@ -58,20 +45,7 @@ public class RepeatNode extends DecoratorNode {
 
         @Override
         public void handle(Status result) {
-            if (result == Status.FAILURE) {
-                stop(Status.FAILURE);
-                return;
-            }
-
-            if (getNode().child != null) {
-                start(getNode().child);
-            }
-        }
-
-        @Override
-        public RepeatNode getNode() {
-            return (RepeatNode) super.getNode();
+            stop(Status.SUCCESS);
         }
     }
-
 }

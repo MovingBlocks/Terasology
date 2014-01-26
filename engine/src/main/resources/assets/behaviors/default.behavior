@@ -1,9 +1,9 @@
 {"model": {
-    "nodeType": "org.terasology.logic.behavior.tree.RepeatNode",
+    "nodeType": "RepeatNode",
     "nodeId": 0,
     "node": {
         "child": {
-            "nodeType": "org.terasology.logic.behavior.tree.SequenceNode",
+            "nodeType": "SequenceNode",
             "nodeId": 1,
             "node": {
                 "children": [

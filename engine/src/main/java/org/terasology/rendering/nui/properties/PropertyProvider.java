@@ -17,13 +17,13 @@ package org.terasology.rendering.nui.properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.UICheckbox;
@@ -57,6 +57,7 @@ public class PropertyProvider<T> {
         factories.put(Checkbox.class, new CheckboxPropertyFactory());
         factories.put(OneOf.List.class, new OneOfListPropertyFactory());
         factories.put(OneOf.Enum.class, new OneOfEnumPropertyFactory());
+        factories.put(OneOf.Provider.class, new OneOfProviderPropertyFactory());
         factories.put(TextField.class, new TextPropertyFactory());
 
         try {
@@ -192,6 +193,27 @@ public class PropertyProvider<T> {
             Object[] items = cls.getEnumConstants();
             UIDropdown dropdown = new UIDropdown();
             dropdown.bindOptions(new DefaultBinding(Arrays.asList(items)));
+            Binding binding = new Binding() {
+                @Override
+                public Object get() {
+                    return fieldMetadata.getValueChecked(target);
+                }
+
+                @Override
+                public void set(Object value) {
+                    fieldMetadata.setValue(target, value);
+                }
+            };
+            dropdown.bindSelection(binding);
+            return new Property<>(label, binding, dropdown);
+        }
+    }
+
+    private class OneOfProviderPropertyFactory implements PropertyFactory<OneOf.Provider> {
+        @Override
+        public Property create(final FieldMetadata<Object, ?> fieldMetadata, String label, OneOf.Provider info) {
+            UIDropdown dropdown = new UIDropdown();
+            dropdown.bindOptions(CoreRegistry.get(OneOfProviderFactory.class).get(info.name()));
             Binding binding = new Binding() {
                 @Override
                 public Object get() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.API;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.registry.InjectionHelper;
 
 import java.util.Deque;
@@ -173,7 +174,7 @@ public class Interpreter {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }
             if (current.getParent() != null) {
-                current.getParent().handle(current.getStatus());
+                stop(current, current.getStatus());
             }
         } else {
             tasks.addLast(current);
@@ -190,7 +191,7 @@ public class Interpreter {
 
     @Override
     public String toString() {
-        return actor.minion().toString();
+        return actor.component(DisplayInformationComponent.class).name;
     }
 
     public interface Debugger {

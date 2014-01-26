@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.engine.API;
 
 /**
+ * Special kind of parallel node.
+ *
+ * Finishes with SUCCESS, as soon as one child node finishes SUCCESS
+ * Finishes with FAILURE, as soon as one child node finishes FAILURE
+ *
  * @author synopia
  */
 @API
