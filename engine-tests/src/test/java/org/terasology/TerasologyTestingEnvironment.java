@@ -53,6 +53,7 @@ import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -198,7 +199,7 @@ public abstract class TerasologyTestingEnvironment {
                 }
             });
 
-            CoreRegistry.put(ShaderManager.class, new ShaderManager()).initShaders();
+            CoreRegistry.put(ShaderManager.class, new ShaderManagerLwjgl()).initShaders();
 
             DefaultBlockFamilyFactoryRegistry blockFamilyFactoryRegistry = new DefaultBlockFamilyFactoryRegistry();
             blockFamilyFactoryRegistry.setBlockFamilyFactory("horizontal", new HorizontalBlockFamilyFactory());
