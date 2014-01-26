@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -62,6 +63,7 @@ import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -111,9 +113,11 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
 import sun.reflect.annotation.AnnotationParser;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -194,7 +198,7 @@ public class TerasologyEngine implements GameEngine {
             initAssets();
             initControls();
             updateInputConfig();
-            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManagerLwjgl(this));
             nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
 
             if (config.getSystem().isMonitoringEnabled()) {

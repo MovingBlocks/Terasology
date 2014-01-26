@@ -15,101 +15,45 @@
  */
 package org.terasology.rendering.gui.framework;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.widgets.UIWindow;
+import java.util.List;
 
 import javax.vecmath.Vector2f;
-import java.util.Collections;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
-/**
- * Extends UIDisplayContainer to transparently init. OpenGL for 2D rendering.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- */
-public class UIDisplayRenderer extends UIDisplayContainer {
+public interface UIDisplayRenderer {
 
-    public UIDisplayRenderer() {
-        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-    }
+    public void renderTransformed();
 
-    @Override
-    public void renderTransformed() {
-        render();
-    }
-
-    @Override
-    public void render() {
-        if (isVisible()) {
-            glMatrixMode(GL_PROJECTION);
-            glPushMatrix();
-            glLoadIdentity();
-            glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 1024, -1024);
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-            glLoadIdentity();
-
-            glDisable(GL_CULL_FACE);
-            glDisable(GL_DEPTH_TEST);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-            super.render();
-
-            glDisable(GL_BLEND);
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_CULL_FACE);
-
-            glPopMatrix();
-            glMatrixMode(GL_PROJECTION);
-            glPopMatrix();
-            glMatrixMode(GL_MODELVIEW);
-        }
-    }
+    public void render();
 
     /**
      * Get the focused window. The focused window is the top element within the display elements array which is visible.
      *
      * @return The focused window.
      */
-    public UIWindow getWindowFocused() {
-        if (getDisplayElements().size() > 0) {
-
-            for (int i = getDisplayElements().size() - 1; i >= 0; i--) {
-                if (getDisplayElements().get(i).isVisible()) {
-                    return (UIWindow) getDisplayElements().get(i);
-                }
-            }
-        }
-
-        return null;
-    }
+    public UIWindow getWindowFocused();
 
     /**
      * Set the given window to the top position of the display element array. Therefore the window will be focused.
      *
      * @param window The window to focus.
      */
-    public void setWindowFocus(UIWindow window) {
-        int windowPosition = getDisplayElements().indexOf(window);
+    public void setWindowFocus(UIWindow window);
 
-        if (windowPosition != -1) {
-            Collections.rotate(getDisplayElements().subList(windowPosition, getDisplayElements().size()), -1);
-        }
-    }
+    public void addDisplayElementToPosition(int position, UIDisplayElement element);
+
+    public List<UIDisplayElement> getDisplayElements();
+
+    public void layout();
+
+    public void removeAllDisplayElements();
+
+    public void update();
+
+    public void setVisible(boolean b);
+
+    public void setSize(Vector2f vector2f);
+
+    public void removeDisplayElement(UIDisplayElement displayElement);
 }
