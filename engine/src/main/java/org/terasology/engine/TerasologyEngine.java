@@ -18,6 +18,7 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -95,6 +96,7 @@ import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
@@ -111,9 +113,11 @@ import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
+
 import sun.reflect.annotation.AnnotationParser;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -195,7 +199,7 @@ public class TerasologyEngine implements GameEngine {
             initControls();
             updateInputConfig();
             guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
+            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class),new LwjglCanvasRenderer()));
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
