@@ -26,7 +26,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.block.loader.WorldAtlasImpl;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.ChunkConstants;
@@ -48,7 +49,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
 
     @Before
     public void setup() throws IOException {
-        BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
+        BlockManagerImpl blockManager = new BlockManagerImpl(new NullWorldAtlas(), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         airBlock = BlockManager.getAir();
         solidBlock = new Block();

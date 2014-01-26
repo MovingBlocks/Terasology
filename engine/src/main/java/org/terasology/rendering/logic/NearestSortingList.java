@@ -403,7 +403,6 @@ public class NearestSortingList implements Iterable<EntityRef> {
      */
     private class SortTask extends TimerTask {
         private DistanceComparator comparator = new DistanceComparator();
-        private Vector3f playerPos = new Vector3f();
         private Camera originCamera;
 
         /**
