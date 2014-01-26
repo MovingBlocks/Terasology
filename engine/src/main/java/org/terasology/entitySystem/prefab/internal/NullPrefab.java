@@ -85,6 +85,6 @@ public class NullPrefab extends Prefab {
 
     @Override
     public Iterable<Component> iterateComponents() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 }

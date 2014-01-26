@@ -22,6 +22,8 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.utilities.collection.NullIterator;
 
+import java.util.Collections;
+
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.
  *
@@ -72,7 +74,7 @@ public final class NullEntityRef extends EntityRef {
 
     @Override
     public Iterable<Component> iterateComponents() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override

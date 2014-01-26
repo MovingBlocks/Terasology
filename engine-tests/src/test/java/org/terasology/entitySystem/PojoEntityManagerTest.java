@@ -361,7 +361,7 @@ public class PojoEntityManagerTest {
 
     @Test
     public void isLoadedTrueAfterRestore() {
-        EntityRef entity = entityManager.createEntityWithId(2, NullIterator.<Component>newInstance());
+        EntityRef entity = entityManager.createEntityWithId(2, Collections.<Component>emptyList());
         assertTrue(entity.isActive());
     }
 

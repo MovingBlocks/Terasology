@@ -25,6 +25,8 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
 import org.terasology.utilities.collection.NullIterator;
 
+import java.util.Collections;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -160,7 +162,7 @@ public class PojoEntityRef extends EntityRef {
         if (exists()) {
             return entityManager.iterateComponents(id);
         }
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override

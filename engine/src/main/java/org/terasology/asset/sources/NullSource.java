@@ -48,12 +48,12 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> list() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override
     public Iterable<AssetUri> list(AssetType type) {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override
@@ -63,6 +63,6 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> listOverrides() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 }

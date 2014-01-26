@@ -74,6 +74,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -160,7 +161,7 @@ public class EntityAwareWorldProviderTest {
         blockInFamilyTwo.setKeepActive(true);
         blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"),
                 ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne),
-                NullIterator.<String>newInstance()), true);
+                Collections.<String>emptyList()), true);
 
         keepActiveBlock = new Block();
         keepActiveBlock.setKeepActive(true);
