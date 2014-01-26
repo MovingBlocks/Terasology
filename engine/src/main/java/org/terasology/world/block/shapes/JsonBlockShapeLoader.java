@@ -75,7 +75,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         return gson.fromJson(new InputStreamReader(stream), BlockShapeData.class);
     }
 
-    private class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
+    private static class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
 
         public static final String PITCH_SYMMETRIC = "pitchSymmetric";
         public static final String YAW_SYMMETRIC = "yawSymmetric";
@@ -241,7 +241,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         }
     }
 
-    private class BlockMeshPartHandler implements JsonDeserializer<BlockMeshPart> {
+    private static class BlockMeshPartHandler implements JsonDeserializer<BlockMeshPart> {
 
         @Override
         public BlockMeshPart deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

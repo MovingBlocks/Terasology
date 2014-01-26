@@ -95,7 +95,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
         entity.saveComponent(delayedComponent);
     }
 
-    private final class DelayedOperation {
+    private static final class DelayedOperation {
         private String operationId;
         private EntityRef entityRef;
 

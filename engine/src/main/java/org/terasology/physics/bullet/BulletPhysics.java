@@ -678,7 +678,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    public class BulletRigidBody implements RigidBody {
+    public static class BulletRigidBody implements RigidBody {
 
         public final com.bulletphysics.dynamics.RigidBody rb;
         private final Transform temp = new Transform();

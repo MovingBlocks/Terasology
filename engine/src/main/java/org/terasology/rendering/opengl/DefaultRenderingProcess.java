@@ -1510,7 +1510,7 @@ public class DefaultRenderingProcess {
         fboLookup.put(title + "PingPong", fbo1);
     }
 
-    public class PBO {
+    public static class PBO {
         public int pboId;
         public int bufferWidth;
         public int bufferHeight;

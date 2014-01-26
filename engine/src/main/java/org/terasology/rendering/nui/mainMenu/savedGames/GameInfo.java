@@ -26,7 +26,7 @@ import java.util.Date;
  */
 public class GameInfo {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private Date timestamp;
     private GameManifest manifest;
@@ -37,7 +37,8 @@ public class GameInfo {
     }
 
     public String toString() {
-        return manifest.getTitle() + "\n" + DATE_FORMAT.format(timestamp);
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        return manifest.getTitle() + "\n" + format.format(timestamp);
     }
 
     public Date getTimestamp() {

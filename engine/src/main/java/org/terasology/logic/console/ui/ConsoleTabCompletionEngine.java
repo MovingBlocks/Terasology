@@ -56,15 +56,15 @@ public class ConsoleTabCompletionEngine implements TabCompletionEngine {
         } else if (matches.size() > 1) {
             //multiple matches found
             //add list of available commands
-            String commandMatches = "";
+            StringBuilder commandMatches = new StringBuilder();
             for (String cmd : matches) {
-                if (!commandMatches.isEmpty()) {
-                    commandMatches += " ";
+                if (commandMatches.length() != 0) {
+                    commandMatches.append(" ");
                 }
 
-                commandMatches += cmd;
+                commandMatches.append(cmd);
             }
-            console.addMessage(commandMatches);
+            console.addMessage(commandMatches.toString());
         }
         return text;
     }

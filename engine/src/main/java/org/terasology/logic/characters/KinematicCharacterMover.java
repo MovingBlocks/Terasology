@@ -726,7 +726,7 @@ public class KinematicCharacterMover implements CharacterMover {
     /**
      * Holds the result of movement.
      */
-    public class MoveResult {
+    public static class MoveResult {
 
         private Vector3f finalPosition;
         private boolean horizontalHit;

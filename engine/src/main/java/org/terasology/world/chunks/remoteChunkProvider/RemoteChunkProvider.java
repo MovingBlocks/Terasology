@@ -238,7 +238,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         return remoteWorldGenerator;
     }
 
-    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+    private static class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
 
         private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 

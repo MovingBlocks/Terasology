@@ -168,7 +168,7 @@ public class UILabel extends UIDisplayContainer {
                         if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
                             //than wrap the string at the previous space
                             wrapText.insert(lastSpace + 1, '\n');
-                            wrapPosition.add(new Integer(lastSpace + 1));
+                            wrapPosition.add(lastSpace + 1);
 
                             lastWrap = lastSpace + 1;
                         }
