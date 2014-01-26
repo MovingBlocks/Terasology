@@ -65,9 +65,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
 
-    public NUIManagerInternal(AssetManager assetManager) {
+    public NUIManagerInternal(AssetManager assetManager, CanvasRenderer renderer) {
         this.assetManager = assetManager;
-        this.canvas = new CanvasImpl(this, CoreRegistry.get(Time.class), new LwjglCanvasRenderer());
+        this.canvas = new CanvasImpl(this, CoreRegistry.get(Time.class), renderer);
     }
 
     public void refreshWidgetsLibrary() {

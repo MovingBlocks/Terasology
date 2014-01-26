@@ -96,6 +96,7 @@ import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
@@ -195,7 +196,7 @@ public class TerasologyEngine implements GameEngine {
             initControls();
             updateInputConfig();
             guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
+            nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
