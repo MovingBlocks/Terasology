@@ -69,6 +69,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     @Override
     public void initialise() {
         for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
+
             BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
             trees.add(asset);
         }

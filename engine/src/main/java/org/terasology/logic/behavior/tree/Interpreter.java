@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.API;
+import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.registry.InjectionHelper;
 
 import java.util.Deque;
@@ -190,7 +191,7 @@ public class Interpreter {
 
     @Override
     public String toString() {
-        return actor.minion().toString();
+        return actor.component(DisplayInformationComponent.class).name;
     }
 
     public interface Debugger {
