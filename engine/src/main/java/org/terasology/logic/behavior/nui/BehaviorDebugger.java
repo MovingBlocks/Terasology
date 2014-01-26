@@ -47,13 +47,17 @@ public class BehaviorDebugger implements Interpreter.Debugger {
     @Override
     public void nodeFinished(Node node, Status status) {
         RenderableNode renderableNode = tree.getRenderableNode(node);
-        renderableNode.setStatus(status);
+        if (renderableNode != null) {
+            renderableNode.setStatus(status);
+        }
     }
 
     @Override
     public void nodeUpdated(Node node, Status status) {
         RenderableNode renderableNode = tree.getRenderableNode(node);
-        renderableNode.setStatus(status);
+        if (renderableNode != null) {
+            renderableNode.setStatus(status);
+        }
     }
 
     @Override

@@ -68,6 +68,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -109,6 +110,8 @@ public class EntitySystemBuilder {
         // Event System
         entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+
+        CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);

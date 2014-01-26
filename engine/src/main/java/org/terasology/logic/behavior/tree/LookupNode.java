@@ -15,63 +15,45 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.engine.API;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * Repeats the child node forever.
- *
- * Never finishes with SUCCESS.
- * Finishes with FAILURE, as soon as decorated node finishes with FAILURE
- *
- * @author synopia
+ * Node that runs a behavior tree.
  */
-@API
-public class RepeatNode extends DecoratorNode {
-    public RepeatNode() {
-    }
-
-    public RepeatNode(Node child) {
-        this.child = child;
-    }
+public class LookupNode extends Node {
+    @OneOf.Provider(name = "behaviorTrees")
+    private BehaviorTree tree;
 
     @Override
-    public RepeatTask createTask() {
-        return new RepeatTask(this);
+    public Task createTask() {
+        return new LookupTask(this);
     }
 
-    public static class RepeatTask extends DecoratorTask {
-        public RepeatTask(RepeatNode node) {
+    public static class LookupTask extends Task {
+        public LookupTask(Node node) {
             super(node);
         }
 
         @Override
         public void onInitialize() {
-            if (getNode().child != null) {
-                start(getNode().child);
+            if (getNode().tree != null) {
+                start(getNode().tree.getRoot());
             }
         }
 
         @Override
         public Status update(float dt) {
-            return Status.RUNNING;
+            return getNode().tree == null ? Status.SUCCESS : Status.RUNNING;
         }
 
         @Override
         public void handle(Status result) {
-            if (result == Status.FAILURE) {
-                stop(Status.FAILURE);
-                return;
-            }
-
-            if (getNode().child != null) {
-                start(getNode().child);
-            }
         }
 
         @Override
-        public RepeatNode getNode() {
-            return (RepeatNode) super.getNode();
+        public LookupNode getNode() {
+            return (LookupNode) super.getNode();
         }
     }
-
 }

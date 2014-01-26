@@ -15,36 +15,25 @@
  */
 package org.terasology.rendering.nui.properties;
 
+import com.google.common.collect.Maps;
+import org.terasology.rendering.nui.databinding.Binding;
+
+import java.util.Map;
+
 /**
- * Created by synopia on 03.01.14.
+ * @author synopia
  */
+public class OneOfProviderFactory {
+    private Map<String, Binding<?>> provider = Maps.newHashMap();
 
-import org.terasology.engine.API;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@API
-public interface OneOf {
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @API
-    public @interface Enum {
+    public OneOfProviderFactory() {
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @API
-    public @interface List {
-        String[] items();
+    public void register(String name, Binding<?> binding) {
+        provider.put(name, binding);
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @API
-    public @interface Provider {
-        String name();
+    public Binding<?> get(String name) {
+        return provider.get(name);
     }
 }

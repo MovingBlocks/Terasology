@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
 import org.terasology.engine.module.ModuleManager;
@@ -23,6 +24,7 @@ import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.MonitorNode;
 import org.terasology.logic.behavior.tree.ParallelNode;
 import org.terasology.logic.behavior.tree.RepeatNode;
@@ -50,12 +52,6 @@ public class FactoryTest {
         BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
         CoreRegistry.put(BehaviorNodeFactory.class, nodeFactory);
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
-        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
-        moduleManager.applyActiveModules();
-        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
-        CoreRegistry.put(ReflectFactory.class, reflectFactory);
-        CoreRegistry.put(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
-        CoreRegistry.put(ModuleManager.class, moduleManager);
         BehaviorTreeData data = buildSample();
 
         OutputStream os = new ByteArrayOutputStream(10000);
@@ -82,5 +78,19 @@ public class FactoryTest {
         tree.createRenderable();
         tree.layout(null);
         return tree;
+    }
+
+    @Before
+    public void setup() {
+        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager.applyActiveModules();
+        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        CoreRegistry.put(ReflectFactory.class, reflectFactory);
+        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
+        CoreRegistry.put(CopyStrategyLibrary.class, copyStrategies);
+        CoreRegistry.put(ModuleManager.class, moduleManager);
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategies);
+        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        nodesClassLibrary.scan();
     }
 }

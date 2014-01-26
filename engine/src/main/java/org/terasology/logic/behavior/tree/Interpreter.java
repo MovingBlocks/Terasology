@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ public class Interpreter {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }
             if (current.getParent() != null) {
-                current.getParent().handle(current.getStatus());
+                stop(current, current.getStatus());
             }
         } else {
             tasks.addLast(current);

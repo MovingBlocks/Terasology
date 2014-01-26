@@ -1,7 +1,7 @@
 {
     "BehaviorNode" : {
-        "type"      : "CounterNode",
-        "name"      : "Counter",
+        "type"      : "WrapperNode",
+        "name"      : "Wrapper",
         "category"  : "logic",
         "shape"     : "rect",
         "color"     : [0.7, 0.7, 0.7],

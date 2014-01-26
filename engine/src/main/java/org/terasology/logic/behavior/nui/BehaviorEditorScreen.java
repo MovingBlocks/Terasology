@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIDropdown;
@@ -68,9 +69,12 @@ public class BehaviorEditorScreen extends UIScreenLayer {
     private BehaviorNodeFactory nodeFactory;
     @In
     private BehaviorSystem behaviorSystem;
+    @In
+    private OneOfProviderFactory providerFactory;
 
     @Override
     public void initialise() {
+
         entityProperties = find("entity_properties", PropertyLayout.class);
         behaviorEditor = find("tree", BehaviorEditor.class);
         properties = find("properties", PropertyLayout.class);
@@ -93,16 +97,15 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             }
         });
 
-        selectTree.bindOptions(new Binding<List<BehaviorTree>>() {
+        Binding<List<BehaviorTree>> treeBinding = new ReadOnlyBinding<List<BehaviorTree>>() {
             @Override
             public List<BehaviorTree> get() {
                 return Lists.newArrayList(behaviorSystem.getTrees());
             }
+        };
+        selectTree.bindOptions(treeBinding);
+        providerFactory.register("behaviorTrees", treeBinding);
 
-            @Override
-            public void set(List<BehaviorTree> value) {
-            }
-        });
         selectTree.bindSelection(new Binding<BehaviorTree>() {
             @Override
             public BehaviorTree get() {

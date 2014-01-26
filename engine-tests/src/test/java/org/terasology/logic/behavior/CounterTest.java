@@ -17,10 +17,8 @@ package org.terasology.logic.behavior;
 
 import junit.framework.Assert;
 import org.junit.Test;
-import org.terasology.logic.behavior.tree.DelayNode;
+import org.terasology.logic.behavior.tree.CounterNode;
 import org.terasology.logic.behavior.tree.Interpreter;
-import org.terasology.logic.behavior.tree.RepeatNode;
-import org.terasology.logic.behavior.tree.SequenceNode;
 
 /**
  * Created by synopia on 11.01.14.
@@ -28,52 +26,41 @@ import org.terasology.logic.behavior.tree.SequenceNode;
 public class CounterTest {
 
     @Test
-    public void test0_0() {
+    public void test00() {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
-        DelayNode delayNode = new DelayNode(0, debugNode);
-        interpreter.start(delayNode);
-
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask first = debugNode.lastTask;
-        Assert.assertTrue(first.updateCalled);
-        Assert.assertTrue(first.initializeCalled);
-        Assert.assertTrue(first.terminateCalled);
-
-        Assert.assertTrue(interpreter.tick(0) == 0);
-    }
-
-    @Test
-    public void test0_1() {
-        Interpreter interpreter = new Interpreter(null);
-        DebugNode debugNode = new DebugNode(0);
-        DelayNode delayNode = new DelayNode(1, debugNode);
-
-        interpreter.start(delayNode);
+        CounterNode counterNode = new CounterNode(0, debugNode);
+        interpreter.start(counterNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         Assert.assertNull(debugNode.lastTask);
+        Assert.assertTrue(interpreter.tick(0) == 0);
+    }
+
+    @Test
+    public void test01() {
+        Interpreter interpreter = new Interpreter(null);
+        DebugNode debugNode = new DebugNode(0);
+        CounterNode counterNode = new CounterNode(1, debugNode);
+
+        interpreter.start(counterNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
-        DebugNode.DebugTask first = debugNode.lastTask;
-        Assert.assertTrue(first.updateCalled);
-        Assert.assertTrue(first.initializeCalled);
-        Assert.assertTrue(first.terminateCalled);
-        first.reset();
+        Assert.assertTrue(debugNode.lastTask.updateCalled);
+        Assert.assertTrue(debugNode.lastTask.initializeCalled);
+        Assert.assertTrue(debugNode.lastTask.terminateCalled);
+        debugNode.lastTask = null;
 
         Assert.assertTrue(interpreter.tick(0) == 0);
     }
 
     @Test
-    public void test1_1() {
+    public void test11() {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(1);
-        DelayNode delayNode = new DelayNode(1, debugNode);
+        CounterNode counterNode = new CounterNode(1, debugNode);
 
-        interpreter.start(delayNode);
-
-        Assert.assertTrue(interpreter.tick(0) > 0);
-        Assert.assertNull(debugNode.lastTask);
+        interpreter.start(counterNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -124,25 +111,5 @@ public class CounterTest {
         Assert.assertSame(first, last);
 
         Assert.assertTrue(interpreter.tick(0) == 0);
-    }
-
-    @Test
-    public void test() {
-        Interpreter interpreter = new Interpreter(null);
-        SequenceNode first = new SequenceNode();
-        SequenceNode left = new SequenceNode();
-        first.setChild(0, left);
-        RepeatNode root = new RepeatNode(first);
-        root.setChild(0, first);
-        first.setChild(1, new DebugNode(1));
-
-        left.setChild(0, new DebugNode(1));
-        left.setChild(1, new DebugNode(1));
-
-        interpreter.start(root);
-
-        for (int i = 0; i < 100; i++) {
-            interpreter.tick(0);
-        }
     }
 }
