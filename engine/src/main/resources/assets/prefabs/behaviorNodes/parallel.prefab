@@ -1,6 +1,6 @@
 {
     "BehaviorNode" : {
-        "type"      : "org.terasology.logic.behavior.tree.ParallelNode",
+        "type"      : "ParallelNode",
         "name"      : "Parallel",
         "category"  : "logic",
         "shape"     : "diamond",

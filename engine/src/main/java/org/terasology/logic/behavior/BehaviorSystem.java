@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -37,7 +36,6 @@ import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -64,20 +62,16 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
+    public BehaviorSystem() {
+        CoreRegistry.put(BehaviorSystem.class, this);
+    }
+
     @Override
     public void initialise() {
-        CoreRegistry.put(BehaviorSystem.class, this);
-        List<BehaviorNodeComponent> items = Lists.newArrayList();
-        Collection<Prefab> prefabs = prefabManager.listPrefabs(BehaviorNodeComponent.class);
-        for (Prefab prefab : prefabs) {
-            EntityRef entityRef = entityManager.create(prefab);
-            items.add(entityRef.getComponent(BehaviorNodeComponent.class));
-        }
         for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
             BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
             trees.add(asset);
         }
-        CoreRegistry.put(BehaviorNodeFactory.class, new BehaviorNodeFactory(items));
     }
 
     @ReceiveEvent

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.Color;
 public class BehaviorNodeComponent implements Component {
     public static final BehaviorNodeComponent DEFAULT = new BehaviorNodeComponent();
 
-    public String type;                         // fq class name to node type
+    public String type;
     public String name;
     public String category;                     // for palette
     public String shape = "diamond";            // diamond or rect

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,24 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -34,35 +49,45 @@ import java.util.Map;
  *
  * @author synopia
  */
-public class BehaviorNodeFactory {
+@RegisterSystem
+public class BehaviorNodeFactory implements ComponentSystem {
     private final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
 
-    private Map<Class<? extends Node>, BehaviorNodeComponent> nodes = Maps.newHashMap();
+    private Map<ClassMetadata<? extends Node, ?>, BehaviorNodeComponent> nodes = Maps.newHashMap();
     private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
-    private final List<String> categories;
+    private List<String> categories;
+    private ClassLibrary<Node> nodesLibrary;
 
-    public BehaviorNodeFactory(List<BehaviorNodeComponent> components) {
-        for (BehaviorNodeComponent component : components) {
-            // TODO: Use a ClassLibrary, otherwise stop requiring the use of full class names in prefabs.
-            ClassLoader[] classLoaders = CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getConfiguration().getClassLoaders();
-            for (ClassLoader classLoader : classLoaders) {
-                try {
-                    Class<? extends Node> type = (Class<? extends Node>) classLoader.loadClass(component.type);
-                    nodes.put(type, component);
-                    logger.warn("Found behavior node for class " + component.type + " name=" + component.name);
+    @In
+    private ModuleManager moduleManager;
+    @In
+    private EntityManager entityManager;
+    @In
+    private PrefabManager prefabManager;
+    @In
+    private AssetManager assetManager;
 
-                    List<BehaviorNodeComponent> list = categoryComponents.get(component.category);
-                    if (list == null) {
-                        list = Lists.newArrayList();
-                        categoryComponents.put(component.category, list);
-                    }
-                    list.add(component);
-                    break;
-                } catch (ClassNotFoundException e) {
-                    // ignore
-                }
-            }
-        }
+    public BehaviorNodeFactory() {
+        CoreRegistry.put(BehaviorNodeFactory.class, this);
+    }
+
+    @Override
+    public void initialise() {
+        refreshLibrary();
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    public void refreshLibrary() {
+        refreshNodes();
+        refreshPrefabs();
+        sortLibrary();
+    }
+
+    private void sortLibrary() {
         categories = Lists.newArrayList(categoryComponents.keySet());
         Collections.sort(categories);
         for (String category : categories) {
@@ -75,22 +100,58 @@ public class BehaviorNodeFactory {
         }
     }
 
-    public BehaviorNodeComponent getNodeComponent(Node node) {
-        BehaviorNodeComponent nodeComponent = nodes.get(node.getClass());
-        if (nodeComponent == null) {
-            return BehaviorNodeComponent.DEFAULT;
+    private void refreshPrefabs() {
+        Collection<Prefab> prefabs = prefabManager.listPrefabs(BehaviorNodeComponent.class);
+        for (Prefab prefab : prefabs) {
+            EntityRef entityRef = entityManager.create(prefab);
+            BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
+            List<ClassMetadata<? extends Node, ?>> metadata = nodesLibrary.getMetadata(component.type);
+            if (metadata.size() == 1) {
+                ClassMetadata<? extends Node, ?> classMetadata = metadata.get(0);
+                if (classMetadata.isConstructable()) {
+                    nodes.put(classMetadata, component);
+                    logger.info("Found behavior node for class " + component.type + " name=" + component.name);
+                    List<BehaviorNodeComponent> list = categoryComponents.get(component.category);
+                    if (list == null) {
+                        list = Lists.newArrayList();
+                        categoryComponents.put(component.category, list);
+                    }
+                    list.add(component);
+                } else {
+                    logger.warn("Node cannot be constructed! -> ignoring " + component.type + " name=" + component.name);
+                }
+            } else {
+                logger.warn("Multiple nodes found -> ignoring! " + component.type + " name=" + component.name);
+            }
         }
-        return nodeComponent;
+    }
+
+    private void refreshNodes() {
+        nodesLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        for (Module module : moduleManager.getActiveCodeModules()) {
+            for (Class<? extends Node> elementType : module.getReflections().getSubTypesOf(Node.class)) {
+                nodesLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
+            }
+        }
+    }
+
+    public BehaviorNodeComponent getNodeComponent(Node node) {
+        ClassMetadata<? extends Node, ?> metadata = nodesLibrary.getMetadata(node.getClass());
+        if (metadata != null) {
+            BehaviorNodeComponent nodeComponent = nodes.get(metadata);
+            if (nodeComponent == null) {
+                return BehaviorNodeComponent.DEFAULT;
+            }
+            return nodeComponent;
+        } else {
+            return null;
+        }
     }
 
     public Node getNode(BehaviorNodeComponent nodeComponent) {
-        for (Map.Entry<Class<? extends Node>, BehaviorNodeComponent> entry : nodes.entrySet()) {
+        for (Map.Entry<ClassMetadata<? extends Node, ?>, BehaviorNodeComponent> entry : nodes.entrySet()) {
             if (nodeComponent == entry.getValue()) {
-                try {
-                    return entry.getKey().newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                return entry.getKey().newInstance();
             }
         }
         return null;

@@ -1,6 +1,6 @@
 {
     "BehaviorNode" : {
-        "type"      : "org.terasology.logic.behavior.tree.InverterNode",
+        "type"      : "InverterNode",
         "name"      : "Inverter",
         "category"  : "logic",
         "shape"     : "rect",
