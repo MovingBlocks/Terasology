@@ -37,8 +37,7 @@ public class RepeatTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
         RepeatNode repeatNode = new RepeatNode(debugNode);
-        interpreter.setRoot(repeatNode);
-        interpreter.start();
+        interpreter.start(repeatNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask2;
@@ -62,8 +61,7 @@ public class RepeatTest {
         DebugNode debugNode = new DebugNode(1);
         RepeatNode repeatNode = new RepeatNode(debugNode);
 
-        interpreter.setRoot(repeatNode);
-        interpreter.start();
+        interpreter.start(repeatNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -99,9 +97,7 @@ public class RepeatTest {
             }
         }));
 
-        Task task = repeat.createTask();
-
-        interpreter.start(task);
+        Task task = interpreter.start(repeat);
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
@@ -124,11 +120,7 @@ public class RepeatTest {
             }
         }));
 
-        Task task = repeat.createTask();
-
-        interpreter.start(task);
-        interpreter.tick(0);
-        Assert.assertEquals(Status.RUNNING, task.getStatus());
+        Task task = interpreter.start(repeat);
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
@@ -153,9 +145,7 @@ public class RepeatTest {
 
         move.children().add(new DebugNode(3));
         move.children().add(mock);
-        Task task = move.createTask();
-
-        interpreter.start(task);
+        Task task = interpreter.start(move);
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, task.getStatus());
         interpreter.tick(0);
@@ -181,6 +171,11 @@ public class RepeatTest {
                     @Override
                     public Node getNode() {
                         return node;
+                    }
+
+                    @Override
+                    public void handle(Status result) {
+
                     }
                 });
                 mocker.mock(spy);

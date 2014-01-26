@@ -16,7 +16,6 @@
 package org.terasology.logic.console.ui;
 
 import org.terasology.input.MouseInput;
-import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;

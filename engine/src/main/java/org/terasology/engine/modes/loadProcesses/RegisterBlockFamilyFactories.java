@@ -76,4 +76,9 @@ public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
             }
         }
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

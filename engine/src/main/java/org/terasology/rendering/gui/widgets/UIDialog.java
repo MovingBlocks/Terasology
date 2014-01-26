@@ -288,7 +288,7 @@ public class UIDialog extends UIWindow {
     }
 
     @Deprecated
-    private class UIDialogBackground extends UIDisplayContainer {
+    private static class UIDialogBackground extends UIDisplayContainer {
         private UIImage leftBackground;
         private UIImage centerBackground;
         private UIImage rightBackground;

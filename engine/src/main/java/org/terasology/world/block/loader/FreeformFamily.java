@@ -17,9 +17,9 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.world.block.BlockUri;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ public class FreeformFamily {
     public List<String> categories;
 
     public FreeformFamily(BlockUri uri) {
-        this(uri, NullIterator.<String>newInstance());
+        this(uri, Collections.<String>emptyList());
     }
 
     public FreeformFamily(BlockUri uri, Iterable<String> categories) {

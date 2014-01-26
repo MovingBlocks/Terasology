@@ -34,4 +34,9 @@ public class InitialiseCommandSystem extends SingleStepLoadProcess {
         CoreRegistry.put(Console.class, new ConsoleImpl());
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

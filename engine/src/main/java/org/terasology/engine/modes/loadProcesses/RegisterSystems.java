@@ -76,4 +76,9 @@ public class RegisterSystems extends SingleStepLoadProcess {
         registeredModules.add(module.getId().toLowerCase(Locale.ENGLISH));
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
+
 }

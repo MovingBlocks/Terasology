@@ -24,12 +24,11 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.registry.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.InjectionHelper;
 
 import java.util.List;
 import java.util.Map;

@@ -59,4 +59,9 @@ public class RegisterMods extends SingleStepLoadProcess {
         ApplyModulesUtil.applyModules();
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

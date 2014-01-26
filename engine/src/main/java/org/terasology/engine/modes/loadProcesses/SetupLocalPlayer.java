@@ -38,4 +38,9 @@ public class SetupLocalPlayer extends SingleStepLoadProcess {
         return true;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
+
 }

@@ -244,6 +244,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 logger.error("Failed to cloase allModuleClassLoader", e);
             }
         }
+
         allModuleClassLoader = new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
         for (ExtensionModule module : getExtensionModules()) {
             module.setInactiveClassLoader(allModuleClassLoader);

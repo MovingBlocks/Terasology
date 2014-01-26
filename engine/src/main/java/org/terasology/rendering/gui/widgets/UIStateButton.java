@@ -138,7 +138,7 @@ public class UIStateButton extends UIButton {
         }
     }
 
-    private class ButtonState {
+    private static class ButtonState {
         String name;
         StateButtonAction action;
 

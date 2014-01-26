@@ -28,12 +28,13 @@ import org.terasology.world.time.WorldTime;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public interface WorldProviderCore {
+
     /**
      * Returns the world entity.
      *
      * @return the entity of the world
      */
-    public EntityRef getWorldEntity();
+    EntityRef getWorldEntity();
 
     /**
      * Returns the title of this world.

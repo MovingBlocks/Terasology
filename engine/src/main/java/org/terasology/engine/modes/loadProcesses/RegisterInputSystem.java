@@ -130,4 +130,9 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
             }
         }
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

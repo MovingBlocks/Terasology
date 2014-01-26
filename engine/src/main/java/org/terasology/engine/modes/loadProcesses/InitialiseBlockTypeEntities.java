@@ -37,4 +37,9 @@ public class InitialiseBlockTypeEntities extends SingleStepLoadProcess {
         blockManager.subscribe(new BlockTypeEntityGenerator(CoreRegistry.get(EntityManager.class), blockManager));
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

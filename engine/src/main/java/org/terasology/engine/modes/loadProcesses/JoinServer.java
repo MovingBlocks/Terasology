@@ -115,4 +115,9 @@ public class JoinServer implements LoadProcess {
     public float getProgress() {
         return joinStatus.getCurrentActivityProgress();
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 10;
+    }
 }

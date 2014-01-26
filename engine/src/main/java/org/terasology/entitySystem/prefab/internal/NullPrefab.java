@@ -21,7 +21,6 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Collections;
 import java.util.List;
@@ -85,6 +84,6 @@ public class NullPrefab extends Prefab {
 
     @Override
     public Iterable<Component> iterateComponents() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 }

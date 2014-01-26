@@ -79,7 +79,7 @@ public class WorldGeneratorManager {
                 return info;
             }
         }
-        return generatorInfo.get(0);
+        return null;
 
     }
 

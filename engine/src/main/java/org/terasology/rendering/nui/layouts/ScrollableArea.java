@@ -25,9 +25,9 @@ import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -103,7 +103,7 @@ public class ScrollableArea extends CoreLayout {
         if (content != null) {
             return Arrays.asList(content).iterator();
         }
-        return NullIterator.newInstance();
+        return Collections.emptyIterator();
     }
 
     @Override

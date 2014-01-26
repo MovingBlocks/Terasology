@@ -37,7 +37,7 @@ public final class CoreRegistry {
     }
 
     /**
-     * Registers a core system
+     * Registers an object. These objects will be removed when CoreRegistry.clear() is called (typically when game state changes)
      *
      * @param type   The interface which the system fulfils
      * @param object The system itself
@@ -49,7 +49,9 @@ public final class CoreRegistry {
     }
 
     /**
-     * Registers a core system
+     * Registers an object. These objects are not removed when CoreRegistry.clear() is called.
+     *
+     * Requires the "permRegister" RuntimePermission
      *
      * @param type   The interface which the system fulfils
      * @param object The system itself
@@ -65,6 +67,7 @@ public final class CoreRegistry {
     }
 
     /**
+     *
      * @param type
      * @param <T>
      * @return The system fulfilling the given interface
@@ -73,7 +76,15 @@ public final class CoreRegistry {
         return type.cast(store.get(type));
     }
 
+    /**
+     * Clears all non-permanent objects from the registry.
+     *
+     * Requires the "clearRegistry" RuntimePermission
+     */
     public static void clear() {
+        if (System.getSecurityManager() != null) {
+            System.getSecurityManager().checkPermission(new RuntimePermission("clearRegistry"));
+        }
         Iterator<Map.Entry<Class<?>, Object>> iterator = store.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<Class<?>, Object> entry = iterator.next();

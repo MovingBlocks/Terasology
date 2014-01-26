@@ -44,12 +44,12 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.utilities.collection.NullIterator;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -302,7 +302,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         TIntList idList = new TIntArrayList();
         TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
         if (primeIterator == null) {
-            return NullIterator.newInstance();
+            return Collections.emptyList();
         }
 
         while (primeIterator.hasNext()) {
@@ -326,7 +326,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
         TIntList idList = new TIntArrayList();
         TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClass);
         if (primeIterator == null) {
-            return NullIterator.newInstance();
+            return Collections.emptyList();
         }
 
         while (primeIterator.hasNext()) {
@@ -391,7 +391,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
 
             return createEntityWithoutLifecycleEvents(components);
         } else {
-            return createEntityWithoutLifecycleEvents(NullIterator.<Component>newInstance());
+            return createEntityWithoutLifecycleEvents(Collections.<Component>emptyList());
         }
     }
 
@@ -682,7 +682,7 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
             }
             return list;
         }
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {

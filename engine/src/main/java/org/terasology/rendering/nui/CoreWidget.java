@@ -20,8 +20,8 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
-import org.terasology.utilities.collection.NullIterator;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -38,7 +38,7 @@ public abstract class CoreWidget extends AbstractWidget {
 
     @Override
     public Iterator<UIWidget> iterator() {
-        return NullIterator.newInstance();
+        return Collections.emptyIterator();
     }
 
     @Override

@@ -37,4 +37,9 @@ public class ProcessBlockPrefabs extends SingleStepLoadProcess {
         blockManager.subscribe(new BlockPrefabManager(CoreRegistry.get(EntityManager.class), blockManager));
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

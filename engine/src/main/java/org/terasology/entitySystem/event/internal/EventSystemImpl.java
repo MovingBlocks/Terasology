@@ -392,7 +392,7 @@ public class EventSystemImpl implements EventSystem {
         Object getHandler();
     }
 
-    private class ReflectedEventHandlerInfo implements EventHandlerInfo {
+    private static class ReflectedEventHandlerInfo implements EventHandlerInfo {
         private ComponentSystem handler;
         private Method method;
         private ImmutableList<Class<? extends Component>> filterComponents;
@@ -448,7 +448,7 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
+    private static class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
         private EventReceiver<T> receiver;
         private Class<? extends Component>[] components;
         private int priority;

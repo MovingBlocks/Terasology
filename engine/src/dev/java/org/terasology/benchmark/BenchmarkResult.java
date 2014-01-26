@@ -43,11 +43,12 @@ public abstract class BenchmarkResult {
         LEFT {
             @Override
             public String pad(String value, int size) {
-                String result = (value == null ? "" : value);
-                while (result.length() < size) {
-                    result = result + " ";
+                StringBuilder builder = new StringBuilder();
+                builder.append(value == null ? "" : value);
+                while (builder.length() < size) {
+                    builder.append(" ");
                 }
-                return result;
+                return builder.toString();
             }
         },
 

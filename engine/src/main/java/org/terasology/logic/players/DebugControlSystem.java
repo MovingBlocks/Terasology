@@ -16,14 +16,11 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
@@ -33,6 +30,8 @@ import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.rendering.world.ViewDistance;

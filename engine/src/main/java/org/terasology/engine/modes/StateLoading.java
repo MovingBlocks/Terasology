@@ -21,7 +21,6 @@ import com.google.common.collect.Queues;
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -51,10 +50,11 @@ import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.gui.windows.UIScreenLoading;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.mainMenu.loadingScreen.LoadingScreen;
 
 import java.util.Queue;
 
@@ -73,9 +73,12 @@ public class StateLoading implements GameState {
     private LoadProcess current;
     private JoinStatus joinStatus;
 
-    private GUIManager guiManager;
+    private NUIManager nuiManager;
 
-    private UIScreenLoading loadingScreen;
+    private LoadingScreen loadingScreen;
+
+    private int progress;
+    private int maxProgress;
 
     /**
      * Constructor for server or single player games
@@ -87,7 +90,7 @@ public class StateLoading implements GameState {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
 
         this.gameManifest = gameManifest;
-        this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = netMode;
     }
 
@@ -98,7 +101,7 @@ public class StateLoading implements GameState {
      */
     public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();
-        this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = NetworkMode.CLIENT;
         this.joinStatus = joinStatus;
     }
@@ -119,10 +122,15 @@ public class StateLoading implements GameState {
                 break;
         }
 
+        progress = 0;
+        maxProgress = 0;
+        for (LoadProcess process : loadProcesses) {
+            maxProgress += process.getExpectedCost();
+        }
+
         popStep();
-        guiManager.closeAllWindows();
-        loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
-        loadingScreen.updateStatus(current.getMessage(), current.getProgress() * 100f);
+        loadingScreen = nuiManager.setScreen("engine:loadingScreen", LoadingScreen.class);
+        loadingScreen.updateStatus(current.getMessage(), current.getProgress());
     }
 
     private void initClient() {
@@ -172,6 +180,9 @@ public class StateLoading implements GameState {
     }
 
     private void popStep() {
+        if (current != null) {
+            progress += current.getExpectedCost();
+        }
         current = null;
         if (!loadProcesses.isEmpty()) {
             current = loadProcesses.remove();
@@ -199,17 +210,18 @@ public class StateLoading implements GameState {
             }
         }
         if (current == null) {
-            CoreRegistry.get(GUIManager.class).closeWindow("loading");
+            nuiManager.popScreen();
             CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
-            loadingScreen.updateStatus(current.getMessage(), 100f * current.getProgress());
-            guiManager.update();
+            float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
+            loadingScreen.updateStatus(current.getMessage(), progressValue);
+            nuiManager.update(delta);
         }
     }
 
     @Override
     public void render() {
-        CoreRegistry.get(GUIManager.class).render();
+        nuiManager.render();
     }
 
     @Override

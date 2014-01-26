@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.mainMenu;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -23,14 +24,15 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.registry.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.mainMenu.savedGames.GameProvider;
@@ -42,6 +44,8 @@ import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -92,11 +96,31 @@ public class CreateGameScreen extends UIScreenLayer {
 
         final UIDropdown<WorldGeneratorInfo> worldGenerator = find("worldGenerator", UIDropdown.class);
         if (worldGenerator != null) {
-            worldGenerator.setOptions(worldGeneratorManager.getWorldGenerators());
+            worldGenerator.bindOptions(new ReadOnlyBinding<List<WorldGeneratorInfo>>() {
+                @Override
+                public List<WorldGeneratorInfo> get() {
+                    List<WorldGeneratorInfo> result = Lists.newArrayList();
+                    for (WorldGeneratorInfo option : worldGeneratorManager.getWorldGenerators()) {
+                        if (config.getDefaultModSelection().hasModule(option.getUri().getModuleName())) {
+                            result.add(option);
+                        }
+                    }
+                    return result;
+                }
+            });
             worldGenerator.bindSelection(new Binding<WorldGeneratorInfo>() {
                 @Override
                 public WorldGeneratorInfo get() {
-                    return worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
+                    WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
+                    if (info == null || !config.getDefaultModSelection().hasModule(info.getUri().getModuleName())) {
+                        for (WorldGeneratorInfo worldGenInfo : worldGeneratorManager.getWorldGenerators()) {
+                            if (config.getDefaultModSelection().hasModule(worldGenInfo.getUri().getModuleName())) {
+                                set(worldGenInfo);
+                                return worldGenInfo;
+                            }
+                        }
+                    }
+                    return info;
                 }
 
                 @Override
@@ -109,7 +133,10 @@ public class CreateGameScreen extends UIScreenLayer {
             worldGenerator.setOptionRenderer(new StringTextRenderer<WorldGeneratorInfo>() {
                 @Override
                 public String getString(WorldGeneratorInfo value) {
-                    return value.getDisplayName();
+                    if (value != null) {
+                        return value.getDisplayName();
+                    }
+                    return "";
                 }
             });
         }

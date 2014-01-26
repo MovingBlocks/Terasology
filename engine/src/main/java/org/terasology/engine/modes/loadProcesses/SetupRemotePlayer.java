@@ -41,4 +41,9 @@ public class SetupRemotePlayer extends SingleStepLoadProcess {
         }
         return false;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

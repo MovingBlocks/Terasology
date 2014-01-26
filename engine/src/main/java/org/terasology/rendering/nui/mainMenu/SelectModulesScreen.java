@@ -18,12 +18,13 @@ package org.terasology.rendering.nui.mainMenu;
 import com.google.common.collect.Lists;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleInfo;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleSelection;
-import org.terasology.registry.In;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -189,8 +190,6 @@ public class SelectModulesScreen extends UIScreenLayer {
                     }
                 });
             }
-
-
         }
 
 
@@ -201,6 +200,9 @@ public class SelectModulesScreen extends UIScreenLayer {
                 moduleConfig.clear();
                 for (Module module : selection.getSelection()) {
                     moduleConfig.addModule(module.getId());
+                }
+                if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
+                    config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
                 }
                 config.save();
                 getManager().popScreen();

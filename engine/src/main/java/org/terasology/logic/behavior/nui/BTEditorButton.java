@@ -24,7 +24,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author synopia
  */
-@RegisterBindButton(id = "behavior", description = "Toggle Behavior editor")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_CAPITAL)
+@RegisterBindButton(id = "behavior_editor", description = "Toggle Behavior editor")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_F5)
 public class BTEditorButton extends BindButtonEvent {
 }

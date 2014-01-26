@@ -700,7 +700,9 @@ public final class WorldRenderer {
         // Sunlight
         Vector3f sunlightWorldPosition = new Vector3f(skysphere.getSunDirection(true));
         sunlightWorldPosition.scale(50000f);
-        sunlightWorldPosition.add(activeCamera.getPosition());
+        if (activeCamera != null) {
+            sunlightWorldPosition.add(activeCamera.getPosition());
+        }
         renderLightComponent(mainDirectionalLight, sunlightWorldPosition, program, camera, false);
 
         DefaultRenderingProcess.getInstance().endRenderDirectionalLights();

@@ -27,6 +27,12 @@ public final class NullIterator<T> implements Iterator<T>, Iterable<T> {
     private NullIterator() {
     }
 
+    /**
+     * @param <T>
+     * @return
+     * @deprecated Use Collections.emptyIterator() or Collections.emptyList() instead.
+     */
+    @Deprecated
     public static <T> NullIterator<T> newInstance() {
         return INSTANCE;
     }

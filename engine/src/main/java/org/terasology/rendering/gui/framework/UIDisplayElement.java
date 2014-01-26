@@ -55,7 +55,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  *         TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
-    protected static UIDisplayElement focusedElement;
+    static UIDisplayElement focusedElement;
 
     private static final Logger logger = LoggerFactory.getLogger(UIDisplayElement.class);
 

@@ -30,11 +30,11 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -476,7 +476,7 @@ public class AssetManager {
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list().iterator();
             } else {
-                currentUriIterator = NullIterator.newInstance();
+                currentUriIterator = Collections.emptyIterator();
             }
             iterate();
         }
@@ -522,7 +522,7 @@ public class AssetManager {
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list(type).iterator();
             } else {
-                currentUriIterator = NullIterator.newInstance();
+                currentUriIterator = Collections.emptyIterator();
             }
             iterate();
         }

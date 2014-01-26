@@ -17,10 +17,10 @@ package org.terasology.rendering.assets.texture;
 
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.Texture;
 
 /**
  * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
+ *
  * @author Immortius
  */
 public interface TextureRegion {
