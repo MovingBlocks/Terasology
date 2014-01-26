@@ -48,13 +48,6 @@ public class ProfiledEnvironment extends Environment {
     }
 
     @Override
-    protected void activateAllModules() {
-        Object id = Profiler.start();
-        delegate.activateAllModules();
-        logger.info("Activate all modules: " + Profiler.getAsStringAndStop(id));
-    }
-
-    @Override
     protected void loadPrefabs() {
         Object id = Profiler.start();
         delegate.loadPrefabs();
