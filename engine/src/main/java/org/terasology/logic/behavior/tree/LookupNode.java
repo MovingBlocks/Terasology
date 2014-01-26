@@ -23,7 +23,7 @@ import org.terasology.rendering.nui.properties.OneOf;
  */
 public class LookupNode extends Node {
     @OneOf.Provider(name = "behaviorTrees")
-    private BehaviorTree tree;
+    public BehaviorTree tree;
 
     @Override
     public Task createTask() {
@@ -49,6 +49,7 @@ public class LookupNode extends Node {
 
         @Override
         public void handle(Status result) {
+            stop(result);
         }
 
         @Override

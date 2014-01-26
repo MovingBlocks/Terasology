@@ -18,6 +18,7 @@ package org.terasology.logic.behavior.nui;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.behavior.BehaviorComponent;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.BehaviorSystem;
@@ -31,6 +32,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.mainMenu.EnterTextPopup;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -73,7 +75,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
 
     @Override
     public void initialise() {
-
+        debugger = new BehaviorDebugger();
         entityProperties = find("entity_properties", PropertyLayout.class);
         behaviorEditor = find("tree", BehaviorEditor.class);
         properties = find("properties", PropertyLayout.class);
@@ -90,9 +92,11 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             @Override
             public void set(RenderableNode value) {
                 selectedNode = value;
-                PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
                 properties.clear();
-                properties.addPropertyProvider("Behavior Node", provider);
+                if (value != null) {
+                    PropertyProvider<?> provider = new PropertyProvider<>(value.getNode());
+                    properties.addPropertyProvider("Behavior Node", provider);
+                }
             }
         });
 
@@ -210,7 +214,37 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 if (selectedNode != null) {
-                    behaviorSystem.createTree("xyz", selectedNode.getNode());
+                    nuiManager.pushScreen("engine:enterTextPopup", EnterTextPopup.class).bindInput(new Binding<String>() {
+                        @Override
+                        public String get() {
+                            return null;
+                        }
+
+                        @Override
+                        public void set(String value) {
+                            behaviorSystem.createTree(value, selectedNode.getNode());
+                        }
+                    });
+                }
+            }
+        });
+        WidgetUtil.trySubscribe(this, "assign", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                if (selectedTree != null && selectedInterpreter != null) {
+                    EntityRef minion = selectedInterpreter.actor().minion();
+                    minion.removeComponent(BehaviorComponent.class);
+                    BehaviorComponent component = new BehaviorComponent();
+                    component.tree = selectedTree;
+                    minion.addComponent(component);
+                    List<Interpreter> interpreter = behaviorSystem.getInterpreter();
+                    selectEntity.setSelection(null);
+                    for (Interpreter i : interpreter) {
+                        if (i.actor().minion() == minion) {
+                            selectEntity.setSelection(i);
+                            break;
+                        }
+                    }
                 }
             }
         });
@@ -253,7 +287,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
 
     private void updateDebugger() {
         if (selectedInterpreter != null && selectedTree != null) {
-            debugger = new BehaviorDebugger(selectedTree);
+            debugger.setTree(selectedTree);
             selectedInterpreter.setDebugger(debugger);
         }
     }

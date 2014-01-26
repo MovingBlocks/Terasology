@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,10 @@ public class BehaviorEditor extends ZoomableLayout {
 
     public void setTree(BehaviorTree tree) {
         this.tree = tree;
+        selectedNode = null;
+        if (selectionBinding != null) {
+            selectionBinding.set(null);
+        }
         removeAll();
         for (RenderableNode widget : tree.getRenderableNodes()) {
             addWidget(widget);
@@ -203,6 +207,7 @@ public class BehaviorEditor extends ZoomableLayout {
         }
         Node node = CoreRegistry.get(BehaviorNodeFactory.class).getNode(data);
         newNode = tree.createNode(node);
+        CoreRegistry.get(BehaviorSystem.class).treeModified(tree);
         return newNode;
     }
 

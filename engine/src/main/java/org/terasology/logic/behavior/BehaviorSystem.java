@@ -20,6 +20,8 @@ import com.google.common.collect.Maps;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.module.UriUtil;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
@@ -32,12 +34,17 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,6 +62,7 @@ import java.util.Map;
  */
 @RegisterSystem
 public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
+    public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
     @In
     private EntityManager entityManager;
     @In
@@ -105,16 +113,28 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     public BehaviorTree createTree(String name, Node root) {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(root);
-        BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, "Behaviors", name), data);
+        BehaviorTree behaviorTree = new BehaviorTree(new AssetUri(AssetType.BEHAVIOR, BEHAVIORS, name.replaceAll("\\W+", "")), data);
         trees.add(behaviorTree);
-        saveAll();
+        save(behaviorTree);
         return behaviorTree;
     }
 
-    public void saveAll() {
-        for (BehaviorTree tree : trees) {
-            AssetUri uri = tree.getURI();
-            System.out.println(uri);
+    public void save(BehaviorTree tree) {
+        Path savePath;
+        AssetUri uri = tree.getURI();
+        if (BEHAVIORS.equals(uri.getModuleName())) {
+            savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("assets").resolve("behaviors");
+        } else {
+            Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("overrides");
+            savePath = overridesPath.resolve(uri.getModuleName()).resolve("behaviors");
+        }
+        BehaviorTreeLoader loader = new BehaviorTreeLoader();
+        try {
+            Files.createDirectories(savePath);
+            Path file = savePath.resolve(uri.getAssetName() + ".behavior");
+            loader.save(new FileOutputStream(file.toFile()), tree.getData());
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot save asset " + uri + " to " + savePath, e);
         }
     }
 
@@ -138,6 +158,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         for (Interpreter interpreter : entityInterpreters.values()) {
             interpreter.reset();
         }
+        save(tree);
     }
 
     @Override

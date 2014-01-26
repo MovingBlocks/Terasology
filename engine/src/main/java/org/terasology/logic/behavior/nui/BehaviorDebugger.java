@@ -24,12 +24,10 @@ import org.terasology.logic.behavior.tree.Status;
  * @author synopia
  */
 public class BehaviorDebugger implements Interpreter.Debugger {
-    private final BehaviorTree tree;
+    private BehaviorTree tree;
     private int ticksToRun = -1;
 
-    public BehaviorDebugger(BehaviorTree tree) {
-        this.tree = tree;
-        started();
+    public BehaviorDebugger() {
     }
 
     public void pause() {
@@ -46,6 +44,9 @@ public class BehaviorDebugger implements Interpreter.Debugger {
 
     @Override
     public void nodeFinished(Node node, Status status) {
+        if (tree == null) {
+            return;
+        }
         RenderableNode renderableNode = tree.getRenderableNode(node);
         if (renderableNode != null) {
             renderableNode.setStatus(status);
@@ -54,6 +55,9 @@ public class BehaviorDebugger implements Interpreter.Debugger {
 
     @Override
     public void nodeUpdated(Node node, Status status) {
+        if (tree == null) {
+            return;
+        }
         RenderableNode renderableNode = tree.getRenderableNode(node);
         if (renderableNode != null) {
             renderableNode.setStatus(status);
@@ -62,6 +66,9 @@ public class BehaviorDebugger implements Interpreter.Debugger {
 
     @Override
     public void started() {
+        if (tree == null) {
+            return;
+        }
         for (RenderableNode renderableNode : tree.getRenderableNodes()) {
             renderableNode.setStatus(null);
         }
@@ -79,4 +86,8 @@ public class BehaviorDebugger implements Interpreter.Debugger {
         }
     }
 
+    public void setTree(BehaviorTree selectedTree) {
+        tree = selectedTree;
+        started();
+    }
 }

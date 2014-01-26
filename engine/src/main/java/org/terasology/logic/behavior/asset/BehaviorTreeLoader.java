@@ -30,6 +30,7 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
 import org.terasology.engine.module.Module;
+import org.terasology.logic.behavior.tree.LookupNode;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
@@ -163,11 +164,21 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                                 nextName(in, "nodeId");
                                 int id = in.nextInt();
                                 nextName(in, "node");
-                                T result = delegateAdapter.read(in);
-                                idNodes.put(id, (Node) result);
-                                nodeIds.put((Node) result, id);
+                                Node result;
+                                if (classMetadata.getType() == LookupNode.class) {
+                                    result = classMetadata.newInstance();
+                                    in.beginObject();
+                                    nextName(in, "tree");
+                                    String uri = in.nextString();
+                                    ((LookupNode) result).tree = (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, uri);
+                                    in.endObject();
+                                } else {
+                                    result = (Node) delegateAdapter.read(in);
+                                }
+                                idNodes.put(id, result);
+                                nodeIds.put(result, id);
                                 in.endObject();
-                                return result;
+                                return (T) result;
                             } else {
                                 throw new RuntimeException("Unambiguous type " + nodeType);
                             }
@@ -175,6 +186,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             return delegate.read(in);
                         }
                     }
+
                     private TypeAdapter<T> getDelegateAdapter(Class cls) {
                         return (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
                     }
@@ -186,12 +198,21 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
         private class BehaviorTreeTypeAdapterFactory extends TypeAdapter<BehaviorTree> {
             @Override
             public void write(JsonWriter out, BehaviorTree value) throws IOException {
-                out.value(value.getURI().toString());
+                if (value == null) {
+                    out.value("");
+                } else {
+                    out.value(value.getURI().toNormalisedSimpleString());
+                }
             }
 
             @Override
             public BehaviorTree read(JsonReader in) throws IOException {
-                return (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, in.nextString());
+                String uri = in.nextString();
+                if (uri != null && uri.length() > 0) {
+                    return (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, in.nextString());
+                } else {
+                    return null;
+                }
             }
         }
     }
