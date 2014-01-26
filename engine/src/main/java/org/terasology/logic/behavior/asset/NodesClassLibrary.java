@@ -29,6 +29,7 @@ import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,19 +43,9 @@ public class NodesClassLibrary extends AbstractClassLibrary<Node> {
     }
 
     public void scan() {
-        Set<Class<?>> parentTypes = Sets.newHashSet();
-
-        for (Class<? extends Node> type : CoreRegistry.get(ModuleManager.class).getActiveModuleReflections().getSubTypesOf(Node.class)) {
-            parentTypes.add(type.getSuperclass());
-        }
-        for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
-            for (Class<?> parentType : parentTypes) {
-                for (Class<?> type : module.getReflections().getSubTypesOf(parentType)) {
-                    logger.info("Found node class " + type);
-                    register(new SimpleUri(module.getId(), type.getSimpleName()), (Class<? extends Node>) type);
-                }
-
-            }
+        for (Map.Entry<String, Class<? extends Node>> entry : CoreRegistry.get(ModuleManager.class).findAllSubclassesOf(Node.class).entries()) {
+            logger.info("Found node class {}", entry.getValue());
+            register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }
     }
 
