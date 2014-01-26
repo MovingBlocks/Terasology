@@ -40,4 +40,9 @@ public class StartServer extends SingleStepLoadProcess {
         }
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

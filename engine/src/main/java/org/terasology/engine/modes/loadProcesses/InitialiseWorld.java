@@ -120,4 +120,9 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 5;
+    }
 }

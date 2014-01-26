@@ -77,4 +77,9 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         return true;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
+
 }

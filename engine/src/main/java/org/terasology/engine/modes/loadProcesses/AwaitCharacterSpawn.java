@@ -63,4 +63,8 @@ public class AwaitCharacterSpawn implements LoadProcess {
         return 0f;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 10;
+    }
 }

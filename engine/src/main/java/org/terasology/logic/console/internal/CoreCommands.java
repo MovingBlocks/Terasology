@@ -16,6 +16,9 @@
 package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.modes.StateIngame;
@@ -44,6 +47,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -84,6 +88,18 @@ public class CoreCommands implements ComponentSystem {
 
     @Override
     public void shutdown() {
+    }
+
+    @Command(shortDescription = "Reloads a skin")
+    public String reloadSkin(String skin) {
+        AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
+        UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
+        if (uiSkinData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiSkinData);
+            return "Success";
+        } else {
+            return "Unable to resolve skin '" + skin + "'";
+        }
     }
 
     @Command(shortDescription = "Toggles Fullscreen Mode")

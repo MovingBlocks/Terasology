@@ -57,4 +57,9 @@ public class PrepareWorld implements LoadProcess {
         return 0;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 5;
+    }
+
 }

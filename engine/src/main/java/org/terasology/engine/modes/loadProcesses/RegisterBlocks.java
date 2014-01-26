@@ -60,4 +60,9 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         return true;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
+
 }

@@ -51,4 +51,8 @@ public class CacheBlocks extends StepBasedLoadProcess {
         setTotalSteps(blockManager.getBlockFamilyCount());
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

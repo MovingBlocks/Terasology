@@ -46,4 +46,9 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
         tessellator.generateMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "gelatinousCube"));
         return true;
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

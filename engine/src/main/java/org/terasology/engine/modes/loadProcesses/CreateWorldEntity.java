@@ -50,4 +50,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         return true;
     }
 
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
+
 }
