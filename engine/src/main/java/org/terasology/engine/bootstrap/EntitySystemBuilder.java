@@ -19,9 +19,6 @@ package org.terasology.engine.bootstrap;
 import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -42,6 +39,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -61,6 +59,9 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vecto
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3iTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector4fTypeHandler;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -108,6 +109,10 @@ public class EntitySystemBuilder {
         // Event System
         entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
+        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        nodesClassLibrary.scan();
 
         registerComponents(library.getComponentLibrary(), moduleManager);
         registerEvents(entityManager.getEventSystem(), moduleManager);

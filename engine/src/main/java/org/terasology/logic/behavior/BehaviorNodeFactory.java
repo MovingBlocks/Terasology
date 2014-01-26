@@ -20,8 +20,6 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,12 +27,9 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.Node;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
@@ -56,7 +51,6 @@ public class BehaviorNodeFactory implements ComponentSystem {
     private Map<ClassMetadata<? extends Node, ?>, BehaviorNodeComponent> nodes = Maps.newHashMap();
     private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
     private List<String> categories;
-    private ClassLibrary<Node> nodesLibrary;
 
     @In
     private ModuleManager moduleManager;
@@ -66,6 +60,8 @@ public class BehaviorNodeFactory implements ComponentSystem {
     private PrefabManager prefabManager;
     @In
     private AssetManager assetManager;
+    @In
+    private NodesClassLibrary nodesClassLibrary;
 
     public BehaviorNodeFactory() {
         CoreRegistry.put(BehaviorNodeFactory.class, this);
@@ -82,7 +78,6 @@ public class BehaviorNodeFactory implements ComponentSystem {
     }
 
     public void refreshLibrary() {
-        refreshNodes();
         refreshPrefabs();
         sortLibrary();
     }
@@ -105,7 +100,7 @@ public class BehaviorNodeFactory implements ComponentSystem {
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = entityManager.create(prefab);
             BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
-            ClassMetadata<? extends Node, ?> classMetadata = nodesLibrary.getMetadata(new SimpleUri(component.type));
+            ClassMetadata<? extends Node, ?> classMetadata = nodesClassLibrary.resolve(component.type);
             if (classMetadata != null) {
                 if (classMetadata.isConstructable()) {
                     nodes.put(classMetadata, component);
@@ -125,17 +120,8 @@ public class BehaviorNodeFactory implements ComponentSystem {
         }
     }
 
-    private void refreshNodes() {
-        nodesLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            for (Class<? extends Node> elementType : module.getReflections().getSubTypesOf(Node.class)) {
-                nodesLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
-            }
-        }
-    }
-
     public BehaviorNodeComponent getNodeComponent(Node node) {
-        ClassMetadata<? extends Node, ?> metadata = nodesLibrary.getMetadata(node.getClass());
+        ClassMetadata<? extends Node, ?> metadata = nodesClassLibrary.getMetadata(node.getClass());
         if (metadata != null) {
             BehaviorNodeComponent nodeComponent = nodes.get(metadata);
             if (nodeComponent == null) {
