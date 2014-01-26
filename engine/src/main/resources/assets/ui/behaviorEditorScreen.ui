@@ -65,6 +65,11 @@
                     },
                     {
                         "type" : "UIButton",
+                        "id" : "remove",
+                        "text" : "remove"
+                    },
+                    {
+                        "type" : "UIButton",
                         "id" : "assign",
                         "text" : "assign"
                     }
@@ -106,11 +111,14 @@
                 ]
             },
             {
-                "type" : "UIList",
-                "layoutInfo" : {
-                    "cc" : "cell 0 2, spany 2"
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "UIList",
+                    "id" : "palette"
                 },
-                "id" : "palette"
+                "layoutInfo" : {
+                    "cc" : "cell 0 2, spany 2, h 500!"
+                }
             }
         ]
     }

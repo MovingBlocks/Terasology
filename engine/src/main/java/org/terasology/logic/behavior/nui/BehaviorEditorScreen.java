@@ -248,6 +248,25 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                 }
             }
         });
+        WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                if (selectedNode != null && selectedTree != null) {
+                    RenderableNode targetNode = selectedNode.getInputPort().getTargetNode();
+                    if (targetNode != null) {
+                        for (int i = 0; i < targetNode.getChildrenCount(); i++) {
+                            if (targetNode.getChild(i) == selectedNode) {
+                                targetNode.withModel().removeChild(i);
+                                break;
+                            }
+                        }
+                    }
+                    removeWidget(selectedNode);
+                    behaviorEditor.nodeClicked(null);
+                    behaviorSystem.treeModified(selectedTree);
+                }
+            }
+        });
 
         WidgetUtil.trySubscribe(this, "debug_run", new ActivateEventListener() {
             @Override
@@ -283,6 +302,13 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         });
 
         paletteItems = findPaletteItems();
+    }
+
+    private void removeWidget(RenderableNode node) {
+        behaviorEditor.removeWidget(node);
+        for (RenderableNode renderableNode : node.children()) {
+            removeWidget(renderableNode);
+        }
     }
 
     private void updateDebugger() {
