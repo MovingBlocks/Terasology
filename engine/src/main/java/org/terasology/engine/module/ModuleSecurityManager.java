@@ -181,7 +181,8 @@ public class ModuleSecurityManager extends SecurityManager {
 
         if (moduleDepth - 1 > 0) {
             throw new AccessControlException(
-                    String.format("Module class '%s' calling into '%s' requiring permission '%s'", stack[moduleDepth].getName(), stack[moduleDepth - 1].getName(), permission));
+                    String.format("Module class '%s' calling into '%s' requiring permission '%s'"
+                            , stack[moduleDepth].getName(), stack[moduleDepth - 1].getName(), permission));
         } else {
             throw new AccessControlException(String.format("Module class '%s' requiring permission '%s'", stack[moduleDepth].getName(), permission));
         }
