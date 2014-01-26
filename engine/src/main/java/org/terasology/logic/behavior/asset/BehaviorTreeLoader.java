@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,15 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.terasology.asset.AssetLoader;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.DefaultClassLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
@@ -51,8 +57,11 @@ import java.util.Map;
  */
 public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     private BehaviorTreeGson treeGson = new BehaviorTreeGson();
+    private ClassLibrary<Node> nodesLibrary;
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
+        refreshLibrary();
+
         try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream))) {
             write.setIndent("  ");
             write.beginObject().name("model");
@@ -63,6 +72,8 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
 
     @Override
     public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+        refreshLibrary();
+
         BehaviorTreeData data = new BehaviorTreeData();
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
             reader.setLenient(true);
@@ -72,6 +83,15 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             reader.endObject();
         }
         return data;
+    }
+
+    private void refreshLibrary() {
+        nodesLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        for (Module module : CoreRegistry.get(ModuleManager.class).getActiveCodeModules()) {
+            for (Class<? extends Node> elementType : module.getReflections().getSubTypesOf(Node.class)) {
+                nodesLibrary.register(new SimpleUri(module.getId(), elementType.getSimpleName()), elementType);
+            }
+        }
     }
 
     private String nextName(JsonReader in, String expectedName) throws IOException {
@@ -129,20 +149,16 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                     public void write(JsonWriter out, T value) throws IOException {
                         if (value instanceof Node) {
                             out.beginObject();
-                            if (nodeIds.containsKey(value)) {
-                                out.name("nodeType").value("ref")
-                                        .name("nodeId").value(nodeIds.get(value));
-                            } else {
-                                idNodes.put(currentId, (Node) value);
-                                nodeIds.put((Node) value, currentId);
+                            idNodes.put(currentId, (Node) value);
+                            nodeIds.put((Node) value, currentId);
 
-                                TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(value.getClass()));
-                                out.name("nodeType").value(value.getClass().getCanonicalName())
-                                        .name("nodeId").value(currentId);
-                                currentId++;
-                                out.name("node");
-                                delegateAdapter.write(out, value);
-                            }
+                            TypeAdapter<T> delegateAdapter = getDelegateAdapter(value.getClass());
+
+                            out.name("nodeType").value(nodesLibrary.getMetadata(((Node) value).getClass()).getUri().toString())
+                                    .name("nodeId").value(currentId);
+                            currentId++;
+                            out.name("node");
+                            delegateAdapter.write(out, value);
                             out.endObject();
                         } else {
                             delegate.write(out, value);
@@ -156,42 +172,27 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             in.beginObject();
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
-                            T result;
-                            if ("ref".equals(nodeType)) {
-                                nextName(in, "nodeId");
-                                int id = in.nextInt();
-                                result = (T) idNodes.get(id);
-                            } else {
-                                // TODO: Use ClassLibrary or otherwise stop requiring full class names in components
-                                ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-                                ClassLoader[] classLoaders;
-                                if (moduleManager != null) {
-                                    classLoaders = moduleManager.getActiveModuleReflections().getConfiguration().getClassLoaders();
-                                } else {
-                                    classLoaders = new ClassLoader[]{getClass().getClassLoader()};
-                                }
-                                Class cls = null;
-                                for (ClassLoader classLoader : classLoaders) {
-                                    try {
-                                        cls = classLoader.loadClass(nodeType);
-                                        break;
-                                    } catch (ClassNotFoundException e) {
-                                        // ignore
-                                    }
-                                }
-                                TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
+                            ClassMetadata<? extends Node, ?> classMetadata = nodesLibrary.getMetadata(new SimpleUri(nodeType));
+                            if (classMetadata != null) {
+                                TypeAdapter<T> delegateAdapter = getDelegateAdapter(classMetadata.getType());
                                 nextName(in, "nodeId");
                                 int id = in.nextInt();
                                 nextName(in, "node");
-                                result = delegateAdapter.read(in);
+                                T result = delegateAdapter.read(in);
                                 idNodes.put(id, (Node) result);
                                 nodeIds.put((Node) result, id);
+                                in.endObject();
+                                return result;
+                            } else {
+                                throw new RuntimeException(nodeType + " not found!");
                             }
-                            in.endObject();
-                            return result;
                         } else {
                             return delegate.read(in);
                         }
+                    }
+
+                    private TypeAdapter<T> getDelegateAdapter(Class cls) {
+                        return (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
                     }
                 };
             }

@@ -105,9 +105,8 @@ public class BehaviorNodeFactory implements ComponentSystem {
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = entityManager.create(prefab);
             BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
-            List<ClassMetadata<? extends Node, ?>> metadata = nodesLibrary.getMetadata(component.type);
-            if (metadata.size() == 1) {
-                ClassMetadata<? extends Node, ?> classMetadata = metadata.get(0);
+            ClassMetadata<? extends Node, ?> classMetadata = nodesLibrary.getMetadata(new SimpleUri(component.type));
+            if (classMetadata != null) {
                 if (classMetadata.isConstructable()) {
                     nodes.put(classMetadata, component);
                     logger.info("Found behavior node for class " + component.type + " name=" + component.name);
@@ -121,7 +120,7 @@ public class BehaviorNodeFactory implements ComponentSystem {
                     logger.warn("Node cannot be constructed! -> ignoring " + component.type + " name=" + component.name);
                 }
             } else {
-                logger.warn("Multiple nodes found -> ignoring! " + component.type + " name=" + component.name);
+                logger.warn("Node not found -> ignoring! " + component.type + " name=" + component.name);
             }
         }
     }
