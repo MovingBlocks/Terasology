@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,25 +21,35 @@ import javax.vecmath.Vector2f;
 import org.terasology.asset.AssetUri;
 
 /**
+ * Dummy implementation of WorldAtlas
  * @author Martin Steiger
  */
-public interface WorldAtlas {
+public class NullWorldAtlas implements WorldAtlas {
 
-    int getTileSize();
+    @Override
+    public int getTileSize() {
+        return 0;
+    }
 
-    int getAtlasSize();
+    @Override
+    public int getAtlasSize() {
+        return 0;
+    }
 
-    float getRelativeTileSize();
+    @Override
+    public float getRelativeTileSize() {
+        return 0;
+    }
 
-    int getNumMipmaps();
+    @Override
+    public int getNumMipmaps() {
+        return 0;
+    }
 
-    /**
-     * Obtains the tex coords of a block tile. If it isn't part of the atlas it is added to the atlas.
-     *
-     * @param uri         The uri of the block tile of interest.
-     * @param warnOnError Whether a warning should be logged if the asset canot be found
-     * @return The tex coords of the tile in the atlas.
-     */
-    Vector2f getTexCoords(AssetUri uri, boolean warnOnError);
+    @Override
+    public Vector2f getTexCoords(AssetUri uri, boolean warnOnError) {
+        return new Vector2f();
+    }
 
+    
 }

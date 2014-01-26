@@ -1,18 +1,17 @@
 /*
- * Copyright (C) 2012-2014 Martin Steiger
+ * Copyright 2014 MovingBlocks
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.terasology.utilities;
@@ -30,52 +29,52 @@ import com.google.common.collect.ImmutableList;
  * Tests {@link CamelCaseMatcher}
  * @author Martin Steiger
  */
-public class CamelCaseMatcherTest
-{
-	@Test
-	public void testDefault() {
-		List<String> commands = ImmutableList.of("MyPossibleResultString");
-		List<String> queries = ImmutableList.of("MyPossibleResultString", "MPRS", 
-				"MPRString", "MyPosResStr" , "M", "MyP*RString", "*PosResString", "My*String");
-		
-		for (String query : queries) {
-			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-			assertTrue("The query did not match the command",  matches.size() == 1);
-		}
-	}
-	
-	@Test
-	public void testTeraCommands() {
-		List<String> commands = ImmutableList.of("azerty", "bindKey", "clearChunkCache", "countAI", 
-				"damage", "debugTarget", "destroyAI", "destroyEntitiesUsingPrefab", "dumpEntities", 
-				"exit", "fullscreen", "generateNameList", "generateNameList", "ghost", "giveBlock", 
-				"giveBlock", "giveItem", "health", "help", "hjump", "hspeed", "initNameGenerator", 
-				"kill", "listBlocks", "listBlocksByCategory", "listFreeShapeBlocks", "listItems", 
-				"listShapes", "mute", "neo", "nextName", "placeBlock", "playTestSound", "purgeWorld", 
-				"restoreSpeed", "say", "setGroundFriction", "setJumpSpeed", "setMaxGhostSpeed", 
-				"setMaxGroundSpeed", "setMaxHealth", "setRegenRaterate", "showHealth", "showMovement", 
-				"sleigh", "spawnBlock", "spawnPrefab", "stepHeight", "teleport");
+public class CamelCaseMatcherTest {
+    
+    @Test
+    public void testDefault() {
+        List<String> commands = ImmutableList.of("MyPossibleResultString");
+        List<String> queries = ImmutableList.of("MyPossibleResultString", "MPRS", 
+                "MPRString", "MyPosResStr" , "M", "MyP*RString", "*PosResString", "My*String");
+        
+        for (String query : queries) {
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            assertTrue("The query did not match the command",  matches.size() == 1);
+        }
+    }
+    
+    @Test
+    public void testTeraCommands() {
+        List<String> commands = ImmutableList.of("azerty", "bindKey", "clearChunkCache", "countAI", 
+                "damage", "debugTarget", "destroyAI", "destroyEntitiesUsingPrefab", "dumpEntities", 
+                "exit", "fullscreen", "generateNameList", "generateNameList", "ghost", "giveBlock", 
+                "giveBlock", "giveItem", "health", "help", "hjump", "hspeed", "initNameGenerator", 
+                "kill", "listBlocks", "listBlocksByCategory", "listFreeShapeBlocks", "listItems", 
+                "listShapes", "mute", "neo", "nextName", "placeBlock", "playTestSound", "purgeWorld", 
+                "restoreSpeed", "say", "setGroundFriction", "setJumpSpeed", "setMaxGhostSpeed", 
+                "setMaxGroundSpeed", "setMaxHealth", "setRegenRaterate", "showHealth", "showMovement", 
+                "sleigh", "spawnBlock", "spawnPrefab", "stepHeight", "teleport");
 
-		List<String> noHitQueries = ImmutableList.of("asdfd", "AvDS", "MPRString");
+        List<String> noHitQueries = ImmutableList.of("asdfd", "AvDS", "MPRString");
 
-		for (String query : noHitQueries) {
-			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-			assertTrue("The query '" + query + "' should not match any command",  matches.size() == 0);
-		}
+        for (String query : noHitQueries) {
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            assertTrue("The query '" + query + "' should not match any command",  matches.size() == 0);
+        }
 
-		List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
-		
-		for (String query : oneHitQueries) {
-			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-			assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
-		}
+        List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
+        
+        for (String query : oneHitQueries) {
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
+        }
 
-		List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
-		
-		for (String query : multiHitQueries) {
-			Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-			assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(),  matches.size() > 1);
-		}
-	}
-	
+        List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
+        
+        for (String query : multiHitQueries) {
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(),  matches.size() > 1);
+        }
+    }
+    
 }

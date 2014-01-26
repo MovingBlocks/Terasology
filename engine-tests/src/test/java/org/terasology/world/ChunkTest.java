@@ -24,7 +24,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.WorldAtlasImpl;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.ChunkConstants;
@@ -43,7 +43,7 @@ public class ChunkTest extends TerasologyTestingEnvironment {
     @Before
     public void setup() throws Exception {
         super.setup();
-        blockManager = new BlockManagerImpl(new WorldAtlas(4096), new DefaultBlockFamilyFactoryRegistry());
+        blockManager = new BlockManagerImpl(new WorldAtlasImpl(4096), new DefaultBlockFamilyFactoryRegistry());
         CoreRegistry.put(BlockManager.class, blockManager);
         chunk = new ChunkImpl(new Vector3i(0, 0, 0));
     }
