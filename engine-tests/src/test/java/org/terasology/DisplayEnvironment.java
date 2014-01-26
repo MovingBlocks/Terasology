@@ -33,6 +33,7 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -161,7 +162,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         });
 
         // TODO: move somewhere else
-        CoreRegistry.put(ShaderManager.class, new ShaderManager()).initShaders();
+        CoreRegistry.put(ShaderManager.class, new ShaderManagerLwjgl()).initShaders();
     }
 
     @Override
