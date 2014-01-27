@@ -26,6 +26,10 @@ public interface Lerpable<T> {
     /**
      * Linear interpolation between the instance on which it is called
      * and a other instance of the same class.
+     *
+     * When providing an implementation, remember that any instance of T
+     * can be cast to the implementing class and vice versa.
+     *
      * @param other second instance (of same class) to interpolate with
      * @param point point of interpolation
      * @param <T> Reference to the implementing class itself
