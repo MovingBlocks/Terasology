@@ -18,7 +18,7 @@ package org.terasology.rendering.headless;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.font.FontData;
-import org.terasology.rendering.base.BaseFont;
+import org.terasology.rendering.assets.font.BaseFont;
 
 public class HeadlessFont extends BaseFont {
 

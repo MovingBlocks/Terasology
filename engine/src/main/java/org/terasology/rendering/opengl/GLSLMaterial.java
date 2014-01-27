@@ -47,7 +47,7 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.base.BaseMaterial;
+import org.terasology.rendering.assets.material.BaseMaterial;
 import org.terasology.rendering.shader.ShaderParameters;
 
 import com.google.common.base.Objects;

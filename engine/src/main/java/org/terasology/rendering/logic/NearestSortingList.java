@@ -23,7 +23,6 @@ import org.terasology.logic.location.DistanceComparator;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.rendering.cameras.Camera;
 
-import javax.vecmath.Vector3f;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -70,7 +69,7 @@ public class NearestSortingList implements Iterable<EntityRef> {
      * Default value is 50 milliseconds.
      *
      * @return the amount of milliseconds between the start of two consecutive
-     *         sorting runs. (Unless sorting takes longer than this value in ms.)
+     * sorting runs. (Unless sorting takes longer than this value in ms.)
      */
     public long getSortPeriod() {
         return sortPeriod;
@@ -191,8 +190,8 @@ public class NearestSortingList implements Iterable<EntityRef> {
      *
      * @param output The array to fill with entities from this container.
      * @return The amount of entities that were put into the array. If there are
-     *         less entities in this container than the size of output, this
-     *         number will be this.size(). Otherwise it will be output.length
+     * less entities in this container than the size of output, this
+     * number will be this.size(). Otherwise it will be output.length
      */
     public synchronized int getNearest(EntityRef[] output) {
         int size = Math.min(size(), output.length);
@@ -209,8 +208,8 @@ public class NearestSortingList implements Iterable<EntityRef> {
      *
      * @param count the number of entities to return.
      * @return An array with Entities. Attempts have been made to put the
-     *         Entities that are closer to the player at a lower index. The size
-     *         of this array equals min(count, size()).
+     * Entities that are closer to the player at a lower index. The size
+     * of this array equals min(count, size()).
      */
     public EntityRef[] getNearest(int count) {
         EntityRef[] output = new EntityRef[Math.min(count, size())];

@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.base;
+package org.terasology.rendering.assets.font;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.vecmath.Vector3f;
-
+import com.google.common.collect.Maps;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontCharacter;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.nui.HorizontalAlign;
 
-import com.google.common.collect.Maps;
+import javax.vecmath.Vector3f;
+import java.util.List;
+import java.util.Map;
 
 public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
 

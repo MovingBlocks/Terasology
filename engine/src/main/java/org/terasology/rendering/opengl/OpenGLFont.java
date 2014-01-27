@@ -36,7 +36,7 @@ import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.font.FontCharacter;
 import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.base.BaseFont;
+import org.terasology.rendering.assets.font.BaseFont;
 
 /**
  * @author Immortius

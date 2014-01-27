@@ -15,11 +15,9 @@
  */
 package org.terasology.logic.behavior.asset;
 
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -27,10 +25,8 @@ import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author synopia

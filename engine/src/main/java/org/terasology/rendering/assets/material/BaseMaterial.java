@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.base;
+package org.terasology.rendering.assets.material;
 
-import java.nio.FloatBuffer;
+import org.terasology.asset.AbstractAsset;
+import org.terasology.asset.AssetUri;
+import org.terasology.rendering.assets.shader.ShaderProgramFeature;
+import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.cameras.Camera;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Tuple2f;
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Tuple4f;
-
-import org.terasology.asset.AbstractAsset;
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.shader.ShaderProgramFeature;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.cameras.Camera;
+import java.nio.FloatBuffer;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
 
@@ -83,7 +80,7 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
 
     public abstract void deactivateFeature(ShaderProgramFeature feature);
 
-    public abstract void deactivateFeatures(ShaderProgramFeature ... features);
+    public abstract void deactivateFeatures(ShaderProgramFeature... features);
 
     public abstract void bindTextures();
 

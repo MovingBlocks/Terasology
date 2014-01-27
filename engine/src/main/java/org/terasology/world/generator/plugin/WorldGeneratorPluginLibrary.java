@@ -17,7 +17,6 @@ package org.terasology.world.generator.plugin;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;

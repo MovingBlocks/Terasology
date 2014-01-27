@@ -15,12 +15,9 @@
  */
 package org.terasology.engine.module;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import org.reflections.Reflections;
 
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
