@@ -23,7 +23,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  */
 public abstract class AbstractWidget implements UIWidget {
 
-    private final String id;
+    private String id;
     private Binding<String> family = new DefaultBinding<>();
     private boolean focused;
 
@@ -45,6 +45,10 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public final String getId() {
         return id;
+    }
+
+    protected void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -117,5 +121,10 @@ public abstract class AbstractWidget implements UIWidget {
         for (UIWidget item : this) {
             item.update(delta);
         }
+    }
+
+    @Override
+    public boolean canBeFocus() {
+        return true;
     }
 }

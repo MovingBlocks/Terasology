@@ -59,6 +59,6 @@ public final class TextureDataFactory {
         // The buffer must be reset back to the initial position before passing it onward.
         data.rewind();
 
-        return new TextureData(TEXTURE_WIDTH, TEXTURE_HEIGHT, new ByteBuffer[]{data}, WrapMode.Repeat, FilterMode.Nearest);
+        return new TextureData(TEXTURE_WIDTH, TEXTURE_HEIGHT, new ByteBuffer[]{data}, WrapMode.REPEAT, FilterMode.NEAREST);
     }
 }

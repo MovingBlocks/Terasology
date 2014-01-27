@@ -61,9 +61,7 @@ public interface Console {
      */
     Iterable<Message> getMessages();
 
-    int previousCommandSize();
-
-    String getPreviousCommand(int index);
+    List<String> getPreviousCommands();
 
     /**
      * Subscribe for notification of all messages added to the console

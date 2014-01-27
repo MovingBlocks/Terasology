@@ -17,13 +17,14 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.WorldAtlasImpl;
 
 /**
  * @author Immortius
@@ -44,7 +45,7 @@ public class RegisterBlocks extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        WorldAtlas atlas = new WorldAtlas(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution());
+        WorldAtlas atlas = new WorldAtlasImpl(CoreRegistry.get(Config.class).getRendering().getMaxTextureAtlasResolution());
         CoreRegistry.put(WorldAtlas.class, atlas);
 
         BlockManagerImpl blockManager;
@@ -58,6 +59,11 @@ public class RegisterBlocks extends SingleStepLoadProcess {
         CoreRegistry.put(BlockManager.class, blockManager);
 
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 }

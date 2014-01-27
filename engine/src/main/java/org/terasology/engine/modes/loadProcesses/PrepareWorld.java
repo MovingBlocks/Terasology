@@ -19,7 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -55,6 +55,11 @@ public class PrepareWorld implements LoadProcess {
     @Override
     public float getProgress() {
         return 0;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 5;
     }
 
 }

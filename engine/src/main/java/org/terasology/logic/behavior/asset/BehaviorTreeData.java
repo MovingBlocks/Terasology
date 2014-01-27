@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import org.abego.treelayout.TreeLayout;
 import org.abego.treelayout.util.DefaultConfiguration;
 import org.abego.treelayout.util.FixedNodeExtentProvider;
 import org.terasology.asset.AssetData;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
 import org.terasology.logic.behavior.nui.RenderableNode;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.registry.CoreRegistry;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Collections;
@@ -99,7 +99,15 @@ public class BehaviorTreeData implements AssetData {
     }
 
     public List<RenderableNode> getRenderableNodes() {
-        return Lists.newArrayList(renderableNodes.values());
+        final List<RenderableNode> result = Lists.newArrayList();
+        root.visit(null, new Node.Visitor<RenderableNode>() {
+            @Override
+            public RenderableNode visit(RenderableNode item, Node node) {
+                result.add(renderableNodes.get(node));
+                return null;
+            }
+        });
+        return result;
     }
 
     public RenderableNode getRenderableNode(Node node) {

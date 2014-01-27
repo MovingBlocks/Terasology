@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

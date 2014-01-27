@@ -105,6 +105,9 @@ public class ZoomableLayout extends CoreLayout {
 
         canvas.addInteractionRegion(dragListener);
         for (PositionalWidget widget : widgets) {
+            if (!widget.isVisible()) {
+                continue;
+            }
             Vector2i screenStart = worldToScreen(widget.getPosition());
             Vector2f worldEnd = new Vector2f(widget.getPosition());
             worldEnd.add(widget.getSize());

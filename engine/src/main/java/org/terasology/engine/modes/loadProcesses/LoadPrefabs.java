@@ -53,4 +53,9 @@ public class LoadPrefabs extends StepBasedLoadProcess {
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         setTotalSteps(Lists.newArrayList(Assets.list(AssetType.PREFAB)).size());
     }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

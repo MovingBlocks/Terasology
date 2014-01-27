@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;

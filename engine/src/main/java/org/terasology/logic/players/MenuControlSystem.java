@@ -16,21 +16,21 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
-import org.terasology.input.binds.general.ConsoleButton;
-import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.binds.general.PauseButton;
+import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
 /**
@@ -45,7 +45,10 @@ public class MenuControlSystem implements ComponentSystem {
     public static final String HUD = "hud";
 
     @In
-    GUIManager guiManager;
+    private GUIManager guiManager;
+
+    @In
+    private NUIManager nuiManager;
 
     @Override
     public void initialise() {
@@ -54,14 +57,6 @@ public class MenuControlSystem implements ComponentSystem {
 
     @Override
     public void shutdown() {
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN) {
-            guiManager.openWindow(CHAT);
-            event.consume();
-        }
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -75,7 +70,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onTogglePause(PauseButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(GUIManager.class).openWindow(PAUSE_MENU);
+            nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
     }
@@ -92,7 +87,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = {ClientComponent.class})
     public void onDeath(DeathEvent event, EntityRef entity) {
         if (entity.getComponent(ClientComponent.class).local) {
-            CoreRegistry.get(GUIManager.class).openWindow("death");
+            nuiManager.pushScreen("engine:deathScreen");
         }
     }
 

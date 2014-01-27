@@ -1,0 +1,10 @@
+{
+    "BehaviorNode" : {
+        "type"      : "LookupNode",
+        "name"      : "Lookup",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

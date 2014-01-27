@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,20 @@
  */
 package org.terasology.logic.behavior.tree;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.API;
+import org.terasology.logic.common.DisplayInformationComponent;
+import org.terasology.registry.InjectionHelper;
 
 import java.util.Deque;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -41,6 +48,11 @@ public class Interpreter {
         public Status update(float dt) {
             return null;
         }
+
+        @Override
+        public void handle(Status result) {
+
+        }
     };
 
     private Debugger debugger;
@@ -48,6 +60,7 @@ public class Interpreter {
     private Deque<Task> tasks = Queues.newLinkedBlockingDeque();
     private Node root;
     private Set<Node> startedNodes = Sets.newHashSet();
+    private Map<Task, List<Task>> startedTasks = Maps.newHashMap();
 
     public Interpreter(Actor actor) {
         this.actor = actor;
@@ -60,49 +73,71 @@ public class Interpreter {
 
     public void reset() {
         tasks.clear();
-        start();
+        startedTasks.clear();
+
+        start(root);
         tasks.addLast(TERMINAL);
     }
 
-    public void setRoot(Node root) {
-        this.root = root;
-    }
-
-    public void start() {
-        start(root, null);
+    public Task start(Node start) {
+        root = start;
+        Task task = start(start, null);
         if (debugger != null) {
             debugger.started();
         }
+        return task;
     }
 
-    public void start(Task task) {
-        start(task, null);
-    }
-
-    public void start(Node node, Task.Observer observer) {
+    public Task start(Node node, Task parent) {
         if (node == null) {
-            return;
+            return null;
         }
-        start(node.createTask(), observer);
+        Task task = node.createTask();
+        start(task, parent);
+        return task;
     }
 
-    public void start(Task task, Task.Observer observer) {
+    private void start(Task task, Task parent) {
+        InjectionHelper.inject(task);
         task.setActor(actor);
         task.setInterpreter(this);
-        task.setObserver(observer);
-
+        task.setParent(parent);
+        if (parent != null) {
+            List<Task> subTasks = startedTasks.get(parent);
+            if (subTasks == null) {
+                subTasks = Lists.newArrayList();
+                startedTasks.put(parent, subTasks);
+            }
+            subTasks.add(task);
+        }
         tasks.addFirst(task);
     }
 
     public void stop(Task task, Status result) {
         task.setStatus(result);
-        Task.Observer observer = task.getObserver();
-        if (observer != null) {
-            observer.handle(result);
+        Task parent = task.getParent();
+        if (parent != null) {
+            parent.handle(result);
         }
-        tasks.remove(task);
+        stopStartedTasks(task);
         if (debugger != null) {
             debugger.nodeFinished(task.getNode(), result);
+        }
+    }
+
+    private void stopStartedTasks(Task parent) {
+        Queue<Task> open = Queues.newArrayDeque();
+        open.offer(parent);
+        while (!open.isEmpty()) {
+            Task current = open.poll();
+            if (current.getStatus() == Status.RUNNING) {
+                current.onTerminate(Status.FAILURE);
+            }
+            tasks.remove(current);
+            List<Task> subTasks = startedTasks.remove(current);
+            if (subTasks != null) {
+                open.addAll(subTasks);
+            }
         }
     }
 
@@ -138,8 +173,8 @@ public class Interpreter {
             if (debugger != null) {
                 debugger.nodeFinished(current.getNode(), current.getStatus());
             }
-            if (current.getObserver() != null) {
-                current.getObserver().handle(current.getStatus());
+            if (current.getParent() != null) {
+                stop(current, current.getStatus());
             }
         } else {
             tasks.addLast(current);
@@ -156,7 +191,7 @@ public class Interpreter {
 
     @Override
     public String toString() {
-        return actor.minion().toString();
+        return actor.component(DisplayInformationComponent.class).name;
     }
 
     public interface Debugger {

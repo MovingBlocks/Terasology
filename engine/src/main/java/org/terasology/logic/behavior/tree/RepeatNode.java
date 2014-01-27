@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import org.terasology.engine.API;
 /**
  * Repeats the child node forever.
  *
+ * Never finishes with SUCCESS.
+ * Finishes with FAILURE, as soon as decorated node finishes with FAILURE
+ *
  * @author synopia
  */
 @API
@@ -36,7 +39,7 @@ public class RepeatNode extends DecoratorNode {
         return new RepeatTask(this);
     }
 
-    public static class RepeatTask extends DecoratorTask implements Task.Observer {
+    public static class RepeatTask extends DecoratorTask {
         public RepeatTask(RepeatNode node) {
             super(node);
         }
@@ -44,7 +47,7 @@ public class RepeatNode extends DecoratorNode {
         @Override
         public void onInitialize() {
             if (getNode().child != null) {
-                interpreter().start(getNode().child, this);
+                start(getNode().child);
             }
         }
 
@@ -56,12 +59,12 @@ public class RepeatNode extends DecoratorNode {
         @Override
         public void handle(Status result) {
             if (result == Status.FAILURE) {
-                interpreter().stop(this, Status.FAILURE);
+                stop(Status.FAILURE);
                 return;
             }
 
             if (getNode().child != null) {
-                interpreter().start(getNode().child, this);
+                start(getNode().child);
             }
         }
 

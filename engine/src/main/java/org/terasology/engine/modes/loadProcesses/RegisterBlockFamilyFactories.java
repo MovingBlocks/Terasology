@@ -19,7 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.world.block.family.BlockFamilyFactory;
@@ -75,5 +75,10 @@ public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
                 logger.error("Failed to load blockFamilyFactory {}", id, e);
             }
         }
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

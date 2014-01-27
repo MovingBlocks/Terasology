@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -39,6 +39,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -63,6 +64,7 @@ public class StateIngame implements GameState {
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;
     private GUIManager guiManager;
+    private NUIManager nuiManager;
     private WorldRenderer worldRenderer;
     private EngineEntityManager entityManager;
     private CameraTargetSystem cameraTargetSystem;
@@ -72,12 +74,12 @@ public class StateIngame implements GameState {
     /* GAME LOOP */
     private boolean pauseGame;
 
-
     public StateIngame() {
     }
 
     public void init(GameEngine engine) {
         guiManager = CoreRegistry.get(GUIManager.class);
+        nuiManager = CoreRegistry.get(NUIManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         eventSystem = CoreRegistry.get(EventSystem.class);
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
@@ -85,6 +87,7 @@ public class StateIngame implements GameState {
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
         eventSystem.registerEventHandler(guiManager);
+        eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);
@@ -119,6 +122,7 @@ public class StateIngame implements GameState {
         componentSystemManager.shutdown();
         GameThread.processWaitingProcesses();
         guiManager.closeAllWindows();
+        nuiManager.closeAllScreens();
 
         if (worldRenderer != null) {
             worldRenderer.dispose();
@@ -153,7 +157,7 @@ public class StateIngame implements GameState {
             worldRenderer.update(delta);
         }
 
-        updateUserInterface();
+        updateUserInterface(delta);
     }
 
     @Override
@@ -192,9 +196,13 @@ public class StateIngame implements GameState {
 
     public void renderUserInterface() {
         guiManager.render();
+        PerformanceMonitor.startActivity("Rendering NUI");
+        nuiManager.render();
+        PerformanceMonitor.endActivity();
     }
 
-    private void updateUserInterface() {
+    private void updateUserInterface(float delta) {
+        nuiManager.update(delta);
         guiManager.update();
     }
 

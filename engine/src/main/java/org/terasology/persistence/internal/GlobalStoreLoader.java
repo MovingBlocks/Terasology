@@ -126,7 +126,7 @@ final class GlobalStoreLoader {
     private Prefab loadPrefab(EntityData.Prefab prefabData, Map<String, EntityData.Prefab> pendingPrefabs) {
         Prefab result = Assets.getPrefab(prefabData.getName());
         if (result == null) {
-            if (prefabData.hasParentName() && pendingPrefabs.containsKey(pendingPrefabs.get(prefabData.getParentName()))) {
+            if (prefabData.hasParentName() && pendingPrefabs.containsKey(prefabData.getParentName())) {
                 loadPrefab(pendingPrefabs.get(prefabData.getParentName()), pendingPrefabs);
             }
             Module module = moduleManager.getActiveModule(new SimpleUri(prefabData.getName()).getNormalisedModuleName());

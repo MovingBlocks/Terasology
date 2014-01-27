@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
@@ -58,5 +58,10 @@ public class RegisterMods extends SingleStepLoadProcess {
 
         ApplyModulesUtil.applyModules();
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

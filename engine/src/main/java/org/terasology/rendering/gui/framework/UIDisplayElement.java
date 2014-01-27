@@ -20,7 +20,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.GUIManager;
@@ -55,7 +55,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  *         TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
-    protected static UIDisplayElement focusedElement;
+    static UIDisplayElement focusedElement;
 
     private static final Logger logger = LoggerFactory.getLogger(UIDisplayElement.class);
 

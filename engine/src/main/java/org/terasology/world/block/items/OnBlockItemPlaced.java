@@ -27,11 +27,12 @@ public class OnBlockItemPlaced implements Event {
     private EntityRef placedBlock;
 
     public OnBlockItemPlaced(Vector3i pos, EntityRef placedBlock) {
+        this.position = pos;
         this.placedBlock = placedBlock;
     }
 
     public Vector3i getPosition() {
-        return position;
+        return new Vector3i(position);
     }
 
     public EntityRef getPlacedBlock() {

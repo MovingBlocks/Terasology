@@ -96,7 +96,7 @@ public class UIDropdown<T> extends CoreWidget {
 
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             canvas.setPart(LIST_ITEM);
-            for (int i = 0; i < options.get().size(); ++i) {
+            for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
                 } else {

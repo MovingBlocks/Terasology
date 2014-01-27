@@ -24,8 +24,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
@@ -361,7 +361,7 @@ public class PojoEntityManagerTest {
 
     @Test
     public void isLoadedTrueAfterRestore() {
-        EntityRef entity = entityManager.createEntityWithId(2, NullIterator.<Component>newInstance());
+        EntityRef entity = entityManager.createEntityWithId(2, Collections.<Component>emptyList());
         assertTrue(entity.isActive());
     }
 

@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.world.WorldRenderer;
@@ -48,6 +48,11 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
         }
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 }

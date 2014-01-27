@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.asset;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,11 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.Border;
@@ -64,12 +60,17 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.physics.CollisionGroup;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -88,8 +89,6 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
@@ -148,7 +147,7 @@ public class UILoader implements AssetLoader<UIData> {
         }
         Gson gson = gsonBuilder.create();
 
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
         }
@@ -198,22 +197,14 @@ public class UILoader implements AssetLoader<UIData> {
                 id = jsonObject.get("id").getAsString();
             }
 
-            UIWidget element;
+            UIWidget element = elementMetadata.newInstance();
             if (id != null) {
-                try {
-                    Constructor<? extends UIWidget> constructor = elementMetadata.getType().getConstructor(String.class);
-                    constructor.setAccessible(true);
-                    element = constructor.newInstance(id);
-
-                } catch (NoSuchMethodException e) {
-                    logger.warn("UIWidget type {} lacks id constructor", elementMetadata.getUri());
-                    element = elementMetadata.newInstance();
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                    logger.warn("Failed to construct {} with id", elementMetadata.getUri(), e);
-                    element = elementMetadata.newInstance();
+                FieldMetadata fieldMetadata = elementMetadata.getField("id");
+                if (fieldMetadata == null) {
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
+                } else {
+                    fieldMetadata.setValue(element, id);
                 }
-            } else {
-                element = elementMetadata.newInstance();
             }
 
             // Deserialize normal fields.

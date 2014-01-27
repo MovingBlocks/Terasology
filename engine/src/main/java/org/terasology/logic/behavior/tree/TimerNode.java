@@ -15,18 +15,17 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * Created by synopia on 19.01.14.
+ * TimerNode.
+ *
+ * Starts the decorated node.
+ * Finishes with SUCCESS, after <code>time</code> seconds.
+ * Finishes with FAILURE, as soon as decorated node finishes with FAILURE.
+ *
  */
-public class TimerNode extends Node {
-    public static final String SUCCESS = "SUCCESS";
-    public static final String FAILURE = "FAILURE";
-    @OneOf.List(items = {SUCCESS, FAILURE})
-    private String result = SUCCESS;
-
+public class TimerNode extends DecoratorNode {
     @Range(min = 0, max = 20)
     private float time;
 
@@ -35,7 +34,7 @@ public class TimerNode extends Node {
         return new TimerTask(this);
     }
 
-    public static class TimerTask extends Task {
+    public static class TimerTask extends DecoratorTask {
         private float remainingTime;
 
         public TimerTask(Node node) {
@@ -45,17 +44,26 @@ public class TimerNode extends Node {
         @Override
         public void onInitialize() {
             remainingTime = getNode().time;
+            if (getNode().child != null) {
+                start(getNode().child);
+            }
         }
 
         @Override
         public Status update(float dt) {
             remainingTime -= dt;
             if (remainingTime <= 0) {
-                return getNode().result == SUCCESS ? Status.SUCCESS : Status.FAILURE;
+                return Status.SUCCESS;
             }
             return Status.RUNNING;
         }
 
+        @Override
+        public void handle(Status result) {
+            if (result == Status.FAILURE) {
+                stop(Status.FAILURE);
+            }
+        }
 
         @Override
         public TimerNode getNode() {

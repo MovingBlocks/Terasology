@@ -30,12 +30,11 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.utilities.collection.NullIterator;
 
-import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 
 // TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods
-@API(permissions = FilePermission.class)
+@API
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
@@ -252,23 +251,13 @@ public class AssetManager {
             }
 
             Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
-            InputStream stream = null;
-            try {
-                stream = url.openStream();
+            try (InputStream stream = url.openStream()) {
                 urls.remove(url);
                 urls.add(0, url);
                 return loader.load(module, stream, urls);
             } catch (IOException ioe) {
                 logger.error("Error reading asset {}", uri, ioe);
                 return null;
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException innerException) {
-                        logger.error("Error closing stream for {}", uri, innerException);
-                    }
-                }
             }
         }
         logger.warn("Unable to resolve asset: {}", uri);
@@ -477,7 +466,7 @@ public class AssetManager {
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list().iterator();
             } else {
-                currentUriIterator = NullIterator.newInstance();
+                currentUriIterator = Collections.emptyIterator();
             }
             iterate();
         }
@@ -523,7 +512,7 @@ public class AssetManager {
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list(type).iterator();
             } else {
-                currentUriIterator = NullIterator.newInstance();
+                currentUriIterator = Collections.emptyIterator();
             }
             iterate();
         }

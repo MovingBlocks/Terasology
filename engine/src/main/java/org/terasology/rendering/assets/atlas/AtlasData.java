@@ -16,7 +16,7 @@
 package org.terasology.rendering.assets.atlas;
 
 import org.terasology.asset.AssetData;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import java.util.Map;
 

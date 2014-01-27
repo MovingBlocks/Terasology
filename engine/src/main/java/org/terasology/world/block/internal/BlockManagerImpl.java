@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -108,7 +108,7 @@ public class BlockManagerImpl extends BlockManager {
         if (knownBlockMappings.size() >= MAX_ID) {
             nextId = UNKNOWN_ID;
         } else if (knownBlockMappings.size() > 0) {
-            nextId = (byte) knownBlockMappings.size();
+            nextId = (short) knownBlockMappings.size();
         }
 
         for (String rawFamilyUri : registeredBlockFamilies) {
@@ -144,11 +144,11 @@ public class BlockManagerImpl extends BlockManager {
         getAir().setEntity(EntityRef.NULL);
     }
 
-    private byte getNextId() {
+    private short getNextId() {
         if (nextId > MAX_ID) {
             return UNKNOWN_ID;
         }
-        return (byte) nextId++;
+        return (short) nextId++;
     }
 
     public void subscribe(BlockRegistrationListener listener) {
@@ -170,7 +170,7 @@ public class BlockManagerImpl extends BlockManager {
             for (Block block : family.getBlocks()) {
                 Integer id = registration.get(block.getURI().toString());
                 if (id != null) {
-                    block.setId((byte) id.intValue());
+                    block.setId((short) id.intValue());
                 } else {
                     logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
                     block.setId(UNKNOWN_ID);

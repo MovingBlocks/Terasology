@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.utilities.collection.NullIterator;
 
 import java.net.URL;
 import java.util.Collections;
@@ -48,12 +47,12 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> list() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override
     public Iterable<AssetUri> list(AssetType type) {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 
     @Override
@@ -63,6 +62,6 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> listOverrides() {
-        return NullIterator.newInstance();
+        return Collections.emptyList();
     }
 }

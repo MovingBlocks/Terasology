@@ -16,7 +16,7 @@
 
 package org.terasology.logic.common.lifespan;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;

@@ -26,7 +26,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -36,8 +36,6 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.regions.ActAsBlockComponent;
 
 import javax.vecmath.Vector3f;
 

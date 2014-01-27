@@ -28,7 +28,6 @@ public final class AssetUri extends AbstractBaseUri {
     public static final String TYPE_SEPARATOR = ":";
 
     private AssetType type;
-    private String fullUri;
 
     private String moduleName = "";
     private String assetName = "";

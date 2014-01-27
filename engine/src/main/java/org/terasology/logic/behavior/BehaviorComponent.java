@@ -17,7 +17,6 @@ package org.terasology.logic.behavior;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.logic.behavior.asset.BehaviorTree;
-import org.terasology.logic.behavior.tree.Interpreter;
 
 /**
  * Entities with this component are handled by a behavior tree. Default tree to fetch may be set.

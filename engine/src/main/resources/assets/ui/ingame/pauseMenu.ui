@@ -1,0 +1,53 @@
+{
+    "type" : "pauseMenu",
+    "skin" : "pauseMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "columnLayout",
+                "verticalSpacing" : 8,
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "Paused"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [1, 8]
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "close",
+                        "text" : "Back"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [1, 16]
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "settings",
+                        "text" : "Settings"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "mainMenu",
+                        "text" : "Return to Menu"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "exit",
+                        "text" : "Exit Terasology"
+                    }
+                ],
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-center" : {}
+                }
+            }
+        ]
+    }
+}

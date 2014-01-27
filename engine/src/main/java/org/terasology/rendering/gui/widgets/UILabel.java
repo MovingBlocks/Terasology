@@ -19,7 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.ShaderManager;
@@ -168,7 +168,7 @@ public class UILabel extends UIDisplayContainer {
                         if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
                             //than wrap the string at the previous space
                             wrapText.insert(lastSpace + 1, '\n');
-                            wrapPosition.add(new Integer(lastSpace + 1));
+                            wrapPosition.add(lastSpace + 1);
 
                             lastWrap = lastSpace + 1;
                         }

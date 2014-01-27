@@ -19,7 +19,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.behavior.nui.Port;
 import org.terasology.logic.behavior.nui.PortList;
 import org.terasology.logic.behavior.nui.RenderableNode;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,16 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
 import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.logic.behavior.tree.LookupNode;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +55,7 @@ import java.util.Map;
  * @author synopia
  */
 public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorTreeLoader.class);
     private BehaviorTreeGson treeGson = new BehaviorTreeGson();
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
@@ -93,6 +99,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             gsonNode = new GsonBuilder()
                     .setPrettyPrinting()
                     .registerTypeAdapterFactory(new NodeTypeAdapterFactory())
+                    .registerTypeAdapter(BehaviorTree.class, new BehaviorTreeTypeAdapterFactory())
                     .create();
         }
 
@@ -128,12 +135,13 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                     @Override
                     public void write(JsonWriter out, T value) throws IOException {
                         if (value instanceof Node) {
+                            out.beginObject();
                             idNodes.put(currentId, (Node) value);
                             nodeIds.put((Node) value, currentId);
 
-                            TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(value.getClass()));
-                            out.beginObject()
-                                    .name("nodeType").value(value.getClass().getCanonicalName())
+                            TypeAdapter<T> delegateAdapter = getDelegateAdapter(value.getClass());
+
+                            out.name("nodeType").value(CoreRegistry.get(NodesClassLibrary.class).getMetadata(((Node) value).getClass()).getUri().toString())
                                     .name("nodeId").value(currentId);
                             currentId++;
                             out.name("node");
@@ -142,7 +150,6 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                         } else {
                             delegate.write(out, value);
                         }
-
                     }
 
                     @Override
@@ -151,36 +158,61 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             in.beginObject();
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
-                            ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-                            ClassLoader[] classLoaders;
-                            if (moduleManager != null) {
-                                classLoaders = moduleManager.getActiveModuleReflections().getConfiguration().getClassLoaders();
-                            } else {
-                                classLoaders = new ClassLoader[]{getClass().getClassLoader()};
-                            }
-                            Class cls = null;
-                            for (ClassLoader classLoader : classLoaders) {
-                                try {
-                                    cls = classLoader.loadClass(nodeType);
-                                    break;
-                                } catch (ClassNotFoundException e) {
-                                    // ignore
+                            ClassMetadata<? extends Node, ?> classMetadata = CoreRegistry.get(NodesClassLibrary.class).resolve(nodeType);
+                            if (classMetadata != null) {
+                                TypeAdapter<T> delegateAdapter = getDelegateAdapter(classMetadata.getType());
+                                nextName(in, "nodeId");
+                                int id = in.nextInt();
+                                nextName(in, "node");
+                                Node result;
+                                if (classMetadata.getType() == LookupNode.class) {
+                                    result = classMetadata.newInstance();
+                                    in.beginObject();
+                                    nextName(in, "tree");
+                                    String uri = in.nextString();
+                                    ((LookupNode) result).tree = (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, uri);
+                                    in.endObject();
+                                } else {
+                                    result = (Node) delegateAdapter.read(in);
                                 }
+                                idNodes.put(id, result);
+                                nodeIds.put(result, id);
+                                in.endObject();
+                                return (T) result;
+                            } else {
+                                throw new RuntimeException("Unambiguous type " + nodeType);
                             }
-                            TypeAdapter<T> delegateAdapter = (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
-                            nextName(in, "nodeId");
-                            int id = in.nextInt();
-                            nextName(in, "node");
-                            T read = delegateAdapter.read(in);
-                            idNodes.put(id, (Node) read);
-                            nodeIds.put((Node) read, id);
-                            in.endObject();
-                            return read;
                         } else {
                             return delegate.read(in);
                         }
                     }
+
+                    private TypeAdapter<T> getDelegateAdapter(Class cls) {
+                        return (TypeAdapter<T>) gson.getDelegateAdapter(NodeTypeAdapterFactory.this, TypeToken.get(cls));
+                    }
                 };
+            }
+
+        }
+
+        private class BehaviorTreeTypeAdapterFactory extends TypeAdapter<BehaviorTree> {
+            @Override
+            public void write(JsonWriter out, BehaviorTree value) throws IOException {
+                if (value == null) {
+                    out.value("");
+                } else {
+                    out.value(value.getURI().toNormalisedSimpleString());
+                }
+            }
+
+            @Override
+            public BehaviorTree read(JsonReader in) throws IOException {
+                String uri = in.nextString();
+                if (uri != null && uri.length() > 0) {
+                    return (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, in.nextString());
+                } else {
+                    return null;
+                }
             }
         }
     }

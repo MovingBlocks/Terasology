@@ -18,9 +18,9 @@ package org.terasology.benchmark.reflectFactory;
 import org.terasology.benchmark.AbstractBenchmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.reflect.FieldAccessor;
-import org.terasology.classMetadata.reflect.InaccessibleFieldException;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.FieldAccessor;
+import org.terasology.reflection.reflect.InaccessibleFieldException;
+import org.terasology.reflection.reflect.ReflectFactory;
 
 /**
  * @author Immortius

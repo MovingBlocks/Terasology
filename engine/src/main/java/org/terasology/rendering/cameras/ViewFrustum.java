@@ -16,7 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
 

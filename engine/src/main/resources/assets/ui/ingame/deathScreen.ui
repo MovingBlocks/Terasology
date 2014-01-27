@@ -1,0 +1,34 @@
+{
+    "type" : "deathScreen",
+    "skin" : "deathScreen",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "ColumnLayout",
+                "verticalSpacing" : 8,
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "text" : "You are Dead"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [1, 16]
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Respawn",
+                        "id" : "respawn"
+                    }
+                ],
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-center" : {}
+                }
+            }
+        ]
+    }
+}

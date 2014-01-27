@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -174,6 +175,27 @@ public class EventSystemImpl implements EventSystem {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    public void unregisterEventHandler(ComponentSystem handler) {
+        for (SetMultimap<Class<? extends Component>, EventHandlerInfo> eventHandlers : componentSpecificHandlers.values()) {
+            Iterator<EventHandlerInfo> eventHandlerIterator = eventHandlers.values().iterator();
+            while (eventHandlerIterator.hasNext()) {
+                EventHandlerInfo eventHandler = eventHandlerIterator.next();
+                if (eventHandler.getHandler().equals(handler)) {
+                    eventHandlerIterator.remove();
+                }
+            }
+        }
+
+        Iterator<EventHandlerInfo> eventHandlerIterator = generalHandlers.values().iterator();
+        while (eventHandlerIterator.hasNext()) {
+            EventHandlerInfo eventHandler = eventHandlerIterator.next();
+            if (eventHandler.getHandler().equals(handler)) {
+                eventHandlerIterator.remove();
             }
         }
     }
@@ -366,9 +388,11 @@ public class EventSystemImpl implements EventSystem {
         void invoke(EntityRef entity, Event event);
 
         int getPriority();
+
+        Object getHandler();
     }
 
-    private class ReflectedEventHandlerInfo implements EventHandlerInfo {
+    private static class ReflectedEventHandlerInfo implements EventHandlerInfo {
         private ComponentSystem handler;
         private Method method;
         private ImmutableList<Class<? extends Component>> filterComponents;
@@ -417,9 +441,14 @@ public class EventSystemImpl implements EventSystem {
         public int getPriority() {
             return priority;
         }
+
+        @Override
+        public ComponentSystem getHandler() {
+            return handler;
+        }
     }
 
-    private class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
+    private static class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
         private EventReceiver<T> receiver;
         private Class<? extends Component>[] components;
         private int priority;
@@ -467,6 +496,11 @@ public class EventSystemImpl implements EventSystem {
         @Override
         public int hashCode() {
             return Objects.hashCode(receiver);
+        }
+
+        @Override
+        public Object getHandler() {
+            return receiver;
         }
     }
 }

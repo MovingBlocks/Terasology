@@ -18,7 +18,7 @@ package org.terasology.rendering.nui;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;

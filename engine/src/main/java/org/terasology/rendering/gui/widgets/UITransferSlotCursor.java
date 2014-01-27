@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.widgets;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;

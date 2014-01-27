@@ -164,7 +164,7 @@ public final class TeraMath {
      * @return
      */
     public static boolean isFinite(float value) {
-        return value != Float.NaN && value != Float.NEGATIVE_INFINITY && value != Float.POSITIVE_INFINITY;
+        return !Float.isNaN(value) && !Float.isInfinite(value);
     }
 
     /**
@@ -174,7 +174,7 @@ public final class TeraMath {
      * @return
      */
     public static boolean isFinite(double value) {
-        return value != Double.NaN && value != Double.NEGATIVE_INFINITY && value != Double.POSITIVE_INFINITY;
+        return !Double.isNaN(value) && !Double.isInfinite(value);
     }
 
     /**

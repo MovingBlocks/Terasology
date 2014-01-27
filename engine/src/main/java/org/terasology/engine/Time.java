@@ -52,4 +52,9 @@ public interface Time {
      */
     float getGameTime();
 
+    /**
+     * @return Real time in milliseconds.
+     */
+    long getRealTimeInMs();
+
 }

@@ -42,6 +42,24 @@
                 "right" : 12
             }
         },
+        "UILoadBar" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "min-width" : 128,
+            "max-width" : 512,
+            "fixed-height" : 20
+        },
         "UIList" : {
             "parts" : {
                 "item" : {
@@ -262,6 +280,7 @@
                 "slider" : {
                     "background" : "engine:sliderTrack",
                     "fixed-height" : 8,
+                    "min-width" : 8,
                     "background-border" : {
                         "top" : 0,
                         "bottom" : 0,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,23 @@
 package org.terasology.logic.behavior;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.module.ModuleManagerImpl;
+import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.MonitorNode;
 import org.terasology.logic.behavior.tree.ParallelNode;
 import org.terasology.logic.behavior.tree.RepeatNode;
 import org.terasology.logic.behavior.tree.SequenceNode;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,7 +52,6 @@ public class FactoryTest {
         BehaviorNodeFactory nodeFactory = mock(BehaviorNodeFactory.class);
         CoreRegistry.put(BehaviorNodeFactory.class, nodeFactory);
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
-
         BehaviorTreeData data = buildSample();
 
         OutputStream os = new ByteArrayOutputStream(10000);
@@ -71,5 +78,19 @@ public class FactoryTest {
         tree.createRenderable();
         tree.layout(null);
         return tree;
+    }
+
+    @Before
+    public void setup() {
+        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager.applyActiveModules();
+        ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
+        CoreRegistry.put(ReflectFactory.class, reflectFactory);
+        CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
+        CoreRegistry.put(CopyStrategyLibrary.class, copyStrategies);
+        CoreRegistry.put(ModuleManager.class, moduleManager);
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategies);
+        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        nodesClassLibrary.scan(moduleManager);
     }
 }

@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -40,5 +40,10 @@ public class SetupRemotePlayer extends SingleStepLoadProcess {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;

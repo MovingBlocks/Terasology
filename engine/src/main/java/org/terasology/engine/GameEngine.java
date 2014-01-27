@@ -58,6 +58,11 @@ public interface GameEngine {
     boolean isDisposed();
 
     /**
+     * @return The current state of the engine
+     */
+    GameState getState();
+
+    /**
      * Clears all states, replacing them with newState
      *
      * @param newState

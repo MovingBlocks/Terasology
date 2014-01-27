@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -129,5 +129,10 @@ public class RegisterInputSystem extends SingleStepLoadProcess {
                 logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
             }
         }
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

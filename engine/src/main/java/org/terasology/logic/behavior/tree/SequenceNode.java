@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,11 @@ import org.terasology.engine.API;
 import java.util.Iterator;
 
 /**
- * Evaluates the children one by one. As soon as a child fails, this node will return FAILURE immediatly.
- * When all children are evaluated, this node succeeds.
+ * Evaluates the children one by one.
+ *
+ * Starts next child, if previous child finishes with SUCCESS.
+ * Finishes with SUCCESS, when all children finishes SUCCESS.
+ * Finishes with FAILURE, as soon as a child finished with FAILURE
  *
  * @author synopia
  */
@@ -32,7 +35,7 @@ public class SequenceNode extends CompositeNode {
         return new SequenceTask(this);
     }
 
-    public static class SequenceTask extends CompositeTask implements Task.Observer {
+    public static class SequenceTask extends CompositeTask {
         private Iterator<Node> iterator;
         private Node current;
 
@@ -45,22 +48,22 @@ public class SequenceNode extends CompositeNode {
             iterator = getNode().children().iterator();
             if (iterator.hasNext()) {
                 current = iterator.next();
-                interpreter().start(current, this);
+                start(current);
             }
         }
 
         @Override
         public void handle(Status result) {
             if (result == Status.FAILURE) {
-                interpreter().stop(this, Status.FAILURE);
+                stop(Status.FAILURE);
                 return;
             }
 
             if (iterator.hasNext()) {
                 current = iterator.next();
-                interpreter().start(current, this);
+                start(current);
             } else {
-                interpreter().stop(this, Status.SUCCESS);
+                stop(Status.SUCCESS);
             }
         }
 

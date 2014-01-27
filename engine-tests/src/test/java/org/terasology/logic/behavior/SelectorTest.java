@@ -53,8 +53,7 @@ public class SelectorTest {
         node.children().add(one);
         node.children().add(two);
 
-        Task selector = node.createTask();
-        interpreter.start(selector);
+        Task selector = interpreter.start(node);
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, selector.getStatus());
         interpreter.tick(0);
@@ -85,9 +84,7 @@ public class SelectorTest {
         node.children().add(one);
         node.children().add(two);
 
-        Task selector = node.createTask();
-
-        interpreter.start(selector);
+        Task selector = interpreter.start(node);
         interpreter.tick(0);
         Assert.assertEquals(Status.RUNNING, selector.getStatus());
         interpreter.tick(0);
@@ -116,8 +113,7 @@ public class SelectorTest {
 
             node.children().add(mock);
 
-            SelectorNode.SelectorTask task = node.createTask();
-            interpreter.start(task);
+            Task task = interpreter.start(node);
             interpreter.tick(0);
             Assert.assertEquals(Status.RUNNING, task.getStatus());
             interpreter.tick(0);
@@ -140,6 +136,11 @@ public class SelectorTest {
                     @Override
                     public Node getNode() {
                         return node;
+                    }
+
+                    @Override
+                    public void handle(Status result) {
+
                     }
                 });
                 mocker.mock(spy);

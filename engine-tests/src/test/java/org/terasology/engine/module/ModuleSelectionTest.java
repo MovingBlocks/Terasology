@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.junit.Before;
@@ -229,6 +230,16 @@ public class ModuleSelectionTest {
 
         @Override
         public Iterable<Module> getActiveCodeModules() {
+            return null;
+        }
+
+        @Override
+        public List<Module> getActiveModulesOrderedByDependency() {
+            return null;
+        }
+
+        @Override
+        public <T> ListMultimap<String, Class<? extends T>> findAllSubclassesOf(Class<? extends T> type) {
             return null;
         }
 

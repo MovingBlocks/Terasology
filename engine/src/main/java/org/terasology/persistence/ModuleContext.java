@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 

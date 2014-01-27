@@ -59,7 +59,7 @@ public class ChunkBlockIteratorImpl implements ChunkBlockIterator {
             }
         }
         blockPos.set(pos.x + worldOffset.x, pos.y + worldOffset.y, pos.z + worldOffset.z);
-        block = blockManager.getBlock((byte) data.get(pos.x, pos.y, pos.z));
+        block = blockManager.getBlock((short) data.get(pos.x, pos.y, pos.z));
         return true;
     }
 

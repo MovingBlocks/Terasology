@@ -114,6 +114,11 @@ public final class TimeLwjgl implements EngineTime {
     }
 
     @Override
+    public long getRealTimeInMs() {
+        return getRawTimeInMs();
+    }
+
+    @Override
     public void updateTimeFromServer(long targetTime) {
         desynch = targetTime - getGameTimeInMs();
     }

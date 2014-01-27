@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,22 +15,13 @@
  */
 package org.terasology.engine;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * Registry giving access to major singleton systems, via the interface they fulfil.
- *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
+ * @deprecated Please use org.terasology.registry.CoreRegistry instead. Support for this class will be dropped in the future.
  */
 @API
+@Deprecated
 public final class CoreRegistry {
-    private static Map<Class<? extends Object>, Object> store = Maps.newConcurrentMap();
-    private static Set<Class<? extends Object>> permStore = Sets.newSetFromMap(Maps.<Class<? extends Object>, Boolean>newConcurrentMap());
 
     private CoreRegistry() {
     }
@@ -43,8 +34,7 @@ public final class CoreRegistry {
      * @param <T>
      */
     public static <T, U extends T> U put(Class<T> type, U object) {
-        store.put(type, object);
-        return object;
+        return org.terasology.registry.CoreRegistry.put(type, object);
     }
 
     /**
@@ -55,9 +45,7 @@ public final class CoreRegistry {
      * @param <T>
      */
     public static <T, U extends T> U putPermanently(Class<T> type, U object) {
-        store.put(type, object);
-        permStore.add(type);
-        return object;
+        return org.terasology.registry.CoreRegistry.putPermanently(type, object);
     }
 
     /**
@@ -66,21 +54,16 @@ public final class CoreRegistry {
      * @return The system fulfilling the given interface
      */
     public static <T> T get(Class<T> type) {
-        return type.cast(store.get(type));
+        return org.terasology.registry.CoreRegistry.get(type);
     }
 
     public static void clear() {
-        Iterator<Map.Entry<Class<?>, Object>> iterator = store.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<Class<?>, Object> entry = iterator.next();
-            if (!permStore.contains(entry.getKey())) {
-                iterator.remove();
-            }
-        }
+        org.terasology.registry.CoreRegistry.clear();
     }
 
     public static <T> void remove(Class<T> type) {
-        store.remove(type);
+        org.terasology.registry.CoreRegistry.remove(type);
     }
 
 }
+

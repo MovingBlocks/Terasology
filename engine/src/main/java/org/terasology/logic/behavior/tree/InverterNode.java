@@ -16,6 +16,11 @@
 package org.terasology.logic.behavior.tree;
 
 /**
+ * Inverts the decorated node.
+ * <p/>
+ * Finishes with SUCCESS, when decorated node finishes FAILURE
+ * Finishes with FAILURE, when decorated node finishes SUCCESS
+ *
  * @author synopia
  */
 public class InverterNode extends DecoratorNode {
@@ -24,20 +29,20 @@ public class InverterNode extends DecoratorNode {
         return new InverterTask(this);
     }
 
-    public static class InverterTask extends DecoratorTask implements Task.Observer {
+    public static class InverterTask extends DecoratorTask {
         public InverterTask(Node node) {
             super(node);
         }
 
         @Override
         public void onInitialize() {
-            interpreter().start(getNode().child, this);
+            start(getNode().child);
         }
 
         @Override
         public void handle(Status result) {
-            Status invert = result == result.SUCCESS ? Status.FAILURE : result == result.FAILURE ? Status.SUCCESS : null;
-            interpreter().stop(this, invert);
+            Status invert = result == Status.SUCCESS ? Status.FAILURE : result == Status.FAILURE ? Status.SUCCESS : null;
+            stop(invert);
         }
 
         @Override

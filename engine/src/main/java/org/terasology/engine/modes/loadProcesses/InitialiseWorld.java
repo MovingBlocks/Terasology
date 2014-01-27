@@ -19,7 +19,9 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
@@ -43,6 +45,7 @@ import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;
@@ -68,6 +71,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
+
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class),
+                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
+
         StorageManager storageManager = CoreRegistry.put(StorageManager.class,
                 new StorageManagerInternal(CoreRegistry.get(ModuleManager.class), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
@@ -112,5 +119,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         worldProvider.getTime().setMilliseconds(worldInfo.getTime());
 
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 5;
     }
 }

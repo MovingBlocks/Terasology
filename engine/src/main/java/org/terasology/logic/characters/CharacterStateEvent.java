@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.BroadcastEvent;

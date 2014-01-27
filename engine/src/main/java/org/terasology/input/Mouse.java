@@ -15,7 +15,7 @@
  */
 package org.terasology.input;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector2i;
 
 /**

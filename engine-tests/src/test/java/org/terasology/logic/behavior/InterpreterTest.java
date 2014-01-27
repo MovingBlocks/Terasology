@@ -42,8 +42,7 @@ public class InterpreterTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(0);
 
-        interpreter.setRoot(debugNode);
-        interpreter.start();
+        interpreter.start(debugNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -59,8 +58,7 @@ public class InterpreterTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(1);
 
-        interpreter.setRoot(debugNode);
-        interpreter.start();
+        interpreter.start(debugNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -84,8 +82,7 @@ public class InterpreterTest {
         Interpreter interpreter = new Interpreter(null);
         DebugNode debugNode = new DebugNode(10);
 
-        interpreter.setRoot(debugNode);
-        interpreter.start();
+        interpreter.start(debugNode);
 
         Assert.assertTrue(interpreter.tick(0) > 0);
         DebugNode.DebugTask first = debugNode.lastTask;
@@ -160,6 +157,11 @@ public class InterpreterTest {
                     @Override
                     public Status update(float dt) {
                         return result;
+                    }
+
+                    @Override
+                    public void handle(Status result) {
+
                     }
                 });
                 return task;

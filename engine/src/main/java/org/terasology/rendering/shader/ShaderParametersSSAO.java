@@ -23,7 +23,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -139,7 +139,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
             noiseValues.flip();
 
             texture = Assets.generateAsset(new AssetUri(AssetType.TEXTURE, "engine:ssaoNoise"), new TextureData(SSAO_NOISE_SIZE, SSAO_NOISE_SIZE,
-                    new ByteBuffer[]{noiseValues}, Texture.WrapMode.Repeat, Texture.FilterMode.Nearest), Texture.class);
+                    new ByteBuffer[]{noiseValues}, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST), Texture.class);
         }
         return texture;
     }

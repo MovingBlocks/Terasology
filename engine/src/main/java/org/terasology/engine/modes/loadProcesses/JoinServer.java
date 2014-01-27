@@ -19,7 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
@@ -114,5 +114,10 @@ public class JoinServer implements LoadProcess {
     @Override
     public float getProgress() {
         return joinStatus.getCurrentActivityProgress();
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 10;
     }
 }

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
@@ -1510,7 +1510,7 @@ public class DefaultRenderingProcess {
         fboLookup.put(title + "PingPong", fbo1);
     }
 
-    public class PBO {
+    public static class PBO {
         public int pboId;
         public int bufferWidth;
         public int bufferHeight;

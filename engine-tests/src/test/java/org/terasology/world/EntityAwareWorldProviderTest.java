@@ -27,9 +27,9 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
@@ -74,6 +74,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -160,7 +161,7 @@ public class EntityAwareWorldProviderTest {
         blockInFamilyTwo.setKeepActive(true);
         blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"),
                 ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne),
-                NullIterator.<String>newInstance()), true);
+                Collections.<String>emptyList()), true);
 
         keepActiveBlock = new Block();
         keepActiveBlock.setKeepActive(true);

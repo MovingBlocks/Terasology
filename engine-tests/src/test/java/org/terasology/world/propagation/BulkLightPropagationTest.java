@@ -31,7 +31,8 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.block.loader.WorldAtlasImpl;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.ChunkProvider;
@@ -61,7 +62,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
     public void setup() throws Exception {
         super.setup();
         lightRules = new LightPropagationRules();
-        blockManager = new BlockManagerImpl(new WorldAtlas(4096),
+        blockManager = new BlockManagerImpl(new NullWorldAtlas(),
                 Lists.<String>newArrayList(), Maps.<String, Short>newHashMap(), true, new DefaultBlockFamilyFactoryRegistry());
         fullLight = new Block();
         fullLight.setDisplayName("Torch");
@@ -347,7 +348,6 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void betweenChunks() throws Exception {
-        Thread.sleep(10000);
         ChunkImpl main = new ChunkImpl(new Vector3i(0, 0, 0));
         main.setChunkState(ChunkImpl.State.COMPLETE);
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {

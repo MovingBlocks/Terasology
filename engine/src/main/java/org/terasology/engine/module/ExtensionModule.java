@@ -23,7 +23,7 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -37,7 +37,6 @@ import java.nio.file.Path;
  * @author Immortius
  */
 public class ExtensionModule implements Module {
-    private ModuleManager manager;
     private ModuleInfo moduleInfo;
     private Path moduleRoot;
     private AssetSource moduleSource;
@@ -47,11 +46,10 @@ public class ExtensionModule implements Module {
     private String id;
     private Version version;
 
-    public ExtensionModule(ModuleManager manager, Path moduleRoot, ModuleInfo info, Version version, AssetSource moduleSource) {
+    public ExtensionModule(Path moduleRoot, ModuleInfo info, Version version, AssetSource moduleSource) {
         if (info == null) {
             throw new IllegalArgumentException("Module info must not be null");
         }
-        this.manager = manager;
         this.moduleInfo = info;
         this.moduleRoot = moduleRoot;
         this.moduleSource = moduleSource;

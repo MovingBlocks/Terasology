@@ -16,12 +16,9 @@
 
 package org.terasology.engine.bootstrap;
 
-import org.reflections.Reflections;
+import com.google.common.collect.ListMultimap;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -42,6 +39,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.systems.internal.DoNotAutoRegister;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -61,12 +59,16 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vecto
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3iTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector4fTypeHandler;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -75,6 +77,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -108,6 +111,12 @@ public class EntitySystemBuilder {
         // Event System
         entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+
+        CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
+
+        NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
+        CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
+        nodesClassLibrary.scan(moduleManager);
 
         registerComponents(library.getComponentLibrary(), moduleManager);
         registerEvents(entityManager.getEventSystem(), moduleManager);
@@ -152,16 +161,12 @@ public class EntitySystemBuilder {
     }
 
     private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            registerEvents(module.getId(), eventSystem, module.getReflections());
-        }
-    }
-
-    private void registerEvents(String moduleName, EventSystem eventSystem, Reflections reflections) {
-        for (Class<? extends Event> eventType : reflections.getSubTypesOf(Event.class)) {
-            if (eventType.getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(moduleName, eventType.getSimpleName()), eventType);
+        ListMultimap<String, Class<? extends Event>> allSubclassesOf = moduleManager.findAllSubclassesOf(Event.class);
+        for (Map.Entry<String, Class<? extends Event>> entry : allSubclassesOf.entries()) {
+            if (entry.getValue().getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
             }
         }
     }
+
 }

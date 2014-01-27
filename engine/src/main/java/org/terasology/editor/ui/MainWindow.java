@@ -22,7 +22,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.editor.TeraEd;
 import org.terasology.editor.properties.PropertyProvider;
 import org.terasology.editor.properties.ReflectionProvider;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.StateChangeSubscriber;
 import org.terasology.rendering.opengl.GLSLMaterial;
 

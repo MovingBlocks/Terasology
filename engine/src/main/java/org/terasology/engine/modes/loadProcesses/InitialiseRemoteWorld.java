@@ -17,7 +17,7 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
@@ -75,6 +75,11 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 }

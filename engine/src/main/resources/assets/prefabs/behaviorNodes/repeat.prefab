@@ -1,6 +1,6 @@
 {
     "BehaviorNode" : {
-        "type"      : "org.terasology.logic.behavior.tree.RepeatNode",
+        "type"      : "RepeatNode",
         "name"      : "Repeat",
         "category"  : "logic",
         "shape"     : "rect",

@@ -86,7 +86,7 @@ configurations {
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
     compile group: 'com.google.guava', name: 'guava', version: '15.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
@@ -110,9 +110,9 @@ dependencies {
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
-
+	// TODO: These could be moved into facade
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
+	runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.5'
     // And here is Groovy to read the config file
     runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
 

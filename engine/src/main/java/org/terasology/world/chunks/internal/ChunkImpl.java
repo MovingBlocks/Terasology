@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -221,12 +221,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Block getBlock(Vector3i pos) {
-        return blockManager.getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
+        return blockManager.getBlock((short) blockData.get(pos.x, pos.y, pos.z));
     }
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        return blockManager.getBlock((byte) blockData.get(x, y, z));
+        return blockManager.getBlock((short) blockData.get(x, y, z));
     }
 
     @Override

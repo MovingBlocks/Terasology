@@ -20,7 +20,7 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.Sound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;

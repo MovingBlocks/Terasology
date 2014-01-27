@@ -1173,7 +1173,7 @@ public class UIText extends UIDisplayContainerScrollable {
      *
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
-    private class UITextCursor extends UIDisplayContainer {
+    private static class UITextCursor extends UIDisplayContainer {
         private Color color = new Color(Color.black);
 
         public UITextCursor(Vector2f size) {

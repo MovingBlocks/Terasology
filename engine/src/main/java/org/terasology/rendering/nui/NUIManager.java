@@ -16,13 +16,31 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.classMetadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
 
 /**
  * @author Immortius
  */
 public interface NUIManager extends ComponentSystem, FocusManager {
+
+    boolean isOpen(String screenUri);
+
+    boolean isOpen(AssetUri screenUri);
+
+    UIScreenLayer getScreen(AssetUri screenUri);
+
+    UIScreenLayer getScreen(String screenUri);
+
+    void closeScreen(String screenUri);
+
+    void closeScreen(AssetUri screenUri);
+
+    void closeScreen(UIScreenLayer screen);
+
+    void toggleScreen(String screenUri);
+
+    void toggleScreen(AssetUri screenUri);
 
     UIScreenLayer pushScreen(AssetUri screenUri);
 
@@ -46,7 +64,7 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void setScreen(UIScreenLayer screen);
 
-    void closeScreens();
+    void closeAllScreens();
 
     void render();
 
@@ -57,4 +75,6 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setFocus(UIWidget element);
 
     UIWidget getFocus();
+
+    boolean isReleasingMouse();
 }

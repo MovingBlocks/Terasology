@@ -25,8 +25,8 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -117,15 +117,14 @@ public class UIText extends CoreWidget {
         correctCursor();
 
         // TODO: Add a crop within margin option to UIWidget?
-        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true)) {
-            try (SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
-                canvas.drawText(text.get(), canvas.getRegion());
-                if (isFocused()) {
-                    if (hasSelection()) {
-                        drawSelection(canvas);
-                    } else {
-                        drawCursor(canvas);
-                    }
+        try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
+            canvas.drawText(text.get(), canvas.getRegion());
+            if (isFocused()) {
+                if (hasSelection()) {
+                    drawSelection(canvas);
+                } else {
+                    drawCursor(canvas);
                 }
             }
         }
@@ -201,6 +200,7 @@ public class UIText extends CoreWidget {
                         cursorPosition--;
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.DELETE: {
@@ -211,6 +211,7 @@ public class UIText extends CoreWidget {
                         String after = fullText.substring(cursorPosition + 1);
                         setText(before + after);
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.LEFT: {
@@ -223,6 +224,7 @@ public class UIText extends CoreWidget {
                             selectionStart = cursorPosition;
                         }
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.RIGHT: {
@@ -235,6 +237,7 @@ public class UIText extends CoreWidget {
                             selectionStart = cursorPosition;
                         }
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.HOME: {
@@ -243,6 +246,7 @@ public class UIText extends CoreWidget {
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.END: {
@@ -250,12 +254,14 @@ public class UIText extends CoreWidget {
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
+                    event.consume();
                     break;
                 }
                 case Keyboard.KeyId.ENTER: {
                     for (ActivateEventListener listener : listeners) {
                         listener.onActivated(this);
                     }
+                    event.consume();
                     break;
                 }
                 default: {
@@ -263,13 +269,16 @@ public class UIText extends CoreWidget {
                         if (event.getKey() == Keyboard.Key.V) {
                             removeSelection();
                             paste();
+                            event.consume();
                             break;
                         } else if (event.getKey() == Keyboard.Key.C) {
                             copySelection();
+                            event.consume();
                             break;
                         } else if (event.getKey() == Keyboard.Key.X) {
                             copySelection();
                             removeSelection();
+                            event.consume();
                             break;
                         }
                     }
@@ -279,6 +288,7 @@ public class UIText extends CoreWidget {
                         setText(before + event.getKeyCharacter() + after);
                         cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
                         selectionStart = cursorPosition;
+                        event.consume();
                     }
                     break;
                 }
@@ -289,13 +299,15 @@ public class UIText extends CoreWidget {
     }
 
     private void updateOffset() {
-        String before = getText().substring(0, cursorPosition);
-        int cursorDist = lastFont.getWidth(before);
-        if (cursorDist < offset) {
-            offset = cursorDist;
-        }
-        if (cursorDist > offset + lastWidth) {
-            offset = cursorDist - lastWidth + 1;
+        if (lastFont != null) {
+            String before = getText().substring(0, cursorPosition);
+            int cursorDist = lastFont.getWidth(before);
+            if (cursorDist < offset) {
+                offset = cursorDist;
+            }
+            if (cursorDist > offset + lastWidth) {
+                offset = cursorDist - lastWidth + 1;
+            }
         }
     }
 
@@ -378,6 +390,15 @@ public class UIText extends CoreWidget {
 
             updateOffset();
         }
+    }
+
+    public void setCursorPosition(int position) {
+        this.cursorPosition = TeraMath.clamp(position, 0, getText().length());
+        this.selectionStart = cursorPosition;
+    }
+
+    public int getCursorPosition() {
+        return cursorPosition;
     }
 
     public void bindText(Binding<String> binding) {

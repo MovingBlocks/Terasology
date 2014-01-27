@@ -16,7 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.ConsoleImpl;
 
@@ -33,5 +33,10 @@ public class InitialiseCommandSystem extends SingleStepLoadProcess {
     public boolean step() {
         CoreRegistry.put(Console.class, new ConsoleImpl());
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }
