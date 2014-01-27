@@ -24,7 +24,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 
 public class HeadlessTexture extends AbstractAsset<TextureData> implements Texture {
 
-    static int idCounter = 0;
+    static int idCounter;
 
     private TextureData textureData;
     private int id;
@@ -43,8 +43,8 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     }
 
     @Override
-    public void reload(TextureData textureData) {
-        this.textureData = textureData;
+    public void reload(TextureData data) {
+        this.textureData = data;
     }
 
     @Override
