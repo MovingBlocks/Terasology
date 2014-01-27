@@ -462,10 +462,6 @@ public final class TeraMath {
         return x1 * (1.0f - p) + x2 * p;
     }
 
-    public static <T extends Lerpable<? super T>> T lerp(T x1, T x2, double p) {
-        return x1.lerp(x2,p);
-    }
-
     /**
      * Trilinear interpolation.
      */
