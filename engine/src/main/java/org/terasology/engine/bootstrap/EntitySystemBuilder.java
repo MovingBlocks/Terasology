@@ -116,7 +116,7 @@ public class EntitySystemBuilder {
 
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan();
+        nodesClassLibrary.scan(moduleManager);
 
         registerComponents(library.getComponentLibrary(), moduleManager);
         registerEvents(entityManager.getEventSystem(), moduleManager);

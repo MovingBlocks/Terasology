@@ -348,7 +348,6 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void betweenChunks() throws Exception {
-        Thread.sleep(10000);
         ChunkImpl main = new ChunkImpl(new Vector3i(0, 0, 0));
         main.setChunkState(ChunkImpl.State.COMPLETE);
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {

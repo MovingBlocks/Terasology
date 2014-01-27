@@ -91,6 +91,6 @@ public class FactoryTest {
         CoreRegistry.put(ModuleManager.class, moduleManager);
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategies);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan();
+        nodesClassLibrary.scan(moduleManager);
     }
 }

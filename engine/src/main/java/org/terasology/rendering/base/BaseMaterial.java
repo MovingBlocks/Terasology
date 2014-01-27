@@ -34,9 +34,8 @@ import org.terasology.rendering.cameras.Camera;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
 
-    public BaseMaterial(AssetUri uri, MaterialData data) {
+    public BaseMaterial(AssetUri uri) {
         super(uri);
-        reload(data);
     }
 
     public abstract void reload(MaterialData data);

@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.MatrixUtils;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
@@ -76,7 +77,8 @@ public class GLSLMaterial extends BaseMaterial {
     private ShaderParameters shaderParameters;
 
     public GLSLMaterial(AssetUri uri, MaterialData data) {
-        super(uri, data);
+        super(uri);
+        shaderManager = CoreRegistry.get(ShaderManager.class);
         reload(data);
     }
 
@@ -131,7 +133,7 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void reload(MaterialData data) {
+    public final void reload(MaterialData data) {
         Util.checkGLError();
         dispose();
 
