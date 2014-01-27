@@ -251,23 +251,13 @@ public class AssetManager {
             }
 
             Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
-            InputStream stream = null;
-            try {
-                stream = url.openStream();
+            try (InputStream stream = url.openStream()) {
                 urls.remove(url);
                 urls.add(0, url);
                 return loader.load(module, stream, urls);
             } catch (IOException ioe) {
                 logger.error("Error reading asset {}", uri, ioe);
                 return null;
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException innerException) {
-                        logger.error("Error closing stream for {}", uri, innerException);
-                    }
-                }
             }
         }
         logger.warn("Unable to resolve asset: {}", uri);

@@ -54,7 +54,7 @@ import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.mainMenu.loadingScreen.LoadingScreen;
+import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 
 import java.util.Queue;
 

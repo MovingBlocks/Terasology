@@ -14,7 +14,7 @@
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "TOP",
-                        "offset" : 48
+                        "offset" : 16
                     }
                 }
             },
@@ -72,7 +72,7 @@
                     {
                         "type" : "UIButton",
                         "id" : "close",
-                        "text" : "Return to Main Menu"
+                        "text" : "Back"
                     }
                 ]
             }

@@ -22,6 +22,7 @@ import org.terasology.asset.AssetUri;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -45,8 +46,8 @@ public class DirectorySource extends AbstractSource {
     }
 
     private void scanOverrides(Path overrideDirectory, Path basePath) {
-        try {
-            for (Path child : Files.newDirectoryStream(overrideDirectory)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(overrideDirectory)) {
+            for (Path child : stream) {
                 if (Files.isDirectory(child)) {
                     scanOverrides(child, basePath);
                 } else if (Files.isRegularFile(child)) {
@@ -69,8 +70,8 @@ public class DirectorySource extends AbstractSource {
     }
 
     private void scanAssets(Path path, Path basePath) {
-        try {
-            for (Path child : Files.newDirectoryStream(path)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
+            for (Path child : stream) {
                 if (Files.isDirectory(child)) {
                     scanAssets(child, basePath);
                 } else if (Files.isRegularFile(child)) {

@@ -65,7 +65,7 @@ public class CommandInfo {
             if (i == method.getParameterTypes().length - 1 && parameterType == EntityRef.class) {
                 clientEntityRequired = true;
             } else {
-                String paramName = method.getParameterTypes()[i].toString();
+                String paramName = method.getParameterTypes()[i].getSimpleName();
                 for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
                     if (paramAnnot instanceof CommandParam) {
                         paramName = ((CommandParam) paramAnnot).value();

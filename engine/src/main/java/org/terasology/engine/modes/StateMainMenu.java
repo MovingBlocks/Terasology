@@ -39,7 +39,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.mainMenu.ErrorMessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
 
 /**
  * The class implements the main game menu.

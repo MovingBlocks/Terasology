@@ -79,6 +79,7 @@ public class UICommandEntry extends UIText {
 
     public void bindCommandHistory(Binding<List<String>> binding) {
         commandHistory = binding;
+        index = commandHistory.get().size();
     }
 
     public List<String> getCommandHistory() {

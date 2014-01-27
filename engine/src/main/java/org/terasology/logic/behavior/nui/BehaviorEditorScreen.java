@@ -32,7 +32,7 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
-import org.terasology.rendering.nui.mainMenu.EnterTextPopup;
+import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;

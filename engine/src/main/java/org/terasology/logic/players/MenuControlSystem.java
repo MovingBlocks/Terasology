@@ -30,6 +30,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
 /**
@@ -44,7 +45,10 @@ public class MenuControlSystem implements ComponentSystem {
     public static final String HUD = "hud";
 
     @In
-    GUIManager guiManager;
+    private GUIManager guiManager;
+
+    @In
+    private NUIManager nuiManager;
 
     @Override
     public void initialise() {
@@ -66,7 +70,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onTogglePause(PauseButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(GUIManager.class).openWindow(PAUSE_MENU);
+            nuiManager.toggleScreen("engine:pauseMenu");
             event.consume();
         }
     }
@@ -83,7 +87,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = {ClientComponent.class})
     public void onDeath(DeathEvent event, EntityRef entity) {
         if (entity.getComponent(ClientComponent.class).local) {
-            CoreRegistry.get(GUIManager.class).openWindow("death");
+            nuiManager.pushScreen("engine:deathScreen");
         }
     }
 
