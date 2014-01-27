@@ -39,9 +39,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
-import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.rendering.gui.windows.UIScreenInventory;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
@@ -77,8 +75,6 @@ public class GUIManager implements ComponentSystem {
         //TODO parser action here! this is temporary
         registeredWindows.put("container", UIScreenContainer.class);
         registeredWindows.put("metrics", UIScreenMetrics.class);
-        registeredWindows.put("death", UIScreenDeath.class);
-        registeredWindows.put("pause", UIMenuPause.class);
         registeredWindows.put("inventory", UIScreenInventory.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }

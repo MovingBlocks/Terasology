@@ -152,22 +152,29 @@ public class CreateGameScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "play", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                GameManifest gameManifest = new GameManifest();
-
-                gameManifest.setTitle(worldName.getText());
-                gameManifest.setSeed(seed.getText());
-                for (String moduleName : config.getDefaultModSelection().listModules()) {
-                    Module module = moduleManager.getLatestModuleVersion(moduleName);
-                    if (module != null) {
-                        gameManifest.addModule(module.getId(), module.getVersion());
+                if (worldGenerator.getSelection() == null) {
+                    ErrorMessagePopup errorMessagePopup = getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class);
+                    if (errorMessagePopup != null) {
+                        errorMessagePopup.setError("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
                     }
+                } else {
+                    GameManifest gameManifest = new GameManifest();
+
+                    gameManifest.setTitle(worldName.getText());
+                    gameManifest.setSeed(seed.getText());
+                    for (String moduleName : config.getDefaultModSelection().listModules()) {
+                        Module module = moduleManager.getLatestModuleVersion(moduleName);
+                        if (module != null) {
+                            gameManifest.addModule(module.getId(), module.getVersion());
+                        }
+                    }
+
+                    WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
+                            (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
+                    gameManifest.addWorld(worldInfo);
+
+                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
                 }
-
-                WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                        (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
-                gameManifest.addWorld(worldInfo);
-
-                gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
             }
         });
 
