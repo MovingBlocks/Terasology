@@ -650,7 +650,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
 
-        moduleSecurityManager.addAllowedPermission(GUIManager.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(GUIManagerLwjgl.class, ReflectPermission.class);
 
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
