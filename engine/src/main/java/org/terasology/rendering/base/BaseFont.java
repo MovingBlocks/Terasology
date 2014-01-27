@@ -47,8 +47,8 @@ public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
     public abstract void drawString(int x, int y, String text, Color color);
 
     @Override
-    public void reload(FontData data) {
-        this.data = data;
+    public void reload(FontData fontData) {
+        this.data = fontData;
     }
 
     @Override

@@ -29,7 +29,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.base.BaseMaterial;
 import org.terasology.rendering.cameras.Camera;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {

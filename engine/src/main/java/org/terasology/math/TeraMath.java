@@ -335,6 +335,109 @@ public final class TeraMath {
         return base;
     }
 
+
+
+    /**
+     * Modulus operation, where the result has the same sign as the divisor.
+     *
+     * Modulus(a, b) differs from a % b in that the result of the first has the
+     * same sign as a, while the latter has the same sign as b.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static double modulus(double dividend, double divisor)
+    {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the divisor.
+     *
+     * Modulus(a, b) differs from a % b in that the result of the first has the
+     * same sign as a, while the latter has the same sign as b.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static float modulus(float dividend, float divisor)
+    {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the divisor.
+     *
+     * Modulus(a, b) differs from a % b in that the result of the first has the
+     * same sign as a, while the latter has the same sign as b.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static int modulus(int dividend, int divisor)
+    {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
+
+    /**
+     * Modulus operation, where the result has the same sign as the dividend.
+     *
+     * Modulus(a, b) equals a % b.
+     * This function (alias) exists primarily to be used in places where both modulus and % are used,
+     * to make a clearer distinction between the two operations.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static double remainder(double dividend, double divisor)
+    {
+        return dividend % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the dividend.
+     *
+     * Modulus(a, b) equals a % b.
+     * This function (alias) exists primarily to be used in places where both modulus and % are used,
+     * to make a clearer distinction between the two operations.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static float remainder(float dividend, float divisor)
+    {
+        return dividend % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the dividend.
+     *
+     * Modulus(a, b) equals a % b.
+     * This function (alias) exists primarily to be used in places where both modulus and % are used,
+     * to make a clearer distinction between the two operations.
+     *
+     * @author DizzyDragon
+     * @param dividend The value that is divided
+     * @param divisor The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     */
+    public static int remainder(int dividend, int divisor)
+    {
+        return dividend % divisor;
+    }
+
+
     /**
      * Bilinear interpolation.
      */

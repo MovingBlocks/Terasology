@@ -18,12 +18,14 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
+import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -57,6 +59,7 @@ import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -114,13 +117,17 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -195,7 +202,7 @@ public class TerasologyEngine implements GameEngine {
             initAssets();
             initControls();
             updateInputConfig();
-            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManagerLwjgl(this));
             nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
 
             if (config.getSystem().isMonitoringEnabled()) {
@@ -400,6 +407,25 @@ public class TerasologyEngine implements GameEngine {
             Display.setLocation(rc.getWindowPosX(), rc.getWindowPosY());
             Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
+            try {
+                
+                String root = "org/terasology/icons/";
+                ClassLoader classLoader = getClass().getClassLoader();
+                
+                BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));
+                BufferedImage icon32 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_32.png"));
+                BufferedImage icon64 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_64.png"));
+                BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
+                
+                Display.setIcon(new ByteBuffer[] {
+                    new ImageIOImageData().imageToByteBuffer(icon16, false, false, null),
+                    new ImageIOImageData().imageToByteBuffer(icon32, false, false, null),
+                    new ImageIOImageData().imageToByteBuffer(icon64, false, false, null),
+                    new ImageIOImageData().imageToByteBuffer(icon128, false, false, null)
+                });
+            } catch (IOException | IllegalArgumentException e) {
+                logger.warn("Could not set icon", e);
+            }
             Display.create(rc.getPixelFormat());
             Display.setVSyncEnabled(rc.isVSync());
         } catch (LWJGLException e) {
