@@ -34,9 +34,9 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public void reload(MeshData data) {
-        this.data = data;
-        this.aabb = AABB.createEncompasing(data.getVertices());
+    public void reload(MeshData meshData) {
+        this.data = meshData;
+        this.aabb = AABB.createEncompasing(meshData.getVertices());
     }
 
     @Override
