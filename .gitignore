@@ -31,8 +31,7 @@ facades/PC/Terasology.launch
 *.directory
 
 #Ignore OSX
-Icon
-Icon?
+Icon
 
 #Ignore Windows
 ehthumbs.db
