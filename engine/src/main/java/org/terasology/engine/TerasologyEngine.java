@@ -57,6 +57,7 @@ import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -195,7 +196,7 @@ public class TerasologyEngine implements GameEngine {
             initAssets();
             initControls();
             updateInputConfig();
-            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
+            guiManager = CoreRegistry.putPermanently(GUIManager.class, new GUIManagerLwjgl(this));
             nuiManager = CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
 
             if (config.getSystem().isMonitoringEnabled()) {
