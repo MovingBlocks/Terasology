@@ -15,12 +15,21 @@
  */
 package org.terasology.engine;
 
-import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.paths.PathManager;
-
-import javax.swing.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+
+import javax.swing.JOptionPane;
+
+import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglInput;
+import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 /**
  * Main method for launching Terasology
@@ -50,7 +59,13 @@ public final class Terasology {
             } else {
                 PathManager.getInstance().useDefaultHomePath();
             }
-            TerasologyEngine engine = new TerasologyEngine();
+            
+            Deque<EngineSubsystem> subsystemList = new ArrayDeque<EngineSubsystem>(Arrays.asList(
+                    new EngineSubsystem[]{
+                            new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput()
+                    }));
+
+            TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
             engine.run(new StateMainMenu());
             engine.dispose();
