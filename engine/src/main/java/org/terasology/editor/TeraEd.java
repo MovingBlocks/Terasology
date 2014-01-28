@@ -15,6 +15,9 @@
  */
 package org.terasology.editor;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
@@ -23,6 +26,12 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
+import org.terasology.engine.subsystem.lwjgl.LwjglCustomViewPort;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglInput;
+import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
 
@@ -59,14 +68,20 @@ public final class TeraEd extends JWindow {
             logger.warn("Failed to set look and feel to Nimbus", e);
         }
 
-        engine = new TerasologyEngine();
+        LwjglCustomViewPort lwjglCustomViewPort = new LwjglCustomViewPort();
+        List<EngineSubsystem> subsystemList = Arrays.asList(new EngineSubsystem[] {
+                new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
+                lwjglCustomViewPort
+        });
+
+        engine = new TerasologyEngine(subsystemList);
         mainWindow = new MainWindow(this);
+        lwjglCustomViewPort.setCustomViewport(mainWindow.getViewport());
 
         try {
             PathManager.getInstance().useDefaultHomePath();
 
             engine.setHibernationAllowed(false);
-            engine.setCustomViewport(mainWindow.getViewport());
             engine.subscribeToStateChange(mainWindow);
             engine.init();
 
