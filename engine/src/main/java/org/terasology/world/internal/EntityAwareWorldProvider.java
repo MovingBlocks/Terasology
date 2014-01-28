@@ -223,7 +223,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         EntityRef oldEntitySample = oldEntityBuilder.buildWithoutLifecycleEvents();
 
         EntityBuilder newEntityBuilder = entityManager.newBuilder(type.getPrefab());
-        oldEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
+        newEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
         EntityRef newEntitySample = newEntityBuilder.buildWithoutLifecycleEvents();
 
         try {
