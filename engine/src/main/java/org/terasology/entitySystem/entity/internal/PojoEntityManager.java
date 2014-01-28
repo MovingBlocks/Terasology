@@ -127,10 +127,12 @@ public class PojoEntityManager implements EntityManager, EngineEntityManager {
     @Override
     public EntityBuilder newBuilder(Prefab prefab) {
         EntityBuilder builder = new EntityBuilder(this);
-        for (Component component : prefab.iterateComponents()) {
-            builder.addComponent(componentLibrary.copy(component));
+        if (prefab != null) {
+            for (Component component : prefab.iterateComponents()) {
+                builder.addComponent(componentLibrary.copy(component));
+            }
+            builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         }
-        builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return builder;
     }
 

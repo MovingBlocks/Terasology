@@ -216,8 +216,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param type        The new type of the block
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
-        EntityRef oldEntitySample = (!oldType.getPrefab().isEmpty()) ? entityManager.createEntityWithoutLifecycleEvents(oldType.getPrefab()) : EntityRef.NULL;
-        EntityRef newEntitySample = (!type.getPrefab().isEmpty()) ? entityManager.createEntityWithoutLifecycleEvents(type.getPrefab()) : EntityRef.NULL;
+        BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
+
+        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldType.getPrefab());
+        oldEntityBuilder.addComponent(new BlockComponent(oldType, new Vector3i(blockComponent.getPosition())));
+        EntityRef oldEntitySample = oldEntityBuilder.buildWithoutLifecycleEvents();
+
+        EntityBuilder newEntityBuilder = entityManager.newBuilder(type.getPrefab());
+        oldEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
+        EntityRef newEntitySample = newEntityBuilder.buildWithoutLifecycleEvents();
 
         try {
             for (Component component : blockEntity.iterateComponents()) {
@@ -228,7 +235,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
                 }
             }
 
-            BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
+
             blockComponent.setBlock(type);
             blockEntity.saveComponent(blockComponent);
 
