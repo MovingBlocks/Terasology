@@ -437,6 +437,7 @@ public class ModuleManagerImpl implements ModuleManager {
                     throw new IllegalStateException("Active modules missing dependency '" + dependency.getId() + "'");
                 }
             }
+            result.add(module);
         }
     }
 
