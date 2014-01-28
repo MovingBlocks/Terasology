@@ -31,6 +31,7 @@ import javax.vecmath.Vector2f;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -41,6 +42,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 @API
 public class Icon {
     private static Map<String, Icon> icons;
+    private static Map<TextureRegion, Icon> textureRegionIconMap = new WeakHashMap<>();
 
     private UIImage element;
     private BlockFamily blockFamily;
@@ -75,6 +77,17 @@ public class Icon {
         setAtlasPosition(0, 0);
     }
 
+    public Icon(TextureRegion textureRegion) {
+        element = new UIImage(textureRegion);
+
+        element.setSize(new Vector2f(32, 32));
+        element.setTextureSize(new Vector2f(16, 16));
+        element.setVisible(true);
+        element.setPosition(new Vector2f(-10f, -16f));
+
+        blockFamily = null;
+    }
+
     /**
      * Returns the icon for <code>name</code>.
      *
@@ -87,6 +100,18 @@ public class Icon {
         }
 
         return icons.get(name.toLowerCase(Locale.ENGLISH));
+    }
+
+    /**
+     * @return the Icon for item
+     */
+    public static Icon get(TextureRegion textureRegion) {
+        Icon icon = textureRegionIconMap.get(textureRegion);
+        if (icon == null) {
+            icon = new Icon(textureRegion);
+            textureRegionIconMap.put(textureRegion, icon);
+        }
+        return icon;
     }
 
     public Texture getTexture() {

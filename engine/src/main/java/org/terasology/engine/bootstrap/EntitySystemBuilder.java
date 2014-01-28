@@ -54,6 +54,7 @@ import org.terasology.persistence.typeSerialization.typeHandlers.extension.Entit
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.PrefabTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Region3iTypeHandler;
+import org.terasology.persistence.typeSerialization.typeHandlers.extension.TextureRegionTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector2fTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3iTypeHandler;
@@ -67,6 +68,8 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
@@ -137,6 +140,8 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
+        serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());
+        serializationLibrary.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
         serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());

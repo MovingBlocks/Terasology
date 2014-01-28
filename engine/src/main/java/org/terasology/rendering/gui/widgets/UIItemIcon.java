@@ -130,7 +130,7 @@ public class UIItemIcon extends UIDisplayContainer {
         }
 
         //render icon
-        if (itemComponent.icon.isEmpty()) {
+        if (itemComponent.icon == null) {
             BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
             if (blockItem != null) {
                 renderBlockIcon(blockItem.blockFamily);

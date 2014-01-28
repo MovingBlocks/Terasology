@@ -19,13 +19,12 @@ import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -34,12 +33,14 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
-import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -167,7 +168,7 @@ public class FirstPersonRenderer implements RenderSystem {
         shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
-    private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
+    private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {
         Material shader = Assets.getMaterial("engine:block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
@@ -187,15 +188,17 @@ public class FirstPersonRenderer implements RenderSystem {
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
         glScalef(0.75f, 0.75f, 0.75f);
 
-        Mesh itemMesh = iconMeshes.get(iconName);
-        if (itemMesh == null) {
-            Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "icon." + iconName),
-                    icon.getTextureRegion());
-            iconMeshes.put(iconName, itemMesh);
-        }
+        if (iconTexture instanceof Asset<?>) {
+            AssetUri uri = ((Asset<?>) iconTexture).getURI();
+            Mesh itemMesh = iconMeshes.get(uri.toNormalisedString());
+            if (itemMesh == null) {
+                itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "pixelMesh." + uri.getAssetName()),
+                        iconTexture);
+                iconMeshes.put(uri.toNormalisedString(), itemMesh);
+            }
 
-        itemMesh.render();
+            itemMesh.render();
+        }
 
         glPopMatrix();
 

@@ -71,6 +71,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -137,6 +138,7 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Prefab.class, new PrefabTypeHandler());
         library.add(Border.class, new BorderTypeHandler());
         library.add(TextureRegion.class, new TextureRegionTypeHandler());
+        library.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())

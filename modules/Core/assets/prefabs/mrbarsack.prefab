@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Mr Barsack's Axe",
-        "icon" : "Axe",
+        "icon" : "engine:items.Axe",
         "renderWithIcon" : true,
         "baseDamage" : 50
     }

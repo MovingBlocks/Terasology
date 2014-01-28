@@ -2,7 +2,7 @@
     "parent": "engine:iconItem",
     "Item": {
         "name": "Door",
-        "icon": "door",
+        "icon": "engine:items.door",
         "renderWithIcon": true,
         "stackId": "door",
         "consumedOnUse": true,

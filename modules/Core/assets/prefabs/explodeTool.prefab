@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Explode Tool",
-        "icon" : "Dynamite",
+        "icon" : "engine:items.dynamiteStick",
         "usage" : "ON_BLOCK"
     },
     "ExplosionAction" : {

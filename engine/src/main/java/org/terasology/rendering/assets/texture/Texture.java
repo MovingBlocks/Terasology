@@ -16,13 +16,12 @@
 
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.asset.Asset;
 import org.terasology.math.Rect2f;
 
 /**
  * @author Immortius
  */
-public interface Texture extends Asset<TextureData>, TextureRegion {
+public interface Texture extends TextureRegionAsset<TextureData> {
 
     Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
 

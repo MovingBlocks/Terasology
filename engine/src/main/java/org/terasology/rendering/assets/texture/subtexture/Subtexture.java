@@ -21,13 +21,13 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.assets.texture.Texture;
 
 /**
  * @author Immortius
  */
-public class Subtexture extends AbstractAsset<SubtextureData> implements TextureRegion {
+public class Subtexture extends AbstractAsset<SubtextureData> implements TextureRegionAsset<SubtextureData> {
 
     private Texture texture;
     private Rect2f subregion;

@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Railgun",
-        "icon" : "Railgun",
+        "icon" : "engine:items.dynamite",
         "usage" : "IN_DIRECTION"
     },
     "TunnelAction" : {},

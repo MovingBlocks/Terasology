@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Miniaturizer",
-        "icon" : "scissors",
+        "icon" : "engine:items.scissors",
 		"usage" : "ON_BLOCK"
     },
   	"PlaySoundAction" : {

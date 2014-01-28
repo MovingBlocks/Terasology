@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Axe",
-        "icon" : "Axe",
+        "icon" : "engine:items.axe",
         "renderWithIcon" : true,
         "damageType" : "axeDamage"
     }

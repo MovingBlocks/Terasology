@@ -1,7 +1,7 @@
 {
     "Item" : {
         "name" : "Coal",
-        "icon" : "Coal",
+        "icon" : "engine:items.coal",
         "renderWithIcon" : true,
         "stackId" : "coal"
     }

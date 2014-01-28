@@ -75,7 +75,7 @@ public class UIImage extends UIDisplayContainer {
         setColor(color);
     }
 
-    public UIImage(Texture texture) {
+    public UIImage(TextureRegion texture) {
         setTexture(texture);
     }
 
