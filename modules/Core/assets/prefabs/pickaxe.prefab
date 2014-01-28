@@ -2,7 +2,7 @@
     "parent" : "engine:iconItem",
     "Item" : {
         "name" : "Pick Axe",
-        "icon" : "engine:items.Pick",
+        "icon" : "items.pick",
         "renderWithIcon" : true,
         "damageType" : "pickaxeDamage"
     }

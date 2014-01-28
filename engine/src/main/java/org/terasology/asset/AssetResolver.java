@@ -20,6 +20,8 @@ package org.terasology.asset;
  */
 public interface AssetResolver<T extends Asset<U>, U extends AssetData> {
 
+    AssetUri resolve(String partialUri);
+
     T resolve(AssetUri uri, AssetFactory<U, T> factory);
 
 }

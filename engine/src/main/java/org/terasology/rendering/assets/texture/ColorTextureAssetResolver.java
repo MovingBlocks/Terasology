@@ -20,6 +20,7 @@ import java.awt.Color;
 
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetResolver;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 /**
@@ -33,6 +34,20 @@ import org.terasology.asset.AssetUri;
  * @author mkienenb
  */
 public class ColorTextureAssetResolver implements AssetResolver<Texture, TextureData> {
+
+    @Override
+    public AssetUri resolve(String partialUri) {
+        String[] parts = partialUri.split("\\.", 2);
+        if (parts.length != 2) {
+            return null;
+        }
+
+        if (!TextureUtil.GENERATED_COLOR_NAME_PREFIX.equals(parts[0])) {
+            return null;
+        }
+
+        return new AssetUri(AssetType.TEXTURE, "engine", partialUri);
+    }
 
     @Override
     public Texture resolve(AssetUri uri, AssetFactory<TextureData, Texture> factory) {

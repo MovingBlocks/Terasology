@@ -77,7 +77,15 @@ public class AssetManager {
         if (uri.isValid()) {
             return Lists.newArrayList(uri);
         }
-        return Lists.newArrayList(uriLookup.get(type).row(UriUtil.normalise(name)).values());
+
+        List<AssetUri> results = Lists.newArrayList(uriLookup.get(type).row(UriUtil.normalise(name)).values());
+        for (AssetResolver resolver : resolvers.get(type)) {
+            AssetUri additionalUri = resolver.resolve(name);
+            if (additionalUri != null) {
+                results.add(additionalUri);
+            }
+        }
+        return results;
     }
 
     public AssetUri resolve(AssetType type, String name) {

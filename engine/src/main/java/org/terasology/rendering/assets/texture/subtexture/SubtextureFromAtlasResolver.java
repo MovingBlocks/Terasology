@@ -28,6 +28,18 @@ import org.terasology.rendering.assets.atlas.Atlas;
 public class SubtextureFromAtlasResolver implements AssetResolver<Subtexture, SubtextureData> {
 
     @Override
+    public AssetUri resolve(String partialUri) {
+        String[] parts = partialUri.split("\\.", 2);
+        if (parts.length == 2) {
+            AssetUri uri = Assets.resolveAssetUri(AssetType.ATLAS, parts[0]);
+            if (uri != null) {
+                return new AssetUri(AssetType.SUBTEXTURE, uri.getModuleName(), partialUri);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public Subtexture resolve(AssetUri uri, AssetFactory<SubtextureData, Subtexture> factory) {
         String[] parts = uri.getAssetName().split("\\.", 2);
         if (parts.length == 2) {
