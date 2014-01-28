@@ -108,7 +108,7 @@ public class ItemPickupSystem implements ComponentSystem {
                 Mesh itemMesh = Assets.getMesh(iconMeshUri);
                 if (itemMesh == null) {
                     Icon icon = Icon.get(itemComponent.icon);
-                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, iconMeshUri), icon.getTexture(), icon.getX(), icon.getY());
+                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, iconMeshUri), icon.getTextureRegion());
                 }
                 builder.getComponent(MeshComponent.class).mesh = itemMesh;
             }

@@ -17,8 +17,10 @@ package org.terasology.rendering.primitives;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.API;
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
@@ -29,22 +31,23 @@ public final class MeshFactory {
     private MeshFactory() {
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int posX, int posY) {
-        return generateItemMesh(uri, tex, posX, posY, 0, false, null);
+    public static Mesh generateItemMesh(AssetUri uri, TextureRegion tex) {
+        return generateItemMesh(uri, tex, 0, false, null);
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, Texture tex, int positionX, int positionY, int alphaLimit, boolean withContour, Vector4f colorContour) {
-        ByteBuffer buffer = tex.getData().getBuffers()[0];
+    public static Mesh generateItemMesh(AssetUri uri, TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
+        ByteBuffer buffer = tex.getTexture().getData().getBuffers()[0];
 
-        int posX = 16 * positionX;
-        int posY = 16 * positionY;
+        Rect2i pixelRegion = tex.getPixelRegion();
+        int posX = pixelRegion.minX();
+        int posY = pixelRegion.minY();
 
-        int stride = tex.getWidth() * 4;
+        int stride = tex.getTexture().getWidth() * 4;
 
         Tessellator tessellator = new Tessellator();
 
-        for (int y = 0; y < 16; y++) {
-            for (int x = 0; x < 16; x++) {
+        for (int y = 0; y < tex.getHeight(); y++) {
+            for (int x = 0; x < tex.getWidth(); x++) {
                 int r = buffer.get((posY + y) * stride + (posX + x) * 4) & 255;
                 int g = buffer.get((posY + y) * stride + (posX + x) * 4 + 1) & 255;
                 int b = buffer.get((posY + y) * stride + (posX + x) * 4 + 2) & 255;

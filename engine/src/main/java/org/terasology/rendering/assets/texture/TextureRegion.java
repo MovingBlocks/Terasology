@@ -16,6 +16,7 @@
 package org.terasology.rendering.assets.texture;
 
 import org.terasology.math.Rect2f;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 
 /**
@@ -31,6 +32,11 @@ public interface TextureRegion {
      * @return The region of the texture represented by this asset
      */
     Rect2f getRegion();
+
+    /**
+     * @return The pixel region of the texture represented by this asset
+     */
+    Rect2i getPixelRegion();
 
     int getWidth();
 

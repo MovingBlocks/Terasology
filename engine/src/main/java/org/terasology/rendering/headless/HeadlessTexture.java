@@ -18,6 +18,7 @@ package org.terasology.rendering.headless;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2f;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -95,5 +96,10 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     @Override
     public FilterMode getFilterMode() {
         return textureData.getFilterMode();
+    }
+
+    @Override
+    public Rect2i getPixelRegion() {
+        return Rect2i.createFromMinAndSize(0, 0, textureData.getWidth(), textureData.getHeight());
     }
 }

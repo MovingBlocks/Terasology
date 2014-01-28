@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.texture.subtexture;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2f;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -61,6 +62,12 @@ public class Subtexture extends AbstractAsset<SubtextureData> implements Texture
     @Override
     public Rect2f getRegion() {
         return subregion;
+    }
+
+    @Override
+    public Rect2i getPixelRegion() {
+        return Rect2i.createFromMinAndSize(TeraMath.floorToInt(subregion.minX() * texture.getWidth())
+                , TeraMath.floorToInt(subregion.minY() * texture.getHeight()), getWidth(), getHeight());
     }
 
     @Override
