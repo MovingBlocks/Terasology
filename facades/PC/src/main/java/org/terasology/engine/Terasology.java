@@ -17,8 +17,9 @@ package org.terasology.engine;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Deque;
 
 import javax.swing.JOptionPane;
 
@@ -59,9 +60,10 @@ public final class Terasology {
                 PathManager.getInstance().useDefaultHomePath();
             }
             
-            List<EngineSubsystem> subsystemList = Arrays.asList(new EngineSubsystem[] {
-                    new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput()
-            });
+            Deque<EngineSubsystem> subsystemList = new ArrayDeque<EngineSubsystem>(Arrays.asList(
+                    new EngineSubsystem[]{
+                            new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput()
+                    }));
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();

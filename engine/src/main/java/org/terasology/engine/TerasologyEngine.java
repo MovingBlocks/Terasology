@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -107,13 +108,13 @@ public class TerasologyEngine implements GameEngine {
     private boolean gameFocused = true;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    private Iterable<EngineSubsystem> engineSubsystems;
+    private Deque<EngineSubsystem> engineSubsystems;
 
-    public TerasologyEngine(Iterable<EngineSubsystem> initialEngineSubsystems) {
+    public TerasologyEngine(Deque<EngineSubsystem> initialEngineSubsystems) {
         this.engineSubsystems = initialEngineSubsystems;
     }
 
-    protected Iterable<EngineSubsystem> getEngineSubsystems() {
+    protected Deque<EngineSubsystem> getEngineSubsystems() {
         return engineSubsystems;
     }
 
@@ -246,7 +247,9 @@ public class TerasologyEngine implements GameEngine {
             if (!running) {
                 disposed = true;
                 initialised = false;
-                for (EngineSubsystem subsystem : getEngineSubsystems()) {
+                Iterator<EngineSubsystem> iter = getEngineSubsystems().descendingIterator();
+                while (iter.hasNext()) {
+                    EngineSubsystem subsystem = iter.next();
                     subsystem.dispose();
                 }
             }
@@ -418,7 +421,9 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
-        for (EngineSubsystem subsystem : getEngineSubsystems()) {
+        Iterator<EngineSubsystem> iter = getEngineSubsystems().descendingIterator();
+        while (iter.hasNext()) {
+            EngineSubsystem subsystem = iter.next();
             subsystem.shutdown(config);
         }
 
