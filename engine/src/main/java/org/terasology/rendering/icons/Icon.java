@@ -93,7 +93,7 @@ public class Icon {
         if (blockFamily != null) {
             return terrainTex;
         }
-        return element.getTexture();
+        return element.getTexture().getTexture();
     }
 
     public static void registerIcon(String name, String textureUri, int x, int y) {

@@ -455,7 +455,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             addStyle(style);
         } else {
             //check if same texture is already loaded
-            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+            if (!style.getTexture().getTexture().getURI().toString().equals("texture:" + texture)) {
                 style.setTexture(Assets.getTexture(texture));
             }
         }
@@ -479,7 +479,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             addStyle(style);
         } else {
             //check if same texture is already loaded
-            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+            if (!style.getTexture().getTexture().getURI().toString().equals("texture:" + texture)) {
                 style.setTexture(Assets.getTexture(texture));
             }
 

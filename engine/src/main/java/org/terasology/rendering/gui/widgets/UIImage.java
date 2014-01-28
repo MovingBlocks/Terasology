@@ -20,10 +20,12 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.Rect2f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.internal.ColorUtil;
 import org.terasology.rendering.primitives.Tessellator;
@@ -54,7 +56,7 @@ public class UIImage extends UIDisplayContainer {
     private static final Logger logger = LoggerFactory.getLogger(UIImage.class);
 
     private Color color;
-    private Texture texture;
+    private TextureRegion texture;
 
     private Vector2f textureOrigin = new Vector2f(0.0f, 0.0f);
     private Vector2f textureSize = new Vector2f(1.0f, 1.0f);
@@ -94,11 +96,12 @@ public class UIImage extends UIDisplayContainer {
 
         if (texture != null) {
             CoreRegistry.get(ShaderManager.class).enableDefaultTextured();
-            glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);
+            Rect2f drawRegion = texture.getRegion();
+            glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getTexture().getId() : 0);
             glMatrixMode(GL_TEXTURE);
             glPushMatrix();
-            glTranslatef(textureOrigin.x, textureOrigin.y, 0.0f);
-            glScalef(textureSize.x, textureSize.y, 1.0f);
+            glTranslatef(drawRegion.minX() + drawRegion.width() * textureOrigin.x, drawRegion.minY() + drawRegion.height() * textureOrigin.y, 0.0f);
+            glScalef(drawRegion.width() * textureSize.x, drawRegion.height() * textureSize.y, 1.0f);
             glMatrixMode(GL11.GL_MODELVIEW);
 
             glPushMatrix();
@@ -170,7 +173,7 @@ public class UIImage extends UIDisplayContainer {
      *
      * @param texture The texture.
      */
-    public void setTexture(Texture texture) {
+    public void setTexture(TextureRegion texture) {
         this.texture = texture;
 
         if (texture != null) {
@@ -178,7 +181,7 @@ public class UIImage extends UIDisplayContainer {
         }
     }
 
-    public Texture getTexture() {
+    public TextureRegion getTexture() {
         return texture;
     }
 
