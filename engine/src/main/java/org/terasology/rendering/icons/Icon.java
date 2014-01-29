@@ -80,7 +80,11 @@ public class Icon {
         element = new UIImage(textureRegion);
 
         element.setSize(new Vector2f(32, 32));
-        element.setTextureSize(textureRegion.size().toVector2f());
+        if (textureRegion != null) {
+            element.setTextureSize(textureRegion.size().toVector2f());
+        } else {
+            element.setTextureSize(new Vector2f(16, 16));
+        }
         element.setVisible(true);
         element.setPosition(new Vector2f(-10f, -16f));
 
