@@ -34,6 +34,15 @@ ext {
     displayVersion = versionBase
 }
 
+def convertGitBranch = { gitBranch ->
+    if (gitBranch != null) {
+        // Remove "origin/" from "origin/develop"
+        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
+    } else {
+        ""
+    }
+}
+
 // TODO: Make a top-level commons.gradle and put repositories and global variables etc in there then include: it?
 
 // Declare remote repositories we're interested in - library files will be fetched from here
@@ -127,7 +136,7 @@ jar {
 
     manifest {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
+        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
     }
 }
 
@@ -195,7 +204,7 @@ task createVersionInfoFile {
             ant.entry(key:'buildTag',value:env.BUILD_TAG)
             ant.entry(key:'buildUrl',value:env.BUILD_URL)
             ant.entry(key:'jobName',value:env.JOB_NAME)
-            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
+            ant.entry(key:'gitBranch',value:convertGitBranch(env.GIT_BRANCH))
             ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
             ant.entry(key:'dateTime',value:startDateTimeString)
             ant.entry(key:'displayVersion',value:displayVersion)
