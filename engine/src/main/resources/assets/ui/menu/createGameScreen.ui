@@ -82,7 +82,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Choose World Generator:"
+                            "text" : "Choose World Generator (enabling modules may add more):"
                         },
                         {
                             "type" : "UIDropdown",
@@ -108,7 +108,7 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
-                        "text" : "Mods...",
+                        "text" : "Modules...",
                         "id" : "mods"
                     },
                     {
