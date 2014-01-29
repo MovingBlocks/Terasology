@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
+
 import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
 import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorldGenerator;
 import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
@@ -171,6 +173,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new LoadEntities());
         loadProcesses.add(new InitialiseBlockTypeEntities());
         loadProcesses.add(new CreateWorldEntity());
+        loadProcesses.add(new InitialiseWorldGenerator(gameManifest));
         if (netMode == NetworkMode.SERVER) {
             loadProcesses.add(new StartServer());
         }
