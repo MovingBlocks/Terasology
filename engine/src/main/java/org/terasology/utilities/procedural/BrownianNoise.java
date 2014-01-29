@@ -21,7 +21,7 @@ package org.terasology.utilities.procedural;
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
  * @author Martin Steiger
  */
-public class BrownianNoise {
+public abstract class BrownianNoise {
 
     /**
      * Default persistence value

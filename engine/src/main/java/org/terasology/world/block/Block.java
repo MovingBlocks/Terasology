@@ -664,8 +664,6 @@ public final class Block {
         for (BlockPart dir : BlockPart.values()) {
             BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
-                float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
-                tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
                 tessellator.addMeshPart(part);
             }
         }

@@ -26,8 +26,8 @@ void main(){
 
     vec4 color = texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
 
-    float light = 0.6 * max(0.0, dot(normal, vec3(0.57735,-0.57735,0.57735))) +
-                  0.3 * max(0.0, dot(normal, vec3(-0.707107, 0, -0.707107))) + 0.1;
+    float light = min(1.0,
+                  0.3 * max(0.0, dot(normal, vec3(0, -1, 0))) + 1.0 * max(0.0, dot(normal, vec3(0,0,1))));
 
     color.rgb = color.rgb * light;
 

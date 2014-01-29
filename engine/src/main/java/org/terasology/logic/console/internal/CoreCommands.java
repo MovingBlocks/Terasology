@@ -44,6 +44,9 @@ import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.MaterialData;
+import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
@@ -97,6 +100,30 @@ public class CoreCommands implements ComponentSystem {
             return "Success";
         } else {
             return "Unable to resolve skin '" + skin + "'";
+        }
+    }
+
+    @Command(shortDescription = "Reloads a shader")
+    public String reloadShader(String shader) {
+        AssetUri uri = new AssetUri(AssetType.SHADER, shader);
+        ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
+        if (shaderData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, shaderData);
+            return "Success";
+        } else {
+            return "Unable to resolve shader '" + shader + "'";
+        }
+    }
+
+    @Command(shortDescription = "Reloads a material")
+    public String reloadMaterial(String material) {
+        AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
+        MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
+        if (materialData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, materialData);
+            return "Success";
+        } else {
+            return "Unable to resolve material '" + material + "'";
         }
     }
 
