@@ -93,8 +93,6 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void cancelDelayedAction(CancelDelayedActionEvent event, EntityRef entity) {
-        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        delayedOperationsSortedByTime.remove(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
         entity.removeComponent(DelayedActionComponent.class);
     }
 
