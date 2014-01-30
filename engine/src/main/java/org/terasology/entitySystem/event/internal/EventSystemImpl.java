@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.event.internal;
 
+import com.esotericsoftware.reflectasm.MethodAccess;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
 import com.google.common.collect.BiMap;
@@ -164,7 +165,7 @@ public class EventSystemImpl implements EventSystem {
                     componentParams.add((Class<? extends Component>) types[i]);
                 }
 
-                ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), requiredComponents, componentParams);
+                ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), requiredComponents, componentParams);
                 if (requiredComponents.isEmpty()) {
                     generalHandlers.put((Class<? extends Event>) types[0], handlerInfo);
                 } else {
@@ -434,6 +435,62 @@ public class EventSystemImpl implements EventSystem {
             } catch (IllegalArgumentException ex) {
                 logger.error("Failed to invoke event", ex);
             } catch (InvocationTargetException ex) {
+                logger.error("Failed to invoke event", ex);
+            }
+        }
+
+        public int getPriority() {
+            return priority;
+        }
+
+        @Override
+        public ComponentSystem getHandler() {
+            return handler;
+        }
+    }
+
+    private static class ByteCodeEventHandlerInfo implements EventHandlerInfo {
+        private ComponentSystem handler;
+        private MethodAccess methodAccess;
+        private int methodIndex;
+        private ImmutableList<Class<? extends Component>> filterComponents;
+        private ImmutableList<Class<? extends Component>> componentParams;
+        private int priority;
+
+        public ByteCodeEventHandlerInfo(ComponentSystem handler,
+                                        Method method,
+                                        int priority,
+                                        Collection<Class<? extends Component>> filterComponents,
+                                        Collection<Class<? extends Component>> componentParams) {
+
+
+            this.handler = handler;
+            this.methodAccess = MethodAccess.get(handler.getClass());
+            methodIndex = methodAccess.getIndex(method.getName(), method.getParameterTypes());
+            this.filterComponents = ImmutableList.copyOf(filterComponents);
+            this.componentParams = ImmutableList.copyOf(componentParams);
+            this.priority = priority;
+        }
+
+        public boolean isValidFor(EntityRef entity) {
+            for (Class<? extends Component> component : filterComponents) {
+                if (!entity.hasComponent(component)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public void invoke(EntityRef entity, Event event) {
+            try {
+                Object[] params = new Object[2 + componentParams.size()];
+                params[0] = event;
+                params[1] = entity;
+                for (int i = 0; i < componentParams.size(); ++i) {
+                    params[i + 2] = entity.getComponent(componentParams.get(i));
+                }
+                methodAccess.invoke(handler, methodIndex, params);
+            } catch (IllegalArgumentException ex) {
                 logger.error("Failed to invoke event", ex);
             }
         }

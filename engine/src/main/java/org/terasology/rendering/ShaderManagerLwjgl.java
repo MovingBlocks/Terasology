@@ -136,6 +136,10 @@ public class ShaderManagerLwjgl implements ShaderManager {
             shader.recompile();
         }
 
+        for (Material material : CoreRegistry.get(AssetManager.class).listLoadedAssets(AssetType.MATERIAL, Material.class)) {
+            material.recompile();
+        }
+
         activeMaterial = null;
     }
 
