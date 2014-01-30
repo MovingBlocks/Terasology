@@ -118,7 +118,10 @@ public class Icon {
         if (blockFamily != null) {
             return terrainTex;
         }
-        return element.getTexture().getTexture();
+        if (element.getTexture() != null) {
+            return element.getTexture().getTexture();
+        }
+        return null;
     }
 
     public static void registerIcon(String name, String textureUri, int x, int y) {

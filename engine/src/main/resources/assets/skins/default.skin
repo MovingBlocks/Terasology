@@ -5,6 +5,23 @@
         "UILabel" : {
             "text-align-vertical" : "top"
         },
+        "UITooltip" : {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "align-horizontal" : "left",
+            "align-vertical" : "bottom"
+        },
         "InventoryGrid" : {
             "background" : "engine:box",
             "background-border" : {

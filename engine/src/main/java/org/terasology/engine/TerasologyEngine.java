@@ -18,7 +18,6 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -70,6 +69,7 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -119,7 +119,6 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FilePermission;
@@ -408,20 +407,20 @@ public class TerasologyEngine implements GameEngine {
             Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             try {
-                
+
                 String root = "org/terasology/icons/";
                 ClassLoader classLoader = getClass().getClassLoader();
-                
+
                 BufferedImage icon16 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_16.png"));
                 BufferedImage icon32 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_32.png"));
                 BufferedImage icon64 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_64.png"));
                 BufferedImage icon128 = ImageIO.read(classLoader.getResourceAsStream(root + "gooey_sweet_128.png"));
-                
-                Display.setIcon(new ByteBuffer[] {
-                    new ImageIOImageData().imageToByteBuffer(icon16, false, false, null),
-                    new ImageIOImageData().imageToByteBuffer(icon32, false, false, null),
-                    new ImageIOImageData().imageToByteBuffer(icon64, false, false, null),
-                    new ImageIOImageData().imageToByteBuffer(icon128, false, false, null)
+
+                Display.setIcon(new ByteBuffer[]{
+                        new ImageIOImageData().imageToByteBuffer(icon16, false, false, null),
+                        new ImageIOImageData().imageToByteBuffer(icon32, false, false, null),
+                        new ImageIOImageData().imageToByteBuffer(icon64, false, false, null),
+                        new ImageIOImageData().imageToByteBuffer(icon128, false, false, null)
                 });
             } catch (IOException | IllegalArgumentException e) {
                 logger.warn("Could not set icon", e);
@@ -647,6 +646,9 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("createClassLoader"));
+        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
+        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
 
