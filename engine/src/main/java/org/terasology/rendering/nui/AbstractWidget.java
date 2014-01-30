@@ -28,6 +28,8 @@ public abstract class AbstractWidget implements UIWidget {
     private boolean focused;
 
     private Binding<Boolean> visible = new DefaultBinding<>(true);
+    private Binding<String> tooltip = new DefaultBinding<>("");
+    private float tooltipDelay = 0.5f;
 
     public AbstractWidget() {
         id = "";
@@ -126,5 +128,29 @@ public abstract class AbstractWidget implements UIWidget {
     @Override
     public boolean canBeFocus() {
         return true;
+    }
+
+    @Override
+    public void bindTooltip(Binding<String> binding) {
+        tooltip = binding;
+    }
+
+    @Override
+    public String getTooltip() {
+        return tooltip.get();
+    }
+
+    @Override
+    public void setTooltip(String val) {
+        tooltip.set(val);
+    }
+
+    @Override
+    public float getTooltipDelay() {
+        return tooltipDelay;
+    }
+
+    public final void setTooltipDelay(float value) {
+        this.tooltipDelay = value;
     }
 }

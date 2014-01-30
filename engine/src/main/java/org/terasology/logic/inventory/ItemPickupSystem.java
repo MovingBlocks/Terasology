@@ -103,7 +103,7 @@ public class ItemPickupSystem implements ComponentSystem {
         EntityBuilder builder = event.getPickup();
         if (builder.hasComponent(MeshComponent.class)) {
             MeshComponent mesh = builder.getComponent(MeshComponent.class);
-            if (mesh.mesh == null && Icon.get(itemComponent.icon) != null) {
+            if (mesh.mesh == null && itemComponent.icon != null) {
                 String iconMeshUri = "engine:icon." + itemComponent.icon;
                 Mesh itemMesh = Assets.getMesh(iconMeshUri);
                 if (itemMesh == null) {

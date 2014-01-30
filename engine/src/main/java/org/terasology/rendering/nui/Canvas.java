@@ -447,5 +447,23 @@ public interface Canvas {
      */
     void addInteractionRegion(InteractionListener listener, Rect2i region);
 
+    /**
+     * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the
+     * full area of the widget.
+     *
+     * @param listener
+     * @param tooltip
+     */
+    void addInteractionRegion(InteractionListener listener, String tooltip);
+
+    /**
+     * Adds an interaction region filling the desired region.
+     *
+     * @param listener
+     * @param tooltip
+     * @param region
+     */
+    void addInteractionRegion(InteractionListener listener, String tooltip, Rect2i region);
+
     void drawLine(int startX, int startY, int endX, int endY, Color color);
 }
