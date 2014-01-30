@@ -67,9 +67,10 @@ public class UITooltip extends UILabel {
         }
         left = TeraMath.clamp(left, 0, canvas.size().x - textSize.x);
 
+
         try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(left, top, textSize.x, textSize.y), false)) {
             canvas.drawBackground();
-            super.onDraw(canvas);
+            canvas.drawText(getText(), style.getBackgroundBorder().shrink(canvas.getRegion()));
         }
     }
 

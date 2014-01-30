@@ -18,7 +18,7 @@ package org.terasology.network.internal;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.DisplayInformationComponent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 
@@ -51,7 +51,7 @@ public abstract class AbstractClient implements Client {
 
         // TODO: Send event for clientInfo creation, don't create here.
         EntityRef clientInfo = entityManager.create("engine:clientInfo");
-        DisplayInformationComponent displayInfo = clientInfo.getComponent(DisplayInformationComponent.class);
+        DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
         displayInfo.name = name;
         clientInfo.saveComponent(displayInfo);
 

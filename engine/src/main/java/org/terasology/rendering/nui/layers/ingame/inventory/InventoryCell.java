@@ -18,14 +18,18 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Quat4f;
@@ -37,6 +41,21 @@ import javax.vecmath.Vector3f;
 public class InventoryCell extends CoreWidget {
 
     private Binding<EntityRef> targetItem = new DefaultBinding<>(EntityRef.NULL);
+
+    private InteractionListener interactionListener = new BaseInteractionListener();
+
+    public InventoryCell() {
+        bindTooltip(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                DisplayNameComponent displayNameComponent = targetItem.get().getComponent(DisplayNameComponent.class);
+                if (displayNameComponent != null) {
+                    return displayNameComponent.name;
+                }
+                return "";
+            }
+        });
+    }
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -59,6 +78,7 @@ public class InventoryCell extends CoreWidget {
                     canvas.drawTexture(Assets.getSubtexture("engine:items.questionMark"));
                 }
             }
+            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         }
     }
 
@@ -77,5 +97,10 @@ public class InventoryCell extends CoreWidget {
 
     public void setTargetItem(EntityRef val) {
         targetItem.set(val);
+    }
+
+    @Override
+    public float getTooltipDelay() {
+        return 0;
     }
 }

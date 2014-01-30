@@ -22,7 +22,7 @@ import org.terasology.network.Replicate;
 /**
  * @author Immortius
  */
-public class DisplayInformationComponent implements Component {
+public class DisplayNameComponent implements Component {
     @Replicate
     public String name = "";
     @Replicate
@@ -30,6 +30,6 @@ public class DisplayInformationComponent implements Component {
 
 
     public String toString() {
-        return String.format("DisplayInformation(name = '%s', description = '%s')", name, description);
+        return String.format("DisplayName(name = '%s', description = '%s')", name, description);
     }
 }

@@ -1,7 +1,9 @@
 {
     "parent" : "engine:iconItem",
+    "DisplayName" : {
+        "name" : "Railgun"
+    },
     "Item" : {
-        "name" : "Railgun",
         "icon" : "engine:items.dynamite",
         "usage" : "IN_DIRECTION"
     },
