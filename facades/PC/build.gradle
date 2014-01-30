@@ -1,8 +1,7 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
+// The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
+
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config
+apply from: "$rootDir/config/gradle/common.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
@@ -23,14 +22,6 @@ ext {
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
     displayVersion = versionBase
-}
-
-// Same repository configuration as root project
-repositories {
-    mavenCentral()
-    maven {
-        url "http://www.movingblocks.net:8081/artifactory/repo"
-    }
 }
 
 dependencies {
@@ -216,15 +207,4 @@ tasks.eclipse {
 
 cleanEclipse.doLast {
     new File(projectDir, "Terasology.launch").delete()
-}
-
-checkstyle {
-    ignoreFailures = true
-    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
-}
-
-pmd {
-    ignoreFailures = true
-    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
 }

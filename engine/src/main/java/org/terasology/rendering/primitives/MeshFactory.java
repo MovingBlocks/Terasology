@@ -19,7 +19,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.engine.API;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 
 import javax.vecmath.Vector4f;
@@ -54,7 +53,7 @@ public final class MeshFactory {
                 int a = buffer.get((posY + y) * stride + (posX + x) * 4 + 3) & 255;
 
                 if (a > alphaLimit) {
-                    Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, 1.0f);
+                    Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
                     TessellatorHelper.addBlockMesh(tessellator, color, 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 0.5f, 2f * 0.0625f * (15 - y) - 1f, 0f);
 
                     if (withContour) {

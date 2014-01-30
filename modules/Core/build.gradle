@@ -1,25 +1,13 @@
-import groovy.json.JsonSlurper
-
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-apply plugin: 'java'
-apply plugin: 'project-report'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config
+apply from: "$rootDir/config/gradle/common.gradle"
+
+import groovy.json.JsonSlurper
 
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
-}
-
-// Same repository configuration as root project
-repositories {
-    mavenCentral()
-    maven {
-        url "http://www.movingblocks.net:8081/artifactory/repo"
-    }
 }
 
 def moduleDepends = [];
@@ -208,29 +196,4 @@ eclipse {
     classpath {
         defaultOutputDir = file('build/classes')
     }
-}
-
-// Extra details provided for unit tests
-test {
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-
-    // Make sure the natives have been extracted, but only if we're in a multi-workspace setup
-    if (project.name != project(':').name) {
-        dependsOn rootProject.extractNatives
-    }
-}
-
-checkstyle {
-    ignoreFailures = true
-    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
-}
-
-pmd {
-    ignoreFailures = true
-    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
 }

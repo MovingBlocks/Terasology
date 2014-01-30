@@ -23,10 +23,10 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.registry.In;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -83,6 +83,17 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
     public void componentDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
         delayedOperationsSortedByTime.remove(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
+    }
+
+    @ReceiveEvent(components = {DelayedActionComponent.class})
+    public void getDelayedAction(GetDelayedActionEvent event, EntityRef entity) {
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        event.setActionId(delayedComponent.getActionId());
+    }
+
+    @ReceiveEvent(components = {DelayedActionComponent.class})
+    public void cancelDelayedAction(CancelDelayedActionEvent event, EntityRef entity) {
+        entity.removeComponent(DelayedActionComponent.class);
     }
 
     @ReceiveEvent

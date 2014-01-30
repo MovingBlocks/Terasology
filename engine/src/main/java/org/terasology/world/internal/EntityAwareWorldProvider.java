@@ -23,6 +23,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.registry.CoreRegistry;
@@ -218,50 +220,49 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
         BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
 
-        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldType.getPrefab());
+        Prefab oldPrefab = Assets.getPrefab(oldType.getPrefab());
+        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab);
         oldEntityBuilder.addComponent(new BlockComponent(oldType, new Vector3i(blockComponent.getPosition())));
-        EntityRef oldEntitySample = oldEntityBuilder.buildWithoutLifecycleEvents();
+        BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab, oldEntityBuilder.iterateComponents());
+        blockEntity.send(oldEntityEvent);
+        for (Component comp : oldEntityEvent.getResultComponents()) {
+            oldEntityBuilder.addComponent(comp);
+        }
 
-        EntityBuilder newEntityBuilder = entityManager.newBuilder(type.getPrefab());
+        Prefab newPrefab = Assets.getPrefab(type.getPrefab());
+        EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab);
         newEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
-        EntityRef newEntitySample = newEntityBuilder.buildWithoutLifecycleEvents();
+        BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab, newEntityBuilder.iterateComponents());
+        blockEntity.send(newEntityEvent);
+        for (Component comp : newEntityEvent.getResultComponents()) {
+            newEntityBuilder.addComponent(comp);
+        }
 
-        try {
-            for (Component component : blockEntity.iterateComponents()) {
-                if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass())
-                        && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
-                        && !newEntitySample.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
-                    blockEntity.removeComponent(component.getClass());
-                }
+        for (Component component : blockEntity.iterateComponents()) {
+            if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass())
+                    && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
+                    && !newEntityBuilder.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
+                blockEntity.removeComponent(component.getClass());
             }
+        }
 
 
-            blockComponent.setBlock(type);
-            blockEntity.saveComponent(blockComponent);
+        blockComponent.setBlock(type);
+        blockEntity.saveComponent(blockComponent);
 
-            HealthComponent health = blockEntity.getComponent(HealthComponent.class);
-            if (health == null && type.isDestructible()) {
-                blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
-            } else if (health != null && !type.isDestructible()) {
-                blockEntity.removeComponent(HealthComponent.class);
-            } else if (health != null && type.isDestructible()) {
-                health.maxHealth = type.getHardness();
-                health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
-                blockEntity.saveComponent(health);
-            }
+        HealthComponent health = blockEntity.getComponent(HealthComponent.class);
+        if (health == null && type.isDestructible()) {
+            blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
+        } else if (health != null && !type.isDestructible()) {
+            blockEntity.removeComponent(HealthComponent.class);
+        } else if (health != null && type.isDestructible()) {
+            health.maxHealth = type.getHardness();
+            health.currentHealth = Math.min(health.currentHealth, health.maxHealth);
+            blockEntity.saveComponent(health);
+        }
 
-            if (Objects.equal(oldEntitySample, newEntitySample)) {
-                return;
-            }
-
-            if (newEntitySample.exists()) {
-                for (Component comp : newEntitySample.iterateComponents()) {
-                    copyIntoPrefab(blockEntity, comp, retainComponents);
-                }
-            }
-        } finally {
-            entityManager.destroyEntityWithoutEvents(oldEntitySample);
-            entityManager.destroyEntityWithoutEvents(newEntitySample);
+        for (Component comp : newEntityBuilder.iterateComponents()) {
+            copyIntoPrefab(blockEntity, comp, retainComponents);
         }
     }
 

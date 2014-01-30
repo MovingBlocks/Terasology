@@ -122,6 +122,14 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public void recompile() {
+        TIntIntIterator it = shaderPrograms.iterator();
+        while (it.hasNext()) {
+            it.advance();
+            GL20.glDeleteProgram(it.value());
+        }
+        shaderPrograms.clear();
+        uniformLocationMap.clear();
+
         shaderPrograms.put(0, shader.linkShaderProgram(0));
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
             int featureMask = ShaderProgramFeature.getBitset(permutation);
