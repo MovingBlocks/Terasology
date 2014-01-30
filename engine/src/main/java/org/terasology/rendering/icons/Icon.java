@@ -22,7 +22,6 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.BasicTextureRegion;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
@@ -81,7 +80,11 @@ public class Icon {
         element = new UIImage(textureRegion);
 
         element.setSize(new Vector2f(32, 32));
-        element.setTextureSize(new Vector2f(16, 16));
+        if (textureRegion != null) {
+            element.setTextureSize(textureRegion.size().toVector2f());
+        } else {
+            element.setTextureSize(new Vector2f(16, 16));
+        }
         element.setVisible(true);
         element.setPosition(new Vector2f(-10f, -16f));
 
@@ -449,6 +452,10 @@ public class Icon {
     }
 
     public TextureRegion getTextureRegion() {
+        TextureRegion texture = element.getTexture();
+        if (texture != null) {
+            return texture;
+        }
         Vector2i size = getTexture().size();
         return new BasicTextureRegion(getTexture(), new Vector2f(x * 16f / size.x, y * 16f / size.y), new Vector2f(16f / size.x, 16f / size.y));
     }

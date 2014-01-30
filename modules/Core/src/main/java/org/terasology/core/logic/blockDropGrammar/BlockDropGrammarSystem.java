@@ -20,7 +20,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
@@ -28,6 +27,7 @@ import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.BlockManager;
@@ -117,7 +117,7 @@ public class BlockDropGrammarSystem implements ComponentSystem {
     }
 
     private void createDrop(EntityRef item, Vector3f location) {
-        EntityRef pickup = pickupBuilder.createPickupFor(item, location, 60);
+        EntityRef pickup = pickupBuilder.createPickupFor(item, location, 60, true);
         pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
     }
 
