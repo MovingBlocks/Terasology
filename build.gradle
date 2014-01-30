@@ -192,7 +192,6 @@ idea {
     // Exclude special dirs
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
-    module.excludeDirs += file('gradle')
 
     // Exclude output dirs
     module.excludeDirs += file('logs')
