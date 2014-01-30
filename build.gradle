@@ -16,6 +16,7 @@ apply plugin: 'idea'
 
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 // Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
 apply from: 'utility.gradle'
@@ -252,4 +253,9 @@ checkstyle {
 pmd {
     ignoreFailures = true
     ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}
+
+findbugs {
+    ignoreFailures = true
+    excludeFilter = new File(rootDir, 'config/findbugs/findbugs-exclude.xml')
 }

@@ -9,6 +9,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -240,4 +242,9 @@ checkstyle {
 pmd {
     ignoreFailures = true
     ruleSetFiles = files("config/pmd/pmd.xml")
+}
+
+findbugs {
+    ignoreFailures = true
+    excludeFilter = new File(rootDir, 'config/findbugs/findbugs-exclude.xml')
 }

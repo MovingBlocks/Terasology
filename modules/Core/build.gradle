@@ -8,6 +8,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
@@ -233,4 +234,10 @@ checkstyle {
 pmd {
     ignoreFailures = true
     ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+}
+
+findbugs {
+    ignoreFailures = true
+    // This works as a solo module build in Jenkins as the config dir is copied in as part of the engine harness
+    excludeFilter = new File(rootDir, 'config/findbugs/findbugs-exclude.xml')
 }
