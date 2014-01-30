@@ -89,8 +89,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldGenerator worldGenerator;
         try {
             worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(worldInfo.getWorldGenerator());
-            worldGenerator.initialize();
-            worldGenerator.setWorldSeed(worldInfo.getSeed());
+            CoreRegistry.put(WorldGenerator.class, worldGenerator);
         } catch (UnresolvedWorldGeneratorException e) {
             logger.error("Unable to load world generator", e);
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));
