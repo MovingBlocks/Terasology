@@ -23,20 +23,27 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class ByteCodeReflectFactory implements ReflectFactory {
+    private static final Logger logger = LoggerFactory.getLogger(ByteCodeReflectFactory.class);
 
     private ClassPool pool;
     private CtClass objectConstructorInterface;
+
+    private ReflectFactory backupFactory = new ReflectionReflectFactory();
 
     public ByteCodeReflectFactory() {
         try {
@@ -54,21 +61,27 @@ public class ByteCodeReflectFactory implements ReflectFactory {
         try {
             return (ObjectConstructor<T>) type.getClassLoader().loadClass(constructorClassName).getConstructor().newInstance();
         } catch (ClassNotFoundException ignored) {
-            if (Modifier.isPrivate(type.getDeclaredConstructor().getModifiers())) {
-                throw new NoSuchMethodException("Constructor for '" + type + "' exists but is private");
-            }
-
-            CtClass constructorClass = pool.makeClass(type.getName() + "_ReflectConstructor");
-            constructorClass.setInterfaces(new CtClass[]{objectConstructorInterface});
             try {
+                if (Modifier.isPrivate(type.getDeclaredConstructor().getModifiers())) {
+                    logger.warn("Constructor for '{}' exists but is private, falling back on reflection", type);
+                    return backupFactory.createConstructor(type);
+                }
+
+                CtClass constructorClass = pool.makeClass(type.getName() + "_ReflectConstructor");
+                constructorClass.setInterfaces(new CtClass[]{objectConstructorInterface});
+
                 CtMethod method = CtNewMethod.make("public Object construct() { return new " + type.getName() + "();}", constructorClass);
                 constructorClass.addMethod(method);
-                return (ObjectConstructor<T>) (constructorClass.toClass().getConstructor().newInstance());
+                return (ObjectConstructor<T>) (constructorClass.toClass(type.getClassLoader(), type.getProtectionDomain()).getConstructor().newInstance());
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | CannotCompileException e) {
-                throw new RuntimeException("Error instantiating constructor object for " + type, e);
+                logger.error("Error instantiating constructor object for '{}', falling back on reflection", type, e);
+                return backupFactory.createConstructor(type);
+            } catch (NoSuchMethodException e) {
+                return null;
             }
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Error instantiating constructor object for " + type, e);
+            logger.error("Error instantiating constructor object for '{}', falling back on reflection", type, e);
+            return backupFactory.createConstructor(type);
         }
 
     }
@@ -80,7 +93,16 @@ public class ByteCodeReflectFactory implements ReflectFactory {
 
     @Override
     public <T, U> FieldAccessor<T, U> createFieldAccessor(Class<T> ownerType, Field field, Class<U> fieldType) throws InaccessibleFieldException {
-        return new ReflectASMFieldAccessor<>(ownerType, field, fieldType);
+        try {
+            return new ReflectASMFieldAccessor<>(ownerType, field, fieldType);
+        } catch (IllegalArgumentException | InaccessibleFieldException e) {
+            logger.warn("Failed to create accessor for field '{}' of type '{}', falling back on reflection", field.getName(), ownerType.getName());
+            return backupFactory.createFieldAccessor(ownerType, field, fieldType);
+        }
+    }
+
+    public void setClassPool(ClassPool classPool) {
+        pool = classPool;
     }
 
     private static class ReflectASMFieldAccessor<T, U> implements FieldAccessor<T, U> {

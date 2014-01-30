@@ -76,7 +76,11 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
 
         this.uri = uri;
         this.clazz = type;
-        this.constructor = factory.createConstructor(type);
+        if (!type.isInterface() && !Modifier.isAbstract(type.getModifiers())) {
+            this.constructor = factory.createConstructor(type);
+        } else {
+            this.constructor = null;
+        }
 
         addFields(copyStrategyLibrary, factory);
     }

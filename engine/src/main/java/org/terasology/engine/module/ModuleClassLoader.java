@@ -88,7 +88,6 @@ public class ModuleClassLoader extends URLClassLoader {
             byte[] b = cc.toBytecode();
             return defineClass(name, b, 0, b.length);
         } catch (CannotCompileException | NotFoundException | IOException e) {
-            logger.error("Failed to load {}", name, e);
             throw new ClassNotFoundException("Failed to find or load class " + name, e);
         }
     }
