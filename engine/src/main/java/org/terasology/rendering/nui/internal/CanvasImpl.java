@@ -138,7 +138,7 @@ public class CanvasImpl implements CanvasControl {
         }
         drawOnTopOperations.clear();
 
-        if (topMouseOverRegion != null && time.getGameTime() >= tooltipTime) {
+        if (topMouseOverRegion != null && time.getGameTime() >= tooltipTime && getSkin() != null) {
             tooltipWidget.setText(topMouseOverRegion.getTooltip());
             drawWidget(tooltipWidget);
         }
@@ -843,7 +843,7 @@ public class CanvasImpl implements CanvasControl {
      * The state of the canvas
      */
     private static class CanvasState {
-        public UISkin skin;
+        public UISkin skin = Assets.getSkin("engine:default");
         public String family = "";
         public UIWidget element;
         public String part = "";
