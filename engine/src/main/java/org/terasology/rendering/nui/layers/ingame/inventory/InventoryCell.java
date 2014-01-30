@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.primitives.UnsignedBytes;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
@@ -77,6 +78,9 @@ public class InventoryCell extends CoreWidget {
                 } else {
                     canvas.drawTexture(Assets.getSubtexture("engine:items.questionMark"));
                 }
+            }
+            if (itemComponent.stackCount > 1) {
+                canvas.drawText(Integer.toString(UnsignedBytes.toInt(itemComponent.stackCount)));
             }
             canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         }

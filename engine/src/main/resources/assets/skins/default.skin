@@ -53,7 +53,9 @@
                 "bottom" : 4,
                 "left" : 4,
                 "right" : 4
-            }
+            },
+            "text-align-horizontal" : "right",
+            "text-align-vertical" : "bottom"
         },
         "UIText" : {
             "text-align-horizontal" : "left",
