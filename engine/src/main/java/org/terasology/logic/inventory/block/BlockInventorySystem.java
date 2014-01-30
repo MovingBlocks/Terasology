@@ -18,15 +18,17 @@ package org.terasology.logic.inventory.block;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.logic.health.DoDestroyEvent;
-import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
+import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
 import org.terasology.world.block.items.OnBlockToItem;
@@ -42,7 +44,13 @@ public class BlockInventorySystem extends BaseComponentSystem {
     @In
     private SlotBasedInventoryManager inventoryManager;
 
-    private PickupBuilder pickupBuilder = new PickupBuilder();
+    private PickupBuilder pickupBuilder;
+
+    @Override
+    public void initialise() {
+        pickupBuilder = new PickupBuilder();
+    }
+
 
     @ReceiveEvent(components = {InventoryComponent.class, RetainBlockInventoryComponent.class})
     public void copyBlockInventory(OnBlockToItem event, EntityRef blockEntity) {
@@ -65,12 +73,13 @@ public class BlockInventorySystem extends BaseComponentSystem {
     public void dropContentsOfInventory(DoDestroyEvent event, EntityRef entity) {
         Vector3f position = entity.getComponent(LocationComponent.class).getWorldPosition();
 
+        FastRandom random = new FastRandom();
         int slotCount = inventoryManager.getNumSlots(entity);
-        for (int i=0; i<slotCount; i++) {
-            EntityRef itemInSlot = inventoryManager.getItemInSlot(entity, 0);
+        for (int i = 0; i < slotCount; i++) {
+            EntityRef itemInSlot = inventoryManager.getItemInSlot(entity, i);
             if (itemInSlot.exists()) {
-                inventoryManager.removeItem(entity, itemInSlot);
-                pickupBuilder.createPickupFor(itemInSlot, position, 60);
+                EntityRef pickup = pickupBuilder.createPickupFor(itemInSlot, position, 60, true);
+                pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
             }
         }
     }

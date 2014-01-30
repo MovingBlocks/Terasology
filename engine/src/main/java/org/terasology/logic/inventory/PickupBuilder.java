@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.inventory;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.registry.CoreRegistry;
 
 import javax.vecmath.Vector3f;
 
@@ -41,6 +41,10 @@ public final class PickupBuilder {
     }
 
     public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan) {
+        return createPickupFor(itemEntity, pos, lifespan, false);
+    }
+
+    public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan, boolean dropAll) {
         ItemComponent itemComp = itemEntity.getComponent(ItemComponent.class);
         if (itemComp == null || !itemComp.pickupPrefab.exists()) {
             return EntityRef.NULL;
@@ -49,7 +53,11 @@ public final class PickupBuilder {
         EntityRef pickupItem = itemEntity;
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
-            pickupItem = inventoryManager.removeItem(owner, itemEntity, 1);
+            if (dropAll) {
+                inventoryManager.removeItem(owner, itemEntity);
+            } else {
+                pickupItem = inventoryManager.removeItem(owner, itemEntity, 1);
+            }
         }
 
         //don't perform actual drop on client side
