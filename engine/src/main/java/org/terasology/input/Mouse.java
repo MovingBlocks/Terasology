@@ -17,6 +17,7 @@ package org.terasology.input;
 
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.Display;
 
 /**
  * @author Immortius
@@ -32,5 +33,9 @@ public final class Mouse {
 
     public static boolean getButtonState(int button) {
         return CoreRegistry.get(InputSystem.class).getMouseDevice().isButtonDown(button);
+    }
+
+    public static boolean isVisible() {
+        return CoreRegistry.get(InputSystem.class).getMouseDevice().isVisible();
     }
 }

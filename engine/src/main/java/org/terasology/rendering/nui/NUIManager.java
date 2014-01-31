@@ -66,6 +66,12 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void closeAllScreens();
 
+    void addCursorAttachment(CursorAttachment attachment);
+
+    void removeCursorAttachment(CursorAttachment attachment);
+
+    void removeAllCursorAttachments();
+
     void render();
 
     void update(float delta);

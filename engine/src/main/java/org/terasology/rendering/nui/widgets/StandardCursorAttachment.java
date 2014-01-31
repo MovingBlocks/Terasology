@@ -21,6 +21,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.CursorAttachment;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UIStyle;
@@ -28,15 +29,17 @@ import org.terasology.rendering.nui.skin.UIStyle;
 /**
  * @author Immortius
  */
-public class CursorAttachment extends CoreWidget {
+public class StandardCursorAttachment extends CoreWidget implements CursorAttachment {
     private static final int MOUSE_CURSOR_HEIGHT = 18;
 
     private UIWidget attachment;
 
+    @Override
     public UIWidget getAttachment() {
         return attachment;
     }
 
+    @Override
     public void setAttachment(UIWidget attachment) {
         this.attachment = attachment;
     }

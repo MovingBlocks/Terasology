@@ -18,7 +18,9 @@ package org.terasology.rendering.nui.internal;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -43,6 +45,7 @@ import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
+import org.terasology.rendering.nui.CursorAttachment;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
@@ -50,7 +53,9 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -64,6 +69,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
+
+    private Set<CursorAttachment> cursorAttachments = Sets.newLinkedHashSet();
 
     public NUIManagerInternal(AssetManager assetManager, CanvasRenderer renderer) {
         this.assetManager = assetManager;
@@ -247,6 +254,21 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         focus = null;
     }
 
+    @Override
+    public void addCursorAttachment(CursorAttachment attachment) {
+        cursorAttachments.add(attachment);
+    }
+
+    @Override
+    public void removeCursorAttachment(CursorAttachment attachment) {
+        cursorAttachments.remove(attachment);
+    }
+
+    @Override
+    public void removeAllCursorAttachments() {
+        cursorAttachments.clear();
+    }
+
     public void render() {
         canvas.preRender();
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
@@ -259,6 +281,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         for (UIScreenLayer screen : screensToRender) {
             canvas.setSkin(screen.getSkin());
             canvas.drawWidget(screen, canvas.getRegion());
+        }
+        if (Mouse.isVisible()) {
+            for (CursorAttachment attachment : cursorAttachments) {
+                canvas.drawWidget(attachment);
+            }
         }
         canvas.postRender();
     }

@@ -24,13 +24,13 @@ import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.CursorAttachment;
+import org.terasology.rendering.nui.widgets.StandardCursorAttachment;
 import org.terasology.world.block.items.BlockItemComponent;
 
 /**
  * @author Immortius
  */
-public class TransferItemCursor extends CursorAttachment {
+public class TransferItemCursor extends StandardCursorAttachment {
 
     private Binding<EntityRef> item = new DefaultBinding<>(EntityRef.NULL);
 
