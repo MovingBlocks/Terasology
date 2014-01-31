@@ -16,6 +16,12 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
@@ -28,6 +34,7 @@ import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -79,6 +86,7 @@ public class MenuControlSystem implements ComponentSystem {
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F12:
                 DefaultRenderingProcess.getInstance().takeScreenshot();
+                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
                 break;
         }
     }
