@@ -68,6 +68,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
 
         for (DelayedOperation delayedOperation : operationsToInvoke) {
             if (delayedOperation.entityRef.exists()) {
+                delayedOperation.entityRef.removeComponent(DelayedActionComponent.class);
                 delayedOperation.entityRef.send(new DelayedActionTriggeredEvent(delayedOperation.operationId));
             }
         }
