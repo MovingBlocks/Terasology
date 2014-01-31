@@ -33,10 +33,7 @@ import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UIList;
+import org.terasology.rendering.nui.widgets.*;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -58,6 +55,8 @@ public class SelectModulesScreen extends UIScreenLayer {
     @Override
     public void initialise() {
 
+        //get all the default modes and load them up in selection
+        //  checking if it's valid along the way
         selection = new ModuleSelection(moduleManager);
         for (String moduleId : config.getDefaultModSelection().listModules()) {
             ModuleSelection newSelection = selection.add(moduleId);
@@ -66,18 +65,24 @@ public class SelectModulesScreen extends UIScreenLayer {
             }
         }
 
+        //get all the modules id's, except engine
         List<String> moduleIds = Lists.newArrayList(moduleManager.getModuleIds());
         moduleIds.remove("engine");
+
+        //create our own copy of the modules
         List<Module> modules = Lists.newArrayListWithCapacity(moduleIds.size());
         for (String id : moduleIds) {
             modules.add(moduleManager.getLatestModuleVersion(id));
         }
+
+        //sort by name
         Collections.sort(modules, new Comparator<Module>() {
             @Override
             public int compare(Module o1, Module o2) {
                 return o1.getModuleInfo().getDisplayName().compareTo(o2.getModuleInfo().getDisplayName());
             }
         });
+
 
         final UIList<Module> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
@@ -104,6 +109,26 @@ public class SelectModulesScreen extends UIScreenLayer {
                     return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
                 }
             });
+
+            //ItemActivateEventListener is triggered by double clicking
+            moduleList.subscribe(new ItemActivateEventListener<Module>() {
+                @Override
+                public void onItemActivated(UIWidget widget, Module item) {
+                    String id = item.getId();
+                    if (selection.contains(id)) {
+                        ModuleSelection newSelection = selection.remove(id);
+                        if (newSelection.isValid()) {
+                            selection = newSelection;
+                        }
+                    } else {
+                        ModuleSelection newSelection = selection.add(id);
+                        if (newSelection.isValid()) {
+                            selection = newSelection;
+                        }
+                    }
+                }
+            });
+
 
 
             Binding<ModuleInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleInfo>() {

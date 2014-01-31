@@ -616,6 +616,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
+        moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
 
         moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);

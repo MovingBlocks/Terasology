@@ -507,6 +507,9 @@ public class ModuleManagerImpl implements ModuleManager {
         validSuperTypes.add(type);
 
         for (Module module : getActiveModulesOrderedByDependency()) {
+            if (!module.isCodeModule()) {
+                continue;
+            }
             List<Class<? extends T>> moduleTypes = Lists.newArrayList();
             for (Class<? extends T> superType : validSuperTypes) {
                 for (Class<? extends T> subtype : module.getReflections().getSubTypesOf(superType)) {
