@@ -147,6 +147,7 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.initializeLate(config);
             }
 
+            // InputSystem is required to be initialized at this point.
             // Display is required to be initialized by an EngineSubsystem and registered as a Core system at this point.
 
             initAssets();
