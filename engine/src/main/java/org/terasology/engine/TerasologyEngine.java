@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
+import org.terasology.logic.behavior.tree.Task;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -655,6 +656,9 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
 
         moduleSecurityManager.addAllowedPermission(GUIManagerLwjgl.class, ReflectPermission.class);
+
+        // allow Tasks to be injected
+        moduleSecurityManager.addAllowedPermission(Task.class, new ReflectPermission("suppressAccessChecks"));
 
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
