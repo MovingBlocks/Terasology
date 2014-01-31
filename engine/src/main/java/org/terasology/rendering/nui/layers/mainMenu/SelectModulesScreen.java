@@ -229,6 +229,41 @@ public class SelectModulesScreen extends UIScreenLayer {
                     }
                 });
             }
+
+            UIButton enableAll = find("enableAll", UIButton.class);
+            if (enableAll != null) {
+                enableAll.subscribe(new ActivateEventListener() {
+                    @Override
+                    public void onActivated(UIWidget button) {
+                        for (Module m : moduleList.getList()) {
+                            ModuleSelection newSelection = selection.add(m);
+                            if (newSelection.isValid()) {
+                                selection = newSelection;
+                            }
+                        }
+                    }
+                });
+            }
+
+            UIButton disableAll = find("disableAll", UIButton.class);
+            if (disableAll != null) {
+                disableAll.subscribe(new ActivateEventListener() {
+                    @Override
+                    public void onActivated(UIWidget button) {
+                        for (Module m : moduleList.getList()) {
+                            // The Core module is mandatory - ignore trying to disable it
+                            if (m.getId().equals("core")){
+                                continue;
+                            }
+
+                            //skipping the valid checks - the only one that should be left is the core module
+                            //TODO: Add a remove method that takes the module
+                            ModuleSelection newSelection = selection.remove(m.getId());
+                            selection = newSelection;
+                        }
+                    }
+                });
+            }
         }
 
 
