@@ -23,7 +23,7 @@ import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 
-public abstract class HeadlessShader extends AbstractAsset<ShaderData> implements Shader {
+public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader {
 
     private ShaderData shaderProgramBase;
 
