@@ -18,6 +18,7 @@ package org.terasology.logic.behavior.asset;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -38,6 +39,7 @@ import org.terasology.registry.CoreRegistry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.NotSerializableException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -76,6 +78,9 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
             nextName(reader, "model");
             data.setRoot(treeGson.loadTree(reader));
             reader.endObject();
+        } catch (JsonSyntaxException e) {
+            logger.error("Cannot load tree! " + e.getMessage());
+            return null;
         }
         return data;
     }
@@ -159,11 +164,11 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                             nextName(in, "nodeType");
                             String nodeType = in.nextString();
                             ClassMetadata<? extends Node, ?> classMetadata = CoreRegistry.get(NodesClassLibrary.class).resolve(nodeType);
+                            nextName(in, "nodeId");
+                            int id = in.nextInt();
+                            nextName(in, "node");
                             if (classMetadata != null) {
                                 TypeAdapter<T> delegateAdapter = getDelegateAdapter(classMetadata.getType());
-                                nextName(in, "nodeId");
-                                int id = in.nextInt();
-                                nextName(in, "node");
                                 Node result;
                                 if (classMetadata.getType() == LookupNode.class) {
                                     result = classMetadata.newInstance();
@@ -180,7 +185,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                                 in.endObject();
                                 return (T) result;
                             } else {
-                                throw new RuntimeException("Unambiguous type " + nodeType);
+                                throw new NotSerializableException(nodeType);
                             }
                         } else {
                             return delegate.read(in);
