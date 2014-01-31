@@ -632,6 +632,7 @@ public class TerasologyEngine implements GameEngine {
             }
         }
 
+        moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
         moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
         moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
         // TODO: Create a cleaner clipboard access class, put permission on that
