@@ -619,7 +619,11 @@ public final class TeraMath {
      * @param val
      * @return The lowest power of two greater or equal to val
      */
+    //TODO There might be a more elegant solution to produce a correct results on MIN_VALUE
     public static int ceilPowerOfTwo(int val) {
+        if(val == Integer.MIN_VALUE)
+            return 0;
+
         int result = val - 1;
         result = (result >> 1) | result;
         result = (result >> 2) | result;
@@ -636,6 +640,17 @@ public final class TeraMath {
      */
     public static boolean isPowerOfTwo(int val) {
         return val == ceilPowerOfTwo(val);
+    }
+
+    //TODO replace old isPowerOfTwo with this implementation?
+    /**
+     * Checks whether or not an integer value is a power of 2.
+     * @param val The value that will be checked.
+     * @return True if and only if val is a power of two.
+     * @author DizzyDragon
+     */
+    public static boolean fastIsPowerOfTwo(int val) {
+        return (val & (val-1)) == 0 && val > 0;
     }
 
     /**
