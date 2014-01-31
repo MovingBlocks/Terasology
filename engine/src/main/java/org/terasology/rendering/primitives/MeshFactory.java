@@ -43,6 +43,8 @@ public final class MeshFactory {
 
         int stride = tex.getTexture().getWidth() * 4;
 
+        float textureSize = Math.max(tex.getWidth(), tex.getHeight());
+
         Tessellator tessellator = new Tessellator();
 
         for (int y = 0; y < tex.getHeight(); y++) {
@@ -54,7 +56,7 @@ public final class MeshFactory {
 
                 if (a > alphaLimit) {
                     Vector4f color = new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
-                    TessellatorHelper.addBlockMesh(tessellator, color, 2f * 0.0625f, 1.0f, 0.5f, 2f * 0.0625f * x - 0.5f, 2f * 0.0625f * (15 - y) - 1f, 0f);
+                    TessellatorHelper.addBlockMesh(tessellator, color, 2f / textureSize, 1.0f, 0.5f, 2f / textureSize * x - 0.5f, 2f / textureSize * (15 - y) - 1f, 0f);
 
                     if (withContour) {
                         int newX = 0;
