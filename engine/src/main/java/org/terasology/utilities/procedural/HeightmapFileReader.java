@@ -30,7 +30,11 @@ public final class HeightmapFileReader {
     private HeightmapFileReader() {
     }
 
-    public static float[][] readFile(String file, String delimiter) throws IOException {
+    public static float[][] readFile() throws IOException {
+        // TODO: Exact file to read has been hard coded in engine for security reasons until height maps become assets
+        String file = "Heightmap.txt";
+        String delimiter = "\n";
+
         try (InputStream fis = new FileInputStream(file)) {
             return readValues(fis, delimiter);
         }

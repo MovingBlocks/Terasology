@@ -65,7 +65,8 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
     public void setWorldSeed(String seed) {
         logger.info("Initialising World"); //Why is this methode called twice?
         try {
-            heightmap = HeightmapFileReader.readFile("Heightmap.txt", "\n");
+            // TODO: Exact file to read has been hard coded in engine for security reasons until height maps become assets
+            heightmap = HeightmapFileReader.readFile();
         } catch (IOException e) {
             logger.error("Failed to read heightmap", e);
         }
