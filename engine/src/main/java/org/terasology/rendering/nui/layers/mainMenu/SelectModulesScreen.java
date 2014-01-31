@@ -115,6 +115,13 @@ public class SelectModulesScreen extends UIScreenLayer {
                 @Override
                 public void onItemActivated(UIWidget widget, Module item) {
                     String id = item.getId();
+
+                    // The Core module is mandatory - ignore toggle requests
+                    if (id.equals("core")) {
+                        return;
+                    }
+
+                    // Toggle
                     if (selection.contains(id)) {
                         ModuleSelection newSelection = selection.remove(id);
                         if (newSelection.isValid()) {
@@ -179,6 +186,13 @@ public class SelectModulesScreen extends UIScreenLayer {
                     public void onActivated(UIWidget button) {
                         if (moduleList.getSelection() != null) {
                             String id = moduleList.getSelection().getId();
+
+                            // The Core module is mandatory - ignore toggle requests
+                            if (id.equals("core")) {
+                                return;
+                            }
+
+                            // Toggle
                             if (selection.contains(id)) {
                                 ModuleSelection newSelection = selection.remove(id);
                                 if (newSelection.isValid()) {
