@@ -648,13 +648,7 @@ public final class Block {
             return;
         }
 
-        if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
-            mesh.render();
-        } else {
-            glDisable(GL11.GL_CULL_FACE);
-            mesh.render();
-            glEnable(GL11.GL_CULL_FACE);
-        }
+        mesh.render();
 
         mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
@@ -665,6 +659,9 @@ public final class Block {
             BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
                 tessellator.addMeshPart(part);
+                if (doubleSided) {
+                    tessellator.addMeshPartReversed(part);
+                }
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
