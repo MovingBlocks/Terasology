@@ -83,10 +83,8 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     @Override
     public void reload(MeshData newData) {
-        Util.checkGLError();
         dispose();
         buildMesh(newData);
-        Util.checkGLError();
     }
 
     @Override

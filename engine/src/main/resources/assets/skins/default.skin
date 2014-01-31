@@ -39,9 +39,6 @@
         },
         "InventoryCell" : {
             "background" : "engine:box",
-            "fixed-width" : 40,
-            "fixed-height" : 40,
-            "texture-scale-mode" : "scale_fit",
             "background-border" : {
                 "top" : 4,
                 "bottom" : 4,
@@ -53,7 +50,16 @@
                 "bottom" : 4,
                 "left" : 4,
                 "right" : 4
-            },
+            }
+        },
+        "TransferItemCursor" : {
+            "align-horizontal" : "center",
+            "align-vertical" : "top"
+        },
+        "ItemIcon" : {
+            "fixed-width" : 32,
+            "fixed-height" : 32,
+            "texture-scale-mode" : "scale_fit",
             "text-align-horizontal" : "right",
             "text-align-vertical" : "bottom"
         },

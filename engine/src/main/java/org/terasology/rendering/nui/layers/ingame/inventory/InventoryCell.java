@@ -15,15 +15,20 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.input.Keyboard;
+import org.terasology.input.MouseInput;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.math.TeraMath;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -33,78 +38,163 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.world.block.items.BlockItemComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
 /**
  * @author Immortius
  */
 public class InventoryCell extends CoreWidget {
 
-    private Binding<EntityRef> targetItem = new DefaultBinding<>(EntityRef.NULL);
+    private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
+    private Binding<Integer> targetSlot = new DefaultBinding<Integer>(0);
 
-    private InteractionListener interactionListener = new BaseInteractionListener();
+    private ItemIcon icon = new ItemIcon();
+
+    private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
+    private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+
+    private InteractionListener interactionListener = new BaseInteractionListener() {
+        @Override
+        public boolean onMouseClick(MouseInput button, Vector2i pos) {
+            if (MouseInput.MOUSE_LEFT == button) {
+                swapItem();
+            } else if (MouseInput.MOUSE_RIGHT == button) {
+                int stackSize = inventoryManager.getStackSize(getTargetItem());
+                if (stackSize > 0) {
+                    giveAmount((stackSize + 1) / 2);
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+            int amount = (Keyboard.isKeyDown(Keyboard.KeyId.RIGHT_CTRL) || Keyboard.isKeyDown(Keyboard.KeyId.LEFT_CTRL)) ? 2 : 1;
+
+            //move item to the transfer slot
+            if (wheelTurns > 0) {
+                takeAmount(amount);
+            } else {
+                //get item from transfer slot
+                giveAmount(amount);
+            }
+            return true;
+        }
+    };
 
     public InventoryCell() {
-        bindTooltip(new ReadOnlyBinding<String>() {
+        icon.bindTooltip(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                DisplayNameComponent displayNameComponent = targetItem.get().getComponent(DisplayNameComponent.class);
+                DisplayNameComponent displayNameComponent = getTargetItem().getComponent(DisplayNameComponent.class);
                 if (displayNameComponent != null) {
                     return displayNameComponent.name;
                 }
                 return "";
             }
         });
+        icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
+            @Override
+            public TextureRegion get() {
+                if (getTargetItem().exists()) {
+                    ItemComponent itemComp = getTargetItem().getComponent(ItemComponent.class);
+                    if (itemComp != null) {
+                        return itemComp.icon;
+                    }
+                    BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
+                    if (blockItemComp == null) {
+                        return Assets.getTextureRegion("engine:items.questionMark");
+                    }
+                }
+                return null;
+            }
+        });
+        icon.bindMesh(new ReadOnlyBinding<Mesh>() {
+            @Override
+            public Mesh get() {
+                BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
+                if (blockItemComp != null) {
+                    return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
+                }
+                return null;
+            }
+        });
+        icon.setMeshTexture(Assets.getTexture("engine:terrain"));
+        icon.bindQuantity(new ReadOnlyBinding<Integer>() {
+            @Override
+            public Integer get() {
+                ItemComponent itemComp = getTargetItem().getComponent(ItemComponent.class);
+                if (itemComp != null) {
+                    return UnsignedBytes.toInt(itemComp.stackCount);
+                }
+                return 1;
+            }
+        });
     }
 
     @Override
     public void onDraw(Canvas canvas) {
-        ItemComponent itemComponent = getTargetItem().getComponent(ItemComponent.class);
-        if (itemComponent != null) {
-            if (itemComponent.icon != null) {
-                canvas.drawTexture(itemComponent.icon);
-            } else {
-                BlockItemComponent blockItem = getTargetItem().getComponent(BlockItemComponent.class);
-                if (blockItem != null) {
-                    Mesh mesh = blockItem.blockFamily.getArchetypeBlock().getMesh();
-                    if (mesh != null) {
-                        Quat4f rot = new Quat4f(0, 0, 0, 1);
-                        QuaternionUtil.setEuler(rot, TeraMath.PI / 6, -TeraMath.PI / 12, 0);
-                        canvas.drawMesh(mesh, Assets.getTexture("engine:terrain"), canvas.getRegion(), rot, new Vector3f(), 1.0f);
-                    } else {
-                        canvas.drawTexture(Assets.getSubtexture("engine:items.questionMark"));
-                    }
-                } else {
-                    canvas.drawTexture(Assets.getSubtexture("engine:items.questionMark"));
-                }
-            }
-            if (itemComponent.stackCount > 1) {
-                canvas.drawText(Integer.toString(UnsignedBytes.toInt(itemComponent.stackCount)));
-            }
-            canvas.addInteractionRegion(interactionListener, canvas.getRegion());
-        }
+        canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        canvas.drawWidget(icon);
     }
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return new Vector2i();
-    }
-
-    public void bindTargetItem(Binding<EntityRef> binding) {
-        targetItem = binding;
+        return canvas.calculateRestrictedSize(icon, sizeHint);
     }
 
     public EntityRef getTargetItem() {
-        return targetItem.get();
+        return inventoryManager.getItemInSlot(getTargetInventory(), getTargetSlot());
     }
 
-    public void setTargetItem(EntityRef val) {
-        targetItem.set(val);
+    public void bindTargetInventory(Binding<EntityRef> binding) {
+        targetInventory = binding;
+    }
+
+    public EntityRef getTargetInventory() {
+        return targetInventory.get();
+    }
+
+    public void setTargetInventory(EntityRef val) {
+        targetInventory.set(val);
+    }
+
+    public void bindTargetSlot(Binding<Integer> binding) {
+        targetSlot = binding;
+    }
+
+    public int getTargetSlot() {
+        return targetSlot.get();
+    }
+
+    public void setTargetSlot(int val) {
+        targetSlot.set(val);
     }
 
     @Override
     public float getTooltipDelay() {
         return 0;
+    }
+
+    private void swapItem() {
+        if (getTransferItem().exists()) {
+            inventoryManager.moveItem(getTransferEntity(), 0, getTargetInventory(), getTargetSlot());
+        } else {
+            inventoryManager.moveItem(getTargetInventory(), getTargetSlot(), getTransferEntity(), 0);
+        }
+    }
+
+    private void giveAmount(int amount) {
+        inventoryManager.moveItemAmount(getTargetInventory(), getTargetSlot(), getTransferEntity(), 0, amount);
+    }
+
+    private void takeAmount(int amount) {
+        inventoryManager.moveItemAmount(getTransferEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
+    }
+
+    private EntityRef getTransferEntity() {
+        return localPlayer.getCharacterEntity().getComponent(CharacterComponent.class).movingItem;
+    }
+
+    private EntityRef getTransferItem() {
+        return inventoryManager.getItemInSlot(getTransferEntity(), 0);
     }
 }

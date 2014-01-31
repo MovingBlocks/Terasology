@@ -12,6 +12,12 @@
                     "position-horizontal-center" : {},
                     "position-vertical-center" : {}
                 }
+            },
+            {
+                "type" : "TransferItemCursor",
+                "id" : "cursor",
+                "layoutInfo" : {
+                }
             }
         ]
     }

@@ -159,7 +159,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     @Override
     public void reload(ShaderData data) {
-        Util.checkGLError();
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();
@@ -170,7 +169,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
         updateAvailableFeatures();
         recompile();
-        Util.checkGLError();
     }
 
     private static StringBuilder createShaderBuilder() {

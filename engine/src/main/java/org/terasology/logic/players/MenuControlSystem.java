@@ -58,7 +58,7 @@ public class MenuControlSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = ClientComponent.class)
+    @ReceiveEvent(components = ClientComponent.class, priority = 300)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             nuiManager.toggleScreen("engine:inventoryScreen");

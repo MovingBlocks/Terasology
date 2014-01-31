@@ -69,7 +69,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
 
     @Override
     public void reload(SkeletalMeshData newData) {
-        Util.checkGLError();
         dispose();
 
         this.data = newData;
@@ -90,7 +89,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         uvBuffer.flip();
         vboUVBuffer = VertexBufferObjectManager.getInstance().getVboId();
         VertexBufferObjectManager.getInstance().bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
-        Util.checkGLError();
     }
 
     @Override

@@ -71,7 +71,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        checkGLError();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -97,7 +96,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         glMatrixMode(GL_MODELVIEW);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
-        checkGLError();
     }
 
     @Override

@@ -15,67 +15,37 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.input.Mouse;
-import org.terasology.math.Rect2i;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.skin.UIStyle;
+import org.terasology.rendering.nui.databinding.Binding;
 
 /**
  * @author Immortius
  */
-public class UITooltip extends UILabel {
+public class UITooltip extends CursorAttachment {
 
-    private static final int MOUSE_CURSOR_HEIGHT = 18;
+    private UILabel label;
 
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (getText().isEmpty()) {
-            return;
-        }
-
-        UIStyle style = canvas.getCurrentStyle();
-        Vector2i textSize = new Vector2i(style.getFont().getWidth(getText()), style.getFont().getHeight(getText()));
-        textSize.add(style.getMargin().getTotals());
-
-        int top;
-        switch (style.getVerticalAlignment()) {
-            case TOP:
-                top = Mouse.getPosition().y - textSize.y;
-                break;
-            case MIDDLE:
-                top = Mouse.getPosition().y;
-                break;
-            default:
-                top = Mouse.getPosition().y + MOUSE_CURSOR_HEIGHT;
-                break;
-        }
-        top = TeraMath.clamp(top, 0, canvas.size().y - textSize.y);
-        int left;
-        switch (style.getHorizontalAlignment()) {
-            case RIGHT:
-                left = Mouse.getPosition().x - textSize.x;
-                break;
-            case CENTER:
-                left = Mouse.getPosition().x - textSize.x / 2;
-                break;
-            default:
-                left = Mouse.getPosition().x;
-                break;
-        }
-        left = TeraMath.clamp(left, 0, canvas.size().x - textSize.x);
-
-
-        try (SubRegion ignored = canvas.subRegion(Rect2i.createFromMinAndSize(left, top, textSize.x, textSize.y), false)) {
-            canvas.drawBackground();
-            canvas.drawText(getText(), style.getBackgroundBorder().shrink(canvas.getRegion()));
-        }
+    public UITooltip() {
+        label = new UILabel();
+        setAttachment(label);
     }
 
     @Override
-    public boolean isSkinAppliedByCanvas() {
-        return false;
+    public void onDraw(Canvas canvas) {
+        if (!getText().isEmpty()) {
+            super.onDraw(canvas);
+        }
+    }
+
+    public void bindBinding(Binding<String> binding) {
+        label.bindText(binding);
+    }
+
+    public String getText() {
+        return label.getText();
+    }
+
+    public void setText(String val) {
+        label.setText(val);
     }
 }

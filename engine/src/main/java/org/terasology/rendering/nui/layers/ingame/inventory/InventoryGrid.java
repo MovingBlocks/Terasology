@@ -44,6 +44,7 @@ public class InventoryGrid extends CoreWidget {
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
     private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
 
+
     @Override
     public void update(float delta) {
         super.update(delta);
@@ -52,7 +53,13 @@ public class InventoryGrid extends CoreWidget {
         if (numSlots > cells.size()) {
             for (int i = cells.size(); i < numSlots; ++i) {
                 InventoryCell cell = new InventoryCell();
-                cell.bindTargetItem(new SlotBinding(i));
+                cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
+                    @Override
+                    public EntityRef get() {
+                        return getTargetEntity();
+                    }
+                });
+                cell.setTargetSlot(i);
                 cells.add(cell);
             }
         }

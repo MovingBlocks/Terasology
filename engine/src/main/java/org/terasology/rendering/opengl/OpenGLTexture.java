@@ -74,7 +74,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     @Override
     public void reload(TextureData data) {
-        Util.checkGLError();
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
@@ -123,7 +122,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
                 break;
         }
-        Util.checkGLError();
     }
 
     private int getGLMode(WrapMode mode) {
@@ -162,10 +160,8 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     @Override
     public void dispose() {
         if (id != 0) {
-            Util.checkGLError();
             glDeleteTextures(id);
             id = 0;
-            Util.checkGLError();
         }
     }
 
