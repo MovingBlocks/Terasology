@@ -39,7 +39,8 @@ Note that these instructions are meant for the stable release. The latest develo
 * [I] - Toggle inventory screen
 * [H] - Hide user interface
 * [F] - Toggle viewing distance (near, moderate, far, ultra)
-* [Tab] - Toggle developer console
+* [`] - Toggle developer console (the "grave" key, above tab)
+* [Tab] - Auto-completion in the console
 * [Escape] - Show/hide the game menu screen
 * [F1] - Toggle window focus
 * [F3] - Toggle debug mode and information
@@ -74,7 +75,7 @@ May move slot or disappear as development continues
 Console Commands
 --------
 
-Press Tab to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting Tab again with a partially typed command will auto-complete it (including abbreviated camel case like rS for restoreSpeed)
+Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like rS for restoreSpeed)
 
 * help - Show in-game help (more thorough)
 * ghost - fly / no-clip mode (old double-jump for "god" mode)
@@ -124,24 +125,33 @@ Modules must be enabled during world creation by selecting them using the "Modul
 
 Here's a list of modules bundled with the game by default (as of this writing anyway - this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.movingblocks.net/view/Modules and you can download updated modules from there if needed.
 
+* [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities
+* [ChangingBlocks](https://github.com/Terasology/ChangingBlocks) - allows blocks that change over time (like crops that grow - which will happen if you also enable Crops)
 * Core - mandatory content needed for normal game launch
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
+* [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
+* [LightAndShadow](https://github.com/Terasology/LightAndShadow) - Main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
+* [Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working :D
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
 * [Oreons](https://github.com/Terasology/Oreons) - little sentient cookie people! Don't do much yet. Place with `spawnPrefab "Oreons:OreonGuard"` in the console
-* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn creatures from the LASR model - get a portal from the console with `giveBlock "portal"`
+* [Pathfinding](https://github.com/Terasology/Pathfinding) - framework for pathfinding used by other modules
+* [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Wood and Stone gameplay
+* [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock "portal"`
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
+* [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
+* [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting at a stone age type level
 
 Some of the modules in action:
 
