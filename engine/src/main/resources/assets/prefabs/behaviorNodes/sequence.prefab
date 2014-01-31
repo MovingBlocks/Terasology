@@ -5,6 +5,7 @@
         "category"  : "logic",
         "shape"     : "diamond",
         "color"     : [0.7, 0.7, 0.7],
+        "description": "Composite\nEvaluates the children one by one.\nStarts next child, if previous child finishes with SUCCESS.\nFinishes with SUCCESS, when all children finishes SUCCESS.\nFinishes with FAILURE, as soon as a child finished with FAILURE.",
         "textColor" : [  0,   0,   0]
     }
 }

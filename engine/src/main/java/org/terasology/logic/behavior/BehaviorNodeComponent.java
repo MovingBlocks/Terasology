@@ -32,6 +32,7 @@ public class BehaviorNodeComponent implements Component {
     public String shape = "diamond";            // diamond or rect
     public Color color = Color.GREY;
     public Color textColor = Color.BLACK;
+    public String description = "";
 
     @Override
     public String toString() {
