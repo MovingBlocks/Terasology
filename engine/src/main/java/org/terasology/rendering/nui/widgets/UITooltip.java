@@ -21,7 +21,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 /**
  * @author Immortius
  */
-public class UITooltip extends StandardCursorAttachment {
+public class UITooltip extends CursorAttachment {
 
     private UILabel label;
 

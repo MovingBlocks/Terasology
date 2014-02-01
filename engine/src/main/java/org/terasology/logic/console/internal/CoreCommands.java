@@ -44,7 +44,6 @@ import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.cameras.Camera;

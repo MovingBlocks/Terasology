@@ -21,7 +21,6 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
-import org.terasology.rendering.nui.CursorAttachment;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UIStyle;
@@ -29,17 +28,15 @@ import org.terasology.rendering.nui.skin.UIStyle;
 /**
  * @author Immortius
  */
-public class StandardCursorAttachment extends CoreWidget implements CursorAttachment {
+public class CursorAttachment extends CoreWidget {
     private static final int MOUSE_CURSOR_HEIGHT = 18;
 
     private UIWidget attachment;
 
-    @Override
     public UIWidget getAttachment() {
         return attachment;
     }
 
-    @Override
     public void setAttachment(UIWidget attachment) {
         this.attachment = attachment;
     }
@@ -92,5 +89,10 @@ public class StandardCursorAttachment extends CoreWidget implements CursorAttach
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
         return canvas.calculateRestrictedSize(attachment, sizeHint);
+    }
+
+    @Override
+    public boolean isVisible() {
+        return super.isVisible() && Mouse.isVisible();
     }
 }

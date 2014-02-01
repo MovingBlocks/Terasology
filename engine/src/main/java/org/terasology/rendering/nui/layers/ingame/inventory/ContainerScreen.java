@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
@@ -25,7 +26,7 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 /**
  * @author Immortius
  */
-public class InventoryScreen extends CoreScreenLayer {
+public class ContainerScreen extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
@@ -33,11 +34,19 @@ public class InventoryScreen extends CoreScreenLayer {
     @In
     private SlotBasedInventoryManager inventoryManager;
 
+    private InventoryGrid containerInventory;
+
     @Override
     public void initialise() {
         InventoryGrid inventory = find("inventory", InventoryGrid.class);
         inventory.setTargetEntity(localPlayer.getCharacterEntity());
         inventory.setCellOffset(10);
+
+        containerInventory = find("container", InventoryGrid.class);
+    }
+
+    public void setContainerEntity(EntityRef container) {
+        containerInventory.setTargetEntity(container);
     }
 
     @Override

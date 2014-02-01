@@ -43,15 +43,16 @@ public class InventoryGrid extends CoreWidget {
 
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
     private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
-
+    private Binding<Integer> cellOffset = new DefaultBinding<>(0);
+    private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
     @Override
     public void update(float delta) {
         super.update(delta);
 
-        int numSlots = inventoryManager.getNumSlots(getTargetEntity());
-        if (numSlots > cells.size()) {
-            for (int i = cells.size(); i < numSlots; ++i) {
+        int numSlots = inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset();
+        if (numSlots > cells.size() && cells.size() < getMaxCellCount()) {
+            for (int i = cells.size(); i < numSlots && i < getMaxCellCount(); ++i) {
                 InventoryCell cell = new InventoryCell();
                 cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
                     @Override
@@ -59,7 +60,7 @@ public class InventoryGrid extends CoreWidget {
                         return getTargetEntity();
                     }
                 });
-                cell.setTargetSlot(i);
+                cell.bindTargetSlot(new SlotBinding(i));
                 cells.add(cell);
             }
         }
@@ -67,8 +68,8 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int numSlots = inventoryManager.getNumSlots(getTargetEntity());
-        if (numSlots != 0) {
+        int numSlots = Math.min(inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
             for (int i = 0; i < numSlots && i < cells.size(); ++i) {
@@ -81,8 +82,8 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        int numSlots = inventoryManager.getNumSlots(getTargetEntity());
-        if (numSlots != 0) {
+        int numSlots = Math.min(inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(maxHorizontalCells, sizeHint.getX() / cellSize.getX());
             int verticalCells = ((numSlots - 1) / horizontalCells) + 1;
@@ -121,7 +122,31 @@ public class InventoryGrid extends CoreWidget {
         targetEntity.set(val);
     }
 
-    private class SlotBinding extends ReadOnlyBinding<EntityRef> {
+    public void bindCellOffset(Binding<Integer> binding) {
+        cellOffset = binding;
+    }
+
+    public int getCellOffset() {
+        return cellOffset.get();
+    }
+
+    public void setCellOffset(int val) {
+        cellOffset.set(val);
+    }
+
+    public void bindMaxCellCount(Binding<Integer> binding) {
+        maxCellCount = binding;
+    }
+
+    public int getMaxCellCount() {
+        return maxCellCount.get();
+    }
+
+    public void setMaxCellCount(int val) {
+        maxCellCount.set(val);
+    }
+
+    private final class SlotBinding extends ReadOnlyBinding<Integer> {
 
         private int slot;
 
@@ -130,8 +155,9 @@ public class InventoryGrid extends CoreWidget {
         }
 
         @Override
-        public EntityRef get() {
-            return inventoryManager.getItemInSlot(getTargetEntity(), slot);
+        public Integer get() {
+            return getCellOffset() + slot;
         }
     }
+
 }

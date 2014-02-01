@@ -15,9 +15,8 @@
  */
 package org.terasology.input;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.Display;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius

@@ -18,23 +18,35 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import com.google.common.primitives.UnsignedBytes;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.StandardCursorAttachment;
+import org.terasology.rendering.nui.widgets.CursorAttachment;
 import org.terasology.world.block.items.BlockItemComponent;
 
 /**
  * @author Immortius
  */
-public class TransferItemCursor extends StandardCursorAttachment {
+public class TransferItemCursor extends CursorAttachment implements ControlWidget {
 
     private Binding<EntityRef> item = new DefaultBinding<>(EntityRef.NULL);
 
-    public TransferItemCursor() {
+    @In
+    private LocalPlayer localPlayer;
+
+    @In
+    private SlotBasedInventoryManager inventoryManager;
+
+    @Override
+    public void initialise() {
         ItemIcon icon = new ItemIcon();
         setAttachment(icon);
         icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
@@ -74,6 +86,17 @@ public class TransferItemCursor extends StandardCursorAttachment {
                 return 1;
             }
         });
+
+        bindItem(new ReadOnlyBinding<EntityRef>() {
+            @Override
+            public EntityRef get() {
+                CharacterComponent charComp = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+                if (charComp != null) {
+                    return inventoryManager.getItemInSlot(charComp.movingItem, 0);
+                }
+                return EntityRef.NULL;
+            }
+        });
     }
 
     public void bindItem(Binding<EntityRef> binding) {
@@ -87,4 +110,5 @@ public class TransferItemCursor extends StandardCursorAttachment {
     public void setItem(EntityRef val) {
         item.set(val);
     }
+
 }

@@ -16,13 +16,20 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 /**
  * @author Immortius
  */
 public interface NUIManager extends ComponentSystem, FocusManager {
+
+    HUDScreenLayer getHUD();
+
+    boolean isHUDVisible();
+
+    void setHUDVisible(boolean visible);
 
     boolean isOpen(String screenUri);
 
@@ -46,11 +53,11 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer pushScreen(String screenUri);
 
-    <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
+    <T extends CoreScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
+    <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
 
-    void pushScreen(UIScreenLayer screen);
+    void pushScreen(CoreScreenLayer screen);
 
     void popScreen();
 
@@ -58,19 +65,21 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     UIScreenLayer setScreen(String screenUri);
 
-    <T extends UIScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType);
+    <T extends CoreScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T setScreen(String screenUri, Class<T> expectedType);
+    <T extends CoreScreenLayer> T setScreen(String screenUri, Class<T> expectedType);
 
-    void setScreen(UIScreenLayer screen);
+    void setScreen(CoreScreenLayer screen);
 
-    void closeAllScreens();
+    <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType);
 
-    void addCursorAttachment(CursorAttachment attachment);
+    <T extends ControlWidget> T addOverlay(AssetUri screenUri, Class<T> expectedType);
 
-    void removeCursorAttachment(CursorAttachment attachment);
+    void addOverlay(ControlWidget overlay);
 
-    void removeAllCursorAttachments();
+    void removeOverlay(ControlWidget overlay);
+
+    void clear();
 
     void render();
 

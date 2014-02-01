@@ -115,7 +115,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.shutdown();
         stopBackgroundMusic();
-        nuiManager.closeAllScreens();
+        nuiManager.clear();
 
         entityManager.clear();
         CoreRegistry.clear();

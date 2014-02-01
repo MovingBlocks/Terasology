@@ -93,7 +93,7 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             left = align.getStart(targetRegion) + info.getOffset();
         }
         if (element.layoutHint.getPositionRight() != null) {
-            HorizontalInfo info = element.layoutHint.getPositionLeft();
+            HorizontalInfo info = element.layoutHint.getPositionRight();
             Rect2i targetRegion = getTargetRegion(info.getWidget(), canvas);
             HorizontalAlign align = (info.getTarget() != null) ? info.getTarget() : HorizontalAlign.RIGHT;
             right = align.getStart(targetRegion) - info.getOffset();

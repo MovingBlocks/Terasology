@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -25,7 +25,7 @@ import org.terasology.rendering.nui.widgets.UIText;
 /**
  * @author synopia
  */
-public class EnterTextPopup extends UIScreenLayer {
+public class EnterTextPopup extends CoreScreenLayer {
     private Binding<String> inputBinding;
 
     @Override
@@ -49,11 +49,6 @@ public class EnterTextPopup extends UIScreenLayer {
 
     public void bindInput(Binding<String> binding) {
         this.inputBinding = binding;
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return true;
     }
 
 }

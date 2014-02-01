@@ -45,6 +45,7 @@ public class InventoryCell extends CoreWidget {
 
     private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
     private Binding<Integer> targetSlot = new DefaultBinding<Integer>(0);
+    private Binding<Boolean> selected = new DefaultBinding<>(false);
 
     private ItemIcon icon = new ItemIcon();
 
@@ -169,9 +170,29 @@ public class InventoryCell extends CoreWidget {
         targetSlot.set(val);
     }
 
+    public void bindSelected(Binding<Boolean> binding) {
+        selected = binding;
+    }
+
+    public boolean isSelected() {
+        return selected.get();
+    }
+
+    public void setSelected(boolean val) {
+        selected.set(val);
+    }
+
     @Override
     public float getTooltipDelay() {
         return 0;
+    }
+
+    @Override
+    public String getMode() {
+        if (isSelected()) {
+            return ACTIVE_MODE;
+        }
+        return DEFAULT_MODE;
     }
 
     private void swapItem() {
@@ -197,4 +218,5 @@ public class InventoryCell extends CoreWidget {
     private EntityRef getTransferItem() {
         return inventoryManager.getItemInSlot(getTransferEntity(), 0);
     }
+
 }

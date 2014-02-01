@@ -32,7 +32,6 @@ import org.terasology.rendering.nui.Color;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -53,7 +52,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.Util.checkGLError;
 
 /**
  * @author Immortius

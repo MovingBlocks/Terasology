@@ -23,7 +23,7 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
@@ -37,7 +37,7 @@ import org.terasology.rendering.nui.widgets.UIList;
 /**
  * @author Immortius
  */
-public class JoinGameScreen extends UIScreenLayer {
+public class JoinGameScreen extends CoreScreenLayer {
 
     @In
     private Config config;
@@ -115,6 +115,11 @@ public class JoinGameScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     private void join(String address) {

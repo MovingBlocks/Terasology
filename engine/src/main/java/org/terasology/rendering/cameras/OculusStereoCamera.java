@@ -16,8 +16,8 @@
 package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
 

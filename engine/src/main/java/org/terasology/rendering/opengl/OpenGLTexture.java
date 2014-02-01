@@ -17,7 +17,6 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
@@ -62,6 +61,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     /**
      * Note: Generally should not be called directly. Instead use Assets.generateAsset().
+     *
      * @param uri
      * @param data
      */
