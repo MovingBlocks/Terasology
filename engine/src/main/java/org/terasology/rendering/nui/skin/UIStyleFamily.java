@@ -23,6 +23,7 @@ import org.terasology.utilities.ReflectionUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * @author Immortius
@@ -30,6 +31,8 @@ import java.util.Map;
 public class UIStyleFamily {
     private UIStyle baseStyle;
     private Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyleLookup = Maps.newHashMap();
+
+    private Map<Class<? extends UIWidget>, List<Class<? extends UIWidget>>> cachedInheritanceTree = new WeakHashMap<>();
 
     public UIStyleFamily(UIStyle baseStyle, Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyles) {
         this.baseStyle = baseStyle;
@@ -76,7 +79,12 @@ public class UIStyleFamily {
     }
 
     public UIStyle getElementStyle(Class<? extends UIWidget> element, String part, String mode) {
-        List<Class<? extends UIWidget>> classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+
+        List<Class<? extends UIWidget>> classes = cachedInheritanceTree.get(element);
+        if (classes == null) {
+            classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+            cachedInheritanceTree.put(element, classes);
+        }
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));

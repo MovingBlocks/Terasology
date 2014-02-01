@@ -23,16 +23,15 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
@@ -159,7 +158,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     @Override
     public void reload(ShaderData data) {
-        Util.checkGLError();
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();
@@ -170,7 +168,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
         updateAvailableFeatures();
         recompile();
-        Util.checkGLError();
     }
 
     private static StringBuilder createShaderBuilder() {
@@ -366,10 +363,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
                             for (int i = 0; i < lineNumberInt - 1; ++i) {
                                 reader.nextLine();
                             }
-    
+
                             errorLine = reader.nextLine();
                             errorLine = "Error prone line: '" + errorLine + "'";
-    
+
                             logger.warn("{} \n Line: {}", error, errorLine);
                         }
                         break;

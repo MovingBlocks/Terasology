@@ -1,7 +1,9 @@
 {
     "parent" : "engine:iconItem",
+    "DisplayName" : {
+        "name" : "Miniaturizer"
+    },
     "Item" : {
-        "name" : "Miniaturizer",
         "icon" : "engine:items.scissors",
 		"usage" : "ON_BLOCK"
     },

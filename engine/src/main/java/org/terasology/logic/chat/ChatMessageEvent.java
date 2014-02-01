@@ -17,7 +17,7 @@
 package org.terasology.logic.chat;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.common.DisplayInformationComponent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
@@ -46,7 +46,7 @@ public class ChatMessageEvent implements MessageEvent {
     }
 
     public Message getFormattedMessage() {
-        DisplayInformationComponent displayInfo = from.getComponent(DisplayInformationComponent.class);
+        DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
         return new Message(String.format("%s: %s", (displayInfo != null) ? displayInfo.name : "Unknown", message), CoreMessageType.CHAT);
     }
 

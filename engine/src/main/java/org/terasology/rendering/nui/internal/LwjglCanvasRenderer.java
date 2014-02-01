@@ -32,7 +32,6 @@ import org.terasology.rendering.nui.Color;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
@@ -53,7 +52,6 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.Util.checkGLError;
 
 /**
  * @author Immortius
@@ -71,7 +69,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        checkGLError();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -97,7 +94,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         glMatrixMode(GL_MODELVIEW);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
-        checkGLError();
     }
 
     @Override

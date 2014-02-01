@@ -18,7 +18,6 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.
@@ -648,13 +645,7 @@ public final class Block {
             return;
         }
 
-        if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
-            mesh.render();
-        } else {
-            glDisable(GL11.GL_CULL_FACE);
-            mesh.render();
-            glEnable(GL11.GL_CULL_FACE);
-        }
+        mesh.render();
 
         mat.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
@@ -664,9 +655,10 @@ public final class Block {
         for (BlockPart dir : BlockPart.values()) {
             BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
-                float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
-                tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
                 tessellator.addMeshPart(part);
+                if (doubleSided) {
+                    tessellator.addMeshPartReversed(part);
+                }
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));

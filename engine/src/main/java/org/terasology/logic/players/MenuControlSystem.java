@@ -24,7 +24,8 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Keyboard;
@@ -32,43 +33,33 @@ import org.terasology.input.binds.general.PauseButton;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
 /**
  * @author Immortius
  */
-@RegisterSystem
-public class MenuControlSystem implements ComponentSystem {
-
-    public static final String PAUSE_MENU = "pause";
-    public static final String INVENTORY = "inventory";
-    public static final String CHAT = "chat";
-    public static final String HUD = "hud";
-
-    @In
-    private GUIManager guiManager;
+@RegisterSystem(RegisterMode.CLIENT)
+public class MenuControlSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
 
     @Override
     public void initialise() {
-
-    }
-
-    @Override
-    public void shutdown() {
+        nuiManager.getHUD().addHUDElement("toolbar");
+        TransferItemCursor cursor = new TransferItemCursor();
+        nuiManager.addOverlay(cursor);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            guiManager.openWindow(INVENTORY);
+            nuiManager.toggleScreen("engine:inventoryScreen");
             event.consume();
         }
     }
