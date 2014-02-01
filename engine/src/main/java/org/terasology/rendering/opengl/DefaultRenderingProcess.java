@@ -1350,8 +1350,9 @@ public class DefaultRenderingProcess {
     public void takeScreenshot() {
         takeScreenshot = true;
 
-        overwriteRtWidth = 1920 * 2;
-        overwriteRtHeight = 1080 * 2;
+        // TODO: Used to be huge for super screenies, shrunk down for performance until size is an in-game option
+        overwriteRtWidth = 1152;
+        overwriteRtHeight = 700;
         createOrUpdateFullscreenFbos();
     }
 

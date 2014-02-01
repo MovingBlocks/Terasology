@@ -70,12 +70,55 @@
                     },
                     "contents" : [
                         {
-                            "type" : "ScrollableArea",
-                            "content" : {
-                                "type" : "UIList",
-                                "id" : "moduleList",
-                                "family" : "module-list"
-                            }
+                            "type" : "RelativeLayout",
+                            "family" : "description",
+                            "contents" : [
+                                {
+                                    "type" : "ScrollableArea",
+                                    "content" : {
+                                        "type" : "UIList",
+                                        "id" : "moduleList",
+                                        "family" : "module-list"
+                                    },
+                                    "layoutInfo" : {
+
+                                        "position-horizontal-center" : {},
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        },
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "actionButtons",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "RowLayout",
+                                    "id" : "actionButtons",
+                                    "horizontalSpacing" : 8,
+                                    "contents" : [
+                                        {
+                                            "type" : "UIButton",
+                                            "id" : "enableAll",
+                                            "text" : "Enable All"
+                                        },
+                                        {
+                                            "type" : "UIButton",
+                                            "id" : "disableAll",
+                                            "text" : "Disable All"
+                                        }
+                                    ],
+                                    "layoutInfo" : {
+                                        "width" : 250,
+                                        "height" : 24,
+                                        "position-horizontal-center" : {},
+                                        "position-bottom" : {
+                                            "target" : "BOTTOM"
+                                        }
+                                    }
+                                }
+                            ]
                         },
                         {
                             "type" : "RelativeLayout",
