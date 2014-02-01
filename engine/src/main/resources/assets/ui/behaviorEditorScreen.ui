@@ -1,6 +1,6 @@
 {
     "type" : "engine:behaviorEditorScreen",
-    "skin" : "engine:mainMenu",
+    "skin" : "engine:behaviorEditor",
     "contents" : {
         "type" : "migLayout",
         "layoutConstraints" : "",
