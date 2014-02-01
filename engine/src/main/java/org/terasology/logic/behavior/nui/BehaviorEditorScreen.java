@@ -147,7 +147,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                     EntityRef minion = value.actor().minion();
                     entityProperties.clear();
                     for (Component component : minion.iterateComponents()) {
-                        entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                        entityProperties.addPropertyProvider(component.getClass().getSimpleName().replace("Component", ""), new PropertyProvider<>(component));
                     }
                 }
                 updateDebugger();

@@ -19,11 +19,10 @@ import org.terasology.rendering.nui.properties.Range;
 
 /**
  * TimerNode.
- *
+ * <p/>
  * Starts the decorated node.
  * Finishes with SUCCESS, after <code>time</code> seconds.
  * Finishes with FAILURE, as soon as decorated node finishes with FAILURE.
- *
  */
 public class TimerNode extends DecoratorNode {
     @Range(min = 0, max = 20)
@@ -60,9 +59,7 @@ public class TimerNode extends DecoratorNode {
 
         @Override
         public void handle(Status result) {
-            if (result == Status.FAILURE) {
-                stop(Status.FAILURE);
-            }
+            stop(result);
         }
 
         @Override

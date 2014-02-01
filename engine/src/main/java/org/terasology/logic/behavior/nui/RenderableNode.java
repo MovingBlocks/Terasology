@@ -25,7 +25,7 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.logic.behavior.tree.Status;
 import org.terasology.logic.behavior.tree.TreeAccessor;
 import org.terasology.math.Vector2i;
-import org.terasology.registry.In;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -59,9 +59,6 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
     private Status status;
     private boolean collapsed;
     private boolean copyMode;
-
-    @In
-    private BehaviorNodeFactory nodeFactory;
 
     private InteractionListener moveListener = new BaseInteractionListener() {
         @Override
@@ -130,7 +127,7 @@ public class RenderableNode extends CoreWidget implements ZoomableLayout.Positio
         canvas.drawText(text);
 
         if (editor != null) {
-            canvas.addInteractionRegion(moveListener, nodeFactory.getNodeComponent(node).description);
+            canvas.addInteractionRegion(moveListener, CoreRegistry.get(BehaviorNodeFactory.class).getNodeComponent(node).description);
         }
         portList.onDraw(canvas);
     }
