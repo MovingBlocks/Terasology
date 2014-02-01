@@ -34,22 +34,26 @@
                 }
             },
             {
-                "type" : "UIBox",
+                "type" : "ScrollableArea",
                 "id" : "params",
                 "layoutInfo" : {
                     "width" : 500,
-                    "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "BOTTOM",
                         "offset" : 16,
                         "widget" : "subtitle"
-                    }
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 16,
+                        "widget" : "footer"
+                    }                    
                 }
             },
             {
                 "type" : "RowLayout",
-                "id" : "actionsRow",
+                "id" : "footer",
                 "horizontalSpacing" : 4,
                 "contents" : [
                     {
@@ -59,7 +63,7 @@
                     }
                 ],
                 "layoutInfo" : {
-                    "width" : 400,
+                    "width" : 128,
                     "height" : 32,
                     "position-horizontal-center" : {},
                     "position-bottom" : {

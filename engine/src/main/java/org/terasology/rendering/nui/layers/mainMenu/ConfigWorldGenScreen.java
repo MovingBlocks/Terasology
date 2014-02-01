@@ -28,9 +28,8 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.IntToFloatBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
-import org.terasology.rendering.nui.layouts.RowLayout;
+import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIBox;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -64,7 +63,7 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
 
     private int imageSize = 128;
 
-    private UIBox list;
+    private ScrollableArea list;
 
     private WorldConfigurator worldConfig;
 
@@ -96,22 +95,21 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
             moduleManager.disableAllModules();
         }
 
-        list = find("params", UIBox.class);
+        list = find("params", ScrollableArea.class);
         if (list != null) {
             ColumnLayout layout = new ColumnLayout();
-            layout.setColumns(1);
+            layout.setColumns(2);
             layout.setVerticalSpacing(4);
-            layout.setHorizontalSpacing(4);
-            layout.setFamily("left-label");
+            layout.setHorizontalSpacing(8);
+            layout.setFamily("option-grid");
+            layout.setColumnWidths(0.25f, 0.75f);
             list.setContent(layout);
 
             for (Parameter p : worldConfig.getParams()) {
-                RowLayout rl = new RowLayout();
                 UILabel label = new UILabel(p.getLabel());
                 UIWidget widget = getWidgetFor(p);
-                rl.addWidget(label, null);
-                rl.addWidget(widget, null);
-                layout.addWidget(rl);
+                layout.addWidget(label, null);
+                layout.addWidget(widget, null);
             }
         }
 
@@ -123,6 +121,7 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
             final IntParameter ip = (IntParameter) p;
             UISlider slider = new UISlider();
             slider.setIncrement(1.0f);
+            slider.setPrecision(0);
             slider.setMinimum(ip.getMin());
             slider.setRange(ip.getMax() - ip.getMin());
             Binding<Float> binding = new IntToFloatBinding(ip.getBinding());
