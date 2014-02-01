@@ -1,0 +1,73 @@
+{
+    "type" : "engine:configWorldGenScreen",
+    "skin" : "engine:mainMenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "subtitle",
+                "family" : "title",
+                "text" : "Configuration",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "id" : "params",
+                "layoutInfo" : {
+                    "width" : 500,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    }
+                }
+            },
+            {
+                "type" : "RowLayout",
+                "id" : "actionsRow",
+                "horizontalSpacing" : 4,
+                "contents" : [
+                    {
+                        "type" : "UIButton",
+                        "text" : "Close",
+                        "id" : "close"
+                    }
+                ],
+                "layoutInfo" : {
+                    "width" : 400,
+                    "height" : 32,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+            }
+        ]
+    }
+}

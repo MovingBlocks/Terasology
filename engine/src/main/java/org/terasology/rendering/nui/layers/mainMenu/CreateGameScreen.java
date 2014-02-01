@@ -187,6 +187,14 @@ public class CreateGameScreen extends UIScreenLayer {
                 }
             }
         });
+
+        WidgetUtil.trySubscribe(this, "config", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:configWorldGen");
+            }
+        });
+        
         WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

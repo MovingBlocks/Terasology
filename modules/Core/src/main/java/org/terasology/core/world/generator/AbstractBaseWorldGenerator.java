@@ -15,7 +15,9 @@
  */
 package org.terasology.core.world.generator;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
@@ -28,6 +30,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.generator.SecondPassGenerator;
+import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
@@ -152,5 +155,10 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public Iterable<String> getLayers() {
         return Arrays.asList("Biome", "Humidity", "Temperature");
+    }
+    
+    @Override
+    public Optional<WorldConfigurator> getConfigurator() {
+        return Optional.absent();
     }
 }
