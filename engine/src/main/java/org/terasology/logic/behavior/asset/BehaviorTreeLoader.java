@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -52,7 +52,6 @@ import java.util.Map;
  * If there are both, Nodes and Renderables tree, both are loaded/saved. To ensure, the nodes get associated to
  * the correct renderable, additional ids are introduced (only in the json file).
  * <p/>
- * TODO this may be rewritten, especially considering the save functionality
  *
  * @author synopia
  */
