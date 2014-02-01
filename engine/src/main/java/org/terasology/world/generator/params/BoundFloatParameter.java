@@ -27,7 +27,12 @@ import java.lang.annotation.Target;
  */
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Label {
+@Target(ElementType.FIELD)
+public @interface BoundFloatParameter {
 
+    String label();
+    float min();
+    float max();
+    float step();
 }
+
