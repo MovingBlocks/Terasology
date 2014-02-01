@@ -14,7 +14,7 @@
                     "position-horizontal-center" : {},
                     "position-top" : {
                         "target" : "TOP",
-                        "offset" : 16
+                        "offset" : 48
                     }
                 }
             },
