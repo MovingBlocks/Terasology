@@ -19,7 +19,6 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -71,7 +70,6 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.params.Parameters;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.awt.*;
@@ -411,7 +409,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAllowedPermission(HeightmapFileReader.class, new FilePermission("Heightmap.txt", "read"));
         moduleSecurityManager.addAllowedPermission(EnumMap.class, ReflectPermission.class);
         moduleSecurityManager.addAllowedPermission(WorldGeneratorPluginLibrary.class, new RuntimePermission("accessDeclaredMembers"));
-        moduleSecurityManager.addAllowedPermission(Parameters.class, new RuntimePermission("accessDeclaredMembers"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
         moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
