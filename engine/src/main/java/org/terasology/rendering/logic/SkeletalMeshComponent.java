@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class SkeletalMeshComponent implements Component {
     public MeshAnimation animation;
     public boolean loop;
     public float animationRate = 1.0f;
+    public float heightOffset = 0f;
 
     @Owns
     public Map<String, EntityRef> boneEntities;
