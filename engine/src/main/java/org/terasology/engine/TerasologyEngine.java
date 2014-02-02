@@ -386,6 +386,9 @@ public class TerasologyEngine implements GameEngine {
 
         moduleSecurityManager.addFullPrivilegePackage("ch.qos.logback.classic");
 
+        moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
+        moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
+        
         /*moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
         moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
         moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);

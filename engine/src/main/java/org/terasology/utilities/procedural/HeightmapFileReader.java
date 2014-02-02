@@ -16,9 +16,19 @@
 
 package org.terasology.utilities.procedural;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
+import java.awt.image.DataBufferUShort;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.RoundingMode;
+
+import javax.imageio.ImageIO;
+
+import com.google.common.math.DoubleMath;
 
 /**
  * Reads a heightmap encoded in a textfile
@@ -30,6 +40,36 @@ public final class HeightmapFileReader {
     private HeightmapFileReader() {
     }
 
+    public static void convertFileToTexture() throws IOException {
+        float[][] heightmap = readFile();
+
+        double scaleFactor = 256 * 256 * 12.8f;
+
+//        Slick's PNGDecoder does not support 16 bit textures
+        
+//        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_USHORT_GRAY);
+//        DataBufferUShort buffer = (DataBufferUShort) image.getRaster().getDataBuffer();
+//        scaleFactor *= 256.0f;
+        
+//        Slick's PNGDecoder does not support grayscale textures
+        
+//        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
+//        DataBufferByte buffer = (DataBufferByte) image.getRaster().getDataBuffer();
+
+        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_RGB);
+        DataBufferInt buffer = (DataBufferInt) image.getRaster().getDataBuffer();
+        
+        for (int x = 0; x < 512; x++) {
+            for (int z = 0; z < 512; z++) {
+                double doubleVal = heightmap[x][z] * scaleFactor;
+                int val = DoubleMath.roundToInt(doubleVal, RoundingMode.HALF_UP);
+                buffer.setElem(z * 512 + x, val);
+            }
+        }
+        
+        ImageIO.write(image, "png", new File("platec_heightmap.png"));
+    }
+    
     public static float[][] readFile() throws IOException {
         // TODO: Exact file to read has been hard coded in engine for security reasons until height maps become assets
         String file = "Heightmap.txt";
@@ -63,6 +103,9 @@ public final class HeightmapFileReader {
                 break;
             }
         }
+        
+//        System.out.println("min " + min);
+//        System.out.println("max " + max);
         return (theMap);
     }
 }
