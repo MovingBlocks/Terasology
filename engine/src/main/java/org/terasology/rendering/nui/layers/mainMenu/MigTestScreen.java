@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Arrays;
@@ -23,11 +23,16 @@ import java.util.Arrays;
 /**
  * Created by synopia on 06.01.14.
  */
-public class MigTestScreen extends UIScreenLayer {
+public class MigTestScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         find("list1", UIList.class).setList(Arrays.asList("one", "two", "12345678901234567890"));
         find("list2", UIList.class).setList(Arrays.asList("one", "two", "12345678901234567890"));
         find("list3", UIList.class).setList(Arrays.asList("one", "two", "12345678901234567890"));
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

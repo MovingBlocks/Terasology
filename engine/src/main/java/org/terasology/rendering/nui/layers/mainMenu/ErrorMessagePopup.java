@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -24,7 +24,7 @@ import org.terasology.rendering.nui.widgets.UILabel;
 /**
  * @author Immortius
  */
-public class ErrorMessagePopup extends UIScreenLayer {
+public class ErrorMessagePopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
@@ -34,11 +34,6 @@ public class ErrorMessagePopup extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return true;
     }
 
     public void setError(String title, String message) {

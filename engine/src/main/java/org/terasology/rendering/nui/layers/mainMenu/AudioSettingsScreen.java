@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
@@ -27,7 +27,7 @@ import org.terasology.rendering.nui.widgets.UISlider;
 /**
  * @author Immortius
  */
-public class AudioSettingsScreen extends UIScreenLayer {
+public class AudioSettingsScreen extends CoreScreenLayer {
 
     @In
     private Config config;
@@ -58,6 +58,11 @@ public class AudioSettingsScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
 }

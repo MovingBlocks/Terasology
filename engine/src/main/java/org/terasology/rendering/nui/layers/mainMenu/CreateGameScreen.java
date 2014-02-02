@@ -27,7 +27,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
@@ -50,7 +50,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class CreateGameScreen extends UIScreenLayer {
+public class CreateGameScreen extends CoreScreenLayer {
 
     private static final String DEFAULT_GAME_NAME_PREFIX = "Game ";
     private static final Logger logger = LoggerFactory.getLogger(CreateGameScreen.class);
@@ -201,5 +201,10 @@ public class CreateGameScreen extends UIScreenLayer {
 
     public void setLoadingAsServer(boolean loadingAsServer) {
         this.loadingAsServer = loadingAsServer;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

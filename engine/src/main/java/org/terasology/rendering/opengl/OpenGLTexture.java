@@ -17,7 +17,6 @@ package org.terasology.rendering.opengl;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
@@ -62,6 +61,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     /**
      * Note: Generally should not be called directly. Instead use Assets.generateAsset().
+     *
      * @param uri
      * @param data
      */
@@ -74,7 +74,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
     @Override
     public void reload(TextureData data) {
-        Util.checkGLError();
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
@@ -123,7 +122,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
 
                 break;
         }
-        Util.checkGLError();
     }
 
     private int getGLMode(WrapMode mode) {
@@ -162,10 +160,8 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     @Override
     public void dispose() {
         if (id != 0) {
-            Util.checkGLError();
             glDeleteTextures(id);
             id = 0;
-            Util.checkGLError();
         }
     }
 

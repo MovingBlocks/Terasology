@@ -22,7 +22,7 @@ import org.terasology.engine.modes.StateLoading;
 import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -31,7 +31,7 @@ import org.terasology.rendering.nui.widgets.UIText;
 /**
  * @author Immortius
  */
-public class JoinServerPopup extends UIScreenLayer {
+public class JoinServerPopup extends CoreScreenLayer {
 
     @In
     private Config config;
@@ -67,8 +67,4 @@ public class JoinServerPopup extends UIScreenLayer {
         });
     }
 
-    @Override
-    public boolean isLowerLayerVisible() {
-        return true;
-    }
 }

@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -27,7 +27,7 @@ import org.terasology.rendering.nui.widgets.UIText;
 /**
  * @author Immortius
  */
-public class AddServerPopup extends UIScreenLayer {
+public class AddServerPopup extends CoreScreenLayer {
 
     @In
     private Config config;
@@ -56,8 +56,4 @@ public class AddServerPopup extends UIScreenLayer {
         });
     }
 
-    @Override
-    public boolean isLowerLayerVisible() {
-        return true;
-    }
 }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,6 @@
 
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -29,14 +28,13 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.config.Config;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.module.EngineModulePolicy;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.Display;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.event.internal.EventSystemImpl;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -46,7 +44,6 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -56,34 +53,29 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.awt.*;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
-import java.util.*;
+import java.security.Policy;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LoggingPermission;
 
 /**
  * @author Immortius
@@ -379,8 +371,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
         moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
-
-        moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
         moduleSecurityManager.addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
@@ -394,7 +384,9 @@ public class TerasologyEngine implements GameEngine {
             }
         }
 
-        moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
+        moduleSecurityManager.addFullPrivilegePackage("ch.qos.logback.classic");
+
+        /*moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
         moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
         moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
         // TODO: Create a cleaner clipboard access class, put permission on that
@@ -420,6 +412,10 @@ public class TerasologyEngine implements GameEngine {
 
         moduleSecurityManager.addAllowedPermission(GUIManagerLwjgl.class, ReflectPermission.class);
 
+        // allow Tasks to be injected
+        moduleSecurityManager.addAllowedPermission(Task.class, new ReflectPermission("suppressAccessChecks"));   */
+
+        Policy.setPolicy(new EngineModulePolicy());
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
     }

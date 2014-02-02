@@ -39,9 +39,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
-import org.terasology.rendering.gui.windows.UIScreenInventory;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.world.WorldComponent;
 
@@ -73,9 +71,7 @@ public class GUIManagerLwjgl implements ComponentSystem, GUIManager {
 
     private void registerWindows() {
         //TODO parser action here! this is temporary
-        registeredWindows.put("container", UIScreenContainer.class);
         registeredWindows.put("metrics", UIScreenMetrics.class);
-        registeredWindows.put("inventory", UIScreenInventory.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }
 
