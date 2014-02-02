@@ -56,14 +56,13 @@ public final class HeightmapFileReader {
 //        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_BYTE_GRAY);
 //        DataBufferByte buffer = (DataBufferByte) image.getRaster().getDataBuffer();
 
-        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_RGB);
         DataBufferInt buffer = (DataBufferInt) image.getRaster().getDataBuffer();
         
         for (int x = 0; x < 512; x++) {
             for (int z = 0; z < 512; z++) {
                 double doubleVal = heightmap[x][z] * scaleFactor;
                 int val = DoubleMath.roundToInt(doubleVal, RoundingMode.HALF_UP);
-                System.out.println(val);
                 buffer.setElem(z * 512 + x, val);
             }
         }
