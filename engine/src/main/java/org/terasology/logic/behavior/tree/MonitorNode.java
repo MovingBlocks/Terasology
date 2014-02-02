@@ -18,12 +18,10 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.engine.API;
 
 /**
- * <strong>Monitor</strong> <code>Parallel</code>
- * <p/>
- * <p/>
- * <code>SUCCESS</code>: as soon as one child node finishes SUCCESS
- * <code>FAILURE</code>: as soon as one child node finishes <code>FAILURE</code>.
- * <p/>
+ * <br/>
+ * <b>SUCCESS</b>: as soon as one child node finishes SUCCESS<br/>
+ * <b>FAILURE</b>: as soon as one child node finishes <b>FAILURE</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

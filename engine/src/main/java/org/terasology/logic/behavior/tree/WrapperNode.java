@@ -16,10 +16,8 @@
 package org.terasology.logic.behavior.tree;
 
 /**
- * <strong>Wrapper</strong> <code>Decorator</code>
- * <p/>
- * Always finishes with <code>SUCCESS</code>.
- * <p/>
+ * Always finishes with <b>SUCCESS</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class WrapperNode extends DecoratorNode {

@@ -19,13 +19,11 @@ import org.terasology.engine.API;
 import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * <strong>Parallel</strong> <code>Composite</code>
- * <p/>
- * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in which state.
- * <p/>
- * <code>SUCCESS</code>: when success policy is fulfilled (one or all children <code>SUCCESS</code>).
- * <code>FAILURE</code>, when failure policy is fulfilled (one or all children <code>FAILURE</code>).
- * <p/>
+ * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in which state.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: when success policy is fulfilled (one or all children <b>SUCCESS</b>).<br/>
+ * <b>FAILURE</b>, when failure policy is fulfilled (one or all children <b>FAILURE</b>).<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

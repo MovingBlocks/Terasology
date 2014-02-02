@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,8 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,6 +34,9 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
+import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -62,6 +67,10 @@ public class BehaviorNodeFactory implements ComponentSystem {
     private AssetManager assetManager;
     @In
     private NodesClassLibrary nodesClassLibrary;
+    @In
+    private OneOfProviderFactory providerFactory;
+
+    private List<AssetUri> sounds = Lists.newArrayList();
 
     public BehaviorNodeFactory() {
         CoreRegistry.put(BehaviorNodeFactory.class, this);
@@ -78,6 +87,21 @@ public class BehaviorNodeFactory implements ComponentSystem {
     }
 
     public void refreshLibrary() {
+        for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
+            sounds.add(uri);
+        }
+        providerFactory.register("sounds", new ReadOnlyBinding<List<AssetUri>>() {
+                    @Override
+                    public List<AssetUri> get() {
+                        return sounds;
+                    }
+                }, new StringTextRenderer<AssetUri>() {
+                    @Override
+                    public String getString(AssetUri value) {
+                        return value.getAssetName();
+                    }
+                }
+        );
         refreshPrefabs();
         sortLibrary();
     }

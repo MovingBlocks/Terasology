@@ -424,7 +424,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
         entity.removeComponent(NetworkComponent.class);
 
-        if (false && prefab != null) {
+        if (prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {

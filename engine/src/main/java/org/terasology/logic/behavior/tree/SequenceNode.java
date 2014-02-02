@@ -20,14 +20,12 @@ import org.terasology.engine.API;
 import java.util.Iterator;
 
 /**
- * <strong>Sequence</strong> <code>Composite</code>
- * <p/>
- * Evaluates the children one by one.
- * Starts next child, if previous child finishes with <code>SUCCESS</code>.
- * <p/>
- * <code>SUCCESS</code>: when all children finishes <code>SUCCESS</code>.
- * <code>FAILURE</code>: as soon as a child finished with <code>FAILURE</code>.
- * <p/>
+ * Evaluates the children one by one.<br/>
+ * Starts next child, if previous child finishes with <b>SUCCESS</b>.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: when all children finishes <b>SUCCESS</b>.<br/>
+ * <b>FAILURE</b>: as soon as a child finished with <b>FAILURE</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

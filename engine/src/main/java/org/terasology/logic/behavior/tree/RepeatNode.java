@@ -18,13 +18,11 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.engine.API;
 
 /**
- * <strong>Repeat</strong> <code>Decorator</code>
- * <p/>
- * Repeats the child node forever.
- * <p/>
- * <code>SUCCESS</code>: Never.
- * <code>FAILURE</code>: as soon as decorated node finishes with <code>FAILURE</code>.
- * <p/>
+ * Repeats the child node forever.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: Never.<br/>
+ * <b>FAILURE</b>: as soon as decorated node finishes with <b>FAILURE</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API

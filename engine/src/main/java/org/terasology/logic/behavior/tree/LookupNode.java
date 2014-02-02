@@ -19,13 +19,11 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * <strong>Lookup</strong> <code>Decorator</code>
- * <p/>
- * Node that runs a behavior tree.
- * <p/>
- * <code>SUCCESS</code>: when tree finishes with <code>SUCCESS</code>.
- * <code>FAILURE</code>: when tree finishes with <code>FAILURE</code>.
- * <p/>
+ * Node that runs a behavior tree.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: when tree finishes with <b>SUCCESS</b>.<br/>
+ * <b>FAILURE</b>: when tree finishes with <b>FAILURE</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 public class LookupNode extends Node {

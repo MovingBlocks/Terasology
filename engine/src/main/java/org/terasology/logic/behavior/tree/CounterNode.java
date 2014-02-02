@@ -19,13 +19,11 @@ import org.terasology.engine.API;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * <strong>Counter</strong> <code>Decorator</code>
- * <p/>
- * Starts child a limit number of times.
- * <p/>
- * <code>SUCCESS</code>: when child finished with <code>SUCCESS</code>n times.
- * <code>FAILURE</code>: as soon as child finishes with <code>FAILURE</code>.
- * <p/>
+ * Starts child a limit number of times.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: when child finished with <b>SUCCESS</b>n times.<br/>
+ * <b>FAILURE</b>: as soon as child finishes with <b>FAILURE</b>.<br/>
+ * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
 @API
