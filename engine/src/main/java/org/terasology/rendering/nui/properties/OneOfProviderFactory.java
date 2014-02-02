@@ -20,6 +20,7 @@ import org.terasology.engine.API;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,11 +34,11 @@ public class OneOfProviderFactory {
     public OneOfProviderFactory() {
     }
 
-    public void register(String name, Binding<?> binding) {
+    public <T> void register(String name, Binding<List<T>> binding) {
         register(name, binding, null);
     }
 
-    public void register(String name, Binding<?> binding, ItemRenderer<?> itemRenderer) {
+    public <T> void register(String name, Binding<List<T>> binding, ItemRenderer<T> itemRenderer) {
         provider.put(name, binding);
         itemRenderers.put(name, itemRenderer);
     }
