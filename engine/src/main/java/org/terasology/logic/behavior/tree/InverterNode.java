@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,14 @@
 package org.terasology.logic.behavior.tree;
 
 /**
- * Inverts the decorated node.
+ * <strong>Inverter</strong> <code>Decorator</code>
  * <p/>
- * Finishes with SUCCESS, when decorated node finishes FAILURE
- * Finishes with FAILURE, when decorated node finishes SUCCESS
- *
- * @author synopia
+ * Inverts the child.
+ * <p/>
+ * <code>SUCCESS</code>: when child finishes <code>FAILURE</code>.
+ * <code>FAILURE</code>: when child finishes <code>SUCCESS</code>.
+ * <p/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 public class InverterNode extends DecoratorNode {
     @Override

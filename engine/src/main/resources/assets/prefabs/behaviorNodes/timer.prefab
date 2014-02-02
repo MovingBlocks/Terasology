@@ -4,7 +4,7 @@
         "name"      : "Timer",
         "category"  : "logic",
         "shape"     : "rect",
-        "description": "Decorator\nStarts the decorated node.\nFinishes with SUCCESS, after x seconds.\nFinishes with FAILURE, as soon as decorated node finishes with FAILURE.",
+        "description": "Decorator\nStarts the decorated node.\nSUCCESS: after x seconds.\nFAILURE: as soon as decorated node finishes with FAILURE.",
         "color"     : [0.7, 0.7, 0.7],
         "textColor" : [  0,   0,   0]
     }

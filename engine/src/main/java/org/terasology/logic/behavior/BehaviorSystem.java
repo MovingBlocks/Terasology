@@ -174,9 +174,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             interpreter = new Interpreter(new Actor(entityRef));
             BehaviorTree tree = behaviorComponent.tree;
             entityInterpreters.put(entityRef, interpreter);
-            behaviorComponent.tree = tree;
-            entityRef.saveComponent(behaviorComponent);
-            interpreter.start(tree.getRoot());
+            if (tree != null) {
+                interpreter.start(tree.getRoot());
+            }
         }
     }
 }

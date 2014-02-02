@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,13 +19,14 @@ import org.terasology.engine.API;
 import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in
- * which state.
+ * <strong>Parallel</strong> <code>Composite</code>
  * <p/>
- * Finishes with SUCCESS, when success policy is fulfilled (one or all children SUCCESS).
- * Finishes with FAILURE, when failure policy is fulfilled (one or all children FAILURE).
- *
- * @author synopia
+ * All children are evaluated in parallel. Policies for success and failure will define when this node finishes and in which state.
+ * <p/>
+ * <code>SUCCESS</code>: when success policy is fulfilled (one or all children <code>SUCCESS</code>).
+ * <code>FAILURE</code>, when failure policy is fulfilled (one or all children <code>FAILURE</code>).
+ * <p/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 @API
 public class ParallelNode extends CompositeNode {

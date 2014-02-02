@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
@@ -38,6 +35,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -50,6 +48,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
@@ -424,7 +424,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         }
         entity.removeComponent(NetworkComponent.class);
 
-        if (prefab != null) {
+        if (false && prefab != null) {
             for (Component comp : prefab.iterateComponents()) {
                 Component currentComp = entity.getComponent(comp.getClass());
                 if (currentComp == null) {

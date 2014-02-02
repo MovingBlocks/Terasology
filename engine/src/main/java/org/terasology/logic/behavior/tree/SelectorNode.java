@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,13 +20,15 @@ import org.terasology.engine.API;
 import java.util.Iterator;
 
 /**
+ * <strong>Selector</strong> <code>Composite</code>
+ * <p/>
  * Evaluates the children one by one.
- *
- * Starts next child, if previous child finishes with FAILURE.
- * Finishes with SUCCESS, as soon as a child finishes SUCCESS.
- * Finishes with FAILURE, when all children finished with FAILURE
- *
- * @author synopia
+ * Starts next child, if previous child finishes with <code>FAILURE</code>.
+ * <p/>
+ * <code>SUCCESS</code>: as soon as a child finishes <code>SUCCESS</code>.
+ * <code>FAILURE</code>: when all children finished with <code>FAILURE</code>.
+ * <p/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 @API
 public class SelectorNode extends CompositeNode {
