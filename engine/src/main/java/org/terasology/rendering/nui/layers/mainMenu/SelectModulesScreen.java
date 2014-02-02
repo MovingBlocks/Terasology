@@ -255,7 +255,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     public void onActivated(UIWidget button) {
                         for (Module m : moduleList.getList()) {
                             // The Core module is mandatory - ignore trying to disable it
-                            if (m.getId().equals("core")){
+                            if (m.getId().equals("core")) {
                                 continue;
                             }
 

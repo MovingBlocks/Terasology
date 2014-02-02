@@ -34,6 +34,9 @@ import org.terasology.persistence.ModuleContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -259,10 +262,13 @@ public class AssetManager {
             }
 
             Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
-            try (InputStream stream = url.openStream()) {
+            try (InputStream stream = AccessController.doPrivileged(new PrivilegedOpenStream(url))) {
                 urls.remove(url);
                 urls.add(0, url);
                 return loader.load(module, stream, urls);
+            } catch (PrivilegedActionException e) {
+                logger.error("Error reading asset {}", uri, e.getCause());
+                return null;
             } catch (IOException ioe) {
                 logger.error("Error reading asset {}", uri, ioe);
                 return null;
@@ -455,13 +461,17 @@ public class AssetManager {
     }
 
     public InputStream getAssetStream(AssetUri uri) throws IOException {
-        List<URL> assetURLs = getAssetURLs(uri);
+        final List<URL> assetURLs = getAssetURLs(uri);
 
         if (assetURLs.isEmpty()) {
             return null;
         }
 
-        return assetURLs.get(0).openStream();
+        try {
+            return AccessController.doPrivileged(new PrivilegedOpenStream(assetURLs.get(0)));
+        } catch (PrivilegedActionException e) {
+            throw new IOException(e.getCause().getMessage(), e.getCause());
+        }
     }
 
     private class AllAssetIterator implements Iterator<AssetUri> {
@@ -554,4 +564,17 @@ public class AssetManager {
         }
     }
 
+    private static final class PrivilegedOpenStream implements PrivilegedExceptionAction<InputStream> {
+
+        private URL url;
+
+        private PrivilegedOpenStream(URL url) {
+            this.url = url;
+        }
+
+        @Override
+        public InputStream run() throws Exception {
+            return url.openStream();
+        }
+    }
 }
