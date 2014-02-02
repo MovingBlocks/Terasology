@@ -15,8 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import com.google.common.collect.Lists;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.skin.UISkin;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -24,6 +29,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
 public abstract class AbstractWidget implements UIWidget {
 
     private String id;
+    private UISkin skin;
     private Binding<String> family = new DefaultBinding<>();
     private boolean focused;
 
@@ -51,6 +57,16 @@ public abstract class AbstractWidget implements UIWidget {
 
     protected void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public final UISkin getSkin() {
+        return skin;
+    }
+
+    @Override
+    public final void setSkin(UISkin skin) {
+        this.skin = skin;
     }
 
     @Override
@@ -85,6 +101,22 @@ public abstract class AbstractWidget implements UIWidget {
             }
         }
         return null;
+    }
+
+    @Override
+    public final <T extends UIWidget> Collection<T> findAll(Class<T> type) {
+        List<T> results = Lists.newArrayList();
+        findAll(type, this, results);
+        return results;
+    }
+
+    private <T extends UIWidget> void findAll(Class<T> type, UIWidget widget, List<T> results) {
+        if (type.isInstance(widget)) {
+            results.add(type.cast(widget));
+        }
+        for (UIWidget content : widget) {
+            findAll(type, content, results);
+        }
     }
 
     public boolean isVisible() {

@@ -17,9 +17,11 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
@@ -37,6 +39,9 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         CoreRegistry.get(ShaderManager.class).initShaders();
+
+        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
 
         // TODO: This should be elsewhere
         // Create gelatinousCubeMesh

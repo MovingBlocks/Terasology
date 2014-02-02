@@ -21,6 +21,9 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.skin.UISkin;
+
+import java.util.Collection;
 
 /**
  * @author Immortius
@@ -33,6 +36,10 @@ public interface UIWidget extends Iterable<UIWidget> {
     String ACTIVE_MODE = "active";
 
     String getId();
+
+    UISkin getSkin();
+
+    void setSkin(UISkin skin);
 
     String getFamily();
 
@@ -55,6 +62,8 @@ public interface UIWidget extends Iterable<UIWidget> {
      * @return The widget with the given id and type, or null.
      */
     <T extends UIWidget> T find(String id, Class<T> type);
+
+    <T extends UIWidget> Collection<T> findAll(Class<T> type);
 
     void onDraw(Canvas canvas);
 

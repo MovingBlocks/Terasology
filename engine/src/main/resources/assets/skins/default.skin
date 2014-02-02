@@ -20,7 +20,39 @@
                 "right" : 4
             },
             "align-horizontal" : "left",
-            "align-vertical" : "bottom"
+            "align-vertical" : "bottom",
+            "text-align-horizontal" : "left"
+        },
+        "InventoryCell" : {
+            "background" : "engine:box",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "modes" : {
+                "active" : {
+                    "background" : "engine:boxActive"
+                }
+            }
+        },
+        "TransferItemCursor" : {
+            "align-horizontal" : "center",
+            "align-vertical" : "top"
+        },
+        "ItemIcon" : {
+            "fixed-width" : 48,
+            "fixed-height" : 48,
+            "texture-scale-mode" : "scale_fit",
+            "text-align-horizontal" : "right",
+            "text-align-vertical" : "bottom"
         },
         "UIText" : {
             "text-align-horizontal" : "left",
@@ -73,7 +105,7 @@
                 "left" : 4,
                 "right" : 4
             },
-            "min-width" : 128,
+            "min-width" : 256,
             "max-width" : 512,
             "fixed-height" : 20
         },

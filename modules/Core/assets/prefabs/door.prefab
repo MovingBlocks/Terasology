@@ -1,7 +1,9 @@
 {
     "parent": "engine:iconItem",
+    "DisplayName" : {
+        "name": "Door"
+    },
     "Item": {
-        "name": "Door",
         "icon": "engine:items.door",
         "renderWithIcon": true,
         "stackId": "door",

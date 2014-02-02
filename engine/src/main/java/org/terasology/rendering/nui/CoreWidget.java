@@ -61,4 +61,5 @@ public abstract class CoreWidget extends AbstractWidget {
     public Vector2i getMaxContentSize(Canvas canvas) {
         return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
+
 }

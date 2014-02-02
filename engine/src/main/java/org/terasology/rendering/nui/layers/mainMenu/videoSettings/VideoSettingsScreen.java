@@ -23,7 +23,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
@@ -38,7 +38,7 @@ import java.util.Arrays;
 /**
  * @author Immortius
  */
-public class VideoSettingsScreen extends UIScreenLayer {
+public class VideoSettingsScreen extends CoreScreenLayer {
     private static final Logger logger = LoggerFactory.getLogger(VideoSettingsScreen.class);
 
     @In
@@ -127,5 +127,10 @@ public class VideoSettingsScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

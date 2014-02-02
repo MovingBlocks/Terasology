@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -33,11 +32,11 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
@@ -90,7 +89,7 @@ public class StateIngame implements GameState {
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        guiManager.openWindow(MenuControlSystem.HUD);
+        guiManager.openWindow("hud");
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
@@ -122,7 +121,7 @@ public class StateIngame implements GameState {
         componentSystemManager.shutdown();
         GameThread.processWaitingProcesses();
         guiManager.closeAllWindows();
-        nuiManager.closeAllScreens();
+        nuiManager.clear();
 
         if (worldRenderer != null) {
             worldRenderer.dispose();

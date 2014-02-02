@@ -16,6 +16,8 @@
 
 package org.terasology.rendering.opengl;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
@@ -23,35 +25,29 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.MatrixUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.assets.material.BaseMaterial;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.material.BaseMaterial;
 import org.terasology.rendering.shader.ShaderParameters;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -142,7 +138,6 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public final void reload(MaterialData data) {
-        Util.checkGLError();
         dispose();
 
         shader = (GLSLShader) data.getShader();
@@ -176,12 +171,10 @@ public class GLSLMaterial extends BaseMaterial {
                     break;
             }
         }
-        Util.checkGLError();
     }
 
     @Override
     public void dispose() {
-        Util.checkGLError();
         logger.debug("Disposing material {}.", getURI());
 
         TIntIntIterator it = shaderPrograms.iterator();
@@ -192,8 +185,6 @@ public class GLSLMaterial extends BaseMaterial {
         shaderPrograms.clear();
         uniformLocationMap.clear();
         shader = null;
-        Util.checkGLError();
-
     }
 
     @Override
