@@ -1,7 +1,9 @@
 {
     "parent" : "engine:iconItem",
+    "DisplayName" : {
+        "name" : "Pick Axe"
+    },
     "Item" : {
-        "name" : "Pick Axe",
         "icon" : "items.pick",
         "renderWithIcon" : true,
         "damageType" : "pickaxeDamage"

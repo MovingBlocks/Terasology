@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Set;
 
@@ -37,6 +36,7 @@ public class ModuleSecurityManager extends SecurityManager {
 
     private Set<Class> apiClasses = Sets.newHashSet();
     private Set<String> apiPackages = Sets.newHashSet();
+    private Set<String> fullPrivilegePackages = Sets.newHashSet();
 
     private Set<Class<? extends Permission>> globallyAllowedPermissionsTypes = Sets.newHashSet();
     private Set<Permission> globallyAllowedPermissionsInstances = Sets.newHashSet();
@@ -145,13 +145,14 @@ public class ModuleSecurityManager extends SecurityManager {
      *
      * @param perm
      */
-    public void checkModAccess(Permission perm) {
+    public boolean checkModAccess(Permission perm) {
+
         if (calculatingPermission.get() != null) {
-            return;
+            return true;
         }
 
         if (globallyAllowedPermissionsTypes.contains(perm.getClass()) || globallyAllowedPermissionsInstances.contains(perm)) {
-            return;
+            return true;
         }
 
         calculatingPermission.set(true);
@@ -161,41 +162,40 @@ public class ModuleSecurityManager extends SecurityManager {
             for (int i = 0; i < stack.length; ++i) {
                 ClassLoader owningLoader = stack[i].getClassLoader();
                 if (owningLoader != null && owningLoader instanceof ModuleClassLoader) {
-                    checkAPIPermissionsFor(perm, i, stack);
-                    return;
+                    return checkAPIPermissionsFor(perm, i, stack);
+
                 }
             }
         } finally {
             calculatingPermission.set(null);
         }
+        return false;
     }
 
-    private void checkAPIPermissionsFor(Permission permission, int moduleDepth, Class[] stack) {
+    private boolean checkAPIPermissionsFor(Permission permission, int moduleDepth, Class[] stack) {
         Set<Class> allowed = Sets.union(allowedPermissionInstances.get(permission), allowedPermissionsTypes.get(permission.getClass()));
-        Set<String> allowedPackages = Sets.union(allowedPackagePermissionInstances.get(permission), allowedPackagePermissionsTypes.get(permission.getClass()));
+        Set<String> allowedPackages = Sets.union(Sets.union(allowedPackagePermissionInstances.get(permission), allowedPackagePermissionsTypes.get(permission.getClass()))
+                , fullPrivilegePackages);
         for (int i = moduleDepth - 1; i >= 0; i--) {
             if (allowed.contains(stack[i]) || allowedPackages.contains(stack[i].getPackage().getName())) {
-                return;
+                return true;
             }
         }
-
-        if (moduleDepth - 1 > 0) {
-            throw new AccessControlException(
-                    String.format("Module class '%s' calling into '%s' requiring permission '%s'"
-                            , stack[moduleDepth].getName(), stack[moduleDepth - 1].getName(), permission));
-        } else {
-            throw new AccessControlException(String.format("Module class '%s' requiring permission '%s'", stack[moduleDepth].getName(), permission));
-        }
+        return false;
     }
 
     @Override
     public void checkPermission(Permission perm) {
-        checkModAccess(perm);
+        if (!checkModAccess(perm)) {
+            super.checkPermission(perm);
+        }
     }
 
     @Override
     public void checkPermission(Permission perm, Object context) {
-        checkModAccess(perm);
+        if (!checkModAccess(perm)) {
+            super.checkPermission(perm);
+        }
     }
 
     public boolean checkAccess(Class type) {
@@ -207,5 +207,9 @@ public class ModuleSecurityManager extends SecurityManager {
             System.getSecurityManager().checkPermission(ADD_ALLOWED_PERMISSION);
         }
         apiPackages.add(packageName);
+    }
+
+    public void addFullPrivilegePackage(String packageName) {
+        fullPrivilegePackages.add(packageName);
     }
 }

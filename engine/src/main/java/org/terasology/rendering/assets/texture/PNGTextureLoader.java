@@ -130,6 +130,8 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             } else {
                 return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
             }
+        } catch (UnsupportedOperationException e) {
+            throw new IOException(e);
         } finally {
             pngStream.close();
         }

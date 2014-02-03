@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.terasology.asset.Assets;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -23,8 +24,6 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.common.DisplayInformationComponent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.texture.Texture;
@@ -33,7 +32,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.world.block.items.BlockItemComponent;
 
 import javax.vecmath.Vector2f;
 
@@ -205,17 +203,9 @@ public class UIInventoryCell extends UIDisplayContainer {
     }
 
     private String getLabelFor(EntityRef item) {
-        DisplayInformationComponent info = item.getComponent(DisplayInformationComponent.class);
+        DisplayNameComponent info = item.getComponent(DisplayNameComponent.class);
         if (info != null) {
             return info.name;
-        }
-        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-        if (blockItem != null) {
-            return blockItem.blockFamily.getDisplayName();
-        }
-        ItemComponent itemComponent = item.getComponent(ItemComponent.class);
-        if (itemComponent != null) {
-            return itemComponent.name;
         }
         return "";
     }

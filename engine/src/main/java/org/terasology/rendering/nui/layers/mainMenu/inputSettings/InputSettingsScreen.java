@@ -23,12 +23,13 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.input.InputSystem;
 import org.terasology.registry.In;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.databinding.BindHelper;
@@ -54,7 +55,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class InputSettingsScreen extends UIScreenLayer {
+public class InputSettingsScreen extends CoreScreenLayer {
 
     private int horizontalSpacing = 4;
 
@@ -63,6 +64,9 @@ public class InputSettingsScreen extends UIScreenLayer {
 
     @In
     private ModuleManager moduleManager;
+
+    @In
+    private InputSystem inputSystem;
 
 
     @Override
@@ -192,8 +196,14 @@ public class InputSettingsScreen extends UIScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
+                config.getInput().getBinds().applyBinds(inputSystem, moduleManager);
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     private static final class ExtensionBind implements Comparable<ExtensionBind> {

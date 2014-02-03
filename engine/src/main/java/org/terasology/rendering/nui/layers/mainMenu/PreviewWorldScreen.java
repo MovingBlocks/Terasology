@@ -30,7 +30,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -52,7 +52,7 @@ import java.util.Objects;
 /**
  * @author Immortius
  */
-public class PreviewWorldScreen extends UIScreenLayer {
+public class PreviewWorldScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(PreviewWorldScreen.class);
 
@@ -136,6 +136,11 @@ public class PreviewWorldScreen extends UIScreenLayer {
             image.setImage(tex);
             currentSettings = newSettings;
         }
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     public void bindSeed(Binding<String> binding) {

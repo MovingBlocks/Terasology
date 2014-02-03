@@ -25,7 +25,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.registry.In;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
@@ -40,7 +40,7 @@ import java.nio.file.Path;
 /**
  * @author Immortius
  */
-public class SelectGameScreen extends UIScreenLayer {
+public class SelectGameScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(SelectGameScreen.class);
 
@@ -103,6 +103,11 @@ public class SelectGameScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     private void loadGame(GameInfo item) {

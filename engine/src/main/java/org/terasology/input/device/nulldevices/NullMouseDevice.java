@@ -42,6 +42,11 @@ public class NullMouseDevice implements MouseDevice {
     }
 
     @Override
+    public boolean isVisible() {
+        return false;
+    }
+
+    @Override
     public Queue<InputAction> getInputQueue() {
         return Queues.newArrayDeque();
     }

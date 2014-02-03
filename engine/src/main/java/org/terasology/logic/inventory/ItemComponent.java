@@ -29,12 +29,6 @@ import org.terasology.rendering.assets.texture.TextureRegion;
  */
 public final class ItemComponent implements Component {
     /**
-     * The display name of this item
-     */
-    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public String name = "";
-
-    /**
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)

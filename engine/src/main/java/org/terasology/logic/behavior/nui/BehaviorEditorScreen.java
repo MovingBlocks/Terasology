@@ -25,8 +25,8 @@ import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * @author synopia
  */
-public class BehaviorEditorScreen extends UIScreenLayer {
+public class BehaviorEditorScreen extends CoreScreenLayer {
 
     public static final String PALETTE_ITEM_OPEN = "--";
     public static final String PALETTE_ITEM_CLOSE = "++";
@@ -302,6 +302,11 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         });
 
         paletteItems = findPaletteItems();
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     private void removeWidget(RenderableNode node) {

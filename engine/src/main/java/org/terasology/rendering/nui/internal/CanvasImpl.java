@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -200,11 +201,11 @@ public class CanvasImpl implements CanvasControl {
             if (!newTopMouseOverRegion.equals(topMouseOverRegion)) {
                 topMouseOverRegion = newTopMouseOverRegion;
                 tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                lastTooltipPosition.set(Mouse.getPosition());
+                lastTooltipPosition.set(position);
             } else {
-                if (lastTooltipPosition.gridDistance(Mouse.getPosition()) > MAX_DOUBLE_CLICK_DISTANCE) {
+                if (lastTooltipPosition.gridDistance(position) > MAX_DOUBLE_CLICK_DISTANCE) {
                     tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                    lastTooltipPosition.set(Mouse.getPosition());
+                    lastTooltipPosition.set(position);
                 }
             }
 
@@ -292,6 +293,7 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void setSkin(UISkin skin) {
+        Preconditions.checkNotNull(skin);
         state.skin = skin;
     }
 
@@ -369,7 +371,8 @@ public class CanvasImpl implements CanvasControl {
             focusDrawn = true;
         }
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
-        UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
+        UISkin skin = (element.getSkin() != null) ? element.getSkin() : state.skin;
+        UIStyle newStyle = skin.getStyleFor(family, element.getClass(), element.getMode());
         Rect2i regionArea;
         try (SubRegion ignored = subRegionForWidget(element, region, false)) {
             regionArea = applyStyleToSize(region, newStyle, element.getMaxContentSize(this));
@@ -390,6 +393,9 @@ public class CanvasImpl implements CanvasControl {
     private SubRegion subRegionForWidget(UIWidget widget, Rect2i region, boolean crop) {
         SubRegion result = subRegion(region, crop);
         state.element = widget;
+        if (widget.getSkin() != null) {
+            setSkin(widget.getSkin());
+        }
         if (widget.getFamily() != null) {
             setFamily(widget.getFamily());
         }

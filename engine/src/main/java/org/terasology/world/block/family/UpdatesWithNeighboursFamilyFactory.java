@@ -29,6 +29,8 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockDefinition;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyFactory {
@@ -43,12 +45,40 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
 
+    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING =
+            new HashMap<String, Byte>() {{
+                put(NO_CONNECTIONS, (byte) 0);
+                put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK));
+
+                put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT));
+                put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK));
+
+                put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP));
+                put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT));
+
+                put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT));
+                put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP));
+
+                put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM));
+                put(SIX_CONNECTIONS, (byte) 63);
+            }};
+
     private ConnectionCondition connectionCondition;
     private byte connectionSides;
+    private boolean horizontalOnly;
+    private Map<String, Byte> shapeMapping;
+
 
     protected UpdatesWithNeighboursFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides) {
+        this(connectionCondition, connectionSides, DEFAULT_SHAPE_MAPPING, false);
+    }
+
+    protected UpdatesWithNeighboursFamilyFactory(ConnectionCondition connectionCondition, byte connectionSides,
+                                                 Map<String, Byte> shapeMapping, boolean horizontalOnly) {
         this.connectionCondition = connectionCondition;
         this.connectionSides = connectionSides;
+        this.shapeMapping = shapeMapping;
+        this.horizontalOnly = horizontalOnly;
     }
 
     @Override
@@ -57,54 +87,55 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
         TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
 
         basicBlocks[0] = new TByteObjectHashMap<>();
-        basicBlocks[0].put((byte) 0,
-                getBlockDefinition(NO_CONNECTIONS, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[0], blockBuilder, blockDefJson, NO_CONNECTIONS);
 
         basicBlocks[1] = new TByteObjectHashMap<>();
-        basicBlocks[1].put(SideBitFlag.getSides(Side.BACK),
-                getBlockDefinition(ONE_CONNECTION, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[1], blockBuilder, blockDefJson, ONE_CONNECTION);
 
         basicBlocks[2] = new TByteObjectHashMap<>();
-        basicBlocks[2].put(SideBitFlag.getSides(Side.BACK, Side.FRONT),
-                getBlockDefinition(TWO_CONNECTIONS_LINE, blockBuilder, blockDefJson));
-        basicBlocks[2].put(SideBitFlag.getSides(Side.LEFT, Side.BACK),
-                getBlockDefinition(TWO_CONNECTIONS_CORNER, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[2], blockBuilder, blockDefJson, TWO_CONNECTIONS_LINE);
+        putBlockDefinition(basicBlocks[2], blockBuilder, blockDefJson, TWO_CONNECTIONS_CORNER);
 
         basicBlocks[3] = new TByteObjectHashMap<>();
-        basicBlocks[3].put(SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP),
-                getBlockDefinition(THREE_CONNECTIONS_CORNER, blockBuilder, blockDefJson));
-        basicBlocks[3].put(SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT),
-                getBlockDefinition(THREE_CONNECTIONS_T, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[3], blockBuilder, blockDefJson, THREE_CONNECTIONS_CORNER);
+        putBlockDefinition(basicBlocks[3], blockBuilder, blockDefJson, THREE_CONNECTIONS_T);
 
         basicBlocks[4] = new TByteObjectHashMap<>();
-        basicBlocks[4].put(SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT),
-                getBlockDefinition(FOUR_CONNECTIONS_CROSS, blockBuilder, blockDefJson));
-        basicBlocks[4].put(SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP),
-                getBlockDefinition(FOUR_CONNECTIONS_SIDE, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[4], blockBuilder, blockDefJson, FOUR_CONNECTIONS_CROSS);
+        putBlockDefinition(basicBlocks[4], blockBuilder, blockDefJson, FOUR_CONNECTIONS_SIDE);
 
         basicBlocks[5] = new TByteObjectHashMap<>();
-        basicBlocks[5].put(SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM),
-                getBlockDefinition(FIVE_CONNECTIONS, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[5], blockBuilder, blockDefJson, FIVE_CONNECTIONS);
 
         basicBlocks[6] = new TByteObjectHashMap<>();
-        basicBlocks[6].put((byte) 63,
-                getBlockDefinition(SIX_CONNECTIONS, blockBuilder, blockDefJson));
+        putBlockDefinition(basicBlocks[6], blockBuilder, blockDefJson, SIX_CONNECTIONS);
 
         BlockUri blockUri = new BlockUri(blockDefUri.getModuleName(), blockDefUri.getAssetName());
 
         // Now make sure we have all combinations based on the basic set (above) and rotations
         for (byte connections = 0; connections < 64; connections++) {
-            Block block = constructBlockForConnections(connections, blockBuilder, blockDefUri, basicBlocks);
-            if (block == null) {
-                throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
+            // Only the allowed connections should be created
+            if ((connections & connectionSides) == connections) {
+                Block block = constructBlockForConnections(connections, blockBuilder, blockDefUri, basicBlocks);
+                if (block == null) {
+                    throw new IllegalStateException("Unable to find correct block definition for connections: " + connections);
+                }
+                block.setUri(new BlockUri(blockUri, String.valueOf(connections)));
+                blocksForConnections.put(connections, block);
             }
-            block.setUri(new BlockUri(blockUri, String.valueOf(connections)));
-            blocksForConnections.put(connections, block);
         }
 
         final Block archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
         return new UpdatesWithNeighboursFamily(connectionCondition, blockUri, blockDefinition.categories,
                 archetypeBlock, blocksForConnections, connectionSides);
+    }
+
+    private void putBlockDefinition(TByteObjectMap<BlockDefinition> blockDefinitions, BlockBuilderHelper blockBuilder, JsonObject blockDefJson,
+                                    String connections) {
+        Byte value = shapeMapping.get(connections);
+        if (value != null) {
+            blockDefinitions.put(value, getBlockDefinition(connections, blockBuilder, blockDefJson));
+        }
     }
 
     private Block constructBlockForConnections(final byte connections, final BlockBuilderHelper blockBuilder,
@@ -127,7 +158,8 @@ public abstract class UpdatesWithNeighboursFamilyFactory implements BlockFamilyF
     private Rotation getRotationToAchieve(byte source, byte target) {
         Collection<Side> originalSides = SideBitFlag.getSides(source);
 
-        for (Rotation rot : Rotation.values()) {
+        Iterable<Rotation> rotations = horizontalOnly ? Rotation.horizontalRotations() : Rotation.values();
+        for (Rotation rot : rotations) {
             Set<Side> transformedSides = Sets.newHashSet();
             for (Side originalSide : originalSides) {
                 transformedSides.add(rot.rotate(originalSide));

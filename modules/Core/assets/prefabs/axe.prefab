@@ -1,7 +1,9 @@
 {
     "parent" : "engine:iconItem",
+    "DisplayName" : {
+        "name" : "Axe"
+    },
     "Item" : {
-        "name" : "Axe",
         "icon" : "engine:items.axe",
         "renderWithIcon" : true,
         "damageType" : "axeDamage"

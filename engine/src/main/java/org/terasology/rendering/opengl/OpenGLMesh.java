@@ -26,7 +26,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.Util;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.AABB;
@@ -83,10 +82,8 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     @Override
     public void reload(MeshData newData) {
-        Util.checkGLError();
         dispose();
         buildMesh(newData);
-        Util.checkGLError();
     }
 
     @Override

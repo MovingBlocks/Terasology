@@ -125,8 +125,6 @@ public class UIScreenInventory extends UIWindow {
     @Override
     public void close() {
         super.close();
-        getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-        getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
     }
 
     @Override
@@ -136,8 +134,6 @@ public class UIScreenInventory extends UIWindow {
         inventory.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 10);
         //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
-        getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
-        getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
         layout();
         inventory.setPosition(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() + 5f));
         inventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
