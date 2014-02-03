@@ -17,20 +17,25 @@
 package org.terasology.core.world.generator.chunkGenerators;
 
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.WorldBiomeProvider;
+import org.terasology.asset.Assets;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.utilities.procedural.HeightmapFileReader;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.FirstPassGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Generates a terrain based on a provided heightmap
@@ -63,13 +68,25 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        logger.info("Initialising World"); //Why is this methode called twice?
-        try {
-            // TODO: Exact file to read has been hard coded in engine for security reasons until height maps become assets
-            heightmap = HeightmapFileReader.readFile();
-        } catch (IOException e) {
-            logger.error("Failed to read heightmap", e);
+        if (seed == null)
+            return;
+        
+        logger.info("Reading height map..");
+        
+        Texture texture = Assets.getTexture("core:platec_heightmap");
+        ByteBuffer[] bb = texture.getData().getBuffers();
+        IntBuffer intBuf = bb[0].asIntBuffer();
+
+        int width = texture.getWidth();
+        int height = texture.getHeight();
+
+        heightmap = new float[width][height];
+        while (intBuf.position() < intBuf.limit()) {
+            int pos = intBuf.position();
+            int val = intBuf.get();
+            heightmap[pos % width][pos / width] = val / (256 * 256 * 256 * 12.8f);
         }
+        
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
         //try also other combinations with shift and rotate
         //heightmap = rotateArray(heightmap);
