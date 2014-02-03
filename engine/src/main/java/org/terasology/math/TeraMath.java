@@ -615,12 +615,17 @@ public final class TeraMath {
      * Lowest power of two greater or equal to val
      * <p/>
      * For values &lt;= 0 returns 0
+     * For values &gt;= 2 ^ 30 a runtime exception is throw, because this would cause an overflow
      *
      * @param val
      * @return The lowest power of two greater or equal to val
      */
-    //TODO There might be a more elegant solution to produce a correct results on MIN_VALUE
     public static int ceilPowerOfTwo(int val) {
+        final int LARGEST_FITTING_POWER_OF_TWO = Integer.MIN_VALUE >>> 1;
+
+        if(val > LARGEST_FITTING_POWER_OF_TWO)
+            throw new IllegalArgumentException("ceilPowerOfTwo overflows on values > " + LARGEST_FITTING_POWER_OF_TWO);
+
         if(val == Integer.MIN_VALUE)
             return 0;
 
@@ -637,20 +642,10 @@ public final class TeraMath {
     /**
      * @param val
      * @return Whether val is a power of two
+     * @deprecated Use com.google.common.math.IntMath.isPowerOfTwo instead
      */
     public static boolean isPowerOfTwo(int val) {
-        return val == ceilPowerOfTwo(val);
-    }
-
-    //TODO replace old isPowerOfTwo with this implementation?
-    /**
-     * Checks whether or not an integer value is a power of 2.
-     * @param val The value that will be checked.
-     * @return True if and only if val is a power of two.
-     * @author DizzyDragon
-     */
-    public static boolean fastIsPowerOfTwo(int val) {
-        return (val & (val-1)) == 0 && val > 0;
+        return com.google.common.math.IntMath.isPowerOfTwo(val);
     }
 
     /**
