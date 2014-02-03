@@ -201,11 +201,11 @@ public class CanvasImpl implements CanvasControl {
             if (!newTopMouseOverRegion.equals(topMouseOverRegion)) {
                 topMouseOverRegion = newTopMouseOverRegion;
                 tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                lastTooltipPosition.set(Mouse.getPosition());
+                lastTooltipPosition.set(position);
             } else {
-                if (lastTooltipPosition.gridDistance(Mouse.getPosition()) > MAX_DOUBLE_CLICK_DISTANCE) {
+                if (lastTooltipPosition.gridDistance(position) > MAX_DOUBLE_CLICK_DISTANCE) {
                     tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                    lastTooltipPosition.set(Mouse.getPosition());
+                    lastTooltipPosition.set(position);
                 }
             }
 
