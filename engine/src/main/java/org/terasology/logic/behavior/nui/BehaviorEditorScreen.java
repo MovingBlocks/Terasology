@@ -31,8 +31,9 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -146,7 +147,7 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
                     EntityRef minion = value.actor().minion();
                     entityProperties.clear();
                     for (Component component : minion.iterateComponents()) {
-                        entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                        entityProperties.addPropertyProvider(component.getClass().getSimpleName().replace("Component", ""), new PropertyProvider<>(component));
                     }
                 }
                 updateDebugger();
@@ -187,6 +188,12 @@ public class BehaviorEditorScreen extends CoreScreenLayer {
             @Override
             public List<BehaviorNodeComponent> get() {
                 return paletteItems;
+            }
+        });
+        palette.setItemRenderer(new ToStringTextRenderer<BehaviorNodeComponent>() {
+            @Override
+            public String getTooltip(BehaviorNodeComponent value) {
+                return value.description;
             }
         });
 

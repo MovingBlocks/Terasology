@@ -30,4 +30,9 @@ public abstract class AbstractItemRenderer<T> implements ItemRenderer<T> {
             draw(value, canvas);
         }
     }
+
+    @Override
+    public String getTooltip(T value) {
+        return null;
+    }
 }

@@ -1,6 +1,6 @@
 {
     "type" : "engine:behaviorEditorScreen",
-    "skin" : "engine:mainMenu",
+    "skin" : "engine:behaviorEditor",
     "contents" : {
         "type" : "migLayout",
         "layoutConstraints" : "",
@@ -15,19 +15,25 @@
                 }
             },
             {
-                "type" : "propertyLayout",
-                "id" : "properties",
-                "rowConstraints" : "[min]",
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "properties",
+                    "rowConstraints" : "[min]"
+                },
                 "layoutInfo" : {
-                    "cc" : "cell 2 2, aligny top, w 200!"
+                    "cc" : "cell 2 2, aligny top, w 220!, h 300!"
                 }
             },
             {
-                "type" : "propertyLayout",
-                "id" : "entity_properties",
-                "rowConstraints" : "[min]",
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "entity_properties",
+                    "rowConstraints" : "[min]"
+                },
                 "layoutInfo" : {
-                    "cc" : "cell 2 3, aligny top, w 200!"
+                    "cc" : "cell 2 3, aligny top, w 220!, h 300!"
                 }
             },
             {

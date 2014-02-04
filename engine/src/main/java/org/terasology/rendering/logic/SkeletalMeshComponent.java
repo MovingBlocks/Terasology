@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.Map;
@@ -36,7 +37,8 @@ public class SkeletalMeshComponent implements Component {
     public MeshAnimation animation;
     public boolean loop;
     public float animationRate = 1.0f;
-    public float heightOffset;
+    @Range(min = -2.5f, max = 2.5f)
+    public float heightOffset = 0f;
 
     @Owns
     public Map<String, EntityRef> boneEntities;

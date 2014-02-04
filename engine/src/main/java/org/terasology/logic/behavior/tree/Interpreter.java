@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,8 @@ import org.terasology.engine.API;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.registry.InjectionHelper;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -93,12 +95,10 @@ public class Interpreter {
             return null;
         }
         Task task = node.createTask();
-        start(task, parent);
-        return task;
+        return start(task, parent);
     }
 
-    private void start(Task task, Task parent) {
-        InjectionHelper.inject(task);
+    private Task start(final Task task, Task parent) {
         task.setActor(actor);
         task.setInterpreter(this);
         task.setParent(parent);
@@ -111,6 +111,13 @@ public class Interpreter {
             subTasks.add(task);
         }
         tasks.addFirst(task);
+        return AccessController.doPrivileged(new PrivilegedAction<Task>() {
+            @Override
+            public Task run() {
+                InjectionHelper.inject(task);
+                return task;
+            }
+        });
     }
 
     public void stop(Task task, Status result) {

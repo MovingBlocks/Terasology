@@ -987,7 +987,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         public String getTooltip() {
-            if (tooltipOverride.isEmpty()) {
+            if (tooltipOverride == null || tooltipOverride.isEmpty()) {
                 return element.getTooltip();
             }
             return tooltipOverride;

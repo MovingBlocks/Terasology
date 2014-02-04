@@ -73,7 +73,7 @@ public class UIList<T> extends CoreWidget {
             canvas.drawBackground(itemRegion);
 
             itemRenderer.draw(item, canvas, canvas.getCurrentStyle().getMargin().shrink(itemRegion));
-            canvas.addInteractionRegion(listener, itemRegion);
+            canvas.addInteractionRegion(listener, itemRenderer.getTooltip(item), itemRegion);
 
             yOffset += preferredSize.getY();
         }

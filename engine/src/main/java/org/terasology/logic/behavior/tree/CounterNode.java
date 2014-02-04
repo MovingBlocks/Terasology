@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,12 +19,12 @@ import org.terasology.engine.API;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * A CounterNode starts it decorated node <code>limit</code> times.
- * <p/>
- * Finishes with SUCCESS when decorated node finished SUCCESS <code>limit</code> times.
- * Finishes with FAILURE, as soon as decorated node finishes FAILURE.
- *
- * @author synopia
+ * Starts child a limit number of times.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: when child finished with <b>SUCCESS</b>n times.<br/>
+ * <b>FAILURE</b>: as soon as child finishes with <b>FAILURE</b>.<br/>
+ * <br/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 @API
 public class CounterNode extends DecoratorNode {
