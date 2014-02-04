@@ -615,6 +615,7 @@ public final class TeraMath {
      * Lowest power of two greater or equal to val
      * <p/>
      * For values &lt;= 0 returns 0
+     * For values &gt;= 2 ^ 30 returns 0. (2^30 is the largest power of 2 that fits within a int).
      *
      * @param val
      * @return The lowest power of two greater or equal to val
@@ -627,15 +628,17 @@ public final class TeraMath {
         result = (result >> 8) | result;
         result = (result >> 16) | result;
         result++;
-        return result;
+
+        return (result & ~(Integer.MIN_VALUE));
     }
 
     /**
      * @param val
      * @return Whether val is a power of two
+     * @deprecated Use com.google.common.math.IntMath.isPowerOfTwo instead
      */
     public static boolean isPowerOfTwo(int val) {
-        return val == ceilPowerOfTwo(val);
+        return com.google.common.math.IntMath.isPowerOfTwo(val);
     }
 
     /**
