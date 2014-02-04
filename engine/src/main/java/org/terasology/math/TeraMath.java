@@ -637,6 +637,7 @@ public final class TeraMath {
      * @return Whether val is a power of two
      * @deprecated Use com.google.common.math.IntMath.isPowerOfTwo instead
      */
+    @Deprecated
     public static boolean isPowerOfTwo(int val) {
         return com.google.common.math.IntMath.isPowerOfTwo(val);
     }

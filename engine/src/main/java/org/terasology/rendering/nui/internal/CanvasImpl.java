@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
-import org.terasology.input.Mouse;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2f;
