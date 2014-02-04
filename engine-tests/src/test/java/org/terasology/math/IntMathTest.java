@@ -24,7 +24,11 @@ import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.ChunkConstants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Immortius
@@ -51,14 +55,23 @@ public class IntMathTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of CeilPowerOfTwo method, of class IntMath.
-     */
+
+
     @Test
     public void testCeilPowerOfTwo() {
-        assertEquals(8, TeraMath.ceilPowerOfTwo(8));
-        assertEquals(8, TeraMath.ceilPowerOfTwo(7));
-        assertEquals(0, TeraMath.ceilPowerOfTwo(-100));
+        List<Integer> powersOfTwo = generateAllPowersOfTwo();
+        for(int i = 1; i < powersOfTwo.size(); i++) {
+            //test inputs on and around powers of two. Skips tests on zero
+            testCeilPowerOfTwo(powersOfTwo.get(i-1), powersOfTwo.get(i));
+        }
+
+        int largestIntegerPowerOfTwo = powersOfTwo.get(powersOfTwo.size()-1);
+        //test other boundary values
+        assertEquals("0", 0, TeraMath.ceilPowerOfTwo(0));
+        assertEquals("-1", 0, TeraMath.ceilPowerOfTwo(0));
+        assertEquals("Integer.MIN_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MIN_VALUE));
+        assertEquals("Integer.MAX_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE));
+        assertEquals("Largest integer power of two + 1", 0, TeraMath.ceilPowerOfTwo(largestIntegerPowerOfTwo + 1));
     }
 
     @Test
@@ -97,4 +110,50 @@ public class IntMathTest {
         assertEquals(-2, TeraMath.calcChunkPosX(-ChunkConstants.SIZE_X - 1));
     }
 
+
+
+    /**
+     * Tests TeraMath.ceilPowerOfTwo for inputs that are
+     * powers of two themselves, or are have a distance of 1 to a power of two.
+     * @param currentPowerOfTwo The power of two used to produce the input
+     * @param nextPowerOfTwo The next power of two, sometimes used as expected output
+     */
+    private void testCeilPowerOfTwo(int currentPowerOfTwo, int nextPowerOfTwo){
+
+        assertEquals("input " + currentPowerOfTwo,
+                currentPowerOfTwo,  TeraMath.ceilPowerOfTwo(currentPowerOfTwo)
+        );
+
+
+        int expectedValue = (currentPowerOfTwo == 1) ? 0 :
+                (currentPowerOfTwo == 2) ? 1 :
+                        currentPowerOfTwo;
+
+        assertEquals("input " + currentPowerOfTwo + " - 1",
+                expectedValue,  TeraMath.ceilPowerOfTwo(currentPowerOfTwo - 1)
+        );
+
+        assertEquals("input " + currentPowerOfTwo + " + 1",
+                nextPowerOfTwo,     TeraMath.ceilPowerOfTwo(currentPowerOfTwo + 1)
+        );
+    }
+
+    /**
+     * Generates a list of all powers of two that fit within a int
+     * @return list of powers of two
+     */
+    private final static List<Integer> generateAllPowersOfTwo() {
+        ArrayList<Integer> powersOfTwo = new ArrayList<>();
+
+        int value = 1;
+
+        while(value > 0) {
+            powersOfTwo.add(value);
+            value <<= 1;
+        }
+
+        System.out.println(powersOfTwo.get(powersOfTwo.size() - 1));
+
+        return powersOfTwo;
+    }
 }
