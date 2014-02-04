@@ -51,7 +51,7 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
                 if (value == null) {
                     out.nullValue();
                 } else {
-                    out.value(toLowercase(value));
+                    out.value(toLowercase(value).replaceAll("_", " "));
                 }
             }
 
@@ -61,7 +61,7 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
                     reader.nextNull();
                     return null;
                 } else {
-                    return lowercaseToConstant.get(toLowercase(reader.nextString()));
+                    return lowercaseToConstant.get(toLowercase(reader.nextString()).replaceAll(" ", "_"));
                 }
             }
         };

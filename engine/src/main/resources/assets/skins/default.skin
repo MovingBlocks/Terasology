@@ -50,7 +50,7 @@
         "ItemIcon" : {
             "fixed-width" : 48,
             "fixed-height" : 48,
-            "texture-scale-mode" : "scale_fit",
+            "texture-scale-mode" : "scale fit",
             "text-align-horizontal" : "right",
             "text-align-vertical" : "bottom"
         },
@@ -72,7 +72,7 @@
             }
         },
         "UIImage" : {
-            "texture-scale-mode" : "scale_fit"
+            "texture-scale-mode" : "scale fit"
         },
         "RowLayout" : {
         },
@@ -127,7 +127,7 @@
                         "left" : 2,
                         "right" : 2
                     },
-                    "texture-scale-mode" : "scale_fit",
+                    "texture-scale-mode" : "scale fit",
                     "modes" : {
                         "hover" : {
                             "background" : "buttonOver"
@@ -211,7 +211,7 @@
                 "left" : 10,
                 "right" : 10
             },
-            "texture-scale-mode" : "scale_fit",
+            "texture-scale-mode" : "scale fit",
             "modes" : {
                 "hover" : {
                     "background" : "buttonOver"
@@ -238,7 +238,7 @@
                 "left" : 4,
                 "right" : 4
             },
-            "texture-scale-mode" : "scale_fit",
+            "texture-scale-mode" : "scale fit",
             "modes" : {
                 "hover" : {
                     "background" : "buttonOver"
