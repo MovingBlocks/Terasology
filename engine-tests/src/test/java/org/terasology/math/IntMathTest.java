@@ -70,20 +70,8 @@ public class IntMathTest {
         assertEquals("0", 0, TeraMath.ceilPowerOfTwo(0));
         assertEquals("-1", 0, TeraMath.ceilPowerOfTwo(0));
         assertEquals("Integer.MIN_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MIN_VALUE));
-
-        try {
-            TeraMath.ceilPowerOfTwo(largestIntegerPowerOfTwo + 1);
-            fail("Expected runtime exception because of overflow");
-        }
-        catch (RuntimeException expectedException)
-        { }
-
-        try {
-            TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE);
-            fail("Expected runtime exception because of overflow");
-        }
-        catch (RuntimeException expectedException)
-        { }
+        assertEquals("Integer.MAX_VALUE", 0, TeraMath.ceilPowerOfTwo(Integer.MAX_VALUE));
+        assertEquals("Largest integer power of two + 1", 0, TeraMath.ceilPowerOfTwo(largestIntegerPowerOfTwo + 1));
     }
 
     @Test
