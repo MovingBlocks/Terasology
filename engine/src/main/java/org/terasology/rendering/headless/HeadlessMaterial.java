@@ -37,7 +37,7 @@ public class HeadlessMaterial extends BaseMaterial {
 
     @Override
     public void reload(MaterialData newData) {
-        this.data = data;
+        this.data = newData;
     }
 
     @Override
