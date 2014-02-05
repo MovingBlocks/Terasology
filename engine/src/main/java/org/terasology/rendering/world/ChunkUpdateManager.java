@@ -101,13 +101,13 @@ public final class ChunkUpdateManager {
 
         @Override
         public void run() {
-            ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
+            ChunkMesh[] newMeshes = new ChunkMesh[WorldRendererLwjgl.VERTICAL_SEGMENTS];
             ChunkView chunkView = worldProvider.getLocalView(c.getPos());
             if (chunkView != null) {
                 c.setDirty(false);
-                for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
-                    int meshHeight = ChunkConstants.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS;
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
+                for (int seg = 0; seg < WorldRendererLwjgl.VERTICAL_SEGMENTS; seg++) {
+                    int meshHeight = ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS;
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
                 }
 
                 c.setPendingMesh(newMeshes);

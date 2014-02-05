@@ -46,6 +46,7 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.registry.CoreRegistry;
@@ -96,6 +97,8 @@ public class LwjglGraphics implements EngineSubsystem {
 
     @Override
     public void postInitialise(Config config) {
+        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
+
         LwjglDisplay lwjglDisplay = new LwjglDisplay();
         CoreRegistry.putPermanently(org.terasology.engine.subsystem.Display.class, lwjglDisplay);
 
