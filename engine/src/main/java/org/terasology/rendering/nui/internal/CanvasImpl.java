@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -26,7 +25,6 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
-import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -41,7 +39,6 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -49,13 +46,10 @@ import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UITooltip;
 
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -85,17 +79,11 @@ public class CanvasImpl implements CanvasControl {
 
     private CanvasState state;
 
-    private Mesh billboard = Assets.getMesh("engine:UIBillboard");
-    private Material textureMat = Assets.getMaterial("engine:UITexture");
     private Material meshMat = Assets.getMaterial("engine:UILitMesh");
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
     private boolean focusDrawn;
-
-    // Text mesh caching
-    private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
-    private Set<TextCacheKey> usedText = Sets.newHashSet();
 
     // Interaction region handling
     private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
@@ -142,18 +130,6 @@ public class CanvasImpl implements CanvasControl {
             tooltipWidget.setText(topMouseOverRegion.getTooltip());
             drawWidget(tooltipWidget);
         }
-
-        Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
-        while (textIterator.hasNext()) {
-            Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
-            if (!usedText.contains(entry.getKey())) {
-                for (Mesh mesh : entry.getValue().values()) {
-                    Assets.dispose(mesh);
-                }
-                textIterator.remove();
-            }
-        }
-        usedText.clear();
 
         renderer.postRender();
         if (!focusDrawn) {
@@ -777,7 +753,7 @@ public class CanvasImpl implements CanvasControl {
     }
 
     private void crop(Rect2i cropRegion) {
-        textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+        renderer.crop(cropRegion);
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
@@ -786,62 +762,16 @@ public class CanvasImpl implements CanvasControl {
 
     private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion,
                                      float ux, float uy, float uw, float uh, float alpha) {
-        Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
-        Rect2f textureArea = texture.getRegion();
-        textureMat.setFloat2("scale", scale);
-        textureMat.setFloat2("offset",
-                absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
-                absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
-        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
-        textureMat.setTexture("texture", texture.getTexture());
-        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
-        textureMat.bindTextures();
-        if (mode == ScaleMode.SCALE_FILL) {
-            if (!cropRegion.equals(state.cropRegion)) {
-                crop(cropRegion);
-                billboard.render();
-                crop(state.cropRegion);
-            } else {
-                billboard.render();
-            }
-        } else {
-            billboard.render();
-        }
+        crop(cropRegion);
+        renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
+        crop(state.cropRegion);
     }
 
     private void drawTextInternal(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
                                   Color color, Color shadowColor, float alpha) {
-        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
-        usedText.add(key);
-        Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
-        if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
-            cachedText.put(key, fontMesh);
-        }
-
-        Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
-        offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), absoluteRegion.height());
-
-
-        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            entry.getKey().bindTextures();
-            entry.getKey().setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
-            if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
-                Vector4f shadowValues = shadowColor.toVector4f();
-                shadowValues.w *= alpha;
-                entry.getKey().setFloat4("color", shadowValues);
-                entry.getValue().render();
-            }
-
-            entry.getKey().setFloat2("offset", offset.x, offset.y);
-            Vector4f colorValues = color.toVector4f();
-            colorValues.w *= alpha;
-            entry.getKey().setFloat4("color", colorValues);
-            entry.getValue().render();
-        }
+        crop(cropRegion);
+        renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, alpha);
+        crop(state.cropRegion);
     }
 
     /**
@@ -935,41 +865,6 @@ public class CanvasImpl implements CanvasControl {
                 }
                 state = previousState;
             }
-        }
-    }
-
-    /**
-     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
-     */
-    private static class TextCacheKey {
-        private String text;
-        private Font font;
-        private int width;
-        private HorizontalAlign alignment;
-
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment) {
-            this.text = text;
-            this.font = font;
-            this.width = maxWidth;
-            this.alignment = alignment;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj instanceof TextCacheKey) {
-                TextCacheKey other = (TextCacheKey) obj;
-                return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(text, font, width, alignment);
         }
     }
 
