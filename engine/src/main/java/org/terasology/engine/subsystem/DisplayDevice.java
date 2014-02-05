@@ -15,16 +15,12 @@
  */
 package org.terasology.engine.subsystem;
 
-public interface Display {
+public interface DisplayDevice {
     boolean isActive();
 
     boolean isCloseRequested();
 
     void setFullscreen(boolean state);
-
-    void resizeViewport();
-
-    boolean wasResized();
 
     // TODO: this breaks the nice API we have so far.
     // From the lwjgl docs:
@@ -33,5 +29,10 @@ public interface Display {
     //   This method is called from update(), so it is not necessary to call this method
     //   if update() is called periodically.
     void processMessages();
+
+    boolean isHeadless();
+
+    // TODO: another method that possibly doesn't need to exist, but I need to check with Immortius on this
+    void prepareToRender();
 
 }
