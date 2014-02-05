@@ -16,10 +16,11 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.Time;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -42,14 +43,16 @@ public class PrepareWorld implements LoadProcess {
         if (worldRenderer.pregenerateChunks()) {
             return true;
         }
-        long totalTime = Sys.getTime() * 1000 / Sys.getTimerResolution() - startTime;
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        long totalTime = time.getRawTimeInMs() - startTime;
         return totalTime > 5000;
     }
 
     @Override
     public void begin() {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        startTime = Sys.getTime() * 1000 / Sys.getTimerResolution();
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        startTime = time.getRawTimeInMs();
     }
 
     @Override
