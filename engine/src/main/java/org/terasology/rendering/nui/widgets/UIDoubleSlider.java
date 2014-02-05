@@ -120,25 +120,11 @@ public class UIDoubleSlider extends CoreWidget {
         canvas.setPart(SLIDER);
         canvas.drawBackground();
 
-        drawTickerLeft(canvas, TICKER_LEFT, valueLeft, tickerListenerLeft);
-        drawTickerRight(canvas, TICKER_RIGHT, valueRight, tickerListenerRight);
-
-//        canvas.setPart(TICKER);
-//        String display = String.format("%." + precision + "f", value.get());
-//        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
-//        tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
-//
-//        sliderWidth = canvas.size().x - tickerWidth;
-//        int drawLocation = pixelOffsetFor(getValue(), sliderWidth);
-//        Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
-//        try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
-//            canvas.drawBackground();
-//            canvas.drawText(display);
-//            canvas.addInteractionRegion(tickerListener);
-//        }
+        drawTicker(canvas, TICKER_LEFT, valueLeft, tickerListenerLeft, false);
+        drawTicker(canvas, TICKER_RIGHT, valueRight, tickerListenerRight, true);
     }
 
-    private void drawTickerLeft(Canvas canvas, String part, Binding<Float> value, InteractionListener tickerListener) {
+    private void drawTicker(Canvas canvas, String part, Binding<Float> value, InteractionListener tickerListener, boolean rightTicker) {
         canvas.setPart(part);
         String display = String.format("%." + precision + "f", value.get());
         int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
@@ -146,22 +132,9 @@ public class UIDoubleSlider extends CoreWidget {
 
         sliderWidth = canvas.size().x - tickerWidth * 2;
         int drawLocation = pixelOffsetFor(value.get(), sliderWidth);
-        Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
-        try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
-            canvas.drawBackground();
-            canvas.drawText(display);
-            canvas.addInteractionRegion(tickerListener);
+        if(rightTicker) {
+            drawLocation += tickerWidth;
         }
-    }
-
-    private void drawTickerRight(Canvas canvas, String part, Binding<Float> value, InteractionListener tickerListener) {
-        canvas.setPart(part);
-        String display = String.format("%." + precision + "f", value.get());
-        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
-        tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
-
-        sliderWidth = canvas.size().x - tickerWidth * 2;
-        int drawLocation = pixelOffsetFor(value.get(), sliderWidth) + tickerWidth;
         Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
         try (SubRegion ignored = canvas.subRegion(tickerRegion, false)) {
             canvas.drawBackground();
@@ -188,21 +161,6 @@ public class UIDoubleSlider extends CoreWidget {
 
         result.y = Math.max(result.y, Math.max(left.y, right.y));
         result.x = Math.max(result.x, left.x + left.y);
-//        canvas.setPart(TICKER);
-//        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
-//        tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
-//        result.x = Math.max(result.x, tickerWidth);
-//
-//        if (canvas.getCurrentStyle().getFixedWidth() != 0) {
-//            result.x = Math.max(result.x, canvas.getCurrentStyle().getFixedWidth());
-//        } else {
-//            result.x = Math.max(result.x, canvas.getCurrentStyle().getMinWidth());
-//        }
-//        if (canvas.getCurrentStyle().getFixedHeight() != 0) {
-//            result.y = Math.max(result.y, canvas.getCurrentStyle().getFixedHeight());
-//        } else {
-//            result.y = Math.max(result.y, canvas.getCurrentStyle().getMinHeight());
-//        }
         return result;
     }
 
