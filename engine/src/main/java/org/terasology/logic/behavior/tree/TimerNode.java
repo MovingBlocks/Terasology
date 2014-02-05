@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,12 +18,12 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.rendering.nui.properties.Range;
 
 /**
- * TimerNode.
- *
- * Starts the decorated node.
- * Finishes with SUCCESS, after <code>time</code> seconds.
- * Finishes with FAILURE, as soon as decorated node finishes with FAILURE.
- *
+ * Starts the decorated node.<br/>
+ * <br/>
+ * <b>SUCCESS</b>: after x seconds.<br/>
+ * <b>FAILURE</b>: as soon as decorated node finishes with <b>FAILURE</b>.<br/>
+ * <br/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 public class TimerNode extends DecoratorNode {
     @Range(min = 0, max = 20)
@@ -61,7 +61,7 @@ public class TimerNode extends DecoratorNode {
         @Override
         public void handle(Status result) {
             if (result == Status.FAILURE) {
-                stop(Status.FAILURE);
+                stop(result);
             }
         }
 

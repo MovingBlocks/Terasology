@@ -79,6 +79,10 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @Override
     public void initialise() {
+        List<AssetUri> uris = Lists.newArrayList();
+        for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
+            uris.add(uri);
+        }
         for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
 
             BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
@@ -174,9 +178,9 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             interpreter = new Interpreter(new Actor(entityRef));
             BehaviorTree tree = behaviorComponent.tree;
             entityInterpreters.put(entityRef, interpreter);
-            behaviorComponent.tree = tree;
-            entityRef.saveComponent(behaviorComponent);
-            interpreter.start(tree.getRoot());
+            if (tree != null) {
+                interpreter.start(tree.getRoot());
+            }
         }
     }
 }

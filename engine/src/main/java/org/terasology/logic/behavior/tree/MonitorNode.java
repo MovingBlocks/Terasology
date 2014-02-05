@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,12 +18,11 @@ package org.terasology.logic.behavior.tree;
 import org.terasology.engine.API;
 
 /**
- * Special kind of parallel node.
- *
- * Finishes with SUCCESS, as soon as one child node finishes SUCCESS
- * Finishes with FAILURE, as soon as one child node finishes FAILURE
- *
- * @author synopia
+ * <br/>
+ * <b>SUCCESS</b>: as soon as one child node finishes SUCCESS<br/>
+ * <b>FAILURE</b>: as soon as one child node finishes <b>FAILURE</b>.<br/>
+ * <br/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 @API
 public class MonitorNode extends ParallelNode {

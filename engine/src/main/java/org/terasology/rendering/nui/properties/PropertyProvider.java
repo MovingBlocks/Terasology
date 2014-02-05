@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.itemRendering.ItemRenderer;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -213,7 +214,12 @@ public class PropertyProvider<T> {
         @Override
         public Property create(final FieldMetadata<Object, ?> fieldMetadata, String label, OneOf.Provider info) {
             UIDropdown dropdown = new UIDropdown();
-            dropdown.bindOptions(CoreRegistry.get(OneOfProviderFactory.class).get(info.name()));
+            OneOfProviderFactory factory = CoreRegistry.get(OneOfProviderFactory.class);
+            dropdown.bindOptions(factory.get(info.name()));
+            ItemRenderer<?> itemRenderer = factory.getItemRenderer(info.name());
+            if (itemRenderer != null) {
+                dropdown.setOptionRenderer(itemRenderer);
+            }
             Binding binding = new Binding() {
                 @Override
                 public Object get() {
