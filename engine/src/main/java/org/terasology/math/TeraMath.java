@@ -655,6 +655,31 @@ public final class TeraMath {
         }
         return power;
     }
+    
+    /**
+     * Perlin's blending spline (interpolation function)
+     * <p>
+     * 6t<sup>5</sup>-15t<sup>4</sup>+10t<sup>3</sup>
+     * </p>
+     * It has both 1st and 2nd derivative of 0 at 0 and 1 
+     * @param t
+     */
+    public static double fadePerlin(double t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    /**
+     * Hermite's blending spline h01 (interpolation function)
+     * <p> 
+     * 3t<sup>2</sup>-2t<sup>3</sup>
+     * </p>
+     * It has a 1st derivative of 0 at 0 and 1 
+     * @param t
+     */
+    public static double fadeHermite(double t) {
+        return t * t * (3 - 2 * t);
+    }
+    
 
     public static int floorToInt(float val) {
         int i = (int) val;
