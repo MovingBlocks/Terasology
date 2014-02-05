@@ -104,7 +104,7 @@ public class DelayedActionSystem implements UpdateSubscriberSystem {
         }
         long scheduleTime = time.getGameTimeInMs() + event.getDelay();
         DelayedActionComponent delayedComponent = new DelayedActionComponent(scheduleTime, event.getActionId());
-        entity.saveComponent(delayedComponent);
+        entity.addComponent(delayedComponent);
     }
 
     private static final class DelayedOperation {
