@@ -71,21 +71,21 @@ public class UIScrollbar extends CoreWidget {
 
                 setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
                 mouseOffset = handleSize / 2;
-//                dragging = true;
+                dragging = true;
                 return true;
             }
             return false;
         }
-//
-//        @Override
-//        public void onMouseDrag(Vector2i pos) {
-//            updatePosition(pos.y - mouseOffset);
-//        }
-//
-//        @Override
-//        public void onMouseRelease(MouseInput button, Vector2i pos) {
-//            dragging = false;
-//        }
+
+        @Override
+        public void onMouseDrag(Vector2i pos) {
+            updatePosition(pos.y - mouseOffset);
+        }
+
+        @Override
+        public void onMouseRelease(MouseInput button, Vector2i pos) {
+            dragging = false;
+        }
     };
 
     @Override
