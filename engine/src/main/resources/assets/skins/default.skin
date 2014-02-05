@@ -359,6 +359,66 @@
                     }
                 }
             }
+        },
+        "UIDoubleSlider" : {
+            "text-align-horizontal" : "center",
+            "text-align-vertical" : "middle",
+            "fixed-height" : 32,
+            "parts" : {
+                "slider" : {
+                    "background" : "engine:sliderTrack",
+                    "fixed-height" : 8,
+                    "min-width" : 8,
+                    "background-border" : {
+                        "top" : 0,
+                        "bottom" : 0,
+                        "left" : 3,
+                        "right" : 3
+                    }
+                },
+                "tickerLeft" : {
+                    "background" : "engine:box",
+                    "fixed-height" : 32,
+                    "background-border" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 4,
+                        "right" : 4
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "engine:boxActive"
+                        }
+                    }
+                },
+                "tickerRight" : {
+                    "background" : "engine:box",
+                    "fixed-height" : 32,
+                    "background-border" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 4,
+                        "right" : 4
+                    },
+                    "margin" : {
+                        "top" : 4,
+                        "bottom" : 4,
+                        "left" : 5,
+                        "right" : 5
+                    },
+                    "modes" : {
+                        "active" : {
+                            "background" : "engine:boxActive"
+                        }
+                    }
+                }
+            }
         }
     }
 }

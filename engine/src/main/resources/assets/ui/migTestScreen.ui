@@ -107,6 +107,38 @@
             {
                 "type" : "UILabel",
                 "id" : "",
+                "text" : "UIDoubleSlider",
+                 "layoutInfo" : {
+                     "cc" : "newline"
+                 }
+            },
+            {
+                "type" : "UIDoubleSlider",
+                "id" : "",
+                "text" : "B1",
+                 "layoutInfo" : {
+                     "cc" : "w min, h min"
+                 }
+            },
+            {
+                "type" : "UIDoubleSlider",
+                "id" : "",
+                "text" : "B2",
+                "layoutInfo" : {
+                    "cc" : ""
+                }
+            },
+            {
+                "type" : "UIDoubleSlider",
+                "id" : "",
+                "text" : "B3",
+                "layoutInfo" : {
+                    "cc" : "grow"
+                }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "",
                 "text" : "UIText",
                  "layoutInfo" : {
                      "cc" : "newline"
