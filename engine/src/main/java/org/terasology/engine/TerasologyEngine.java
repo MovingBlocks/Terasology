@@ -148,9 +148,6 @@ public class TerasologyEngine implements GameEngine {
             if (CoreRegistry.get(RenderingSubsystemFactory.class) == null) {
                 throw new IllegalStateException("EngineSubsystemFactory not registered as a core system.");
             }
-            if (CoreRegistry.get(RenderingSubsystemFactory.class) == null) {
-                throw new IllegalStateException("EngineSubsystemFactory not registered as a core system.");
-            }
             if (CoreRegistry.get(InputSystem.class) == null) {
                 throw new IllegalStateException("InputSystem not registered as a core system.");
             }
