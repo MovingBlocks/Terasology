@@ -15,6 +15,10 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import org.lwjgl.LWJGLException;
@@ -22,13 +26,14 @@ import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.registry.CoreRegistry;
 
-public class LwjglDisplay implements org.terasology.engine.subsystem.Display {
+public class LwjglDisplayDevice implements DisplayDevice {
 
-    private static final Logger logger = LoggerFactory.getLogger(LwjglDisplay.class);
+    private static final Logger logger = LoggerFactory.getLogger(LwjglDisplayDevice.class);
 
-    public LwjglDisplay() {
+    public LwjglDisplayDevice() {
     }
 
     @Override
@@ -43,6 +48,10 @@ public class LwjglDisplay implements org.terasology.engine.subsystem.Display {
 
     @Override
     public void setFullscreen(boolean state) {
+        setFullscreen(state, true);
+    }
+
+    void setFullscreen(boolean state, boolean resize) {
         try {
             if (state) {
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
@@ -56,20 +65,24 @@ public class LwjglDisplay implements org.terasology.engine.subsystem.Display {
             logger.error("Can not initialize graphics device.", e);
             System.exit(1);
         }
-    }
-
-    @Override
-    public void resizeViewport() {
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
-    }
-
-    @Override
-    public boolean wasResized() {
-        return Display.wasResized();
+        if (resize) {
+            glViewport(0, 0, Display.getWidth(), Display.getHeight());
+        }
     }
 
     @Override
     public void processMessages() {
         Display.processMessages();
+    }
+
+    @Override
+    public boolean isHeadless() {
+        return false;
+    }
+
+    @Override
+    public void prepareToRender() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
     }
 }
