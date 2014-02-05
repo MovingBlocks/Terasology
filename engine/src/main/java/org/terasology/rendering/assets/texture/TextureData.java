@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.assets.texture;
 
+import com.google.common.math.IntMath;
 import org.terasology.asset.AssetData;
-import org.terasology.math.TeraMath;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -53,7 +53,7 @@ public class TextureData implements AssetData {
         if (mipmaps[0].limit() != width * height * depth * BYTES_PER_PIXEL) {
             throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height * depth)");
         }
-        if (mipmaps.length > 1 && !(TeraMath.isPowerOfTwo(width) && TeraMath.isPowerOfTwo(height) && TeraMath.isPowerOfTwo(depth))) {
+        if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height) && IntMath.isPowerOfTwo(depth))) {
             throw new IllegalArgumentException("Texture width, height and depth must be powers of 2 for mipmapping");
         }
         for (int i = 1; i < mipmaps.length; ++i) {
@@ -83,7 +83,7 @@ public class TextureData implements AssetData {
         if (mipmaps[0].limit() != width * height * BYTES_PER_PIXEL) {
             throw new IllegalArgumentException("Texture data size incorrect, must be a set of RGBA values for each pixel (width * height)");
         }
-        if (mipmaps.length > 1 && !(TeraMath.isPowerOfTwo(width) && TeraMath.isPowerOfTwo(height))) {
+        if (mipmaps.length > 1 && !(IntMath.isPowerOfTwo(width) && IntMath.isPowerOfTwo(height))) {
             throw new IllegalArgumentException("Texture width and height must be powers of 2 for mipmapping");
         }
         for (int i = 1; i < mipmaps.length; ++i) {

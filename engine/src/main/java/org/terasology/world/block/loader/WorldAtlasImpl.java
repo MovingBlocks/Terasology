@@ -16,6 +16,7 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
+import com.google.common.math.IntMath;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.newdawn.slick.opengl.PNGDecoder;
@@ -25,9 +26,9 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
@@ -151,7 +152,7 @@ public class WorldAtlasImpl implements WorldAtlas {
 
     private boolean checkTile(TileData tile) {
         return tile.getImage().getWidth() == tile.getImage().getHeight()
-                && TeraMath.isPowerOfTwo(tile.getImage().getWidth());
+                && IntMath.isPowerOfTwo(tile.getImage().getWidth());
     }
 
     private void addNormal(AssetUri uri) {

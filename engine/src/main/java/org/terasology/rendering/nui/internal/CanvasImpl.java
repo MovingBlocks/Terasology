@@ -889,7 +889,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         public Rect2i getRelativeRegion() {
-            return Rect2i.createFromMinAndMax(0, 0, drawRegion.width(), drawRegion.height());
+            return Rect2i.createFromMinAndSize(0, 0, drawRegion.width(), drawRegion.height());
         }
     }
 

@@ -231,7 +231,9 @@ public final class BindsConfig {
                     bindButton.setRepeating(info.repeating());
 
                     for (Input input : getBinds(bindUri)) {
-                        inputSystem.linkBindButtonToInput(input, bindUri);
+                        if (input != null) {
+                            inputSystem.linkBindButtonToInput(input, bindUri);
+                        }
                     }
 
                     logger.debug("Registered button bind: {}", bindUri);
