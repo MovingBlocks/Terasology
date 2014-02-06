@@ -72,7 +72,7 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
     }
 
     @Override
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion, Color color, Color shadowColor,
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color, Color shadowColor,
                          float alpha) {
         // Do nothing
     }
