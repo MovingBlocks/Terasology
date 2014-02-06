@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.input.InputSystem;
@@ -51,6 +52,10 @@ public class HeadlessInput implements EngineSubsystem {
     private void initControls() {
         InputSystem inputSystem = new InputSystem();
         CoreRegistry.putPermanently(InputSystem.class, inputSystem);
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

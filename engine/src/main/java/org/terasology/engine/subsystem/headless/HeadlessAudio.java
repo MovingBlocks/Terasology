@@ -20,6 +20,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.registry.CoreRegistry;
@@ -61,6 +62,10 @@ public class HeadlessAudio implements EngineSubsystem {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
         assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

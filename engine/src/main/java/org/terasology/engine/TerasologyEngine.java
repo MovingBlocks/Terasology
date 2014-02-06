@@ -105,7 +105,7 @@ public class TerasologyEngine implements GameEngine {
         this.subsystems = Queues.newArrayDeque(subsystems);
     }
 
-    protected Deque<EngineSubsystem> getSubsystems() {
+    public Deque<EngineSubsystem> getSubsystems() {
         return subsystems;
     }
 

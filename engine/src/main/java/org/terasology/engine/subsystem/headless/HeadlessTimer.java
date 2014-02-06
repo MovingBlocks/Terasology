@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless;
 
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.internal.TimeSystem;
@@ -53,6 +54,10 @@ public class HeadlessTimer implements EngineSubsystem {
     private void initTimer() {
         EngineTime time = new TimeSystem();
         CoreRegistry.putPermanently(Time.class, time);
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

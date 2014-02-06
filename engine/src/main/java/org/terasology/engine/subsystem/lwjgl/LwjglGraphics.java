@@ -44,6 +44,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -284,6 +285,10 @@ public class LwjglGraphics implements EngineSubsystem {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_NORMALIZE);
         glDepthFunc(GL_LEQUAL);
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }
