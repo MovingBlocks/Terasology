@@ -115,7 +115,7 @@ public class CanvasImpl implements CanvasControl {
         Vector2i size = renderer.getTargetSize();
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
         renderer.preRender();
-        crop(state.cropRegion);
+        renderer.crop(state.cropRegion);
         focusDrawn = false;
     }
 
@@ -557,7 +557,7 @@ public class CanvasImpl implements CanvasControl {
                 if (state.drawOnTop) {
                     drawOnTopOperations.add(new DrawTextureOperation(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
                 } else {
-                    drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha());
+                    drawTextureInternal(texture, color, mode, absoluteRegion, ux, uy, uw, uh, state.getAlpha());
                 }
             }
         }
@@ -752,26 +752,20 @@ public class CanvasImpl implements CanvasControl {
         }
     }
 
-    private void crop(Rect2i cropRegion) {
-        renderer.crop(cropRegion);
-    }
-
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
     }
 
-    private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion,
+    private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                                      float ux, float uy, float uw, float uh, float alpha) {
-        crop(cropRegion);
         renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
-        crop(state.cropRegion);
     }
 
     private void drawTextInternal(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
                                   Color color, Color shadowColor, float alpha) {
-        crop(cropRegion);
-        renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, alpha);
-        crop(state.cropRegion);
+        renderer.crop(cropRegion);
+        renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha);
+        renderer.crop(state.cropRegion);
     }
 
     /**
@@ -846,7 +840,7 @@ public class CanvasImpl implements CanvasControl {
                     state = new CanvasState(state, subRegion, cropRegion);
                 } else if (!cropRegion.equals(state.cropRegion)) {
                     state = new CanvasState(state, subRegion, cropRegion);
-                    crop(cropRegion);
+                    renderer.crop(cropRegion);
                     croppingRegion = true;
                 } else {
                     state = new CanvasState(state, subRegion);
@@ -861,7 +855,7 @@ public class CanvasImpl implements CanvasControl {
             if (!disposed) {
                 disposed = true;
                 if (croppingRegion) {
-                    crop(previousState.cropRegion);
+                    renderer.crop(previousState.cropRegion);
                 }
                 state = previousState;
             }
@@ -936,7 +930,9 @@ public class CanvasImpl implements CanvasControl {
 
         @Override
         public void draw() {
-            drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+            renderer.crop(cropRegion);
+            drawTextureInternal(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
+            renderer.crop(state.cropRegion);
         }
     }
 

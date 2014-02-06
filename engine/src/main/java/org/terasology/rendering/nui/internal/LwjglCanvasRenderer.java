@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -36,15 +38,11 @@ import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.VerticalAlign;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-
 import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -76,6 +74,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  */
 public class LwjglCanvasRenderer implements CanvasRenderer {
 
+    private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
@@ -86,6 +85,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     // Text mesh caching
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
+
+    private Rect2i requestedCropRegion;
+    private Rect2i currentTextureCropRegion;
 
     @Override
     public void preRender() {
@@ -107,6 +109,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         MatrixUtils.matrixToFloatBuffer(modelView, matrixBuffer);
         glLoadMatrix(matrixBuffer);
         matrixBuffer.rewind();
+
+        requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
+        currentTextureCropRegion = requestedCropRegion;
+        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1, requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
     }
 
     @Override
@@ -153,7 +159,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         finalMat.mul(translateTransform);
         MatrixUtils.matrixToFloatBuffer(finalMat, matrixBuffer);
 
-        material.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+        material.setFloat4(CROPPING_BOUNDARIES_PARAM, cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
         material.setMatrix4("posMatrix", translateTransform);
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -198,7 +204,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     @Override
     public void crop(Rect2i cropRegion) {
-        textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+        requestedCropRegion = cropRegion;
     }
 
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
@@ -206,6 +212,21 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
         Rect2f textureArea = texture.getRegion();
         textureMat.setFloat2("scale", scale);
+
+        // TODO: Alter texSize and texOffset for scale fill instead.
+        if (mode == ScaleMode.SCALE_FILL) {
+            Rect2i effectiveCropRegion = requestedCropRegion.intersect(absoluteRegion);
+            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, effectiveCropRegion.minX(), effectiveCropRegion.maxX() + 1,
+                    effectiveCropRegion.minY(), effectiveCropRegion.maxY() + 1);
+            currentTextureCropRegion = effectiveCropRegion;
+        } else {
+            if (!currentTextureCropRegion.equals(requestedCropRegion)
+                    && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
+                textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                        requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+                currentTextureCropRegion = requestedCropRegion;
+            }
+        }
         textureMat.setFloat2("offset",
                 absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
                 absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
@@ -217,7 +238,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         billboard.render();
     }
 
-    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
                          Color color, Color shadowColor, float alpha) {
         TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
         usedText.add(key);
@@ -233,7 +254,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
-            entry.getKey().setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
+            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1, requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             if (shadowColor.a() != 0) {
                 entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
                 Vector4f shadowValues = shadowColor.toVector4f();
@@ -274,7 +295,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             if (obj instanceof TextCacheKey) {
                 TextCacheKey other = (TextCacheKey) obj;
                 return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                       && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
+                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
             }
             return false;
         }
