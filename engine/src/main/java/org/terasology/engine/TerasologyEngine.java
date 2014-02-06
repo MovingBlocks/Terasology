@@ -33,7 +33,7 @@ import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.Display;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -138,7 +138,9 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.postInitialise(config);
             }
 
-            // Display is required to be initialized by an EngineSubsystem and registered as a Core system at this point.
+            if (CoreRegistry.get(DisplayDevice.class) == null) {
+                throw new IllegalStateException("DisplayDevice not registered as a core system.");
+            }
 
             initAssets();
 
@@ -453,7 +455,7 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        Display display = CoreRegistry.get(Display.class);
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
@@ -547,9 +549,8 @@ public class TerasologyEngine implements GameEngine {
     public void setFullscreen(boolean state) {
         if (config.getRendering().isFullscreen() != state) {
             config.getRendering().setFullscreen(state);
-            Display display = CoreRegistry.get(Display.class);
+            DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
             display.setFullscreen(state);
-            display.resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
     }
@@ -563,7 +564,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public boolean hasFocus() {
-        Display display = CoreRegistry.get(Display.class);
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
         return gameFocused && display.isActive();
     }
 

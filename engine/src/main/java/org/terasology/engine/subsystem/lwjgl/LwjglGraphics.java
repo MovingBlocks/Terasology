@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GUIManagerLwjgl;
@@ -96,8 +98,8 @@ public class LwjglGraphics implements EngineSubsystem {
 
     @Override
     public void postInitialise(Config config) {
-        LwjglDisplay lwjglDisplay = new LwjglDisplay();
-        CoreRegistry.putPermanently(org.terasology.engine.subsystem.Display.class, lwjglDisplay);
+        LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice();
+        CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
 
         initDisplay(config, lwjglDisplay);
         initOpenGL(lwjglDisplay);
@@ -117,9 +119,8 @@ public class LwjglGraphics implements EngineSubsystem {
         Display.sync(60);
         currentState.render();
 
-        org.terasology.engine.subsystem.Display display = CoreRegistry.get(org.terasology.engine.subsystem.Display.class);
-        if (display.wasResized()) {
-            display.resizeViewport();
+        if (Display.wasResized()) {
+            glViewport(0, 0, Display.getWidth(), Display.getHeight());
         }
     }
 
@@ -158,9 +159,9 @@ public class LwjglGraphics implements EngineSubsystem {
         }
     }
 
-    private void initDisplay(Config config, LwjglDisplay lwjglDisplay) {
+    private void initDisplay(Config config, LwjglDisplayDevice lwjglDisplay) {
         try {
-            lwjglDisplay.setFullscreen(config.getRendering().isFullscreen());
+            lwjglDisplay.setFullscreen(config.getRendering().isFullscreen(), false);
 
             RenderingConfig rc = config.getRendering();
             Display.setLocation(rc.getWindowPosX(), rc.getWindowPosY());
@@ -192,9 +193,9 @@ public class LwjglGraphics implements EngineSubsystem {
         }
     }
 
-    private void initOpenGL(LwjglDisplay lwjglDisplay) {
+    private void initOpenGL(LwjglDisplayDevice lwjglDisplay) {
         checkOpenGL();
-        lwjglDisplay.resizeViewport();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {

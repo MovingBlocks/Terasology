@@ -17,9 +17,11 @@ package org.terasology.engine;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -64,6 +66,9 @@ public class ComponentSystemManager {
     }
 
     public void loadSystems(String moduleName, Reflections reflections, NetworkMode netMode) {
+        DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
+        boolean isHeadless = displayDevice.isHeadless();
+
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
@@ -72,7 +77,7 @@ public class ComponentSystemManager {
             }
 
             RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
-            if (registerInfo.value().isValidFor(netMode, false)) {
+            if (registerInfo.value().isValidFor(netMode, isHeadless)) {
                 String id = moduleName + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {
