@@ -19,6 +19,7 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
@@ -65,7 +66,8 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
 
         // Init. a new world
-        WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
