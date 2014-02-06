@@ -67,6 +67,8 @@ public class UIScrollbar extends CoreWidget {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
+                updatePosition(pos.y - mouseOffset);
+
                 setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
                 mouseOffset = handleSize / 2;
                 dragging = true;
