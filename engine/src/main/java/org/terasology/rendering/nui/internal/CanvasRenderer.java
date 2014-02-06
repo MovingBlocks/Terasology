@@ -17,9 +17,14 @@ package org.terasology.rendering.nui.internal;
 
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.VerticalAlign;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -33,11 +38,17 @@ public interface CanvasRenderer {
 
     void postRender();
 
-    void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
-
     Vector2i getTargetSize();
+
+    void crop(Rect2i cropRegion);
+
+    void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
 
     void drawMaterialAt(Material material, Rect2i drawRegion);
 
     void drawLine(int sx, int sy, int ex, int ey, Color color);
+
+    void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, float ux, float uy, float uw, float uh, float alpha);
+
+    void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color, Color shadowColor, float alpha);
 }
