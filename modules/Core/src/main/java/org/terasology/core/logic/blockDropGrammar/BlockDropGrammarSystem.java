@@ -23,6 +23,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
@@ -32,6 +33,7 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.CreateBlockDropsEvent;
+import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
@@ -45,6 +47,8 @@ public class BlockDropGrammarSystem implements ComponentSystem {
     private EntityManager entityManager;
     @In
     private BlockManager blockManager;
+    @In
+    private InventoryManager inventoryManager;
 
     private BlockItemFactory blockItemFactory;
     private PickupBuilder pickupBuilder;
@@ -69,65 +73,84 @@ public class BlockDropGrammarSystem implements ComponentSystem {
 
     @ReceiveEvent
     public void onDestroyed(DoDestroyEvent event, EntityRef entity, BlockDropGrammarComponent blockDrop, LocationComponent locationComp) {
-        FastRandom rnd = new FastRandom();
+        BlockDamageModifierComponent blockDamageModifierComponent = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
+        float chanceOfBlockDrop = 1;
 
-        if (blockDrop.blockDrops != null) {
-            for (String drop : blockDrop.blockDrops) {
-                String dropResult = drop;
-                boolean dropping = true;
-                int pipeIndex = dropResult.indexOf('|');
-                if (pipeIndex > -1) {
-                    float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
-                    if (rnd.nextFloat() >= chance) {
-                        dropping = false;
-                    }
-                    dropResult = dropResult.substring(pipeIndex + 1);
-                }
-                if (dropping) {
-                    DropParser dropParser = new DropParser(rnd, dropResult).invoke();
-                    EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
-                    createDrop(dropItem, locationComp.getWorldPosition());
-                }
-            }
+        if (blockDamageModifierComponent != null) {
+            chanceOfBlockDrop = 1 - blockDamageModifierComponent.blockAnnihilationChance;
         }
 
-        if (blockDrop.itemDrops != null) {
-            for (String drop : blockDrop.itemDrops) {
-                String dropResult = drop;
-                boolean dropping = true;
-                int pipeIndex = dropResult.indexOf('|');
-                if (pipeIndex > -1) {
-                    float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
-                    if (rnd.nextFloat() >= chance) {
-                        dropping = false;
+        if (random.nextFloat() < chanceOfBlockDrop) {
+            if (blockDrop.blockDrops != null) {
+                for (String drop : blockDrop.blockDrops) {
+                    String dropResult = drop;
+                    boolean dropping = true;
+                    int pipeIndex = dropResult.indexOf('|');
+                    if (pipeIndex > -1) {
+                        float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
+                        if (random.nextFloat() >= chance) {
+                            dropping = false;
+                        }
+                        dropResult = dropResult.substring(pipeIndex + 1);
                     }
-                    dropResult = dropResult.substring(pipeIndex + 1);
+                    if (dropping) {
+                        DropParser dropParser = new DropParser(random, dropResult).invoke();
+                        EntityRef dropItem = blockItemFactory.newInstance(blockManager.getBlockFamily(dropParser.getDrop()), dropParser.getCount());
+                        if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
+                            createDrop(dropItem, locationComp.getWorldPosition(), true);
+                        }
+                    }
                 }
-                if (dropping) {
-                    DropParser dropParser = new DropParser(rnd, dropResult).invoke();
-                    EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
-                    if (dropParser.getCount() > 1) {
-                        ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
-                        itemComponent.stackCount = (byte) dropParser.getCount();
+            }
+
+            if (blockDrop.itemDrops != null) {
+                for (String drop : blockDrop.itemDrops) {
+                    String dropResult = drop;
+                    boolean dropping = true;
+                    int pipeIndex = dropResult.indexOf('|');
+                    if (pipeIndex > -1) {
+                        float chance = Float.parseFloat(dropResult.substring(0, pipeIndex));
+                        if (random.nextFloat() >= chance) {
+                            dropping = false;
+                        }
+                        dropResult = dropResult.substring(pipeIndex + 1);
                     }
-                    createDrop(dropEntity.build(), locationComp.getWorldPosition());
+                    if (dropping) {
+                        DropParser dropParser = new DropParser(random, dropResult).invoke();
+                        EntityBuilder dropEntity = entityManager.newBuilder(dropParser.getDrop());
+                        if (dropParser.getCount() > 1) {
+                            ItemComponent itemComponent = dropEntity.getComponent(ItemComponent.class);
+                            itemComponent.stackCount = (byte) dropParser.getCount();
+                        }
+                        EntityRef dropItem = dropEntity.build();
+                        if (shouldDropToWorld(event, blockDamageModifierComponent, dropItem)) {
+                            createDrop(dropItem, locationComp.getWorldPosition(), false);
+                        }
+                    }
                 }
             }
         }
     }
 
-    private void createDrop(EntityRef item, Vector3f location) {
+    private boolean shouldDropToWorld(DoDestroyEvent event, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef dropItem) {
+        return blockDamageModifierComponent == null || !blockDamageModifierComponent.directPickup
+                || !inventoryManager.giveItem(event.getInstigator(), dropItem);
+    }
+
+    private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {
         EntityRef pickup = pickupBuilder.createPickupFor(item, location, 60, true);
-        pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+        if (applyMovement) {
+            pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));
+        }
     }
 
     private class DropParser {
-        private FastRandom rnd;
+        private Random rnd;
         private String drop;
         private int count;
         private String resultDrop;
 
-        public DropParser(FastRandom rnd, String drop) {
+        public DropParser(Random rnd, String drop) {
             this.rnd = rnd;
             this.drop = drop;
         }
