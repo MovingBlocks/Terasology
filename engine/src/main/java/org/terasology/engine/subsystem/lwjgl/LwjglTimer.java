@@ -15,6 +15,11 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import java.io.PrintStream;
+
+import org.lwjgl.LWJGLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
@@ -22,11 +27,14 @@ import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.utilities.LWJGLHelper;
 
 public class LwjglTimer implements EngineSubsystem {
 
     @Override
     public void preInitialise() {
+        initLogger();
+        LWJGLHelper.initNativeLibs();
         initTimer(); // Dependent on LWJGL
     }
 
@@ -48,6 +56,28 @@ public class LwjglTimer implements EngineSubsystem {
 
     @Override
     public void dispose() {
+    }
+
+    private void initLogger() {
+        if (LWJGLUtil.DEBUG) {
+            // Pipes System.out and err to log, because that's where lwjgl writes it to.
+            System.setOut(new PrintStream(System.out) {
+                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
+
+                @Override
+                public void print(final String message) {
+                    logger.info(message);
+                }
+            });
+            System.setErr(new PrintStream(System.err) {
+                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
+
+                @Override
+                public void print(final String message) {
+                    logger.error(message);
+                }
+            });
+        }
     }
 
     private void initTimer() {
