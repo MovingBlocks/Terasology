@@ -80,10 +80,12 @@ public final class ReflectionUtil {
     public static Method findGetter(String propertyName, Class beanClass) {
         Method result = findMethod(beanClass, "get" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
         if (result != null) {
+            result.setAccessible(true);
             return result;
         }
         result = findMethod(beanClass, "is" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1));
         if (result != null) {
+            result.setAccessible(true);
             return result;
         }
         return null;
@@ -96,6 +98,9 @@ public final class ReflectionUtil {
     public static Method findSetter(String propertyName, Class beanClass, Class propertyType) {
         String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
         Method result = findMethod(beanClass, setterName, propertyType);
+        if (result != null) {
+            result.setAccessible(true);
+        }
         return result;
     }
 
