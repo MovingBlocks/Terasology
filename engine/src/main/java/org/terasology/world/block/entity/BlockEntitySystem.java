@@ -24,7 +24,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.BeforeDamagedEvent;
@@ -37,6 +36,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
@@ -131,14 +131,19 @@ public class BlockEntitySystem implements ComponentSystem {
             EntityRef item = blockItemFactory.newInstance(block.getBlockFamily(), 1);
             entity.send(new OnBlockToItem(item));
 
-            if (block.isDirectPickup()) {
-                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
-                    processDropping(item, location);
-                }
-            } else {
+            if (shouldDropToWorld(event, block, blockDamageModifierComponent, item)) {
                 processDropping(item, location);
             }
         }
+    }
+
+    private boolean shouldDropToWorld(CreateBlockDropsEvent event, Block block, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef item) {
+        return !isDirectPickup(block, blockDamageModifierComponent)
+                && !inventoryManager.giveItem(event.getInstigator(), item);
+    }
+
+    private boolean isDirectPickup(Block block, BlockDamageModifierComponent blockDamageModifierComponent) {
+        return block.isDirectPickup() || (blockDamageModifierComponent != null && blockDamageModifierComponent.directPickup);
     }
 
     private void commonDestroyed(DoDestroyEvent event, EntityRef entity) {
