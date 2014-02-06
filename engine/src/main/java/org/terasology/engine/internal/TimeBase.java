@@ -50,6 +50,15 @@ public abstract class TimeBase implements EngineTime {
     public Iterator<Float> tick() {
         long now = getRawTimeInMs();
         long newDelta = now - last.get();
+        if (0 == newDelta) {
+            // running too fast, slow down to avoid busy-waiting
+            try {
+                Thread.sleep(0, 1000);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+            newDelta = now - last.get();
+        }
         if (newDelta >= UPDATE_CAP) {
             logger.warn("Delta too great ({}), capping to {}", newDelta, UPDATE_CAP);
             newDelta = UPDATE_CAP;
