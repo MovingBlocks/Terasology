@@ -15,21 +15,6 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
@@ -45,7 +30,6 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GUIManagerLwjgl;
@@ -84,12 +68,27 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
-public class LwjglGraphics implements EngineSubsystem {
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+
+public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
     @Override
     public void preInitialise() {
+        super.preInitialise();
     }
 
     @Override
@@ -238,13 +237,13 @@ public class LwjglGraphics implements EngineSubsystem {
 
     private void checkOpenGL() {
         boolean canRunGame = GLContext.getCapabilities().OpenGL11
-                             & GLContext.getCapabilities().OpenGL12
-                             & GLContext.getCapabilities().OpenGL14
-                             & GLContext.getCapabilities().OpenGL15
-                             & GLContext.getCapabilities().GL_ARB_framebuffer_object
-                             & GLContext.getCapabilities().GL_ARB_texture_float
-                             & GLContext.getCapabilities().GL_ARB_half_float_pixel
-                             & GLContext.getCapabilities().GL_ARB_shader_objects;
+                & GLContext.getCapabilities().OpenGL12
+                & GLContext.getCapabilities().OpenGL14
+                & GLContext.getCapabilities().OpenGL15
+                & GLContext.getCapabilities().GL_ARB_framebuffer_object
+                & GLContext.getCapabilities().GL_ARB_texture_float
+                & GLContext.getCapabilities().GL_ARB_half_float_pixel
+                & GLContext.getCapabilities().GL_ARB_shader_objects;
 
         if (!canRunGame) {
             String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";

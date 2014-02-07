@@ -22,15 +22,15 @@ import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.Config;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.registry.CoreRegistry;
 
-public class LwjglAudio implements EngineSubsystem {
+public class LwjglAudio extends BaseLwjglSubsystem {
 
     private AudioManager audioManager;
 
     @Override
     public void preInitialise() {
+        super.preInitialise();
     }
 
     @Override

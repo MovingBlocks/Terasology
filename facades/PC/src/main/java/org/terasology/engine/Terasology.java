@@ -15,14 +15,7 @@
  */
 package org.terasology.engine;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-
-import javax.swing.JOptionPane;
-
+import com.google.common.collect.Lists;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -35,6 +28,11 @@ import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
+
+import javax.swing.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 
 /**
  * Main method for launching Terasology
@@ -69,17 +67,11 @@ public final class Terasology {
                 PathManager.getInstance().useDefaultHomePath();
             }
 
-            Deque<EngineSubsystem> subsystemList;
+            Collection<EngineSubsystem> subsystemList;
             if (isHeadless) {
-                subsystemList = new ArrayDeque<EngineSubsystem>(Arrays.asList(
-                        new EngineSubsystem[]{
-                                new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput()
-                        }));
+                subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
             } else {
-                subsystemList = new ArrayDeque<EngineSubsystem>(Arrays.asList(
-                        new EngineSubsystem[]{
-                                new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput()
-                        }));
+                subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
