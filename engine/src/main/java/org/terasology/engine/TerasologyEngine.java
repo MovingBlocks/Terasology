@@ -35,12 +35,14 @@ import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
+import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
@@ -129,8 +131,11 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.preInitialise();
             }
 
-            // Time is required to be initialized by an EngineSubsystem to an EngineTime at this point.
+            // Verify required systems are available
             time = (EngineTime) CoreRegistry.get(Time.class);
+            if (time == null) {
+                throw new IllegalStateException("Time not registered as a core system.");
+            }
 
             initManagers();
 
@@ -138,8 +143,15 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.postInitialise(config);
             }
 
+            // Verify required systems are available
             if (CoreRegistry.get(DisplayDevice.class) == null) {
                 throw new IllegalStateException("DisplayDevice not registered as a core system.");
+            }
+            if (CoreRegistry.get(RenderingSubsystemFactory.class) == null) {
+                throw new IllegalStateException("EngineSubsystemFactory not registered as a core system.");
+            }
+            if (CoreRegistry.get(InputSystem.class) == null) {
+                throw new IllegalStateException("InputSystem not registered as a core system.");
             }
 
             initAssets();
