@@ -138,8 +138,7 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     private boolean shouldDropToWorld(CreateBlockDropsEvent event, Block block, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef item) {
-        return !isDirectPickup(block, blockDamageModifierComponent)
-                && !inventoryManager.giveItem(event.getInstigator(), item);
+        return !isDirectPickup(block, blockDamageModifierComponent) || !inventoryManager.giveItem(event.getInstigator(), item);
     }
 
     private boolean isDirectPickup(Block block, BlockDamageModifierComponent blockDamageModifierComponent) {
