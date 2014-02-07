@@ -20,6 +20,7 @@ import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 
 import java.awt.*;
@@ -63,6 +64,10 @@ public class LwjglCustomViewPort extends BaseLwjglSubsystem {
 
     public void setCustomViewport(Canvas canvas) {
         this.customViewPort = canvas;
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

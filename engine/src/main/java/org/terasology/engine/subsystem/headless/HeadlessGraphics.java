@@ -20,6 +20,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -160,6 +161,10 @@ public class HeadlessGraphics implements EngineSubsystem {
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();
 
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem;
 
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
 
 public interface EngineSubsystem {
@@ -31,4 +32,5 @@ public interface EngineSubsystem {
 
     void dispose();
 
+    void registerSystems(ComponentSystemManager componentSystemManager);
 }
