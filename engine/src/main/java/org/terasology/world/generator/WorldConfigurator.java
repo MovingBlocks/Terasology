@@ -26,4 +26,6 @@ import org.terasology.world.generator.params.Parameter;
 public interface WorldConfigurator  {
 
     List<Parameter> getParams();
+    
+    Object getObject();
 }

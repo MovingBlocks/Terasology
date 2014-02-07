@@ -28,7 +28,9 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.IntToFloatBinding;
 import org.terasology.rendering.nui.layouts.ColumnLayout;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UICheckbox;
 import org.terasology.rendering.nui.widgets.UILabel;
@@ -63,9 +65,9 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
 
     private int imageSize = 128;
 
-    private ScrollableArea list;
-
     private WorldConfigurator worldConfig;
+
+    private PropertyLayout properties;
 
     @Override
     public void initialise() {
@@ -95,22 +97,10 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
             moduleManager.disableAllModules();
         }
 
-        list = find("params", ScrollableArea.class);
-        if (list != null) {
-            ColumnLayout layout = new ColumnLayout();
-            layout.setColumns(2);
-            layout.setVerticalSpacing(4);
-            layout.setHorizontalSpacing(8);
-            layout.setFamily("option-grid");
-            layout.setColumnWidths(0.25f, 0.75f);
-            list.setContent(layout);
-
-            for (Parameter p : worldConfig.getParams()) {
-                UILabel label = new UILabel(p.getLabel());
-                UIWidget widget = getWidgetFor(p);
-                layout.addWidget(label, null);
-                layout.addWidget(widget, null);
-            }
+        properties = find("properties", PropertyLayout.class);
+        if (properties != null) {
+            PropertyProvider<?> provider = new PropertyProvider<>(worldConfig.getObject());
+            properties.addPropertyProvider("Behavior Node", provider);
         }
 
 

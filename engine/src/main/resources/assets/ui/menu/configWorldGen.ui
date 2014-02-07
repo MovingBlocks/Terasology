@@ -32,10 +32,10 @@
                         "widget" : "title"
                     }
                 }
-            },
+            },       
             {
-                "type" : "ScrollableArea",
-                "id" : "params",
+                "type" : "propertyLayout",
+                "id" : "properties",
                 "layoutInfo" : {
                     "width" : 500,
                     "position-horizontal-center" : {},
