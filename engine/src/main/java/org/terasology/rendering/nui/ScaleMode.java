@@ -62,7 +62,7 @@ public enum ScaleMode {
     TILED {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            return new Vector2f(1, 1);
+            return new Vector2f(region.width(), region.height());
         }
     };
 

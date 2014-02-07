@@ -26,11 +26,13 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
@@ -86,6 +88,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
     private Set<TextCacheKey> usedText = Sets.newHashSet();
 
+    // Texutre mesh caching
+    private Map<TextureCacheKey, Mesh> cachedTextures = Maps.newLinkedHashMap();
+    private Set<TextureCacheKey> usedTextures = Sets.newHashSet();
+
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
 
@@ -129,6 +135,16 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             }
         }
         usedText.clear();
+
+        Iterator<Map.Entry<TextureCacheKey, Mesh>> textureIterator = cachedTextures.entrySet().iterator();
+        while (textureIterator.hasNext()) {
+            Map.Entry<TextureCacheKey, Mesh> entry = textureIterator.next();
+            if (!usedTextures.contains(entry.getKey())) {
+                Assets.dispose(entry.getValue());
+                textureIterator.remove();
+            }
+        }
+        usedTextures.clear();
 
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
@@ -210,8 +226,6 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
-
-
         if (!currentTextureCropRegion.equals(requestedCropRegion)
                 && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
             textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
@@ -221,29 +235,83 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
         Rect2f textureArea = texture.getRegion();
-        if (mode == ScaleMode.SCALE_FILL) {
-            textureMat.setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
-            textureMat.setFloat2("scale", absoluteRegion.width(), absoluteRegion.height());
+        Mesh mesh = billboard;
+        switch (mode) {
+            case TILED: {
+                TextureCacheKey key = new TextureCacheKey(texture.size(), absoluteRegion.size());
+                usedTextures.add(key);
+                mesh = cachedTextures.get(key);
+                if (mesh == null) {
+                    MeshBuilder builder = new MeshBuilder();
+                    int tileW = TeraMath.ceilToInt(uw * texture.getWidth());
+                    int tileH = TeraMath.ceilToInt(uh * texture.getHeight());
+                    int horizTiles = TeraMath.fastAbs((absoluteRegion.width() - 1) / tileW) + 1;
+                    int vertTiles = TeraMath.fastAbs((absoluteRegion.height() - 1) / tileH) + 1;
 
-            float texBorderX = (scale.x - absoluteRegion.width()) / scale.x * uw;
-            float texBorderY = (scale.y - absoluteRegion.height()) / scale.y * uh;
+                    int offsetX = absoluteRegion.width() - horizTiles * tileW;
+                    int offsetY = absoluteRegion.height() - vertTiles * tileH;
 
-            textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
-                    , textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
-            textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
-        } else {
-            textureMat.setFloat2("scale", scale);
-            textureMat.setFloat2("offset",
-                    absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
-                    absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
+                    for (int tileY = 0; tileY < vertTiles; tileY++) {
+                        for (int tileX = 0; tileX < horizTiles; tileX++) {
+                            int left = offsetX + tileW * tileX;
+                            int top = offsetY + tileH * tileY;
+                            float vertLeft = Math.max((float) left / absoluteRegion.width(), 0);
+                            float vertTop = Math.max((float) top / absoluteRegion.height(), 0);
+                            float vertRight = Math.min((float) (left + tileW) / absoluteRegion.width(), 1);
+                            float vertBottom = Math.min((float) (top + tileH) / absoluteRegion.height(), 1);
+                            builder.addPoly(new Vector3f(vertLeft, vertTop, 0), new Vector3f(vertRight, vertTop, 0), new Vector3f(vertRight, vertBottom, 0),
+                                    new Vector3f(vertLeft, vertBottom, 0));
 
-            textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-            textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+                            float texCoordLeft = (float) (Math.max(left, 0) - left) / tileW;
+                            float texCoordTop = (float) (Math.max(top, 0) - top) / tileH;
+                            float texCoordRight = (float) (Math.min(left + tileW, absoluteRegion.width()) - left) / tileW;
+                            float texCoordBottom = (float) (Math.min(top + tileH, absoluteRegion.height()) - top) / tileH;
+                            builder.addTexCoord(texCoordLeft, texCoordTop);
+                            builder.addTexCoord(texCoordRight, texCoordTop);
+                            builder.addTexCoord(texCoordRight, texCoordBottom);
+                            builder.addTexCoord(texCoordLeft, texCoordBottom);
+                        }
+                    }
+                    mesh = builder.build();
+                    cachedTextures.put(key, mesh);
+                }
+                textureMat.setFloat2("scale", scale);
+                textureMat.setFloat2("offset",
+                        absoluteRegion.minX(),
+                        absoluteRegion.minY());
+
+                textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+                textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+                break;
+            }
+            case SCALE_FILL: {
+                textureMat.setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
+                textureMat.setFloat2("scale", absoluteRegion.width(), absoluteRegion.height());
+
+                float texBorderX = (scale.x - absoluteRegion.width()) / scale.x * uw;
+                float texBorderY = (scale.y - absoluteRegion.height()) / scale.y * uh;
+
+                textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
+                        , textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
+                textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
+                break;
+            }
+            default: {
+                textureMat.setFloat2("scale", scale);
+                textureMat.setFloat2("offset",
+                        absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
+                        absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
+
+                textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+                textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+                break;
+            }
         }
+
         textureMat.setTexture("texture", texture.getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
         textureMat.bindTextures();
-        billboard.render();
+        mesh.render();
     }
 
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
@@ -308,6 +376,37 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         @Override
         public int hashCode() {
             return Objects.hash(text, font, width, alignment, baseColor, shadowColor);
+        }
+    }
+
+    /**
+     * A key that identifies an entry in the texture cache. It contains the elements that affect the generation of mesh for texture rendering.
+     */
+    private static class TextureCacheKey {
+
+        private Vector2i textureSize;
+        private Vector2i areaSize;
+
+        public TextureCacheKey(Vector2i textureSize, Vector2i areaSize) {
+            this.textureSize = new Vector2i(textureSize);
+            this.areaSize = new Vector2i(areaSize);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj instanceof TextureCacheKey) {
+                TextureCacheKey other = (TextureCacheKey) obj;
+                return Objects.equals(textureSize, other.textureSize) && Objects.equals(areaSize, other.areaSize);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(textureSize, areaSize);
         }
     }
 }
