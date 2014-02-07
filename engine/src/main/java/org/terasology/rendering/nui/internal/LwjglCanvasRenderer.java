@@ -210,29 +210,36 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
                             float ux, float uy, float uw, float uh, float alpha) {
+
+
+        if (!currentTextureCropRegion.equals(requestedCropRegion)
+                && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
+            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            currentTextureCropRegion = requestedCropRegion;
+        }
+
         Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
         Rect2f textureArea = texture.getRegion();
-        textureMat.setFloat2("scale", scale);
-
-        // TODO: Alter texSize and texOffset for scale fill instead.
         if (mode == ScaleMode.SCALE_FILL) {
-            Rect2i effectiveCropRegion = requestedCropRegion.intersect(absoluteRegion);
-            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, effectiveCropRegion.minX(), effectiveCropRegion.maxX() + 1,
-                    effectiveCropRegion.minY(), effectiveCropRegion.maxY() + 1);
-            currentTextureCropRegion = effectiveCropRegion;
+            textureMat.setFloat2("offset", absoluteRegion.minX(), absoluteRegion.minY());
+            textureMat.setFloat2("scale", absoluteRegion.width(), absoluteRegion.height());
+
+            float texBorderX = (scale.x - absoluteRegion.width()) / scale.x * uw;
+            float texBorderY = (scale.y - absoluteRegion.height()) / scale.y * uh;
+
+            textureMat.setFloat2("texOffset", textureArea.minX() + (ux + 0.5f * texBorderX) * textureArea.width()
+                    , textureArea.minY() + (uy + 0.5f * texBorderY) * textureArea.height());
+            textureMat.setFloat2("texSize", (uw - texBorderX) * textureArea.width(), (uh - texBorderY) * textureArea.height());
         } else {
-            if (!currentTextureCropRegion.equals(requestedCropRegion)
-                    && !(currentTextureCropRegion.encompasses(absoluteRegion) && requestedCropRegion.encompasses(absoluteRegion))) {
-                textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
-                        requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
-                currentTextureCropRegion = requestedCropRegion;
-            }
+            textureMat.setFloat2("scale", scale);
+            textureMat.setFloat2("offset",
+                    absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
+                    absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
+
+            textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+            textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
         }
-        textureMat.setFloat2("offset",
-                absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
-                absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
-        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
         textureMat.setTexture("texture", texture.getTexture());
         textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
         textureMat.bindTextures();
