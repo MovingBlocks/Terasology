@@ -57,6 +57,7 @@ public abstract class TimeBase implements EngineTime {
             } catch (InterruptedException e) {
                 // do nothing
             }
+            now = getRawTimeInMs();
             newDelta = now - last.get();
         }
         if (newDelta >= UPDATE_CAP) {
