@@ -107,7 +107,7 @@ public class TerasologyEngine implements GameEngine {
         this.subsystems = Queues.newArrayDeque(subsystems);
     }
 
-    public Deque<EngineSubsystem> getSubsystems() {
+    public Iterable<EngineSubsystem> getSubsystems() {
         return subsystems;
     }
 
@@ -252,7 +252,7 @@ public class TerasologyEngine implements GameEngine {
             if (!running) {
                 disposed = true;
                 initialised = false;
-                Iterator<EngineSubsystem> iter = getSubsystems().descendingIterator();
+                Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
                 while (iter.hasNext()) {
                     EngineSubsystem subsystem = iter.next();
                     subsystem.dispose();
@@ -440,7 +440,7 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
-        Iterator<EngineSubsystem> iter = getSubsystems().descendingIterator();
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
         while (iter.hasNext()) {
             EngineSubsystem subsystem = iter.next();
             subsystem.shutdown(config);
