@@ -16,8 +16,8 @@
 
 package org.terasology.rendering;
 
-import org.newdawn.slick.Color;
 import org.terasology.engine.API;
+import org.terasology.rendering.nui.Color;
 
 /**
  * Defines a set of special characters that manipulate the font color of a rendered text string.
@@ -103,7 +103,7 @@ public final class FontColor {
     }
 
     /**
-     * @param the colored text
+     * @param text The colored text
      * @return the same text string, but without the color information
      */
     public static String stripColor(String text) {

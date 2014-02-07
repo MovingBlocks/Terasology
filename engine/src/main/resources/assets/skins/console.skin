@@ -3,7 +3,8 @@
     "elements" : {
         "UILabel" : {
             "text-align-horizontal" : "LEFT",
-            "text-align-vertical" : "top"
+            "text-align-vertical" : "top",
+            "text-shadowed" : false
         }
     }
 }

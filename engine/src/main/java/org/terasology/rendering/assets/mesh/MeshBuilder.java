@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.mesh;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.rendering.nui.Color;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -46,6 +47,20 @@ public class MeshBuilder {
         addVertex(v3);
         for (Vector3f v : vn) {
             addVertex(v);
+        }
+        return this;
+    }
+
+    public MeshBuilder addColor(Color c1, Color... colors) {
+        meshData.getColors().add(c1.rf());
+        meshData.getColors().add(c1.gf());
+        meshData.getColors().add(c1.bf());
+        meshData.getColors().add(c1.af());
+        for (Color c : colors) {
+            meshData.getColors().add(c.rf());
+            meshData.getColors().add(c.gf());
+            meshData.getColors().add(c.bf());
+            meshData.getColors().add(c.af());
         }
         return this;
     }

@@ -15,19 +15,12 @@
  */
 package org.terasology.rendering.assets.font;
 
-import com.google.common.collect.Maps;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshBuilder;
-import org.terasology.rendering.nui.HorizontalAlign;
 
-import javax.vecmath.Vector3f;
 import java.util.List;
-import java.util.Map;
 
 public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
 
@@ -44,61 +37,6 @@ public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
     @Override
     public void reload(FontData fontData) {
         this.data = fontData;
-    }
-
-    @Override
-    public Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlign alignment) {
-        Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
-        addLinesToMesh(lines, meshBuilders, width, alignment);
-
-        Map<Material, Mesh> result = Maps.newLinkedHashMap();
-        for (Map.Entry<Material, MeshBuilder> entry : meshBuilders.entrySet()) {
-            result.put(entry.getKey(), entry.getValue().build());
-        }
-        return result;
-    }
-
-    private void addLinesToMesh(List<String> lines, Map<Material, MeshBuilder> meshBuilders, int maxWidth, HorizontalAlign alignment) {
-        int y = 0;
-        for (String line : lines) {
-            int w = getWidth(line);
-            int x = alignment.getOffset(w, maxWidth);
-            for (char c : line.toCharArray()) {
-                FontCharacter character = data.getCharacter(c);
-                if (character != null && character.getPage() != null) {
-                    MeshBuilder builder = meshBuilders.get(character.getPageMat());
-                    if (builder == null) {
-                        builder = new MeshBuilder();
-                        meshBuilders.put(character.getPageMat(), builder);
-                    }
-                    addCharacter(builder, character, x, y);
-
-                    x += character.getxAdvance();
-                }
-            }
-            y += data.getLineHeight();
-        }
-    }
-
-    public void addCharacter(MeshBuilder builder, FontCharacter character, int x, int y) {
-        float top = y + character.getyOffset();
-        float bottom = top + character.getHeight();
-        float left = x + character.getxOffset();
-        float right = left + character.getWidth();
-        float texTop = character.getY();
-        float texBottom = texTop + character.getTexHeight();
-        float texLeft = character.getX();
-        float texRight = texLeft + character.getTexWidth();
-
-        Vector3f v1 = new Vector3f(left, top, 0);
-        Vector3f v2 = new Vector3f(right, top, 0);
-        Vector3f v3 = new Vector3f(right, bottom, 0);
-        Vector3f v4 = new Vector3f(left, bottom, 0);
-        builder.addPoly(v1, v2, v3, v4);
-        builder.addTexCoord(texLeft, texTop);
-        builder.addTexCoord(texRight, texTop);
-        builder.addTexCoord(texRight, texBottom);
-        builder.addTexCoord(texLeft, texBottom);
     }
 
     @Override
@@ -157,6 +95,11 @@ public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
     @Override
     public boolean hasCharacter(Character c) {
         return c == '\n' || data.getCharacter(c) != null;
+    }
+
+    @Override
+    public FontCharacter getCharacterData(Character c) {
+        return data.getCharacter(c);
     }
 
     @Override

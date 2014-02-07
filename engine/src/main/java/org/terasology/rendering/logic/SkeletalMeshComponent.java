@@ -38,7 +38,7 @@ public class SkeletalMeshComponent implements Component {
     public boolean loop;
     public float animationRate = 1.0f;
     @Range(min = -2.5f, max = 2.5f)
-    public float heightOffset = 0f;
+    public float heightOffset;
 
     @Owns
     public Map<String, EntityRef> boneEntities;

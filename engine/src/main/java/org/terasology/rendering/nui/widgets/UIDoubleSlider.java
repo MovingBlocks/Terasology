@@ -19,7 +19,11 @@ import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -132,7 +136,7 @@ public class UIDoubleSlider extends CoreWidget {
 
         sliderWidth = canvas.size().x - tickerWidth * 2;
         int drawLocation = pixelOffsetFor(value.get(), sliderWidth);
-        if(rightTicker) {
+        if (rightTicker) {
             drawLocation += tickerWidth;
         }
         Rect2i tickerRegion = Rect2i.createFromMinAndSize(drawLocation, 0, tickerWidth, canvas.size().y);
@@ -253,7 +257,7 @@ public class UIDoubleSlider extends CoreWidget {
     public void setValueLeft(float val) {
         valueLeft.set(val);
 
-        if(val > valueRight.get()) {
+        if (val > valueRight.get()) {
             valueRight.set(val);
         }
     }
@@ -261,7 +265,7 @@ public class UIDoubleSlider extends CoreWidget {
     public void setValueRight(float val) {
         valueRight.set(val);
 
-        if(val < valueLeft.get()) {
+        if (val < valueLeft.get()) {
             valueLeft.set(val);
         }
     }

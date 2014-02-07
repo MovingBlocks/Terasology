@@ -28,6 +28,7 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontMeshBuilder;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -42,7 +43,6 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +112,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         requestedCropRegion = Rect2i.createFromMinAndSize(0, 0, Display.getWidth(), Display.getHeight());
         currentTextureCropRegion = requestedCropRegion;
-        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1, requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+        textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1
+                , requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
     }
 
     @Override
@@ -240,12 +241,13 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion,
                          Color color, Color shadowColor, float alpha) {
-        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
+        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign, color, shadowColor);
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
         List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
         if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
+            FontMeshBuilder meshBuilder = new FontMeshBuilder(font);
+            fontMesh = meshBuilder.createTextMesh(lines, absoluteRegion.width(), hAlign, color, shadowColor);
             cachedText.put(key, fontMesh);
         }
 
@@ -254,19 +256,10 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
             entry.getKey().bindTextures();
-            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1, requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
-            if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
-                Vector4f shadowValues = shadowColor.toVector4f();
-                shadowValues.w *= alpha;
-                entry.getKey().setFloat4("color", shadowValues);
-                entry.getValue().render();
-            }
-
+            entry.getKey().setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
             entry.getKey().setFloat2("offset", offset.x, offset.y);
-            Vector4f colorValues = color.toVector4f();
-            colorValues.w *= alpha;
-            entry.getKey().setFloat4("color", colorValues);
+            entry.getKey().setFloat("alpha", alpha);
             entry.getValue().render();
         }
     }
@@ -279,12 +272,16 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         private Font font;
         private int width;
         private HorizontalAlign alignment;
+        private Color baseColor;
+        private Color shadowColor;
 
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment) {
+        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment, Color baseColor, Color shadowColor) {
             this.text = text;
             this.font = font;
             this.width = maxWidth;
             this.alignment = alignment;
+            this.baseColor = baseColor;
+            this.shadowColor = shadowColor;
         }
 
         @Override
@@ -295,14 +292,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             if (obj instanceof TextCacheKey) {
                 TextCacheKey other = (TextCacheKey) obj;
                 return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
+                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment)
+                        && Objects.equals(baseColor, other.baseColor) && Objects.equals(shadowColor, other.shadowColor);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(text, font, width, alignment);
+            return Objects.hash(text, font, width, alignment, baseColor, shadowColor);
         }
     }
 }
