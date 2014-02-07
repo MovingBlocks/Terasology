@@ -25,14 +25,12 @@ import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
 import org.newdawn.slick.opengl.ImageIOImageData;
@@ -48,6 +46,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.registry.CoreRegistry;
@@ -84,7 +83,6 @@ import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
-import org.terasology.utilities.LWJGLHelper;
 
 public class LwjglGraphics implements EngineSubsystem {
 
@@ -92,12 +90,12 @@ public class LwjglGraphics implements EngineSubsystem {
 
     @Override
     public void preInitialise() {
-        initLogger();
-        LWJGLHelper.initNativeLibs();
     }
 
     @Override
     public void postInitialise(Config config) {
+        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
+
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice();
         CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
 
@@ -135,28 +133,6 @@ public class LwjglGraphics implements EngineSubsystem {
     @Override
     public void dispose() {
         Display.destroy();
-    }
-
-    private void initLogger() {
-        if (LWJGLUtil.DEBUG) {
-            // Pipes System.out and err to log, because that's where lwjgl writes it to.
-            System.setOut(new PrintStream(System.out) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
-
-                @Override
-                public void print(final String message) {
-                    logger.info(message);
-                }
-            });
-            System.setErr(new PrintStream(System.err) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
-
-                @Override
-                public void print(final String message) {
-                    logger.error(message);
-                }
-            });
-        }
     }
 
     private void initDisplay(Config config, LwjglDisplayDevice lwjglDisplay) {

@@ -28,5 +28,6 @@ public class BlockDamageModifierComponent implements Component {
     public Map<String, Integer> materialDamageMultiplier = Maps.newHashMap();
     public float blockAnnihilationChance;
     public boolean skipPerBlockEffects;
+    public boolean directPickup;
 
 }
