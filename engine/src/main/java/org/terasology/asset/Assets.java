@@ -316,6 +316,9 @@ public final class Assets {
     }
 
     public static TextureRegion getTextureRegion(String simpleUri) {
+        if (simpleUri.isEmpty()) {
+            return null;
+        }
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         AssetUri uri = assetManager.resolve(AssetType.TEXTURE, simpleUri);
         if (uri != null) {

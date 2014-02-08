@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.skin;
 
+import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -27,13 +28,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
+import org.terasology.engine.module.Module;
+import org.terasology.persistence.ModuleContext;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.Module;
-import org.terasology.persistence.ModuleContext;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
@@ -64,6 +65,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
                 .registerTypeAdapter(UISkinData.class, new UISkinTypeAdapter())
                 .registerTypeAdapter(TextureRegion.class, new TextureRegionTypeAdapter())
                 .registerTypeAdapter(Color.class, new ColorTypeAdapter())
+                .registerTypeAdapter(Optional.class, new OptionalTextureRegionTypeAdapter())
                 .create();
     }
 
@@ -182,4 +184,10 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
+    private class OptionalTextureRegionTypeAdapter implements JsonDeserializer<Optional> {
+        @Override
+        public Optional deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return Optional.fromNullable(Assets.getTextureRegion(json.getAsString()));
+        }
+    }
 }
