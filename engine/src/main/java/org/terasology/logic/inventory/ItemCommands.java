@@ -61,7 +61,11 @@ public class ItemCommands implements ComponentSystem {
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
             EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-            playerEntity.send(new GiveItemAction(item));
+            GiveItemAction event = new GiveItemAction(item);
+            playerEntity.send(event);
+            if (!event.isConsumed()) {
+                item.destroy();
+            }
             return "You received an item of " + prefab.getName();
         } else {
             return blockCommands.giveBlock(itemPrefabName, client);
