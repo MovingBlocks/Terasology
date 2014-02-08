@@ -57,10 +57,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     private final UIImage[] hearts;
     private final UIImage[] breathBubbles;
     private final UIImage crosshair;
-    private final UILabel debugLine1;
-    private final UILabel debugLine2;
-    private final UILabel debugLine3;
-    private final UILabel debugLine4;
 
     private final Config config = CoreRegistry.get(Config.class);
 
@@ -112,20 +108,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         crosshair.setVerticalAlign(EVerticalAlign.CENTER);
         crosshair.setVisible(true);
 
-        debugLine1 = new UILabel();
-        debugLine1.setPosition(new Vector2f(4, 4));
-        debugLine2 = new UILabel();
-        debugLine2.setPosition(new Vector2f(4, 22));
-        debugLine3 = new UILabel();
-        debugLine3.setPosition(new Vector2f(4, 38));
-        debugLine4 = new UILabel();
-        debugLine4.setPosition(new Vector2f(4, 54));
-
         addDisplayElement(crosshair);
-        addDisplayElement(debugLine1);
-        addDisplayElement(debugLine2);
-        addDisplayElement(debugLine3);
-        addDisplayElement(debugLine4);
 
         localPlayer = CoreRegistry.get(LocalPlayer.class);
 
@@ -139,29 +122,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
         updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
         updateBreathBar(localPlayer.getCharacterEntity().getComponent(DrownsComponent.class), localPlayer.getCharacterEntity().getComponent(DrowningComponent.class));
-        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-
-        boolean enableDebug = config.getSystem().isDebugEnabled();
-        debugLine1.setVisible(enableDebug);
-        debugLine2.setVisible(enableDebug);
-        debugLine3.setVisible(enableDebug);
-        debugLine4.setVisible(enableDebug);
-
-        if (enableDebug) {
-            CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
-            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f",
-                    time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            if (entityManager != null) {
-                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
-            }
-            Vector3f pos = CoreRegistry.get(LocalPlayer.class).getPosition();
-            float yaw = (character != null) ? character.yaw : 0;
-            debugLine3.setText(String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Yaw %.2f", pos.x, pos.y, pos.z, yaw));
-            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f",
-                    ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
-                    CoreRegistry.get(WorldProvider.class).getTime().getDays()));
-        }
     }
 
     private void updateBreathBar(DrownsComponent drownsComponent, DrowningComponent drowningComponent) {

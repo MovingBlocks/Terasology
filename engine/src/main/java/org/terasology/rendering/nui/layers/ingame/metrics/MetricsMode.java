@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.rendering.gui.windows.metricsScreen;
-
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.gui.widgets.UILabel;
-
-import java.util.List;
+package org.terasology.rendering.nui.layers.ingame.metrics;
 
 /**
  * @author Immortius
  */
-final class SpikesMode extends MetricsMode {
+public abstract class MetricsMode {
 
-    public SpikesMode() {
-        super("Spikes", true, true);
+    private String name;
+
+    public MetricsMode(String name) {
+        this.name = name;
     }
 
-    @Override
-    public void updateLines(List<UILabel> lines) {
-        displayMetrics(PerformanceMonitor.getDecayingSpikes(), lines);
+    public abstract String getMetrics();
+
+    public abstract boolean isAvailable();
+
+    public abstract boolean isPerformanceManagerMode();
+
+    public String getName() {
+        return name;
     }
 }

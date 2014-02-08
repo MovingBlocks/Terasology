@@ -281,7 +281,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public <T extends ControlWidget> T addOverlay(AssetUri screenUri, Class<T> expectedType) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
         if (data != null && expectedType.isInstance(data.getRootWidget())) {
-            addOverlay(expectedType.cast(data.getRootWidget()));
+            T result = expectedType.cast(data.getRootWidget());
+            addOverlay(result);
+            return result;
         }
         return null;
     }
@@ -334,6 +336,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         for (UIScreenLayer screen : screens) {
             screen.update(delta);
+        }
+
+        for (ControlWidget widget : overlays) {
+            widget.update(delta);
         }
     }
 

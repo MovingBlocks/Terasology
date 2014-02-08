@@ -19,7 +19,6 @@ import com.google.common.collect.Maps;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -34,13 +33,13 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
-import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.world.WorldComponent;
 
 import javax.vecmath.Vector2f;
@@ -71,7 +70,6 @@ public class GUIManagerLwjgl implements ComponentSystem, GUIManager {
 
     private void registerWindows() {
         //TODO parser action here! this is temporary
-        registeredWindows.put("metrics", UIScreenMetrics.class);
         registeredWindows.put("hud", UIScreenHUD.class);
     }
 

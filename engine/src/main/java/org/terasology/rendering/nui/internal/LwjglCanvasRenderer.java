@@ -324,7 +324,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         Vector2i textureSize = new Vector2i(TeraMath.ceilToInt(texture.getWidth() * uw), TeraMath.ceilToInt(texture.getHeight() * uh));
 
-        TextureCacheKey key = new TextureCacheKey(textureSize, region.size());
+        TextureCacheKey key = new TextureCacheKey(textureSize, region.size(), border, tile);
         usedTextures.add(key);
         Mesh mesh = cachedTextures.get(key);
         if (mesh == null) {

@@ -34,7 +34,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     private InteractionListener defaultScreenListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            return isModal();
+            return true;
         }
     };
     private NUIManager manager;
@@ -78,7 +78,9 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     public void onDraw(Canvas canvas) {
-        canvas.addInteractionRegion(getScreenListener());
+        if (isModal()) {
+            canvas.addInteractionRegion(getScreenListener());
+        }
         if (contents != null) {
             canvas.drawWidget(contents, canvas.getRegion());
         }

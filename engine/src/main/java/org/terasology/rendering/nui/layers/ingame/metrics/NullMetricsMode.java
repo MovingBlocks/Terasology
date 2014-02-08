@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.rendering.gui.windows.metricsScreen;
-
-import org.terasology.rendering.gui.widgets.UILabel;
-
-import java.util.List;
+package org.terasology.rendering.nui.layers.ingame.metrics;
 
 /**
  * @author Immortius
  */
-final class NullMode extends MetricsMode {
+public class NullMetricsMode extends MetricsMode {
 
-    public NullMode() {
-        super("", false, false);
+    public NullMetricsMode() {
+        super("");
     }
 
     @Override
-    public void updateLines(List<UILabel> lines) {
-        for (UILabel line : lines) {
-            line.setVisible(false);
-        }
+    public String getMetrics() {
+        return "";
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
+    public boolean isPerformanceManagerMode() {
+        return false;
     }
 }
