@@ -55,11 +55,11 @@ public final class PickupBuilder {
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
             if (dropAll) {
-                RemoveItemAction action = new RemoveItemAction(pickupItem, false);
+                RemoveItemAction action = new RemoveItemAction(EntityRef.NULL, pickupItem, false);
                 owner.send(action);
                 pickupItem = action.getRemovedItem();
             } else {
-                RemoveItemAction action = new RemoveItemAction(pickupItem, false, 1);
+                RemoveItemAction action = new RemoveItemAction(EntityRef.NULL, pickupItem, false, 1);
                 owner.send(action);
                 pickupItem = action.getRemovedItem();
             }

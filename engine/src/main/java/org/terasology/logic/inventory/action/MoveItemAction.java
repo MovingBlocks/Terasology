@@ -24,12 +24,14 @@ import org.terasology.entitySystem.event.Event;
  */
 @API
 public class MoveItemAction implements Event {
+    private EntityRef instigator;
     private EntityRef to;
     private int slotFrom;
     private int slotTo;
     private int count;
 
-    public MoveItemAction(int slotFrom, EntityRef to, int slotTo, int count) {
+    public MoveItemAction(EntityRef instigator, int slotFrom, EntityRef to, int slotTo, int count) {
+        this.instigator = instigator;
         this.to = to;
         this.slotFrom = slotFrom;
         this.slotTo = slotTo;
@@ -50,5 +52,9 @@ public class MoveItemAction implements Event {
 
     public int getCount() {
         return count;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

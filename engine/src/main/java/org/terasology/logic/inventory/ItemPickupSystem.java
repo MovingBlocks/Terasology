@@ -62,7 +62,7 @@ public class ItemPickupSystem implements ComponentSystem {
     public void onBump(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
 
-        GiveItemAction action = new GiveItemAction(pickupComponent.itemEntity);
+        GiveItemAction action = new GiveItemAction(entity, pickupComponent.itemEntity);
         event.getOtherEntity().send(action);
         if (action.isConsumed()) {
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));

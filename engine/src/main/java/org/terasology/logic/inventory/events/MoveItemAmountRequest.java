@@ -29,8 +29,8 @@ public class MoveItemAmountRequest extends MoveItemRequest {
     protected MoveItemAmountRequest() {
     }
 
-    public MoveItemAmountRequest(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount, int changeId) {
-        super(fromInventory, fromSlot, toInventory, toSlot, changeId);
+    public MoveItemAmountRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount, int changeId) {
+        super(instigator, fromInventory, fromSlot, toInventory, toSlot, changeId);
         this.amount = amount;
     }
 

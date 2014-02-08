@@ -27,18 +27,21 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
  */
 @API
 public class RemoveItemAction extends AbstractConsumableEvent {
+    private EntityRef instigator;
     private EntityRef item;
     private boolean destroyRemoved;
     private Integer count;
 
     private EntityRef removedItem;
 
-    public RemoveItemAction(EntityRef item, boolean destroyRemoved) {
+    public RemoveItemAction(EntityRef instigator, EntityRef item, boolean destroyRemoved) {
+        this.instigator = instigator;
         this.item = item;
         this.destroyRemoved = destroyRemoved;
     }
 
-    public RemoveItemAction(EntityRef item, boolean destroyRemoved, int count) {
+    public RemoveItemAction(EntityRef instigator, EntityRef item, boolean destroyRemoved, int count) {
+        this.instigator = instigator;
         this.item = item;
         this.destroyRemoved = destroyRemoved;
         this.count = count;
@@ -62,5 +65,9 @@ public class RemoveItemAction extends AbstractConsumableEvent {
 
     public EntityRef getRemovedItem() {
         return removedItem;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

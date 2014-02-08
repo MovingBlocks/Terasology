@@ -143,7 +143,7 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     private boolean giveItem(CreateBlockDropsEvent event, EntityRef item) {
-        GiveItemAction action = new GiveItemAction(item);
+        GiveItemAction action = new GiveItemAction(item, item);
         event.getInstigator().send(action);
         return action.isConsumed();
     }

@@ -298,7 +298,7 @@ public class BlockCommands implements ComponentSystem {
             return "Unknown block or item";
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-        GiveItemAction action = new GiveItemAction(item);
+        GiveItemAction action = new GiveItemAction(playerEntity, item);
         playerEntity.send(action);
         if (!action.isConsumed()) {
             item.destroy();

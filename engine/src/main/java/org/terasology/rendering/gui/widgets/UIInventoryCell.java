@@ -218,15 +218,15 @@ public class UIInventoryCell extends UIDisplayContainer {
     }
 
     private void swapItem() {
-        getTransferEntity().send(new SwitchItemAction(0, inventoryEntity, slot));
+        getTransferEntity().send(new SwitchItemAction(localPlayer.getCharacterEntity(), 0, inventoryEntity, slot));
     }
 
     private void giveAmount(int amount) {
-        inventoryEntity.send(new MoveItemAction(slot, getTransferEntity(), 0, amount));
+        inventoryEntity.send(new MoveItemAction(localPlayer.getCharacterEntity(), slot, getTransferEntity(), 0, amount));
     }
 
     private void takeAmount(int amount) {
-        getTransferEntity().send(new MoveItemAction(0, inventoryEntity, slot, amount));
+        getTransferEntity().send(new MoveItemAction(localPlayer.getCharacterEntity(), 0, inventoryEntity, slot, amount));
     }
 
     /**

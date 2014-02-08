@@ -91,13 +91,13 @@ public class InventoryUtils {
         return item1.stackId.equals(item2.stackId);
     }
 
-    private static boolean validateMove(EntityRef from, int slotFrom, EntityRef to, int slotTo) {
+    private static boolean validateMove(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
         // Validate the move
         EntityRef itemFrom = InventoryUtils.getItemAt(from, slotFrom);
         EntityRef itemTo = InventoryUtils.getItemAt(to, slotTo);
 
         if (itemFrom.exists()) {
-            BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(itemFrom, slotFrom);
+            BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, itemFrom, slotFrom);
             from.send(removeFrom);
             if (removeFrom.isConsumed()) {
                 return false;
@@ -105,7 +105,7 @@ public class InventoryUtils {
         }
 
         if (itemTo.exists()) {
-            BeforeItemRemovedFromInventory removeTo = new BeforeItemRemovedFromInventory(itemTo, slotTo);
+            BeforeItemRemovedFromInventory removeTo = new BeforeItemRemovedFromInventory(instigator, itemTo, slotTo);
             to.send(removeTo);
             if (removeTo.isConsumed()) {
                 return false;
@@ -113,7 +113,7 @@ public class InventoryUtils {
         }
 
         if (itemTo.exists()) {
-            BeforeItemPutInInventory putFrom = new BeforeItemPutInInventory(itemTo, slotFrom);
+            BeforeItemPutInInventory putFrom = new BeforeItemPutInInventory(instigator, itemTo, slotFrom);
             from.send(putFrom);
             if (putFrom.isConsumed()) {
                 return false;
@@ -121,7 +121,7 @@ public class InventoryUtils {
         }
 
         if (itemFrom.exists()) {
-            BeforeItemPutInInventory putTo = new BeforeItemPutInInventory(itemFrom, slotTo);
+            BeforeItemPutInInventory putTo = new BeforeItemPutInInventory(instigator, itemFrom, slotTo);
             to.send(putTo);
             if (putTo.isConsumed()) {
                 return false;
@@ -131,7 +131,7 @@ public class InventoryUtils {
         return true;
     }
 
-    private static boolean validateMoveAmount(EntityRef from, int slotFrom, EntityRef to, int slotTo, int amount) {
+    private static boolean validateMoveAmount(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo, int amount) {
         ItemComponent itemFrom = InventoryUtils.getItemAt(from, slotFrom).getComponent(ItemComponent.class);
         ItemComponent itemTo = InventoryUtils.getItemAt(to, slotTo).getComponent(ItemComponent.class);
 
@@ -152,14 +152,14 @@ public class InventoryUtils {
             return false;
         }
 
-        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(InventoryUtils.getItemAt(from, slotFrom), slotFrom);
+        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, InventoryUtils.getItemAt(from, slotFrom), slotFrom);
         from.send(removeFrom);
         if (removeFrom.isConsumed()) {
             return false;
         }
 
         if (itemTo == null) {
-            BeforeItemPutInInventory putTo = new BeforeItemPutInInventory(InventoryUtils.getItemAt(from, slotFrom), slotTo);
+            BeforeItemPutInInventory putTo = new BeforeItemPutInInventory(instigator, InventoryUtils.getItemAt(from, slotFrom), slotTo);
             to.send(putTo);
             if (putTo.isConsumed()) {
                 return false;
@@ -169,12 +169,12 @@ public class InventoryUtils {
         return true;
     }
 
-    static boolean moveItem(EntityRef from, int slotFrom, EntityRef to, int slotTo) {
+    static boolean moveItem(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
         if (checkForStacking(from, slotFrom, to, slotTo)) {
             return true;
         }
 
-        if (!InventoryUtils.validateMove(from, slotFrom, to, slotTo)) {
+        if (!InventoryUtils.validateMove(instigator, from, slotFrom, to, slotTo)) {
             return false;
         }
         EntityRef itemFrom = getItemAt(from, slotFrom);
@@ -202,8 +202,8 @@ public class InventoryUtils {
         return false;
     }
 
-    static boolean moveItemAmount(EntityRef from, int slotFrom, EntityRef to, int slotTo, int amount) {
-        if (!InventoryUtils.validateMoveAmount(from, slotFrom, to, slotTo, amount)) {
+    static boolean moveItemAmount(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo, int amount) {
+        if (!InventoryUtils.validateMoveAmount(instigator, from, slotFrom, to, slotTo, amount)) {
             return false;
         }
 

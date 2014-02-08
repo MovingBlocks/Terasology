@@ -27,25 +27,19 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
  */
 @API
 public class GiveItemAction extends AbstractConsumableEvent {
+    private EntityRef instigator;
     private EntityRef item;
     private Integer slot;
-    private boolean force;
 
-    public GiveItemAction(EntityRef item) {
+    public GiveItemAction(EntityRef instigator, EntityRef item) {
+        this.instigator = instigator;
         this.item = item;
     }
 
-    public GiveItemAction(EntityRef item, int slot) {
+    public GiveItemAction(EntityRef instigator, EntityRef item, int slot) {
+        this.instigator = instigator;
         this.item = item;
         this.slot = slot;
-    }
-
-    public boolean isForce() {
-        return force;
-    }
-
-    public void setForce(boolean force) {
-        this.force = force;
     }
 
     public EntityRef getItem() {
@@ -54,5 +48,9 @@ public class GiveItemAction extends AbstractConsumableEvent {
 
     public Integer getSlot() {
         return slot;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

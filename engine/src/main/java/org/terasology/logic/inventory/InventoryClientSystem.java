@@ -50,22 +50,22 @@ public class InventoryClientSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void switchItemRequest(SwitchItemAction event, EntityRef entity) {
-        if (!InventoryUtils.moveItem(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo())) {
+        if (!InventoryUtils.moveItem(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo())) {
             return;
         }
 
-        MoveItemRequest request = new MoveItemRequest(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), changeId++);
+        MoveItemRequest request = new MoveItemRequest(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void moveItemRequest(MoveItemAction event, EntityRef entity) {
-        if (!InventoryUtils.moveItemAmount(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount())) {
+        if (!InventoryUtils.moveItemAmount(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount())) {
             return;
         }
 
-        MoveItemAmountRequest request = new MoveItemAmountRequest(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount(), changeId++);
+        MoveItemAmountRequest request = new MoveItemAmountRequest(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount(), changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
     }
@@ -80,9 +80,9 @@ public class InventoryClientSystem extends BaseComponentSystem {
         for (MoveItemRequest request : pendingMoves.values()) {
             if (request instanceof MoveItemAmountRequest) {
                 int amount = ((MoveItemAmountRequest) request).getAmount();
-                InventoryUtils.moveItemAmount(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot(), amount);
+                InventoryUtils.moveItemAmount(request.getInstigator(), request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot(), amount);
             } else {
-                InventoryUtils.moveItem(request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
+                InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
             }
         }
     }

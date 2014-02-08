@@ -22,10 +22,12 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class BeforeItemPutInInventory extends AbstractConsumableEvent {
+    private EntityRef instigator;
     private EntityRef item;
     private int slot;
 
-    public BeforeItemPutInInventory(EntityRef item, int slot) {
+    public BeforeItemPutInInventory(EntityRef instigator, EntityRef item, int slot) {
+        this.instigator = instigator;
         this.item = item;
         this.slot = slot;
     }
@@ -36,5 +38,9 @@ public class BeforeItemPutInInventory extends AbstractConsumableEvent {
 
     public int getSlot() {
         return slot;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

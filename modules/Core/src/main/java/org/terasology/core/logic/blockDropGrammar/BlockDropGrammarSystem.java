@@ -139,7 +139,7 @@ public class BlockDropGrammarSystem implements ComponentSystem {
     }
 
     private boolean giveItem(EntityRef instigator, EntityRef dropItem) {
-        GiveItemAction giveEvent = new GiveItemAction(dropItem);
+        GiveItemAction giveEvent = new GiveItemAction(instigator, dropItem);
         instigator.send(giveEvent);
         return giveEvent.isConsumed();
     }

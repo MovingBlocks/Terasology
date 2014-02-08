@@ -42,12 +42,12 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void switchItem(SwitchItemAction event, EntityRef entity) {
-        InventoryUtils.moveItem(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo());
+        InventoryUtils.moveItem(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo());
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void moveItem(MoveItemAction event, EntityRef entity) {
-        InventoryUtils.moveItemAmount(entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
+        InventoryUtils.moveItemAmount(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
@@ -70,7 +70,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
             }
         }
 
-        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(event.getItem(), slotWithItem);
+        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(event.getInstigator(), event.getItem(), slotWithItem);
         entity.send(removeFrom);
         if (removeFrom.isConsumed()) {
             return;
@@ -125,7 +125,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
         ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
         if (itemAt == null || InventoryUtils.isSameItem(itemAt, itemToGive)) {
             if (itemAt == null) {
-                if (canPutItemIntoSlot(event.isForce(), entity, event.getItem(), slot)) {
+                if (canPutItemIntoSlot(event.getInstigator(), entity, event.getItem(), slot)) {
                     InventoryUtils.putItemIntoSlot(entity, event.getItem(), slot);
                     event.consume();
                     return true;
@@ -142,11 +142,11 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
         return false;
     }
 
-    private boolean canPutItemIntoSlot(boolean force, EntityRef entity, EntityRef item, int slot) {
-        if (force || !item.exists()) {
+    private boolean canPutItemIntoSlot(EntityRef instigator, EntityRef entity, EntityRef item, int slot) {
+        if (!item.exists()) {
             return true;
         }
-        BeforeItemPutInInventory itemPut = new BeforeItemPutInInventory(item, slot);
+        BeforeItemPutInInventory itemPut = new BeforeItemPutInInventory(instigator, item, slot);
         entity.send(itemPut);
         return !itemPut.isConsumed();
     }
@@ -154,7 +154,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
     @ReceiveEvent
     public void moveItemAmountRequest(MoveItemAmountRequest request, EntityRef entity) {
         try {
-            InventoryUtils.moveItemAmount(request.getFromInventory(), request.getFromSlot(),
+            InventoryUtils.moveItemAmount(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
                     request.getToInventory(), request.getToSlot(), request.getAmount());
         } finally {
             entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
@@ -165,7 +165,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
     public void moveItemRequest(MoveItemRequest request, EntityRef entity) {
         try {
             if (!(request instanceof MoveItemAmountRequest)) {
-                InventoryUtils.moveItem(request.getFromInventory(), request.getFromSlot(),
+                InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
                         request.getToInventory(), request.getToSlot());
             }
         } finally {

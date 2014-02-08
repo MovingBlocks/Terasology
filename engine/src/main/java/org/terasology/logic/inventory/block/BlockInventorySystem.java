@@ -55,7 +55,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
         int slotCount = InventoryUtils.getSlotCount(blockEntity);
         inventoryItem.addComponent(new InventoryComponent(slotCount));
         for (int i = 0; i < slotCount; i++) {
-            blockEntity.send(new SwitchItemAction(i, inventoryItem, i));
+            blockEntity.send(new SwitchItemAction(blockEntity, i, inventoryItem, i));
         }
         ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
         if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
@@ -68,7 +68,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
     public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
         int slotCount = InventoryUtils.getSlotCount(itemEntity);
         for (int i = 0; i < slotCount; i++) {
-            event.getPlacedBlock().send(new SwitchItemAction(i, itemEntity, i));
+            event.getPlacedBlock().send(new SwitchItemAction(itemEntity, i, itemEntity, i));
         }
     }
 

@@ -197,15 +197,15 @@ public class InventoryCell extends CoreWidget {
     }
 
     private void swapItem() {
-        getTransferEntity().send(new SwitchItemAction(0, getTargetInventory(), getTargetSlot()));
+        getTransferEntity().send(new SwitchItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot()));
     }
 
     private void giveAmount(int amount) {
-        getTargetInventory().send(new MoveItemAction(getTargetSlot(), getTransferEntity(), 0, amount));
+        getTargetInventory().send(new MoveItemAction(localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount));
     }
 
     private void takeAmount(int amount) {
-        getTransferEntity().send(new MoveItemAction(0, getTargetInventory(), getTargetSlot(), amount));
+        getTransferEntity().send(new MoveItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount));
     }
 
     private EntityRef getTransferEntity() {

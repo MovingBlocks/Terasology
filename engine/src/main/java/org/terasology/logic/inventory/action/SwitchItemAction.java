@@ -24,11 +24,13 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
  */
 @API
 public class SwitchItemAction extends AbstractConsumableEvent {
+    private EntityRef instigator;
     private EntityRef to;
     private int slotFrom;
     private int slotTo;
 
-    public SwitchItemAction(int slotFrom, EntityRef to, int slotTo) {
+    public SwitchItemAction(EntityRef instigator, int slotFrom, EntityRef to, int slotTo) {
+        this.instigator = instigator;
         this.to = to;
         this.slotFrom = slotFrom;
         this.slotTo = slotTo;
@@ -44,5 +46,9 @@ public class SwitchItemAction extends AbstractConsumableEvent {
 
     public int getSlotTo() {
         return slotTo;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }
