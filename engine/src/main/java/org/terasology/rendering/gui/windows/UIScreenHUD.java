@@ -17,26 +17,18 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.drowning.DrowningComponent;
 import org.terasology.logic.drowning.DrownsComponent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import java.util.Locale;
 
 /**
  * HUD displayed on the user's screen.

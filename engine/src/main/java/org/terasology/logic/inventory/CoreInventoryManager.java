@@ -30,7 +30,7 @@ import org.terasology.registry.Share;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
-@Share({InventoryManager.class})
+@Share(InventoryManager.class)
 public class CoreInventoryManager extends BaseComponentSystem implements InventoryManager {
     private static final Logger logger = LoggerFactory.getLogger(CoreInventoryManager.class);
 

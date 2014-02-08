@@ -26,7 +26,7 @@ import org.terasology.registry.CoreRegistry;
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class InventoryUtils {
+public final class InventoryUtils {
     private InventoryUtils() {
     }
 

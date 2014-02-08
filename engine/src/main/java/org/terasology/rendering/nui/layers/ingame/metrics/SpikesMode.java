@@ -18,9 +18,6 @@ package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import gnu.trove.map.TObjectDoubleMap;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.rendering.gui.widgets.UILabel;
-
-import java.util.List;
 
 /**
  * @author Immortius

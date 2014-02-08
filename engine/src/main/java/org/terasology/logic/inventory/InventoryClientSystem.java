@@ -65,7 +65,8 @@ public class InventoryClientSystem extends BaseComponentSystem {
             return;
         }
 
-        MoveItemAmountRequest request = new MoveItemAmountRequest(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount(), changeId++);
+        MoveItemAmountRequest request = new MoveItemAmountRequest(event.getInstigator(), entity,
+                event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount(), changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
     }
@@ -80,7 +81,8 @@ public class InventoryClientSystem extends BaseComponentSystem {
         for (MoveItemRequest request : pendingMoves.values()) {
             if (request instanceof MoveItemAmountRequest) {
                 int amount = ((MoveItemAmountRequest) request).getAmount();
-                InventoryUtils.moveItemAmount(request.getInstigator(), request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot(), amount);
+                InventoryUtils.moveItemAmount(request.getInstigator(), request.getFromInventory(),
+                        request.getFromSlot(), request.getToInventory(), request.getToSlot(), amount);
             } else {
                 InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
             }
