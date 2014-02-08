@@ -17,19 +17,18 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.collect.Lists;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicationCheck;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.List;
 
 /**
  * Allows an entity to store items.
- * You can use the {@link InventoryManager} for assorted utility related to inventories.
  *
  * @author Immortius <immortius@gmail.com>
  */
@@ -41,7 +40,7 @@ public final class InventoryComponent implements Component, ReplicationCheck {
 
     @Replicate
     @Owns
-    List<EntityRef> itemSlots = Lists.newArrayList();
+    public List<EntityRef> itemSlots = Lists.newArrayList();
 
     public InventoryComponent() {
     }

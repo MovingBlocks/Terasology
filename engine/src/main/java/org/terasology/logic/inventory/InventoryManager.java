@@ -24,54 +24,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 public interface InventoryManager {
 
     /**
-     * Moves all items from one inventory to another, as far as possible
-     *
-     * @param fromInventory
-     * @param toInventory
-     */
-    void moveAll(EntityRef fromInventory, EntityRef toInventory);
-
-    /**
-     * @param inventoryEntity
-     * @param item
-     * @return Whether the given item can be added to the inventory
-     */
-    boolean canTakeItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * @param inventoryEntity
-     * @param item
-     * @return Whether the item was fully consumed in being added to the inventory
-     */
-    boolean giveItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * Removes an item from the inventory (but doesn't destroy it)
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    void removeItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * Removes a number of an item from the inventory. If the count equals or exceeds actual stack size of the item,
-     * the entire stack is removed. Otherwise a new item is created of the correct stack size, and the existing item's
-     * stack size is decremented to match.
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    EntityRef removeItem(EntityRef inventoryEntity, EntityRef item, int stackCount);
-
-    /**
-     * Removes an item from the inventory and destroys it
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    void destroyItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
      * @param itemA
      * @param itemB
      * @return Whether the two items can be merged (ignoring stack size limits)
@@ -85,11 +37,22 @@ public interface InventoryManager {
     int getStackSize(EntityRef item);
 
     /**
-     * This version of setStackSize will destroy the item if newStackSize is <=0
-     *
+     * @param inventoryEntity
+     * @param slot
+     * @return The item in the given slot
+     */
+    EntityRef getItemInSlot(EntityRef inventoryEntity, int slot);
+
+    /**
      * @param inventoryEntity
      * @param item
-     * @param newStackSize
+     * @return The slot containing the given item, or -1 if it wasn't found in the inventory
      */
-    void setStackSize(EntityRef inventoryEntity, EntityRef item, int newStackSize);
+    int findSlotWithItem(EntityRef inventoryEntity, EntityRef item);
+
+    /**
+     * @param inventoryEntity
+     * @return The number of slots the given entity has
+     */
+    int getNumSlots(EntityRef inventoryEntity);
 }

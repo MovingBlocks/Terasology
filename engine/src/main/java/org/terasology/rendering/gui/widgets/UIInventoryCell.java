@@ -16,16 +16,17 @@
 package org.terasology.rendering.gui.widgets;
 
 import org.terasology.asset.Assets;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.inventory.InventoryUtils;
+import org.terasology.logic.inventory.action.MoveItemAction;
+import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -48,16 +49,11 @@ public class UIInventoryCell extends UIDisplayContainer {
 
     private LocalPlayer localPlayer;
 
-    private SlotBasedInventoryManager inventoryManager;
-
     //sub elements
     private final UIImage selectionRectangle;
     private final UIImage background;
     private final UILabel itemLabel;
     private UIItemIcon icon;
-
-    // Ghost inventory slot just stores the item (does not remove it from inventory) and you can't transfer it out
-    private boolean ghost;
 
     private boolean selected;
     private boolean selectOnMouseOver = true;
@@ -121,8 +117,8 @@ public class UIInventoryCell extends UIDisplayContainer {
                 if (MouseInput.MOUSE_LEFT.getId() == button) {
                     swapItem();
                 } else if (MouseInput.MOUSE_RIGHT.getId() == button) {
-                    EntityRef item = inventoryManager.getItemInSlot(inventoryEntity, slot);
-                    int stackSize = inventoryManager.getStackSize(item);
+                    EntityRef item = InventoryUtils.getItemAt(inventoryEntity, slot);
+                    int stackSize = InventoryUtils.getStackCount(item);
                     if (stackSize > 0) {
                         giveAmount((stackSize + 1) / 2);
                     }
@@ -155,7 +151,6 @@ public class UIInventoryCell extends UIDisplayContainer {
         this.inventoryEntity = inventoryEntity;
         this.slot = slot;
         this.localPlayer = CoreRegistry.get(LocalPlayer.class);
-        inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
 
         setSize(size);
 
@@ -178,7 +173,7 @@ public class UIInventoryCell extends UIDisplayContainer {
         itemLabel.setVisible(false);
         itemLabel.setPosition(ITEM_LABEL_POSITION);
 
-        icon = new UIItemIcon(inventoryManager);
+        icon = new UIItemIcon();
         icon.setPosition(iconPosition);
         icon.setVisible(true);
 
@@ -195,7 +190,7 @@ public class UIInventoryCell extends UIDisplayContainer {
     @Override
     public void update() {
         super.update();
-        EntityRef item = inventoryManager.getItemInSlot(inventoryEntity, slot);
+        EntityRef item = InventoryUtils.getItemAt(inventoryEntity, slot);
         icon.setItem(item);
         if (itemLabel.isVisible()) {
             itemLabel.setText(getLabelFor(item));
@@ -215,43 +210,23 @@ public class UIInventoryCell extends UIDisplayContainer {
     }
 
     private EntityRef getTransferItem() {
-        return inventoryManager.getItemInSlot(getTransferEntity(), 0);
+        return InventoryUtils.getItemAt(getTransferEntity(), 0);
     }
 
     private EntityRef getItem() {
-        return inventoryManager.getItemInSlot(inventoryEntity, slot);
+        return InventoryUtils.getItemAt(inventoryEntity, slot);
     }
 
     private void swapItem() {
-        if (ghost) {
-            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
-        } else {
-            if (getTransferItem().exists()) {
-                inventoryManager.moveItem(getTransferEntity(), 0, inventoryEntity, slot);
-            } else {
-                inventoryManager.moveItem(inventoryEntity, slot, getTransferEntity(), 0);
-            }
-        }
+        getTransferEntity().send(new SwitchItemAction(0, inventoryEntity, slot));
     }
 
     private void giveAmount(int amount) {
-        if (ghost) {
-            inventoryManager.putItemInSlot(inventoryEntity, slot, EntityRef.NULL);
-        } else {
-            inventoryManager.moveItemAmount(inventoryEntity, slot, getTransferEntity(), 0, amount);
-        }
+        inventoryEntity.send(new MoveItemAction(slot, getTransferEntity(), 0, amount));
     }
 
     private void takeAmount(int amount) {
-        if (ghost) {
-            EntityRef transferSlot = inventoryManager.getItemInSlot(getTransferEntity(), 0);
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            inventoryManager.putItemInSlot(inventoryEntity, slot, entityManager.copy(transferSlot));
-        } else {
-            inventoryManager.moveItemAmount(getTransferEntity(), 0, inventoryEntity, slot, amount);
-        }
+        getTransferEntity().send(new MoveItemAction(0, inventoryEntity, slot, amount));
     }
 
     /**
@@ -289,13 +264,5 @@ public class UIInventoryCell extends UIDisplayContainer {
     public void setSelected(boolean enable) {
         selected = enable;
         selectionRectangle.setVisible(enable);
-    }
-
-    public boolean isGhost() {
-        return ghost;
-    }
-
-    public void setGhost(boolean ghost) {
-        this.ghost = ghost;
     }
 }

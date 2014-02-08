@@ -20,12 +20,10 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
@@ -37,6 +35,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -61,9 +60,6 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     @In
     private NetworkSystem networkSystem;
-
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     private ChunkProvider chunkProvider;
 
@@ -104,7 +100,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {
-            PlayerFactory playerFactory = new PlayerFactory(entityManager, inventoryManager);
+            PlayerFactory playerFactory = new PlayerFactory(entityManager);
             EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z), clientEntity);
             Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
 

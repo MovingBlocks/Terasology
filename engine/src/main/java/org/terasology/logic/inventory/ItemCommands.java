@@ -21,11 +21,12 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
 
 /**
@@ -60,9 +61,7 @@ public class ItemCommands implements ComponentSystem {
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
             EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-            if (!inventoryManager.giveItem(playerEntity, item)) {
-                item.destroy();
-            }
+            playerEntity.send(new GiveItemAction(item));
             return "You received an item of " + prefab.getName();
         } else {
             return blockCommands.giveBlock(itemPrefabName, client);

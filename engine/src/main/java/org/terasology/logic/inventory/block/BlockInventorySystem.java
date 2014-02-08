@@ -22,12 +22,12 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
@@ -41,9 +41,6 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockInventorySystem extends BaseComponentSystem {
 
-    @In
-    private SlotBasedInventoryManager inventoryManager;
-
     private PickupBuilder pickupBuilder;
 
     @Override
@@ -55,8 +52,11 @@ public class BlockInventorySystem extends BaseComponentSystem {
     @ReceiveEvent(components = {InventoryComponent.class, RetainBlockInventoryComponent.class})
     public void copyBlockInventory(OnBlockToItem event, EntityRef blockEntity) {
         EntityRef inventoryItem = event.getItem();
-        inventoryItem.addComponent(new InventoryComponent(inventoryManager.getNumSlots(blockEntity)));
-        inventoryManager.moveAll(blockEntity, inventoryItem);
+        int slotCount = InventoryUtils.getSlotCount(blockEntity);
+        inventoryItem.addComponent(new InventoryComponent(slotCount));
+        for (int i = 0; i < slotCount; i++) {
+            blockEntity.send(new SwitchItemAction(i, inventoryItem, i));
+        }
         ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
         if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
             itemComponent.stackId = "";
@@ -66,7 +66,10 @@ public class BlockInventorySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {InventoryComponent.class, BlockItemComponent.class})
     public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
-        inventoryManager.moveAll(itemEntity, event.getPlacedBlock());
+        int slotCount = InventoryUtils.getSlotCount(itemEntity);
+        for (int i = 0; i < slotCount; i++) {
+            event.getPlacedBlock().send(new SwitchItemAction(i, itemEntity, i));
+        }
     }
 
     @ReceiveEvent(components = {InventoryComponent.class, DropBlockInventoryComponent.class, LocationComponent.class})
@@ -74,9 +77,9 @@ public class BlockInventorySystem extends BaseComponentSystem {
         Vector3f position = entity.getComponent(LocationComponent.class).getWorldPosition();
 
         FastRandom random = new FastRandom();
-        int slotCount = inventoryManager.getNumSlots(entity);
+        int slotCount = InventoryUtils.getSlotCount(entity);
         for (int i = 0; i < slotCount; i++) {
-            EntityRef itemInSlot = inventoryManager.getItemInSlot(entity, i);
+            EntityRef itemInSlot = InventoryUtils.getItemAt(entity, i);
             if (itemInSlot.exists()) {
                 EntityRef pickup = pickupBuilder.createPickupFor(itemInSlot, position, 60, true);
                 pickup.send(new ImpulseEvent(random.nextVector3f(30.0f)));

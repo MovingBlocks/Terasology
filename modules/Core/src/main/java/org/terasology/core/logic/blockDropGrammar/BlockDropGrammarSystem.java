@@ -26,6 +26,7 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -134,7 +135,13 @@ public class BlockDropGrammarSystem implements ComponentSystem {
 
     private boolean shouldDropToWorld(DoDestroyEvent event, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef dropItem) {
         return blockDamageModifierComponent == null || !blockDamageModifierComponent.directPickup
-                || !inventoryManager.giveItem(event.getInstigator(), dropItem);
+                || !giveItem(event.getInstigator(), dropItem);
+    }
+
+    private boolean giveItem(EntityRef instigator, EntityRef dropItem) {
+        GiveItemAction giveEvent = new GiveItemAction(dropItem);
+        instigator.send(giveEvent);
+        return giveEvent.isConsumed();
     }
 
     private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {

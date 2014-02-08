@@ -32,6 +32,7 @@ import org.terasology.logic.health.FullHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Vector3i;
@@ -138,7 +139,13 @@ public class BlockEntitySystem implements ComponentSystem {
     }
 
     private boolean shouldDropToWorld(CreateBlockDropsEvent event, Block block, BlockDamageModifierComponent blockDamageModifierComponent, EntityRef item) {
-        return !isDirectPickup(block, blockDamageModifierComponent) || !inventoryManager.giveItem(event.getInstigator(), item);
+        return !isDirectPickup(block, blockDamageModifierComponent) || !giveItem(event, item);
+    }
+
+    private boolean giveItem(CreateBlockDropsEvent event, EntityRef item) {
+        GiveItemAction action = new GiveItemAction(item);
+        event.getInstigator().send(action);
+        return action.isConsumed();
     }
 
     private boolean isDirectPickup(Block block, BlockDamageModifierComponent blockDamageModifierComponent) {

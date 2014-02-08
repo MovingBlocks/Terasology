@@ -25,13 +25,14 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.logic.LightComponent;
@@ -60,12 +61,12 @@ public class ItemPickupSystem implements ComponentSystem {
     @ReceiveEvent(components = PickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
-        if (inventoryManager.giveItem(event.getOtherEntity(), pickupComponent.itemEntity)) {
-            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
-            event.getOtherEntity().send(new PickedUpItem(pickupComponent.itemEntity));
 
+        GiveItemAction action = new GiveItemAction(pickupComponent.itemEntity);
+        event.getOtherEntity().send(action);
+        if (action.isConsumed()) {
+            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
             pickupComponent.itemEntity = EntityRef.NULL;
-            entity.saveComponent(pickupComponent);
             entity.destroy();
         }
     }

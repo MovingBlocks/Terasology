@@ -17,7 +17,6 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.inventory.InventoryButton;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -29,9 +28,6 @@ public class InventoryScreen extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
-
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     @Override
     public void initialise() {

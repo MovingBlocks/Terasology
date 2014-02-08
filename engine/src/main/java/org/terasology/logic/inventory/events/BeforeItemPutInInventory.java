@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.logic.inventory.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
 /**
- * @author Immortius
+ * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public class ReceivedItemEvent implements Event {
+public class BeforeItemPutInInventory extends AbstractConsumableEvent {
     private EntityRef item;
-    private int slot = -1;
+    private int slot;
 
-    public ReceivedItemEvent(EntityRef item) {
-        this.item = item;
-    }
-
-    public ReceivedItemEvent(EntityRef item, int slot) {
+    public BeforeItemPutInInventory(EntityRef item, int slot) {
         this.item = item;
         this.slot = slot;
     }

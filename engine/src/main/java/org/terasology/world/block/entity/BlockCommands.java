@@ -21,21 +21,22 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.registry.Share;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -297,7 +298,9 @@ public class BlockCommands implements ComponentSystem {
             return "Unknown block or item";
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-        if (!inventoryManager.giveItem(playerEntity, item)) {
+        GiveItemAction action = new GiveItemAction(item);
+        playerEntity.send(action);
+        if (!action.isConsumed()) {
             item.destroy();
         }
 

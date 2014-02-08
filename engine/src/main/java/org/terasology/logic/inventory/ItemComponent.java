@@ -46,6 +46,9 @@ public final class ItemComponent implements Component {
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String stackId = "";
 
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    public byte maxStackSize = 99;
+
     /**
      * How many of said item are there in this stack
      */
