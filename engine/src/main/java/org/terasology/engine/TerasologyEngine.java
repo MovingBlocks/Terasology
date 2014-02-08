@@ -405,35 +405,6 @@ public class TerasologyEngine implements GameEngine {
 
         moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
         moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
-        
-        /*moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
-        moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
-        moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
-        // TODO: Create a cleaner clipboard access class, put permission on that
-        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(AssetManager.class, FilePermission.class);
-        moduleSecurityManager.addAllowedPermission(HeightmapFileReader.class, new PropertyPermission("user.dir", "read"));
-        moduleSecurityManager.addAllowedPermission(HeightmapFileReader.class, new FilePermission("Heightmap.txt", "read"));
-        moduleSecurityManager.addAllowedPermission(EnumMap.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(WorldGeneratorPluginLibrary.class, new RuntimePermission("accessDeclaredMembers"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
-        moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
-
-        moduleSecurityManager.addAllowedPermission(GUIManagerLwjgl.class, ReflectPermission.class);
-
-        // allow Tasks to be injected
-        moduleSecurityManager.addAllowedPermission(Task.class, new ReflectPermission("suppressAccessChecks"));   */
 
         Policy.setPolicy(new EngineModulePolicy());
         System.setSecurityManager(moduleSecurityManager);

@@ -34,6 +34,7 @@ public interface UIWidget extends Iterable<UIWidget> {
     String HOVER_MODE = "hover";
     String FOCUSED_MODE = "focused";
     String ACTIVE_MODE = "active";
+    String BASE_PART = "base";
 
     String getId();
 
@@ -56,6 +57,7 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     /**
      * Finds a widget with the given id and type, within the current widget and its contents.
+     *
      * @param id
      * @param type
      * @param <T>

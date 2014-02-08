@@ -31,9 +31,9 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  * @author JoeClacks
  */
 public class UIDoubleSlider extends CoreWidget {
-    public static final String SLIDER = "slider";
-    public static final String TICKER_LEFT = "tickerLeft";
-    public static final String TICKER_RIGHT = "tickerRight";
+    public static final String SLIDER_PART = "slider";
+    public static final String TICKER_LEFT_PART = "tickerLeft";
+    public static final String TICKER_RIGHT_PART = "tickerRight";
 
     private InteractionListener tickerListenerLeft = new BaseInteractionListener() {
         private Vector2i offset = new Vector2i();
@@ -121,11 +121,11 @@ public class UIDoubleSlider extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.setPart(SLIDER);
+        canvas.setPart(SLIDER_PART);
         canvas.drawBackground();
 
-        drawTicker(canvas, TICKER_LEFT, valueLeft, tickerListenerLeft, false);
-        drawTicker(canvas, TICKER_RIGHT, valueRight, tickerListenerRight, true);
+        drawTicker(canvas, TICKER_LEFT_PART, valueLeft, tickerListenerLeft, false);
+        drawTicker(canvas, TICKER_RIGHT_PART, valueRight, tickerListenerRight, true);
     }
 
     private void drawTicker(Canvas canvas, String part, Binding<Float> value, InteractionListener tickerListener, boolean rightTicker) {
@@ -150,7 +150,7 @@ public class UIDoubleSlider extends CoreWidget {
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
         Vector2i result = new Vector2i();
-        canvas.setPart(SLIDER);
+        canvas.setPart(SLIDER_PART);
         result.x = canvas.getCurrentStyle().getFixedWidth();
         if (result.x == 0) {
             result.x = canvas.getCurrentStyle().getMinWidth();
@@ -160,8 +160,8 @@ public class UIDoubleSlider extends CoreWidget {
             result.y = canvas.getCurrentStyle().getMinHeight();
         }
 
-        Vector2i left = getTickerPreferredContentSize(canvas, TICKER_LEFT);
-        Vector2i right = getTickerPreferredContentSize(canvas, TICKER_RIGHT);
+        Vector2i left = getTickerPreferredContentSize(canvas, TICKER_LEFT_PART);
+        Vector2i right = getTickerPreferredContentSize(canvas, TICKER_RIGHT_PART);
 
         result.y = Math.max(result.y, Math.max(left.y, right.y));
         result.x = Math.max(result.x, left.x + left.y);

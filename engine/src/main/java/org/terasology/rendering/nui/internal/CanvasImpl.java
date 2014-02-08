@@ -309,7 +309,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
         Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
             Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
@@ -325,7 +325,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
         try (SubRegion ignored = subRegionForWidget(widget, getRegion(), false)) {
             return applyStyleToSize(elementStyle.getMargin().grow(widget.getMaxContentSize(this)), elementStyle);
         }
@@ -347,7 +347,7 @@ public class CanvasImpl implements CanvasControl {
         }
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
         UISkin skin = (element.getSkin() != null) ? element.getSkin() : state.skin;
-        UIStyle newStyle = skin.getStyleFor(family, element.getClass(), element.getMode());
+        UIStyle newStyle = skin.getStyleFor(family, element.getClass(), UIWidget.BASE_PART, element.getMode());
         Rect2i regionArea;
         try (SubRegion ignored = subRegionForWidget(element, region, false)) {
             regionArea = applyStyleToSize(region, newStyle, element.getMaxContentSize(this));
@@ -374,7 +374,7 @@ public class CanvasImpl implements CanvasControl {
         if (widget.getFamily() != null) {
             setFamily(widget.getFamily());
         }
-        setPart("");
+        setPart(UIWidget.BASE_PART);
         setMode(widget.getMode());
         return result;
     }

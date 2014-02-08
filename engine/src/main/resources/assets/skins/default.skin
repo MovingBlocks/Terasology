@@ -144,7 +144,7 @@
             "text-align-horizontal" : "left",
             "fixed-height" : 32,
             "parts" : {
-                "box" : {
+                "base" : {
                     "background" : "dropdown",
                     "background-border" : {
                         "top" : 3,
