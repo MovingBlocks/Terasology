@@ -197,6 +197,7 @@ idea {
     module.excludeDirs += file('logs')
     module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')
+    module.excludeDirs += file('terasology-server')
 
     project {
         // Set JDK

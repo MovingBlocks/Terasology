@@ -10,6 +10,10 @@ def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
 
 ext {
+    // Default path to store server data if running headless via Gradle
+    localServerDataPath = 'terasology-server'
+
+    // General props
     mainClassName = 'org.terasology.engine.Terasology'
     subDirLibs = 'libs'
     templatesDir = new File(rootDir, 'templates')
@@ -18,6 +22,7 @@ ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
 
+    // Version related
     startDateTimeString = dateTimeFormat.format(new Date())
     versionFileName = 'VERSION'
     versionBase = new File(templatesDir, "version.txt").text.trim()
@@ -47,9 +52,8 @@ jar {
     }
 }
 
-// Task to run the game, PC-style
 task runPC(type:JavaExec) {
-    description = "Run 'Terasology' to play the game"
+    description = "Run 'Terasology' to play the game as a standard PC application"
 
     // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
     dependsOn rootProject.extractNatives
@@ -59,7 +63,28 @@ task runPC(type:JavaExec) {
     // Run arguments
     main = mainClassName
     workingDir = rootDir
-    args '-homedir'
+    String[] runArgs = ["-homedir"]
+    args runArgs
+
+    // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
+    classpath sourceSets.main.output.classesDir
+    classpath project(':engine').sourceSets.main.output.classesDir
+    classpath project(':engine').configurations.runtime
+}
+
+task startServer(type:JavaExec) {
+    description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
+
+    // Dependencies: natives + all modules & the PC facade itself (which will trigger the engine)
+    dependsOn rootProject.extractNatives
+    dependsOn rootProject.moduleClasses
+    dependsOn classes
+
+    // Run arguments
+    main = mainClassName
+    workingDir = rootDir
+    String[] runArgs = ["-headless", "-homedir=$localServerDataPath"]
+    args runArgs
 
     // Classpath: PC itself, engine classes, engine dependencies. Not modules or natives since the engine finds those
     classpath sourceSets.main.output.classesDir
