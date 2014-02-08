@@ -516,7 +516,7 @@ public class CanvasImpl implements CanvasControl {
             if (state.drawOnTop) {
                 drawOnTopOperations.add(new DrawTextOperation(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha()));
             } else {
-                drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha());
+                renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, state.getAlpha());
             }
         }
     }
@@ -554,7 +554,7 @@ public class CanvasImpl implements CanvasControl {
             if (state.drawOnTop) {
                 drawOnTopOperations.add(new DrawTextureOperation(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
             } else {
-                drawTextureInternal(texture, color, mode, absoluteRegion, ux, uy, uw, uh, state.getAlpha());
+                renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, state.getAlpha());
             }
         }
     }
@@ -573,76 +573,16 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh) {
-        float top = (float) border.getTop() / texture.getHeight();
-        float left = (float) border.getLeft() / texture.getWidth();
-        float bottom = (float) border.getBottom() / texture.getHeight();
-        float right = (float) border.getRight() / texture.getWidth();
-        int centerHoriz = region.width() - border.getLeft() - border.getRight();
-        int centerVert = region.height() - border.getTop() - border.getBottom();
-
-        if (border.getTop() != 0) {
-            // TOP-LEFT CORNER
-            if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.minY(), border.getLeft(), border.getTop()), ScaleMode.STRETCH,
-                        ux, uy, left, top);
-            }
-            // TOP BORDER
-            Rect2i topArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY(), centerHoriz, border.getTop());
-            if (tile) {
-                drawTextureRaw(texture, topArea, ScaleMode.TILED, ux + left, uy, uw - left - right, top);
-            } else {
-                drawTextureRaw(texture, topArea, ScaleMode.STRETCH, ux + left, uy, uw - left - right, top);
-            }
-            // TOP-RIGHT CORNER
-            if (border.getRight() != 0) {
-                Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY(), border.getRight(), border.getTop());
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux + uw - right, uy, right, top);
-            }
+        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
+            return;
         }
-        // LEFT BORDER
-        if (border.getLeft() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(region.minX(), region.minY() + border.getTop(), border.getLeft(), centerVert);
-            if (tile) {
-                drawTextureRaw(texture, area, ScaleMode.TILED, ux, uy + top, left, uh - top - bottom);
+        Rect2i absoluteRegion = relativeToAbsolute(region);
+        Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
+        if (!cropRegion.isEmpty()) {
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawBorderedTextureOperation(texture, absoluteRegion, border, tile, cropRegion, ux, uy, uw, uh, state.getAlpha()));
             } else {
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux, uy + top, left, uh - top - bottom);
-            }
-        }
-        // CENTER
-        if (tile) {
-            drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert),
-                    ScaleMode.TILED, ux + left, uy + top, uw - left - right, uh - top - bottom);
-        } else {
-            drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
-                    ux + left, uy + top, uw - left - right, uh - top - bottom);
-        }
-
-        // RIGHT BORDER
-        if (border.getRight() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY() + border.getTop(), border.getRight(), centerVert);
-            if (tile) {
-                drawTextureRaw(texture, area, ScaleMode.TILED, ux + uw - right, uy + top, right, uh - top - bottom);
-            } else {
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux + uw - right, uy + top, right, uh - top - bottom);
-            }
-        }
-        if (border.getBottom() != 0) {
-            // BOTTOM-LEFT CORNER
-            if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom() + 1, border.getLeft(), border.getBottom()),
-                        ScaleMode.STRETCH, ux, uy + uw - bottom, left, bottom);
-            }
-            // BOTTOM BORDER
-            Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom() + 1, centerHoriz, border.getBottom());
-            if (tile) {
-                drawTextureRaw(texture, bottomArea, ScaleMode.TILED, ux + left, uy + uw - bottom, uw - left - right, bottom);
-            } else {
-                drawTextureRaw(texture, bottomArea, ScaleMode.STRETCH, ux + left, uy + uw - bottom, uw - left - right, bottom);
-            }
-            // BOTTOM-RIGHT CORNER
-            if (border.getRight() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.maxY() - border.getBottom() + 1, border.getRight(),
-                        border.getBottom()), ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
+                renderer.drawTextureBordered(texture, absoluteRegion, border, tile, ux, uy, uw, uh, state.getAlpha());
             }
         }
     }
@@ -726,18 +666,6 @@ public class CanvasImpl implements CanvasControl {
 
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
-    }
-
-    private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,
-                                     float ux, float uy, float uw, float uh, float alpha) {
-        renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
-    }
-
-    private void drawTextInternal(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
-                                  Color color, Color shadowColor, float alpha) {
-        renderer.crop(cropRegion);
-        renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha);
-        renderer.crop(state.cropRegion);
     }
 
     /**
@@ -903,7 +831,42 @@ public class CanvasImpl implements CanvasControl {
         @Override
         public void draw() {
             renderer.crop(cropRegion);
-            drawTextureInternal(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
+            renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
+            renderer.crop(state.cropRegion);
+        }
+    }
+
+    private final class DrawBorderedTextureOperation implements DrawOperation {
+
+        private TextureRegion texture;
+        private Border border;
+        private boolean tile;
+        private Rect2i absoluteRegion;
+        private Rect2i cropRegion;
+        private float ux;
+        private float uy;
+        private float uw;
+        private float uh;
+        private float alpha;
+
+        private DrawBorderedTextureOperation(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile,
+                                             Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+            this.texture = texture;
+            this.tile = tile;
+            this.absoluteRegion = absoluteRegion;
+            this.border = border;
+            this.cropRegion = cropRegion;
+            this.ux = ux;
+            this.uy = uy;
+            this.uw = uw;
+            this.uh = uh;
+            this.alpha = alpha;
+        }
+
+        @Override
+        public void draw() {
+            renderer.crop(cropRegion);
+            renderer.drawTextureBordered(texture, absoluteRegion, border, tile, ux, uy, uw, uh, alpha);
             renderer.crop(state.cropRegion);
         }
     }
@@ -956,7 +919,9 @@ public class CanvasImpl implements CanvasControl {
 
         @Override
         public void draw() {
-            drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, alpha);
+            renderer.crop(cropRegion);
+            renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha);
+            renderer.crop(state.cropRegion);
         }
     }
 

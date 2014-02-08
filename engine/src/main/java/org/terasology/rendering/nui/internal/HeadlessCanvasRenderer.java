@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.internal;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -74,6 +75,11 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
     @Override
     public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color, Color shadowColor,
                          float alpha) {
+        // Do nothing
+    }
+
+    @Override
+    public void drawTextureBordered(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
@@ -51,4 +52,6 @@ public interface CanvasRenderer {
     void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, float ux, float uy, float uw, float uh, float alpha);
 
     void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color, Color shadowColor, float alpha);
+
+    void drawTextureBordered(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha);
 }

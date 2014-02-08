@@ -22,6 +22,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.math.AABB;
+import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
@@ -77,6 +78,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class LwjglCanvasRenderer implements CanvasRenderer {
 
     private static final String CROPPING_BOUNDARIES_PARAM = "croppingBoundaries";
+    private static final Rect2f FULL_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
     private Matrix4f modelView;
     private FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
     private Mesh billboard = Assets.getMesh("engine:UIBillboard");
@@ -243,35 +245,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                 mesh = cachedTextures.get(key);
                 if (mesh == null) {
                     MeshBuilder builder = new MeshBuilder();
-                    int tileW = TeraMath.ceilToInt(uw * texture.getWidth());
-                    int tileH = TeraMath.ceilToInt(uh * texture.getHeight());
-                    int horizTiles = TeraMath.fastAbs((absoluteRegion.width() - 1) / tileW) + 1;
-                    int vertTiles = TeraMath.fastAbs((absoluteRegion.height() - 1) / tileH) + 1;
-
-                    int offsetX = absoluteRegion.width() - horizTiles * tileW;
-                    int offsetY = absoluteRegion.height() - vertTiles * tileH;
-
-                    for (int tileY = 0; tileY < vertTiles; tileY++) {
-                        for (int tileX = 0; tileX < horizTiles; tileX++) {
-                            int left = offsetX + tileW * tileX;
-                            int top = offsetY + tileH * tileY;
-                            float vertLeft = Math.max((float) left / absoluteRegion.width(), 0);
-                            float vertTop = Math.max((float) top / absoluteRegion.height(), 0);
-                            float vertRight = Math.min((float) (left + tileW) / absoluteRegion.width(), 1);
-                            float vertBottom = Math.min((float) (top + tileH) / absoluteRegion.height(), 1);
-                            builder.addPoly(new Vector3f(vertLeft, vertTop, 0), new Vector3f(vertRight, vertTop, 0), new Vector3f(vertRight, vertBottom, 0),
-                                    new Vector3f(vertLeft, vertBottom, 0));
-
-                            float texCoordLeft = (float) (Math.max(left, 0) - left) / tileW;
-                            float texCoordTop = (float) (Math.max(top, 0) - top) / tileH;
-                            float texCoordRight = (float) (Math.min(left + tileW, absoluteRegion.width()) - left) / tileW;
-                            float texCoordBottom = (float) (Math.min(top + tileH, absoluteRegion.height()) - top) / tileH;
-                            builder.addTexCoord(texCoordLeft, texCoordTop);
-                            builder.addTexCoord(texCoordRight, texCoordTop);
-                            builder.addTexCoord(texCoordRight, texCoordBottom);
-                            builder.addTexCoord(texCoordLeft, texCoordBottom);
-                        }
-                    }
+                    addTiles(builder, absoluteRegion, FULL_REGION, texture.size(), FULL_REGION);
                     mesh = builder.build();
                     cachedTextures.put(key, mesh);
                 }
@@ -339,6 +313,151 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         }
     }
 
+    @Override
+    public void drawTextureBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
+        if (!currentTextureCropRegion.equals(requestedCropRegion)
+                && !(currentTextureCropRegion.encompasses(region) && requestedCropRegion.encompasses(region))) {
+            textureMat.setFloat4(CROPPING_BOUNDARIES_PARAM, requestedCropRegion.minX(), requestedCropRegion.maxX() + 1,
+                    requestedCropRegion.minY(), requestedCropRegion.maxY() + 1);
+            currentTextureCropRegion = requestedCropRegion;
+        }
+
+        Vector2i textureSize = new Vector2i(TeraMath.ceilToInt(texture.getWidth() * uw), TeraMath.ceilToInt(texture.getHeight() * uh));
+
+        TextureCacheKey key = new TextureCacheKey(textureSize, region.size());
+        usedTextures.add(key);
+        Mesh mesh = cachedTextures.get(key);
+        if (mesh == null) {
+            MeshBuilder builder = new MeshBuilder();
+
+
+            float topTex = (float) border.getTop() / textureSize.y;
+            float leftTex = (float) border.getLeft() / textureSize.x;
+            float bottomTex = 1f - (float) border.getBottom() / textureSize.y;
+            float rightTex = 1f - (float) border.getRight() / textureSize.x;
+            int centerHoriz = region.width() - border.getTotalWidth();
+            int centerVert = region.height() - border.getTotalHeight();
+
+            float top = (float) border.getTop() / region.height();
+            float left = (float) border.getLeft() / region.width();
+            float bottom = 1f - (float) border.getBottom() / region.height();
+            float right = 1f - (float) border.getRight() / region.width();
+
+            if (border.getTop() != 0) {
+                if (border.getLeft() != 0) {
+                    addRectPoly(builder, 0, 0, left, top, 0, 0, leftTex, topTex);
+                }
+                if (tile) {
+                    addTiles(builder, Rect2i.createFromMinAndSize(border.getLeft(), 0, centerHoriz, border.getTop()), Rect2f.createFromMinAndMax(left, 0, right, top),
+                            new Vector2i(textureSize.x - border.getTotalWidth(), border.getTop()),
+                            Rect2f.createFromMinAndMax(leftTex, 0, rightTex, topTex));
+                } else {
+                    addRectPoly(builder, left, 0, right, top, leftTex, 0, rightTex, topTex);
+                }
+                if (border.getRight() != 0) {
+                    addRectPoly(builder, right, 0, 1, top, rightTex, 0, 1, topTex);
+                }
+            }
+
+            if (border.getLeft() != 0) {
+                if (tile) {
+                    addTiles(builder, Rect2i.createFromMinAndSize(0, border.getTop(), border.getLeft(), centerVert), Rect2f.createFromMinAndMax(0, top, left, bottom),
+                            new Vector2i(border.getLeft(), textureSize.y - border.getTotalHeight()),
+                            Rect2f.createFromMinAndMax(0, topTex, leftTex, bottomTex));
+                } else {
+                    addRectPoly(builder, 0, top, left, bottom, 0, topTex, leftTex, bottomTex);
+                }
+            }
+
+            if (tile) {
+                addTiles(builder, Rect2i.createFromMinAndSize(border.getLeft(), border.getTop(), centerHoriz, centerVert),
+                        Rect2f.createFromMinAndMax(left, top, right, bottom),
+                        new Vector2i(textureSize.x - border.getTotalWidth(), textureSize.y - border.getTotalHeight()),
+                        Rect2f.createFromMinAndMax(leftTex, topTex, rightTex, bottomTex));
+            } else {
+                addRectPoly(builder, left, top, right, bottom, leftTex, topTex, rightTex, bottomTex);
+            }
+
+            if (border.getRight() != 0) {
+                if (tile) {
+                    addTiles(builder, Rect2i.createFromMinAndSize(region.width() - border.getRight(), border.getTop(), border.getRight(), centerVert),
+                            Rect2f.createFromMinAndMax(right, top, 1, bottom),
+                            new Vector2i(border.getRight(), textureSize.y - border.getTotalHeight()),
+                            Rect2f.createFromMinAndMax(rightTex, topTex, 1, bottomTex));
+                } else {
+                    addRectPoly(builder, right, top, 1, bottom, rightTex, topTex, 1, bottomTex);
+                }
+            }
+
+            if (border.getBottom() != 0) {
+                if (border.getLeft() != 0) {
+                    addRectPoly(builder, 0, bottom, left, 1, 0, bottomTex, leftTex, 1);
+                }
+                if (tile) {
+                    addTiles(builder, Rect2i.createFromMinAndSize(border.getLeft(), region.height() - border.getBottom(), centerHoriz, border.getBottom()),
+                            Rect2f.createFromMinAndMax(left, bottom, right, 1),
+                            new Vector2i(textureSize.x - border.getTotalWidth(), border.getBottom()),
+                            Rect2f.createFromMinAndMax(leftTex, bottomTex, rightTex, 1));
+                } else {
+                    addRectPoly(builder, left, bottom, right, 1, leftTex, bottomTex, rightTex, 1);
+                }
+                if (border.getRight() != 0) {
+                    addRectPoly(builder, right, bottom, 1, 1, rightTex, bottomTex, 1, 1);
+                }
+            }
+
+            mesh = builder.build();
+            cachedTextures.put(key, mesh);
+        }
+        textureMat.setFloat2("scale", region.width(), region.height());
+        textureMat.setFloat2("offset", region.minX(), region.minY());
+
+        Rect2f textureArea = texture.getRegion();
+        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
+        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
+
+        textureMat.setTexture("texture", texture.getTexture());
+        textureMat.setFloat4("color", 1, 1, 1, alpha);
+        textureMat.bindTextures();
+        mesh.render();
+    }
+
+    private void addRectPoly(MeshBuilder builder, float minX, float minY, float maxX, float maxY, float texMinX, float texMinY, float texMaxX, float texMaxY) {
+        builder.addPoly(new Vector3f(minX, minY, 0), new Vector3f(maxX, minY, 0), new Vector3f(maxX, maxY, 0), new Vector3f(minX, maxY, 0));
+        builder.addTexCoord(texMinX, texMinY);
+        builder.addTexCoord(texMaxX, texMinY);
+        builder.addTexCoord(texMaxX, texMaxY);
+        builder.addTexCoord(texMinX, texMaxY);
+    }
+
+    private void addTiles(MeshBuilder builder, Rect2i drawRegion, Rect2f subDrawRegion, Vector2i textureSize, Rect2f subTextureRegion) {
+        int tileW = textureSize.x;
+        int tileH = textureSize.y;
+        int horizTiles = TeraMath.fastAbs((drawRegion.width() - 1) / tileW) + 1;
+        int vertTiles = TeraMath.fastAbs((drawRegion.height() - 1) / tileH) + 1;
+
+        int offsetX = (drawRegion.width() - horizTiles * tileW) / 2;
+        int offsetY = (drawRegion.height() - vertTiles * tileH) / 2;
+
+        for (int tileY = 0; tileY < vertTiles; tileY++) {
+            for (int tileX = 0; tileX < horizTiles; tileX++) {
+                int left = offsetX + tileW * tileX;
+                int top = offsetY + tileH * tileY;
+
+                float vertLeft = subDrawRegion.minX() + subDrawRegion.width() * Math.max((float) left / drawRegion.width(), 0);
+                float vertTop = subDrawRegion.minY() + subDrawRegion.height() * Math.max((float) top / drawRegion.height(), 0);
+                float vertRight = subDrawRegion.minX() + subDrawRegion.width() * Math.min((float) (left + tileW) / drawRegion.width(), 1);
+                float vertBottom = subDrawRegion.minY() + subDrawRegion.height() * Math.min((float) (top + tileH) / drawRegion.height(), 1);
+                float texCoordLeft = subTextureRegion.minX() + subTextureRegion.width() * (Math.max(left, 0) - left) / tileW;
+                float texCoordTop = subTextureRegion.minY() + subTextureRegion.height() * (Math.max(top, 0) - top) / tileH;
+                float texCoordRight = subTextureRegion.minX() + subTextureRegion.width() * (Math.min(left + tileW, drawRegion.width()) - left) / tileW;
+                float texCoordBottom = subTextureRegion.minY() + subTextureRegion.height() * (Math.min(top + tileH, drawRegion.height()) - top) / tileH;
+
+                addRectPoly(builder, vertLeft, vertTop, vertRight, vertBottom, texCoordLeft, texCoordTop, texCoordRight, texCoordBottom);
+            }
+        }
+    }
+
     /**
      * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
      */
@@ -386,10 +505,21 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
         private Vector2i textureSize;
         private Vector2i areaSize;
+        private Border border;
+        private boolean tiled;
 
         public TextureCacheKey(Vector2i textureSize, Vector2i areaSize) {
             this.textureSize = new Vector2i(textureSize);
             this.areaSize = new Vector2i(areaSize);
+            this.border = Border.ZERO;
+            this.tiled = true;
+        }
+
+        public TextureCacheKey(Vector2i textureSize, Vector2i areaSize, Border border, boolean tiled) {
+            this.textureSize = new Vector2i(textureSize);
+            this.areaSize = new Vector2i(areaSize);
+            this.border = border;
+            this.tiled = tiled;
         }
 
         @Override
@@ -399,14 +529,15 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
             }
             if (obj instanceof TextureCacheKey) {
                 TextureCacheKey other = (TextureCacheKey) obj;
-                return Objects.equals(textureSize, other.textureSize) && Objects.equals(areaSize, other.areaSize);
+                return Objects.equals(textureSize, other.textureSize) && Objects.equals(areaSize, other.areaSize)
+                        && Objects.equals(border, other.border) && tiled == other.tiled;
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(textureSize, areaSize);
+            return Objects.hash(textureSize, areaSize, border, tiled);
         }
     }
 }
