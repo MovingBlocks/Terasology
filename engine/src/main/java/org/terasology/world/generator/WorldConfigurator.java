@@ -15,17 +15,17 @@
  */
 package org.terasology.world.generator;
 
-import java.util.List;
-
-import org.terasology.world.generator.params.Parameter;
+import java.util.Map;
 
 /**
- * Allows configuration
+ * Allows for configuration
  * @author Martin Steiger
  */
 public interface WorldConfigurator  {
 
-    List<Parameter> getParams();
-    
-    Object getObject();
+    /**
+     * The values are supposed to be annotated with {@link org.terasology.rendering.nui.properties.Property}
+     * @return a map (label->object)
+     */
+    Map<String, ?> getProperties();
 }

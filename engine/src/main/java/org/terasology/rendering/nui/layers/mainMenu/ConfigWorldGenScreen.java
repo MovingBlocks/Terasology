@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -25,27 +27,14 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.Binding;
-import org.terasology.rendering.nui.databinding.IntToFloatBinding;
-import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UICheckbox;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UISlider;
-import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.params.BooleanParameter;
-import org.terasology.world.generator.params.FloatParameter;
-import org.terasology.world.generator.params.IntParameter;
-import org.terasology.world.generator.params.Parameter;
-import org.terasology.world.generator.params.StringParameter;
 
 /**
  * @author Immortius
@@ -99,54 +88,15 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
 
         properties = find("properties", PropertyLayout.class);
         if (properties != null) {
-            PropertyProvider<?> provider = new PropertyProvider<>(worldConfig.getObject());
-            properties.addPropertyProvider("Behavior Node", provider);
+            Map<String, ?> props = worldConfig.getProperties();
+            for (String label : props.keySet()) {
+                PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));
+                properties.addPropertyProvider(label, provider);
+            }
         }
 
 
     }
-
-    private UIWidget getWidgetFor(Parameter p) {
-        if (p instanceof IntParameter) {
-            final IntParameter ip = (IntParameter) p;
-            UISlider slider = new UISlider();
-            slider.setIncrement(1.0f);
-            slider.setPrecision(0);
-            slider.setMinimum(ip.getMin());
-            slider.setRange(ip.getMax() - ip.getMin());
-            Binding<Float> binding = new IntToFloatBinding(ip.getBinding());
-            slider.bindValue(binding);
-            return slider;
-        }
-
-        if (p instanceof FloatParameter) {
-            final FloatParameter fp = (FloatParameter) p;
-            UISlider slider = new UISlider();
-            slider.setIncrement(fp.getStep());
-            slider.setMinimum(fp.getMin());
-            slider.setRange(fp.getMax() - fp.getMin());
-            Binding<Float> binding = fp.getBinding();
-            slider.bindValue(binding);
-            return slider;
-        }
-        
-        if (p instanceof StringParameter) {
-            final StringParameter sp = (StringParameter) p;
-            UIText text = new UIText();
-            text.bindText(sp.getBinding());
-            return text;
-        }
-        
-        if (p instanceof BooleanParameter) {
-            final BooleanParameter bp = (BooleanParameter) p;
-            UICheckbox checkbox = new UICheckbox();
-            checkbox.bindChecked(bp.getBinding());
-            return checkbox;
-        }
-        
-        return new UILabel("-");
-    }
-    
 }
 
 
