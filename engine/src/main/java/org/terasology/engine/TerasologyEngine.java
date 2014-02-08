@@ -68,6 +68,7 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
 import java.security.Policy;
 import java.util.Collection;
@@ -399,6 +400,8 @@ public class TerasologyEngine implements GameEngine {
         }
 
         moduleSecurityManager.addFullPrivilegePackage("ch.qos.logback.classic");
+        moduleSecurityManager.addAllowedPermission("com.google.gson", ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission("com.google.gson.internal", ReflectPermission.class);
 
         moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
         moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);

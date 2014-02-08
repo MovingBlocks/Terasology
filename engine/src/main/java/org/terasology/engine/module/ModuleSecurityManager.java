@@ -163,7 +163,6 @@ public class ModuleSecurityManager extends SecurityManager {
                 ClassLoader owningLoader = stack[i].getClassLoader();
                 if (owningLoader != null && owningLoader instanceof ModuleClassLoader) {
                     return checkAPIPermissionsFor(perm, i, stack);
-
                 }
             }
         } finally {
@@ -174,8 +173,8 @@ public class ModuleSecurityManager extends SecurityManager {
 
     private boolean checkAPIPermissionsFor(Permission permission, int moduleDepth, Class[] stack) {
         Set<Class> allowed = Sets.union(allowedPermissionInstances.get(permission), allowedPermissionsTypes.get(permission.getClass()));
-        Set<String> allowedPackages = Sets.union(Sets.union(allowedPackagePermissionInstances.get(permission), allowedPackagePermissionsTypes.get(permission.getClass()))
-                , fullPrivilegePackages);
+        Set<String> allowedPackages = Sets.union(Sets.union(allowedPackagePermissionInstances.get(permission), allowedPackagePermissionsTypes.get(permission.getClass())),
+                fullPrivilegePackages);
         for (int i = moduleDepth - 1; i >= 0; i--) {
             if (allowed.contains(stack[i]) || allowedPackages.contains(stack[i].getPackage().getName())) {
                 return true;
