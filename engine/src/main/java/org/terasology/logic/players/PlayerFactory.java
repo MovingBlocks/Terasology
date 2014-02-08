@@ -19,7 +19,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
 
@@ -31,11 +31,9 @@ import javax.vecmath.Vector3f;
 public class PlayerFactory {
 
     private EntityManager entityManager;
-    private SlotBasedInventoryManager inventoryManager;
 
-    public PlayerFactory(EntityManager entityManager, SlotBasedInventoryManager inventoryManager) {
+    public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.inventoryManager = inventoryManager;
     }
 
     public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
@@ -51,7 +49,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        player.send(new SelectedItemChangedEvent(EntityRef.NULL, inventoryManager.getItemInSlot(player, 0)));
+        player.send(new SelectedItemChangedEvent(EntityRef.NULL, InventoryUtils.getItemAt(player, 0)));
 
         return player;
     }

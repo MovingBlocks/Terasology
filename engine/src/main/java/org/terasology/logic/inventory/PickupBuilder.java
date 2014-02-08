@@ -19,6 +19,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.lifespan.LifespanComponent;
+import org.terasology.logic.inventory.action.RemoveItemAction;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.registry.CoreRegistry;
@@ -54,9 +55,13 @@ public final class PickupBuilder {
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
             if (dropAll) {
-                inventoryManager.removeItem(owner, itemEntity);
+                RemoveItemAction action = new RemoveItemAction(EntityRef.NULL, pickupItem, false);
+                owner.send(action);
+                pickupItem = action.getRemovedItem();
             } else {
-                pickupItem = inventoryManager.removeItem(owner, itemEntity, 1);
+                RemoveItemAction action = new RemoveItemAction(EntityRef.NULL, pickupItem, false, 1);
+                owner.send(action);
+                pickupItem = action.getRemovedItem();
             }
         }
 

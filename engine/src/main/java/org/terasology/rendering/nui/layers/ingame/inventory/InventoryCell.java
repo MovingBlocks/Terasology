@@ -22,8 +22,10 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.action.MoveItemAction;
+import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
@@ -49,7 +51,6 @@ public class InventoryCell extends CoreWidget {
 
     private ItemIcon icon = new ItemIcon();
 
-    private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
     private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -58,7 +59,7 @@ public class InventoryCell extends CoreWidget {
             if (MouseInput.MOUSE_LEFT == button) {
                 swapItem();
             } else if (MouseInput.MOUSE_RIGHT == button) {
-                int stackSize = inventoryManager.getStackSize(getTargetItem());
+                int stackSize = InventoryUtils.getStackCount(getTargetItem());
                 if (stackSize > 0) {
                     giveAmount((stackSize + 1) / 2);
                 }
@@ -143,7 +144,7 @@ public class InventoryCell extends CoreWidget {
     }
 
     public EntityRef getTargetItem() {
-        return inventoryManager.getItemInSlot(getTargetInventory(), getTargetSlot());
+        return InventoryUtils.getItemAt(getTargetInventory(), getTargetSlot());
     }
 
     public void bindTargetInventory(Binding<EntityRef> binding) {
@@ -196,19 +197,15 @@ public class InventoryCell extends CoreWidget {
     }
 
     private void swapItem() {
-        if (getTransferItem().exists()) {
-            inventoryManager.moveItem(getTransferEntity(), 0, getTargetInventory(), getTargetSlot());
-        } else {
-            inventoryManager.moveItem(getTargetInventory(), getTargetSlot(), getTransferEntity(), 0);
-        }
+        getTransferEntity().send(new SwitchItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot()));
     }
 
     private void giveAmount(int amount) {
-        inventoryManager.moveItemAmount(getTargetInventory(), getTargetSlot(), getTransferEntity(), 0, amount);
+        getTargetInventory().send(new MoveItemAction(localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount));
     }
 
     private void takeAmount(int amount) {
-        inventoryManager.moveItemAmount(getTransferEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
+        getTransferEntity().send(new MoveItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount));
     }
 
     private EntityRef getTransferEntity() {
@@ -216,7 +213,7 @@ public class InventoryCell extends CoreWidget {
     }
 
     private EntityRef getTransferItem() {
-        return inventoryManager.getItemInSlot(getTransferEntity(), 0);
+        return InventoryUtils.getItemAt(getTransferEntity(), 0);
     }
 
 }

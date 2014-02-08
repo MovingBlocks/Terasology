@@ -19,10 +19,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.UIWidget;
@@ -42,7 +41,6 @@ public class InventoryGrid extends CoreWidget {
     private List<InventoryCell> cells = Lists.newArrayList();
 
     private Binding<EntityRef> targetEntity = new DefaultBinding<>(EntityRef.NULL);
-    private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
     private Binding<Integer> cellOffset = new DefaultBinding<>(0);
     private Binding<Integer> maxCellCount = new DefaultBinding<>(Integer.MAX_VALUE);
 
@@ -50,7 +48,7 @@ public class InventoryGrid extends CoreWidget {
     public void update(float delta) {
         super.update(delta);
 
-        int numSlots = inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset();
+        int numSlots = InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset();
         if (numSlots > cells.size() && cells.size() < getMaxCellCount()) {
             for (int i = cells.size(); i < numSlots && i < getMaxCellCount(); ++i) {
                 InventoryCell cell = new InventoryCell();
@@ -68,7 +66,7 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int numSlots = Math.min(inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        int numSlots = Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
         if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
@@ -82,7 +80,7 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        int numSlots = Math.min(inventoryManager.getNumSlots(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        int numSlots = Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
         if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(maxHorizontalCells, sizeHint.getX() / cellSize.getX());

@@ -30,8 +30,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -72,8 +72,6 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     @In
     private WorldRenderer worldRenderer;
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     private Mesh handMesh;
     private Texture handTex;
@@ -119,7 +117,7 @@ public class FirstPersonRenderer implements RenderSystem {
         float handMovementAnimationOffset = character.handAnimation;
 
         int invSlotIndex = character.selectedItem;
-        EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
+        EntityRef heldItem = InventoryUtils.getItemAt(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {

@@ -17,9 +17,8 @@ package org.terasology.rendering.gui.widgets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;
@@ -34,7 +33,6 @@ import java.util.List;
 public class UIInventoryGrid extends UIDisplayContainer {
     private static final Logger logger = LoggerFactory.getLogger(UIInventoryGrid.class);
 
-    private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
     private EntityRef entity = EntityRef.NULL;
     private List<UIInventoryCell> cells = new ArrayList<UIInventoryCell>();
 
@@ -47,19 +45,16 @@ public class UIInventoryGrid extends UIDisplayContainer {
     private int maxSlotsInGrid;
 
     public UIInventoryGrid(int numColumns) {
-        if (inventoryManager == null) {
-            logger.error("No inventory manager");
-        }
         this.numColumns = numColumns;
     }
 
     public void linkToEntity(EntityRef newEntity) {
-        int numSlots = inventoryManager.getNumSlots(newEntity);
+        int numSlots = InventoryUtils.getSlotCount(newEntity);
         this.linkToEntity(newEntity, 0, numSlots);
     }
 
     public void linkToEntity(EntityRef newEntity, int slotOffset) {
-        int numSlots = inventoryManager.getNumSlots(newEntity);
+        int numSlots = InventoryUtils.getSlotCount(newEntity);
         this.linkToEntity(newEntity, slotOffset, Math.max(0, numSlots - slotOffset));
     }
 
@@ -86,7 +81,7 @@ public class UIInventoryGrid extends UIDisplayContainer {
         cells.clear();
 
         int start = startSlot;
-        int numSlots = inventoryManager.getNumSlots(entity);
+        int numSlots = InventoryUtils.getSlotCount(entity);
         int numCells = Math.min(maxSlotsInGrid, numSlots);
         for (int i = 0; i < numCells; ++i) {
             int slot = (i + start) % numSlots;
@@ -122,7 +117,7 @@ public class UIInventoryGrid extends UIDisplayContainer {
     public void setSelected(int selectedTool) {
         int cell = selectedTool - startSlot;
         while (cell < 0) {
-            cell += inventoryManager.getNumSlots(entity);
+            cell += InventoryUtils.getSlotCount(entity);
         }
         for (int i = 0; i < cells.size(); ++i) {
             cells.get(i).setSelected(i == cell);

@@ -19,8 +19,8 @@ import com.google.common.primitives.UnsignedBytes;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -41,9 +41,6 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
 
     @In
     private LocalPlayer localPlayer;
-
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -92,7 +89,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
             public EntityRef get() {
                 CharacterComponent charComp = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
                 if (charComp != null) {
-                    return inventoryManager.getItemInSlot(charComp.movingItem, 0);
+                    return InventoryUtils.getItemAt(charComp.movingItem, 0);
                 }
                 return EntityRef.NULL;
             }
