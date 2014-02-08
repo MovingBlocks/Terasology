@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,8 @@ import com.google.common.collect.Maps;
 import org.terasology.engine.API;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
@@ -64,7 +64,7 @@ public class Actor {
     public <T extends Component> T component(Class<T> type) {
         T component = minion.getComponent(type);
         if (component == null) {
-            ComponentMetadata<T> metadata = CoreRegistry.get(ComponentLibrary.class).getMetadata(type);
+            ComponentMetadata<T> metadata = CoreRegistry.get(EntitySystemLibrary.class).getComponentLibrary().getMetadata(type);
             if (metadata == null || !metadata.isConstructable()) {
                 throw new RuntimeException("Cannot create component for " + type);
             }
