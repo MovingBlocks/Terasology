@@ -20,8 +20,8 @@ import org.terasology.rendering.nui.properties.Range;
 /**
  * Starts the decorated node.<br/>
  * <br/>
- * <b>SUCCESS</b>: after x seconds.<br/>
- * <b>FAILURE</b>: as soon as decorated node finishes with <b>FAILURE</b>.<br/>
+ * <b>SUCCESS</b>: as soon as decorated node finishes with <b>SUCCESS</b>.<br/>
+ * <b>FAILURE</b>: after x seconds.<br/>
  * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
@@ -53,14 +53,14 @@ public class TimerNode extends DecoratorNode {
         public Status update(float dt) {
             remainingTime -= dt;
             if (remainingTime <= 0) {
-                return Status.SUCCESS;
+                return Status.FAILURE;
             }
             return Status.RUNNING;
         }
 
         @Override
         public void handle(Status result) {
-            if (result == Status.FAILURE) {
+            if (result == Status.SUCCESS) {
                 stop(result);
             }
         }
