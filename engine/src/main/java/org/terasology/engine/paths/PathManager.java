@@ -35,7 +35,8 @@ import java.util.List;
  */
 public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
-    public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = ".terasology";
+    public static final String LINUX_CONFIG_DIR = ".config";
+    public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = "Terasology";
 
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String LOG_DIR = "logs";
@@ -130,7 +131,7 @@ public final class PathManager {
     public void useDefaultHomePath() throws IOException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
-                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home"), LINUX_CONFIG_DIR, TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
             case LWJGLUtil.PLATFORM_MACOSX:
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
@@ -149,7 +150,7 @@ public final class PathManager {
                 homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
             default:
-                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home"), LINUX_CONFIG_DIR, TERASOLOGY_HIDDEN_FOLDER_NAME);
                 break;
         }
         updateDirs();
