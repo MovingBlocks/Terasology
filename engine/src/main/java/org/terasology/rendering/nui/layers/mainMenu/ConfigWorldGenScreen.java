@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
@@ -88,6 +89,7 @@ public class ConfigWorldGenScreen extends UIScreenLayer {
 
         properties = find("properties", PropertyLayout.class);
         if (properties != null) {
+            properties.setOrdering(PropertyOrdering.byLabel());
             Map<String, ?> props = worldConfig.getProperties();
             for (String label : props.keySet()) {
                 PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));

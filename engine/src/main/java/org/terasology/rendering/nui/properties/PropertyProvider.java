@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -32,9 +33,11 @@ import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 
 import javax.vecmath.Vector3f;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -91,7 +94,7 @@ public class PropertyProvider<T> {
     }
 
     public List<Property<?, ?>> getProperties() {
-        return properties;
+        return Collections.unmodifiableList(properties);
     }
 
     public boolean isEmpty() {
