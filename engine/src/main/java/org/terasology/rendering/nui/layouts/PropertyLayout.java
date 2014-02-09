@@ -84,7 +84,7 @@ public class PropertyLayout extends MigLayout {
                     }
                 }
             });
-            addWidget(expand, new CCHint("newline, w 25!"));
+            addWidget(expand, new CCHint("newline, w 45!, h 22!"));
             addWidget(headline, new CCHint());
             addWidget(layout, new CCHint("newline, spanx 2"));
         }

@@ -24,7 +24,7 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
@@ -38,9 +38,10 @@ import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 /**
- * @author Immortius
+ * A config screen for world generation
+ * @author Martin Steiger
  */
-public class ConfigWorldGenScreen extends UIScreenLayer {
+public class ConfigWorldGenScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWorldGenScreen.class);
 
