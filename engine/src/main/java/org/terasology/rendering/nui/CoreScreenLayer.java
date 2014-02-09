@@ -131,6 +131,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         return areaHint;
     }
 
+    @Override
     public boolean isModal() {
         return true;
     }

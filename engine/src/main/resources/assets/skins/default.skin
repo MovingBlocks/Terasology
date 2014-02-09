@@ -279,23 +279,6 @@
                 "bottom" : 4,
                 "left" : 4,
                 "right" : 4
-            },
-            "parts" : {
-                "scrollbar-slider" : {
-                    "background" : "engine:sliderTrack",
-                    "fixed-width" : 8,
-                    "background-border" : {
-                        "top" : 3,
-                        "bottom" : 3,
-                        "left" : 0,
-                        "right" : 0
-                    }
-                },
-                "scrollbar-handle" : {
-                    "background" : "engine:handle",
-                    "fixed-width" : 16,
-                    "fixed-height" : 16
-                 }
             }
         },
         "ColumnLayout" : {

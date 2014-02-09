@@ -28,6 +28,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
@@ -40,7 +41,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class HUDScreenLayer extends CoreWidget implements UIScreenLayer {
+public class HUDScreenLayer extends CoreScreenLayer {
 
     private List<HUDElement> elements = Lists.newArrayList();
 
@@ -144,6 +145,11 @@ public class HUDScreenLayer extends CoreWidget implements UIScreenLayer {
 
     @Override
     public void initialise() {
+    }
+
+    @Override
+    public boolean isModal() {
+        return false;
     }
 
     private static final class HUDElement {

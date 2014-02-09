@@ -26,6 +26,8 @@ public interface UIScreenLayer extends UIWidget, ControlWidget {
 
     boolean isEscapeToCloseAllowed();
 
+    boolean isModal();
+
     NUIManager getManager();
 
     void setManager(NUIManager manager);

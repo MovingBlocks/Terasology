@@ -35,6 +35,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
@@ -380,7 +381,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     */
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
-    public void mouseAxisEvent(AxisEvent event, EntityRef entity) {
+    public void mouseAxisEvent(MouseAxisEvent event, EntityRef entity) {
         if (isReleasingMouse()) {
             event.consume();
         }
@@ -442,6 +443,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
             if (!screens.isEmpty() && screens.peek().isEscapeToCloseAllowed()) {
                 popScreen();
+                event.consume();
+            }
+        }
+        for (UIScreenLayer screen : screens) {
+            if (screen.isModal()) {
                 event.consume();
             }
         }
