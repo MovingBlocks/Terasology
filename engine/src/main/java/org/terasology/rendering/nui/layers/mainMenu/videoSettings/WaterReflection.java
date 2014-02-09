@@ -28,23 +28,18 @@ public enum WaterReflection {
             renderConfig.setLocalReflections(false);
         }
     },
-    LOCAL("Local (SSR)") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
-            renderConfig.setReflectiveWater(false);
-            renderConfig.setLocalReflections(true);
-        }
-    },
     GLOBAL("Global") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setReflectiveWater(true);
-            renderConfig.setLocalReflections(true);
+            renderConfig.setLocalReflections(false);
         }
     },
-    CUSTOM("Custom") {
+    LOCAL("SSR (EXPERIMENTAL)") {
         @Override
         public void apply(RenderingConfig renderConfig) {
+            renderConfig.setReflectiveWater(false);
+            renderConfig.setLocalReflections(true);
         }
     };
 

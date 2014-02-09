@@ -49,7 +49,6 @@ import org.terasology.rendering.shader.ShaderParametersSSAO;
 import org.terasology.rendering.shader.ShaderParametersShadowMap;
 import org.terasology.rendering.shader.ShaderParametersSky;
 import org.terasology.rendering.shader.ShaderParametersSobel;
-import org.terasology.rendering.shader.ShaderParametersVolumetricLightingRayMarching;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -102,7 +101,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("lightGeometryPass", new ShaderParametersLightGeometryPass());
         prepareAndStoreShaderProgramInstance("simple", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("ssaoBlur", new ShaderParametersDefault());
-        prepareAndStoreShaderProgramInstance("volLightingRayMarching", new ShaderParametersVolumetricLightingRayMarching());
     }
 
     @Override

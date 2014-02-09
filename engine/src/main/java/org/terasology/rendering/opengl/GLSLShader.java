@@ -236,14 +236,8 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         if (config.getRendering().isDynamicShadowsPcfFiltering()) {
             builder.append("#define DYNAMIC_SHADOWS_PCF \n");
         }
-        if (config.getRendering().isVolumetricFog()) {
-            builder.append("#define VOLUMETRIC_FOG \n");
-        }
         if (config.getRendering().isCloudShadows()) {
             builder.append("#define CLOUD_SHADOWS \n");
-        }
-        if (config.getRendering().isVolumetricLighting()) {
-            builder.append("#define VOLUMETRIC_LIGHTING \n");
         }
         if (config.getRendering().isLocalReflections()) {
             builder.append("#define LOCAL_REFLECTIONS \n");

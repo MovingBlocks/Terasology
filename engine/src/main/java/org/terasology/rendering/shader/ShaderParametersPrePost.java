@@ -69,21 +69,6 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
 
         program.setFloat2("aberrationOffset", aberrationOffsetX, aberrationOffsetY, true);
 
-
-        if (CoreRegistry.get(Config.class).getRendering().isVolumetricLighting()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
-            program.setInt("texVolumetricLighting", texId++, true);
-
-            WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-            Camera activeCamera = worldRenderer.getActiveCamera();
-
-            if (activeCamera != null) {
-                float worldFog = Math.max(worldRenderer.getSmoothedPlayerSunlightValue(), 0.2f) * CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition());
-                program.setFloat4("volumetricLightingSettings", worldFog, 0.0f, 0.0f, 0.0f);
-            }
-        }
-
         if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");

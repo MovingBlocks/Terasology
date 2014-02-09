@@ -62,7 +62,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);
         if (environmentalEffects != null) {
-            environmentalEffects.setOptions(Lists.newArrayList(EnvironmentalEffects.OFF, EnvironmentalEffects.LOW, EnvironmentalEffects.MEDIUM, EnvironmentalEffects.HIGH));
+            environmentalEffects.setOptions(Lists.newArrayList(EnvironmentalEffects.OFF, EnvironmentalEffects.LOW, EnvironmentalEffects.HIGH));
             environmentalEffects.bindSelection(new EnvironmentEffectsBinding(config.getRendering()));
         }
 
@@ -74,7 +74,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<WaterReflection> waterReflection = find("reflections", UIDropdown.class);
         if (waterReflection != null) {
-            waterReflection.setOptions(Lists.newArrayList(WaterReflection.SKY, WaterReflection.LOCAL, WaterReflection.GLOBAL));
+            waterReflection.setOptions(Lists.newArrayList(WaterReflection.SKY, WaterReflection.GLOBAL, WaterReflection.LOCAL));
             waterReflection.bindSelection(new WaterReflectionBinding(config.getRendering()));
         }
 

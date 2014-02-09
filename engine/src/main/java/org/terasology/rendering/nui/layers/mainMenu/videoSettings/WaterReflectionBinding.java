@@ -32,14 +32,10 @@ public class WaterReflectionBinding implements Binding<WaterReflection> {
     @Override
     public WaterReflection get() {
         if (config.isReflectiveWater()) {
-            if (config.isLocalReflections()) {
-                return WaterReflection.GLOBAL;
-            }
-            return WaterReflection.CUSTOM;
+            return WaterReflection.GLOBAL;
+        } else if (config.isLocalReflections()) {
+            return WaterReflection.LOCAL;
         } else {
-            if (config.isLocalReflections()) {
-                return WaterReflection.LOCAL;
-            }
             return WaterReflection.SKY;
         }
     }

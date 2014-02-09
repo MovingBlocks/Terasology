@@ -31,22 +31,13 @@ public class EnvironmentEffectsBinding implements Binding<EnvironmentalEffects> 
 
     @Override
     public EnvironmentalEffects get() {
-        if (config.isVolumetricLighting()) {
-            if (config.isAnimateWater() && config.isAnimateGrass() && config.isVolumetricFog()) {
-                return EnvironmentalEffects.HIGH;
-            }
-        } else if (config.isAnimateWater()) {
-            if (config.isAnimateGrass() && config.isVolumetricFog()) {
-                return EnvironmentalEffects.MEDIUM;
-            }
-        } else if (config.isAnimateGrass()) {
-            if (config.isVolumetricFog()) {
-                return EnvironmentalEffects.LOW;
-            }
-        } else if (!config.isVolumetricFog()) {
+        if (config.isAnimateGrass() && !config.isAnimateWater()) {
+            return EnvironmentalEffects.LOW;
+        } else if (config.isAnimateWater() && config.isAnimateWater()) {
+            return EnvironmentalEffects.HIGH;
+        } else {
             return EnvironmentalEffects.OFF;
         }
-        return EnvironmentalEffects.CUSTOM;
     }
 
     @Override

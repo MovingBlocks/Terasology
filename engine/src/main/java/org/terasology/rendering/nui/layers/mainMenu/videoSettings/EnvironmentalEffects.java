@@ -24,8 +24,6 @@ public enum EnvironmentalEffects {
     OFF("Off") {
         @Override
         public void apply(RenderingConfig renderConfig) {
-            renderConfig.setVolumetricLighting(false);
-            renderConfig.setVolumetricFog(false);
             renderConfig.setAnimateGrass(false);
             renderConfig.setAnimateWater(false);
         }
@@ -33,33 +31,15 @@ public enum EnvironmentalEffects {
     LOW("Low") {
         @Override
         public void apply(RenderingConfig renderConfig) {
-            renderConfig.setVolumetricLighting(false);
-            renderConfig.setVolumetricFog(true);
             renderConfig.setAnimateGrass(true);
             renderConfig.setAnimateWater(false);
-        }
-    },
-    MEDIUM("Medium") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
-            renderConfig.setVolumetricLighting(false);
-            renderConfig.setVolumetricFog(true);
-            renderConfig.setAnimateGrass(true);
-            renderConfig.setAnimateWater(true);
         }
     },
     HIGH("High") {
         @Override
         public void apply(RenderingConfig renderConfig) {
-            renderConfig.setVolumetricLighting(true);
-            renderConfig.setVolumetricFog(true);
             renderConfig.setAnimateGrass(true);
             renderConfig.setAnimateWater(true);
-        }
-    },
-    CUSTOM("Custom") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
         }
     };
 

@@ -59,12 +59,10 @@ public class RenderingConfig {
     private boolean normalMapping;
     private boolean parallaxMapping;
     private boolean dynamicShadowsPcfFiltering;
-    private boolean volumetricFog = true;
     private boolean cloudShadows;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
     private int meshLimit = 20;
-    private boolean volumetricLighting;
     private boolean inscattering = true;
     private boolean localReflections = true;
     private boolean vSync;
@@ -337,28 +335,12 @@ public class RenderingConfig {
         this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
     }
 
-    public boolean isVolumetricFog() {
-        return this.volumetricFog;
-    }
-
-    public void setVolumetricFog(boolean volumetricFog) {
-        this.volumetricFog = volumetricFog;
-    }
-
     public boolean isCloudShadows() {
         return cloudShadows;
     }
 
     public void setCloudShadows(boolean cloudShadows) {
         this.cloudShadows = cloudShadows;
-    }
-
-    public boolean isVolumetricLighting() {
-        return this.volumetricLighting;
-    }
-
-    public void setVolumetricLighting(boolean volumetricLighting) {
-        this.volumetricLighting = volumetricLighting;
     }
 
     public boolean isLocalReflections() {

@@ -79,29 +79,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            if (activeCamera != null) {
-                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
-
-                Vector3f fogWorldPosition = new Vector3f(0.0f, -activeCamera.getPosition().y, 0.0f);
-                program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
-    
-                WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-                // Fog density is set according to the fog density provided by the world
-                // TODO: The 50% percent limit shouldn't be hardcoded
-                float worldFog = worldRenderer.getSmoothedPlayerSunlightValue()
-                        * Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
-    
-//                boolean headUnderWater = worldRenderer.isHeadUnderWater();
-//                if (headUnderWater) {
-//                    worldFog = 1.0f;
-//                }
-    
-                program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
-        }
-    }
-
         DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
 
         if (sceneTransparent != null) {
