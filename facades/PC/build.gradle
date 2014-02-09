@@ -222,7 +222,7 @@ idea {
 task copyEclipseLauncher(type: Copy) {
 	from "$rootDir/config/eclipse"
 	into projectDir
-	include("*.launch")
+	include("Terasology.launch")
 }
 
 tasks.eclipse {
