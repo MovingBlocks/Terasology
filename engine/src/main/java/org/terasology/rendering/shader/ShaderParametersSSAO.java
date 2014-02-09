@@ -47,7 +47,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersSSAO extends ShaderParametersBase {
 
-    public static final int SSAO_KERNEL_ELEMENTS = 64;
+    public static final int SSAO_KERNEL_ELEMENTS = 32;
     public static final int SSAO_NOISE_SIZE = 4;
 
     private final Random random = new FastRandom();
