@@ -73,9 +73,9 @@ public class ModuleClassLoader extends URLClassLoader {
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
         try {
-            return (Class<?>) AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
                 @Override
-                public Object run() throws Exception {
+                public Class<?> run() throws Exception {
                     CtClass cc = pool.get(name);
 
                     // Ensure empty constructor of Components and Events are not private, if they exist.

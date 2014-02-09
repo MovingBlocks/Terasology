@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.prefab.internal;
 
+import com.google.common.base.Charsets;
 import org.terasology.asset.AssetLoader;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
@@ -41,7 +42,7 @@ public class PrefabLoader implements AssetLoader<PrefabData> {
 
     @Override
     public PrefabData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
             EngineEntityManager entityManager = CoreRegistry.get(EngineEntityManager.class);

@@ -16,6 +16,7 @@
 
 package org.terasology.utilities.procedural;
 
+import com.google.common.base.Charsets;
 import com.google.common.math.DoubleMath;
 
 import javax.imageio.ImageIO;
@@ -80,7 +81,7 @@ public final class HeightmapFileReader {
     public static float[][] readValues(java.io.InputStream in, String delimiter) throws java.io.IOException, java.lang.NumberFormatException {
         String thisLine;
         java.io.BufferedInputStream s = new java.io.BufferedInputStream(in);
-        java.io.BufferedReader myInput = new java.io.BufferedReader(new java.io.InputStreamReader(s));
+        java.io.BufferedReader myInput = new java.io.BufferedReader(new java.io.InputStreamReader(s, Charsets.UTF_8));
 
         int index = 0;
         float min = 0;

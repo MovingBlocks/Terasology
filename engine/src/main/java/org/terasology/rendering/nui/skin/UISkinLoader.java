@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.skin;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -71,7 +72,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
 
     @Override
     public UISkinData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UISkinData.class);
         }

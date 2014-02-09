@@ -15,6 +15,7 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import com.google.common.base.Charsets;
 import org.lwjgl.LWJGLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +23,14 @@ import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.utilities.LWJGLHelper;
 
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Immortius
  */
 public abstract class BaseLwjglSubsystem implements EngineSubsystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(BaseLwjglSubsystem.class);
     private static boolean initialised;
 
     @Override
@@ -41,8 +44,9 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
 
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
+            try {
             // Pipes System.out and err to log, because that's where lwjgl writes it to.
-            System.setOut(new PrintStream(System.out) {
+            System.setOut(new PrintStream(System.out, false, Charsets.UTF_8.name()) {
                 private Logger logger = LoggerFactory.getLogger("org.lwjgl");
 
                 @Override
@@ -50,7 +54,7 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
                     logger.info(message);
                 }
             });
-            System.setErr(new PrintStream(System.err) {
+            System.setErr(new PrintStream(System.err, false, Charsets.UTF_8.name()) {
                 private Logger logger = LoggerFactory.getLogger("org.lwjgl");
 
                 @Override
@@ -58,6 +62,9 @@ public abstract class BaseLwjglSubsystem implements EngineSubsystem {
                     logger.error(message);
                 }
             });
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Failed to map lwjgl logging", e);
+            }
         }
     }
 }

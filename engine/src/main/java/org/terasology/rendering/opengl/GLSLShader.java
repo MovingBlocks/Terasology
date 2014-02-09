@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -79,10 +80,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
                 InputStream uniformsStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalUniformsIncl.glsl");
                 InputStream definesStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalDefinesIncl.glsl")
         ) {
-            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
-            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
-            includedDefines = CharStreams.toString(new InputStreamReader(definesStream));
-            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream));
+            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream, Charsets.UTF_8));
+            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream, Charsets.UTF_8));
+            includedDefines = CharStreams.toString(new InputStreamReader(definesStream, Charsets.UTF_8));
+            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream, Charsets.UTF_8));
         } catch (IOException e) {
             logger.error("Failed to load Include shader resources");
         }

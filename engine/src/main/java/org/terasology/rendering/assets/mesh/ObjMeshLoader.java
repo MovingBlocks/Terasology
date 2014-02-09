@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.assets.mesh;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -46,7 +47,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
 
     @Override
     public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
 
         List<Vector3f> rawVertices = Lists.newArrayList();
         List<Vector3f> rawNormals = Lists.newArrayList();

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.behavior.asset;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,7 +61,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     private BehaviorTreeGson treeGson = new BehaviorTreeGson();
 
     public void save(OutputStream stream, BehaviorTreeData data) throws IOException {
-        try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream))) {
+        try (JsonWriter write = new JsonWriter(new OutputStreamWriter(stream, Charsets.UTF_8))) {
             write.setIndent("  ");
             write.beginObject().name("model");
             treeGson.saveTree(write, data.getRoot());
@@ -71,7 +72,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     @Override
     public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         BehaviorTreeData data = new BehaviorTreeData();
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             reader.beginObject();
             nextName(reader, "model");

@@ -23,6 +23,7 @@ import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -72,7 +73,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
 
     @Override
     public BlockShapeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        return gson.fromJson(new InputStreamReader(stream), BlockShapeData.class);
+        return gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), BlockShapeData.class);
     }
 
     private static class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {

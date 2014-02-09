@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.behavior.nui;
 
+import com.google.common.base.Charsets;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
@@ -40,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author synopia
@@ -103,7 +105,7 @@ public class BehaviorEditor extends ZoomableLayout {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         try {
             loader.save(baos, tree.getData());
-            return baos.toString();
+            return baos.toString(Charsets.UTF_8.name());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -230,11 +232,11 @@ public class BehaviorEditor extends ZoomableLayout {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(node.getNode());
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
-        OutputStream os = new ByteArrayOutputStream(10000);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
 
         try {
             loader.save(os, data);
-            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toString().getBytes()), null);
+            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null);
             Port.OutputPort parent = node.getInputPort().getTargetPort();
             copy.createRenderable();
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());
