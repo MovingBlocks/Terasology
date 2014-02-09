@@ -25,22 +25,22 @@ import org.terasology.rendering.nui.properties.TextField;
  */
 public class PerlinWorldConfigComponent {
 
-    @TextField
+    @TextField(label = "World Title")
     private String worldTitle = "New World";
     
-    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3)
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for forests")
     private float forestGrassDensity = 0.3f;
 
-    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3)
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for plains")
     private float plainsGrassDensity = 0.2f;
 
-    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3)
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for snow")
     private float snowGrassDensity = 0.001f;
 
-    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3)
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for mountains")
     private float mountainGrassDensity = 0.2f;
 
-    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3)
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for deserts")
     private float desertGrassDensity = 0.001f;
 
 }

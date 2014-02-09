@@ -48,11 +48,11 @@ public class PropertyLayout extends MigLayout {
         this.propertyComparator = comparator;
     }
 
-    public void addPropertyProvider(String label, final PropertyProvider<?> propertyProvider) {
+    public void addPropertyProvider(String groupLabel, final PropertyProvider<?> propertyProvider) {
         if (propertyProvider.getProperties().size() > 0) {
             final UIButton expand = new UIButton("", "+");
             expand.setTooltip("Click to expand");
-            final UILabel headline = new UILabel(label);
+            final UILabel headline = new UILabel(groupLabel);
             final MigLayout layout = new MigLayout();
             layout.setColConstraints("[min][fill]");
             layout.setRowConstraints("[min]");
@@ -71,8 +71,12 @@ public class PropertyLayout extends MigLayout {
                         List<Property<?, ?>> props = Lists.newArrayList(propertyProvider.getProperties());
                         Collections.sort(props, propertyComparator);
                         for (Property<?, ?> property : props) {
-                            layout.addWidget(property.getLabel(), new CCHint("newline"));
-                            layout.addWidget(property.getEditor(), new CCHint());
+                            UILabel label = property.getLabel();
+                            UIWidget editor = property.getEditor();
+                            editor.setTooltip(property.getDescription());
+
+                            layout.addWidget(label, new CCHint("newline"));
+                            layout.addWidget(editor, new CCHint());
                         }
                         invalidate();
                         button.setText("-");
