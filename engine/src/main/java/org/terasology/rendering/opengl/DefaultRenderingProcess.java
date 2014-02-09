@@ -156,7 +156,7 @@ public class DefaultRenderingProcess {
     private float hdrExposureAdjustmentSpeed = 0.05f;
 
     @EditorRange(min = 0.0f, max = 5.0f)
-    private float bloomHighPassThreshold = 0.5f;
+    private float bloomHighPassThreshold = 0.75f;
     @EditorRange(min = 0.0f, max = 32.0f)
     private float bloomBlurRadius = 12.0f;
 
@@ -1146,9 +1146,9 @@ public class DefaultRenderingProcess {
         sceneOpaque.bindTexture();
         program.setInt("tex", texId++);
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindDepthTexture();
-        program.setInt("texDepth", texId++);
+//        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+//        sceneOpaque.bindDepthTexture();
+//        program.setInt("texDepth", texId++);
 
         glViewport(0, 0, highPass.width, highPass.height);
 
