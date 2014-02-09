@@ -34,8 +34,12 @@
                 }
             },       
             {
-                "type" : "propertyLayout",
-                "id" : "properties",
+				"type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "properties",
+                    "rowConstraints" : "[min]"
+                },
                 "layoutInfo" : {
                     "width" : 500,
                     "position-horizontal-center" : {},
