@@ -79,19 +79,19 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
+        DefaultRenderingProcess.FBO sceneReflectiveRefractive = DefaultRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
 
-        if (sceneTransparent != null) {
+        if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneTransparent.bindTexture();
-            program.setInt("texSceneTransparent", texId++, true);
+            sceneReflectiveRefractive.bindTexture();
+            program.setInt("texSceneReflectiveRefractive", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isLocalReflections()) {
-            if (sceneTransparent != null) {
+            if (sceneReflectiveRefractive != null) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                sceneTransparent.bindNormalsTexture();
-                program.setInt("texSceneTransparentNormals", texId++, true);
+                sceneReflectiveRefractive.bindNormalsTexture();
+                program.setInt("texSceneReflectiveRefractiveNormals", texId++, true);
             }
             
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();

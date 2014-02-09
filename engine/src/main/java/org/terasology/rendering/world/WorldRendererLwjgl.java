@@ -554,9 +554,32 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         renderWorld(getActiveCamera());
 
+        /* COMBINE REFRACTIVE/REFLECTIVE WITH THE OPAQUE SCENE */
+        PerformanceMonitor.startActivity("Render Comined Scene");
+        DefaultRenderingProcess.getInstance().renderPreCombinedScene();
+        PerformanceMonitor.endActivity();
+
+        /* RENDER SIMPLE BLEND MATERIALS INTO THE COMBINED SCENE */
+        PerformanceMonitor.startActivity("Render Objects (Transparent)");
+        DefaultRenderingProcess.getInstance().beginRenderSceneOpaque();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDepthMask(false);
+
+        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
+            renderer.renderAlphaBlend();
+        }
+
+        glDisable(GL_BLEND);
+        glDepthMask(true);
+
+        DefaultRenderingProcess.getInstance().endRenderSceneOpaque();
+        PerformanceMonitor.endActivity();
+
         /* RENDER THE FINAL POST-PROCESSED SCENE */
         PerformanceMonitor.startActivity("Render Post-Processing");
-        DefaultRenderingProcess.getInstance().renderScene(stereoRenderState);
+        DefaultRenderingProcess.getInstance().renderPost(stereoRenderState);
         PerformanceMonitor.endActivity();
 
         if (activeCamera != null) {
@@ -703,8 +726,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         /*
         * THIRD CHUNK PASS: REFRACTIVE CHUNKS
         */
-        PerformanceMonitor.startActivity("Render Chunks (Alpha blend)");
-        DefaultRenderingProcess.getInstance().beginRenderSceneTransparent();
+        PerformanceMonitor.startActivity("Render Chunks (Refractive/Reflective)");
+        DefaultRenderingProcess.getInstance().beginRenderSceneReflectiveRefractive();
         // Make sure the water surface is rendered if the player is swimming
         boolean isHeadUnderWater = isHeadUnderWater();
         if (isHeadUnderWater) {
@@ -718,24 +741,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             glEnable(GL11.GL_CULL_FACE);
         }
         PerformanceMonitor.endActivity();
-
-        /*
-         * ALPHA BLEND
-         */
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glDepthMask(false);
-
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderAlphaBlend();
-        }
-
-        glDisable(GL_BLEND);
-        glDepthMask(true);
-        PerformanceMonitor.endActivity();
-        DefaultRenderingProcess.getInstance().endRenderSceneTransparent();
+        DefaultRenderingProcess.getInstance().endRenderSceneReflectiveRefractive();
 
         if (config.getRendering().getDebug().isWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -292,8 +292,8 @@ public class DefaultRenderingProcess {
         createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
         createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
 
-        createFBO("sceneTransparent", rtFullWidth, rtFullHeight, FBOType.HDR, false, true);
-        attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
+        createFBO("sceneReflectiveRefractive", rtFullWidth, rtFullHeight, FBOType.HDR, false, true);
+        attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
 
         createFBO("sceneReflected", rtWidth2, rtHeight2, FBOType.DEFAULT, true);
 
@@ -602,9 +602,9 @@ public class DefaultRenderingProcess {
         bindFbo("sceneOpaque");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         unbindFbo("sceneOpaque");
-        bindFbo("sceneTransparent");
+        bindFbo("sceneReflectiveRefractive");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        unbindFbo("sceneTransparent");
+        unbindFbo("sceneReflectiveRefractive");
     }
 
     public void beginRenderSceneOpaque() {
@@ -724,12 +724,12 @@ public class DefaultRenderingProcess {
         GL20.glDrawBuffers(bufferIds);
     }
 
-    public void beginRenderSceneTransparent() {
-        bindFbo("sceneTransparent");
+    public void beginRenderSceneReflectiveRefractive() {
+        bindFbo("sceneReflectiveRefractive");
     }
 
-    public void endRenderSceneTransparent() {
-        unbindFbo("sceneTransparent");
+    public void endRenderSceneReflectiveRefractive() {
+        unbindFbo("sceneReflectiveRefractive");
     }
 
     public void beginRenderReflectedScene() {
@@ -783,11 +783,7 @@ public class DefaultRenderingProcess {
         bindFbo("sceneOpaque");
     }
 
-    /**
-     * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
-     * of the view port changes.
-     */
-    public void renderScene(StereoRenderState stereoRenderState) {
+    public void renderPreCombinedScene() {
         createOrUpdateFullscreenFbos();
 
         if (config.getRendering().isOutline()) {
@@ -800,7 +796,9 @@ public class DefaultRenderingProcess {
         }
 
         generateCombinedScene();
+    }
 
+    public void renderPost(StereoRenderState stereoRenderState) {
         if (config.getRendering().isLightShafts()) {
             generateLightShafts();
         }
@@ -942,7 +940,7 @@ public class DefaultRenderingProcess {
         unbindFbo("sceneOpaquePingPong");
 
         flipPingPongFbo("sceneOpaque");
-        attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
+        attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
     }
 
     private void applyLightBufferPass(String target) {
@@ -982,7 +980,7 @@ public class DefaultRenderingProcess {
         flipPingPongFbo(target);
 
         if (target.equals("sceneOpaque")) {
-            attachDepthBufferToFbo("sceneOpaque", "sceneTransparent");
+            attachDepthBufferToFbo("sceneOpaque", "sceneReflectiveRefractive");
         }
     }
 

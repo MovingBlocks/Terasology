@@ -66,7 +66,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                DefaultRenderingProcess.getInstance().bindFboTexture("sceneTransparent");
+                DefaultRenderingProcess.getInstance().bindFboTexture("sceneReflectiveRefractive");
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:
