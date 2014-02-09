@@ -30,12 +30,15 @@ void main() {
 
     if (lightDirDotViewDir > 0.0) {
         vec2 texCoord = gl_TexCoord[0].xy;
+        vec2 deltaTexCoord = (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density * vec2(texCoord.xy - lightScreenPos.xy);
 
-        float sceneDepth = texture2D(texDepth, texCoord).r * 2.0 - 1.0;
+        float dist = length(deltaTexCoord.xy);
 
-        vec2 deltaTexCoord = vec2(texCoord - lightScreenPos.xy);
-
-        deltaTexCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
+        // TODO: This shouldn't be hardcoded
+        float threshold = 0.01;
+        if (dist > threshold) {
+            deltaTexCoord.xy /= dist / threshold;
+        }
 
         float illuminationDecay = 1.0;
         for(int i=0; i < LIGHT_SHAFT_SAMPLES ; i++)
