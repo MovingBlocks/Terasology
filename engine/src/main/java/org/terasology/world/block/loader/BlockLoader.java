@@ -16,6 +16,7 @@
 
 package org.terasology.world.block.loader;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -466,7 +467,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private JsonElement readJson(AssetUri blockDefUri) {
         try (InputStream stream = CoreRegistry.get(AssetManager.class).getAssetStream(blockDefUri)) {
             if (stream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
                 return parser.parse(reader);
             } else {
                 logger.error("Failed to load block definition '{}'", blockDefUri);

@@ -18,11 +18,11 @@ package org.terasology.rendering.gui.widgets;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;
@@ -33,12 +33,11 @@ import javax.vecmath.Vector2f;
 public class UITransferSlotCursor extends UIDisplayContainer {
     private UIItemIcon item;
     private LocalPlayer localPlayer;
-    private SlotBasedInventoryManager inventoryManager;
+
 
     public UITransferSlotCursor() {
         this.localPlayer = CoreRegistry.get(LocalPlayer.class);
-        this.inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
-        item = new UIItemIcon(inventoryManager);
+        item = new UIItemIcon();
         addDisplayElement(item);
     }
 
@@ -54,7 +53,7 @@ public class UITransferSlotCursor extends UIDisplayContainer {
     }
 
     private EntityRef getTransferItem() {
-        return inventoryManager.getItemInSlot(getTransferEntity(), 0);
+        return InventoryUtils.getItemAt(getTransferEntity(), 0);
     }
 
 }

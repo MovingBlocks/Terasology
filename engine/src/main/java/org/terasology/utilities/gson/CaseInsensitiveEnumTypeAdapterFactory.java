@@ -42,7 +42,9 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
 
         final Map<String, T> lowercaseToConstant = Maps.newHashMap();
         for (T constant : rawType.getEnumConstants()) {
-            lowercaseToConstant.put(toLowercase(constant), constant);
+            String lowercase = toLowercase(constant);
+            lowercaseToConstant.put(lowercase, constant);
+            lowercaseToConstant.put(lowercase.replaceAll("_", " "), constant);
         }
 
         return new TypeAdapter<T>() {
@@ -51,7 +53,7 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
                 if (value == null) {
                     out.nullValue();
                 } else {
-                    out.value(toLowercase(value));
+                    out.value(toLowercase(value).replaceAll("_", " "));
                 }
             }
 
@@ -61,7 +63,8 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
                     reader.nextNull();
                     return null;
                 } else {
-                    return lowercaseToConstant.get(toLowercase(reader.nextString()));
+                    String value = reader.nextString();
+                    return lowercaseToConstant.get(toLowercase(value));
                 }
             }
         };

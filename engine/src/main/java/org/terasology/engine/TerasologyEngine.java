@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,7 +16,6 @@
 
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -29,24 +28,24 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.config.Config;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
+import org.terasology.engine.module.EngineModulePolicy;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.ModuleManagerImpl;
 import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.engine.subsystem.Display;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.event.internal.EventSystemImpl;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
+import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -56,34 +55,30 @@ import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
-import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
-import java.awt.*;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
-import java.util.*;
+import java.security.Policy;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LoggingPermission;
 
 /**
  * @author Immortius
@@ -113,7 +108,7 @@ public class TerasologyEngine implements GameEngine {
         this.subsystems = Queues.newArrayDeque(subsystems);
     }
 
-    protected Deque<EngineSubsystem> getSubsystems() {
+    public Iterable<EngineSubsystem> getSubsystems() {
         return subsystems;
     }
 
@@ -137,8 +132,11 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.preInitialise();
             }
 
-            // Time is required to be initialized by an EngineSubsystem to an EngineTime at this point.
+            // Verify required systems are available
             time = (EngineTime) CoreRegistry.get(Time.class);
+            if (time == null) {
+                throw new IllegalStateException("Time not registered as a core system.");
+            }
 
             initManagers();
 
@@ -146,7 +144,16 @@ public class TerasologyEngine implements GameEngine {
                 subsystem.postInitialise(config);
             }
 
-            // Display is required to be initialized by an EngineSubsystem and registered as a Core system at this point.
+            // Verify required systems are available
+            if (CoreRegistry.get(DisplayDevice.class) == null) {
+                throw new IllegalStateException("DisplayDevice not registered as a core system.");
+            }
+            if (CoreRegistry.get(RenderingSubsystemFactory.class) == null) {
+                throw new IllegalStateException("EngineSubsystemFactory not registered as a core system.");
+            }
+            if (CoreRegistry.get(InputSystem.class) == null) {
+                throw new IllegalStateException("InputSystem not registered as a core system.");
+            }
 
             initAssets();
 
@@ -246,7 +253,7 @@ public class TerasologyEngine implements GameEngine {
             if (!running) {
                 disposed = true;
                 initialised = false;
-                Iterator<EngineSubsystem> iter = getSubsystems().descendingIterator();
+                Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
                 while (iter.hasNext()) {
                     EngineSubsystem subsystem = iter.next();
                     subsystem.dispose();
@@ -379,8 +386,6 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
         moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
-
-        moduleSecurityManager.addAPIClass(Joiner.class);
         moduleSecurityManager.addAPIClass(IOException.class);
         moduleSecurityManager.addAPIClass(InvocationTargetException.class);
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
@@ -394,32 +399,14 @@ public class TerasologyEngine implements GameEngine {
             }
         }
 
-        moduleSecurityManager.addAllowedPermission(Enum.class, new ReflectPermission("suppressAccessChecks"));
-        moduleSecurityManager.addAllowedPermission(LoggingPermission.class);
-        moduleSecurityManager.addAllowedPermission(ClassLoader.class, FilePermission.class);
-        // TODO: Create a cleaner clipboard access class, put permission on that
-        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(EventSystemImpl.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(PojoEntityManager.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(AssetManager.class, FilePermission.class);
-        moduleSecurityManager.addAllowedPermission(HeightmapFileReader.class, new PropertyPermission("user.dir", "read"));
-        moduleSecurityManager.addAllowedPermission(HeightmapFileReader.class, new FilePermission("Heightmap.txt", "read"));
-        moduleSecurityManager.addAllowedPermission(EnumMap.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(WorldGeneratorPluginLibrary.class, new RuntimePermission("accessDeclaredMembers"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(ClassMetadata.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("createClassLoader"));
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, new RuntimePermission("accessClassInPackage.sun.reflect"));
-        moduleSecurityManager.addAllowedPermission(FieldMetadata.class, ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission(InjectionHelper.class, new RuntimePermission("accessDeclaredMembers"));
-        moduleSecurityManager.addAllowedPermission("java.awt", new RuntimePermission("loadLibrary.dcpr"));
+        moduleSecurityManager.addFullPrivilegePackage("ch.qos.logback.classic");
+        moduleSecurityManager.addAllowedPermission("com.google.gson", ReflectPermission.class);
+        moduleSecurityManager.addAllowedPermission("com.google.gson.internal", ReflectPermission.class);
 
-        moduleSecurityManager.addAllowedPermission(GUIManagerLwjgl.class, ReflectPermission.class);
+        moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
+        moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
 
+        Policy.setPolicy(new EngineModulePolicy());
         System.setSecurityManager(moduleSecurityManager);
         return moduleManager;
     }
@@ -427,7 +414,7 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
-        Iterator<EngineSubsystem> iter = getSubsystems().descendingIterator();
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
         while (iter.hasNext()) {
             EngineSubsystem subsystem = iter.next();
             subsystem.shutdown(config);
@@ -454,7 +441,7 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        Display display = CoreRegistry.get(Display.class);
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
@@ -548,9 +535,8 @@ public class TerasologyEngine implements GameEngine {
     public void setFullscreen(boolean state) {
         if (config.getRendering().isFullscreen() != state) {
             config.getRendering().setFullscreen(state);
-            Display display = CoreRegistry.get(Display.class);
+            DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
             display.setFullscreen(state);
-            display.resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
     }
@@ -564,7 +550,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public boolean hasFocus() {
-        Display display = CoreRegistry.get(Display.class);
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
         return gameFocused && display.isActive();
     }
 

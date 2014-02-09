@@ -16,6 +16,7 @@
 
 package org.terasology.engine.module;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -53,6 +54,8 @@ import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -100,7 +103,8 @@ public class ModuleManagerImpl implements ModuleManager {
                     .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
         }
         engineReflections = new Reflections(builder);
-        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt"))) {
+        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt"),
+                Charsets.UTF_8)) {
             engineModule = new EngineModule(engineReflections, new Gson().fromJson(reader, ModuleInfo.class));
         } catch (Exception e) {
             throw new RuntimeException("Failed to load engine module info", e);
@@ -234,7 +238,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 logger.error("Failed to scan for jar and zip modules", e);
             }
         }
-        List<URL> urls = Lists.newArrayList();
+        final List<URL> urls = Lists.newArrayList();
         for (ExtensionModule module : getExtensionModules()) {
             if (module.isCodeModule()) {
                 urls.add(module.getModuleClasspathUrl());
@@ -248,7 +252,13 @@ public class ModuleManagerImpl implements ModuleManager {
             }
         }
 
-        allModuleClassLoader = new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
+        allModuleClassLoader = AccessController.doPrivileged(new PrivilegedAction<ModuleClassLoader>() {
+            @Override
+            public ModuleClassLoader run() {
+                return new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
+            }
+        });
+
         for (ExtensionModule module : getExtensionModules()) {
             module.setInactiveClassLoader(allModuleClassLoader);
         }
@@ -268,7 +278,7 @@ public class ModuleManagerImpl implements ModuleManager {
             ZipEntry modInfoEntry = zipFile.getEntry("module.txt");
             if (modInfoEntry != null) {
                 try {
-                    ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModuleInfo.class);
+                    ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry), Charsets.UTF_8), ModuleInfo.class);
                     AssetSource source = new ArchiveSource(moduleInfo.getId(), modulePath.toFile(),
                             TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
                     processModuleInfo(moduleInfo, modulePath, source);
@@ -315,7 +325,7 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public void applyActiveModules() {
         List<ExtensionModule> activeCodeMods = getActiveExtensionCodeModules();
-        List<URL> urls = Lists.newArrayList();
+        final List<URL> urls = Lists.newArrayList();
         for (ExtensionModule module : activeCodeMods) {
             urls.add(module.getModuleClasspathUrl());
         }
@@ -326,7 +336,12 @@ public class ModuleManagerImpl implements ModuleManager {
                 logger.error("Failed to close activeModuleClassLoader", e);
             }
         }
-        activeModuleClassLoader = new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
+        activeModuleClassLoader = AccessController.doPrivileged(new PrivilegedAction<ModuleClassLoader>() {
+            @Override
+            public ModuleClassLoader run() {
+                return new ModuleClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader(), moduleSecurityManager);
+            }
+        });
         for (Module module : activeModules.values()) {
             if (module instanceof ExtensionModule) {
                 ((ExtensionModule) module).setActiveClassLoader(activeModuleClassLoader);

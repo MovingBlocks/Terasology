@@ -16,10 +16,14 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.headless.HeadlessAudio;
+import org.terasology.engine.subsystem.headless.HeadlessGraphics;
+import org.terasology.engine.subsystem.headless.HeadlessInput;
+import org.terasology.engine.subsystem.headless.HeadlessTimer;
+import org.terasology.engine.subsystem.headless.mode.StateHeadlessSetup;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
@@ -28,9 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import javax.swing.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Main method for launching Terasology
@@ -41,18 +43,22 @@ import java.util.List;
 public final class Terasology {
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
+    private static final String HEADLESS_ARG = "-headless";
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
         try {
+            boolean isHeadless = false;
             Path homePath = null;
             for (String arg : args) {
                 if (arg.startsWith(HOME_ARG)) {
                     homePath = Paths.get(arg.substring(HOME_ARG.length()));
                 } else if (arg.equals(LOCAL_ARG)) {
                     homePath = Paths.get("");
+                } else if (arg.equals(HEADLESS_ARG)) {
+                    isHeadless = true;
                 }
             }
             if (homePath != null) {
@@ -61,11 +67,20 @@ public final class Terasology {
                 PathManager.getInstance().useDefaultHomePath();
             }
 
-            List<EngineSubsystem> subsystemList = Lists.newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
+            Collection<EngineSubsystem> subsystemList;
+            if (isHeadless) {
+                subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
+            } else {
+                subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
+            }
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
-            engine.run(new StateMainMenu());
+            if (isHeadless) {
+                engine.run(new StateHeadlessSetup());
+            } else {
+                engine.run(new StateMainMenu());
+            }
             engine.dispose();
         } catch (Throwable t) {
             String text = getNestedMessageText(t);

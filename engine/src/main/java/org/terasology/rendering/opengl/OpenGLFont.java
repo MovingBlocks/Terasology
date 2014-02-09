@@ -93,7 +93,7 @@ public class OpenGLFont extends BaseFont {
                     if (c == FontColor.getReset()) {
                         color = baseColor;
                     } else {
-                        color = FontColor.toColor(c);
+                        color = new Color(FontColor.toColor(c).getRepresentation());
                     }
                 }
             }

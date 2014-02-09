@@ -26,6 +26,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
@@ -105,7 +106,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
-        WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer

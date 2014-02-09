@@ -1,6 +1,8 @@
 {
+    "DisplayName" : {
+        "name" : "Coal"
+    },
     "Item" : {
-        "name" : "Coal",
         "icon" : "engine:items.coal",
         "renderWithIcon" : true,
         "stackId" : "coal"

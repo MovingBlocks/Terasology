@@ -47,6 +47,11 @@ public class LwjglMouseDevice implements MouseDevice {
     }
 
     @Override
+    public boolean isVisible() {
+        return !Mouse.isGrabbed();
+    }
+
+    @Override
     public Queue<InputAction> getInputQueue() {
         Queue<InputAction> result = Queues.newArrayDeque();
 

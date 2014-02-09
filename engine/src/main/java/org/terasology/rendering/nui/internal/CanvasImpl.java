@@ -15,18 +15,16 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
-import org.terasology.input.Mouse;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Border;
-import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -41,7 +39,6 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -49,13 +46,10 @@ import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UITooltip;
 
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -85,17 +79,11 @@ public class CanvasImpl implements CanvasControl {
 
     private CanvasState state;
 
-    private Mesh billboard = Assets.getMesh("engine:UIBillboard");
-    private Material textureMat = Assets.getMaterial("engine:UITexture");
     private Material meshMat = Assets.getMaterial("engine:UILitMesh");
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
     private boolean focusDrawn;
-
-    // Text mesh caching
-    private Map<TextCacheKey, Map<Material, Mesh>> cachedText = Maps.newLinkedHashMap();
-    private Set<TextCacheKey> usedText = Sets.newHashSet();
 
     // Interaction region handling
     private Deque<InteractionRegion> interactionRegions = Queues.newArrayDeque();
@@ -127,7 +115,7 @@ public class CanvasImpl implements CanvasControl {
         Vector2i size = renderer.getTargetSize();
         state = new CanvasState(null, Rect2i.createFromMinAndSize(0, 0, size.x, size.y));
         renderer.preRender();
-        crop(state.cropRegion);
+        renderer.crop(state.cropRegion);
         focusDrawn = false;
     }
 
@@ -142,18 +130,6 @@ public class CanvasImpl implements CanvasControl {
             tooltipWidget.setText(topMouseOverRegion.getTooltip());
             drawWidget(tooltipWidget);
         }
-
-        Iterator<Map.Entry<TextCacheKey, Map<Material, Mesh>>> textIterator = cachedText.entrySet().iterator();
-        while (textIterator.hasNext()) {
-            Map.Entry<TextCacheKey, Map<Material, Mesh>> entry = textIterator.next();
-            if (!usedText.contains(entry.getKey())) {
-                for (Mesh mesh : entry.getValue().values()) {
-                    Assets.dispose(mesh);
-                }
-                textIterator.remove();
-            }
-        }
-        usedText.clear();
 
         renderer.postRender();
         if (!focusDrawn) {
@@ -200,11 +176,11 @@ public class CanvasImpl implements CanvasControl {
             if (!newTopMouseOverRegion.equals(topMouseOverRegion)) {
                 topMouseOverRegion = newTopMouseOverRegion;
                 tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                lastTooltipPosition.set(Mouse.getPosition());
+                lastTooltipPosition.set(position);
             } else {
-                if (lastTooltipPosition.gridDistance(Mouse.getPosition()) > MAX_DOUBLE_CLICK_DISTANCE) {
+                if (lastTooltipPosition.gridDistance(position) > MAX_DOUBLE_CLICK_DISTANCE) {
                     tooltipTime = time.getGameTime() + newTopMouseOverRegion.element.getTooltipDelay();
-                    lastTooltipPosition.set(Mouse.getPosition());
+                    lastTooltipPosition.set(position);
                 }
             }
 
@@ -292,6 +268,7 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void setSkin(UISkin skin) {
+        Preconditions.checkNotNull(skin);
         state.skin = skin;
     }
 
@@ -332,7 +309,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
         Rect2i region = applyStyleToSize(Rect2i.createFromMinAndSize(Vector2i.zero(), sizeRestrictions), elementStyle);
         try (SubRegion ignored = subRegionForWidget(widget, region, false)) {
             Vector2i preferredSize = widget.getPreferredContentSize(this, elementStyle.getMargin().shrink(sizeRestrictions));
@@ -348,7 +325,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         String family = (widget.getFamily() != null) ? widget.getFamily() : state.family;
-        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), widget.getMode());
+        UIStyle elementStyle = state.skin.getStyleFor(family, widget.getClass(), UIWidget.BASE_PART, widget.getMode());
         try (SubRegion ignored = subRegionForWidget(widget, getRegion(), false)) {
             return applyStyleToSize(elementStyle.getMargin().grow(widget.getMaxContentSize(this)), elementStyle);
         }
@@ -369,7 +346,8 @@ public class CanvasImpl implements CanvasControl {
             focusDrawn = true;
         }
         String family = (element.getFamily() != null) ? element.getFamily() : state.family;
-        UIStyle newStyle = state.skin.getStyleFor(family, element.getClass(), element.getMode());
+        UISkin skin = (element.getSkin() != null) ? element.getSkin() : state.skin;
+        UIStyle newStyle = skin.getStyleFor(family, element.getClass(), UIWidget.BASE_PART, element.getMode());
         Rect2i regionArea;
         try (SubRegion ignored = subRegionForWidget(element, region, false)) {
             regionArea = applyStyleToSize(region, newStyle, element.getMaxContentSize(this));
@@ -390,10 +368,13 @@ public class CanvasImpl implements CanvasControl {
     private SubRegion subRegionForWidget(UIWidget widget, Rect2i region, boolean crop) {
         SubRegion result = subRegion(region, crop);
         state.element = widget;
+        if (widget.getSkin() != null) {
+            setSkin(widget.getSkin());
+        }
         if (widget.getFamily() != null) {
             setFamily(widget.getFamily());
         }
-        setPart("");
+        setPart(UIWidget.BASE_PART);
         setMode(widget.getMode());
         return result;
     }
@@ -535,7 +516,7 @@ public class CanvasImpl implements CanvasControl {
             if (state.drawOnTop) {
                 drawOnTopOperations.add(new DrawTextOperation(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha()));
             } else {
-                drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, state.getAlpha());
+                renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, state.getAlpha());
             }
         }
     }
@@ -567,41 +548,13 @@ public class CanvasImpl implements CanvasControl {
         if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
             return;
         }
-        if (mode == ScaleMode.TILED) {
-            drawTextureRawTiled(texture, region, ux, uy, uw, uh);
-        } else {
-            Rect2i absoluteRegion = relativeToAbsolute(region);
-            Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
-            if (!cropRegion.isEmpty()) {
-                if (state.drawOnTop) {
-                    drawOnTopOperations.add(new DrawTextureOperation(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
-                } else {
-                    drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha());
-                }
-            }
-        }
-    }
-
-    private void drawTextureRawTiled(TextureRegion texture, Rect2i toArea, float ux, float uy, float uw, float uh) {
-        if (!state.cropRegion.overlaps(relativeToAbsolute(toArea))) {
-            return;
-        }
-        int tileW = (int) (uw * texture.getWidth());
-        int tileH = (int) (uh * texture.getHeight());
-        if (tileW != 0 && tileH != 0) {
-            int horizTiles = TeraMath.fastAbs((toArea.width() - 1) / tileW) + 1;
-            int vertTiles = TeraMath.fastAbs((toArea.height() - 1) / tileH) + 1;
-
-            int offsetX = toArea.width() - horizTiles * tileW;
-            int offsetY = toArea.height() - vertTiles * tileH;
-
-            try (SubRegion ignored = subRegion(toArea, true)) {
-                for (int tileY = 0; tileY < vertTiles; tileY++) {
-                    for (int tileX = 0; tileX < horizTiles; tileX++) {
-                        Rect2i tileArea = Rect2i.createFromMinAndSize(toArea.minX() + offsetX + tileW * tileX, toArea.minY() + offsetY + tileH * tileY, tileW, tileH);
-                        drawTextureRaw(texture, tileArea, ScaleMode.STRETCH, ux, uy, uw, uh);
-                    }
-                }
+        Rect2i absoluteRegion = relativeToAbsolute(region);
+        Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
+        if (!cropRegion.isEmpty()) {
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawTextureOperation(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, state.getAlpha()));
+            } else {
+                renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, state.getAlpha());
             }
         }
     }
@@ -620,76 +573,16 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void drawTextureRawBordered(TextureRegion texture, Rect2i region, Border border, boolean tile, float ux, float uy, float uw, float uh) {
-        float top = (float) border.getTop() / texture.getHeight();
-        float left = (float) border.getLeft() / texture.getWidth();
-        float bottom = (float) border.getBottom() / texture.getHeight();
-        float right = (float) border.getRight() / texture.getWidth();
-        int centerHoriz = region.width() - border.getLeft() - border.getRight();
-        int centerVert = region.height() - border.getTop() - border.getBottom();
-
-        if (border.getTop() != 0) {
-            // TOP-LEFT CORNER
-            if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.minY(), border.getLeft(), border.getTop()), ScaleMode.STRETCH,
-                        ux, uy, left, top);
-            }
-            // TOP BORDER
-            Rect2i topArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY(), centerHoriz, border.getTop());
-            if (tile) {
-                drawTextureRawTiled(texture, topArea, ux + left, uy, uw - left - right, top);
-            } else {
-                drawTextureRaw(texture, topArea, ScaleMode.STRETCH, ux + left, uy, uw - left - right, top);
-            }
-            // TOP-RIGHT CORNER
-            if (border.getRight() != 0) {
-                Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY(), border.getRight(), border.getTop());
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux + uw - right, uy, right, top);
-            }
+        if (!state.cropRegion.overlaps(relativeToAbsolute(region))) {
+            return;
         }
-        // LEFT BORDER
-        if (border.getLeft() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(region.minX(), region.minY() + border.getTop(), border.getLeft(), centerVert);
-            if (tile) {
-                drawTextureRawTiled(texture, area, ux, uy + top, left, uh - top - bottom);
+        Rect2i absoluteRegion = relativeToAbsolute(region);
+        Rect2i cropRegion = absoluteRegion.intersect(state.cropRegion);
+        if (!cropRegion.isEmpty()) {
+            if (state.drawOnTop) {
+                drawOnTopOperations.add(new DrawBorderedTextureOperation(texture, absoluteRegion, border, tile, cropRegion, ux, uy, uw, uh, state.getAlpha()));
             } else {
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux, uy + top, left, uh - top - bottom);
-            }
-        }
-        // CENTER
-        if (tile) {
-            drawTextureRawTiled(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert),
-                    ux + left, uy + top, uw - left - right, uh - top - bottom);
-        } else {
-            drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.minY() + border.getTop(), centerHoriz, centerVert), ScaleMode.STRETCH,
-                    ux + left, uy + top, uw - left - right, uh - top - bottom);
-        }
-
-        // RIGHT BORDER
-        if (border.getRight() != 0) {
-            Rect2i area = Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.minY() + border.getTop(), border.getRight(), centerVert);
-            if (tile) {
-                drawTextureRawTiled(texture, area, ux + uw - right, uy + top, right, uh - top - bottom);
-            } else {
-                drawTextureRaw(texture, area, ScaleMode.STRETCH, ux + uw - right, uy + top, right, uh - top - bottom);
-            }
-        }
-        if (border.getBottom() != 0) {
-            // BOTTOM-LEFT CORNER
-            if (border.getLeft() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.minX(), region.maxY() - border.getBottom() + 1, border.getLeft(), border.getBottom()),
-                        ScaleMode.STRETCH, ux, uy + uw - bottom, left, bottom);
-            }
-            // BOTTOM BORDER
-            Rect2i bottomArea = Rect2i.createFromMinAndSize(region.minX() + border.getLeft(), region.maxY() - border.getBottom() + 1, centerHoriz, border.getBottom());
-            if (tile) {
-                drawTextureRawTiled(texture, bottomArea, ux + left, uy + uw - bottom, uw - left - right, bottom);
-            } else {
-                drawTextureRaw(texture, bottomArea, ScaleMode.STRETCH, ux + left, uy + uw - bottom, uw - left - right, bottom);
-            }
-            // BOTTOM-RIGHT CORNER
-            if (border.getRight() != 0) {
-                drawTextureRaw(texture, Rect2i.createFromMinAndSize(region.maxX() - border.getRight() + 1, region.maxY() - border.getBottom() + 1, border.getRight(),
-                        border.getBottom()), ScaleMode.STRETCH, ux + uw - right, uy + uw - bottom, right, bottom);
+                renderer.drawTextureBordered(texture, absoluteRegion, border, tile, ux, uy, uw, uh, state.getAlpha());
             }
         }
     }
@@ -771,72 +664,8 @@ public class CanvasImpl implements CanvasControl {
         }
     }
 
-    private void crop(Rect2i cropRegion) {
-        textureMat.setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
-    }
-
     private Rect2i relativeToAbsolute(Rect2i region) {
         return Rect2i.createFromMinAndSize(region.minX() + state.drawRegion.minX(), region.minY() + state.drawRegion.minY(), region.width(), region.height());
-    }
-
-    private void drawTextureInternal(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, Rect2i cropRegion,
-                                     float ux, float uy, float uw, float uh, float alpha) {
-        Vector2f scale = mode.scaleForRegion(absoluteRegion, texture.getWidth(), texture.getHeight());
-        Rect2f textureArea = texture.getRegion();
-        textureMat.setFloat2("scale", scale);
-        textureMat.setFloat2("offset",
-                absoluteRegion.minX() + 0.5f * (absoluteRegion.width() - scale.x),
-                absoluteRegion.minY() + 0.5f * (absoluteRegion.height() - scale.y));
-        textureMat.setFloat2("texOffset", textureArea.minX() + ux * textureArea.width(), textureArea.minY() + uy * textureArea.height());
-        textureMat.setFloat2("texSize", uw * textureArea.width(), uh * textureArea.height());
-        textureMat.setTexture("texture", texture.getTexture());
-        textureMat.setFloat4("color", color.rf(), color.gf(), color.bf(), color.af() * alpha);
-        textureMat.bindTextures();
-        if (mode == ScaleMode.SCALE_FILL) {
-            if (!cropRegion.equals(state.cropRegion)) {
-                crop(cropRegion);
-                billboard.render();
-                crop(state.cropRegion);
-            } else {
-                billboard.render();
-            }
-        } else {
-            billboard.render();
-        }
-    }
-
-    private void drawTextInternal(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Rect2i cropRegion,
-                                  Color color, Color shadowColor, float alpha) {
-        TextCacheKey key = new TextCacheKey(text, font, absoluteRegion.width(), hAlign);
-        usedText.add(key);
-        Map<Material, Mesh> fontMesh = cachedText.get(key);
-        List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
-        if (fontMesh == null) {
-            fontMesh = font.createTextMesh(lines, absoluteRegion.width(), hAlign);
-            cachedText.put(key, fontMesh);
-        }
-
-        Vector2i offset = new Vector2i(absoluteRegion.minX(), absoluteRegion.minY());
-        offset.y += vAlign.getOffset(lines.size() * font.getLineHeight(), absoluteRegion.height());
-
-
-        for (Map.Entry<Material, Mesh> entry : fontMesh.entrySet()) {
-            entry.getKey().bindTextures();
-            entry.getKey().setFloat4("croppingBoundaries", cropRegion.minX(), cropRegion.maxX() + 1, cropRegion.minY(), cropRegion.maxY() + 1);
-            if (shadowColor.a() != 0) {
-                entry.getKey().setFloat2("offset", offset.x + 1, offset.y + 1);
-                Vector4f shadowValues = shadowColor.toVector4f();
-                shadowValues.w *= alpha;
-                entry.getKey().setFloat4("color", shadowValues);
-                entry.getValue().render();
-            }
-
-            entry.getKey().setFloat2("offset", offset.x, offset.y);
-            Vector4f colorValues = color.toVector4f();
-            colorValues.w *= alpha;
-            entry.getKey().setFloat4("color", colorValues);
-            entry.getValue().render();
-        }
     }
 
     /**
@@ -884,7 +713,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         public Rect2i getRelativeRegion() {
-            return Rect2i.createFromMinAndMax(0, 0, drawRegion.width(), drawRegion.height());
+            return Rect2i.createFromMinAndSize(0, 0, drawRegion.width(), drawRegion.height());
         }
     }
 
@@ -911,7 +740,7 @@ public class CanvasImpl implements CanvasControl {
                     state = new CanvasState(state, subRegion, cropRegion);
                 } else if (!cropRegion.equals(state.cropRegion)) {
                     state = new CanvasState(state, subRegion, cropRegion);
-                    crop(cropRegion);
+                    renderer.crop(cropRegion);
                     croppingRegion = true;
                 } else {
                     state = new CanvasState(state, subRegion);
@@ -926,45 +755,10 @@ public class CanvasImpl implements CanvasControl {
             if (!disposed) {
                 disposed = true;
                 if (croppingRegion) {
-                    crop(previousState.cropRegion);
+                    renderer.crop(previousState.cropRegion);
                 }
                 state = previousState;
             }
-        }
-    }
-
-    /**
-     * A key that identifies an entry in the text cache. It contains the elements that affect the generation of mesh for text rendering.
-     */
-    private static class TextCacheKey {
-        private String text;
-        private Font font;
-        private int width;
-        private HorizontalAlign alignment;
-
-        public TextCacheKey(String text, Font font, int maxWidth, HorizontalAlign alignment) {
-            this.text = text;
-            this.font = font;
-            this.width = maxWidth;
-            this.alignment = alignment;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj instanceof TextCacheKey) {
-                TextCacheKey other = (TextCacheKey) obj;
-                return Objects.equals(text, other.text) && Objects.equals(font, other.font)
-                        && Objects.equals(width, other.width) && Objects.equals(alignment, other.alignment);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(text, font, width, alignment);
         }
     }
 
@@ -982,7 +776,7 @@ public class CanvasImpl implements CanvasControl {
         }
 
         public String getTooltip() {
-            if (tooltipOverride.isEmpty()) {
+            if (tooltipOverride == null || tooltipOverride.isEmpty()) {
                 return element.getTooltip();
             }
             return tooltipOverride;
@@ -1036,7 +830,44 @@ public class CanvasImpl implements CanvasControl {
 
         @Override
         public void draw() {
-            drawTextureInternal(texture, color, mode, absoluteRegion, cropRegion, ux, uy, uw, uh, alpha);
+            renderer.crop(cropRegion);
+            renderer.drawTexture(texture, color, mode, absoluteRegion, ux, uy, uw, uh, alpha);
+            renderer.crop(state.cropRegion);
+        }
+    }
+
+    private final class DrawBorderedTextureOperation implements DrawOperation {
+
+        private TextureRegion texture;
+        private Border border;
+        private boolean tile;
+        private Rect2i absoluteRegion;
+        private Rect2i cropRegion;
+        private float ux;
+        private float uy;
+        private float uw;
+        private float uh;
+        private float alpha;
+
+        private DrawBorderedTextureOperation(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile,
+                                             Rect2i cropRegion, float ux, float uy, float uw, float uh, float alpha) {
+            this.texture = texture;
+            this.tile = tile;
+            this.absoluteRegion = absoluteRegion;
+            this.border = border;
+            this.cropRegion = cropRegion;
+            this.ux = ux;
+            this.uy = uy;
+            this.uw = uw;
+            this.uh = uh;
+            this.alpha = alpha;
+        }
+
+        @Override
+        public void draw() {
+            renderer.crop(cropRegion);
+            renderer.drawTextureBordered(texture, absoluteRegion, border, tile, ux, uy, uw, uh, alpha);
+            renderer.crop(state.cropRegion);
         }
     }
 
@@ -1088,7 +919,9 @@ public class CanvasImpl implements CanvasControl {
 
         @Override
         public void draw() {
-            drawTextInternal(text, font, hAlign, vAlign, absoluteRegion, cropRegion, color, shadowColor, alpha);
+            renderer.crop(cropRegion);
+            renderer.drawText(text, font, hAlign, vAlign, absoluteRegion, color, shadowColor, alpha);
+            renderer.crop(state.cropRegion);
         }
     }
 

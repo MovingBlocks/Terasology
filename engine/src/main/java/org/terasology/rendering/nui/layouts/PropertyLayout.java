@@ -21,11 +21,11 @@ import java.util.List;
 
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
+import org.terasology.rendering.nui.properties.Property;
+import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.properties.Property;
-import org.terasology.rendering.nui.properties.PropertyProvider;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -84,7 +84,7 @@ public class PropertyLayout extends MigLayout {
                     }
                 }
             });
-            addWidget(expand, new CCHint("newline, w 50!"));
+            addWidget(expand, new CCHint("newline, w 25!"));
             addWidget(headline, new CCHint());
             addWidget(layout, new CCHint("newline, spanx 2"));
         }

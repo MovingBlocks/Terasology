@@ -19,7 +19,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.Util;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.VertexBufferObjectManager;
@@ -69,7 +68,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
 
     @Override
     public void reload(SkeletalMeshData newData) {
-        Util.checkGLError();
         dispose();
 
         this.data = newData;
@@ -90,7 +88,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         uvBuffer.flip();
         vboUVBuffer = VertexBufferObjectManager.getInstance().getVboId();
         VertexBufferObjectManager.getInstance().bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
-        Util.checkGLError();
     }
 
     @Override

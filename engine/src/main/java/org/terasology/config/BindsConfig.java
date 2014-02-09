@@ -29,6 +29,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindableAxis;
+import org.terasology.input.BindableButton;
+import org.terasology.input.InputSystem;
+import org.terasology.input.RegisterBindAxis;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
@@ -45,6 +53,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,6 +63,8 @@ import java.util.Set;
  * @author Immortius
  */
 public final class BindsConfig {
+    private static final Logger logger = LoggerFactory.getLogger(BindsConfig.class);
+
     private ListMultimap<SimpleUri, Input> data = ArrayListMultimap.create();
 
     public BindsConfig() {
@@ -168,6 +179,71 @@ public final class BindsConfig {
         }
         SimpleUri bindUri = new SimpleUri(moduleName, info.id());
         setBinds(bindUri, defaultInputs.toArray(new Input[defaultInputs.size()]));
+    }
+
+    public void applyBinds(InputSystem inputSystem, ModuleManager moduleManager) {
+        inputSystem.clearBinds();
+        for (Module module : moduleManager.getActiveModules()) {
+            if (module.isCodeModule()) {
+                registerButtonBinds(inputSystem, module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+                registerAxisBinds(inputSystem, module.getId(), module.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+            }
+        }
+    }
+
+    private void registerAxisBinds(InputSystem inputSystem, String packageName, Iterable<Class<?>> classes) {
+        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+        for (Class registerBindClass : classes) {
+            RegisterBindAxis info = (RegisterBindAxis) registerBindClass.getAnnotation(RegisterBindAxis.class);
+            String id = prefix + info.id();
+            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
+                BindableButton positiveButton = inputSystem.getBindButton(new SimpleUri(info.positiveButton()));
+                BindableButton negativeButton = inputSystem.getBindButton(new SimpleUri(info.negativeButton()));
+                if (positiveButton == null) {
+                    logger.warn("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
+                    continue;
+                }
+                if (negativeButton == null) {
+                    logger.warn("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
+                    continue;
+                }
+                try {
+                    BindableAxis bindAxis = inputSystem.registerBindAxis(id, (BindAxisEvent) registerBindClass.newInstance(), positiveButton, negativeButton);
+                    bindAxis.setSendEventMode(info.eventMode());
+                    logger.debug("Registered axis bind: {}", id);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.error("Failed to register axis bind \"{}\"", id, e);
+                }
+            } else {
+                logger.error("Failed to register axis bind \"{}\", does not extend BindAxisEvent", id);
+            }
+        }
+    }
+
+    private void registerButtonBinds(InputSystem inputSystem, String moduleId, Iterable<Class<?>> classes) {
+        for (Class registerBindClass : classes) {
+            RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
+            SimpleUri bindUri = new SimpleUri(moduleId, info.id());
+            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
+                try {
+                    BindableButton bindButton = inputSystem.registerBindButton(bindUri, info.description(), (BindButtonEvent) registerBindClass.newInstance());
+                    bindButton.setMode(info.mode());
+                    bindButton.setRepeating(info.repeating());
+
+                    for (Input input : getBinds(bindUri)) {
+                        if (input != null) {
+                            inputSystem.linkBindButtonToInput(input, bindUri);
+                        }
+                    }
+
+                    logger.debug("Registered button bind: {}", bindUri);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    logger.error("Failed to register button bind \"{}\"", e);
+                }
+            } else {
+                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", bindUri);
+            }
+        }
     }
 
     static class Handler implements JsonSerializer<BindsConfig>, JsonDeserializer<BindsConfig> {

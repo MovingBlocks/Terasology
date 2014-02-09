@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.ingame;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 /**
  * @author Immortius
  */
-public class DeathScreen extends UIScreenLayer {
+public class DeathScreen extends CoreScreenLayer {
 
     @Override
     public boolean isEscapeToCloseAllowed() {
@@ -42,5 +42,10 @@ public class DeathScreen extends UIScreenLayer {
                 getManager().closeScreen(DeathScreen.this);
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

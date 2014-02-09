@@ -18,11 +18,17 @@ package org.terasology.rendering.nui.internal;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.HorizontalAlign;
+import org.terasology.rendering.nui.ScaleMode;
+import org.terasology.rendering.nui.VerticalAlign;
 
 public class HeadlessCanvasRenderer implements CanvasRenderer {
 
@@ -53,6 +59,27 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
 
     @Override
     public void drawLine(int sx, int sy, int ex, int ey, Color color) {
+        // Do nothing
+    }
+
+    @Override
+    public void crop(Rect2i cropRegion) {
+        // Do nothing
+    }
+
+    @Override
+    public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion, float ux, float uy, float uw, float uh, float alpha) {
+        // Do nothing
+    }
+
+    @Override
+    public void drawText(String text, Font font, HorizontalAlign hAlign, VerticalAlign vAlign, Rect2i absoluteRegion, Color color, Color shadowColor,
+                         float alpha) {
+        // Do nothing
+    }
+
+    @Override
+    public void drawTextureBordered(TextureRegion texture, Rect2i absoluteRegion, Border border, boolean tile, float ux, float uy, float uw, float uh, float alpha) {
         // Do nothing
     }
 }

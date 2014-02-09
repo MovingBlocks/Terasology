@@ -21,6 +21,7 @@ import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
@@ -33,7 +34,8 @@ import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -42,23 +44,29 @@ import org.terasology.world.WorldProvider;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.CLIENT)
 public class DebugControlSystem implements ComponentSystem {
-
-    private UIScreenMetrics metrics;
 
     @In
     private GameEngine engine;
 
     @In
     private WorldProvider world;
+
     @In
     private WorldRenderer worldRenderer;
+
     @In
     private Config config;
 
+    @In
+    private NUIManager nuiManager;
+
+    private DebugOverlay overlay;
+
     @Override
     public void initialise() {
+        overlay = nuiManager.addOverlay("engine:debugOverlay", DebugOverlay.class);
     }
 
     @Override
@@ -151,8 +159,7 @@ public class DebugControlSystem implements ComponentSystem {
                 event.consume();
                 break;
             case Keyboard.KeyId.F4:
-                metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
-                metrics.toggleMode();
+                overlay.toggleMetricsMode();
                 event.consume();
                 break;
 

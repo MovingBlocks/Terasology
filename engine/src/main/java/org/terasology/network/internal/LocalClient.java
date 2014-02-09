@@ -17,11 +17,11 @@
 package org.terasology.network.internal;
 
 import org.terasology.config.Config;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.rendering.world.ViewDistance;
@@ -44,7 +44,7 @@ public class LocalClient extends AbstractClient {
     public String getName() {
         ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
         if (clientComp != null) {
-            DisplayInformationComponent displayInfo = clientComp.clientInfo.getComponent(DisplayInformationComponent.class);
+            DisplayNameComponent displayInfo = clientComp.clientInfo.getComponent(DisplayNameComponent.class);
             if (displayInfo != null) {
                 return displayInfo.name;
             }

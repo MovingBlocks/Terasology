@@ -29,6 +29,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
@@ -40,7 +41,6 @@ import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -142,7 +142,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     public String getName() {
         ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
         if (clientComp != null) {
-            DisplayInformationComponent displayInfo = clientComp.clientInfo.getComponent(DisplayInformationComponent.class);
+            DisplayNameComponent displayInfo = clientComp.clientInfo.getComponent(DisplayNameComponent.class);
             if (displayInfo != null) {
                 return displayInfo.name;
             }
@@ -159,7 +159,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.name = name;
         ClientComponent client = getEntity().getComponent(ClientComponent.class);
         if (client != null) {
-            DisplayInformationComponent displayInfo = client.clientInfo.getComponent(DisplayInformationComponent.class);
+            DisplayNameComponent displayInfo = client.clientInfo.getComponent(DisplayNameComponent.class);
             if (displayInfo != null) {
                 displayInfo.name = name;
                 client.clientInfo.saveComponent(displayInfo);

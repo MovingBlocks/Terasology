@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.internal;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -34,6 +35,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
 import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
@@ -43,13 +45,17 @@ import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
+import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,10 +66,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private AssetManager assetManager;
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
+    private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
     private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
     private ClassLibrary<UIWidget> widgetsLibrary;
     private UIWidget focus;
+
+    private List<ControlWidget> overlays = Lists.newArrayList();
 
     public NUIManagerInternal(AssetManager assetManager, CanvasRenderer renderer) {
         this.assetManager = assetManager;
@@ -76,6 +85,30 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             widgetsLibrary.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }
     }
+
+    @Override
+    public HUDScreenLayer getHUD() {
+        return hudScreenLayer;
+    }
+
+    @Override
+    public boolean isHUDVisible() {
+        return !screens.isEmpty() && screens.getLast() == hudScreenLayer;
+    }
+
+    @Override
+    public void setHUDVisible(boolean visible) {
+        if (visible) {
+            if (!isHUDVisible()) {
+                screens.addLast(hudScreenLayer);
+            }
+        } else {
+            if (isHUDVisible()) {
+                screens.removeLast();
+            }
+        }
+    }
+
 
     @Override
     public boolean isOpen(String screenUri) {
@@ -134,8 +167,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer pushScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
+        if (data != null && data.getRootWidget() instanceof CoreScreenLayer) {
+            CoreScreenLayer result = (CoreScreenLayer) data.getRootWidget();
             result.setId(screenUri.toNormalisedSimpleString());
             pushScreen(result, screenUri);
             return result;
@@ -153,7 +186,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType) {
+    public <T extends CoreScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType) {
         UIScreenLayer result = pushScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
@@ -162,7 +195,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
+    public <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType) {
         UIScreenLayer result = pushScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
@@ -171,11 +204,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void pushScreen(UIScreenLayer screen) {
+    public void pushScreen(CoreScreenLayer screen) {
         pushScreen(screen, null);
     }
 
-    public void pushScreen(UIScreenLayer screen, AssetUri uri) {
+    public void pushScreen(CoreScreenLayer screen, AssetUri uri) {
+        screen.setManager(this);
         prepare(screen);
         screens.push(screen);
         if (uri != null) {
@@ -194,8 +228,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     @Override
     public UIScreenLayer setScreen(AssetUri screenUri) {
         UIData data = assetManager.loadAssetData(screenUri, UIData.class);
-        if (data != null && data.getRootWidget() instanceof UIScreenLayer) {
-            UIScreenLayer result = (UIScreenLayer) data.getRootWidget();
+        if (data != null && data.getRootWidget() instanceof CoreScreenLayer) {
+            CoreScreenLayer result = (CoreScreenLayer) data.getRootWidget();
             result.setId(screenUri.toNormalisedSimpleString());
             setScreen(result, screenUri);
             return result;
@@ -213,7 +247,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType) {
+    public <T extends CoreScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType) {
         UIScreenLayer result = setScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
@@ -222,7 +256,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public <T extends UIScreenLayer> T setScreen(String screenUri, Class<T> expectedType) {
+    public <T extends CoreScreenLayer> T setScreen(String screenUri, Class<T> expectedType) {
         UIScreenLayer result = setScreen(screenUri);
         if (expectedType.isInstance(result)) {
             return expectedType.cast(result);
@@ -231,17 +265,50 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     @Override
-    public void setScreen(UIScreenLayer screen) {
+    public void setScreen(CoreScreenLayer screen) {
         setScreen(screen, null);
     }
 
-    public void setScreen(UIScreenLayer screen, AssetUri uri) {
-        closeAllScreens();
+    @Override
+    public <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType) {
+        AssetUri assetUri = assetManager.resolve(AssetType.UI_ELEMENT, screenUri);
+        if (assetUri != null) {
+            return addOverlay(assetUri, expectedType);
+        }
+        return null;
+    }
+
+    @Override
+    public <T extends ControlWidget> T addOverlay(AssetUri screenUri, Class<T> expectedType) {
+        UIData data = assetManager.loadAssetData(screenUri, UIData.class);
+        if (data != null && expectedType.isInstance(data.getRootWidget())) {
+            T result = expectedType.cast(data.getRootWidget());
+            addOverlay(result);
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public void addOverlay(ControlWidget overlay) {
+        prepare(overlay);
+        overlays.add(overlay);
+    }
+
+    @Override
+    public void removeOverlay(ControlWidget overlay) {
+        overlays.remove(overlay);
+    }
+
+    public void setScreen(CoreScreenLayer screen, AssetUri uri) {
+        screens.clear();
         pushScreen(screen, uri);
     }
 
     @Override
-    public void closeAllScreens() {
+    public void clear() {
+        overlays.clear();
+        hudScreenLayer.clear();
         screens.clear();
         screenLookup.clear();
         focus = null;
@@ -257,8 +324,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         for (UIScreenLayer screen : screensToRender) {
-            canvas.setSkin(screen.getSkin());
             canvas.drawWidget(screen, canvas.getRegion());
+        }
+        for (ControlWidget overlay : overlays) {
+            canvas.drawWidget(overlay);
         }
         canvas.postRender();
     }
@@ -268,6 +337,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         for (UIScreenLayer screen : screens) {
             screen.update(delta);
+        }
+
+        for (ControlWidget widget : overlays) {
+            widget.update(delta);
         }
     }
 
@@ -308,7 +381,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     */
 
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
-    public void mouseAxisEvent(AxisEvent event, EntityRef entity) {
+    public void mouseAxisEvent(MouseAxisEvent event, EntityRef entity) {
         if (isReleasingMouse()) {
             event.consume();
         }
@@ -317,6 +390,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse button events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
+        if (!Mouse.isVisible()) {
+            return;
+        }
         if (focus != null) {
             focus.onMouseButtonEvent(event);
             if (event.isConsumed()) {
@@ -324,11 +400,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             }
         }
         if (event.isDown()) {
-            if (canvas.processMouseClick(event.getButton(), Mouse.getPosition())) {
+            if (canvas.processMouseClick(event.getButton(), event.getMousePosition())) {
                 event.consume();
             }
         } else {
-            if (canvas.processMouseRelease(event.getButton(), Mouse.getPosition())) {
+            if (canvas.processMouseRelease(event.getButton(), event.getMousePosition())) {
                 event.consume();
             }
         }
@@ -340,6 +416,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     //mouse wheel events
     @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
+        if (!Mouse.isVisible()) {
+            return;
+        }
+
         if (focus != null) {
             focus.onMouseWheelEvent(event);
             if (event.isConsumed()) {
@@ -366,6 +446,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 event.consume();
             }
         }
+        for (UIScreenLayer screen : screens) {
+            if (screen.isModal()) {
+                event.consume();
+            }
+        }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
@@ -389,10 +474,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
     }
 
-    private void prepare(UIScreenLayer screen) {
+    private void prepare(ControlWidget screen) {
         InjectionHelper.inject(screen);
-        screen.setManager(this);
-        screen.getContents();
         screen.initialise();
     }
 

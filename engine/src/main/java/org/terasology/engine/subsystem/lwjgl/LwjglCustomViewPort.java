@@ -15,17 +15,17 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
-import java.awt.Canvas;
-
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
 
-public class LwjglCustomViewPort implements EngineSubsystem {
+import java.awt.*;
+
+public class LwjglCustomViewPort extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglCustomViewPort.class);
 
@@ -33,6 +33,7 @@ public class LwjglCustomViewPort implements EngineSubsystem {
 
     @Override
     public void preInitialise() {
+        super.preInitialise();
     }
 
     @Override
@@ -63,6 +64,10 @@ public class LwjglCustomViewPort implements EngineSubsystem {
 
     public void setCustomViewport(Canvas canvas) {
         this.customViewPort = canvas;
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

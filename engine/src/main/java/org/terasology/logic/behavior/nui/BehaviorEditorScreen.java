@@ -25,14 +25,15 @@ import org.terasology.logic.behavior.BehaviorSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.layouts.PropertyLayout;
+import org.terasology.rendering.nui.itemRendering.ToStringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.EnterTextPopup;
+import org.terasology.rendering.nui.layouts.PropertyLayout;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -47,7 +48,7 @@ import java.util.List;
 /**
  * @author synopia
  */
-public class BehaviorEditorScreen extends UIScreenLayer {
+public class BehaviorEditorScreen extends CoreScreenLayer {
 
     public static final String PALETTE_ITEM_OPEN = "--";
     public static final String PALETTE_ITEM_CLOSE = "++";
@@ -146,7 +147,7 @@ public class BehaviorEditorScreen extends UIScreenLayer {
                     EntityRef minion = value.actor().minion();
                     entityProperties.clear();
                     for (Component component : minion.iterateComponents()) {
-                        entityProperties.addPropertyProvider(component.getClass().getSimpleName(), new PropertyProvider<>(component));
+                        entityProperties.addPropertyProvider(component.getClass().getSimpleName().replace("Component", ""), new PropertyProvider<>(component));
                     }
                 }
                 updateDebugger();
@@ -187,6 +188,12 @@ public class BehaviorEditorScreen extends UIScreenLayer {
             @Override
             public List<BehaviorNodeComponent> get() {
                 return paletteItems;
+            }
+        });
+        palette.setItemRenderer(new ToStringTextRenderer<BehaviorNodeComponent>() {
+            @Override
+            public String getTooltip(BehaviorNodeComponent value) {
+                return value.description;
             }
         });
 
@@ -302,6 +309,11 @@ public class BehaviorEditorScreen extends UIScreenLayer {
         });
 
         paletteItems = findPaletteItems();
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
     private void removeWidget(RenderableNode node) {

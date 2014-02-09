@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.texture;
 
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.newdawn.slick.opengl.PNGDecoder;
@@ -83,7 +84,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
 
             for (URL url : urls) {
                 if (url.toString().endsWith(".texinfo")) {
-                    try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
+                    try (InputStreamReader reader = new InputStreamReader(url.openStream(), Charsets.UTF_8)) {
                         TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                         if (metadata.filterMode != null) {
                             filterMode = metadata.filterMode;
@@ -130,6 +131,8 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             } else {
                 return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
             }
+        } catch (UnsupportedOperationException e) {
+            throw new IOException(e);
         } finally {
             pngStream.close();
         }

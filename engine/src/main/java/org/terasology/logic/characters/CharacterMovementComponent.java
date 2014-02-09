@@ -21,6 +21,7 @@ import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.rendering.nui.properties.Range;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
@@ -31,29 +32,39 @@ import java.util.List;
 public final class CharacterMovementComponent implements Component {
 
     // Collision settings
+    @Range(min = 0, max = 5)
     public float height = 1.6f;
+    @Range(min = 0, max = 5)
     public float radius = 0.3f;
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
 
     // Speed settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public float maxGroundSpeed = 5.0f;
+    @Range(min = 0, max = 10)
+    public float maxGroundSpeed = 1.2f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 10)
     public float maxWaterSpeed = 2.0f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 10)
     public float maxGhostSpeed = 5.0f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 10)
     public float runFactor = 1.5f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 10)
     public float jumpSpeed = 10.0f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 10)
     public float maxClimbSpeed = 3.0f;
 
     // Movement settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 1)
     public float stepHeight = 0.35f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
+    @Range(min = 0, max = 1)
     public float slopeFactor = 0.6f; // Cosine of the maximum slope traversable. 1 is no slope, 0 is any slope
 
     // Determines how easily the play can change direction

@@ -16,17 +16,18 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.registry.CoreRegistry;
 
-public class LwjglTimer implements EngineSubsystem {
+public class LwjglTimer extends BaseLwjglSubsystem {
 
     @Override
     public void preInitialise() {
+        super.preInitialise();
         initTimer(); // Dependent on LWJGL
     }
 
@@ -53,6 +54,10 @@ public class LwjglTimer implements EngineSubsystem {
     private void initTimer() {
         EngineTime time = new TimeLwjgl();
         CoreRegistry.putPermanently(Time.class, time);
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

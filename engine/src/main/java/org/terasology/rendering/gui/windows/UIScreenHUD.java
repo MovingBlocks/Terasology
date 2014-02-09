@@ -15,31 +15,20 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import java.util.Locale;
-
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.drowning.DrowningComponent;
 import org.terasology.logic.drowning.DrownsComponent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIInventoryGrid;
-import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 /**
  * HUD displayed on the user's screen.
@@ -60,15 +49,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     private final UIImage[] hearts;
     private final UIImage[] breathBubbles;
     private final UIImage crosshair;
-    private final UILabel debugLine1;
-    private final UILabel debugLine2;
-    private final UILabel debugLine3;
-    private final UILabel debugLine4;
-
-    private final UIInventoryGrid toolbar;
-
-    private final UIImage leftGearWheel;
-    private final UIImage rightGearWheel;
 
     private final Config config = CoreRegistry.get(Config.class);
 
@@ -120,70 +100,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         crosshair.setVerticalAlign(EVerticalAlign.CENTER);
         crosshair.setVisible(true);
 
-        debugLine1 = new UILabel();
-        debugLine1.setPosition(new Vector2f(4, 4));
-        debugLine2 = new UILabel();
-        debugLine2.setPosition(new Vector2f(4, 22));
-        debugLine3 = new UILabel();
-        debugLine3.setPosition(new Vector2f(4, 38));
-        debugLine4 = new UILabel();
-        debugLine4.setPosition(new Vector2f(4, 54));
-
-        toolbar = new UIInventoryGrid(10);
-        toolbar.setId("toolbar");
-        toolbar.setVisible(true);
-        toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
-        toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
-
-        toolbar.setVisible(true);
-        toolbar.setCellMargin(new Vector2f(0f, 0f));
-        toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
-
-        toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
-        CharacterComponent character = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character != null) {
-            toolbar.setSelected(character.selectedItem);
-        }
-
-        leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
-
-        leftGearWheel.setSize(new Vector2f(36f, 36f));
-        leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
-        leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
-        leftGearWheel.setId("leftGearWheel");
-        leftGearWheel.setVisible(true);
-
-        leftGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
-        leftGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
-        leftGearWheel.setPosition(new Vector2f(
-                leftGearWheel.getPosition().x - 240f,
-                leftGearWheel.getPosition().y - 4f)
-        );
-
-        rightGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
-        rightGearWheel.setSize(new Vector2f(36f, 36f));
-        rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
-        rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
-        rightGearWheel.setId("rightGearWheel");
-        rightGearWheel.setVisible(true);
-
-        rightGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
-        rightGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
-        rightGearWheel.setPosition(new Vector2f(
-                rightGearWheel.getPosition().x + 240f,
-                rightGearWheel.getPosition().y - 4f)
-        );
-
-
         addDisplayElement(crosshair);
-        addDisplayElement(rightGearWheel);
-        addDisplayElement(leftGearWheel);
-        addDisplayElement(debugLine1);
-        addDisplayElement(debugLine2);
-        addDisplayElement(debugLine3);
-        addDisplayElement(debugLine4);
-
-        addDisplayElement(toolbar);
 
         localPlayer = CoreRegistry.get(LocalPlayer.class);
 
@@ -197,49 +114,15 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
         updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
         updateBreathBar(localPlayer.getCharacterEntity().getComponent(DrownsComponent.class), localPlayer.getCharacterEntity().getComponent(DrowningComponent.class));
-        CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-        if (character == null) {
-            toolbar.setVisible(false);
-            leftGearWheel.setVisible(false);
-            rightGearWheel.setVisible(false);
-        } else {
-            toolbar.setVisible(true);
-            toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
-            toolbar.setSelected(character.selectedItem);
-            leftGearWheel.setVisible(true);
-            rightGearWheel.setVisible(true);
-        }
-
-        boolean enableDebug = config.getSystem().isDebugEnabled();
-        debugLine1.setVisible(enableDebug);
-        debugLine2.setVisible(enableDebug);
-        debugLine3.setVisible(enableDebug);
-        debugLine4.setVisible(enableDebug);
-
-        if (enableDebug) {
-            CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
-            double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-            debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f",
-                    time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            if (entityManager != null) {
-                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntityCount(), cameraTarget.toString()));
-            }
-            Vector3f pos = CoreRegistry.get(LocalPlayer.class).getPosition();
-            float yaw = (character != null) ? character.yaw : 0;
-            debugLine3.setText(String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Yaw %.2f", pos.x, pos.y, pos.z, yaw));
-            debugLine4.setText(String.format("total vus: %s | active threads: %s | worldTime: %.2f",
-                    ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount(),
-                    CoreRegistry.get(WorldProvider.class).getTime().getDays()));
-        }
     }
 
     private void updateBreathBar(DrownsComponent drownsComponent, DrowningComponent drowningComponent) {
         if (drownsComponent != null && drowningComponent != null) {
             float breath = drowningComponent.getPercentageBreath(time.getGameTimeInMs());
             if (breath <= 0) {
-                for (int i = 0; i < breathBubbles.length; ++i) {
-                    breathBubbles[i].setVisible(true);
-                    breathBubbles[i].setTextureOrigin(new Vector2f(25f, 18f));
+                for (UIImage breathBubble : breathBubbles) {
+                    breathBubble.setVisible(true);
+                    breathBubble.setTextureOrigin(new Vector2f(25f, 18f));
                 }
             } else {
                 breath *= NUM_BUBBLE_ICONS;
@@ -253,8 +136,8 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
                 }
             }
         } else {
-            for (int i = 0; i < breathBubbles.length; ++i) {
-                breathBubbles[i].setVisible(false);
+            for (UIImage breathBubble : breathBubbles) {
+                breathBubble.setVisible(false);
             }
         }
     }

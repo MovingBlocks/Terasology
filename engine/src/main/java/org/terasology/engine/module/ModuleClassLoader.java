@@ -15,7 +15,6 @@
  */
 package org.terasology.engine.module;
 
-import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -26,11 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.Event;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * @author Immortius
@@ -72,23 +73,32 @@ public class ModuleClassLoader extends URLClassLoader {
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
         try {
-            CtClass cc = pool.get(name);
-            // Ensure empty constructor of Components and Events are not private, if they exist.
-            if (needsNonPrivateConstructor(cc)) {
-                try {
-                    CtConstructor constructor = cc.getDeclaredConstructor(new CtClass[0]);
-                    if ((constructor.getModifiers() & Modifier.PRIVATE) != 0) {
-                        constructor.setModifiers(constructor.getModifiers() & ~Modifier.PRIVATE);
-                    }
-                } catch (NotFoundException e) {
-                    // This may be fine, not necessarily expecting an empty constructor.
-                }
-            }
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
+                @Override
+                public Class<?> run() throws Exception {
+                    CtClass cc = pool.get(name);
 
-            byte[] b = cc.toBytecode();
-            return defineClass(name, b, 0, b.length);
-        } catch (CannotCompileException | NotFoundException | IOException e) {
-            throw new ClassNotFoundException("Failed to find or load class " + name, e);
+                    // Ensure empty constructor of Components and Events are not private, if they exist.
+                    if (needsNonPrivateConstructor(cc)) {
+                        try {
+                            CtConstructor constructor = cc.getDeclaredConstructor(new CtClass[0]);
+                            if ((constructor.getModifiers() & Modifier.PRIVATE) != 0) {
+                                constructor.setModifiers(constructor.getModifiers() & ~Modifier.PRIVATE);
+                            }
+                        } catch (NotFoundException e) {
+                            // This may be fine, not necessarily expecting an empty constructor.
+                        }
+                    }
+
+                    byte[] b = cc.toBytecode();
+                    return defineClass(name, b, 0, b.length);
+                }
+
+
+            });
+
+        } catch (PrivilegedActionException e) {
+            throw new ClassNotFoundException("Failed to find or load class " + name, e.getCause());
         }
     }
 

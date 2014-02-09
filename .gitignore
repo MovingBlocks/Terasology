@@ -31,7 +31,8 @@ facades/PC/Terasology.launch
 *.directory
 
 #Ignore OSX
-Icon
+Icon
+
 
 #Ignore Windows
 ehthumbs.db
@@ -42,6 +43,7 @@ Thumbs.db
 /saves/
 /screenshots/
 /logs/
+/terasology-server/
 config.cfg
 entityDump.txt
 

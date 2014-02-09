@@ -26,14 +26,18 @@ import org.terasology.engine.module.ModuleSelection;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
+import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIList;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,7 +46,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class SelectModulesScreen extends UIScreenLayer {
+public class SelectModulesScreen extends CoreScreenLayer {
 
     @In
     private ModuleManager moduleManager;
@@ -135,7 +139,6 @@ public class SelectModulesScreen extends UIScreenLayer {
                     }
                 }
             });
-
 
 
             Binding<ModuleInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleInfo>() {
@@ -252,7 +255,7 @@ public class SelectModulesScreen extends UIScreenLayer {
                     public void onActivated(UIWidget button) {
                         for (Module m : moduleList.getList()) {
                             // The Core module is mandatory - ignore trying to disable it
-                            if (m.getId().equals("core")){
+                            if (m.getId().equals("core")) {
                                 continue;
                             }
 
@@ -282,6 +285,11 @@ public class SelectModulesScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 
 }

@@ -21,9 +21,9 @@ import org.lwjgl.input.Mouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
@@ -31,12 +31,13 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 
-public class LwjglInput implements EngineSubsystem {
+public class LwjglInput extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
 
     @Override
     public void preInitialise() {
+        super.preInitialise();
     }
 
     @Override
@@ -87,6 +88,10 @@ public class LwjglInput implements EngineSubsystem {
     private void updateInputConfig(Config config) {
         config.getInput().getBinds().updateForChangedMods();
         config.save();
+    }
+
+    @Override
+    public void registerSystems(ComponentSystemManager componentSystemManager) {
     }
 
 }

@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -33,22 +33,18 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.players.MenuControlSystem;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
 
 /**
  * Play mode.
@@ -90,7 +86,7 @@ public class StateIngame implements GameState {
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        guiManager.openWindow(MenuControlSystem.HUD);
+        guiManager.openWindow("hud");
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
@@ -103,8 +99,11 @@ public class StateIngame implements GameState {
         }
         // Show or hide the HUD according to the settings
         final boolean hudHidden = CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
-        for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-            element.setVisible(!hudHidden);
+        UIWindow hudWindow = CoreRegistry.get(GUIManager.class).getWindowById("hud");
+        if (null != hudWindow) {
+            for (UIDisplayElement element : hudWindow.getDisplayElements()) {
+                element.setVisible(!hudHidden);
+            }
         }
     }
 
@@ -122,7 +121,7 @@ public class StateIngame implements GameState {
         componentSystemManager.shutdown();
         GameThread.processWaitingProcesses();
         guiManager.closeAllWindows();
-        nuiManager.closeAllScreens();
+        nuiManager.clear();
 
         if (worldRenderer != null) {
             worldRenderer.dispose();
@@ -171,8 +170,8 @@ public class StateIngame implements GameState {
     }
 
     public void render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
+        DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
+        displayDevice.prepareToRender();
 
         if (worldRenderer != null) {
             if (!CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {

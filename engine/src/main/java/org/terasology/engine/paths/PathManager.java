@@ -35,7 +35,7 @@ import java.util.List;
  */
 public final class PathManager {
     public static final String TERASOLOGY_FOLDER_NAME = "Terasology";
-    public static final String TERASOLOGY_HIDDEN_FOLDER_NAME = ".terasology";
+    public static final Path LINUX_HOME_SUBPATH = Paths.get(".local", "share", "terasology");
 
     private static final String SAVED_GAMES_DIR = "saves";
     private static final String LOG_DIR = "logs";
@@ -89,8 +89,9 @@ public final class PathManager {
 
     /**
      * Searches for a parent directory containing the natives directory
+     *
      * @param startPath path to start from
-     * @param maxDepth max directory levels to search
+     * @param maxDepth  max directory levels to search
      * @return the adjusted path containing the natives directory or null if not found
      */
     private Path findNativesHome(Path startPath, int maxDepth) {
@@ -130,7 +131,7 @@ public final class PathManager {
     public void useDefaultHomePath() throws IOException {
         switch (LWJGLUtil.getPlatform()) {
             case LWJGLUtil.PLATFORM_LINUX:
-                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
             case LWJGLUtil.PLATFORM_MACOSX:
                 homePath = Paths.get(System.getProperty("user.home"), "Library", "Application Support", TERASOLOGY_FOLDER_NAME);
@@ -149,7 +150,7 @@ public final class PathManager {
                 homePath = rawPath.resolve(TERASOLOGY_FOLDER_NAME);
                 break;
             default:
-                homePath = Paths.get(System.getProperty("user.home"), TERASOLOGY_HIDDEN_FOLDER_NAME);
+                homePath = Paths.get(System.getProperty("user.home")).resolve(LINUX_HOME_SUBPATH);
                 break;
         }
         updateDirs();

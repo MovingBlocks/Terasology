@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+uniform float alpha;
 uniform vec2 offset;
-uniform vec4 color;
 
 varying vec2 relPos;
 
@@ -26,5 +26,5 @@ void main()
     relPos = pos.xy;
 	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * pos;
     gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-    gl_FrontColor = color;
+    gl_FrontColor = vec4(gl_Color.rgb, gl_Color.a * alpha);
 }

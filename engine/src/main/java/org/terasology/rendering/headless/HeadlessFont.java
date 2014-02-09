@@ -17,8 +17,8 @@ package org.terasology.rendering.headless;
 
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.font.BaseFont;
+import org.terasology.rendering.assets.font.FontData;
 
 public class HeadlessFont extends BaseFont {
 
@@ -30,4 +30,5 @@ public class HeadlessFont extends BaseFont {
     public void drawString(int x, int y, String text, Color color) {
         // Do nothing
     }
+
 }

@@ -263,4 +263,7 @@ public class Color {
         return toHex();
     }
 
+    public int getRepresentation() {
+        return representation;
+    }
 }

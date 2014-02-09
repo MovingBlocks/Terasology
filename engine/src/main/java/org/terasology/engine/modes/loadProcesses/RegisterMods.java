@@ -16,7 +16,6 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
@@ -24,6 +23,7 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius

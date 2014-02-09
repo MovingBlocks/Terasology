@@ -15,10 +15,7 @@
  */
 package org.terasology.editor;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
-
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.editor.properties.SceneProperties;
@@ -35,6 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
+import java.util.Collection;
 
 /**
  * TeraEd main class.
@@ -70,11 +68,8 @@ public final class TeraEd extends JWindow {
         }
 
         LwjglCustomViewPort lwjglCustomViewPort = new LwjglCustomViewPort();
-        Deque<EngineSubsystem> subsystemList = new ArrayDeque<EngineSubsystem>(Arrays.asList(
-                new EngineSubsystem[]{
-                        new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
-                        lwjglCustomViewPort}
-                ));
+        Collection<EngineSubsystem> subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
+                lwjglCustomViewPort);
 
         engine = new TerasologyEngine(subsystemList);
         mainWindow = new MainWindow(this);

@@ -15,17 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.loadingScreen;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
  * @author Immortius
  */
-public class LoadingScreen extends UIScreenLayer {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoadingScreen.class);
+public class LoadingScreen extends CoreScreenLayer {
 
     private UILabel messageLabel;
     private UILoadBar fillBar;
@@ -47,6 +43,11 @@ public class LoadingScreen extends UIScreenLayer {
 
     @Override
     public boolean isEscapeToCloseAllowed() {
+        return false;
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
         return false;
     }
 }

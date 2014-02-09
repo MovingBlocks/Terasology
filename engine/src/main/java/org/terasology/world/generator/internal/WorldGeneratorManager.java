@@ -122,7 +122,8 @@ public class WorldGeneratorManager {
     private boolean isValidWorldGenerator(Class<?> generatorClass) {
         try {
             return WorldGenerator.class.isAssignableFrom(generatorClass) && generatorClass.getConstructor(SimpleUri.class) != null;
-        } catch (NoSuchMethodException e) {
+            // Being generous in catching here, because if the module is broken due to code changes or missing classes the world generator is invalid
+        } catch (Throwable e) {
             return false;
         }
     }

@@ -118,7 +118,7 @@ public class BindableButtonImpl implements BindableButton {
 
     @Override
     public ButtonState getState() {
-        return (activeInputs.isEmpty()) ? ButtonState.UP : ButtonState.DOWN;
+        return (activeInputs.isEmpty() || consumedActivation) ? ButtonState.UP : ButtonState.DOWN;
     }
 
     /**

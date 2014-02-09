@@ -18,8 +18,6 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
-
-import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -131,7 +129,7 @@ public class StateLoading implements GameState {
         }
 
         popStep();
-        loadingScreen = nuiManager.setScreen("engine:loadingScreen", LoadingScreen.class);
+        loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
         loadingScreen.updateStatus(current.getMessage(), current.getProgress());
     }
 
@@ -206,14 +204,16 @@ public class StateLoading implements GameState {
 
     @Override
     public void update(float delta) {
-        long startTime = 1000 * Sys.getTime() / Sys.getTimerResolution();
-        while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        long startTime = time.getRawTimeInMs();
+        while (current != null && time.getRawTimeInMs() - startTime < 20) {
             if (current.step()) {
                 popStep();
             }
         }
         if (current == null) {
-            nuiManager.popScreen();
+            nuiManager.closeScreen(loadingScreen);
+            nuiManager.setHUDVisible(true);
             CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
             float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;

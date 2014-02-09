@@ -19,7 +19,7 @@ package org.terasology.rendering.gui.widgets;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.gui.events.UIItemIconRendered;
@@ -55,12 +55,9 @@ public class UIItemIcon extends UIDisplayContainer {
     //rendering
     private Texture terrainTex;
 
-    private InventoryManager inventoryManager;
-
     private Integer fixedItemCount;
 
-    public UIItemIcon(InventoryManager inventoryManager) {
-        this.inventoryManager = inventoryManager;
+    public UIItemIcon() {
         terrainTex = Assets.getTexture("engine:terrain");
 
         itemCount = new UILabel();
@@ -95,7 +92,7 @@ public class UIItemIcon extends UIDisplayContainer {
     }
 
     private void updateCountLabel() {
-        int stackSize = inventoryManager.getStackSize(item);
+        int stackSize = InventoryUtils.getStackCount(item);
         if (fixedItemCount != null) {
             stackSize = fixedItemCount;
         }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.behavior.nui;
 
+import com.google.common.base.Charsets;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
@@ -40,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author synopia
@@ -49,7 +51,7 @@ public class BehaviorEditor extends ZoomableLayout {
     private RenderableNode selectedNode;
     private RenderableNode newNode;
     private BehaviorTree tree;
-    private Vector2f mousePos;
+    private Vector2f mousePos = new Vector2f();
     private Binding<RenderableNode> selectionBinding;
 
     private final InteractionListener moveOver = new BaseInteractionListener() {
@@ -103,7 +105,7 @@ public class BehaviorEditor extends ZoomableLayout {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         try {
             loader.save(baos, tree.getData());
-            return baos.toString();
+            return baos.toString(Charsets.UTF_8.name());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -230,11 +232,11 @@ public class BehaviorEditor extends ZoomableLayout {
         BehaviorTreeData data = new BehaviorTreeData();
         data.setRoot(node.getNode());
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
-        OutputStream os = new ByteArrayOutputStream(10000);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
 
         try {
             loader.save(os, data);
-            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toString().getBytes()), null);
+            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null);
             Port.OutputPort parent = node.getInputPort().getTargetPort();
             copy.createRenderable();
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());

@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.assets.atlas;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -52,7 +53,7 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
 
     @Override
     public AtlasData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        AtlasDefinition def = gson.fromJson(new InputStreamReader(stream), AtlasDefinition.class);
+        AtlasDefinition def = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), AtlasDefinition.class);
         Texture texture = Assets.getTexture(def.getTexture());
         if (texture != null) {
             Vector2i size = def.getTextureSize();

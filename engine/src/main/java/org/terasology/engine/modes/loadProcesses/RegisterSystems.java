@@ -20,11 +20,14 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.DependencyInfo;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
+import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;
 
 import java.util.Locale;
@@ -59,6 +62,12 @@ public class RegisterSystems extends SingleStepLoadProcess {
                 loadModule(module);
             }
         }
+
+        TerasologyEngine terasologyEngine = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+        for (EngineSubsystem subsystem : terasologyEngine.getSubsystems()) {
+            subsystem.registerSystems(componentSystemManager);
+        }
+
         return true;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
 import java.util.Map;
@@ -36,6 +37,8 @@ public class SkeletalMeshComponent implements Component {
     public MeshAnimation animation;
     public boolean loop;
     public float animationRate = 1.0f;
+    @Range(min = -2.5f, max = 2.5f)
+    public float heightOffset;
 
     @Owns
     public Map<String, EntityRef> boneEntities;

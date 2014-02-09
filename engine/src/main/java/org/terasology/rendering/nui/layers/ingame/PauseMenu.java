@@ -18,7 +18,7 @@ package org.terasology.rendering.nui.layers.ingame;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 /**
  * @author Immortius
  */
-public class PauseMenu extends UIScreenLayer {
+public class PauseMenu extends CoreScreenLayer {
 
     @Override
     public void initialise() {

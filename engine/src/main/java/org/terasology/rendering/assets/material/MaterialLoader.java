@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.material;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,7 +55,7 @@ public class MaterialLoader implements AssetLoader<MaterialData> {
 
     @Override
     public MaterialData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream), MaterialMetadata.class);
+        MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), MaterialMetadata.class);
 
         Shader shader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);
         if (shader == null) {

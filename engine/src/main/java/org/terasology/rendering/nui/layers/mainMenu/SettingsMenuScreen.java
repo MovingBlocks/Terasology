@@ -17,7 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import org.terasology.config.Config;
 import org.terasology.registry.In;
-import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.layers.mainMenu.inputSettings.InputSettingsScreen;
@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 /**
  * @author Immortius
  */
-public class SettingsMenuScreen extends UIScreenLayer {
+public class SettingsMenuScreen extends CoreScreenLayer {
 
     @In
     private Config config;
@@ -48,7 +48,7 @@ public class SettingsMenuScreen extends UIScreenLayer {
         WidgetUtil.trySubscribe(this, "input", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                UIScreenLayer inputScreen = new InputSettingsScreen();
+                CoreScreenLayer inputScreen = new InputSettingsScreen();
                 inputScreen.setSkin(getSkin());
                 getManager().pushScreen(inputScreen);
             }
@@ -60,5 +60,10 @@ public class SettingsMenuScreen extends UIScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public boolean isLowerLayerVisible() {
+        return false;
     }
 }

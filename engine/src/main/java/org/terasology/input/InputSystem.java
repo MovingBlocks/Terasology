@@ -264,7 +264,7 @@ public class InputSystem implements ComponentSystem {
                 case MOUSE_WHEEL:
                     int dir = action.getInput().getId();
                     if (dir != 0 && action.getTurns() != 0) {
-                        boolean consumed = sendMouseWheelEvent(dir * action.getTurns(), delta);
+                        boolean consumed = sendMouseWheelEvent(mouse.getPosition(), dir * action.getTurns(), delta);
 
                         BindableButtonImpl bind = (dir == 1) ? mouseWheelUpBind : mouseWheelDownBind;
                         if (bind != null) {
@@ -398,8 +398,8 @@ public class InputSystem implements ComponentSystem {
         return consumed;
     }
 
-    private boolean sendMouseWheelEvent(int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(wheelTurns, delta);
+    private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
         setupTarget(mouseWheelEvent);
         for (EntityRef entity : getInputEntities()) {
             entity.send(mouseWheelEvent);

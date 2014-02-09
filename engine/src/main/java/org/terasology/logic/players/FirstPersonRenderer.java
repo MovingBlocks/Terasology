@@ -30,17 +30,14 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -75,8 +72,6 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     @In
     private WorldRenderer worldRenderer;
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     private Mesh handMesh;
     private Texture handTex;
@@ -121,9 +116,8 @@ public class FirstPersonRenderer implements RenderSystem {
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta, (float) java.lang.Math.PI / 8f, 0.05f);
         float handMovementAnimationOffset = character.handAnimation;
 
-        UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
-        int invSlotIndex = character.selectedItem + toolbar.getStartSlot();
-        EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
+        int invSlotIndex = character.selectedItem;
+        EntityRef heldItem = InventoryUtils.getItemAt(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {

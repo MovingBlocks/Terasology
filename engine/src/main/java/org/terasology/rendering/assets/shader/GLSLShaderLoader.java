@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.assets.shader;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -68,13 +69,13 @@ public class GLSLShaderLoader implements AssetLoader<ShaderData> {
     }
 
     private ShaderMetadata readMetadata(URL url) throws IOException {
-        try (Reader reader = new InputStreamReader(url.openStream())) {
+        try (Reader reader = new InputStreamReader(url.openStream(), Charsets.UTF_8)) {
             return gson.fromJson(reader, ShaderMetadata.class);
         }
     }
 
     private String readUrl(URL url) throws IOException {
-        try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
+        try (InputStreamReader reader = new InputStreamReader(url.openStream(), Charsets.UTF_8)) {
             return CharStreams.toString(reader);
         }
     }

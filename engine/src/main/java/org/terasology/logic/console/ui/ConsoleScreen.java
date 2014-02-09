@@ -22,8 +22,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
+import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
-public class ConsoleScreen extends UIScreenLayer {
+public class ConsoleScreen extends CoreScreenLayer {
 
     @In
     private Console console;
@@ -97,11 +97,6 @@ public class ConsoleScreen extends UIScreenLayer {
             }
         });
 
-    }
-
-    @Override
-    public boolean isLowerLayerVisible() {
-        return true;
     }
 
     @Override
