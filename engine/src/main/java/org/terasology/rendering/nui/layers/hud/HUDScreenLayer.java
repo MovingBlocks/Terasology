@@ -20,6 +20,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.engine.API;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -29,9 +30,7 @@ import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
@@ -41,6 +40,7 @@ import java.util.List;
 /**
  * @author Immortius
  */
+@API
 public class HUDScreenLayer extends CoreScreenLayer {
 
     private List<HUDElement> elements = Lists.newArrayList();
@@ -53,7 +53,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public <T extends ControlWidget> T addHUDElement(String uri, Class<T> type, Rect2f region) {
-        AssetUri resolvedUri = Assets.resolveAssetUri(AssetType.UI_ELEMENT, uri);
+        AssetUri resolvedUri = getAssetUriFromStringUri(uri);
         if (resolvedUri != null) {
             return addHUDElement(resolvedUri, type, region);
         }
@@ -73,6 +73,53 @@ public class HUDScreenLayer extends CoreScreenLayer {
         widget.initialise();
         elements.add(new HUDElement(uri, widget, region));
         return widget;
+    }
+
+    private HUDElement findHUDElement(AssetUri uri) {
+        for (HUDElement element : elements) {
+            if (element.uri.equals(uri)) {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
+    private AssetUri getAssetUriFromStringUri(String uri) {
+        AssetUri resolvedUri = Assets.resolveAssetUri(AssetType.UI_ELEMENT, uri);
+        return resolvedUri;
+    }
+
+    public ControlWidget findHUDElementWidget(String uri) {
+        AssetUri resolvedUri = getAssetUriFromStringUri(uri);
+        if (resolvedUri != null) {
+            return findHUDElementWidget(resolvedUri);
+        }
+        return null;
+    }
+
+    public ControlWidget findHUDElementWidget(AssetUri uri) {
+        HUDElement element = findHUDElement(uri);
+        if (null == element) {
+            return null;
+        }
+        return element.widget;
+    }
+
+    public Rect2f findHUDElementRegion(String uri) {
+        AssetUri resolvedUri = getAssetUriFromStringUri(uri);
+        if (resolvedUri != null) {
+            return findHUDElementRegion(resolvedUri);
+        }
+        return null;
+    }
+
+    public Rect2f findHUDElementRegion(AssetUri uri) {
+        HUDElement element = findHUDElement(uri);
+        if (null == element) {
+            return null;
+        }
+        return element.region;
     }
 
     public void clear() {
