@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
+import org.terasology.engine.API;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -26,6 +27,7 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
+@API
 public abstract class CoreHudWidget extends CoreWidget {
 
     private UIWidget contents;
