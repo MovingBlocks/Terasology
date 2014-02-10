@@ -35,7 +35,7 @@ public class InputHandler implements JsonSerializer<Input>, JsonDeserializer<Inp
 
     @Override
     public Input deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return InputType.parse(json.getAsString().replace(" ", "_"));
+        return InputType.parse(json.getAsString());
     }
 
     @Override

@@ -32,6 +32,11 @@ public enum ScaleMode {
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
             return new Vector2f(region.width(), region.height());
         }
+
+        @Override
+        public String toString() {
+            return "stretch";
+        }
     },
 
     /**
@@ -42,6 +47,11 @@ public enum ScaleMode {
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
             float scale = Math.min((float) region.width() / actualWidth, (float) region.height() / actualHeight);
             return new Vector2f(actualWidth * scale, actualHeight * scale);
+        }
+
+        @Override
+        public String toString() {
+            return "scale fit";
         }
     },
 
@@ -54,6 +64,11 @@ public enum ScaleMode {
             float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
             return new Vector2f(actualWidth * scale, actualHeight * scale);
         }
+
+        @Override
+        public String toString() {
+            return "scale fill";
+        }
     },
 
     /**
@@ -63,6 +78,11 @@ public enum ScaleMode {
         @Override
         public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
             return new Vector2f(region.width(), region.height());
+        }
+
+        @Override
+        public String toString() {
+            return "tiled";
         }
     };
 

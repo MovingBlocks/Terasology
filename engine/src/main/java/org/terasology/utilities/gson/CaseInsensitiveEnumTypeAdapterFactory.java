@@ -44,7 +44,6 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
         for (T constant : rawType.getEnumConstants()) {
             String lowercase = toLowercase(constant);
             lowercaseToConstant.put(lowercase, constant);
-            lowercaseToConstant.put(lowercase.replaceAll("_", " "), constant);
         }
 
         return new TypeAdapter<T>() {
@@ -53,7 +52,7 @@ public class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory
                 if (value == null) {
                     out.nullValue();
                 } else {
-                    out.value(toLowercase(value).replaceAll("_", " "));
+                    out.value(toLowercase(value));
                 }
             }
 
