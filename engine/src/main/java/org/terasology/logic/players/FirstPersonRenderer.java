@@ -38,7 +38,7 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
-import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.iconmesh.IconMeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -183,14 +183,7 @@ public class FirstPersonRenderer implements RenderSystem {
         glScalef(0.75f, 0.75f, 0.75f);
 
         if (iconTexture instanceof Asset<?>) {
-            AssetUri uri = ((Asset<?>) iconTexture).getURI();
-            Mesh itemMesh = iconMeshes.get(uri.toNormalisedString());
-            if (itemMesh == null) {
-                itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "pixelMesh." + uri.getAssetName()),
-                        iconTexture);
-                iconMeshes.put(uri.toNormalisedString(), itemMesh);
-            }
-
+            Mesh itemMesh = IconMeshFactory.getIconMesh(iconTexture);
             itemMesh.render();
         }
 

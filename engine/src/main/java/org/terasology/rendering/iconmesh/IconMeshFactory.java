@@ -13,28 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.primitives;
+package org.terasology.rendering.iconmesh;
 
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.engine.API;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 
 @API
-public final class MeshFactory {
+public final class IconMeshFactory {
 
-    private MeshFactory() {
+    private IconMeshFactory() {
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, TextureRegion tex) {
-        return generateItemMesh(uri, tex, 0, false, null);
+    public static Mesh getIconMesh(TextureRegion region) {
+        if (region instanceof Asset) {
+            AssetUri iconUri = ((Asset) region).getURI();
+            return Assets.get(new AssetUri(AssetType.MESH, iconUri.getModuleName(), IconMeshResolver.ICON_DISCRIMINATOR + "." + iconUri.getAssetName()), Mesh.class);
+        } else {
+            return generateIconMesh(region);
+        }
     }
 
-    public static Mesh generateItemMesh(AssetUri uri, TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
+    public static Mesh generateIconMesh(TextureRegion tex) {
+        return generateIconMesh(null, tex, 0, false, null);
+    }
+
+    public static Mesh generateIconMesh(AssetUri uri, TextureRegion tex) {
+        return generateIconMesh(uri, tex, 0, false, null);
+    }
+
+    public static Mesh generateIconMesh(AssetUri uri, TextureRegion tex, int alphaLimit, boolean withContour, Vector4f colorContour) {
         ByteBuffer buffer = tex.getTexture().getData().getBuffers()[0];
 
         Rect2i pixelRegion = tex.getPixelRegion();
@@ -109,8 +127,11 @@ public final class MeshFactory {
                 }
             }
         }
-
-        return tessellator.generateMesh(uri);
+        if (uri == null) {
+            return tessellator.generateMesh();
+        } else {
+            return tessellator.generateMesh(uri);
+        }
     }
 
 }
