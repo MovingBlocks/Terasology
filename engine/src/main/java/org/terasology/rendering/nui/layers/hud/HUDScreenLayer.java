@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -34,14 +34,14 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class HUDScreenLayer extends CoreScreenLayer {
 
-    private List<HUDElement> elements = Lists.newArrayList();
+    private Map<AssetUri, HUDElement> elementsLookup = Maps.newLinkedHashMap();
 
     private AssetManager assetManager = CoreRegistry.get(AssetManager.class);
     private NUIManager manager;
@@ -69,12 +69,36 @@ public class HUDScreenLayer extends CoreScreenLayer {
     public <T extends ControlWidget> T addHUDElement(AssetUri uri, T widget, Rect2f region) {
         InjectionHelper.inject(widget);
         widget.initialise();
-        elements.add(new HUDElement(uri, widget, region));
+        elementsLookup.put(uri, new HUDElement(uri, widget, region));
         return widget;
     }
 
+    public ControlWidget getHUDElement(String uri) {
+        return getHUDElement(new AssetUri(uri));
+    }
+
+    public ControlWidget getHUDElement(AssetUri uri) {
+        HUDElement element = elementsLookup.get(uri);
+        if (element != null) {
+            return element.widget;
+        }
+        return null;
+    }
+
+    public <T extends ControlWidget> T getHUDElement(String uri, Class<T> type) {
+        return getHUDElement(new AssetUri(uri), type);
+    }
+
+    public <T extends ControlWidget> T getHUDElement(AssetUri uri, Class<T> type) {
+        ControlWidget widget = getHUDElement(uri);
+        if (widget != null && type.isInstance(widget)) {
+            return type.cast(widget);
+        }
+        return null;
+    }
+
     public void clear() {
-        elements.clear();
+        elementsLookup.clear();
     }
 
     @Override
@@ -104,7 +128,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     @Override
     public void onDraw(Canvas canvas) {
-        for (HUDElement element : elements) {
+        for (HUDElement element : elementsLookup.values()) {
             int minX = TeraMath.floorToInt(element.region.minX() * canvas.size().x);
             int minY = TeraMath.floorToInt(element.region.minY() * canvas.size().y);
             int sizeX = TeraMath.floorToInt(element.region.width() * canvas.size().x);
@@ -122,7 +146,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     @Override
     public Iterator<UIWidget> iterator() {
         return new Iterator<UIWidget>() {
-            private Iterator<HUDElement> elementIterator = elements.iterator();
+            private Iterator<HUDElement> elementIterator = elementsLookup.values().iterator();
 
             @Override
             public boolean hasNext() {
