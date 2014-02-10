@@ -29,6 +29,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Range {
+    String label() default "";
+    
+    String description() default "";
+    
     float min() default 0;
 
     float max() default 1;

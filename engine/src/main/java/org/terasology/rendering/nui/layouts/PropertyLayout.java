@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.nui.layouts;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.properties.Property;
@@ -23,10 +27,15 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
+
 /**
  * Created by synopia on 03.01.14.
  */
 public class PropertyLayout extends MigLayout {
+
+    private Comparator<? super Property<?, ?>> propertyComparator =  Ordering.allEqual();
 
     public PropertyLayout() {
     }
@@ -34,16 +43,22 @@ public class PropertyLayout extends MigLayout {
     public PropertyLayout(String id) {
         super(id);
     }
+    
+    public void setOrdering(Comparator<? super Property<?, ?>> comparator) {
+        this.propertyComparator = comparator;
+    }
 
-    public void addPropertyProvider(String label, final PropertyProvider<?> propertyProvider) {
+    public void addPropertyProvider(String groupLabel, final PropertyProvider<?> propertyProvider) {
         if (propertyProvider.getProperties().size() > 0) {
             final UIButton expand = new UIButton("", "+");
-            final UILabel headline = new UILabel(label);
+            expand.setTooltip("Click to expand");
+            final UILabel headline = new UILabel(groupLabel);
             final MigLayout layout = new MigLayout();
             layout.setColConstraints("[min][fill]");
             layout.setRowConstraints("[min]");
 
             expand.subscribe(new ActivateEventListener() {
+
                 @Override
                 public void onActivated(UIWidget widget) {
                     UIButton button = (UIButton) widget;
@@ -51,17 +66,25 @@ public class PropertyLayout extends MigLayout {
                         layout.clear();
                         invalidate();
                         button.setText("+");
+                        button.setTooltip("Click to expand");
                     } else {
-                        for (Property<?, ?> property : propertyProvider.getProperties()) {
-                            layout.addWidget(property.getLabel(), new CCHint("newline"));
-                            layout.addWidget(property.getEditor(), new CCHint());
+                        List<Property<?, ?>> props = Lists.newArrayList(propertyProvider.getProperties());
+                        Collections.sort(props, propertyComparator);
+                        for (Property<?, ?> property : props) {
+                            UILabel label = property.getLabel();
+                            UIWidget editor = property.getEditor();
+                            editor.setTooltip(property.getDescription());
+
+                            layout.addWidget(label, new CCHint("newline"));
+                            layout.addWidget(editor, new CCHint());
                         }
                         invalidate();
                         button.setText("-");
+                        button.setTooltip("Click to contract");
                     }
                 }
             });
-            addWidget(expand, new CCHint("newline, w 25!"));
+            addWidget(expand, new CCHint("newline, w 45!, h 22!"));
             addWidget(headline, new CCHint());
             addWidget(layout, new CCHint("newline, spanx 2"));
         }

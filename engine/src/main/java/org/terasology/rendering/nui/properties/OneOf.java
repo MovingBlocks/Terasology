@@ -32,12 +32,19 @@ public interface OneOf {
     @Target(ElementType.FIELD)
     @API
     public @interface Enum {
+        String label() default "";
+        
+        String description() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @API
     public @interface List {
+        String label() default "";
+        
+        String description() default "";
+
         String[] items();
     }
 
@@ -45,6 +52,10 @@ public interface OneOf {
     @Target(ElementType.FIELD)
     @API
     public @interface Provider {
+        String label() default "";
+        
+        String description() default "";
+
         String name();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.properties;
+package org.terasology.world.generator;
 
-import org.terasology.engine.API;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Map;
 
 /**
- * Created by synopia on 03.01.14.
+ * Allows for configuration
+ * @author Martin Steiger
  */
-@API
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface Checkbox {
-    String label() default "";
-    
-    String description() default "";
+public interface WorldConfigurator  {
+
+    /**
+     * The values are supposed to be annotated with {@link org.terasology.rendering.nui.properties.Property}
+     * @return a map (label->object)
+     */
+    Map<String, ?> getProperties();
 }

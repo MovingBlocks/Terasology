@@ -20,6 +20,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.Chunk;
 
+import com.google.common.base.Optional;
+
 /**
  * @author Immortius
  */
@@ -39,4 +41,6 @@ public interface WorldGenerator {
     float getHumidity(float x, float y, float z);
 
     void initialize();
+
+    Optional<WorldConfigurator> getConfigurator();
 }

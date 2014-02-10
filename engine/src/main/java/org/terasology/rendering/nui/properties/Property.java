@@ -19,20 +19,29 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.databinding.Binding;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Created by synopia on 03.01.14.
  */
 public class Property<P, UI extends UIWidget> {
-    private Binding<P> binding;
-    private UI editor;
-    private UILabel label;
+    private final Binding<P> binding;
+    private final UI editor;
+    private final UILabel label;
+    private String description;
 
-    public Property(String labelText, Binding<P> binding, UI editor) {
+    public Property(String labelText, Binding<P> binding, UI editor, String description) {
+        Preconditions.checkArgument(editor != null, "editor must not be null");
+        
         this.binding = binding;
         this.editor = editor;
-        label = new UILabel("", labelText);
+        this.description = description;
+        this.label = new UILabel("", labelText);
     }
 
+    /**
+     * @return the UI label widget, never <code>null</code>
+     */
     public UILabel getLabel() {
         return label;
     }
@@ -40,7 +49,14 @@ public class Property<P, UI extends UIWidget> {
     public Binding<P> getBinding() {
         return binding;
     }
+    
+    public String getDescription() {
+        return description;
+    }
 
+    /**
+     * @return the UI editor widget, never <code>null</code>
+     */
     public UI getEditor() {
         return editor;
     }

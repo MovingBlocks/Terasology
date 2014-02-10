@@ -15,6 +15,8 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
+import java.util.Map;
+
 import org.terasology.core.logic.generators.DefaultGenerators;
 import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerator;
@@ -23,6 +25,10 @@ import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerato
 import org.terasology.core.world.liquid.LiquidsGenerator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.WorldConfigurator;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius
@@ -43,4 +49,22 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
         DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         register(forestGenerator);
     }
+    
+    @Override
+    public Optional<WorldConfigurator> getConfigurator() {
+
+        WorldConfigurator wc = new WorldConfigurator() {
+
+            @Override
+            public Map<String, Object> getProperties() {
+                PerlinWorldConfigComponent configComp = new PerlinWorldConfigComponent();
+                Map<String, Object> map = Maps.newHashMap();
+                map.put("General", configComp);
+                return map;
+            }
+
+        };
+
+        return Optional.of(wc);
+    }    
 }
