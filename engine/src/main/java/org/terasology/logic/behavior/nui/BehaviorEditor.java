@@ -40,8 +40,6 @@ import javax.vecmath.Vector2f;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 /**
  * @author synopia

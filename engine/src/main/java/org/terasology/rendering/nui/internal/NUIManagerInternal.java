@@ -33,7 +33,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
 import org.terasology.input.Mouse;
-import org.terasology.input.events.AxisEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;

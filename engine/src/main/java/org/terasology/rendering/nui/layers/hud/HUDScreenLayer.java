@@ -29,9 +29,7 @@ import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 

@@ -23,10 +23,8 @@ import org.terasology.editor.EditorRange;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 

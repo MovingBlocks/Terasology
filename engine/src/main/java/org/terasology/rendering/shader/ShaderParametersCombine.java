@@ -23,9 +23,7 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 /**
@@ -93,7 +91,7 @@ public class ShaderParametersCombine extends ShaderParametersBase {
                 sceneReflectiveRefractive.bindNormalsTexture();
                 program.setInt("texSceneReflectiveRefractiveNormals", texId++, true);
             }
-            
+
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
                 program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);
