@@ -166,16 +166,7 @@ public class EventSystemImpl implements EventSystem {
                 }
 
                 ByteCodeEventHandlerInfo handlerInfo = new ByteCodeEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), requiredComponents, componentParams);
-                if (requiredComponents.isEmpty()) {
-                    generalHandlers.put((Class<? extends Event>) types[0], handlerInfo);
-                } else {
-                    for (Class<? extends Component> c : requiredComponents) {
-                        addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
-                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
-                            addEventHandler(childType, handlerInfo, c);
-                        }
-                    }
-                }
+                addEventHandler((Class<? extends Event>) types[0], handlerInfo, requiredComponents);
             }
         }
     }
@@ -201,7 +192,23 @@ public class EventSystemImpl implements EventSystem {
         }
     }
 
-    private void addEventHandler(Class<? extends Event> type, EventHandlerInfo handlerInfo, Class<? extends Component> c) {
+    private void addEventHandler(Class<? extends Event> type, EventHandlerInfo handler, Collection<Class<? extends Component>> components) {
+        if (components.isEmpty()) {
+            generalHandlers.put(type, handler);
+            for (Class<? extends Event> childType : childEvents.get(type)) {
+                generalHandlers.put(childType, handler);
+            }
+        } else {
+            for (Class<? extends Component> c : components) {
+                addToComponentSpecificHandlers(type, handler, c);
+                for (Class<? extends Event> childType : childEvents.get(type)) {
+                    addToComponentSpecificHandlers(childType, handler, c);
+                }
+            }
+        }
+    }
+
+    private void addToComponentSpecificHandlers(Class<? extends Event> type, EventHandlerInfo handlerInfo, Class<? extends Component> c) {
         SetMultimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
         if (componentMap == null) {
             componentMap = HashMultimap.create();
@@ -218,12 +225,7 @@ public class EventSystemImpl implements EventSystem {
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes) {
         EventHandlerInfo info = new ReceiverEventHandlerInfo<T>(eventReceiver, priority, componentTypes);
-        for (Class<? extends Component> c : componentTypes) {
-            addEventHandler(eventClass, info, c);
-            for (Class<? extends Event> childType : childEvents.get(eventClass)) {
-                addEventHandler(childType, info, c);
-            }
-        }
+        addEventHandler(eventClass, info, Arrays.asList(componentTypes));
     }
 
     @Override

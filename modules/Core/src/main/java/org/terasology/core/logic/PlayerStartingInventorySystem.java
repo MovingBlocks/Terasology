@@ -39,7 +39,7 @@ public class PlayerStartingInventorySystem implements ComponentSystem {
     @In
     EntityManager entityManager;
 
-    @ReceiveEvent
+    @ReceiveEvent(components = InventoryComponent.class)
     public void onPlayerSpawnedEvent(OnPlayerSpawnedEvent event, EntityRef player) {
         BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
         // Goodie chest
