@@ -30,7 +30,9 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
+    @LayoutConfig
     private UIWidget contents;
+
     private InteractionListener defaultScreenListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {

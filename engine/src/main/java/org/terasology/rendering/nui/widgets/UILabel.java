@@ -19,6 +19,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -30,6 +31,7 @@ import java.util.List;
  */
 public class UILabel extends CoreWidget {
 
+    @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
 
     public UILabel() {

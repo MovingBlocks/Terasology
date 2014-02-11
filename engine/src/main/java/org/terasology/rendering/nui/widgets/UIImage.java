@@ -19,6 +19,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  * @author Immortius
  */
 public class UIImage extends CoreWidget {
+    @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
 
     public UIImage() {

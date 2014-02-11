@@ -28,6 +28,7 @@ import java.util.List;
  * @author Immortius
  */
 public class InputConfigBinding implements Binding<Input> {
+
     private BindsConfig config;
     private SimpleUri bindUri;
     private int position;

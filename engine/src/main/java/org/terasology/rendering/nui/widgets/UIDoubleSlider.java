@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -98,19 +99,25 @@ public class UIDoubleSlider extends CoreWidget {
             }
         }
     };
-    private boolean active;
 
+    @LayoutConfig
     private Binding<Float> minimum = new DefaultBinding<>(0.0f);
+
+    @LayoutConfig
     private Binding<Float> range = new DefaultBinding<>(1.0f);
+
+    @LayoutConfig
     private Binding<Float> increment = new DefaultBinding<>(0.1f);
+
+    @LayoutConfig
+    private int precision = 1;
+
     private Binding<Float> valueLeft = new DefaultBinding<>(0.3f);
     private Binding<Float> valueRight = new DefaultBinding<>(0.7f);
 
-    private int precision = 1;
-
     private int sliderWidth;
-
     private String formatString = "0.0";
+    private boolean active;
 
     public UIDoubleSlider() {
     }

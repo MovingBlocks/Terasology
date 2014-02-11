@@ -26,6 +26,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -38,9 +39,16 @@ import java.util.List;
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
 
+    @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
+
+    @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
+
+    @LayoutConfig
     private Binding<Sound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click"));
+
+    @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
     private boolean down;

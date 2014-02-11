@@ -35,6 +35,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -45,8 +46,10 @@ import org.terasology.world.block.items.BlockItemComponent;
  */
 public class InventoryCell extends CoreWidget {
 
-    private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
+    @LayoutConfig
     private Binding<Integer> targetSlot = new DefaultBinding<Integer>(0);
+
+    private Binding<EntityRef> targetInventory = new DefaultBinding<>(EntityRef.NULL);
     private Binding<Boolean> selected = new DefaultBinding<>(false);
 
     private ItemIcon icon = new ItemIcon();

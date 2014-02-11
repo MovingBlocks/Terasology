@@ -30,6 +30,7 @@ import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -50,8 +51,11 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     private Map<UIWidget, ComponentWrapper> wrappers = Maps.newHashMap();
     private List<ComponentWrapper> children = Lists.newArrayList();
 
+    @LayoutConfig
     private String layoutConstraints;
+    @LayoutConfig
     private String rowConstraints;
+    @LayoutConfig
     private String colConstraints;
 
     private LC lc;
@@ -62,6 +66,7 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
     private boolean dirty;
     private MigComponent delegate = new MigComponent(null, null);
     private List<Rect2i> debugRects = Lists.newArrayList();
+    @LayoutConfig
     private boolean debug;
 
     public MigLayout() {

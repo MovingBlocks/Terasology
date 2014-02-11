@@ -54,8 +54,6 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private int imageSize = 128;
-
     private WorldConfigurator worldConfig;
 
     private PropertyLayout properties;

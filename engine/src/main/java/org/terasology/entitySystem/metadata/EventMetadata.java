@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import com.google.common.base.Predicates;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -38,7 +39,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T, ReplicatedF
     private boolean skipInstigator;
 
     public EventMetadata(Class<T> simpleClass, CopyStrategyLibrary copyStrategies, ReflectFactory factory, SimpleUri uri) throws NoSuchMethodException {
-        super(uri, simpleClass, factory, copyStrategies);
+        super(uri, simpleClass, factory, copyStrategies, Predicates.alwaysTrue());
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;
             lagCompensated = simpleClass.getAnnotation(ServerEvent.class).lagCompensate();
