@@ -26,7 +26,7 @@ import org.terasology.rendering.nui.properties.Range;
 /**
  * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>
  * <br/>
- * <b>SUCCESS</b>: when sound has started playing.<br/>
+ * <b>RUNNING</b>: while sound is playing<br/>
  * <b>FAILURE</b>: otherwise<br/>
  * <br/>
  * Auto generated javadoc - modify README.markdown instead!
@@ -67,7 +67,8 @@ public class PlaySoundNode extends Node {
 
         @Override
         public Status update(float dt) {
-            return playing ? Status.SUCCESS : Status.FAILURE;
+            // TODO should be switch to finish, once sound ends
+            return playing ? Status.RUNNING : Status.FAILURE;
         }
 
         @Override

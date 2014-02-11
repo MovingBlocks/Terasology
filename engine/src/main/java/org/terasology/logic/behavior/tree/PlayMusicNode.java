@@ -23,7 +23,12 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 
 /**
- * Created by synopia on 10.02.14.
+ * <b>Properties</b>: <b>music</b><br/>
+ * <br/>
+ * <b>RUNNING</b>: while music is playing<br/>
+ * <b>FAILURE</b>: otherwise<br/>
+ * <br/>
+ * Auto generated javadoc - modify README.markdown instead!
  */
 public class PlayMusicNode extends Node {
     @OneOf.Provider(name = "music")
@@ -60,7 +65,8 @@ public class PlayMusicNode extends Node {
 
         @Override
         public Status update(float dt) {
-            return playing ? Status.SUCCESS : Status.FAILURE;
+            // TODO should be switch to finish, once sound ends
+            return playing ? Status.RUNNING : Status.FAILURE;
         }
 
         @Override

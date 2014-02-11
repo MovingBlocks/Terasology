@@ -38,6 +38,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
@@ -73,6 +74,8 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
     private List<BehaviorTree> trees = Lists.newArrayList();
 
+    private EntityRef globalEntity;
+
     public BehaviorSystem() {
         CoreRegistry.put(BehaviorSystem.class, this);
     }
@@ -83,13 +86,29 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
         for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
             uris.add(uri);
         }
+        BehaviorTree defaultTree = null;
         for (AssetUri uri : assetManager.listAssets(AssetType.BEHAVIOR)) {
 
             BehaviorTree asset = assetManager.loadAsset(uri, BehaviorTree.class);
             if (asset != null) {
                 trees.add(asset);
+
+                if (asset.getURI().getAssetName().equals("default")) {
+                    defaultTree = asset;
+                }
             }
         }
+        createGlobalEntity(defaultTree);
+    }
+
+    private void createGlobalEntity(BehaviorTree defaultTree) {
+        globalEntity = entityManager.create();
+        BehaviorComponent behaviorComponent = new BehaviorComponent();
+        behaviorComponent.tree = defaultTree;
+        globalEntity.addComponent(behaviorComponent);
+        DisplayNameComponent nameComponent = new DisplayNameComponent();
+        nameComponent.name = "global";
+        globalEntity.addComponent(nameComponent);
     }
 
     @ReceiveEvent
