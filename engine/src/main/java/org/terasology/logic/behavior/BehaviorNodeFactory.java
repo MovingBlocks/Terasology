@@ -71,6 +71,7 @@ public class BehaviorNodeFactory implements ComponentSystem {
     private OneOfProviderFactory providerFactory;
 
     private List<AssetUri> sounds = Lists.newArrayList();
+    private List<AssetUri> music = Lists.newArrayList();
 
     public BehaviorNodeFactory() {
         CoreRegistry.put(BehaviorNodeFactory.class, this);
@@ -90,10 +91,25 @@ public class BehaviorNodeFactory implements ComponentSystem {
         for (AssetUri uri : assetManager.listAssets(AssetType.SOUND)) {
             sounds.add(uri);
         }
+        for (AssetUri uri : assetManager.listAssets(AssetType.MUSIC)) {
+            music.add(uri);
+        }
         providerFactory.register("sounds", new ReadOnlyBinding<List<AssetUri>>() {
                     @Override
                     public List<AssetUri> get() {
                         return sounds;
+                    }
+                }, new StringTextRenderer<AssetUri>() {
+                    @Override
+                    public String getString(AssetUri value) {
+                        return value.getAssetName();
+                    }
+                }
+        );
+        providerFactory.register("music", new ReadOnlyBinding<List<AssetUri>>() {
+                    @Override
+                    public List<AssetUri> get() {
+                        return music;
                     }
                 }, new StringTextRenderer<AssetUri>() {
                     @Override
