@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import net.miginfocom.layout.ContainerWrapper;
 import net.miginfocom.layout.Grid;
 import net.miginfocom.layout.LC;
 import net.miginfocom.layout.LayoutCallback;
+import org.terasology.logic.behavior.tree.Task;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
@@ -34,6 +35,8 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -141,10 +144,17 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
 
     @Override
     public void addWidget(UIWidget element, CCHint hint) {
-        ComponentWrapper cw = getWrapper(element);
+        final ComponentWrapper cw = getWrapper(element);
 
-        String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
-        ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
+        final String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
+        AccessController.doPrivileged(new PrivilegedAction<Task>() {
+            @Override
+            public Task run() {
+                ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
+                return null;
+            }
+        });
+
         wrappers.put(element, cw);
         children.add(cw);
         dirty = true;
