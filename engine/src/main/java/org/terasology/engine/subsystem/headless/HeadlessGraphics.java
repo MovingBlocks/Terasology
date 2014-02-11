@@ -59,6 +59,7 @@ import org.terasology.rendering.headless.HeadlessMesh;
 import org.terasology.rendering.headless.HeadlessShader;
 import org.terasology.rendering.headless.HeadlessSkeletalMesh;
 import org.terasology.rendering.headless.HeadlessTexture;
+import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
@@ -157,6 +158,7 @@ public class HeadlessGraphics implements EngineSubsystem {
         });
         assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
         assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
+        assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerHeadless());
         CoreRegistry.get(ShaderManager.class).initShaders();
         VertexBufferObjectManager.getInstance();

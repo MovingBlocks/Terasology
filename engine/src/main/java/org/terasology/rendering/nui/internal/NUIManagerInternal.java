@@ -40,7 +40,6 @@ import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
@@ -68,7 +67,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
     private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
-    private ClassLibrary<UIWidget> widgetsLibrary;
+    private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
 
     private List<ControlWidget> overlays = Lists.newArrayList();
@@ -79,7 +78,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     public void refreshWidgetsLibrary() {
-        widgetsLibrary = new DefaultClassLibrary<>(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+        widgetsLibrary = new WidgetLibrary(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         for (Map.Entry<String, Class<? extends UIWidget>> entry : CoreRegistry.get(ModuleManager.class).findAllSubclassesOf(UIWidget.class).entries()) {
             widgetsLibrary.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }

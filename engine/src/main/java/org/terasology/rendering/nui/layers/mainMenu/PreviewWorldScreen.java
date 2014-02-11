@@ -67,7 +67,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private int imageSize = 128;
 
-    private WorldGenerator worldGenerator;
     private WorldGenerator2DPreview previewGenerator;
 
     private SeedBinding seedBinding = new SeedBinding();
@@ -82,7 +81,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
         try {
             moduleManager.enableModuleAndDependencies(worldGeneratorModule);
-            worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
+            WorldGenerator worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
             seedBinding.setWorldGenerator(worldGenerator);
 
             if (worldGenerator instanceof WorldGenerator2DPreview) {

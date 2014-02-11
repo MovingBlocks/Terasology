@@ -90,6 +90,9 @@ public class UIStyleFamily {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
             if (elementStyles != null) {
                 style = elementStyles.get(part, mode);
+                if (style == null && part.equals(UIWidget.BASE_PART)) {
+                    style = elementStyles.get("", mode);
+                }
                 if (style == null) {
                     style = elementStyles.get(part, "");
                 }

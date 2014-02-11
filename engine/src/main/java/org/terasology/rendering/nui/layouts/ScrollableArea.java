@@ -21,6 +21,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
@@ -36,9 +37,14 @@ import java.util.Iterator;
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;
 
+    @LayoutConfig
     private UIWidget content;
-    private UIScrollbar scrollbar = new UIScrollbar();
+
+    @LayoutConfig
     private boolean stickToBottom;
+
+    private UIScrollbar scrollbar = new UIScrollbar();
+
 
     private boolean moveToBottomPending;
     private boolean moveToTopPending;

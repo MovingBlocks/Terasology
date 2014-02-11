@@ -31,6 +31,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -57,6 +58,8 @@ public class UIText extends CoreWidget {
 
     private TextureRegion cursorTexture;
     private Binding<String> text = new DefaultBinding<>("");
+
+    @LayoutConfig
     private boolean multiline;
 
     private int cursorPosition;

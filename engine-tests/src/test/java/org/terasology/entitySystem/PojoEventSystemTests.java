@@ -182,6 +182,18 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.receivedList.size());
     }
 
+    @Test
+    public void testChildEventReceivedByUnfilteredHandler() {
+        entity.addComponent(new IntegerComponent());
+        TestEventHandler handler = new TestEventHandler();
+        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEventHandler(handler);
+
+        TestChildEvent event = new TestChildEvent();
+        eventSystem.send(entity, event);
+        assertEquals(1, handler.unfilteredEvents.size());
+    }
+
     private static class TestEvent extends AbstractConsumableEvent {
 
     }
@@ -194,6 +206,7 @@ public class PojoEventSystemTests {
 
         List<Received> receivedList = Lists.newArrayList();
         List<Received> childEventReceived = Lists.newArrayList();
+        List<Received> unfilteredEvents = Lists.newArrayList();
 
         @ReceiveEvent(components = StringComponent.class)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
@@ -208,6 +221,11 @@ public class PojoEventSystemTests {
         @ReceiveEvent(components = IntegerComponent.class)
         public void handleChildEvent(TestChildEvent event, EntityRef entity) {
             childEventReceived.add(new Received(event, entity));
+        }
+
+        @ReceiveEvent
+        public void handleUnfilteredTestEvent(TestEvent event, EntityRef entity) {
+            unfilteredEvents.add(new Received(event, entity));
         }
 
         public void initialise() {

@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import com.google.common.base.Predicates;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -50,7 +51,7 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T, Com
      * @throws NoSuchMethodException If the component has no default constructor
      */
     public ComponentMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategies) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategies);
+        super(uri, type, factory, copyStrategies, Predicates.alwaysTrue());
         replicated = type.getAnnotation(Replicate.class) != null;
         blockLifecycleEventsRequired = type.getAnnotation(RequiresBlockLifecycleEvents.class) != null;
         ForceBlockActive forceBlockActiveAnnotation = type.getAnnotation(ForceBlockActive.class);

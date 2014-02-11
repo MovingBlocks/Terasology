@@ -16,6 +16,7 @@
 package org.terasology.reflection.metadata;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -68,7 +69,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param copyStrategyLibrary A copy strategy library
      * @throws NoSuchMethodException If the class has no default constructor
      */
-    public ClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary)
+    public ClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary, Predicate includedFieldPredicate)
             throws NoSuchMethodException {
         if (System.getSecurityManager() != null) {
             System.getSecurityManager().checkPermission(CREATE_CLASS_METADATA);
@@ -82,7 +83,7 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
             this.constructor = null;
         }
 
-        addFields(copyStrategyLibrary, factory);
+        addFields(copyStrategyLibrary, factory, includedFieldPredicate);
     }
 
     public final SimpleUri getUri() {
@@ -95,8 +96,8 @@ public abstract class ClassMetadata<T, FIELD extends FieldMetadata<T, ?>> {
      * @param copyStrategyLibrary The library of copy strategies
      * @param factory             The reflection provider
      */
-    private void addFields(CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory) {
-        for (Field field : ReflectionUtils.getAllFields(clazz, Predicates.alwaysTrue())) {
+    private void addFields(CopyStrategyLibrary copyStrategyLibrary, ReflectFactory factory, Predicate includedFieldsPredicate) {
+        for (Field field : ReflectionUtils.getAllFields(clazz, includedFieldsPredicate)) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                 continue;
             }

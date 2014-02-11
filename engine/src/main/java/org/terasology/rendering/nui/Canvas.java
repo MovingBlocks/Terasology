@@ -466,4 +466,6 @@ public interface Canvas {
     void addInteractionRegion(InteractionListener listener, String tooltip, Rect2i region);
 
     void drawLine(int startX, int startY, int endX, int endY, Color color);
+
+    void drawFilledRectangle(Rect2i region, Color color);
 }

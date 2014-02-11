@@ -34,10 +34,10 @@ import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.iconmesh.IconMeshFactory;
 import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
-import org.terasology.rendering.primitives.MeshFactory;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
@@ -105,13 +105,7 @@ public class ItemPickupSystem implements ComponentSystem {
         if (builder.hasComponent(MeshComponent.class)) {
             MeshComponent mesh = builder.getComponent(MeshComponent.class);
             if (mesh.mesh == null && itemComponent.icon != null) {
-                String iconMeshUri = "engine:icon." + itemComponent.icon;
-                Mesh itemMesh = Assets.getMesh(iconMeshUri);
-                if (itemMesh == null) {
-                    Icon icon = Icon.get(itemComponent.icon);
-                    itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, iconMeshUri), icon.getTextureRegion());
-                }
-                builder.getComponent(MeshComponent.class).mesh = itemMesh;
+                builder.getComponent(MeshComponent.class).mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
             }
         }
     }

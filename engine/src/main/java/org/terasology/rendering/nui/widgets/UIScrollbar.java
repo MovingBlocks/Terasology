@@ -23,6 +23,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -31,8 +32,11 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  */
 public class UIScrollbar extends CoreWidget {
 
+    @LayoutConfig
     private Binding<Integer> minimum = new DefaultBinding<>(0);
+    @LayoutConfig
     private Binding<Integer> range = new DefaultBinding<>(100);
+
     private Binding<Integer> value = new DefaultBinding<>(0);
 
     private int sliderSize;

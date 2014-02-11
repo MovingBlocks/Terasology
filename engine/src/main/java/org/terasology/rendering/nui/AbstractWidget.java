@@ -28,14 +28,25 @@ import java.util.List;
  */
 public abstract class AbstractWidget implements UIWidget {
 
+    @LayoutConfig
     private String id;
-    private UISkin skin;
-    private Binding<String> family = new DefaultBinding<>();
-    private boolean focused;
 
+    @LayoutConfig
+    private UISkin skin;
+
+    @LayoutConfig
+    private Binding<String> family = new DefaultBinding<>();
+
+    @LayoutConfig
     private Binding<Boolean> visible = new DefaultBinding<>(true);
+
+    @LayoutConfig
     private Binding<String> tooltip = new DefaultBinding<>("");
+
+    @LayoutConfig
     private float tooltipDelay = 0.5f;
+
+    private boolean focused;
 
     public AbstractWidget() {
         id = "";

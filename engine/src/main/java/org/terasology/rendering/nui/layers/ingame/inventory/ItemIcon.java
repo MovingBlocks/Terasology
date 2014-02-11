@@ -25,6 +25,7 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 
@@ -36,10 +37,15 @@ import javax.vecmath.Vector3f;
  */
 public class ItemIcon extends CoreWidget {
 
+    @LayoutConfig
     private Binding<TextureRegion> icon = new DefaultBinding<>();
+    @LayoutConfig
     private Binding<Mesh> mesh = new DefaultBinding<>();
+    @LayoutConfig
     private Binding<Texture> meshTexture = new DefaultBinding<>();
+    @LayoutConfig
     private Binding<Integer> quantity = new DefaultBinding<>(1);
+
     private InteractionListener listener = new BaseInteractionListener();
 
     @Override

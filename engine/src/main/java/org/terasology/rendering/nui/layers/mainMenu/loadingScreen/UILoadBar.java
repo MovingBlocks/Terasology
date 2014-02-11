@@ -24,6 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -33,10 +34,13 @@ import org.terasology.rendering.nui.databinding.DefaultBinding;
  */
 public class UILoadBar extends CoreWidget {
 
+    @LayoutConfig
     private TextureRegion fillTexture = Assets.getTexture("engine:loadBar");
-    private boolean animate = true;
-    private Binding<Float> value = new DefaultBinding<>(0f);
 
+    @LayoutConfig
+    private boolean animate = true;
+
+    private Binding<Float> value = new DefaultBinding<>(0f);
     private Time time = CoreRegistry.get(Time.class);
 
     @Override

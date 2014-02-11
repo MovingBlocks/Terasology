@@ -26,6 +26,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.util.Iterator;
@@ -41,6 +42,8 @@ public class RowLayout extends CoreLayout<RowLayoutHint> {
 
     private List<UIWidget> contents = Lists.newArrayList();
     private Map<UIWidget, RowLayoutHint> hints = Maps.newHashMap();
+
+    @LayoutConfig
     private int horizontalSpacing;
 
     public RowLayout() {

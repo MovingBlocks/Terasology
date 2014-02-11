@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.reflection.metadata;
+package org.terasology.rendering.nui.internal;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.engine.SimpleUri;
+import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.UIWidget;
 
 import java.lang.reflect.Field;
 
 /**
- * A standard class metadata implementation using FieldMetadata.
- *
  * @author Immortius
  */
-public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?>> {
+public class WidgetMetadata<T extends UIWidget> extends ClassMetadata<T, FieldMetadata<T, ?>> {
 
     /**
      * Creates a class metatdata
      *
-     * @param uri                 The uri that identifies this class
+     * @param uri                 The uri that identifies this type
      * @param type                The type to create the metadata for
      * @param factory             A reflection library to provide class construction and field get/set functionality
      * @param copyStrategyLibrary A copy strategy library
      * @throws NoSuchMethodException If the class has no default constructor
      */
-    public DefaultClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategyLibrary, Predicates.alwaysTrue());
+    public WidgetMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
+        super(uri, type, factory, copyStrategyLibrary, IsConfigField.INSTANCE);
     }
 
     @Override
-    protected <V> FieldMetadata<T, V> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
+    protected <V> FieldMetadata<T, ?> createField(Field field, CopyStrategy<V> copyStrategy, ReflectFactory factory) throws InaccessibleFieldException {
         return new FieldMetadata<>(this, field, copyStrategy, factory);
+    }
+
+    private static class IsConfigField implements Predicate<Field> {
+
+        private static final IsConfigField INSTANCE = new IsConfigField();
+
+        @Override
+        public boolean apply(Field input) {
+            return input.getAnnotation(LayoutConfig.class) != null;
+        }
     }
 }

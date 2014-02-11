@@ -30,6 +30,7 @@ import org.terasology.input.InputCategory;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.databinding.BindHelper;

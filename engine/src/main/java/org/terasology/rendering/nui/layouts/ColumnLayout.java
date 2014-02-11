@@ -25,6 +25,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -36,10 +37,13 @@ import java.util.List;
  */
 public class ColumnLayout extends CoreLayout<LayoutHint> {
 
+    @LayoutConfig
     private int columns = 1;
+    @LayoutConfig
     private int horizontalSpacing;
+    @LayoutConfig
     private int verticalSpacing;
-    @SerializedName("auto-size-columns")
+    @LayoutConfig
     private boolean autoSizeColumns;
 
     private List<UIWidget> widgetList = Lists.newArrayList();

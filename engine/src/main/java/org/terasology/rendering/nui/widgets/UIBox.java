@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.Iterator;
  */
 public class UIBox extends CoreWidget {
 
+    @LayoutConfig
     private UIWidget content;
 
     @Override

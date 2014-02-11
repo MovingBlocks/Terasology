@@ -97,6 +97,21 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
+    public boolean removeHUDElement(AssetUri uri) {
+        return elementsLookup.remove(uri) != null;
+    }
+
+    public boolean removeHUDElement(ControlWidget element) {
+        Iterator<Map.Entry<AssetUri, HUDElement>> iterator = elementsLookup.entrySet().iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next().getValue().widget.equals(element)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void clear() {
         elementsLookup.clear();
     }

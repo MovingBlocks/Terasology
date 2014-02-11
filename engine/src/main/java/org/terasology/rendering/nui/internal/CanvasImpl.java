@@ -80,6 +80,7 @@ public class CanvasImpl implements CanvasControl {
     private CanvasState state;
 
     private Material meshMat = Assets.getMaterial("engine:UILitMesh");
+    private Texture whiteTexture = Assets.getTexture("engine:white");
 
     private List<DrawOperation> drawOnTopOperations = Lists.newArrayList();
 
@@ -662,6 +663,11 @@ public class CanvasImpl implements CanvasControl {
         } else {
             renderer.drawLine(sx, sy, ex, ey, color);
         }
+    }
+
+    @Override
+    public void drawFilledRectangle(Rect2i region, Color color) {
+        drawTexture(whiteTexture, region, color);
     }
 
     private Rect2i relativeToAbsolute(Rect2i region) {
