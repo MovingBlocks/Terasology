@@ -137,9 +137,8 @@ tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->
             def repo = (taskName - 'fetch')
             def localName = (repo - 'Facade')
             def parentDir = 'facades'
-            branch = 'develop'
 
-            println "Repo is $repo - localName is $localName and will be using branch $branch"
+            println "Repo is $repo - localName is $localName"
 
             // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
             def githubHome = 'MovingBlocks'
