@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.tree;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.registry.In;
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.properties.OneOf;
  * <b>Properties</b>: <b>music</b><br/>
  * <br/>
  * <b>RUNNING</b>: while music is playing<br/>
+ * <b>SUCCESS</b>: once music ends playing<br/>
  * <b>FAILURE</b>: otherwise<br/>
  * <br/>
  * Auto generated javadoc - modify README.markdown instead!
@@ -39,12 +41,13 @@ public class PlayMusicNode extends Node {
         return new PlayMusicTask(this);
     }
 
-    public static class PlayMusicTask extends Task {
+    public static class PlayMusicTask extends Task implements AudioEndListener {
         @In
         private AudioManager audioManager;
         @In
         private AssetManager assetManager;
         private boolean playing;
+        private boolean finished;
 
         public PlayMusicTask(Node node) {
             super(node);
@@ -52,6 +55,8 @@ public class PlayMusicNode extends Node {
 
         @Override
         public void onInitialize() {
+            audioManager.registerListener(this);
+
             AssetUri uri = getNode().music;
             if (uri != null) {
                 Sound asset = assetManager.loadAsset(uri, Sound.class);
@@ -60,12 +65,26 @@ public class PlayMusicNode extends Node {
                     playing = true;
                 }
             }
+        }
 
+        @Override
+        public void onTerminate(Status result) {
+            audioManager.unregisterListener(this);
+        }
+
+        @Override
+        public void onAudioEnd(Sound sound) {
+            if (playing && getNode().music.equals(sound.getURI())) {
+                playing = false;
+                finished = true;
+            }
         }
 
         @Override
         public Status update(float dt) {
-            // TODO should be switch to finish, once sound ends
+            if (finished) {
+                return Status.SUCCESS;
+            }
             return playing ? Status.RUNNING : Status.FAILURE;
         }
 

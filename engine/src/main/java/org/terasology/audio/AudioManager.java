@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,10 @@ public interface AudioManager {
     void playSound(Sound sound, Vector3f position, float volume, int priority);
 
     void playMusic(Sound sound);
+
+    void registerListener(AudioEndListener listener);
+
+    void unregisterListener(AudioEndListener listener);
 
     /**
      * Update AudioManager sound sources

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.terasology.audio.openAL;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.StaticSound;
@@ -48,6 +50,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class OpenALManager implements AudioManager {
@@ -62,6 +66,10 @@ public class OpenALManager implements AudioManager {
     protected Map<String, SoundPool> pools = Maps.newHashMap();
 
     private Vector3f listenerPosition = new Vector3f();
+
+    private List<AudioEndListener> endListeners = Lists.newArrayList();
+
+    private List<SoundSource> activeSounds = Lists.newArrayList();
 
     private PropertyChangeListener configListener = new PropertyChangeListener() {
         @Override
@@ -190,6 +198,8 @@ public class OpenALManager implements AudioManager {
             }
             source.setGain(volume);
             source.play();
+
+            activeSounds.add(source);
         }
     }
 
@@ -206,6 +216,8 @@ public class OpenALManager implements AudioManager {
         SoundSource source = pool.getSource(sound);
         if (source != null) {
             source.setGain(1.0f).play();
+
+            activeSounds.add(source);
         }
     }
 
@@ -236,6 +248,21 @@ public class OpenALManager implements AudioManager {
         for (SoundPool pool : pools.values()) {
             pool.update(delta);
         }
+        Iterator<SoundSource> iterator = activeSounds.iterator();
+        while (iterator.hasNext()) {
+            SoundSource source = iterator.next();
+            if (!source.isPlaying()) {
+                iterator.remove();
+
+                notifyEndListeners(source.getAudio());
+            }
+        }
+    }
+
+    private void notifyEndListeners(Sound sound) {
+        for (AudioEndListener listener : endListeners) {
+            listener.onAudioEnd(sound);
+        }
     }
 
     protected boolean checkDistance(Vector3f soundPosition) {
@@ -243,6 +270,16 @@ public class OpenALManager implements AudioManager {
         distance.sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;
+    }
+
+    @Override
+    public void registerListener(AudioEndListener listener) {
+        endListeners.add(listener);
+    }
+
+    @Override
+    public void unregisterListener(AudioEndListener listener) {
+        endListeners.remove(listener);
     }
 
     @Override

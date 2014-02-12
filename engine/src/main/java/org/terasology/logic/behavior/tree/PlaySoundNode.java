@@ -17,6 +17,7 @@ package org.terasology.logic.behavior.tree;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.registry.In;
@@ -27,6 +28,7 @@ import org.terasology.rendering.nui.properties.Range;
  * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>
  * <br/>
  * <b>RUNNING</b>: while sound is playing<br/>
+ * <b>SUCCESS</b>: once sound ends playing<br/>
  * <b>FAILURE</b>: otherwise<br/>
  * <br/>
  * Auto generated javadoc - modify README.markdown instead!
@@ -42,12 +44,13 @@ public class PlaySoundNode extends Node {
         return new PlaySoundTask(this);
     }
 
-    public static class PlaySoundTask extends Task {
+    public static class PlaySoundTask extends Task implements AudioEndListener {
         @In
         private AudioManager audioManager;
         @In
         private AssetManager assetManager;
         private boolean playing;
+        private boolean finished;
 
         public PlaySoundTask(Node node) {
             super(node);
@@ -55,19 +58,36 @@ public class PlaySoundNode extends Node {
 
         @Override
         public void onInitialize() {
+            audioManager.registerListener(this);
+
             AssetUri uri = getNode().sound;
             if (uri != null) {
-                Sound sound1 = assetManager.loadAsset(uri, Sound.class);
-                if (sound1 != null) {
-                    audioManager.playSound(sound1, getNode().volume);
+                Sound snd = assetManager.loadAsset(uri, Sound.class);
+                if (snd != null) {
+                    audioManager.playSound(snd, getNode().volume);
                     playing = true;
                 }
             }
         }
 
         @Override
+        public void onAudioEnd(Sound sound) {
+            if (playing && getNode().sound.equals(sound.getURI())) {
+                playing = false;
+                finished = true;
+            }
+        }
+
+        @Override
+        public void onTerminate(Status result) {
+            audioManager.unregisterListener(this);
+        }
+
+        @Override
         public Status update(float dt) {
-            // TODO should be switch to finish, once sound ends
+            if (finished) {
+                return Status.SUCCESS;
+            }
             return playing ? Status.RUNNING : Status.FAILURE;
         }
 
