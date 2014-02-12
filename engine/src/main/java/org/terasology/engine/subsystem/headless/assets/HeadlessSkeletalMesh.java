@@ -13,30 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.headless;
+package org.terasology.engine.subsystem.headless.assets;
 
-import gnu.trove.list.TFloatList;
+import java.util.Collection;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.math.AABB;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 
-public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
+public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
 
-    protected MeshData data;
-    protected AABB aabb;
+    private SkeletalMeshData data;
 
-    public HeadlessMesh(AssetUri uri, MeshData data) {
+    public HeadlessSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
         super(uri);
         reload(data);
     }
 
     @Override
-    public void reload(MeshData meshData) {
-        this.data = meshData;
-        this.aabb = AABB.createEncompasing(meshData.getVertices());
+    public void reload(SkeletalMeshData skeletalMeshData) {
+        this.data = skeletalMeshData;
     }
 
     @Override
@@ -50,17 +48,17 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public AABB getAABB() {
-        return aabb;
+    public int getVertexCount() {
+        return data.getVertexCount();
     }
 
     @Override
-    public TFloatList getVertices() {
-        return data.getVertices();
+    public Collection<Bone> getBones() {
+        return data.getBones();
     }
 
     @Override
-    public void render() {
-        // do nothing
+    public Bone getBone(String boneName) {
+        return data.getBone(boneName);
     }
 }
