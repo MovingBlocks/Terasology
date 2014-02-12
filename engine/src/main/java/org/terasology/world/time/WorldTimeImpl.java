@@ -18,8 +18,9 @@ package org.terasology.world.time;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Immortius
  */
-public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
+public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
     public static final long DAYS_TO_MS = (DAY_LENGTH);
     public static final float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
 
@@ -44,15 +45,6 @@ public class WorldTimeImpl implements WorldTime, UpdateSubscriberSystem {
 
     @In
     private EntityManager entityManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
 
     @Override
     public long getMilliseconds() {

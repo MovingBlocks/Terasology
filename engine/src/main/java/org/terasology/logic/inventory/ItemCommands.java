@@ -20,7 +20,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
@@ -33,7 +33,7 @@ import org.terasology.world.block.entity.BlockCommands;
  * @author Immortius
  */
 @RegisterSystem
-public class ItemCommands implements ComponentSystem {
+public class ItemCommands extends BaseComponentSystem {
 
     @In
     private BlockCommands blockCommands;
@@ -46,14 +46,6 @@ public class ItemCommands implements ComponentSystem {
 
     @In
     private EntityManager entityManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
     public String giveItem(@CommandParam("prefabId or blockName") String itemPrefabName, EntityRef client) {

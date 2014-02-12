@@ -18,7 +18,7 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
@@ -32,15 +32,7 @@ import org.terasology.world.block.items.BlockItemComponent;
  * @author Immortius
  */
 @RegisterSystem
-public class HoldLuminousBlockSystem implements ComponentSystem {
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+public class HoldLuminousBlockSystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onInventorySlotChanged(InventorySlotChangedEvent event, EntityRef entity, CharacterComponent character) {

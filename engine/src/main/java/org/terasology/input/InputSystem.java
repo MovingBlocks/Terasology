@@ -18,12 +18,10 @@ package org.terasology.input;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.device.InputAction;
 import org.terasology.input.device.KeyboardDevice;
@@ -50,6 +48,8 @@ import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ import java.util.Map;
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */
-public class InputSystem implements ComponentSystem {
+public class InputSystem extends BaseComponentSystem {
 
     @In
     private Config config;
@@ -86,6 +86,7 @@ public class InputSystem implements ComponentSystem {
     private LocalPlayer localPlayer;
     private CameraTargetSystem targetSystem;
 
+    @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         targetSystem = CoreRegistry.get(CameraTargetSystem.class);

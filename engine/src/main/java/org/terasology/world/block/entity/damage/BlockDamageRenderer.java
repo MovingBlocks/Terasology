@@ -17,6 +17,7 @@ package org.terasology.world.block.entity.damage;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -47,7 +48,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class BlockDamageRenderer implements RenderSystem {
+public class BlockDamageRenderer extends BaseComponentSystem implements RenderSystem {
 
     @In
     private EntityManager entityManager;
@@ -59,8 +60,6 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
-        this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.worldProvider = CoreRegistry.get(WorldProvider.class);
         this.effectsTexture = Assets.getTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
@@ -68,10 +67,6 @@ public class BlockDamageRenderer implements RenderSystem {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Override

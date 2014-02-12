@@ -27,6 +27,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.registry.CoreRegistry;
@@ -448,20 +449,12 @@ public class EntityAwareWorldProviderTest {
         }
     }
 
-    public static class BlockEventChecker implements ComponentSystem {
+    public static class BlockEventChecker extends BaseComponentSystem {
 
         public boolean addedReceived;
         public boolean activateReceived;
         public boolean deactivateReceived;
         public boolean removedReceived;
-
-        @Override
-        public void initialise() {
-        }
-
-        @Override
-        public void shutdown() {
-        }
 
         @ReceiveEvent(components = BlockComponent.class)
         public void onAdded(OnAddedComponent event, EntityRef entity) {

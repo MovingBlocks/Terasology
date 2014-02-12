@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -37,19 +38,11 @@ import java.util.Objects;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class DelayedActionSystem implements UpdateSubscriberSystem {
+public class DelayedActionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     @In
     private Time time;
 
     private SortedSetMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Override
     public void update(float delta) {

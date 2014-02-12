@@ -16,14 +16,14 @@
 
 package org.terasology.logic.actions;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.registry.In;
 
 import javax.vecmath.Vector3f;
 
@@ -31,18 +31,10 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class SpawnPrefabAction implements ComponentSystem {
+public class SpawnPrefabAction extends BaseComponentSystem {
 
+    @In
     private EntityManager entityManager;
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = SpawnPrefabActionComponent.class)
     public void onActivate(ActivateEvent event, EntityRef entity) {

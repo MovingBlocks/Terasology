@@ -21,8 +21,7 @@ import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.FootstepEvent;
@@ -36,6 +35,7 @@ import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -45,7 +45,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
-public class CharacterSoundSystem implements ComponentSystem {
+public class CharacterSoundSystem extends BaseComponentSystem {
 
     private static final long MIN_TIME = 10;
     private Random random = new FastRandom();
@@ -55,14 +55,6 @@ public class CharacterSoundSystem implements ComponentSystem {
 
     @In
     private AudioManager audioManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent
     public void onFootstep(FootstepEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {

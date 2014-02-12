@@ -16,18 +16,20 @@
 
 package org.terasology.logic.common.lifespan;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.registry.In;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class LifespanSystem implements UpdateSubscriberSystem {
+public class LifespanSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
+    @In
     private EntityManager entityManager;
 
     @Override
@@ -41,14 +43,5 @@ public class LifespanSystem implements UpdateSubscriberSystem {
                 entity.saveComponent(lifespan);
             }
         }
-    }
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-    }
-
-    @Override
-    public void shutdown() {
     }
 }

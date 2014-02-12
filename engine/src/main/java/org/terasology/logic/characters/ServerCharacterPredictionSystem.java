@@ -24,6 +24,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -45,7 +46,7 @@ import java.util.Map;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(PredictionSystem.class)
-public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, PredictionSystem {
+public class ServerCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem, PredictionSystem {
     public static final int RENDER_DELAY = 100;
     public static final int MAX_INPUT_OVERFLOW = 100;
     public static final int MAX_INPUT_UNDERFLOW = 100;
@@ -79,10 +80,6 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
     public void initialise() {
         characterMover = new KinematicCharacterMover(worldProvider, physics);
         nextSendState = time.getGameTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})

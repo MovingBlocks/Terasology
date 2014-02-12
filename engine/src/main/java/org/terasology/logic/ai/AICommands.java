@@ -17,27 +17,19 @@ package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
+import org.terasology.registry.In;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class AICommands implements ComponentSystem {
+public class AICommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Destroys all AIs in the world", runOnServer = true)
     public String destroyAI() {

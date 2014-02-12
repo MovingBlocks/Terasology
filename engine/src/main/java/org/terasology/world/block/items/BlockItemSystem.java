@@ -19,11 +19,9 @@ package org.terasology.world.block.items;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
@@ -34,11 +32,13 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.placement.PlaceBlocks;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -46,7 +46,7 @@ import org.terasology.world.block.family.BlockFamily;
  */
 // TODO: Predict placement client-side (and handle confirm/denial)
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class BlockItemSystem implements ComponentSystem {
+public class BlockItemSystem extends BaseComponentSystem {
 
     @In
     private WorldProvider worldProvider;
@@ -59,14 +59,6 @@ public class BlockItemSystem implements ComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {

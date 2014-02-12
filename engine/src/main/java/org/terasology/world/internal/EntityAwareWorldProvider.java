@@ -99,6 +99,22 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
+    public void preBegin() {
+    }
+
+    @Override
+    public void postBegin() {
+    }
+
+    @Override
+    public void preSave() {
+    }
+
+    @Override
+    public void postSave() {
+    }
+
+    @Override
     public void shutdown() {
         entityManager.unsubscribe(this);
     }

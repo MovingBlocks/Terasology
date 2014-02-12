@@ -23,13 +23,12 @@ import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -41,6 +40,7 @@ import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,7 +65,7 @@ import static org.lwjgl.opengl.GL11.glTranslated;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class MeshRenderer implements RenderSystem {
+public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
 
     @In
@@ -77,6 +77,7 @@ public class MeshRenderer implements RenderSystem {
     @In
     private Config config;
 
+    @In
     private WorldRenderer worldRenderer;
 
     private SetMultimap<Material, EntityRef> opaqueMesh = HashMultimap.create();
@@ -91,7 +92,6 @@ public class MeshRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
         opaqueMeshSorter.initialise(worldRenderer.getActiveCamera());
         translucentMeshSorter.initialise(worldRenderer.getActiveCamera());
     }

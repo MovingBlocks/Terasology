@@ -25,7 +25,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
@@ -34,7 +34,6 @@ import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.rendering.cameras.Camera;
@@ -55,7 +54,7 @@ import java.util.List;
  */
 @RegisterSystem
 @Share(BlockCommands.class)
-public class BlockCommands implements ComponentSystem {
+public class BlockCommands extends BaseComponentSystem {
 
     // TODO: Remove once camera is handled better
     @In
@@ -76,15 +75,14 @@ public class BlockCommands implements ComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    @In
+    private EntityManager entityManager;
+
     private BlockItemFactory blockItemFactory;
 
     @Override
     public void initialise() {
-        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
-    }
-
-    @Override
-    public void shutdown() {
+        blockItemFactory = new BlockItemFactory(entityManager);
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera)

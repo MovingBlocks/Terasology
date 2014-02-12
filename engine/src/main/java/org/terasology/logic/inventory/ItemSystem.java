@@ -19,7 +19,7 @@ package org.terasology.logic.inventory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
@@ -28,15 +28,7 @@ import org.terasology.logic.common.ActivateEvent;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class ItemSystem implements ComponentSystem {
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+public class ItemSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {

@@ -29,7 +29,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
@@ -38,8 +38,8 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,7 +61,8 @@ import java.util.Map;
  * @author synopia
  */
 @RegisterSystem
-public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
+@Share(BehaviorSystem.class)
+public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
     @In
     private EntityManager entityManager;
@@ -72,10 +73,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     private Map<EntityRef, Interpreter> entityInterpreters = Maps.newHashMap();
     private List<BehaviorTree> trees = Lists.newArrayList();
-
-    public BehaviorSystem() {
-        CoreRegistry.put(BehaviorSystem.class, this);
-    }
 
     @Override
     public void initialise() {
@@ -165,11 +162,6 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             interpreter.reset();
         }
         save(tree);
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     private void addEntity(EntityRef entityRef, BehaviorComponent behaviorComponent) {

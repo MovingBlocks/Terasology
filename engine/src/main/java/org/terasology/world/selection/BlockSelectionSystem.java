@@ -15,11 +15,9 @@
  */
 package org.terasology.world.selection;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.location.LocationComponent;
@@ -28,13 +26,16 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 
+import javax.vecmath.Vector3f;
+
 /**
  * This system updates block selections based on the sender's location and the state of the block selection.
- * 
+ *
  * @author synopia, mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class BlockSelectionSystem implements ComponentSystem {
+public class BlockSelectionSystem extends BaseComponentSystem {
+
     @ReceiveEvent(components = {LocationComponent.class})
     public void onStartSelectionAtEntity(SetBlockSelectionStartingPointEvent event, EntityRef entity) {
 
@@ -81,13 +82,5 @@ public class BlockSelectionSystem implements ComponentSystem {
             startPosition = endPosition;
         }
         blockSelectionComponent.currentSelection = Region3i.createBounded(startPosition, endPosition);
-    }
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
     }
 }

@@ -29,6 +29,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -36,7 +37,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.MatrixUtils;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -65,26 +65,18 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
+public class SkeletonRenderer extends BaseComponentSystem implements RenderSystem, UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(SkeletonRenderer.class);
 
+    @In
     private EntityManager entityManager;
+
+    @In
     private WorldRenderer worldRenderer;
 
     @In
     private Config config;
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
-    }
-
-    @Override
-    public void shutdown() {
-
-    }
 
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
     public void newSkeleton(OnActivatedComponent event, EntityRef entity) {

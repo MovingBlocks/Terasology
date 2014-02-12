@@ -23,7 +23,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.BeforeDamagedEvent;
@@ -60,7 +60,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem
-public class BlockEntitySystem implements ComponentSystem {
+public class BlockEntitySystem extends BaseComponentSystem {
 
     @In
     private WorldProvider worldProvider;
@@ -83,10 +83,6 @@ public class BlockEntitySystem implements ComponentSystem {
         blockItemFactory = new BlockItemFactory(entityManager);
         pickupBuilder = new PickupBuilder();
         random = new FastRandom();
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)

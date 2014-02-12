@@ -18,7 +18,7 @@ package org.terasology.core.logic;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
@@ -30,7 +30,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
 @RegisterSystem
-public class PlayerStartingInventorySystem implements ComponentSystem {
+public class PlayerStartingInventorySystem extends BaseComponentSystem {
 
     @In
     BlockManager blockManager;
@@ -87,11 +87,4 @@ public class PlayerStartingInventorySystem implements ComponentSystem {
         player.send(new GiveItemAction(EntityRef.NULL, chest));
     }
 
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 }

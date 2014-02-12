@@ -19,7 +19,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
@@ -43,7 +43,7 @@ import javax.vecmath.Vector3f;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class BlockDropGrammarSystem implements ComponentSystem {
+public class BlockDropGrammarSystem extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
     @In
@@ -60,11 +60,6 @@ public class BlockDropGrammarSystem implements ComponentSystem {
         blockItemFactory = new BlockItemFactory(entityManager);
         pickupBuilder = new PickupBuilder();
         random = new FastRandom();
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     @ReceiveEvent(components = {BlockDropGrammarComponent.class})

@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
-import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.rendering.nui.UIWidget;
 

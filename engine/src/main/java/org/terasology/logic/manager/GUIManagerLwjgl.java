@@ -379,6 +379,25 @@ public class GUIManagerLwjgl implements ComponentSystem, GUIManager {
     }
 
     @Override
+    public void preBegin() {
+
+    }
+
+    @Override
+    public void postBegin() {
+    }
+
+    @Override
+    public void preSave() {
+
+    }
+
+    @Override
+    public void postSave() {
+
+    }
+
+    @Override
     public void shutdown() {
 
     }

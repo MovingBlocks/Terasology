@@ -15,12 +15,11 @@
  */
 package org.terasology.logic.ai;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -31,6 +30,8 @@ import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
@@ -43,26 +44,17 @@ import javax.vecmath.Vector3f;
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class HierarchicalAISystem implements ComponentSystem,
+public class HierarchicalAISystem extends BaseComponentSystem implements
         UpdateSubscriberSystem {
 
+    @In
     private WorldProvider worldProvider;
+    @In
     private EntityManager entityManager;
     private Random random = new FastRandom();
+    @In
     private Time time;
     private boolean idling;
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        time = CoreRegistry.get(Time.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        idling = false;
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     // TODO add way to recognize if attacked
 
@@ -157,7 +149,7 @@ public class HierarchicalAISystem implements ComponentSystem,
                                     tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
                                     tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
                                     tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
-                                    ));
+                            ));
                         } else {
                             ai.movementTarget.set(tempTarget);
                         }
@@ -177,7 +169,7 @@ public class HierarchicalAISystem implements ComponentSystem,
                                     -tempTarget.x + random.nextFloat(-ai.forgiving, ai.forgiving),
                                     -tempTarget.y + random.nextFloat(-ai.forgiving, ai.forgiving),
                                     -tempTarget.z + random.nextFloat(-ai.forgiving, ai.forgiving)
-                                    ));
+                            ));
                         } else {
                             ai.movementTarget
                                     .set(new Vector3f(tempTarget.x * -1,

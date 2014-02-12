@@ -17,14 +17,12 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.action.GiveItemAction;
@@ -33,9 +31,7 @@ import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.iconmesh.IconMeshFactory;
-import org.terasology.rendering.icons.Icon;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.random.FastRandom;
@@ -47,16 +43,12 @@ import javax.vecmath.Vector3f;
 
 
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class ItemPickupSystem implements ComponentSystem {
+public class ItemPickupSystem extends BaseComponentSystem {
 
     @In
     private InventoryManager inventoryManager;
 
     private Random rand = new FastRandom();
-
-    @Override
-    public void initialise() {
-    }
 
     @ReceiveEvent(components = PickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
@@ -108,9 +100,5 @@ public class ItemPickupSystem implements ComponentSystem {
                 builder.getComponent(MeshComponent.class).mesh = IconMeshFactory.getIconMesh(itemComponent.icon);
             }
         }
-    }
-
-    @Override
-    public void shutdown() {
     }
 }

@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 
 /**
  * This system provides the ability to chat with a "say" command. Chat messages are broadcast to all players.
@@ -33,19 +33,11 @@ import org.terasology.network.ClientComponent;
  * @author Immortius
  */
 @RegisterSystem
-public class ChatSystem implements ComponentSystem {
+public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
     @In
     private EntityManager entityManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Sends a message to all other players", runOnServer = true)
     public void say(@CommandParam("message") String message, EntityRef speaker) {

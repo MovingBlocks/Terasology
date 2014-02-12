@@ -17,7 +17,6 @@ package org.terasology.reflection.metadata;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
@@ -25,12 +24,12 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.InaccessibleFieldException;
 import org.terasology.reflection.reflect.ObjectConstructor;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.engine.SimpleUri;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

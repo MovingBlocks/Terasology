@@ -28,7 +28,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Command;
@@ -62,7 +62,7 @@ import java.io.IOException;
  * @author Immortius
  */
 @RegisterSystem
-public class CoreCommands implements ComponentSystem {
+public class CoreCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
@@ -84,10 +84,6 @@ public class CoreCommands implements ComponentSystem {
     @Override
     public void initialise() {
         pickupBuilder = new PickupBuilder();
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Command(shortDescription = "Reloads a skin")

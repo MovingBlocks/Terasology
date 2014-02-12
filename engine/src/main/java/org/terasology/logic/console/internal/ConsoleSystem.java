@@ -17,7 +17,7 @@ package org.terasology.logic.console.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
@@ -40,7 +40,7 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem
-public class ConsoleSystem implements ComponentSystem {
+public class ConsoleSystem extends BaseComponentSystem {
 
     @In
     private Console console;
@@ -50,14 +50,6 @@ public class ConsoleSystem implements ComponentSystem {
 
     @In
     private NUIManager nuiManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = ClientComponent.class, priority = 300)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {

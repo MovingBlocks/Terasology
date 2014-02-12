@@ -24,14 +24,14 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.events.ChangeViewRangeRequest;
+import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.chunks.ChunkConstants;
 
@@ -44,7 +44,7 @@ import org.terasology.world.chunks.ChunkConstants;
  *
  * @author Immortius
  */
-public class NetworkEntitySystem implements ComponentSystem {
+public class NetworkEntitySystem extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
@@ -91,8 +91,4 @@ public class NetworkEntitySystem implements ComponentSystem {
         }
     }
 
-    @Override
-    public void shutdown() {
-
-    }
 }

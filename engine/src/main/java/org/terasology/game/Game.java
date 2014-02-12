@@ -19,6 +19,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModuleConfig;
+import org.terasology.engine.ComponentSystemManager;
+import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.module.Module;
@@ -59,6 +61,11 @@ public class Game {
     }
 
     public void save() {
+        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.preSave();
+        }
+
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
             BlockManager blockManager = CoreRegistry.get(BlockManager.class);
@@ -93,6 +100,10 @@ public class Game {
                 logger.error("Failed to save game", e);
             }
             storageManager.shutdown();
+        }
+
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.postSave();
         }
 
 

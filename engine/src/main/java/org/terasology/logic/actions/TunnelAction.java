@@ -19,8 +19,7 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
@@ -29,6 +28,7 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.Physics;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.BlockEntityRegistry;
@@ -41,7 +41,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class TunnelAction implements ComponentSystem {
+public class TunnelAction extends BaseComponentSystem {
 
     private static final int MAX_DESTROYED_BLOCKS = 1000;
     private static final int MAX_PARTICLE_EFFECTS = 4;
