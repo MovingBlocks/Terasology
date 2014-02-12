@@ -17,7 +17,7 @@ package org.terasology.logic.actions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
@@ -34,22 +34,13 @@ import org.terasology.rendering.nui.layers.ingame.inventory.ContainerScreen;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
-public class AccessInventoryAction implements ComponentSystem {
+public class AccessInventoryAction extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
 
     @In
     private NUIManager nuiManager;
-
-    @Override
-    public void initialise() {
-
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = {AccessInventoryActionComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivate(ActivateEvent event, EntityRef entity) {

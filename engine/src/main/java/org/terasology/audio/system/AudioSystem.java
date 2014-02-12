@@ -22,6 +22,7 @@ import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -38,7 +39,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterSystem
-public class AudioSystem implements UpdateSubscriberSystem {
+public class AudioSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
     private NetworkSystem networkSystem;
@@ -46,15 +47,6 @@ public class AudioSystem implements UpdateSubscriberSystem {
     private LocalPlayer localPlayer;
     @In
     private AudioManager audioManager;
-
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Toggle muting all sound")
     public String mute() {

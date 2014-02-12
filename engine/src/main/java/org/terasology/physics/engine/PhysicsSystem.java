@@ -17,7 +17,6 @@ package org.terasology.physics.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,7 +25,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -40,6 +39,7 @@ import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.physics.events.PhysicsResynchEvent;
+import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
 
@@ -57,7 +57,7 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem
-public class PhysicsSystem implements UpdateSubscriberSystem {
+public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 200;
@@ -67,18 +67,14 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     private NetworkSystem networkSystem;
     @In
     private EntityManager entityManager;
+    @In
     private PhysicsEngine physics;
 
     private long lastNetsync;
 
     @Override
     public void initialise() {
-        physics = CoreRegistry.get(PhysicsEngine.class);
         lastNetsync = 0;
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)

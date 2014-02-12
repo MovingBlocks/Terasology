@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.ai;
 
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -28,6 +29,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
@@ -39,23 +41,15 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class SimpleAISystem implements UpdateSubscriberSystem {
+public class SimpleAISystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
+    @In
     private WorldProvider worldProvider;
+    @In
     private EntityManager entityManager;
     private Random random = new FastRandom();
+    @In
     private Time time;
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        time = CoreRegistry.get(Time.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Override
     public void update(float delta) {

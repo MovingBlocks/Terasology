@@ -20,8 +20,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackRequest;
@@ -43,6 +42,7 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -51,7 +51,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterSystem
-public class CharacterSystem implements ComponentSystem {
+public class CharacterSystem extends BaseComponentSystem {
 
     @In
     private Physics physics;
@@ -75,10 +75,6 @@ public class CharacterSystem implements ComponentSystem {
     @Override
     public void initialise() {
         pickupBuilder = new PickupBuilder();
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})

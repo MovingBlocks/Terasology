@@ -370,7 +370,12 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public boolean isReleasingMouse() {
-        return !screens.isEmpty() && screens.peek().isReleasingMouse();
+        for (UIScreenLayer screen : screens) {
+            if (screen.isReleasingMouse()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*

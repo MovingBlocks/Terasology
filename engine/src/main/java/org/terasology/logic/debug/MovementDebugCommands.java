@@ -16,7 +16,7 @@
 package org.terasology.logic.debug;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.ToggleNoClipEvent;
@@ -29,15 +29,7 @@ import org.terasology.network.ClientComponent;
  * @author Immortius
  */
 @RegisterSystem
-public class MovementDebugCommands implements ComponentSystem {
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true)
     public void ghost(EntityRef client) {

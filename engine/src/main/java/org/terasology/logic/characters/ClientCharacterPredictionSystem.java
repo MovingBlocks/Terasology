@@ -25,6 +25,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -45,7 +46,7 @@ import java.util.Map;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
-public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
+public class ClientCharacterPredictionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(ClientCharacterPredictionSystem.class);
     private static final int BUFFER_SIZE = 128;
 
@@ -70,10 +71,6 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     @Override
     public void initialise() {
         characterMover = new KinematicCharacterMover(worldProvider, physics);
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})

@@ -20,11 +20,9 @@ import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -63,7 +61,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class FirstPersonRenderer implements RenderSystem {
+public class FirstPersonRenderer extends BaseComponentSystem implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(FirstPersonRenderer.class);
 
     @In
@@ -87,10 +85,6 @@ public class FirstPersonRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
         handTex = Assets.getTexture("engine:char");
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Override

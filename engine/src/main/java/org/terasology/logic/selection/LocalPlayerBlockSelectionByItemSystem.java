@@ -18,14 +18,14 @@ package org.terasology.logic.selection;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetChangedEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.In;
 import org.terasology.world.selection.BlockSelectionComponent;
 import org.terasology.world.selection.event.SetBlockSelectionEndingPointEvent;
 import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
@@ -33,12 +33,12 @@ import org.terasology.world.selection.event.SetBlockSelectionStartingPointEvent;
 /**
  * System to allow the use of BlockSelectionComponents. This system is a client only system, though no other player
  * will see selections done by one player.  This system uses an item's activate event to both start and end a selection,
- * then triggers a ApplyBlockSelectionEvent event. 
+ * then triggers a ApplyBlockSelectionEvent event.
  *
  * @author synopia
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
+public class LocalPlayerBlockSelectionByItemSystem extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
     @In
@@ -88,11 +88,4 @@ public class LocalPlayerBlockSelectionByItemSystem implements ComponentSystem {
         target.send(new SetBlockSelectionEndingPointEvent(blockSelectionComponentEntity));
     }
 
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 }

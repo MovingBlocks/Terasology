@@ -27,7 +27,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.logic.behavior.tree.Node;
@@ -50,8 +50,8 @@ import java.util.Map;
  * @author synopia
  */
 @RegisterSystem
-public class BehaviorNodeFactory implements ComponentSystem {
-    private final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
+public class BehaviorNodeFactory extends BaseComponentSystem {
+    private static final Logger logger = LoggerFactory.getLogger(BehaviorNodeFactory.class);
 
     private Map<ClassMetadata<? extends Node, ?>, BehaviorNodeComponent> nodes = Maps.newHashMap();
     private Map<String, List<BehaviorNodeComponent>> categoryComponents = Maps.newHashMap();
@@ -80,11 +80,6 @@ public class BehaviorNodeFactory implements ComponentSystem {
     @Override
     public void initialise() {
         refreshLibrary();
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     public void refreshLibrary() {

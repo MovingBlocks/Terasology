@@ -16,31 +16,23 @@
 package org.terasology.input.internal;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.registry.In;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class BindCommands implements ComponentSystem {
+public class BindCommands extends BaseComponentSystem {
 
     @In
     private InputSystem inputSystem;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Maps a key to a function")
     public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {

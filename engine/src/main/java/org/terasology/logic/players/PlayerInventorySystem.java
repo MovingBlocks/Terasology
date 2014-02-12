@@ -19,7 +19,7 @@ package org.terasology.logic.players;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.inventory.DropItemButton;
@@ -50,7 +50,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterSystem
-public class PlayerInventorySystem implements ComponentSystem {
+public class PlayerInventorySystem extends BaseComponentSystem {
 
     @In
     private LocalPlayer localPlayer;
@@ -66,14 +66,6 @@ public class PlayerInventorySystem implements ComponentSystem {
 
     private long lastInteraction;
     private long lastTimeThrowInteraction;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent
     public void onSlotChangeRequested(SelectItemRequest request, EntityRef character, CharacterComponent characterComp) {

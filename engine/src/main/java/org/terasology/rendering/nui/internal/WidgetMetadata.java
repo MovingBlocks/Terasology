@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;

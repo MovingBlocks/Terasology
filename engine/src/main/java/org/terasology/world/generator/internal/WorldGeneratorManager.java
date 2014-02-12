@@ -19,10 +19,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
@@ -55,14 +55,19 @@ public class WorldGeneratorManager {
             if (module.getReflections() == null) {
                 logger.error("Module has no reflections: {}", module.getId());
             }
-            for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
-                RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
-                if (isValidWorldGenerator(generatorClass)) {
-                    SimpleUri uri = new SimpleUri(module.getId(), annotation.id());
-                    infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
-                } else {
-                    logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor", generatorClass);
+            try {
+                for (Class<?> generatorClass : module.getReflections().getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
+                    RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);
+                    if (isValidWorldGenerator(generatorClass)) {
+                        SimpleUri uri = new SimpleUri(module.getId(), annotation.id());
+                        infos.add(new WorldGeneratorInfo(uri, annotation.displayName(), annotation.description()));
+                    } else {
+                        logger.error("{} marked to be registered as a World Generator, but is not a subclass of WorldGenerator or lacks the correct constructor",
+                                generatorClass);
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Error loading world generator in module {}, skipping", module.getId(), e);
             }
         }
         Collections.sort(infos);

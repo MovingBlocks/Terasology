@@ -24,6 +24,7 @@ import org.terasology.audio.Sound;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -49,7 +50,7 @@ import java.util.Map;
  * @author Immortius
  */
 @RegisterSystem
-public class DoorSystem implements ComponentSystem {
+public class DoorSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
 
     @In
@@ -62,14 +63,6 @@ public class DoorSystem implements ComponentSystem {
     private AudioManager audioManager;
     @In
     private InventoryManager inventoryManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = {DoorComponent.class, ItemComponent.class})
     public void placeDoor(ActivateEvent event, EntityRef entity) {

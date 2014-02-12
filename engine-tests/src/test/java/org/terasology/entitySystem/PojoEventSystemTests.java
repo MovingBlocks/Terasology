@@ -18,6 +18,7 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
@@ -202,7 +203,7 @@ public class PojoEventSystemTests {
 
     }
 
-    public static class TestEventHandler implements ComponentSystem {
+    public static class TestEventHandler extends BaseComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
         List<Received> childEventReceived = Lists.newArrayList();
@@ -248,7 +249,7 @@ public class PojoEventSystemTests {
     }
 
 
-    public static class TestHighPriorityEventHandler implements ComponentSystem {
+    public static class TestHighPriorityEventHandler extends BaseComponentSystem {
 
         public boolean cancel;
 
@@ -287,7 +288,7 @@ public class PojoEventSystemTests {
         }
     }
 
-    public static class TestCompoundComponentEventHandler implements ComponentSystem {
+    public static class TestCompoundComponentEventHandler extends BaseComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
 

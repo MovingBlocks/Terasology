@@ -20,27 +20,19 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateCompon
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.world.RelevanceRegionComponent;
 
 /**
  * @author Immortius
  */
-public class RelevanceSystem implements ComponentSystem {
+public class RelevanceSystem extends BaseComponentSystem {
 
     private LocalChunkProvider chunkProvider;
 
     public RelevanceSystem(LocalChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
-    }
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {RelevanceRegionComponent.class, LocationComponent.class})

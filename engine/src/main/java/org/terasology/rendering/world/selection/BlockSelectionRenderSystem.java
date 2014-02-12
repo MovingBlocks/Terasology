@@ -21,6 +21,7 @@ import java.util.Map;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -38,7 +39,7 @@ import org.terasology.world.selection.BlockSelectionComponent;
  * @author synopia mkienenb@gmail.com
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class BlockSelectionRenderSystem implements RenderSystem {
+public class BlockSelectionRenderSystem extends BaseComponentSystem implements RenderSystem {
     @In
     private EntityManager entityManager;
 
@@ -96,14 +97,6 @@ public class BlockSelectionRenderSystem implements RenderSystem {
         }
         selectionRenderer.endRenderOverlay();
 
-    }
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Override

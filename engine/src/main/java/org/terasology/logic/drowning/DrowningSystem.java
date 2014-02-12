@@ -19,7 +19,7 @@ import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.registry.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -29,6 +29,7 @@ import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 
@@ -36,7 +37,7 @@ import org.terasology.world.WorldProvider;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class DrowningSystem implements UpdateSubscriberSystem {
+public class DrowningSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
     private BlockEntityRegistry blockEntityProvider;
@@ -49,14 +50,6 @@ public class DrowningSystem implements UpdateSubscriberSystem {
 
     @In
     private WorldProvider worldProvider;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Override
     public void update(float delta) {

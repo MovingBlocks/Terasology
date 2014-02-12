@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -50,7 +51,7 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class PlayerSystem implements UpdateSubscriberSystem {
+public class PlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     @In
     private EntityManager entityManager;
@@ -68,10 +69,6 @@ public class PlayerSystem implements UpdateSubscriberSystem {
     @Override
     public void initialise() {
         chunkProvider = worldRenderer.getChunkProvider();
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Override
