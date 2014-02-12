@@ -23,7 +23,6 @@ import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -39,6 +38,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
 import org.terasology.rendering.ShaderManager;
@@ -47,7 +47,6 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
-import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -198,7 +197,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
             localPlayerCamera = new OculusStereoCamera();
         } else {
-            localPlayerCamera = new PerspectiveCamera();
+            localPlayerCamera = CoreRegistry.get(Config.class).getRendering().getCameraFactory().createCamera();
         }
         activeCamera = localPlayerCamera;
 
