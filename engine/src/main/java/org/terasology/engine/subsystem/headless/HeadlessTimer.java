@@ -19,9 +19,9 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
-import org.terasology.engine.internal.TimeSystem;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.headless.device.TimeSystem;
 import org.terasology.registry.CoreRegistry;
 
 public class HeadlessTimer implements EngineSubsystem {

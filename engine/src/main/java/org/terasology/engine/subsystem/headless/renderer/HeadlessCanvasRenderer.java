@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.internal;
+package org.terasology.engine.subsystem.headless.renderer;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.nui.internal.CanvasRenderer;
 
 public class HeadlessCanvasRenderer implements CanvasRenderer {
 
