@@ -22,8 +22,10 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
@@ -64,6 +66,11 @@ import java.util.Map;
 @RegisterSystem
 public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
+    public static final String GLOBAL_ENTITY_NAME = "global";
+    public static final String GLOBAL_ENTITY_DEFAULT_TREE = "default";
+
+    @In
+    private EngineEntityManager engineEntityManager;
     @In
     private EntityManager entityManager;
     @In
@@ -93,7 +100,7 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
             if (asset != null) {
                 trees.add(asset);
 
-                if (asset.getURI().getAssetName().equals("default")) {
+                if (GLOBAL_ENTITY_DEFAULT_TREE.equalsIgnoreCase(asset.getURI().getAssetName())) {
                     defaultTree = asset;
                 }
             }
@@ -102,13 +109,23 @@ public class BehaviorSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     private void createGlobalEntity(BehaviorTree defaultTree) {
-        globalEntity = entityManager.create();
+        for (EntityRef entityRef : entityManager.getEntitiesWith(BehaviorComponent.class, DisplayNameComponent.class)) {
+            if (GLOBAL_ENTITY_NAME.equalsIgnoreCase(entityRef.getComponent(DisplayNameComponent.class).name)) {
+                globalEntity = entityRef;
+                return;
+            }
+        }
+
         BehaviorComponent behaviorComponent = new BehaviorComponent();
         behaviorComponent.tree = defaultTree;
-        globalEntity.addComponent(behaviorComponent);
         DisplayNameComponent nameComponent = new DisplayNameComponent();
-        nameComponent.name = "global";
-        globalEntity.addComponent(nameComponent);
+        nameComponent.name = GLOBAL_ENTITY_NAME;
+
+        EntityBuilder builder = new EntityBuilder(engineEntityManager);
+        builder.addComponent(behaviorComponent);
+        builder.addComponent(nameComponent);
+        globalEntity = builder.build();
+        globalEntity.setPersistent(false);
     }
 
     @ReceiveEvent

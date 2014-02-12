@@ -25,7 +25,6 @@ import net.miginfocom.layout.ContainerWrapper;
 import net.miginfocom.layout.Grid;
 import net.miginfocom.layout.LC;
 import net.miginfocom.layout.LayoutCallback;
-import org.terasology.logic.behavior.tree.Task;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
@@ -147,14 +146,14 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         final ComponentWrapper cw = getWrapper(element);
 
         final String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
-        AccessController.doPrivileged(new PrivilegedAction<Task>() {
+        CC constraint = AccessController.doPrivileged(new PrivilegedAction<CC>() {
             @Override
-            public Task run() {
-                ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
-                return null;
+            public CC run() {
+                return ConstraintParser.parseComponentConstraint(cStr);
             }
         });
 
+        ccMap.put(cw, constraint);
         wrappers.put(element, cw);
         children.add(cw);
         dirty = true;
