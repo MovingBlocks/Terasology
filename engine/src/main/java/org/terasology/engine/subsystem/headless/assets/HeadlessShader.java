@@ -13,52 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.headless;
+package org.terasology.engine.subsystem.headless.assets;
 
-import java.util.Collection;
+import java.util.Collections;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.skeletalmesh.Bone;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+import org.terasology.rendering.assets.shader.Shader;
+import org.terasology.rendering.assets.shader.ShaderData;
+import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 
-public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
+public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader {
 
-    private SkeletalMeshData data;
+    private ShaderData shaderProgramBase;
 
-    public HeadlessSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
+    public HeadlessShader(AssetUri uri, ShaderData data) {
         super(uri);
         reload(data);
     }
 
     @Override
-    public void reload(SkeletalMeshData skeletalMeshData) {
-        this.data = skeletalMeshData;
+    public void reload(ShaderData data) {
+        shaderProgramBase = data;
     }
 
     @Override
     public void dispose() {
-        data = null;
+        shaderProgramBase = null;
     }
 
     @Override
     public boolean isDisposed() {
-        return data == null;
+        return shaderProgramBase == null;
     }
 
     @Override
-    public int getVertexCount() {
-        return data.getVertexCount();
+    public void recompile() {
+        // do nothing
     }
 
     @Override
-    public Collection<Bone> getBones() {
-        return data.getBones();
+    public ShaderParameterMetadata getParameter(String desc) {
+        return null;
     }
 
     @Override
-    public Bone getBone(String boneName) {
-        return data.getBone(boneName);
+    public Iterable<ShaderParameterMetadata> listParameters() {
+        return Collections.emptyList();
     }
 }

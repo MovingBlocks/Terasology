@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.engine.subsystem.headless.renderer;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindButtonEvent;
@@ -22,6 +22,7 @@ import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 public class GUIManagerHeadless implements GUIManager {

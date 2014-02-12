@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.headless;
+package org.terasology.engine.subsystem.headless.device;
 
-import org.newdawn.slick.Color;
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.font.BaseFont;
-import org.terasology.rendering.assets.font.FontData;
+import org.terasology.engine.internal.TimeBase;
 
-public class HeadlessFont extends BaseFont {
-
-    public HeadlessFont(AssetUri uri, FontData data) {
-        super(uri, data);
-    }
-
+public final class TimeSystem extends TimeBase {
     @Override
-    public void drawString(int x, int y, String text, Color color) {
-        // Do nothing
+    public long getRawTimeInMs() {
+        return System.nanoTime() / 1000000;
     }
-
 }
