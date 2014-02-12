@@ -1,0 +1,9 @@
+{
+    "AutoCreate" : {},
+    "DisplayName" : {
+        "name" : "global"
+    },
+    "Behavior" : {
+        "tree" : "default"
+    }
+}

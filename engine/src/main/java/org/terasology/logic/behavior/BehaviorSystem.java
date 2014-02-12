@@ -30,7 +30,6 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
@@ -65,8 +64,6 @@ import java.util.Map;
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
-    public static final String GLOBAL_ENTITY_NAME = "global";
-    public static final String GLOBAL_ENTITY_DEFAULT_TREE = "default";
 
     @In
     private EntityManager entityManager;
