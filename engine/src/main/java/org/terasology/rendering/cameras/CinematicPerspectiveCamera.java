@@ -17,7 +17,6 @@ package org.terasology.rendering.cameras;
 
 import javax.vecmath.Vector3f;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -26,7 +25,7 @@ import java.util.LinkedList;
 public class CinematicPerspectiveCamera extends PerspectiveCamera {
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
-    private Deque<Float> previousDeltas = new LinkedList<>();
+
 
     private int lastCount = 60;
     private float multiplier = 0.9f;
@@ -35,32 +34,26 @@ public class CinematicPerspectiveCamera extends PerspectiveCamera {
     public void update(float deltaT) {
         previousPositions.addFirst(new Vector3f(position));
         previousViewingDirections.addFirst(new Vector3f(viewingDirection));
-        previousDeltas.addFirst(deltaT);
 
         if (previousPositions.size() > lastCount) {
             previousPositions.removeLast();
             previousViewingDirections.removeLast();
-            previousDeltas.removeLast();
         }
 
-        position.set(calculateVector(previousPositions, previousDeltas));
-        viewingDirection.set(calculateVector(previousViewingDirections, previousDeltas));
+        position.set(calculateVector(previousPositions));
+        viewingDirection.set(calculateVector(previousViewingDirections));
 
         super.update(deltaT);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    private Vector3f calculateVector(Deque<Vector3f> vectors, Deque<Float> deltas) {
+    private Vector3f calculateVector(Deque<Vector3f> vectors) {
         int i = 0;
         float x = 0;
         float y = 0;
         float z = 0;
         float factorMult = 0;
 
-        Iterator<Vector3f> vectorIterator = vectors.iterator();
-        Iterator<Float> deltaIterator = deltas.iterator();
-        while (vectorIterator.hasNext()) {
-            Vector3f vector = vectorIterator.next();
-            Float delta = deltaIterator.next();
+        for (Vector3f vector : vectors) {
             double factor = Math.pow(multiplier, i);
             factorMult += factor;
             x += vector.x * factor;
@@ -70,8 +63,5 @@ public class CinematicPerspectiveCamera extends PerspectiveCamera {
         }
 
         return new Vector3f(x / factorMult, y / factorMult, z / factorMult);
-//        float length = result.length();
-//        result.set(result.x/length, result.y/length, result.z/length);
-//        return result;
     }
 }
