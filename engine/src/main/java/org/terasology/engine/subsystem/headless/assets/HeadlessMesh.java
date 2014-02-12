@@ -13,52 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.headless;
+package org.terasology.engine.subsystem.headless.assets;
 
-import java.util.Collections;
+import gnu.trove.list.TFloatList;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.shader.ShaderData;
-import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
+import org.terasology.math.AABB;
+import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.assets.mesh.MeshData;
 
-public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader {
+public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
 
-    private ShaderData shaderProgramBase;
+    protected MeshData data;
+    protected AABB aabb;
 
-    public HeadlessShader(AssetUri uri, ShaderData data) {
+    public HeadlessMesh(AssetUri uri, MeshData data) {
         super(uri);
         reload(data);
     }
 
     @Override
-    public void reload(ShaderData data) {
-        shaderProgramBase = data;
+    public void reload(MeshData meshData) {
+        this.data = meshData;
+        this.aabb = AABB.createEncompasing(meshData.getVertices());
     }
 
     @Override
     public void dispose() {
-        shaderProgramBase = null;
+        data = null;
     }
 
     @Override
     public boolean isDisposed() {
-        return shaderProgramBase == null;
+        return data == null;
     }
 
     @Override
-    public void recompile() {
+    public AABB getAABB() {
+        return aabb;
+    }
+
+    @Override
+    public TFloatList getVertices() {
+        return data.getVertices();
+    }
+
+    @Override
+    public void render() {
         // do nothing
-    }
-
-    @Override
-    public ShaderParameterMetadata getParameter(String desc) {
-        return null;
-    }
-
-    @Override
-    public Iterable<ShaderParameterMetadata> listParameters() {
-        return Collections.emptyList();
     }
 }

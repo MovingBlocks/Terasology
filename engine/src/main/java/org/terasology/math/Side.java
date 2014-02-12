@@ -261,4 +261,20 @@ public enum Side {
         result.add(vector3iDir);
         return result;
     }
+
+    public Side getRelativeSide(Direction direction) {
+        if (direction == Direction.UP) {
+            return pitchClockwise(1);
+        } else if (direction == Direction.DOWN) {
+            return pitchClockwise(-1);
+        } else if (direction == Direction.LEFT) {
+            return yawClockwise(1);
+        } else if (direction == Direction.RIGHT) {
+            return yawClockwise(-1);
+        } else if (direction == Direction.BACKWARD) {
+            return reverse();
+        } else {
+            return this;
+        }
+    }
 }

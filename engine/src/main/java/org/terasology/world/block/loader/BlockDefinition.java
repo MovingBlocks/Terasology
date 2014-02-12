@@ -18,6 +18,7 @@ package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.engine.API;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 
@@ -29,6 +30,8 @@ import java.util.List;
 /**
  * @author Immortius
  */
+// add API so that modules can define Block Families
+@API
 public class BlockDefinition {
     public String displayName = "";
     public boolean liquid;
