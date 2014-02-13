@@ -36,6 +36,6 @@ public class CameraSettingBinding implements Binding<CameraSetting> {
 
     @Override
     public void set(CameraSetting value) {
-        value.apply(config);
+        config.getCameraSettings().setCameraSetting(value);
     }
 }

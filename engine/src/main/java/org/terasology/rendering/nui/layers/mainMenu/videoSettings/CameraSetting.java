@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
-import org.terasology.config.RenderingConfig;
-
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
@@ -35,10 +33,6 @@ public enum CameraSetting {
 
     public int getSmoothingFrames() {
         return smoothingFrames;
-    }
-
-    public void apply(RenderingConfig renderConfig) {
-        renderConfig.getCameraSettings().setCameraSetting(this);
     }
 
     @Override
