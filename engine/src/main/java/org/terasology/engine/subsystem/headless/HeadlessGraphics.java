@@ -33,6 +33,7 @@ import org.terasology.engine.subsystem.headless.assets.HeadlessSkeletalMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.engine.subsystem.headless.device.HeadlessDisplayDevice;
 import org.terasology.engine.subsystem.headless.renderer.GUIManagerHeadless;
+import org.terasology.engine.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessRenderingSubsystemFactory;
 import org.terasology.engine.subsystem.headless.renderer.ShaderManagerHeadless;
 import org.terasology.logic.manager.GUIManager;
@@ -62,7 +63,6 @@ import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureFromAtlasResolver;
 import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 
 public class HeadlessGraphics implements EngineSubsystem {
@@ -80,7 +80,7 @@ public class HeadlessGraphics implements EngineSubsystem {
         initHeadless(headlessDisplay);
 
         CoreRegistry.putPermanently(GUIManager.class, new GUIManagerHeadless());
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
+        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new HeadlessCanvasRenderer()));
 
         //        CoreRegistry.putPermanently(DefaultRenderingProcess.class, new HeadlessRenderingProcess());
     }

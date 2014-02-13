@@ -84,6 +84,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
             } else {
                 event.setRemovedItem(event.getItem());
             }
+            event.consume();
         } else {
             if (!event.isDestroyRemoved()) {
                 EntityRef copy = entityManager.copy(event.getItem());
@@ -95,6 +96,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
             }
 
             InventoryUtils.adjustStackSize(entity, slotWithItem, itemToRemove.stackCount - count);
+            event.consume();
         }
     }
 
@@ -108,13 +110,16 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         Integer slot = event.getSlot();
         if (slot != null) {
-            giveItemToSlot(event, entity, itemToGive, slot);
+            if (giveItemToSlot(event, entity, itemToGive, slot)) {
+                event.consume();
+            }
             return;
         }
 
         int slotCount = InventoryUtils.getSlotCount(entity);
         for (int i = 0; i < slotCount; i++) {
             if (giveItemToSlot(event, entity, itemToGive, i)) {
+                event.consume();
                 return;
             }
         }
@@ -127,13 +132,11 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
             if (itemAt == null) {
                 if (canPutItemIntoSlot(event.getInstigator(), entity, event.getItem(), slot)) {
                     InventoryUtils.putItemIntoSlot(entity, event.getItem(), slot);
-                    event.consume();
                     return true;
                 }
             } else {
                 if (itemAt.stackCount + itemToGive.stackCount <= itemToGive.maxStackSize) {
                     InventoryUtils.adjustStackSize(entity, slot, itemAt.stackCount + itemToGive.stackCount);
-
                     event.getItem().destroy();
                     return true;
                 }
