@@ -21,7 +21,8 @@ import org.lwjgl.opengl.PixelFormat;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.cameras.PerspectiveCamera;
+import org.terasology.rendering.cameras.PerspectiveCameraSettings;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -67,12 +68,12 @@ public class RenderingConfig {
     private boolean inscattering = true;
     private boolean localReflections;
     private boolean vSync;
-    private PerspectiveCamera camera = new PerspectiveCamera();
+    private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
 
-    public PerspectiveCamera getCamera() {
-        return camera;
+    public PerspectiveCameraSettings getCameraSettings() {
+        return cameraSettings;
     }
 
     public PixelFormat getPixelFormat() {

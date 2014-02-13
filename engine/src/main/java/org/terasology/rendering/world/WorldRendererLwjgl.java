@@ -47,6 +47,7 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
+import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -197,7 +198,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
             localPlayerCamera = new OculusStereoCamera();
         } else {
-            localPlayerCamera = CoreRegistry.get(Config.class).getRendering().getCamera();
+            localPlayerCamera = new PerspectiveCamera(CoreRegistry.get(Config.class).getRendering().getCameraSettings());
         }
         activeCamera = localPlayerCamera;
 

@@ -33,8 +33,12 @@ public enum CameraSetting {
         this.smoothingFrames = smoothingFrames;
     }
 
+    public int getSmoothingFrames() {
+        return smoothingFrames;
+    }
+
     public void apply(RenderingConfig renderConfig) {
-        renderConfig.getCamera().setCameraSmoothingFrames(smoothingFrames);
+        renderConfig.getCameraSettings().setCameraSetting(this);
     }
 
     @Override

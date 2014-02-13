@@ -19,6 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -38,8 +39,9 @@ public class PerspectiveCamera extends Camera {
     private Deque<Vector3f> previousPositions = new LinkedList<>();
     private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
 
-    private int cameraSmoothingFrames = 1;
     private float multiplier = 0.9f;
+
+    private PerspectiveCameraSettings cameraSettings;
 
     private float bobbingRotationOffsetFactor;
     private float bobbingVerticalOffsetFactor;
@@ -48,17 +50,13 @@ public class PerspectiveCamera extends Camera {
 
     private Vector3f tempRightVector = new Vector3f();
 
+    public PerspectiveCamera(PerspectiveCameraSettings cameraSettings) {
+        this.cameraSettings = cameraSettings;
+    }
+
     @Override
     public boolean isBobbingAllowed() {
         return true;
-    }
-
-    public void setCameraSmoothingFrames(int cameraSmoothingFrames) {
-        this.cameraSmoothingFrames = cameraSmoothingFrames;
-    }
-
-    public int getCameraSmoothingFrames() {
-        return cameraSmoothingFrames;
     }
 
     public void loadProjectionMatrix() {
@@ -88,7 +86,8 @@ public class PerspectiveCamera extends Camera {
         previousPositions.addFirst(new Vector3f(position));
         previousViewingDirections.addFirst(new Vector3f(viewingDirection));
 
-        if (previousPositions.size() > cameraSmoothingFrames) {
+        CameraSetting cameraSetting = cameraSettings.getCameraSetting();
+        while (previousPositions.size() > cameraSetting.getSmoothingFrames()) {
             previousPositions.removeLast();
             previousViewingDirections.removeLast();
         }

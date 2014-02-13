@@ -13,29 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
+package org.terasology.rendering.cameras;
 
-import org.terasology.config.RenderingConfig;
-import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 
-/**
- * @author Immortius
- */
-public class CameraSettingBinding implements Binding<CameraSetting> {
+public class PerspectiveCameraSettings {
+    private CameraSetting cameraSetting;
 
-    private RenderingConfig config;
-
-    public CameraSettingBinding(RenderingConfig config) {
-        this.config = config;
+    public PerspectiveCameraSettings(CameraSetting cameraSetting) {
+        this.cameraSetting = cameraSetting;
     }
 
-    @Override
-    public CameraSetting get() {
-        return config.getCameraSettings().getCameraSetting();
+    public CameraSetting getCameraSetting() {
+        return cameraSetting;
     }
 
-    @Override
-    public void set(CameraSetting value) {
-        value.apply(config);
+    public void setCameraSetting(CameraSetting cameraSetting) {
+        this.cameraSetting = cameraSetting;
+    }
+
+    public int getSmoothingFramesCount() {
+        return cameraSetting.getSmoothingFrames();
     }
 }
