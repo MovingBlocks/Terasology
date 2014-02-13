@@ -18,6 +18,7 @@ package org.terasology.persistence.typeSerialization.typeHandlers.core;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.UriUtil;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.persistence.typeSerialization.typeHandlers.SimpleTypeHandler;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
@@ -40,6 +41,9 @@ public class MappedContainerTypeHandler<T> extends SimpleTypeHandler<T> {
     public MappedContainerTypeHandler(Class<T> clazz, Map<FieldMetadata<T, ?>, TypeHandler<?>> mappedFields) {
         this.clazz = clazz;
         this.mappedFields = mappedFields;
+        for (FieldMetadata<T, ?> field : mappedFields.keySet()) {
+            this.fieldByName.put(UriUtil.normalise(field.getName()), field);
+        }
     }
 
     @Override
