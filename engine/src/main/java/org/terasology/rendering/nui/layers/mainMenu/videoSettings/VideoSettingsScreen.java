@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -113,6 +113,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fovSlider.setMinimum(70);
             fovSlider.setRange(50);
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
+        }
+
+        UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
+        if (cameraSetting != null) {
+            cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
+            cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
 
         WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
