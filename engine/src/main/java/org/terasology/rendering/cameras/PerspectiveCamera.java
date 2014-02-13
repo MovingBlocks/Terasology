@@ -22,6 +22,8 @@ import org.terasology.math.TeraMath;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+import java.util.Deque;
+import java.util.LinkedList;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
@@ -32,6 +34,12 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class PerspectiveCamera extends Camera {
+    // Values used for smoothing
+    private Deque<Vector3f> previousPositions = new LinkedList<>();
+    private Deque<Vector3f> previousViewingDirections = new LinkedList<>();
+
+    private int cameraSmoothingFrames = 1;
+    private float multiplier = 0.9f;
 
     private float bobbingRotationOffsetFactor;
     private float bobbingVerticalOffsetFactor;
@@ -43,6 +51,14 @@ public class PerspectiveCamera extends Camera {
     @Override
     public boolean isBobbingAllowed() {
         return true;
+    }
+
+    public void setCameraSmoothingFrames(int cameraSmoothingFrames) {
+        this.cameraSmoothingFrames = cameraSmoothingFrames;
+    }
+
+    public int getCameraSmoothingFrames() {
+        return cameraSmoothingFrames;
     }
 
     public void loadProjectionMatrix() {
@@ -62,8 +78,42 @@ public class PerspectiveCamera extends Camera {
     }
 
     public void update(float deltaT) {
+        applyCinematicEffect();
+
         super.update(deltaT);
         updateMatrices();
+    }
+
+    private void applyCinematicEffect() {
+        previousPositions.addFirst(new Vector3f(position));
+        previousViewingDirections.addFirst(new Vector3f(viewingDirection));
+
+        if (previousPositions.size() > cameraSmoothingFrames) {
+            previousPositions.removeLast();
+            previousViewingDirections.removeLast();
+        }
+
+        position.set(calculateVector(previousPositions));
+        viewingDirection.set(calculateVector(previousViewingDirections));
+    }
+
+    private Vector3f calculateVector(Deque<Vector3f> vectors) {
+        int i = 0;
+        float x = 0;
+        float y = 0;
+        float z = 0;
+        float factorMult = 0;
+
+        for (Vector3f vector : vectors) {
+            double factor = Math.pow(multiplier, i);
+            factorMult += factor;
+            x += vector.x * factor;
+            y += vector.y * factor;
+            z += vector.z * factor;
+            i++;
+        }
+
+        return new Vector3f(x / factorMult, y / factorMult, z / factorMult);
     }
 
     public void updateMatrices() {

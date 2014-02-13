@@ -31,10 +31,14 @@ public class CameraSettingBinding implements Binding<CameraSetting> {
 
     @Override
     public CameraSetting get() {
-        if (config.getCameraFactory() == null) {
+        int smoothingFrames = config.getCamera().getCameraSmoothingFrames();
+        if (smoothingFrames < 5) {
             return CameraSetting.NORMAL;
+        } else if (smoothingFrames < 60) {
+            return CameraSetting.SMOOTH;
+        } else {
+            return CameraSetting.CINEMATIC;
         }
-        return config.getCameraFactory().isCinematic() ? CameraSetting.CINEMATIC : CameraSetting.NORMAL;
     }
 
     @Override

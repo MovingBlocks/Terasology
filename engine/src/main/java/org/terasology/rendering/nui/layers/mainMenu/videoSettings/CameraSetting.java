@@ -16,25 +16,25 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import org.terasology.config.RenderingConfig;
-import org.terasology.rendering.cameras.CameraFactory;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public enum CameraSetting {
-    NORMAL("Normal", false),
-    CINEMATIC("Cinematic (Smooth)", true),;
+    NORMAL("Normal", 1),
+    SMOOTH("Smooth", 5),
+    CINEMATIC("Cinematic", 60);
 
     private String displayName;
-    private boolean cinematic;
+    private int smoothingFrames;
 
-    private CameraSetting(String displayName, boolean cinematic) {
+    private CameraSetting(String displayName, int smoothingFrames) {
         this.displayName = displayName;
-        this.cinematic = cinematic;
+        this.smoothingFrames = smoothingFrames;
     }
 
     public void apply(RenderingConfig renderConfig) {
-        renderConfig.setCameraFactory(new CameraFactory(cinematic));
+        renderConfig.getCamera().setCameraSmoothingFrames(smoothingFrames);
     }
 
     @Override

@@ -197,7 +197,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
             localPlayerCamera = new OculusStereoCamera();
         } else {
-            localPlayerCamera = CoreRegistry.get(Config.class).getRendering().getCameraFactory().createCamera();
+            localPlayerCamera = CoreRegistry.get(Config.class).getRendering().getCamera();
         }
         activeCamera = localPlayerCamera;
 
