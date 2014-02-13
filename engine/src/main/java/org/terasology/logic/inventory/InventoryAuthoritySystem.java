@@ -110,7 +110,9 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         Integer slot = event.getSlot();
         if (slot != null) {
-            giveItemToSlot(event, entity, itemToGive, slot);
+            if (giveItemToSlot(event, entity, itemToGive, slot)) {
+                event.consume();
+            }
             return;
         }
 
