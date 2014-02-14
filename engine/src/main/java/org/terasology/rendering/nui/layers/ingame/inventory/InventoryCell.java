@@ -76,10 +76,10 @@ public class InventoryCell extends CoreWidget {
 
             //move item to the transfer slot
             if (wheelTurns > 0) {
-                takeAmount(amount);
+                giveAmount(amount);
             } else {
                 //get item from transfer slot
-                giveAmount(amount);
+                takeAmount(amount);
             }
             return true;
         }
