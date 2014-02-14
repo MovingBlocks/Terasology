@@ -244,8 +244,8 @@ public final class InventoryUtils {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         EntityRef oldItem = inventory.itemSlots.get(slot);
         inventory.itemSlots.set(slot, item);
-        entity.send(new InventorySlotChangedEvent(slot, oldItem, item));
         entity.saveComponent(inventory);
+        entity.send(new InventorySlotChangedEvent(slot, oldItem, item));
     }
 
     static void adjustStackSize(EntityRef entity, int slot, int newCount) {
@@ -254,7 +254,7 @@ public final class InventoryUtils {
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);
         byte oldSize = itemComponent.stackCount;
         itemComponent.stackCount = (byte) newCount;
-        entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
         item.saveComponent(itemComponent);
+        entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
     }
 }
