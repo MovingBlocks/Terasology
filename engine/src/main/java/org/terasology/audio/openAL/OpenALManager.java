@@ -267,7 +267,6 @@ public class OpenALManager implements AudioManager {
                 entry.getValue().onAudioEnd();
             }
         }
-        logger.warn("Active sounds: " + endListeners.size());
     }
 
     protected boolean checkDistance(Vector3f soundPosition) {
