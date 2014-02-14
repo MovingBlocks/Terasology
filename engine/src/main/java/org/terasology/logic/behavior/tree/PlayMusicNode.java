@@ -55,26 +55,19 @@ public class PlayMusicNode extends Node {
 
         @Override
         public void onInitialize() {
-            audioManager.registerListener(this);
-
             AssetUri uri = getNode().music;
             if (uri != null) {
                 Sound asset = assetManager.loadAsset(uri, Sound.class);
                 if (asset != null) {
-                    audioManager.playMusic(asset);
+                    audioManager.playMusic(asset, this);
                     playing = true;
                 }
             }
         }
 
         @Override
-        public void onTerminate(Status result) {
-            audioManager.unregisterListener(this);
-        }
-
-        @Override
-        public void onAudioEnd(Sound sound) {
-            if (playing && getNode().music.equals(sound.getURI())) {
+        public void onAudioEnd() {
+            if (playing) {
                 playing = false;
                 finished = true;
             }

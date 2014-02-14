@@ -16,7 +16,6 @@
 package org.terasology.audio.openAL;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -51,7 +50,6 @@ import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class OpenALManager implements AudioManager {
@@ -67,9 +65,7 @@ public class OpenALManager implements AudioManager {
 
     private Vector3f listenerPosition = new Vector3f();
 
-    private List<AudioEndListener> endListeners = Lists.newArrayList();
-
-    private List<SoundSource> activeSounds = Lists.newArrayList();
+    private Map<SoundSource, AudioEndListener> endListeners = Maps.newHashMap();
 
     private PropertyChangeListener configListener = new PropertyChangeListener() {
         @Override
@@ -187,6 +183,11 @@ public class OpenALManager implements AudioManager {
 
     @Override
     public void playSound(Sound sound, Vector3f position, float volume, int priority) {
+        playSound(sound, position, volume, priority, null);
+    }
+
+    @Override
+    public void playSound(Sound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
         if (position != null && !checkDistance(position)) {
             return;
         }
@@ -199,25 +200,34 @@ public class OpenALManager implements AudioManager {
             source.setGain(volume);
             source.play();
 
-            activeSounds.add(source);
+            if (endListener != null) {
+                endListeners.put(source, endListener);
+            }
         }
     }
 
     @Override
-    public void playMusic(Sound sound) {
+    public void playMusic(Sound music) {
+        playMusic(music, null);
+    }
+
+    @Override
+    public void playMusic(Sound music, AudioEndListener endListener) {
         SoundPool pool = pools.get("music");
 
         pool.stopAll();
 
-        if (sound == null) {
+        if (music == null) {
             return;
         }
 
-        SoundSource source = pool.getSource(sound);
+        SoundSource source = pool.getSource(music);
         if (source != null) {
             source.setGain(1.0f).play();
 
-            activeSounds.add(source);
+            if (endListener != null) {
+                endListeners.put(source, endListener);
+            }
         }
     }
 
@@ -248,21 +258,16 @@ public class OpenALManager implements AudioManager {
         for (SoundPool pool : pools.values()) {
             pool.update(delta);
         }
-        Iterator<SoundSource> iterator = activeSounds.iterator();
+        Iterator<Map.Entry<SoundSource, AudioEndListener>> iterator = endListeners.entrySet().iterator();
         while (iterator.hasNext()) {
-            SoundSource source = iterator.next();
-            if (!source.isPlaying()) {
+            Map.Entry<SoundSource, AudioEndListener> entry = iterator.next();
+            if (!entry.getKey().isPlaying()) {
                 iterator.remove();
 
-                notifyEndListeners(source.getAudio());
+                entry.getValue().onAudioEnd();
             }
         }
-    }
-
-    private void notifyEndListeners(Sound sound) {
-        for (AudioEndListener listener : endListeners) {
-            listener.onAudioEnd(sound);
-        }
+        logger.warn("Active sounds: " + endListeners.size());
     }
 
     protected boolean checkDistance(Vector3f soundPosition) {
@@ -270,16 +275,6 @@ public class OpenALManager implements AudioManager {
         distance.sub(listenerPosition);
 
         return distance.lengthSquared() < MAX_DISTANCE_SQUARED;
-    }
-
-    @Override
-    public void registerListener(AudioEndListener listener) {
-        endListeners.add(listener);
-    }
-
-    @Override
-    public void unregisterListener(AudioEndListener listener) {
-        endListeners.remove(listener);
     }
 
     @Override

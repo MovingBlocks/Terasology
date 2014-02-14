@@ -48,11 +48,11 @@ public interface AudioManager {
 
     void playSound(Sound sound, Vector3f position, float volume, int priority);
 
+    void playSound(Sound sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
+
     void playMusic(Sound sound);
 
-    void registerListener(AudioEndListener listener);
-
-    void unregisterListener(AudioEndListener listener);
+    void playMusic(Sound sound, AudioEndListener endListener);
 
     /**
      * Update AudioManager sound sources

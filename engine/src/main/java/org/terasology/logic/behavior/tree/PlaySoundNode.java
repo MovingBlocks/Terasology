@@ -24,6 +24,8 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
 
+import javax.vecmath.Vector3f;
+
 /**
  * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>
  * <br/>
@@ -58,29 +60,27 @@ public class PlaySoundNode extends Node {
 
         @Override
         public void onInitialize() {
-            audioManager.registerListener(this);
-
             AssetUri uri = getNode().sound;
             if (uri != null) {
                 Sound snd = assetManager.loadAsset(uri, Sound.class);
                 if (snd != null) {
-                    audioManager.playSound(snd, getNode().volume);
+                    if (actor().hasLocation()) {
+                        Vector3f worldPosition = actor().location().getWorldPosition();
+                        audioManager.playSound(snd, worldPosition, getNode().volume, AudioManager.PRIORITY_NORMAL, this);
+                    } else {
+                        audioManager.playSound(snd, new Vector3f(), getNode().volume, AudioManager.PRIORITY_NORMAL, this);
+                    }
                     playing = true;
                 }
             }
         }
 
         @Override
-        public void onAudioEnd(Sound sound) {
-            if (playing && getNode().sound.equals(sound.getURI())) {
+        public void onAudioEnd() {
+            if (playing) {
                 playing = false;
                 finished = true;
             }
-        }
-
-        @Override
-        public void onTerminate(Status result) {
-            audioManager.unregisterListener(this);
         }
 
         @Override

@@ -73,6 +73,14 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
+    public void playSound(Sound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    }
+
+    @Override
+    public void playMusic(Sound sound, AudioEndListener endListener) {
+    }
+
+    @Override
     public void update(float delta) {
     }
 
@@ -86,14 +94,6 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void stopAllSounds() {
-    }
-
-    @Override
-    public void registerListener(AudioEndListener listener) {
-    }
-
-    @Override
-    public void unregisterListener(AudioEndListener listener) {
     }
 
     @Override
