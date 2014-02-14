@@ -74,16 +74,12 @@ public class UIScrollbar extends CoreWidget {
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
                 int offset = pixelOffsetFor(getValue());
-                int newValue;
                 if(offset < pos.y) {
-                    //newValue = getMinimum() + getRange();
-                    newValue = getValue() + pageSize;
+                    setValue(getValue() + pageSize);
                 }
                 else {
-                    newValue = getValue() - pageSize;
+                    setValue(getValue() - pageSize);
                 }
-
-                setValue(newValue);
 
                 return true;
             }
@@ -184,9 +180,4 @@ public class UIScrollbar extends CoreWidget {
         int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
         setValue(newPosition * getRange() / sliderSize);
     }
-
-    public void setPageSize(int size) {
-        pageSize = size;
-    }
-
 }
