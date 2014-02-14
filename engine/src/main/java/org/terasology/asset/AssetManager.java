@@ -330,16 +330,16 @@ public class AssetManager {
             }
         }
         // TODO: Fix disposal
-        //        Iterator<Asset> iterator = assetCache.values().iterator();
-        //        while (iterator.hasNext()) {
-        //            Asset asset = iterator.next();
-        //
-        //            // Don't dispose engine assets, all sorts of systems have references to them
-        //            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
-        //                asset.dispose();
-        //                iterator.remove();
-        //            }
-        //        }
+//        Iterator<Asset> iterator = assetCache.values().iterator();
+//        while (iterator.hasNext()) {
+//            Asset asset = iterator.next();
+//
+//            // Don't dispose engine assets, all sorts of systems have references to them
+//            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
+//                asset.dispose();
+//                iterator.remove();
+//            }
+//        }
     }
 
     public void dispose(Asset asset) {
