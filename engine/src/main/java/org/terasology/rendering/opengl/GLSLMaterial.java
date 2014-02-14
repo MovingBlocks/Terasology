@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
-    private TIntObjectMap<OpenGLTexture> textureMap = new TIntObjectHashMap<>();
+    private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<>();
     private GLSLShader shader;
     private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
@@ -215,7 +215,7 @@ public class GLSLMaterial extends BaseMaterial {
             bindMap.put(desc, texId);
         }
 
-        textureMap.put(texId, (OpenGLTexture) texture);
+        textureMap.put(texId, texture);
     }
 
     @Override

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,6 +63,7 @@ import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.rendering.opengl.BaseOpenGLTexture;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLFont;
@@ -71,7 +72,7 @@ import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -178,6 +179,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
+                if (data == null) {
+                    return new BaseOpenGLTexture(uri);
+                }
                 return new OpenGLTexture(uri, data);
             }
         });

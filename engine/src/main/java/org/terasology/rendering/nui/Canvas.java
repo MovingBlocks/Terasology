@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +15,15 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 
@@ -228,6 +229,19 @@ public interface Canvas {
      * @return A SubRegion, to be closed when no long needed
      */
     SubRegion subRegion(Rect2i region, boolean crop);
+
+    /**
+     * The same like {@code subRegion} but all drawing operations are done on a frame buffer.
+     * <p/>
+     * A texture asset is generated for the given URI. If a texture with this URI already exists, it is reused by the
+     * framebuffer.
+     *
+     * @param uri    The URI to access the texture
+     * @param region The region to restrict to, relative to the current region, in pixels.
+     * @param crop   Whether to crop elements falling outside this region.
+     * @return A SubRegion, to be closed when no long needed
+     */
+    SubRegion subRegionFBO(AssetUri uri, Rect2i region, boolean crop);
 
     /**
      * When drawOnTop is set to true, subsequent drawing will be on top of everything else.

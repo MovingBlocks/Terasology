@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
@@ -44,6 +45,8 @@ import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UITooltip;
+import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.rendering.opengl.FrameBufferObjectFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -93,7 +96,7 @@ public class CanvasImpl implements CanvasControl {
     private float tooltipTime;
     private Vector2i lastTooltipPosition = new Vector2i();
     private UITooltip tooltipWidget = new UITooltip();
-
+    private FrameBufferObjectFactory fboFactory = new FrameBufferObjectFactory();
 
     private InteractionRegion clickedRegion;
 
@@ -245,6 +248,11 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public SubRegion subRegion(Rect2i region, boolean crop) {
         return new SubRegionImpl(region, crop);
+    }
+
+    @Override
+    public SubRegion subRegionFBO(AssetUri uri, Rect2i region, boolean crop) {
+        return new SubRegionFBOImpl(uri, region, crop);
     }
 
     @Override
@@ -765,6 +773,23 @@ public class CanvasImpl implements CanvasControl {
                 }
                 state = previousState;
             }
+        }
+    }
+
+    private class SubRegionFBOImpl extends SubRegionImpl {
+        private FrameBufferObject fbo;
+
+        private SubRegionFBOImpl(AssetUri uri, Rect2i region, boolean crop) {
+            super(region, crop);
+
+            fbo = fboFactory.getNamed(uri, region);
+            fbo.bindFrame();
+        }
+
+        @Override
+        public void close() {
+            fbo.unbindFrame();
+            super.close();
         }
     }
 
