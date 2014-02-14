@@ -127,21 +127,26 @@ Here's a list of modules bundled with the game by default (as of this writing an
 
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
-* [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities
+* [CakeLie](https://github.com/Terasology/CakeLie) - the cake may be a lie, but these cake and candy blocks are delicious!
 * [ChangingBlocks](https://github.com/Terasology/ChangingBlocks) - allows blocks that change over time (like crops that grow - which will happen if you also enable Crops)
+* [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities
+* [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
 * Core - mandatory content needed for normal game launch
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [Fences](https://github.com/Terasology/Fences) - fences!
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
-* [LightAndShadow](https://github.com/Terasology/LightAndShadow) - Main module for the Light & Shadow gameplay
+* [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such
+* [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
 * [Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working :D
+* [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis)
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
+* [MultiBlock](https://github.com/Terasology/MultiBlock) - supports the concept of multiple blocks being part of the same structure
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
 * [Oreons](https://github.com/Terasology/Oreons) - little sentient cookie people! Don't do much yet. Place with `spawnPrefab "Oreons:OreonGuard"` in the console
 * [Pathfinding](https://github.com/Terasology/Pathfinding) - framework for pathfinding used by other modules
@@ -151,7 +156,9 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
-* [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting at a stone age type level
+* [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
+* [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
+* [Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons
 
 Some of the modules in action:
 
@@ -169,13 +176,13 @@ Contributors
 
 (Listed by primary team)
 
-* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou
+* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, MiJyn, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, 3000Lane, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, mkienenb, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, Josharias
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
-* Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx
-* World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger
+* Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
+* World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias
 
 Soundtrack and Sound Effects
 --------
