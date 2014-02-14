@@ -67,7 +67,7 @@ public class ScrollableArea extends CoreLayout {
             boolean atBottom = scrollbar.getRange() == scrollbar.getValue();
 
             Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
-            scrollbar.setRange(contentHeight - contentRegion.height());
+            scrollbar.setRange(contentHeight - contentRegion.height(), contentRegion.height());
             if ((stickToBottom && atBottom) || moveToBottomPending) {
                 scrollbar.setValue(scrollbar.getRange());
                 moveToBottomPending = false;
@@ -80,7 +80,6 @@ public class ScrollableArea extends CoreLayout {
             canvas.addInteractionRegion(scrollListener);
             canvas.drawWidget(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
                     scrollbarWidth, canvas.size().y));
-
             // Draw content
             try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
                 canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));

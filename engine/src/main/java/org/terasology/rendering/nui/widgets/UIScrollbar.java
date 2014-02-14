@@ -44,6 +44,8 @@ public class UIScrollbar extends CoreWidget {
     private boolean dragging;
     private int mouseOffset;
 
+    private int pageSize;
+
     private InteractionListener handleListener = new BaseInteractionListener() {
 
         @Override
@@ -71,24 +73,21 @@ public class UIScrollbar extends CoreWidget {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             if (button == MouseInput.MOUSE_LEFT) {
-                updatePosition(pos.y - mouseOffset);
+                int offset = pixelOffsetFor(getValue());
+                int newValue;
+                if(offset < pos.y) {
+                    //newValue = getMinimum() + getRange();
+                    newValue = getValue() + pageSize;
+                }
+                else {
+                    newValue = getValue() - pageSize;
+                }
 
-                setValue(TeraMath.clamp(pos.y - handleSize / 2, 0, sliderSize) * getRange() / sliderSize);
-                mouseOffset = handleSize / 2;
-                dragging = true;
+                setValue(newValue);
+
                 return true;
             }
             return false;
-        }
-
-        @Override
-        public void onMouseDrag(Vector2i pos) {
-            updatePosition(pos.y - mouseOffset);
-        }
-
-        @Override
-        public void onMouseRelease(MouseInput button, Vector2i pos) {
-            dragging = false;
         }
     };
 
@@ -97,12 +96,12 @@ public class UIScrollbar extends CoreWidget {
         canvas.setPart("slider");
         canvas.drawBackground();
 
-
         canvas.setPart("handle");
         sliderSize = canvas.size().y - canvas.getCurrentStyle().getFixedHeight();
 
         if (sliderSize > 0) {
-            canvas.addInteractionRegion(sliderListener);
+            Rect2i sliderRegion = Rect2i.createFromMinAndSize(0, 0, canvas.getCurrentStyle().getFixedWidth(), canvas.size().y);
+            canvas.addInteractionRegion(sliderListener, sliderRegion);
             int drawLocation = pixelOffsetFor(getValue());
             handleSize = canvas.getCurrentStyle().getFixedHeight();
             Rect2i handleRegion = Rect2i.createFromMinAndSize(0, drawLocation, canvas.getCurrentStyle().getFixedWidth(), handleSize);
@@ -161,6 +160,12 @@ public class UIScrollbar extends CoreWidget {
 
     public void setRange(int val) {
         range.set(val);
+        pageSize = val;
+    }
+
+    public void setRange(int val, int page) {
+        range.set(val);
+        pageSize = page;
     }
 
     public void bindValue(Binding<Integer> binding) {
@@ -178,6 +183,10 @@ public class UIScrollbar extends CoreWidget {
     private void updatePosition(int pixelPos) {
         int newPosition = TeraMath.clamp(pixelPos, 0, sliderSize);
         setValue(newPosition * getRange() / sliderSize);
+    }
+
+    public void setPageSize(int size) {
+        pageSize = size;
     }
 
 }
