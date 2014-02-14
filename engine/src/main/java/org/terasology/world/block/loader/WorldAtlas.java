@@ -19,10 +19,12 @@ package org.terasology.world.block.loader;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.API;
 
 /**
  * @author Martin Steiger
  */
+@API
 public interface WorldAtlas {
 
     int getTileSize();
