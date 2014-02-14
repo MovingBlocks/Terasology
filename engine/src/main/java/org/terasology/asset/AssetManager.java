@@ -21,8 +21,10 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.sources.AssetSourceCollection;
 import org.terasology.engine.API;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
@@ -368,10 +370,21 @@ public class AssetManager {
         return generateAsset(new AssetUri(type, "temp", UUID.randomUUID().toString()), data);
     }
 
-    public void addAssetSource(AssetSource source) {
-        assetSources.put(source.getSourceId().toLowerCase(Locale.ENGLISH), source);
-        for (AssetUri asset : source.list()) {
-            uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
+    public void addAssetSource(AssetSource newSource) {
+        String idKey = newSource.getSourceId().toLowerCase(Locale.ENGLISH);
+        AssetSource originalSource = assetSources.get(idKey);
+        if (null == originalSource) {
+            assetSources.put(idKey, newSource);
+            for (AssetUri asset : newSource.list()) {
+                uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
+            }
+        } else {
+            AssetSourceCollection combinedSource = new AssetSourceCollection(idKey, originalSource, newSource);
+            assetSources.put(idKey, combinedSource);
+            // only need to add entries from new source
+            for (AssetUri asset : newSource.list()) {
+                uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
+            }
         }
     }
 
