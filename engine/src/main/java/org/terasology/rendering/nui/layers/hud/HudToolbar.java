@@ -61,6 +61,16 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
                 return 0f;
             }
         });
+        healthBar.bindMaxValue(new ReadOnlyBinding<Float>() {
+            @Override
+            public Float get() {
+                HealthComponent healthComponent = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
+                if (healthComponent != null) {
+                    return (float) healthComponent.maxHealth;
+                }
+                return 0f;
+            }
+        });
     }
 
 

@@ -1,0 +1,14 @@
+{
+    "inherit" : "default",
+    "elements" : {
+        "UIIconBar" : {
+            "parts" : {
+                "icon" : {
+                    "background" : "engine:icons.darkHeartOutline",
+                    "fixed-width" : 16,
+                    "fixed-height" : 16
+                }
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 {
     "type" : "HudToolbar",
+    "skin" : "HUD",
     "contents" : {
         "type" : "relativeLayout",
         "contents" : [
@@ -62,16 +63,22 @@
                 "id" : "healthBar",
                 "icon" : "engine:icons.redHeart",
                 "halfIconMode" : "split",
-                "iconValue" : 10,
+                "spacing" : 2,
+                "maxIcons" : 10,
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,
                     "position-right" : {
                         "target" : "CENTER"
                     },
+                    "position-left" : {
+                        "target" : "LEFT",
+                        "widget" : "toolbar"
+                    },
                     "position-bottom" : {
                         "target" : "TOP",
-                        "widget" : "toolbar"
+                        "widget" : "toolbar",
+                        "offset" : 1
                     }
                 }
             }

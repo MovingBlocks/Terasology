@@ -46,7 +46,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     private Time time;
 
     /* DISPLAY ELEMENTS */
-    private final UIImage[] hearts;
     private final UIImage[] breathBubbles;
     private final UIImage crosshair;
 
@@ -61,21 +60,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         setId("hud");
         maximize();
         time = CoreRegistry.get(Time.class);
-
-        // Create hearts
-        hearts = new UIImage[NUM_HEART_ICONS];
-        for (int i = 0; i < NUM_HEART_ICONS; i++) {
-            hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
-            hearts[i].setVisible(true);
-            hearts[i].setTextureSize(new Vector2f(9f, 9f));
-            hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
-            hearts[i].setSize(new Vector2f(18f, 18f));
-            hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
-            hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
-            hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
-
-            addDisplayElement(hearts[i]);
-        }
 
         breathBubbles = new UIImage[NUM_BUBBLE_ICONS];
         for (int i = 0; i < NUM_BUBBLE_ICONS; ++i) {
@@ -112,7 +96,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     public void update() {
         super.update();
 
-        updateHealthBar(localPlayer.getCharacterEntity().getComponent(HealthComponent.class));
         updateBreathBar(localPlayer.getCharacterEntity().getComponent(DrownsComponent.class), localPlayer.getCharacterEntity().getComponent(DrowningComponent.class));
     }
 
@@ -139,44 +122,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             for (UIImage breathBubble : breathBubbles) {
                 breathBubble.setVisible(false);
             }
-        }
-    }
-
-    private void updateHealthBar(HealthComponent health) {
-        float healthRatio = 0;
-        if (health != null) {
-            healthRatio = (float) health.currentHealth / health.maxHealth;
-        }
-
-        // Show/Hide hearts relatively to the available health points of the player
-        for (int i = 0; i < NUM_HEART_ICONS; i++) {
-
-            if (i < healthRatio * 10f) {
-                hearts[i].setVisible(true);
-            } else {
-                hearts[i].setVisible(false);
-            }
-
-            // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
-            //Show Poisoned Status with Green Hearts:
-            /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PoisonedComponent.class);
-            entityManager = CoreRegistry.get(EntityManager.class);
-            for (EntityRef entity : entityManager.listEntities(PoisonedComponent.class)) {
-                if (poisoned.poisonDuration >= 1)
-                    hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
-                else
-                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
-            }
-            
-            for (EntityRef entity : entityManager.listEntities(CuredComponent.class)) {
-                //For fixing the Green > Red hearts when cured:
-                CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CuredComponent.class);
-                entityManager = CoreRegistry.get(EntityManager.class);
-                if (cured.cureDuration >= 1)
-                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
-                else
-                    hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
-            }*/
         }
     }
 

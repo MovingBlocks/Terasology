@@ -25,51 +25,72 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.skin.UIStyle;
 
 /**
  * @author Immortius
  */
 public class UIIconBar extends CoreWidget {
 
-    @LayoutConfig
-    private TextureRegion icon;
+    private static final String ICON_PART = "icon";
 
     @LayoutConfig
     private HalfIconMode halfIconMode = HalfIconMode.SPLIT;
 
     @LayoutConfig
-    private float iconValue = 5f;
+    private int maxIcons = 10;
+
+    @LayoutConfig
+    private int spacing = 1;
+
+    @LayoutConfig
+    private TextureRegion icon;
 
     private Binding<Float> value = new DefaultBinding<>(0f);
+    private Binding<Float> maxValue = new DefaultBinding<>(10f);
 
     @Override
     public void onDraw(Canvas canvas) {
-        if (icon != null) {
-            int fullIcons = TeraMath.floorToInt(getValue() / iconValue);
-            int halfIcons = TeraMath.ceilToInt(getValue() / iconValue) - fullIcons;
-            Vector2i offset = new Vector2i();
-            for (int i = 0; i < fullIcons; ++i) {
-                canvas.drawTexture(icon, Rect2i.createFromMinAndSize(offset, icon.size()));
-                offset.x += icon.getWidth();
-                if (offset.x + icon.getWidth() > canvas.size().x) {
-                    offset.x = 0;
-                    offset.y += icon.getHeight();
-                }
+        canvas.setPart(ICON_PART);
+        if (icon != null && getMaxValue() > 0) {
+            Vector2i iconSize = getIconSize(canvas);
+            float ratio = maxIcons * getValue() / getMaxValue();
+            int fullIcons = TeraMath.floorToInt(ratio);
+            boolean halfIcon = false;
+            if (ratio - fullIcons >= 0.5f) {
+                fullIcons++;
+            } else if (ratio - fullIcons > 0) {
+                halfIcon = true;
             }
-            for (int i = 0; i < halfIcons; ++i) {
-                switch (halfIconMode) {
-                    case SHRINK:
-                        Vector2i halfSize = new Vector2i(icon.size());
-                        halfSize.x /= 2;
-                        halfSize.y /= 2;
-                        canvas.drawTexture(icon, Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x, offset.y + halfSize.y), halfSize));
-                        break;
-                    case SPLIT:
-                        canvas.drawTextureRaw(icon, Rect2i.createFromMinAndSize(offset, new Vector2i(icon.getWidth() / 2, icon.getHeight())),
-                                ScaleMode.STRETCH, 0f, 0f, 0.5f, 1.0f);
-                        break;
-                    default:
-                        break;
+            Vector2i offset = new Vector2i();
+            for (int i = 0; i < maxIcons; ++i) {
+                Rect2i iconRegion = Rect2i.createFromMinAndSize(offset, iconSize);
+                canvas.drawBackground(iconRegion);
+                if (ratio - i >= 0.5f) {
+                    canvas.drawTexture(icon, iconRegion);
+                } else if (ratio - i > 0f) {
+                    switch (halfIconMode) {
+                        case SHRINK:
+                            Vector2i halfSize = new Vector2i(iconSize);
+                            halfSize.x /= 2;
+                            halfSize.y /= 2;
+                            canvas.drawTexture(icon,
+                                    Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x, offset.y + halfSize.y), halfSize));
+                            break;
+                        case SPLIT:
+                            canvas.drawTextureRaw(icon,
+                                    Rect2i.createFromMinAndSize(offset, new Vector2i(iconSize.x / 2, iconSize.y)),
+                                    ScaleMode.STRETCH, 0f, 0f, (float) (iconSize.x / 2) / iconSize.x, 1.0f);
+                            break;
+                        default:
+                            canvas.drawTexture(icon, iconRegion);
+                            break;
+                    }
+                }
+                offset.x += iconSize.x + spacing;
+                if (offset.x + iconSize.x > canvas.size().x) {
+                    offset.x = 0;
+                    offset.y += iconSize.y + spacing;
                 }
             }
         }
@@ -77,14 +98,44 @@ public class UIIconBar extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
+        canvas.setPart(ICON_PART);
         if (icon != null) {
-            int icons = TeraMath.ceilToInt(getValue() / iconValue);
-            int maxHorizontalIcons = TeraMath.floorToInt(sizeHint.x / icon.getWidth());
-            int rows = ((icons - 1) / maxHorizontalIcons) + 1;
-            return new Vector2i(Math.min(icons, maxHorizontalIcons) * icon.getWidth(), rows * icon.getHeight());
+            Vector2i iconSize = getIconSize(canvas);
+            int maxHorizontalIcons = TeraMath.floorToInt(sizeHint.x / iconSize.x);
+            int rows = ((maxIcons - 1) / maxHorizontalIcons) + 1;
+            int columns = Math.min(maxIcons, maxHorizontalIcons);
+            return new Vector2i(columns * iconSize.x + (columns - 1) * spacing, rows * iconSize.y + (rows - 1) * spacing);
         } else {
             return Vector2i.zero();
         }
+
+    }
+
+    private Vector2i getIconSize(Canvas canvas) {
+        UIStyle iconStyle = canvas.getCurrentStyle();
+        int width = iconStyle.getFixedWidth();
+        int height = iconStyle.getFixedHeight();
+        if (width == 0) {
+            width = iconStyle.getMinWidth();
+        }
+        if (height == 0) {
+            height = iconStyle.getMinHeight();
+        }
+        if (width == 0) {
+            width = icon.getWidth();
+        }
+        if (height == 0) {
+            height = icon.getHeight();
+        }
+        return new Vector2i(width, height);
+    }
+
+    public TextureRegion getIcon() {
+        return icon;
+    }
+
+    public void setIcon(TextureRegion icon) {
+        this.icon = icon;
     }
 
     public void bindValue(Binding<Float> binding) {
@@ -99,12 +150,16 @@ public class UIIconBar extends CoreWidget {
         value.set(val);
     }
 
-    public TextureRegion getIcon() {
-        return icon;
+    public void bindMaxValue(Binding<Float> binding) {
+        maxValue = binding;
     }
 
-    public void setIcon(TextureRegion icon) {
-        this.icon = icon;
+    public float getMaxValue() {
+        return maxValue.get();
+    }
+
+    public void setMaxValue(float val) {
+        maxValue.set(val);
     }
 
     public HalfIconMode getHalfIconMode() {
@@ -115,17 +170,11 @@ public class UIIconBar extends CoreWidget {
         this.halfIconMode = halfIconMode;
     }
 
-    public float getIconValue() {
-        return iconValue;
-    }
-
-    public void setIconValue(float iconValue) {
-        this.iconValue = iconValue;
-    }
-
     public enum HalfIconMode {
         NONE,
         SPLIT,
         SHRINK,
     }
+
+
 }
