@@ -251,4 +251,36 @@ public class UIStyleFragment {
     public void setAlignmentV(VerticalAlign alignmentV) {
         this.alignmentV = alignmentV;
     }
+
+    public Integer getMinWidth() {
+        return minWidth;
+    }
+
+    public void setMinWidth(Integer minWidth) {
+        this.minWidth = minWidth;
+    }
+
+    public Integer getMinHeight() {
+        return minHeight;
+    }
+
+    public void setMinHeight(Integer minHeight) {
+        this.minHeight = minHeight;
+    }
+
+    public Integer getMaxWidth() {
+        return maxWidth;
+    }
+
+    public void setMaxWidth(Integer maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+
+    public Integer getMaxHeight() {
+        return maxHeight;
+    }
+
+    public void setMaxHeight(Integer maxHeight) {
+        this.maxHeight = maxHeight;
+    }
 }

@@ -5,6 +5,7 @@
         "contents" : [
             {
                 "type" : "flowLayout",
+                "id" : "toolbar",
                 "contents" : [
                     {
                         "type" : "InventoryCell",
@@ -53,6 +54,24 @@
                     "position-horizontal-center" : {},
                     "position-bottom" : {
                         "target" : "BOTTOM"
+                    }
+                }
+            },
+            {
+                "type" : "UIIconBar",
+                "id" : "healthBar",
+                "icon" : "engine:icons.redHeart",
+                "halfIconMode" : "split",
+                "iconValue" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-right" : {
+                        "target" : "CENTER"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "toolbar"
                     }
                 }
             }
