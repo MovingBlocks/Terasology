@@ -444,9 +444,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
             focus.onKeyEvent(event);
         }
         if (event.isDown() && !event.isConsumed() && event.getKey() == Keyboard.Key.ESCAPE) {
-            if (!screens.isEmpty() && screens.peek().isEscapeToCloseAllowed()) {
-                popScreen();
-                event.consume();
+            for (UIScreenLayer screen : screens) {
+                if (screen.isEscapeToCloseAllowed()) {
+                    closeScreen(screen);
+                    event.consume();
+                    break;
+                } else if (screen.isModal()) {
+                    break;
+                }
             }
         }
         for (UIScreenLayer screen : screens) {
