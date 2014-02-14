@@ -330,16 +330,16 @@ public class AssetManager {
             }
         }
         // TODO: Fix disposal
-//        Iterator<Asset> iterator = assetCache.values().iterator();
-//        while (iterator.hasNext()) {
-//            Asset asset = iterator.next();
-//
-//            // Don't dispose engine assets, all sorts of systems have references to them
-//            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
-//                asset.dispose();
-//                iterator.remove();
-//            }
-//        }
+        //        Iterator<Asset> iterator = assetCache.values().iterator();
+        //        while (iterator.hasNext()) {
+        //            Asset asset = iterator.next();
+        //
+        //            // Don't dispose engine assets, all sorts of systems have references to them
+        //            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
+        //                asset.dispose();
+        //                iterator.remove();
+        //            }
+        //        }
     }
 
     public void dispose(Asset asset) {
@@ -375,16 +375,13 @@ public class AssetManager {
         AssetSource originalSource = assetSources.get(idKey);
         if (null == originalSource) {
             assetSources.put(idKey, newSource);
-            for (AssetUri asset : newSource.list()) {
-                uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
-            }
         } else {
             AssetSourceCollection combinedSource = new AssetSourceCollection(idKey, originalSource, newSource);
             assetSources.put(idKey, combinedSource);
-            // only need to add entries from new source
-            for (AssetUri asset : newSource.list()) {
-                uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
-            }
+        }
+        // only need to add entries from new source
+        for (AssetUri asset : newSource.list()) {
+            uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
         }
     }
 
