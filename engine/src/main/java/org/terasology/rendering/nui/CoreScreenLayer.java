@@ -38,6 +38,11 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             return true;
         }
+
+        @Override
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+            return true;
+        }
     };
     private NUIManager manager;
 
