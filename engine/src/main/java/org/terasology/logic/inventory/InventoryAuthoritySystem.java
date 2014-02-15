@@ -102,7 +102,8 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void giveItem(GiveItemAction event, EntityRef entity) {
-        ItemComponent itemToGive = event.getItem().getComponent(ItemComponent.class);
+        EntityRef item = event.getItem();
+        ItemComponent itemToGive = item.getComponent(ItemComponent.class);
         if (itemToGive == null) {
             event.consume();
             return;
@@ -110,7 +111,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         Integer slot = event.getSlot();
         if (slot != null) {
-            if (giveItemToSlot(event, entity, itemToGive, slot)) {
+            if (giveItemToSlot(event, entity, item, slot)) {
                 event.consume();
             }
             return;
@@ -118,25 +119,26 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         int slotCount = InventoryUtils.getSlotCount(entity);
         for (int i = 0; i < slotCount; i++) {
-            if (giveItemToSlot(event, entity, itemToGive, i)) {
+            if (giveItemToSlot(event, entity, item, i)) {
                 event.consume();
                 return;
             }
         }
     }
 
-    private boolean giveItemToSlot(GiveItemAction event, EntityRef entity, ItemComponent itemToGive, int slot) {
+    private boolean giveItemToSlot(GiveItemAction event, EntityRef entity, EntityRef item, int slot) {
         EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
         ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
-        if (itemAt == null || InventoryUtils.isSameItem(itemAt, itemToGive)) {
+        if (InventoryUtils.canStackInto(item, itemAtEntity)) {
             if (itemAt == null) {
                 if (canPutItemIntoSlot(event.getInstigator(), entity, event.getItem(), slot)) {
                     InventoryUtils.putItemIntoSlot(entity, event.getItem(), slot);
                     return true;
                 }
             } else {
-                if (itemAt.stackCount + itemToGive.stackCount <= itemToGive.maxStackSize) {
-                    InventoryUtils.adjustStackSize(entity, slot, itemAt.stackCount + itemToGive.stackCount);
+                ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+                if (sourceItem != null) {
+                    InventoryUtils.adjustStackSize(entity, slot, itemAt.stackCount + sourceItem.stackCount);
                     event.getItem().destroy();
                     return true;
                 }
