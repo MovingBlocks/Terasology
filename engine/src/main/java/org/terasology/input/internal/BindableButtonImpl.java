@@ -27,7 +27,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
@@ -208,17 +207,15 @@ public class BindableButtonImpl implements BindableButton {
         long activateTime = this.time.getGameTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
             lastActivateTime = activateTime;
-            if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
-                if (!consumedActivation) {
-                    boolean consumed = triggerOnRepeat(delta, target);
-                    if (!consumed) {
-                        buttonEvent.prepare(id, ButtonState.REPEAT, delta);
-                        buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
-                        for (EntityRef entity : inputEntities) {
-                            entity.send(buttonEvent);
-                            if (buttonEvent.isConsumed()) {
-                                break;
-                            }
+            if (!consumedActivation) {
+                boolean consumed = triggerOnRepeat(delta, target);
+                if (!consumed) {
+                    buttonEvent.prepare(id, ButtonState.REPEAT, delta);
+                    buttonEvent.setTargetInfo(target, targetBlockPos, hitPosition, hitNormal);
+                    for (EntityRef entity : inputEntities) {
+                        entity.send(buttonEvent);
+                        if (buttonEvent.isConsumed()) {
+                            break;
                         }
                     }
                 }

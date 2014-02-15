@@ -27,7 +27,6 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 
@@ -48,12 +47,11 @@ public class LwjglInput extends BaseLwjglSubsystem {
 
     @Override
     public void preUpdate(GameState currentState, float delta) {
-        GUIManager guiManager = CoreRegistry.get(GUIManager.class);
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         GameEngine engine = CoreRegistry.get(GameEngine.class);
 
         // TODO: this originally occurred before GameThread.processWaitingProcesses();
-        Mouse.setGrabbed(engine.hasMouseFocus() && !(nuiManager.isReleasingMouse() || guiManager.isReleasingMouse()));
+        Mouse.setGrabbed(engine.hasMouseFocus() && !(nuiManager.isReleasingMouse()));
     }
 
     @Override

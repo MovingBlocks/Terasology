@@ -45,7 +45,6 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -537,7 +536,6 @@ public class TerasologyEngine implements GameEngine {
             config.getRendering().setFullscreen(state);
             DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
             display.setFullscreen(state);
-            CoreRegistry.get(GUIManager.class).update(true);
         }
     }
 

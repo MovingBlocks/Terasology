@@ -32,15 +32,13 @@ import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
@@ -59,7 +57,6 @@ public class StateIngame implements GameState {
 
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;
-    private GUIManager guiManager;
     private NUIManager nuiManager;
     private WorldRenderer worldRenderer;
     private EngineEntityManager entityManager;
@@ -74,7 +71,6 @@ public class StateIngame implements GameState {
     }
 
     public void init(GameEngine engine) {
-        guiManager = CoreRegistry.get(GUIManager.class);
         nuiManager = CoreRegistry.get(NUIManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         eventSystem = CoreRegistry.get(EventSystem.class);
@@ -82,11 +78,8 @@ public class StateIngame implements GameState {
         entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
-        eventSystem.registerEventHandler(guiManager);
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
-
-        guiManager.openWindow("hud");
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
@@ -98,13 +91,13 @@ public class StateIngame implements GameState {
             OculusVrHelper.updateFromDevice();
         }
         // Show or hide the HUD according to the settings
-        final boolean hudHidden = CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
-        UIWindow hudWindow = CoreRegistry.get(GUIManager.class).getWindowById("hud");
-        if (null != hudWindow) {
-            for (UIDisplayElement element : hudWindow.getDisplayElements()) {
-                element.setVisible(!hudHidden);
+        nuiManager.getHUD().bindVisible(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return !CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
             }
-        }
+        });
+
     }
 
     @Override
@@ -120,7 +113,6 @@ public class StateIngame implements GameState {
         eventSystem.process();
         componentSystemManager.shutdown();
         GameThread.processWaitingProcesses();
-        guiManager.closeAllWindows();
         nuiManager.clear();
 
         if (worldRenderer != null) {
@@ -194,7 +186,6 @@ public class StateIngame implements GameState {
     }
 
     public void renderUserInterface() {
-        guiManager.render();
         PerformanceMonitor.startActivity("Rendering NUI");
         nuiManager.render();
         PerformanceMonitor.endActivity();
@@ -202,7 +193,6 @@ public class StateIngame implements GameState {
 
     private void updateUserInterface(float delta) {
         nuiManager.update(delta);
-        guiManager.update();
     }
 
     public void pause() {

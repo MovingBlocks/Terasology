@@ -29,11 +29,8 @@ import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.rendering.world.ViewDistance;
@@ -77,10 +74,6 @@ public class DebugControlSystem extends BaseComponentSystem {
 
             config.getRendering().getDebug().setFirstPersonElementsHidden(hide);
             config.getRendering().getDebug().setHudHidden(hide);
-
-            for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                element.setVisible(!hide);
-            }
 
             event.consume();
         }
