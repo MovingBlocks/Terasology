@@ -111,7 +111,6 @@ public class StateIngame implements GameState {
         networkSystem.shutdown();
         // TODO: Shutdown background threads
         eventSystem.process();
-        componentSystemManager.shutdown();
         GameThread.processWaitingProcesses();
         nuiManager.clear();
 
@@ -119,6 +118,7 @@ public class StateIngame implements GameState {
             worldRenderer.dispose();
             worldRenderer = null;
         }
+        componentSystemManager.shutdown();
 
         if (save) {
             CoreRegistry.get(Game.class).save();
