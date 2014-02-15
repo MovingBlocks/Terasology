@@ -37,7 +37,6 @@ import org.terasology.engine.subsystem.headless.renderer.HeadlessRenderingSubsys
 import org.terasology.engine.subsystem.headless.renderer.ShaderManagerHeadless;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -159,8 +158,6 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerHeadless());
         CoreRegistry.get(ShaderManager.class).initShaders();
-        VertexBufferObjectManager.getInstance();
-
     }
 
     @Override

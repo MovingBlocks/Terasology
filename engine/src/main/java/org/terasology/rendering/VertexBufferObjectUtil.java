@@ -18,69 +18,42 @@ package org.terasology.rendering;
 import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
- * Provides support for creating and buffering Vertex Buffer Objects.
+ * Provides support for buffering Vertex Buffer Objects.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class VertexBufferObjectManager {
+public final class VertexBufferObjectUtil {
 
-    private static volatile VertexBufferObjectManager instance;
-    private final TIntArrayList vertexBufferObjectPool = new TIntArrayList();
-
-    public static VertexBufferObjectManager getInstance() {
-        if (instance == null) {
-            instance = new VertexBufferObjectManager();
-        }
-
-        return instance;
+    private VertexBufferObjectUtil() {
     }
 
-    private IntBuffer createVbos(int size) {
-        IntBuffer buffer = BufferUtils.createIntBuffer(size);
-        GL15.glGenBuffers(buffer);
-        return buffer;
-    }
-
-    public synchronized int getVboId() {
-        while (vertexBufferObjectPool.size() > 0) {
-            int id = vertexBufferObjectPool.removeAt(vertexBufferObjectPool.size() - 1);
-            GL15.glDeleteBuffers(id);
-        }
-
-        return createVbos(1).get(0);
-    }
-
-    public synchronized void putVboId(int vboId) {
-        if (vboId > 0) {
-            vertexBufferObjectPool.add(vboId);
-        }
-    }
-
-    public void bufferVboData(int id, FloatBuffer buffer, int drawMode) {
+    public static void bufferVboData(int id, FloatBuffer buffer, int drawMode) {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, drawMode);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
-    public void bufferVboElementData(int id, IntBuffer buffer, int drawMode) {
+    public static void bufferVboElementData(int id, IntBuffer buffer, int drawMode) {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, id);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, drawMode);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    public void bufferVboData(int id, ByteBuffer buffer, int drawMode) {
+    public static void bufferVboData(int id, ByteBuffer buffer, int drawMode) {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, drawMode);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
-    public void bufferVboElementData(int id, ByteBuffer buffer, int drawMode) {
+    public static void bufferVboElementData(int id, ByteBuffer buffer, int drawMode) {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, id);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, drawMode);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);

@@ -29,7 +29,7 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.AABB;
-import org.terasology.rendering.VertexBufferObjectManager;
+import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -82,26 +82,25 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     @Override
     public void reload(MeshData newData) {
-        dispose();
         buildMesh(newData);
     }
 
     @Override
     public void dispose() {
         // TODO: Fix disposal
-        /*hasTexCoord0 = false;
+        hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;
         hasNormal = false;
         indexCount = 0;
         if (vboVertexBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboVertexBuffer);
+            GL15.glDeleteBuffers(vboVertexBuffer);
             vboVertexBuffer = 0;
         }
         if (vboIndexBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboIndexBuffer);
+            GL15.glDeleteBuffers(vboIndexBuffer);
             vboIndexBuffer = 0;
-        }  */
+        }
     }
 
     @Override
@@ -275,8 +274,10 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             }
         }
         vertexBuffer.flip();
-        vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
+        if (vboVertexBuffer == 0) {
+            vboVertexBuffer = GL15.glGenBuffers();
+        }
+        VertexBufferObjectUtil.bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         vertexBuffer.flip();
     }
 
@@ -288,8 +289,10 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         }
         indexBuffer.flip();
 
-        vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+        if (vboIndexBuffer == 0) {
+            vboIndexBuffer = GL15.glGenBuffers();
+        }
+        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
         indexBuffer.flip();
     }
 
