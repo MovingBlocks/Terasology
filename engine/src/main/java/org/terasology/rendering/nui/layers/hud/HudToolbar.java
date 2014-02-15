@@ -43,6 +43,7 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
     private Time time;
 
     private List<InventoryCell> cells = Lists.newArrayList();
+    private UICrosshair crosshair;
 
     @Override
     public void initialise() {
@@ -98,6 +99,12 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
                 return 0f;
             }
         });
+
+        crosshair = find("crosshair", UICrosshair.class);
+    }
+
+    public void setChargeAmount(float amount) {
+        crosshair.setChargeAmount(amount);
     }
 
 

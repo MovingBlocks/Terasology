@@ -108,6 +108,19 @@
                         "offset" : 1
                     }
                 }
+            },
+            {
+                "type" : "UICrosshair",
+                "id" : "crosshair",
+                "crosshairIcon" : "engine:gui.crosshair",
+                "chargeStages" : ["engine:gui.crosshairCharge1","engine:gui.crosshairCharge2","engine:gui.crosshairCharge3","engine:gui.crosshairCharge4",
+                                  "engine:gui.crosshairCharge5","engine:gui.crosshairCharge6","engine:gui.crosshairCharge7","engine:gui.crosshairCharge8"],
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-center" : {}
+                }
             }
         ]
     }

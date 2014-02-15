@@ -77,6 +77,7 @@ public class UIStyle {
         this.textShadowColor = other.textShadowColor;
         this.textShadowed = other.textShadowed;
         this.textAlignmentH = other.textAlignmentH;
+        this.textAlignmentV = other.textAlignmentV;
     }
 
     /**

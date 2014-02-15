@@ -39,7 +39,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.world.WorldComponent;
 
 import javax.vecmath.Vector2f;
@@ -70,7 +69,6 @@ public class GUIManagerLwjgl implements ComponentSystem, GUIManager {
 
     private void registerWindows() {
         //TODO parser action here! this is temporary
-        registeredWindows.put("hud", UIScreenHUD.class);
     }
 
     /**
@@ -309,7 +307,7 @@ public class GUIManagerLwjgl implements ComponentSystem, GUIManager {
      */
     @Override
     public boolean isReleasingMouse() {
-        return isConsumingInput() || renderer.getWindowFocused() == null;
+        return false;
     }
 
     /**
