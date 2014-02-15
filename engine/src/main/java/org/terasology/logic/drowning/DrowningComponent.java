@@ -33,7 +33,7 @@ public class DrowningComponent implements Component {
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     public long nextDrownDamageTime;
 
-    public float getPercentageBreath(long gameTime) {
+    public float getRemainingBreath(long gameTime) {
         long capacity = (endTime - startTime);
         float percentage = (gameTime - startTime) / (float) capacity;
         if (!isBreathing) {

@@ -75,7 +75,7 @@ public class UIIconBar extends CoreWidget {
                             halfSize.x /= 2;
                             halfSize.y /= 2;
                             canvas.drawTexture(icon,
-                                    Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x, offset.y + halfSize.y), halfSize));
+                                    Rect2i.createFromMinAndSize(new Vector2i(offset.x + halfSize.x / 2, offset.y + halfSize.y / 2), halfSize));
                             break;
                         case SPLIT:
                             canvas.drawTextureRaw(icon,

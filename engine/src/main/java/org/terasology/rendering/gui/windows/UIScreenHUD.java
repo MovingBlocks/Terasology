@@ -22,7 +22,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.logic.drowning.DrowningComponent;
 import org.terasology.logic.drowning.DrownsComponent;
-import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -39,14 +38,10 @@ import javax.vecmath.Vector2f;
  */
 public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
-    private static final int NUM_HEART_ICONS = 10;
-    private static final int NUM_BUBBLE_ICONS = 10;
-
     protected EntityManager entityManager;
     private Time time;
 
     /* DISPLAY ELEMENTS */
-    private final UIImage[] breathBubbles;
     private final UIImage crosshair;
 
     private final Config config = CoreRegistry.get(Config.class);
@@ -60,20 +55,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         setId("hud");
         maximize();
         time = CoreRegistry.get(Time.class);
-
-        breathBubbles = new UIImage[NUM_BUBBLE_ICONS];
-        for (int i = 0; i < NUM_BUBBLE_ICONS; ++i) {
-            breathBubbles[i] = new UIImage(Assets.getTexture("engine:icons"));
-            breathBubbles[i].setVisible(true);
-            breathBubbles[i].setTextureSize(new Vector2f(9f, 9f));
-            breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f));
-            breathBubbles[i].setSize(new Vector2f(18f, 18f));
-            breathBubbles[i].setVerticalAlign(EVerticalAlign.BOTTOM);
-            breathBubbles[i].setHorizontalAlign(EHorizontalAlign.CENTER);
-            breathBubbles[i].setPosition(new Vector2f(-18f * i + 210f, -52f));
-
-            addDisplayElement(breathBubbles[i]);
-        }
 
         crosshair = new UIImage(Assets.getTexture("engine:gui"));
         crosshair.setId("crosshair");
@@ -90,39 +71,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
         update();
         layout();
-    }
-
-    @Override
-    public void update() {
-        super.update();
-
-        updateBreathBar(localPlayer.getCharacterEntity().getComponent(DrownsComponent.class), localPlayer.getCharacterEntity().getComponent(DrowningComponent.class));
-    }
-
-    private void updateBreathBar(DrownsComponent drownsComponent, DrowningComponent drowningComponent) {
-        if (drownsComponent != null && drowningComponent != null) {
-            float breath = drowningComponent.getPercentageBreath(time.getGameTimeInMs());
-            if (breath <= 0) {
-                for (UIImage breathBubble : breathBubbles) {
-                    breathBubble.setVisible(true);
-                    breathBubble.setTextureOrigin(new Vector2f(25f, 18f));
-                }
-            } else {
-                breath *= NUM_BUBBLE_ICONS;
-                for (int i = 0; i < breathBubbles.length; ++i) {
-                    breathBubbles[i].setVisible(true);
-                    if (NUM_BUBBLE_ICONS - i - 1 < breath) {
-                        breathBubbles[i].setTextureOrigin(new Vector2f(16f, 18f));
-                    } else {
-                        breathBubbles[i].setTextureOrigin(new Vector2f(25f, 18f));
-                    }
-                }
-            }
-        } else {
-            for (UIImage breathBubble : breathBubbles) {
-                breathBubble.setVisible(false);
-            }
-        }
     }
 
     @Override

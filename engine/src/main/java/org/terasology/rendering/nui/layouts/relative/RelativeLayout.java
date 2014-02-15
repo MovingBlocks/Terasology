@@ -174,7 +174,9 @@ public class RelativeLayout extends CoreLayout<RelativeLayoutHint> {
             }
             WidgetInfo target = contentLookup.get(id);
             if (target != null) {
-                return getRegion(target, canvas);
+                Rect2i region = getRegion(target, canvas);
+                loopDetectionId = "";
+                return region;
             }
         }
         loopDetectionId = "";
