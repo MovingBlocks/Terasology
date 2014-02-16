@@ -40,8 +40,6 @@ import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
 import org.terasology.rendering.assets.atlas.Atlas;
 import org.terasology.rendering.assets.atlas.AtlasData;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -62,7 +60,6 @@ import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
-import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
@@ -175,12 +172,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
                 return new OpenGLTexture(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new OpenGLFont(uri, data);
             }
         });
         assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {

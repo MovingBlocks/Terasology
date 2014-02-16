@@ -111,9 +111,9 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     @Override
     public void dispose() {
         // TODO: Fix this
-        for (int i = 0; i < buffers.length; i++) {
-            if (buffers[i] != 0) {
-                AL10.alDeleteBuffers(buffers[i]);
+        for (int buffer : buffers) {
+            if (buffer != 0) {
+                AL10.alDeleteBuffers(buffer);
             }
         }
         OpenALException.checkState("Deleting buffer data");

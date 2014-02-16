@@ -87,7 +87,6 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
 
     @Override
     public void dispose() {
-        // TODO: Fix disposal
         hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;

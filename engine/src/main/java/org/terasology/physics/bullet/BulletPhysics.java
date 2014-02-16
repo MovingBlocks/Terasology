@@ -51,6 +51,7 @@ import com.google.common.collect.Maps;
 import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.physics.engine.PhysicsLiquidWrapper;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -106,6 +107,7 @@ public class BulletPhysics implements PhysicsEngine {
     private final DiscreteDynamicsWorld discreteDynamicsWorld;
     private final BlockEntityRegistry blockEntityRegistry;
     private final PhysicsWorldWrapper wrapper;
+    private final PhysicsLiquidWrapper liquidWrapper;
     private Map<EntityRef, BulletRigidBody> entityRigidBodies = Maps.newHashMap();
     private Map<EntityRef, BulletCharacterMoverCollider> entityColliders = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
@@ -124,14 +126,23 @@ public class BulletPhysics implements PhysicsEngine {
         wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
 
+        liquidWrapper = new PhysicsLiquidWrapper(world);
+        VoxelWorldShape liquidShape = new VoxelWorldShape(liquidWrapper);
+
         Matrix3f rot = new Matrix3f();
         rot.setIdentity();
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
         rigidBody.rb.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
-        short mask = (short) (~CollisionFilterGroups.STATIC_FILTER);
+        short mask = (short) (~(CollisionFilterGroups.STATIC_FILTER | StandardCollisionGroup.LIQUID.getFlag()));
         discreteDynamicsWorld.addRigidBody(rigidBody.rb, combineGroups(StandardCollisionGroup.WORLD), mask);
+
+        RigidBodyConstructionInfo liquidConsInfo = new RigidBodyConstructionInfo(0, blockMotionState, liquidShape, new Vector3f());
+        BulletRigidBody liquidBody = new BulletRigidBody(liquidConsInfo);
+        liquidBody.rb.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
+        discreteDynamicsWorld.addRigidBody(liquidBody.rb, combineGroups(StandardCollisionGroup.LIQUID),
+                CollisionFilterGroups.SENSOR_TRIGGER);
     }
 
     //*****************Physics Interface methods******************\\

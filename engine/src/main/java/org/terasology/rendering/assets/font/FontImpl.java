@@ -22,17 +22,14 @@ import org.terasology.math.Vector2i;
 
 import java.util.List;
 
-public abstract class BaseFont extends AbstractAsset<FontData> implements Font {
+public final class FontImpl extends AbstractAsset<FontData> implements Font {
 
     protected FontData data;
 
-    public BaseFont(AssetUri uri, FontData data) {
+    public FontImpl(AssetUri uri, FontData data) {
         super(uri);
         reload(data);
     }
-
-    @Override
-    public abstract void drawString(int x, int y, String text, Color color);
 
     @Override
     public void reload(FontData fontData) {

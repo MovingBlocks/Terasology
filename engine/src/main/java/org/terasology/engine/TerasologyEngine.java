@@ -57,6 +57,9 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.font.Font;
+import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
@@ -192,6 +195,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
                 return new BehaviorTree(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            @Override
+            public Font buildAsset(AssetUri uri, FontData data) {
+                return new FontImpl(uri, data);
             }
         });
 
@@ -339,11 +348,6 @@ public class TerasologyEngine implements GameEngine {
     private ModuleManager initModuleManager() {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
-
-        // Temporary - until NUI comes in
-        // TODO: Remove
-        moduleSecurityManager.addAPIPackage("org.lwjgl.opengl");
-        moduleSecurityManager.addAPIPackage("org.newdawn.slick");
 
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
