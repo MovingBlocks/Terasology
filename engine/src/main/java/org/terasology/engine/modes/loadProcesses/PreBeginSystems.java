@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,43 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.network.NetworkSystem;
-import org.terasology.world.BlockEntityRegistry;
+
+import java.util.Iterator;
 
 /**
  * @author Immortius
  */
-public class InitialiseSystems extends SingleStepLoadProcess {
+public class PreBeginSystems extends StepBasedLoadProcess {
+
+    private Iterator<ComponentSystem> componentSystems;
+
     @Override
     public String getMessage() {
-        return "Initialising Systems...";
+        return "Reticulating Splines";
     }
 
     @Override
     public boolean step() {
-        EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        EntitySystemLibrary entitySystemLibrary = CoreRegistry.get(EntitySystemLibrary.class);
-        BlockEntityRegistry blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        if (componentSystems.hasNext()) {
+            componentSystems.next().preBegin();
+        }
+        return componentSystems.hasNext();
+    }
 
-        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
+    @Override
+    public void begin() {
         ComponentSystemManager csm = CoreRegistry.get(ComponentSystemManager.class);
-        csm.initialise();
-
-        return true;
+        componentSystems = csm.iterateAll().iterator();
     }
 
     @Override
     public int getExpectedCost() {
         return 1;
     }
-
 }
