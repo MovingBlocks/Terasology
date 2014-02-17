@@ -43,8 +43,13 @@ public class LoadEntities extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         EntityManager em = CoreRegistry.get(EntityManager.class);
+        boolean entityCreated = false;
         for (EntityRef entity : em.getAllEntities()) {
-            logger.error("Entity created before load, and will be destroyed: {}", entity.toFullDescription());
+            entityCreated = true;
+            logger.error("Entity created before load: {}", entity.toFullDescription());
+        }
+        if (entityCreated) {
+            throw new IllegalStateException("Entity creation detected during component system initialisation, game load aborting");
         }
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         try {
