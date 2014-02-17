@@ -1,5 +1,8 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
+
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/common.gradle"
 
@@ -9,6 +12,23 @@ ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
     env = System.getenv()
 }
+
+// TODO: Move this Gitty stuff off to the common.gradle under config as well?
+// The special build script section here ties dependencies to running the Gradle script itself
+buildscript {
+
+    // This needs to be in here as well for some reason - can't just inherit?
+    repositories {
+        mavenCentral()
+    }
+
+    // Dependencies at build script level
+    dependencies {
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+    }
+}
+
 
 def moduleDepends = [];
 def moduleFile = file('module.txt')
@@ -195,5 +215,29 @@ idea {
 eclipse {
     classpath {
         defaultOutputDir = file('build/classes')
+    }
+}
+
+// Utility task to update the module (except Core) via Git - not tested with local changes present, may cause trouble
+task (updateModule, type: GitPull)  {
+    description = 'Updates source for the module from its home (most likely GitHub)'
+
+    // Base whether the task executes on two things
+    // 1 - we actually asked for it ("gradlew updateModule") - otherwise we don't want it to run
+    // 2 - this is not the Core module, which lives with the engine and needs no updates
+    boolean enabled = "updateModule" in project.gradle.startParameter.taskNames && !project.name.equals("Core")
+    // TODO: Used to cheat with declaring tasks using << but that defers everything (including config) to execution phase
+    // Some tasks do not work that way, this one would ALWAYS go with default (root git repo) in that case
+    // Probably should go through other stuff and use this strategy instead of <<
+
+    // Only if we asked for it (and not Core) do we actually configure the repo path and log that we're updating
+    if (enabled) {
+
+        // This is the Git repo we're actually using - projectDir is specific to the executing project, a.k.a. module whatever
+        // If not enabled the default is the root project's Git dir, which is a valid Git dir
+        // However in the case of Core we'd be setting ain invalid Git dir which causes fail - so this avoids that
+        repoPath = projectDir
+
+        println "Pulling updates via Git to " + getRepoDir() + ", if dependencies change run Gradle again (like 'gradlew idea')"
     }
 }
