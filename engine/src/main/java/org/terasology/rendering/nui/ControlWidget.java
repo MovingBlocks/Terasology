@@ -24,4 +24,6 @@ public interface ControlWidget extends UIWidget {
 
     void initialise();
 
+    void onClosed();
+
 }

@@ -196,9 +196,13 @@ public class InputSettingsScreen extends CoreScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
-                config.getInput().getBinds().applyBinds(inputSystem, moduleManager);
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        config.getInput().getBinds().applyBinds(inputSystem, moduleManager);
     }
 
     @Override

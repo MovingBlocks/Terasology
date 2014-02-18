@@ -273,18 +273,22 @@ public class SelectModulesScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                ModuleConfig moduleConfig = config.getDefaultModSelection();
-                moduleConfig.clear();
-                for (Module module : selection.getSelection()) {
-                    moduleConfig.addModule(module.getId());
-                }
-                if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
-                    config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
-                }
-                config.save();
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        ModuleConfig moduleConfig = config.getDefaultModSelection();
+        moduleConfig.clear();
+        for (Module module : selection.getSelection()) {
+            moduleConfig.addModule(module.getId());
+        }
+        if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
+            config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
+        }
+        config.save();
     }
 
     @Override

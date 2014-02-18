@@ -128,11 +128,15 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                logger.info("Video Settings: " + config.getRendering().toString());
-                CoreRegistry.get(ShaderManager.class).recompileAllShaders();
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        logger.info("Video Settings: " + config.getRendering().toString());
+        CoreRegistry.get(ShaderManager.class).recompileAllShaders();
     }
 
     @Override
