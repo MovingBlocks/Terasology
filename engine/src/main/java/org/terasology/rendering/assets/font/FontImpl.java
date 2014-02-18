@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.assets.font;
 
-import org.newdawn.slick.Color;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector2i;

@@ -15,11 +15,7 @@
  */
 package org.terasology.rendering;
 
-import gnu.trove.list.array.TIntArrayList;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

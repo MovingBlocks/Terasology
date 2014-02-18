@@ -86,7 +86,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public <T extends ControlWidget> T getHUDElement(String uri, Class<T> type) {
-        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT,uri), type);
+        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri), type);
     }
 
     public <T extends ControlWidget> T getHUDElement(AssetUri uri, Class<T> type) {
