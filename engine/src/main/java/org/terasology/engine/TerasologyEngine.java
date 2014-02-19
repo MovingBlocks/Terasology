@@ -521,6 +521,10 @@ public class TerasologyEngine implements GameEngine {
         for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
             subscriber.onStateChange();
         }
+        // drain input queues
+        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        inputSystem.getMouseDevice().getInputQueue();
+        inputSystem.getKeyboard().getInputQueue();
     }
 
     public boolean isFullscreen() {
