@@ -33,6 +33,7 @@ import org.terasology.rendering.nui.NUIManager;
 public class LwjglInput extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
+    private boolean mouseGrabbed;
 
     @Override
     public void preInitialise() {
@@ -43,6 +44,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
     public void postInitialise(Config config) {
         initControls();
         updateInputConfig(config);
+        Mouse.setGrabbed(false);
     }
 
     @Override
@@ -51,7 +53,11 @@ public class LwjglInput extends BaseLwjglSubsystem {
         GameEngine engine = CoreRegistry.get(GameEngine.class);
 
         // TODO: this originally occurred before GameThread.processWaitingProcesses();
-        Mouse.setGrabbed(engine.hasMouseFocus() && !(nuiManager.isReleasingMouse()));
+        boolean newGrabbed = engine.hasMouseFocus() && !(nuiManager.isReleasingMouse());
+        if (newGrabbed != mouseGrabbed) {
+            Mouse.setGrabbed(newGrabbed);
+            mouseGrabbed = newGrabbed;
+        }
     }
 
     @Override
