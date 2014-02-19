@@ -17,6 +17,7 @@ package org.terasology.input.device;
 
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
+import org.terasology.math.Vector2i;
 
 /**
  * @author Immortius
@@ -26,16 +27,26 @@ public final class InputAction {
     private final ButtonState state;
     private final int delta;
     private final char inputChar;
+    private final Vector2i mousePosition;
 
-    public InputAction(Input input, ButtonState state) {
-        this(input, state, '\0');
+    public InputAction(Input input, ButtonState state, Vector2i mousePosition) {
+        this.mousePosition = mousePosition;
+        this.input = input;
+        this.state = state;
+        this.delta = 0;
+        this.inputChar = '\0';
     }
 
-    public InputAction(Input input, int delta) {
-        this(input, delta, '\0');
+    public InputAction(Input input, int delta, Vector2i mousePosition) {
+        this.mousePosition = mousePosition;
+        this.input = input;
+        this.state = ButtonState.DOWN;
+        this.delta = delta;
+        this.inputChar = '\0';
     }
 
     public InputAction(Input input, ButtonState state, char inputChar) {
+        this.mousePosition = null;
         this.input = input;
         this.state = state;
         this.delta = 0;
@@ -43,6 +54,7 @@ public final class InputAction {
     }
 
     public InputAction(Input input, int delta, char inputChar) {
+        this.mousePosition = null;
         this.input = input;
         this.state = ButtonState.DOWN;
         this.delta = delta;
@@ -79,5 +91,9 @@ public final class InputAction {
 
     public char getInputChar() {
         return inputChar;
+    }
+
+    public Vector2i getMousePosition() {
+        return mousePosition;
     }
 }
