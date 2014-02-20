@@ -89,6 +89,10 @@ public final class InventoryUtils {
         ItemComponent itemComp1 = item1.getComponent(ItemComponent.class);
         ItemComponent itemComp2 = item2.getComponent(ItemComponent.class);
 
+        if (itemComp1 == null || itemComp2 == null) {
+            return false;
+        }
+
         if (!isSameStackId(itemComp1, itemComp2)) {
             return false;
         }
