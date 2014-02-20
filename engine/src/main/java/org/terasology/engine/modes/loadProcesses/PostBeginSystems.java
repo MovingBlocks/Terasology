@@ -38,7 +38,7 @@ public class PostBeginSystems extends StepBasedLoadProcess {
         if (componentSystems.hasNext()) {
             componentSystems.next().postBegin();
         }
-        return componentSystems.hasNext();
+        return !componentSystems.hasNext();
     }
 
     @Override
