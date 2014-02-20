@@ -82,15 +82,22 @@ public final class InventoryUtils {
             return true;
         }
 
-        if (!isSameStackId(itemFrom, itemTo)) {
+        return isSameItem(from, to) && itemFrom.stackCount + itemTo.stackCount <= itemFrom.maxStackSize;
+    }
+
+    public static boolean isSameItem(EntityRef item1, EntityRef item2) {
+        ItemComponent itemComp1 = item1.getComponent(ItemComponent.class);
+        ItemComponent itemComp2 = item2.getComponent(ItemComponent.class);
+
+        if (!isSameStackId(itemComp1, itemComp2)) {
             return false;
         }
 
-        if (!hasSameAttributes(from, to)) {
+        if (!hasSameAttributes(item1, item2)) {
             return false;
         }
 
-        return itemFrom.stackCount + itemTo.stackCount <= itemFrom.maxStackSize;
+        return true;
     }
 
     private static boolean hasSameAttributes(EntityRef from, EntityRef to) {
