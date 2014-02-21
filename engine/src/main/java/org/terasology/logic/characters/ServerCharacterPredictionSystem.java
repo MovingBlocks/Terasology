@@ -25,6 +25,7 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateCompon
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -114,6 +115,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
+        CharacterCollider characterCollider = physics.getCharacterCollider(entity);
+        if (characterCollider.isPending()) {
+            logger.debug("Skipping input, collision not yet established");
+            return;
+        }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
         if (input.getDelta() + lastState.getTime() < time.getGameTimeInMs() + MAX_INPUT_OVERFLOW) {

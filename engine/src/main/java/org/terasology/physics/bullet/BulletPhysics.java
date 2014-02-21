@@ -234,7 +234,11 @@ public class BulletPhysics implements PhysicsEngine {
         applyPendingImpulses();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            discreteDynamicsWorld.stepSimulation(delta, 8);
+            if (discreteDynamicsWorld.stepSimulation(delta, 8) != 0) {
+                for (BulletCharacterMoverCollider collider : entityColliders.values()) {
+                    collider.pending = false;
+                }
+            }
             PerformanceMonitor.endActivity();
         } catch (Exception e) {
             logger.error("Error running simulation step.", e);
@@ -780,6 +784,8 @@ public class BulletPhysics implements PhysicsEngine {
         //is allowed to gain direct access to the bullet body:
         private final PairCachingGhostObject collider;
 
+        boolean pending = true;
+
         private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, EntityRef owner) {
             this(pos, shape, groups, filters, 0, owner);
         }
@@ -791,6 +797,11 @@ public class BulletPhysics implements PhysicsEngine {
         private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags, EntityRef owner) {
             collider = createCollider(pos, shape, groups, filters, collisionFlags);
             collider.setUserPointer(owner);
+        }
+
+        @Override
+        public boolean isPending() {
+            return pending;
         }
 
         @Override

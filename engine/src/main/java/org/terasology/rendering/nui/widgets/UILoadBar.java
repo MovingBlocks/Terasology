@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.nui.layers.mainMenu.loadingScreen;
+package org.terasology.rendering.nui.widgets;
 
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
