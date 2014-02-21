@@ -127,7 +127,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                         GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
                     }
                 } else {
-                    GL11.glTexImage2D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+                    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
                 }
 
                 break;
