@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.internal.NetEntityRef;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeSerialization.typeHandlers.TypeHandler;
 import org.terasology.protobuf.EntityData;
@@ -65,7 +64,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
             return blockEntityRegistry.getBlockEntityAt(pos);
         }
         if (value.getIntegerCount() > 0) {
-            return new NetEntityRef(value.getInteger(0), networkSystem);
+            return networkSystem.getEntity(value.getInteger(0));
         }
         return EntityRef.NULL;
     }
@@ -97,7 +96,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
             if (item == 0) {
                 result.add(EntityRef.NULL);
             } else {
-                result.add(new NetEntityRef(item, networkSystem));
+                result.add(networkSystem.getEntity(item));
             }
         }
         for (EntityData.Value blockValue : value.getValueList()) {

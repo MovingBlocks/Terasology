@@ -19,6 +19,7 @@ import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
@@ -26,7 +27,9 @@ import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public interface EngineEntityManager extends EntityManager {
+public interface EngineEntityManager extends LowLevelEntityManager {
+
+    void setEntityRefStrategy(RefStrategy strategy);
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
