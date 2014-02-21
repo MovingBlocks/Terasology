@@ -138,12 +138,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         UIScreenLayer screen = screenLookup.remove(screenUri);
         if (screen != null) {
             screens.remove(screen);
+            screen.onClosed();
         }
     }
 
     @Override
     public void closeScreen(UIScreenLayer screen) {
         if (screens.remove(screen)) {
+            screen.onClosed();
             screenLookup.inverse().remove(screen);
         }
     }
@@ -220,6 +222,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (!screens.isEmpty()) {
             UIScreenLayer popped = screens.pop();
             screenLookup.inverse().remove(popped);
+            popped.onClosed();
         }
     }
 
@@ -295,7 +298,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void removeOverlay(ControlWidget overlay) {
-        overlays.remove(overlay);
+        if (overlays.remove(overlay)) {
+            overlay.onClosed();
+        }
     }
 
     public void setScreen(CoreScreenLayer screen, AssetUri uri) {
@@ -305,8 +310,14 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void clear() {
+        for (ControlWidget overlay : overlays) {
+            overlay.onClosed();
+        }
         overlays.clear();
         hudScreenLayer.clear();
+        for (ControlWidget screen : screens) {
+            screen.onClosed();
+        }
         screens.clear();
         screenLookup.clear();
         focus = null;

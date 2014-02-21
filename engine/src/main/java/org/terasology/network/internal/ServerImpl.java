@@ -71,6 +71,8 @@ import java.util.concurrent.BlockingQueue;
 public class ServerImpl implements Server {
     private static final Logger logger = LoggerFactory.getLogger(ServerImpl.class);
 
+    private int clientEntityNetId;
+
     private NetworkSystemImpl networkSystem;
     private Channel channel;
     private NetMetricSource metricsSource;
@@ -89,8 +91,6 @@ public class ServerImpl implements Server {
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
-
-    private EntityRef clientEntity = EntityRef.NULL;
 
     private EngineTime time;
 
@@ -117,12 +117,12 @@ public class ServerImpl implements Server {
     }
 
     void setClientId(int id) {
-        clientEntity = new NetEntityRef(id, networkSystem);
+        clientEntityNetId = id;
     }
 
     @Override
     public EntityRef getClientEntity() {
-        return clientEntity;
+        return networkSystem.getEntity(clientEntityNetId);
     }
 
     @Override
@@ -202,7 +202,7 @@ public class ServerImpl implements Server {
 
     private boolean isOwned(EntityRef entity) {
         EntityRef owner = networkSystem.getOwnerEntity(entity);
-        return clientEntity.equals(owner);
+        return getClientEntity().equals(owner);
     }
 
 
@@ -256,9 +256,9 @@ public class ServerImpl implements Server {
             int netId = removeEntity.getNetId();
             EntityRef entity = networkSystem.getEntity(netId);
             if (entity.exists()) {
-                networkSystem.unregisterNetworkEntity(entity);
                 logger.info("Destroying entity: {}", entity);
                 entity.destroy();
+                networkSystem.unregisterClientNetworkEntity(netId);
             }
         }
     }
@@ -338,17 +338,7 @@ public class ServerImpl implements Server {
     }
 
     private void createEntityMessage(NetData.CreateEntityMessage message) {
-        EntityRef newEntity = entitySerializer.deserialize(message.getEntity());
-        if (newEntity == null) {
-            logger.error("Received entity is null");
-            return;
-        } else if (newEntity.getComponent(NetworkComponent.class) == null) {
-            logger.error("Received entity with no NetworkComponent: {}", newEntity);
-        } else if (newEntity.getComponent(NetworkComponent.class).getNetworkId() == 0) {
-            logger.error("Received entity with null network id: {}", newEntity);
-        }
-        logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).getNetworkId());
-        networkSystem.registerNetworkEntity(newEntity);
+        entitySerializer.deserialize(message.getEntity());
     }
 
     @Override

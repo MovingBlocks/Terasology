@@ -29,6 +29,7 @@ import java.util.EnumMap;
  * @author Immortius
  */
 public class BlockShapeData implements AssetData {
+    private String displayName = "";
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape collisionShape;
@@ -36,6 +37,17 @@ public class BlockShapeData implements AssetData {
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
+
+    public String getDisplayName() {
+        if (displayName == null) {
+            return "";
+        }
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
 
     public BlockMeshPart getMeshPart(BlockPart part) {
         return meshParts.get(part);

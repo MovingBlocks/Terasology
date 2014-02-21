@@ -86,7 +86,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public <T extends ControlWidget> T getHUDElement(String uri, Class<T> type) {
-        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT,uri), type);
+        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri), type);
     }
 
     public <T extends ControlWidget> T getHUDElement(AssetUri uri, Class<T> type) {
@@ -98,14 +98,21 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public boolean removeHUDElement(AssetUri uri) {
-        return elementsLookup.remove(uri) != null;
+        HUDElement removed = elementsLookup.remove(uri);
+        if (removed != null) {
+            removed.widget.onClosed();
+            return true;
+        }
+        return false;
     }
 
     public boolean removeHUDElement(ControlWidget element) {
         Iterator<Map.Entry<AssetUri, HUDElement>> iterator = elementsLookup.entrySet().iterator();
         while (iterator.hasNext()) {
-            if (iterator.next().getValue().widget.equals(element)) {
+            Map.Entry<AssetUri, HUDElement> item = iterator.next();
+            if (item.getValue().widget.equals(element)) {
                 iterator.remove();
+                item.getValue().widget.onClosed();
                 return true;
             }
         }
@@ -113,6 +120,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public void clear() {
+        for (HUDElement value : elementsLookup.values()) {
+            value.widget.onClosed();
+        }
         elementsLookup.clear();
     }
 

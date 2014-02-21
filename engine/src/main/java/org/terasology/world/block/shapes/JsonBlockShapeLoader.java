@@ -78,6 +78,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
 
     private static class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
 
+        public static final String DISPLAY_NAME = "displayName";
         public static final String PITCH_SYMMETRIC = "pitchSymmetric";
         public static final String YAW_SYMMETRIC = "yawSymmetric";
         public static final String ROLL_SYMMETRIC = "rollSymmetric";
@@ -97,6 +98,10 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             BlockShapeData shape = new BlockShapeData();
             JsonObject shapeObj = json.getAsJsonObject();
+
+            if (shapeObj.has(DISPLAY_NAME)) {
+                shape.setDisplayName(shapeObj.getAsJsonPrimitive(DISPLAY_NAME).getAsString());
+            }
 
             for (BlockPart part : BlockPart.values()) {
                 if (shapeObj.has(part.toString().toLowerCase(Locale.ENGLISH))) {

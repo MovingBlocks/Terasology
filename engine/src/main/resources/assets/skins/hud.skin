@@ -4,9 +4,26 @@
         "UIIconBar" : {
             "parts" : {
                 "icon" : {
-                    "background" : "engine:icons.darkHeartOutline",
                     "fixed-width" : 16,
                     "fixed-height" : 16
+                }
+            }
+        },
+        "UICrosshair" : {
+            "background" : "engine:gui.crosshair",
+            "fixed-width" : 40,
+            "fixed-height" : 40
+        }
+    },
+    "families" : {
+        "healthBar" : {
+            "elements" : {
+                "UIIconBar" : {
+                    "parts" : {
+                        "icon" : {
+                            "background" : "engine:icons.darkHeartOutline"
+                        }
+                    }
                 }
             }
         }

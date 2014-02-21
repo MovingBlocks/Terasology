@@ -90,6 +90,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
@@ -248,7 +249,8 @@ public class UILoader implements AssetLoader<UIData> {
                             LayoutHint hint = null;
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
-                                if (layoutHintType != null && childObject.has(LAYOUT_INFO_FIELD)) {
+                                if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
+                                        && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }

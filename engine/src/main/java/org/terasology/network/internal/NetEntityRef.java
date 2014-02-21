@@ -16,11 +16,10 @@
 
 package org.terasology.network.internal;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.entity.LowLevelEntityManager;
+import org.terasology.entitySystem.entity.internal.BaseEntityRef;
+
+import java.util.Objects;
 
 /**
  * An implementation of EntityRef that deals with entities propagated to a client. These entities may enter and
@@ -29,128 +28,49 @@ import org.terasology.entitySystem.prefab.Prefab;
  *
  * @author Immortius
  */
-public class NetEntityRef extends EntityRef {
+public class NetEntityRef extends BaseEntityRef {
 
     private int networkId;
     private NetworkSystemImpl networkSystem;
 
-    public NetEntityRef(int networkId, NetworkSystemImpl system) {
+    public NetEntityRef(int networkId, NetworkSystemImpl system, LowLevelEntityManager entityManager) {
+        super(entityManager);
         this.networkId = networkId;
         this.networkSystem = system;
     }
 
-    private EntityRef getActualEntityRef() {
-        return networkSystem.getEntity(networkId);
-    }
-
-    @Override
-    public boolean exists() {
-        return getActualEntityRef().exists();
-    }
-
-    @Override
-    public boolean isActive() {
-        return getActualEntityRef().isActive();
-    }
-
-    @Override
-    public boolean hasComponent(Class<? extends Component> component) {
-        return getActualEntityRef().hasComponent(component);
-    }
-
-    @Override
-    public <T extends Component> T getComponent(Class<T> componentClass) {
-        return getActualEntityRef().getComponent(componentClass);
-    }
-
-    @Override
-    public <T extends Component> T addComponent(T component) {
-        return getActualEntityRef().addComponent(component);
-    }
-
-    @Override
-    public void removeComponent(Class<? extends Component> componentClass) {
-        getActualEntityRef().removeComponent(componentClass);
-    }
-
-    @Override
-    public void saveComponent(Component component) {
-        getActualEntityRef().saveComponent(component);
-    }
-
-    @Override
-    public Iterable<Component> iterateComponents() {
-        return getActualEntityRef().iterateComponents();
-    }
-
-    @Override
-    public void destroy() {
-        getActualEntityRef().destroy();
-    }
-
-    @Override
-    public <T extends Event> T send(T event) {
-        getActualEntityRef().send(event);
-        return event;
-    }
-
-    @Override
-    public int getId() {
-        return getActualEntityRef().getId();
-    }
-
-    @Override
-    public boolean isPersistent() {
-        return getActualEntityRef().isPersistent();
-    }
-
-    @Override
-    public void setPersistent(boolean persistent) {
-        getActualEntityRef().setPersistent(persistent);
-    }
-
-    @Override
-    public boolean isAlwaysRelevant() {
-        return getActualEntityRef().isAlwaysRelevant();
-    }
-
-    @Override
-    public void setAlwaysRelevant(boolean alwaysRelevant) {
-        getActualEntityRef().setAlwaysRelevant(alwaysRelevant);
-    }
-
-    @Override
-    public EntityRef getOwner() {
-        return getActualEntityRef().getOwner();
-    }
-
-    @Override
-    public void setOwner(EntityRef owner) {
-        getActualEntityRef().setOwner(owner);
-    }
-
-    @Override
-    public Prefab getParentPrefab() {
-        return getActualEntityRef().getParentPrefab();
-    }
-
-    @Override
-    public AssetUri getPrefabURI() {
-        return getActualEntityRef().getPrefabURI();
+    public int getNetworkId() {
+        return networkId;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || obj instanceof EntityRef && getActualEntityRef().equals(obj);
+        return obj == this || (obj instanceof NetEntityRef && getId() == ((NetEntityRef) obj).getId());
     }
 
     @Override
     public int hashCode() {
-        return getActualEntityRef().hashCode();
+        return Objects.hashCode(networkId);
     }
 
     @Override
-    public String toString() {
-        return "NetEntityRef(netId = " + networkId + ")" + getActualEntityRef().toString();
+    public boolean exists() {
+        return networkId != 0;
+    }
+
+    @Override
+    public int getId() {
+        return networkSystem.getEntityId(networkId);
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        networkId = 0;
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
     }
 }

@@ -45,7 +45,6 @@ import org.terasology.identity.CertificatePair;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -341,11 +340,6 @@ public class TerasologyEngine implements GameEngine {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
 
-        // Temporary - until NUI comes in
-        // TODO: Remove
-        moduleSecurityManager.addAPIPackage("org.lwjgl.opengl");
-        moduleSecurityManager.addAPIPackage("org.newdawn.slick");
-
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
@@ -385,6 +379,7 @@ public class TerasologyEngine implements GameEngine {
         moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
+        moduleSecurityManager.addAPIPackage("com.bulletphysics.linearmath");
         moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
         moduleSecurityManager.addAPIClass(IOException.class);
         moduleSecurityManager.addAPIClass(InvocationTargetException.class);
@@ -526,6 +521,10 @@ public class TerasologyEngine implements GameEngine {
         for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
             subscriber.onStateChange();
         }
+        // drain input queues
+        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        inputSystem.getMouseDevice().getInputQueue();
+        inputSystem.getKeyboard().getInputQueue();
     }
 
     public boolean isFullscreen() {
@@ -537,7 +536,6 @@ public class TerasologyEngine implements GameEngine {
             config.getRendering().setFullscreen(state);
             DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
             display.setFullscreen(state);
-            CoreRegistry.get(GUIManager.class).update(true);
         }
     }
 

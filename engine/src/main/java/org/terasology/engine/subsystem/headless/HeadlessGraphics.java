@@ -25,21 +25,17 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.engine.subsystem.headless.assets.HeadlessFont;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMaterial;
 import org.terasology.engine.subsystem.headless.assets.HeadlessMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessShader;
 import org.terasology.engine.subsystem.headless.assets.HeadlessSkeletalMesh;
 import org.terasology.engine.subsystem.headless.assets.HeadlessTexture;
 import org.terasology.engine.subsystem.headless.device.HeadlessDisplayDevice;
-import org.terasology.engine.subsystem.headless.renderer.GUIManagerHeadless;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessCanvasRenderer;
 import org.terasology.engine.subsystem.headless.renderer.HeadlessRenderingSubsystemFactory;
 import org.terasology.engine.subsystem.headless.renderer.ShaderManagerHeadless;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -47,6 +43,7 @@ import org.terasology.rendering.assets.atlas.Atlas;
 import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -79,7 +76,6 @@ public class HeadlessGraphics implements EngineSubsystem {
         CoreRegistry.putPermanently(DisplayDevice.class, headlessDisplay);
         initHeadless(headlessDisplay);
 
-        CoreRegistry.putPermanently(GUIManager.class, new GUIManagerHeadless());
         CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new HeadlessCanvasRenderer()));
 
         //        CoreRegistry.putPermanently(DefaultRenderingProcess.class, new HeadlessRenderingProcess());
@@ -103,16 +99,16 @@ public class HeadlessGraphics implements EngineSubsystem {
 
     private void initHeadless(HeadlessDisplayDevice headlessDisplay) {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            @Override
+            public Font buildAsset(AssetUri uri, FontData data) {
+                return new FontImpl(uri, data);
+            }
+        });
         assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
                 return new HeadlessTexture(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new HeadlessFont(uri, data);
             }
         });
         assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
@@ -162,8 +158,6 @@ public class HeadlessGraphics implements EngineSubsystem {
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerHeadless());
         CoreRegistry.get(ShaderManager.class).initShaders();
-        VertexBufferObjectManager.getInstance();
-
     }
 
     @Override

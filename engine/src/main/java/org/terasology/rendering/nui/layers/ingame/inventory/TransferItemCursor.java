@@ -108,4 +108,8 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
         item.set(val);
     }
 
+    @Override
+    public void onClosed() {
+    }
+
 }

@@ -110,6 +110,10 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
+    public void onClosed() {
+    }
+
+    @Override
     public void onGainFocus() {
     }
 

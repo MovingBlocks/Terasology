@@ -34,16 +34,15 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryUtils;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.event.SelectItemRequest;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.hud.HudToolbar;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -63,6 +62,9 @@ public class PlayerInventorySystem extends BaseComponentSystem {
 
     @In
     private WorldRenderer worldRenderer;
+
+    @In
+    private NUIManager nuiManager;
 
     private long lastInteraction;
     private long lastTimeThrowInteraction;
@@ -152,18 +154,17 @@ public class PlayerInventorySystem extends BaseComponentSystem {
         }
 
         //resize the crosshair
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
 
-        crossHair.setTextureSize(new Vector2f(22f, 22f));
-        // compute drop power
+        HudToolbar toolbar = nuiManager.getHUD().getHUDElement("engine:toolbar", HudToolbar.class);
+        if (toolbar != null) {
+            toolbar.setChargeAmount(getDropPower());
+        }
+
         float dropPower = getDropPower();
-        //update crosshair to show progress/power
-        crossHair.setTextureOrigin(new Vector2f((46f + 22f * dropPower), 23f));
-
         //handle when we finally let go
         if (!event.isDown()) {
             // Compute new position
-            dropPower *= 25f;
+            dropPower *= 150f;
 
             // TODO: This will change when camera are handled better (via a component)
             Camera playerCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
@@ -192,23 +193,19 @@ public class PlayerInventorySystem extends BaseComponentSystem {
     }
 
     public void resetDropMark() {
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        HudToolbar toolbar = nuiManager.getHUD().getHUDElement("engine:toolbar", HudToolbar.class);
+        if (toolbar != null) {
+            toolbar.setChargeAmount(0);
+        }
         lastTimeThrowInteraction = 0;
-        crossHair.setTextureSize(new Vector2f(20f, 20f));
-        crossHair.setTextureOrigin(new Vector2f(24f, 24f));
     }
 
     private float getDropPower() {
         if (lastTimeThrowInteraction == 0) {
             return 0;
         }
-        float dropPower = (float) Math.floor((time.getGameTimeInMs() - lastTimeThrowInteraction) / 200);
-
-        if (dropPower > 6) {
-            dropPower = 6;
-        }
-
-        return dropPower;
+        float dropPower = (float) (time.getGameTimeInMs() - lastTimeThrowInteraction) / 1200f;
+        return Math.min(1.0f, dropPower);
     }
 
 

@@ -20,10 +20,11 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
-import org.terasology.rendering.VertexBufferObjectManager;
+import org.terasology.rendering.VertexBufferObjectUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -160,12 +161,14 @@ public class ChunkMesh {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
         if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            vertexBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
-            idxBuffers[id] = VertexBufferObjectManager.getInstance().getVboId();
+            IntBuffer buffer = BufferUtils.createIntBuffer(2);
+            GL15.glGenBuffers(buffer);
+            vertexBuffers[id] = buffer.get(0);
+            idxBuffers[id] = buffer.get(1);
             vertexCount[id] = elements.finalIndices.limit();
 
-            VertexBufferObjectManager.getInstance().bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
-            VertexBufferObjectManager.getInstance().bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
+            VertexBufferObjectUtil.bufferVboData(vertexBuffers[id], elements.finalVertices, GL15.GL_STATIC_DRAW);
         } else {
             vertexBuffers[id] = 0;
             idxBuffers[id] = 0;
@@ -239,13 +242,11 @@ public class ChunkMesh {
             if (!disposed) {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
-
-                    VertexBufferObjectManager.getInstance().putVboId(id);
+                    GL15.glDeleteBuffers(id);
                     vertexBuffers[i] = 0;
 
                     id = idxBuffers[i];
-
-                    VertexBufferObjectManager.getInstance().putVboId(id);
+                    GL15.glDeleteBuffers(id);
                     idxBuffers[i] = 0;
                 }
 

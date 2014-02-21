@@ -17,7 +17,6 @@
 package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindAxisSubscriber;
@@ -25,7 +24,6 @@ import org.terasology.input.BindableAxis;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.SendEventMode;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
@@ -90,13 +88,11 @@ public class BindableAxisImpl implements BindableAxis {
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
         float targetValue = 0;
-        if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
-            if (posInput) {
-                targetValue += 1.0f;
-            }
-            if (negInput) {
-                targetValue -= 1.0f;
-            }
+        if (posInput) {
+            targetValue += 1.0f;
+        }
+        if (negInput) {
+            targetValue -= 1.0f;
         }
 
         // TODO: Interpolate, based on some settings (immediate, linear, lerp?)

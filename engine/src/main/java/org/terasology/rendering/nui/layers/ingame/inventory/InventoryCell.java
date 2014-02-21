@@ -101,7 +101,7 @@ public class InventoryCell extends CoreWidget {
             public TextureRegion get() {
                 if (getTargetItem().exists()) {
                     ItemComponent itemComp = getTargetItem().getComponent(ItemComponent.class);
-                    if (itemComp != null) {
+                    if (itemComp != null && itemComp.icon != null) {
                         return itemComp.icon;
                     }
                     BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
@@ -137,6 +137,8 @@ public class InventoryCell extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+        getTargetItem().send(new BeforeInventoryCellRendered(canvas));
+
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         canvas.drawWidget(icon);
 

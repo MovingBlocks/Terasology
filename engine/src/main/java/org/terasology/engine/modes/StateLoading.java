@@ -39,6 +39,7 @@ import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
+import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
@@ -149,6 +150,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseRemoteWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
+        loadProcesses.add(new PreBeginSystems());
         loadProcesses.add(new PostBeginSystems());
         loadProcesses.add(new SetupRemotePlayer());
         loadProcesses.add(new AwaitCharacterSpawn());
@@ -171,13 +173,14 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new LoadEntities());
+        loadProcesses.add(new PreBeginSystems());
         loadProcesses.add(new InitialiseBlockTypeEntities());
         loadProcesses.add(new CreateWorldEntity());
-        loadProcesses.add(new PostBeginSystems());
         loadProcesses.add(new InitialiseWorldGenerator(gameManifest));
         if (netMode == NetworkMode.SERVER) {
             loadProcesses.add(new StartServer());
         }
+        loadProcesses.add(new PostBeginSystems());
         loadProcesses.add(new SetupLocalPlayer());
         loadProcesses.add(new AwaitCharacterSpawn());
         loadProcesses.add(new PrepareWorld());

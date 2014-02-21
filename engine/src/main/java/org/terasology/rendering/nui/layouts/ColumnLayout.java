@@ -48,6 +48,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
+    @LayoutConfig
     @SerializedName("column-widths")
     private float[] columnWidths = new float[]{1.0f};
 
