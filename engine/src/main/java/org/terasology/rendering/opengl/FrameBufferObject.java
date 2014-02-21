@@ -16,16 +16,23 @@
 package org.terasology.rendering.opengl;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.math.Rect2i;
+import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureData;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
@@ -34,54 +41,58 @@ import java.nio.IntBuffer;
  */
 public class FrameBufferObject {
     private int frame;
-    private int color;
+    private Vector2i size;
+    private IntBuffer vp;
 
-    public FrameBufferObject(AssetUri uri, final Rect2i region) {
+    public FrameBufferObject(AssetUri uri, Vector2i size) {
+        this.size = size;
+
         IntBuffer fboId = BufferUtils.createIntBuffer(1);
         GL30.glGenFramebuffers(fboId);
         frame = fboId.get(0);
 
-        IntBuffer texIds = BufferUtils.createIntBuffer(2);
-        GL11.glGenTextures(texIds);
-        color = texIds.get(0);
-
-        generateTexture(uri, region);
-
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, color);
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, region.width(), region.height(), 0, GL11.GL_RGBA, GL11.GL_INT, (ByteBuffer) null);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        Texture texture = generateTexture(uri);
 
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
-        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, color, 0);
+        GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, texture.getId(), 0);
 
         int result = GL30.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
         if (result != GL30.GL_FRAMEBUFFER_COMPLETE) {
             throw new IllegalStateException("Something went wrong with framebuffer! " + result);
         }
 
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 
-        unbindFrame();
+        GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
     }
 
-    private Texture generateTexture(AssetUri uri, Rect2i region) {
-        BaseOpenGLTexture texture = Assets.generateAsset(uri, null, BaseOpenGLTexture.class);
-        texture.setId(color);
-        texture.setWidth(region.width());
-        texture.setHeight(region.height());
-        texture.setWrapMode(Texture.WrapMode.CLAMP);
-        texture.setFilterMode(Texture.FilterMode.LINEAR);
-        return texture;
+    private Texture generateTexture(AssetUri uri) {
+        TextureData data = new TextureData(size.x, size.y, new ByteBuffer[]{}, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+        return Assets.generateAsset(uri, data, Texture.class);
     }
 
     public void unbindFrame() {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+        GL11.glViewport(vp.get(0), vp.get(1), vp.get(2), vp.get(3));
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 
     public void bindFrame() {
+        vp = BufferUtils.createIntBuffer(16);
+        GL11.glGetInteger(GL11.GL_VIEWPORT, vp);
+
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
+        GL11.glViewport(0, 0, size.x, size.y);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, size.x, size.y, 0, 0, 2048f);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
     }
 }

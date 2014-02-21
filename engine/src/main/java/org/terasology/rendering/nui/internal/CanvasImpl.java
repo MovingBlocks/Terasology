@@ -46,7 +46,6 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
-import org.terasology.rendering.opengl.FrameBufferObjectFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -96,7 +95,6 @@ public class CanvasImpl implements CanvasControl {
     private float tooltipTime;
     private Vector2i lastTooltipPosition = new Vector2i();
     private UITooltip tooltipWidget = new UITooltip();
-    private FrameBufferObjectFactory fboFactory = new FrameBufferObjectFactory();
 
     private InteractionRegion clickedRegion;
 
@@ -251,8 +249,8 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public SubRegion subRegionFBO(AssetUri uri, Rect2i region, boolean crop) {
-        return new SubRegionFBOImpl(uri, region, crop);
+    public SubRegion subRegionFBO(AssetUri uri, Vector2i size) {
+        return new SubRegionFBOImpl(uri, size);
     }
 
     @Override
@@ -776,20 +774,22 @@ public class CanvasImpl implements CanvasControl {
         }
     }
 
-    private class SubRegionFBOImpl extends SubRegionImpl {
+    private class SubRegionFBOImpl implements SubRegion {
         private FrameBufferObject fbo;
+        private CanvasState previousState;
 
-        private SubRegionFBOImpl(AssetUri uri, Rect2i region, boolean crop) {
-            super(region, crop);
+        private SubRegionFBOImpl(AssetUri uri, Vector2i size) {
+            previousState = state;
 
-            fbo = fboFactory.getNamed(uri, region);
+            fbo = renderer.getFBO(uri, size);
+            state = new CanvasState(state, Rect2i.createFromMinAndSize(new Vector2i(), size));
             fbo.bindFrame();
         }
 
         @Override
         public void close() {
             fbo.unbindFrame();
-            super.close();
+            state = previousState;
         }
     }
 

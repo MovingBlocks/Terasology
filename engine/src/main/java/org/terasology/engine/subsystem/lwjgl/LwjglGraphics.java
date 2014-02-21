@@ -61,7 +61,6 @@ import org.terasology.rendering.iconmesh.IconMeshResolver;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.opengl.BaseOpenGLTexture;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
 import org.terasology.rendering.opengl.OpenGLMesh;
@@ -181,9 +180,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
-                if (data == null) {
-                    return new BaseOpenGLTexture(uri);
-                }
                 return new OpenGLTexture(uri, data);
             }
         });

@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layouts;
 import com.google.common.collect.Lists;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -170,14 +171,7 @@ public class ZoomableLayout extends CoreLayout {
     }
 
     public Vector2i worldToScreen(Vector2f world) {
-        return new Vector2i((int) ((world.x - windowPosition.x) * pixelSize.x), (int) ((world.y - windowPosition.y) * pixelSize.y));
-    }
-
-    public Vector2i screenUnit(Vector2f world) {
-        Vector2i screen = new Vector2i((int) (pixelSize.x * world.x), (int) (pixelSize.y * world.y));
-        screen.absolute();
-        screen.clamp(0, 1);
-        return screen;
+        return new Vector2i(TeraMath.ceilToInt((world.x - windowPosition.x) * pixelSize.x), TeraMath.ceilToInt((world.y - windowPosition.y) * pixelSize.y));
     }
 
     public void setWindowPosition(Vector2f pos) {

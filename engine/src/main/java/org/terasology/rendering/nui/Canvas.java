@@ -217,7 +217,6 @@ public interface Canvas {
      * SubRegions are an AutoClosable, so ideally are used as a resource in a try-block, to ensure they are closed
      * when no longer needed.
      * <pre>
-     * {@code
      * try (SubRegion ignored = canvas.subRegion(region, true) {
      *    //.. draw within SubRegion.
      * }
@@ -231,17 +230,24 @@ public interface Canvas {
     SubRegion subRegion(Rect2i region, boolean crop);
 
     /**
-     * The same like {@code subRegion} but all drawing operations are done on a frame buffer.
+     * Allocates a sub region for drawing to a target texture, until that SubRegion is closed.
      * <p/>
-     * A texture asset is generated for the given URI. If a texture with this URI already exists, it is reused by the
-     * framebuffer.
+     * For each (texture) uri a FrameBufferObject and a target texture is created.
+     * Notice, the resulting texture is flipped. To draw it in the right order use:
+     * <pre>
+     * try (SubRegion ignored = canvas.subRegionFBO(uri, size) {
+     *    //.. draw within SubRegion.
+     * }
+     * Texture texture = Assets.get(uri, Texture.class);
+     * canvas.drawTextureRaw(texture, screenRegion, ScaleMode.SCALE_FIT, 0, 1f, 1f, -1f);
+     * </pre>
+     * <p/>
      *
      * @param uri    The URI to access the texture
-     * @param region The region to restrict to, relative to the current region, in pixels.
-     * @param crop   Whether to crop elements falling outside this region.
+     * @param size   the size of the texture.
      * @return A SubRegion, to be closed when no long needed
      */
-    SubRegion subRegionFBO(AssetUri uri, Rect2i region, boolean crop);
+    SubRegion subRegionFBO(AssetUri uri, Vector2i size);
 
     /**
      * When drawOnTop is set to true, subsequent drawing will be on top of everything else.
