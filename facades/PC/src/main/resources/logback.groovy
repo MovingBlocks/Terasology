@@ -33,5 +33,6 @@ appender("CONSOLE", ConsoleAppender) {
 
 root(DEBUG, ["CONSOLE", "FILE"])
 logger("org.terasology", INFO)
+logger("org.reflections.Reflections", WARN)
 
 

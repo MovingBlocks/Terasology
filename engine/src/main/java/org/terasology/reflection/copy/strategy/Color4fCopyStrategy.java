@@ -16,12 +16,14 @@
 package org.terasology.reflection.copy.strategy;
 
 import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.copy.RegisterCopyStrategy;
 
 import javax.vecmath.Color4f;
 
 /**
  * @author Immortius
  */
+@RegisterCopyStrategy
 public class Color4fCopyStrategy implements CopyStrategy<Color4f> {
 
     @Override

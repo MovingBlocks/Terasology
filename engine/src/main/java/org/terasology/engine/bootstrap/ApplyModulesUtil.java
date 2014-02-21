@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.utilities.ReflectionUtil;
@@ -43,6 +44,9 @@ public final class ApplyModulesUtil {
         copyStrategyLibrary.clear();
         Set<Class<? extends CopyStrategy>> copyStrategies = moduleManager.getActiveModuleReflections().getSubTypesOf(CopyStrategy.class);
         for (Class<? extends CopyStrategy> copyStrategy : copyStrategies) {
+            if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
+                continue;
+            }
             Class targetType = ReflectionUtil.getTypeParameterForSuper(copyStrategy, CopyStrategy.class, 0);
             if (targetType != null) {
                 try {

@@ -265,10 +265,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
             // TODO: Have our own shader language and parse this stuff out properly
             if (shaderProgramBase.getFragmentProgram().contains(feature.toString())) {
-                logger.info("Fragment shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Fragment shader feature '" + feature.toString() + "' is available...");
                 availableFeatures.add(feature);
             } else if (shaderProgramBase.getVertexProgram().contains(feature.toString())) {
-                logger.info("Vertex shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Vertex shader feature '" + feature.toString() + "' is available...");
                 availableFeatures.add(feature);
             }
         }
@@ -288,7 +288,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             compileShaders(permutation);
             counter++;
         }
-        logger.info("Compiled {} permutations for {}.", counter, getURI());
+        logger.debug("Compiled {} permutations for {}.", counter, getURI());
     }
 
     private void compileShader(int type, Set<ShaderProgramFeature> features) {

@@ -124,7 +124,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
             if (classMetadata != null) {
                 if (classMetadata.isConstructable()) {
                     nodes.put(classMetadata, component);
-                    logger.info("Found behavior node for class " + component.type + " name=" + component.name);
+                    logger.debug("Found behavior node for class " + component.type + " name=" + component.name);
                     List<BehaviorNodeComponent> list = categoryComponents.get(component.category);
                     if (list == null) {
                         list = Lists.newArrayList();

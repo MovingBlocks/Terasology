@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.reflection.copy.strategy;
+package org.terasology.reflection.copy;
 
-import org.terasology.reflection.copy.CopyStrategy;
-import org.terasology.reflection.copy.RegisterCopyStrategy;
-
-import javax.vecmath.Quat4f;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-@RegisterCopyStrategy
-public class Quat4fCopyStrategy implements CopyStrategy<Quat4f> {
-
-    @Override
-    public Quat4f copy(Quat4f value) {
-        if (value != null) {
-            return new Quat4f(value);
-        }
-        return null;
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface RegisterCopyStrategy {
 }
