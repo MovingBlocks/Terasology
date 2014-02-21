@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class TimeBase implements EngineTime {
 
-    private static final Logger logger = LoggerFactory.getLogger(TimeLwjgl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TimeBase.class);
     private static final float DECAY_RATE = 0.95f;
     private static final float ONE_MINUS_DECAY_RATE = 1.0f - DECAY_RATE;
     private static final float RESYNC_TIME_RATE = 0.1f;

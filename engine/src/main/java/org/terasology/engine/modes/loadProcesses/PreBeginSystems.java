@@ -38,7 +38,7 @@ public class PreBeginSystems extends StepBasedLoadProcess {
         if (componentSystems.hasNext()) {
             componentSystems.next().preBegin();
         }
-        return componentSystems.hasNext();
+        return !componentSystems.hasNext();
     }
 
     @Override

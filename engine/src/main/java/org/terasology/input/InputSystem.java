@@ -244,7 +244,7 @@ public class InputSystem extends BaseComponentSystem {
                     int id = action.getInput().getId();
                     if (id != -1) {
                         MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
-                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), mouse.getPosition(), delta);
+                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), action.getMousePosition(), delta);
 
                         BindableButtonImpl bind = mouseButtonBinds.get(button);
                         if (bind != null) {
@@ -265,7 +265,7 @@ public class InputSystem extends BaseComponentSystem {
                 case MOUSE_WHEEL:
                     int dir = action.getInput().getId();
                     if (dir != 0 && action.getTurns() != 0) {
-                        boolean consumed = sendMouseWheelEvent(mouse.getPosition(), dir * action.getTurns(), delta);
+                        boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
 
                         BindableButtonImpl bind = (dir == 1) ? mouseWheelUpBind : mouseWheelDownBind;
                         if (bind != null) {
