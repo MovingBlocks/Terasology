@@ -30,9 +30,12 @@ import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * A OpenGL framebuffer. Generates the fbo and a backing texture.
@@ -75,6 +78,8 @@ public class FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
         GL11.glViewport(vp.get(0), vp.get(1), vp.get(2), vp.get(3));
 
+        glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 0, 2048f);
@@ -89,6 +94,11 @@ public class FrameBufferObject {
         GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frame);
         GL11.glViewport(0, 0, size.x, size.y);
 
+        glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        glTranslatef(0.5f, 0.5f, 0.0f);
+        glScalef(1, -1, 1);
+        glTranslatef(-0.5f, -0.5f, 0.0f);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, size.x, size.y, 0, 0, 2048f);
