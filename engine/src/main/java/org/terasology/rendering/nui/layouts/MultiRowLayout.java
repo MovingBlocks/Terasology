@@ -48,6 +48,7 @@ public class MultiRowLayout extends CoreLayout<LayoutHint> {
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
+    @LayoutConfig
     @SerializedName("row-heights")
     private float[] rowHeights = new float[]{1.0f};
 
