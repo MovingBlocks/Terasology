@@ -30,8 +30,9 @@ import java.util.Objects;
  */
 public class NetEntityRef extends BaseEntityRef {
 
-    private int networkId;
+    private final int networkId;
     private NetworkSystemImpl networkSystem;
+    private boolean exists = true;
 
     public NetEntityRef(int networkId, NetworkSystemImpl system, LowLevelEntityManager entityManager) {
         super(entityManager);
@@ -55,7 +56,7 @@ public class NetEntityRef extends BaseEntityRef {
 
     @Override
     public boolean exists() {
-        return networkId != 0;
+        return exists;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class NetEntityRef extends BaseEntityRef {
     @Override
     public void invalidate() {
         super.invalidate();
-        networkId = 0;
+        exists = false;
     }
 
     @Override
