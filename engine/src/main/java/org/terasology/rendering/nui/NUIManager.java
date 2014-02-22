@@ -68,6 +68,8 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType);
 
+    void pushScreen(CoreScreenLayer screen, AssetUri uri);
+
     void popScreen();
 
     <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType);
