@@ -538,6 +538,10 @@ public class BlockLoader implements BlockBuilderHelper {
             T value = context.deserialize(jsonObj.get("right"), type);
             target.put(BlockPart.RIGHT, value);
         }
+        if (jsonObj.has("center")) {
+            T value = context.deserialize(jsonObj.get("center"), type);
+            target.put(BlockPart.CENTER, value);
+        }
     }
 
     private String properCase(String s) {
