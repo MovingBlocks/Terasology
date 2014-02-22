@@ -778,13 +778,14 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     private final class BulletCharacterMoverCollider implements CharacterCollider {
+
+        boolean pending = true;
+
         private final Transform temp = new Transform();
 
         //If a class can figure out that its Collider is a BulletCollider, it 
         //is allowed to gain direct access to the bullet body:
         private final PairCachingGhostObject collider;
-
-        boolean pending = true;
 
         private BulletCharacterMoverCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, EntityRef owner) {
             this(pos, shape, groups, filters, 0, owner);

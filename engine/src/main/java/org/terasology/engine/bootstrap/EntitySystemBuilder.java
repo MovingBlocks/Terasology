@@ -51,9 +51,9 @@ import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupType
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Region3iTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector2fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
@@ -74,7 +74,6 @@ import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;

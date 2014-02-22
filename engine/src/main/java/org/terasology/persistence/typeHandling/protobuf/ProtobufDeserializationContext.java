@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.protobuf;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonParseException;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;

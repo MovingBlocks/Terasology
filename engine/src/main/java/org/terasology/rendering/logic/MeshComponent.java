@@ -22,8 +22,6 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.ForceBlockActive;
 
-import javax.vecmath.Color4f;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */

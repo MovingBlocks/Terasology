@@ -15,7 +15,6 @@
  */
 package org.terasology.persistence.typeHandling.protobuf;
 
-import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.iterator.TFloatIterator;
@@ -30,7 +29,6 @@ import org.terasology.protobuf.EntityData;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
