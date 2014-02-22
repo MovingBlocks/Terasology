@@ -67,6 +67,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
 
+    private boolean forceReleaseMouse;
+
     private Map<AssetUri, ControlWidget> overlays = Maps.newLinkedHashMap();
 
     public NUIManagerInternal(CanvasRenderer renderer) {
@@ -307,6 +309,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         screens.clear();
         screenLookup.clear();
         focus = null;
+        forceReleaseMouse = false;
     }
 
     public void render() {
@@ -372,7 +375,17 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 return true;
             }
         }
-        return false;
+        return forceReleaseMouse;
+    }
+
+    @Override
+    public boolean isForceReleasingMouse() {
+        return forceReleaseMouse;
+    }
+
+    @Override
+    public void setForceReleasingMouse(boolean value) {
+       forceReleaseMouse = value;
     }
 
     /*
@@ -380,7 +393,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
       have first pick of input
     */
 
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseAxisEvent(MouseAxisEvent event, EntityRef entity) {
         if (isReleasingMouse()) {
             event.consume();
@@ -388,7 +401,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //mouse button events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (!Mouse.isVisible()) {
             return;
@@ -414,7 +427,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //mouse wheel events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (!Mouse.isVisible()) {
             return;
@@ -435,7 +448,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     }
 
     //raw input events
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onKeyEvent(event);
@@ -454,12 +467,13 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         for (UIScreenLayer screen : screens) {
             if (screen.isModal()) {
                 event.consume();
+                return;
             }
         }
     }
 
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
-    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (focus != null) {
             focus.onBindEvent(event);
@@ -474,8 +488,11 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
                 }
             }
         }
-        if (isReleasingMouse()) {
-            event.consume();
+        for (UIScreenLayer screen : screens) {
+            if (screen.isModal()) {
+                event.consume();
+                return;
+            }
         }
     }
 
