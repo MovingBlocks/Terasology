@@ -20,6 +20,8 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetData;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -57,6 +59,8 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.version.TerasologyVersion;
@@ -192,6 +196,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
                 return new BehaviorTree(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.UI_ELEMENT, new AssetFactory<UIData, UIElement>() {
+            @Override
+            public UIElement buildAsset(AssetUri uri, UIData data) {
+                return new UIElement(uri, data);
             }
         });
 
