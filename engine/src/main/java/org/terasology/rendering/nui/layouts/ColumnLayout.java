@@ -150,10 +150,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 usedHeight += row.height;
             }
             usedHeight += (rowInfos.size() - 1) * verticalSpacing;
-            int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
-            for (RowInfo row : rowInfos) {
-                row.height += extraSpacePerRow;
-            }
+            rowOffsetY = (canvas.size().y - usedHeight) / 2;
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);
                 RowInfo rowInfo = rowInfos.get(rowIndex);
@@ -180,7 +177,9 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         for (int i = 0; i < columns && i < row.size(); ++i) {
             UIWidget widget = row.get(i);
             Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
-            cellSize.x *= columnWidths[i];
+            if (!autoSizeColumns) {
+                cellSize.x *= columnWidths[i];
+            }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
                 rowInfo.widgetSizes.add(contentSize);
@@ -353,5 +352,9 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         private int height;
         private List<Vector2i> widgetSizes = Lists.newArrayList();
 
+        @Override
+        public String toString() {
+            return super.toString() + "{height:" + height + ", widgetSizes:" + widgetSizes + "}";
+        }
     }
 }
