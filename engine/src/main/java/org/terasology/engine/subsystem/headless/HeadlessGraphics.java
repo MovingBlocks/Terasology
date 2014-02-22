@@ -74,9 +74,9 @@ public class HeadlessGraphics implements EngineSubsystem {
 
         HeadlessDisplayDevice headlessDisplay = new HeadlessDisplayDevice();
         CoreRegistry.putPermanently(DisplayDevice.class, headlessDisplay);
-        initHeadless(headlessDisplay);
+        initHeadless();
 
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new HeadlessCanvasRenderer()));
+        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new HeadlessCanvasRenderer()));
 
         //        CoreRegistry.putPermanently(DefaultRenderingProcess.class, new HeadlessRenderingProcess());
     }
@@ -97,7 +97,7 @@ public class HeadlessGraphics implements EngineSubsystem {
     public void dispose() {
     }
 
-    private void initHeadless(HeadlessDisplayDevice headlessDisplay) {
+    private void initHeadless() {
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
             @Override

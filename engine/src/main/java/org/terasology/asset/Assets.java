@@ -29,6 +29,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 
 import java.util.List;
@@ -293,6 +294,10 @@ public final class Assets {
 
     public static UISkin getSkin(String uri) {
         return get(AssetType.UI_SKIN, uri, UISkin.class);
+    }
+
+    public static UIElement getUIElement(String uri) {
+        return get(AssetType.UI_ELEMENT, uri, UIElement.class);
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {

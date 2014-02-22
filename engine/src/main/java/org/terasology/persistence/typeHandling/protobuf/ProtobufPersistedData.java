@@ -180,7 +180,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public PersistedDataMap getAsValueMap() {
-        Map<String, PersistedData> result = Maps.newHashMapWithExpectedSize(data.getNameValueCount());
+        Map<String, PersistedData> result = Maps.newLinkedHashMap();
         if (data.getNameValueCount() > 0) {
             for (int i = 0; i < data.getNameValueCount(); ++i) {
                 result.put(data.getNameValue(i).getName(), new ProtobufPersistedData(data.getNameValue(i).getValue()));

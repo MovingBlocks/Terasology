@@ -28,7 +28,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
@@ -98,10 +97,9 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
 
         initDisplay(config, lwjglDisplay);
-        initOpenGL(lwjglDisplay);
+        initOpenGL();
 
-        GameEngine engine = CoreRegistry.get(GameEngine.class);
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
+        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer()));
     }
 
     @Override
@@ -166,7 +164,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         }
     }
 
-    private void initOpenGL(LwjglDisplayDevice lwjglDisplay) {
+    private void initOpenGL() {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();

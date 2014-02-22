@@ -70,6 +70,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
@@ -132,6 +133,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Color.class, new ColorTypeHandler());
         serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
+        serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(AssetType.UI_ELEMENT, UIElement.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
         serializationLibrary.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
         serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
