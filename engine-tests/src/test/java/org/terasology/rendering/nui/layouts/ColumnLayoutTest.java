@@ -148,13 +148,13 @@ public class ColumnLayoutTest {
 
         columnLayout.onDraw(canvas);
 
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((200 - 75) / 2), 0, 50, 10));
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, 0, 5, 10));
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, 0, 20, 10));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((200 - 75) / 2), ((200-20) / 2), 50, 10));
+        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, ((200-20) / 2), 5, 10));
+        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, ((200-20) / 2), 20, 10));
 
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((200 - 75) / 2), 10, 50, 10));
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, 10, 5, 10));
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, 10, 20, 10));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((200 - 75) / 2), ((200-20) / 2) + 10, 50, 10));
+        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, ((200-20) / 2) + 10, 5, 10));
+        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, ((200-20) / 2) + 10, 20, 10));
     }
 
 }

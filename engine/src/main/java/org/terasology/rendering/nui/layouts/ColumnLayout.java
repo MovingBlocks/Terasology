@@ -173,6 +173,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 for (RowInfo row : rowInfos) {
                     row.height += extraSpacePerRow;
                 }
+            } else {
+                rowOffsetY = (canvas.size().y - usedHeight) / 2;
             }
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);
