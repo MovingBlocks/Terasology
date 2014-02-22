@@ -23,7 +23,7 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;

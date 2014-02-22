@@ -27,7 +27,7 @@ import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

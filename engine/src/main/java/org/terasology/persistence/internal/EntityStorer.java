@@ -25,7 +25,7 @@ import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

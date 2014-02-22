@@ -47,13 +47,13 @@ import java.util.Map;
  * @author Immortius
  */
 public class ProtobufPersistedData implements PersistedData, PersistedDataArray {
-    private EntityData.ValueOrBuilder data;
+    private EntityData.Value data;
 
-    public ProtobufPersistedData(EntityData.ValueOrBuilder data) {
+    public ProtobufPersistedData(EntityData.Value data) {
         this.data = data;
     }
 
-    public EntityData.ValueOrBuilder getValue() {
+    public EntityData.Value getValue() {
         return data;
     }
 
@@ -213,7 +213,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public boolean isArray() {
-        return !isNull() && !data.hasBytes();
+        return !isNull();
     }
 
     @Override

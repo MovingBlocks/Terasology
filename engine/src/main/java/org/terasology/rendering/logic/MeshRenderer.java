@@ -193,7 +193,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
                 glScalef(worldScale, worldScale, worldScale);
 
-                meshComp.material.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w, true);
+                meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);
                 meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos), true);
 
                 meshComp.mesh.render();

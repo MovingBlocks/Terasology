@@ -72,7 +72,7 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence.typeSerialization;
+package org.terasology.persistence.serializers;
 
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;

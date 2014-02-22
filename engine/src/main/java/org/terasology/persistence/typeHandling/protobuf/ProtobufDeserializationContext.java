@@ -15,8 +15,11 @@
  */
 package org.terasology.persistence.typeHandling.protobuf;
 
+import com.google.common.collect.Lists;
+import com.google.gson.JsonParseException;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import java.util.List;
 
@@ -25,13 +28,26 @@ import java.util.List;
  */
 public class ProtobufDeserializationContext implements DeserializationContext {
 
+    private TypeSerializationLibrary typeSerializationLibrary;
+
+    public ProtobufDeserializationContext(TypeSerializationLibrary typeSerializationLibrary) {
+        this.typeSerializationLibrary = typeSerializationLibrary;
+    }
+
     @Override
     public <T> T deserializeAs(PersistedData data, Class<T> type) {
-        throw new UnsupportedOperationException();
+        return type.cast(typeSerializationLibrary.getHandlerFor(type).deserialize(data, this));
     }
 
     @Override
     public <T> List<T> deserializeCollection(PersistedData data, Class<T> type) {
-        throw new UnsupportedOperationException();
+        if (!data.isArray()) {
+            throw new IllegalStateException("Data is not an array");
+        }
+        List<T> result = Lists.newArrayList();
+        for (PersistedData item : data.getAsArray()) {
+            result.add(deserializeAs(item, type));
+        }
+        return result;
     }
 }

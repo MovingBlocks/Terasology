@@ -44,7 +44,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

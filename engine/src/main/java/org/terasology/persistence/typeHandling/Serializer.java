@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.persistence.typeSerialization.DeserializeFieldCheck;
+import org.terasology.persistence.serializers.DeserializeFieldCheck;
 
 import java.util.Map;
 
@@ -66,7 +66,7 @@ public class Serializer {
                 return handler.serialize(rawValue, context);
             }
         }
-        return null;
+        return context.createNull();
     }
 
     /**
@@ -127,4 +127,31 @@ public class Serializer {
             }
         }
     }
+
+    /**
+     * Deserializes a Collection of name-values onto an object
+     *
+     * @param target The object to deserialize onto
+     * @param values The collection of values to apply to the object
+     */
+    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializationContext context) {
+        deserializeOnto(target, values, context, DeserializeFieldCheck.NullCheck.newInstance());
+    }
+
+    /**
+     * Deserializes a Collection of name-values onto an object
+     *
+     * @param target The object to deserialize onto
+     * @param values The collection of values to apply to the object
+     * @param check  A check to filter which fields to deserialize
+     */
+    public void deserializeOnto(Object target, Map<FieldMetadata<?, ?>, PersistedData> values, DeserializationContext context, DeserializeFieldCheck check) {
+        for (Map.Entry<FieldMetadata<?, ?>, PersistedData> field : values.entrySet()) {
+            if (check.shouldDeserialize(classMetadata, field.getKey())) {
+                deserializeOnto(target, field.getKey(), field.getValue(), context);
+            }
+        }
+    }
+
+
 }
