@@ -50,38 +50,6 @@ public class ColumnLayoutTest {
     }
 
     @Test
-    public void testThreeColumnsAutosizedEqually() throws Exception {
-
-        columnLayout.setAutoSizeColumns(true);
-        when(canvas.calculateRestrictedSize(eq(itemAt1x1), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x1), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x1), any(Vector2i.class))).thenReturn(new Vector2i(10, 10));
-
-        when(canvas.calculateRestrictedSize(eq(itemAt1x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-
-        Vector2i availableSize = new Vector2i(200, 200);
-
-        Vector2i result = columnLayout.getPreferredContentSize(canvas, availableSize);
-        assertEquals(75, result.x);
-        assertEquals(20, result.y);
-
-        when(canvas.size()).thenReturn(availableSize);
-
-        columnLayout.onDraw(canvas);
-
-        // Centered in available area, drawn consecutively
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(((200 - 75) / 2), 0, 50, 100));
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, 0, 5, 100));
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, 0, 20, 100));
-
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(((200 - 75) / 2), 100, 50, 100));
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50, 100, 5, 100));
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(((200 - 75) / 2) + 50 + 5, 100, 20, 100));
-    }
-
-    @Test
     public void testThreeColumnsProportionallySized() throws Exception {
 
         columnLayout.setAutoSizeColumns(false);
@@ -109,26 +77,24 @@ public class ColumnLayoutTest {
         columnLayout.onDraw(canvas);
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, 0, 100, 100));
+        verify(canvas).drawWidget(itemAt1x1, Rect2i.createFromMinAndSize(0, ((200 - 20) / 2), 100, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(100, 0, 40, 100));
+        verify(canvas).drawWidget(itemAt2x1, Rect2i.createFromMinAndSize(100, ((200 - 20) / 2), 40, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(100 + 40, 0, 60, 100));
+        verify(canvas).drawWidget(itemAt3x1, Rect2i.createFromMinAndSize(100 + 40, ((200 - 20) / 2), 60, 10));
 
         // Gets half of entire area
-        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(0, 100, 100, 100));
+        verify(canvas).drawWidget(itemAt1x2, Rect2i.createFromMinAndSize(0, ((200 - 20) / 2) + 10, 100, 10));
         // Gets one-fifth of entire area
-        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(100, 100, 40, 100));
+        verify(canvas).drawWidget(itemAt2x2, Rect2i.createFromMinAndSize(100, ((200 - 20) / 2) + 10, 40, 10));
         // Gets three-tens of entire area
-        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(100 + 40, 100, 60, 100));
+        verify(canvas).drawWidget(itemAt3x2, Rect2i.createFromMinAndSize(100 + 40, ((200 - 20) / 2) + 10, 60, 10));
     }
 
     @Test
-    public void testThreeColumnsMinimallySized() throws Exception {
+    public void testThreeColumnsAutosizedMinimallySized() throws Exception {
 
-        columnLayout.setAutoSizeColumns(false);
-        columnLayout.setMinimizeWidth(true);
-        columnLayout.setMinimizeHeight(true);
+        columnLayout.setAutoSizeColumns(true);
 
         when(canvas.calculateRestrictedSize(eq(itemAt1x1), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
         when(canvas.calculateRestrictedSize(eq(itemAt2x1), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));

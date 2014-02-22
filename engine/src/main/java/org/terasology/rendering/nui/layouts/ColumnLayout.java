@@ -45,10 +45,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     private int verticalSpacing;
     @LayoutConfig
     private boolean autoSizeColumns;
-    @LayoutConfig
-    private boolean minimizeWidth;
-    @LayoutConfig
-    private boolean minimizeHeight;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
@@ -141,20 +137,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 minRowWidth += (columns - 1) * horizontalSpacing;
 
                 rowOffsetX = (canvas.size().x - minRowWidth) / 2;
-            } else if (minimizeWidth) {
-                for (RowInfo row : rowInfos) {
-                    for (int column = 0; column < row.widgetSizes.size(); column++) {
-                        minWidths[column] = Math.max(minWidths[column], row.widgetSizes.get(column).getX());
-                    }
-                }
-
-                for (int width : minWidths) {
-                    minRowWidth += width;
-                }
-
-                minRowWidth += (columns - 1) * horizontalSpacing;
-
-                rowOffsetX = (canvas.size().x - minRowWidth) / 2;
             } else {
                 minRowWidth = canvas.size().x;
                 for (int i = 0; i < columns; ++i) {
@@ -168,14 +150,7 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 usedHeight += row.height;
             }
             usedHeight += (rowInfos.size() - 1) * verticalSpacing;
-            if (!minimizeHeight) {
-                int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
-                for (RowInfo row : rowInfos) {
-                    row.height += extraSpacePerRow;
-                }
-            } else {
-                rowOffsetY = (canvas.size().y - usedHeight) / 2;
-            }
+            rowOffsetY = (canvas.size().y - usedHeight) / 2;
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);
                 RowInfo rowInfo = rowInfos.get(rowIndex);
@@ -202,9 +177,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         for (int i = 0; i < columns && i < row.size(); ++i) {
             UIWidget widget = row.get(i);
             Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
-            if (!minimizeWidth) {
-                cellSize.x *= columnWidths[i];
-            }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
                 rowInfo.widgetSizes.add(contentSize);
@@ -246,10 +218,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         }
 
         if (!autoSizeColumns) {
-            if (!minimizeWidth) {
-                for (int i = 0; i < columns; ++i) {
-                    size.x = Math.max(size.x, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
-                }
+            for (int i = 0; i < columns; ++i) {
+                size.x = Math.max(size.x, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
             }
         }
 
@@ -283,10 +253,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         }
 
         if (!autoSizeColumns) {
-            if (!minimizeWidth) {
-                for (int i = 0; i < columns; ++i) {
-                    width = Math.min(width, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
-                }
+            for (int i = 0; i < columns; ++i) {
+                width = Math.min(width, TeraMath.floorToInt(columnSizes[i] / columnWidths[i]));
             }
         }
 
@@ -347,22 +315,6 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
 
     public void setAutoSizeColumns(boolean autoSizeColumns) {
         this.autoSizeColumns = autoSizeColumns;
-    }
-
-    public boolean isMinimizeWidth() {
-        return minimizeWidth;
-    }
-
-    public void setMinimizeWidth(boolean minimizeWidth) {
-        this.minimizeWidth = minimizeWidth;
-    }
-
-    public boolean isMinimizeHeight() {
-        return minimizeHeight;
-    }
-
-    public void setMinimizeHeight(boolean minimizeHeight) {
-        this.minimizeHeight = minimizeHeight;
     }
 
     private Iterator<List<UIWidget>> getRowIterator() {
