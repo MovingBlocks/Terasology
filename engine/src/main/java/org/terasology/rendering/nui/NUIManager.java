@@ -59,6 +59,8 @@ public interface NUIManager extends ComponentSystem, FocusManager {
 
     void pushScreen(CoreScreenLayer screen);
 
+    void pushScreen(CoreScreenLayer screen, AssetUri uri);
+
     void popScreen();
 
     UIScreenLayer setScreen(AssetUri screenUri);
