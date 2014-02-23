@@ -54,6 +54,7 @@
                 "columns" : 2,
                 "verticalSpacing" : 16,
                 "horizontalSpacing" : 8,
+                "autoSizeColumns" : false,
                 "column-widths" : [0.6, 0.4],
                 "layoutInfo" : {
                     "width" : 584,
