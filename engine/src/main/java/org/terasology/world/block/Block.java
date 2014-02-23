@@ -551,7 +551,8 @@ public final class Block {
     }
 
     public Mesh getMesh() {
-        if (mesh == null) {
+        logger.info("Getting block mesh");
+        if (mesh == null || mesh.isDisposed()) {
             generateMesh();
         }
         return mesh;
@@ -627,6 +628,7 @@ public final class Block {
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {
+        logger.info("Rendering block mesh");
         if (isInvisible()) {
             return;
         }
@@ -638,7 +640,7 @@ public final class Block {
         mat.setFloat("sunlight", sunlight);
         mat.setFloat("blockLight", blockLight);
 
-        if (mesh == null) {
+        if (mesh == null || mesh.isDisposed()) {
             generateMesh();
         } else if (mesh.isDisposed()) {
             logger.error("Cannot render disposed mesh");

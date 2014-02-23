@@ -50,7 +50,7 @@ public class UILoadBar extends CoreWidget {
             int barWidth = fillTexture.getWidth();
             int offset = 0;
             if (time != null && animate) {
-                offset = TeraMath.floorToInt(time.getRealTimeInMs() / 10) % barWidth;
+                offset = (int) ((time.getRealTimeInMs() / 10) % barWidth);
             }
             int drawnWidth = 0;
             // Draw Offset

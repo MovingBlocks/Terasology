@@ -30,7 +30,9 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.persistence.ModuleContext;
+import org.terasology.rendering.assets.mesh.Mesh;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -326,26 +328,40 @@ public class AssetManager {
         return asset;
     }
 
-    public void clear() {
-        Iterator<Asset> iterator = assetCache.values().iterator();
-        while (iterator.hasNext()) {
-            Asset asset = iterator.next();
-            if (asset instanceof Prefab) {
-                asset.dispose();
-                iterator.remove();
+    public void refresh() {
+        List<Asset> keepAndReload = Lists.newArrayList();
+        List<Asset> dispose = Lists.newArrayList();
+
+        for (Asset asset : assetCache.values()) {
+            if (asset.getURI().getNormalisedModuleName().equals(TerasologyConstants.ENGINE_MODULE) && !(asset instanceof Prefab) && !(asset instanceof BehaviorTree)) {
+                keepAndReload.add(asset);
+            } else {
+                dispose.add(asset);
             }
         }
-        // TODO: Fix disposal
-//        Iterator<Asset> iterator = assetCache.values().iterator();
-//        while (iterator.hasNext()) {
-//            Asset asset = iterator.next();
-//
-//            // Don't dispose engine assets, all sorts of systems have references to them
-//            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
-//                asset.dispose();
-//                iterator.remove();
-//            }
-//        }
+        assetCache.clear();
+
+        for (Asset asset : keepAndReload) {
+            assetCache.put(asset.getURI(), asset);
+        }
+
+        for (Asset asset : keepAndReload) {
+            reload(asset);
+        }
+
+        for (Asset asset : dispose) {
+            if (!(asset instanceof Mesh)) {
+                logger.info("Disposing {}", asset.getURI());
+                asset.dispose();
+            }
+        }
+
+        for (Asset asset : dispose) {
+            if (asset instanceof Mesh) {
+                logger.info("Disposing {}", asset.getURI());
+                asset.dispose();
+            }
+        }
     }
 
     public void dispose(Asset asset) {

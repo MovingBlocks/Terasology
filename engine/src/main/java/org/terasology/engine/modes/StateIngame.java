@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.TeraOVR;
+import org.terasology.asset.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
@@ -127,6 +128,7 @@ public class StateIngame implements GameState {
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
+        CoreRegistry.get(AssetManager.class).refresh();
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);

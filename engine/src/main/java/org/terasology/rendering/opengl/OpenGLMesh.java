@@ -26,6 +26,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
@@ -104,6 +105,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             GL15.glDeleteBuffers(vboIndexBuffer);
             vboIndexBuffer = 0;
         }
+        Util.checkGLError();
     }
 
     @Override
@@ -122,58 +124,70 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     public void preRender() {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        if (hasTexCoord0 || hasTexCoord1) {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
-        if (hasColor) {
-            glEnableClientState(GL_COLOR_ARRAY);
-        }
-        if (hasNormal) {
-            glEnableClientState(GL_NORMAL_ARRAY);
-        }
+        if (!isDisposed()) {
+            glEnableClientState(GL_VERTEX_ARRAY);
+            if (hasTexCoord0 || hasTexCoord1) {
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            }
+            if (hasColor) {
+                glEnableClientState(GL_COLOR_ARRAY);
+            }
+            if (hasNormal) {
+                glEnableClientState(GL_NORMAL_ARRAY);
+            }
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
 
-        glVertexPointer(VERTEX_SIZE, GL11.GL_FLOAT, stride, vertexOffset);
+            glVertexPointer(VERTEX_SIZE, GL11.GL_FLOAT, stride, vertexOffset);
 
-        if (hasTexCoord0) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-            glTexCoordPointer(TEX_COORD_0_SIZE, GL11.GL_FLOAT, stride, texCoord0Offset);
-        }
+            if (hasTexCoord0) {
+                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+                glTexCoordPointer(TEX_COORD_0_SIZE, GL11.GL_FLOAT, stride, texCoord0Offset);
+            }
 
-        if (hasTexCoord1) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-            glTexCoordPointer(TEX_COORD_1_SIZE, GL11.GL_FLOAT, stride, texCoord1Offset);
-        }
+            if (hasTexCoord1) {
+                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+                glTexCoordPointer(TEX_COORD_1_SIZE, GL11.GL_FLOAT, stride, texCoord1Offset);
+            }
 
-        if (hasColor) {
-            glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
-        }
-        if (hasNormal) {
-            glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+            if (hasColor) {
+                glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
+            }
+            if (hasNormal) {
+                glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+            }
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
         }
     }
 
     public void postRender() {
-        if (hasNormal) {
-            glDisableClientState(GL_NORMAL_ARRAY);
-        }
-        if (hasColor) {
-            glDisableClientState(GL_COLOR_ARRAY);
-        }
-        if (hasTexCoord0 || hasTexCoord1) {
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
-        glDisableClientState(GL_VERTEX_ARRAY);
+        if (!isDisposed()) {
+            if (hasNormal) {
+                glDisableClientState(GL_NORMAL_ARRAY);
+            }
+            if (hasColor) {
+                glDisableClientState(GL_COLOR_ARRAY);
+            }
+            if (hasTexCoord0 || hasTexCoord1) {
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            }
+            glDisableClientState(GL_VERTEX_ARRAY);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public void doRender() {
-        GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        if (!isDisposed()) {
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public void render() {

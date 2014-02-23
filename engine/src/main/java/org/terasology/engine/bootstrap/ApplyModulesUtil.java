@@ -60,9 +60,7 @@ public final class ApplyModulesUtil {
         }
 
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.clear();
         assetManager.applyOverrides();
-
-
+        assetManager.refresh();
     }
 }

@@ -264,4 +264,8 @@ public class OpenALManager implements AudioManager {
             }
         };
     }
+
+    public void stopSound(int bufferId) {
+        pools.get("sfx").stopAll();
+    }
 }
