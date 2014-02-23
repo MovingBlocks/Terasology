@@ -38,7 +38,7 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
             def parentDir = 'modules'
 
             // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
-            def githubHome = 'Terasology'
+            def githubHome = 'Nanoware'
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
             }
@@ -88,7 +88,7 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
             def parentDir = 'modules'
 
             // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
-            def githubHome = 'Terasology'
+            def githubHome = 'Nanoware'
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
             }
@@ -180,7 +180,7 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
             println "Repo is $repo - localName is $localName"
 
             // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
-            def githubHome = 'Terasology'
+            def githubHome = 'Nanoware'
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
             }

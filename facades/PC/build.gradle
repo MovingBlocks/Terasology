@@ -173,7 +173,7 @@ task distModules (type: Sync) {
             } else {
                 dependencies {
                     // TODO: When version handling and promotion is in then we can probably remove "changing"
-                    compile group: 'org.terasology.modules', name: dependency, version: '+', changing: true
+                    compile group: 'org.nanoware.modules', name: dependency, version: '+', changing: true
                 }
             }
         }
@@ -183,7 +183,7 @@ task distModules (type: Sync) {
         // But the error goes away if either distApp is removed or this following statement isn't reached
         configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
             def id = artifact.moduleVersion.id
-            if (id.group == 'org.terasology.modules') {
+            if (id.group == 'org.nanoware.modules') {
                 println "Remotely resolved $id.group - $id.name at version $id.version"
                 from artifact.file
                 into("$distsDir/app/modules")

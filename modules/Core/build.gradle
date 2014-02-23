@@ -52,7 +52,7 @@ if (!moduleFile.exists()) {
     version = moduleConfig.version
 
     // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-    group = 'org.terasology.modules'
+    group = 'org.nanoware.modules'
 
     // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
     if (env.BUILD_NUMBER != null) {
@@ -118,12 +118,12 @@ dependencies {
                 println "*** Unsatisfied local dependency for module " + project.name + ": " + dependency
                 // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
                 // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
-                compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
+                compile(group: 'org.nanoware.modules', name: dependency, version: '+', changing: true)
 
                 // NOTE: Referencing resolvedArtifacts actually resolves the involved artifacts at this time (early)
                 configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
                     def id = artifact.moduleVersion.id
-                    if (id.group == 'org.terasology.modules') {
+                    if (id.group == 'org.nanoware.modules') {
                         println "Remotely resolved $id.group - $id.name at version $id.version"
 
                         // This copies the jar from the Gradle cache to the game's module dir for runtime usage
@@ -147,7 +147,7 @@ dependencies {
         moduleDepends.each {
             println "*** Attempting to fetch dependency module from Artifactory: " + project.name + ": " + it
             // The '+' is satisfied by any version
-            compile(group: 'org.terasology.modules', name: it, version: '+')
+            compile(group: 'org.nanoware.modules', name: it, version: '+')
         }
     }
 }
