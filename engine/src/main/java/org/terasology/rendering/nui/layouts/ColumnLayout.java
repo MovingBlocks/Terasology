@@ -45,6 +45,8 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
     private int verticalSpacing;
     @LayoutConfig
     private boolean autoSizeColumns;
+    @LayoutConfig
+    private boolean fillVerticalSpace = true;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
@@ -150,7 +152,16 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 usedHeight += row.height;
             }
             usedHeight += (rowInfos.size() - 1) * verticalSpacing;
-            rowOffsetY = (canvas.size().y - usedHeight) / 2;
+
+            if (fillVerticalSpace) {
+                int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
+
+                for (RowInfo row : rowInfos) {
+                    row.height += extraSpacePerRow;
+                }
+            } else {
+                rowOffsetY = (canvas.size().y - usedHeight) / 2;
+            }
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);
                 RowInfo rowInfo = rowInfos.get(rowIndex);
