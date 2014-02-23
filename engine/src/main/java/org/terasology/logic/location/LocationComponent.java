@@ -51,6 +51,8 @@ public final class LocationComponent implements Component, ReplicationCheck {
     @TextField
     Vector3f position = new Vector3f();
     @Replicate
+    Vector3f offsetPosition = new Vector3f();
+    @Replicate
     Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
     float scale = 1.0f;
@@ -98,11 +100,13 @@ public final class LocationComponent implements Component, ReplicationCheck {
 
     public Vector3f getWorldPosition(Vector3f output) {
         output.set(position);
+        output.add(offsetPosition);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         while (parentLoc != null) {
             output.scale(parentLoc.scale);
             QuaternionUtil.quatRotate(parentLoc.getLocalRotation(), output, output);
             output.add(parentLoc.position);
+            output.add(parentLoc.offsetPosition);
             parentLoc = parentLoc.parent.getComponent(LocationComponent.class);
         }
         return output;

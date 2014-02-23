@@ -31,12 +31,7 @@ import com.bulletphysics.collision.dispatch.GhostPairCallback;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.collision.shapes.CylinderShape;
-import com.bulletphysics.collision.shapes.SphereShape;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
@@ -52,6 +47,7 @@ import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.physics.engine.PhysicsLiquidWrapper;
+import org.terasology.physics.shapes.*;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -69,11 +65,6 @@ import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.PhysicsSystem;
 import org.terasology.physics.engine.PhysicsWorldWrapper;
 import org.terasology.physics.engine.RigidBody;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CylinderShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.physics.shapes.SphereShapeComponent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 
@@ -231,7 +222,7 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public void update(float delta) {
         processQueuedBodies();
-        applyPendingImpulses();
+        applyPendingImpulsesAndForces();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
             if (discreteDynamicsWorld.stepSimulation(delta, 8) != 0) {
@@ -261,6 +252,7 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public boolean updateRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
         if (location == null) {
@@ -273,6 +265,9 @@ public class BulletPhysics implements PhysicsEngine {
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
+            }else{
+                rigidBody.rb.setAngularFactor(rb.angularFactor);
+                rigidBody.rb.setFriction(rb.friction);
             }
 
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
@@ -401,7 +396,7 @@ public class BulletPhysics implements PhysicsEngine {
     private boolean newTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
-        ConvexShape shape = getShapeFor(entity);
+        CollisionShape shape = getShapeFor(entity);
         if (shape != null && location != null && trigger != null) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
@@ -455,7 +450,7 @@ public class BulletPhysics implements PhysicsEngine {
     private RigidBody newRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
-        ConvexShape shape = getShapeFor(entity);
+        CollisionShape shape = getShapeFor(entity);
         if (location != null && rigidBody != null && shape != null) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
@@ -469,6 +464,8 @@ public class BulletPhysics implements PhysicsEngine {
             RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
+            collider.rb.setAngularFactor(rigidBody.angularFactor);
+            collider.rb.setFriction(rigidBody.friction);
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
             addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
@@ -537,13 +534,18 @@ public class BulletPhysics implements PhysicsEngine {
      * Applies all pending impulses to the corresponding rigidBodies and clears
      * the pending impulses.
      */
-    private void applyPendingImpulses() {
+    private void applyPendingImpulsesAndForces() {
         for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
             BulletRigidBody body = entree.getValue();
             body.rb.applyCentralImpulse(body.pendingImpulse);
+            body.rb.applyCentralForce(body.pendingForce);
             body.pendingImpulse.x = 0;
             body.pendingImpulse.y = 0;
             body.pendingImpulse.z = 0;
+
+            body.pendingForce.x = 0;
+            body.pendingForce.y = 0;
+            body.pendingForce.z = 0;
         }
     }
 
@@ -576,24 +578,26 @@ public class BulletPhysics implements PhysicsEngine {
      * @param entity the entity to get the shape of.
      * @return the shape of the entity, ready to be used by Bullet.
      */
-    private ConvexShape getShapeFor(EntityRef entity) {
+    private CollisionShape getShapeFor(EntityRef entity) {
         BoxShapeComponent box = entity.getComponent(BoxShapeComponent.class);
+        RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
+        CollisionShape shape = null;
         if (box != null) {
             Vector3f halfExtents = new Vector3f(box.extents);
             halfExtents.scale(0.5f);
-            return new BoxShape(halfExtents);
+            shape = new BoxShape(halfExtents);
         }
         SphereShapeComponent sphere = entity.getComponent(SphereShapeComponent.class);
         if (sphere != null) {
-            return new SphereShape(sphere.radius);
+            shape = new SphereShape(sphere.radius);
         }
         CapsuleShapeComponent capsule = entity.getComponent(CapsuleShapeComponent.class);
         if (capsule != null) {
-            return new CapsuleShape(capsule.radius, capsule.height);
+            shape = new CapsuleShape(capsule.radius, capsule.height);
         }
         CylinderShapeComponent cylinder = entity.getComponent(CylinderShapeComponent.class);
         if (cylinder != null) {
-            return new CylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
+            shape = new CylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
         }
         HullShapeComponent hull = entity.getComponent(HullShapeComponent.class);
         if (hull != null) {
@@ -606,8 +610,27 @@ public class BulletPhysics implements PhysicsEngine {
                 newVert.z = iterator.next();
                 verts.add(newVert);
             }
-            return new ConvexHullShape(verts);
+            shape = new ConvexHullShape(verts);
         }
+
+        if ( shape != null ){
+            if ( rigidBody!=null && rigidBody.centerOfMass.length() > 0 ){
+                LocationComponent location = entity.getComponent(LocationComponent.class);
+                CompoundShape compoundShape = new CompoundShape();
+                if ( location != null ){
+                    float scale = location.getWorldScale();
+                    shape.setLocalScaling(new Vector3f(scale, scale, scale));
+                }
+                Transform localTransform = new Transform();
+                localTransform.setIdentity();
+                localTransform.origin.set(rigidBody.centerOfMass);
+                compoundShape.addChildShape(localTransform, shape);
+                return compoundShape;
+            }else{
+                return shape;
+            }
+        }
+
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
             return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
@@ -626,7 +649,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    private PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
+    private PairCachingGhostObject createCollider(Vector3f pos, CollisionShape shape, short groups, short filters, int collisionFlags) {
         Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
         PairCachingGhostObject result = new PairCachingGhostObject();
         result.setWorldTransform(startTransform);
@@ -698,6 +721,7 @@ public class BulletPhysics implements PhysicsEngine {
         public final com.bulletphysics.dynamics.RigidBody rb;
         private final Transform temp = new Transform();
         private final Vector3f pendingImpulse = new Vector3f();
+        private final Vector3f pendingForce = new Vector3f();
 
         BulletRigidBody(RigidBodyConstructionInfo info) {
             rb = new com.bulletphysics.dynamics.RigidBody(info);
@@ -706,6 +730,11 @@ public class BulletPhysics implements PhysicsEngine {
         @Override
         public void applyImpulse(Vector3f impulse) {
             pendingImpulse.add(impulse);
+        }
+
+        @Override
+        public void applyForce(Vector3f force) {
+            pendingForce.add(force);
         }
 
         @Override

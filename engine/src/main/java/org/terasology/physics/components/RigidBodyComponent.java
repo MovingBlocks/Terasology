@@ -35,13 +35,16 @@ public class RigidBodyComponent implements Component {
     public float mass = 10.0f;
     @Replicate
     public boolean kinematic;
-
     @Replicate(initialOnly = true)
     public Vector3f velocity = new Vector3f();
-
+    @Replicate
+    public Vector3f centerOfMass = new Vector3f();
     @Replicate(initialOnly = true)
     public Vector3f angularVelocity = new Vector3f();
-
+    @Replicate
+    public float angularFactor = 1f;
+    @Replicate
+    public float friction = 0.5f;
     @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
     @Replicate
