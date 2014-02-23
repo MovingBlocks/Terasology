@@ -1,6 +1,6 @@
 
 // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-new File('modules').eachDir { possibleSubprojectDir ->
+new File(rootDir, 'modules').eachDir { possibleSubprojectDir ->
     def subprojectName = 'modules:' + possibleSubprojectDir.name
     //println "Gradle is reviewing module $subprojectName for inclusion as a sub-project"
     File buildFile = new File(possibleSubprojectDir, "build.gradle")
