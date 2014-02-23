@@ -26,6 +26,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.AABB;
@@ -54,6 +56,8 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
  * @author Immortius
  */
 public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
+    private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
+
     private static final int FLOAT_SIZE = 4;
     private AABB aabb;
 
@@ -173,9 +177,13 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     public void render() {
-        preRender();
-        doRender();
-        postRender();
+        if (!isDisposed()) {
+            preRender();
+            doRender();
+            postRender();
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public int addToBatch(Transform transform, Transform normalTransform, TFloatList vertexData, TIntList indexData, int indexOffset) {

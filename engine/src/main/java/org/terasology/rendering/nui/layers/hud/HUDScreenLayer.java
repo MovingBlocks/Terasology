@@ -68,7 +68,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     public <T extends ControlWidget> T addHUDElement(AssetUri uri, T widget, Rect2f region) {
         InjectionHelper.inject(widget);
-        widget.initialise();
+        widget.onOpened();
         elementsLookup.put(uri, new HUDElement(uri, widget, region));
         return widget;
     }
@@ -191,7 +191,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     @Override
-    public void initialise() {
+    public void onOpened() {
+    }
+
+    @Override
+    protected void initialise() {
     }
 
     @Override

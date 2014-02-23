@@ -21,7 +21,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.sources.AssetSourceCollection;
@@ -225,6 +224,13 @@ public class AssetManager {
         return loadAsset(uri, true);
     }
 
+    public void reload(Asset asset) {
+        AssetData data = loadAssetData(asset.getURI(), false);
+        if (data != null) {
+            asset.reload(data);
+        }
+    }
+
     public <T extends Asset> T loadAsset(AssetUri uri, Class<T> assetClass) {
         Asset result = loadAsset(uri, true);
         if (assetClass.isInstance(result)) {
@@ -299,7 +305,7 @@ public class AssetManager {
         for (AssetResolver resolver : resolvers.get(uri.getAssetType())) {
             Asset result = resolver.resolve(uri, factory);
             if (result != null) {
-                assetCache.put(uri, asset);
+                assetCache.put(uri, result);
                 return result;
             }
         }

@@ -30,10 +30,7 @@ import java.util.Iterator;
  */
 public abstract class CoreScreenLayer extends AbstractWidget implements UIScreenLayer {
 
-    @LayoutConfig
-    private UIWidget contents;
-
-    private InteractionListener defaultScreenListener = new BaseInteractionListener() {
+    private static final InteractionListener DEFAULT_SCREEN_LISTENER = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
             return true;
@@ -44,7 +41,12 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
             return true;
         }
     };
+
+    @LayoutConfig
+    private UIWidget contents;
+
     private NUIManager manager;
+    private boolean initialised;
 
     public CoreScreenLayer() {
     }
@@ -58,12 +60,21 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     protected InteractionListener getScreenListener() {
-        return defaultScreenListener;
+        return DEFAULT_SCREEN_LISTENER;
     }
 
     public void setContents(UIWidget contents) {
         this.contents = contents;
     }
+
+    public void onOpened() {
+        if (!initialised) {
+            initialise();
+            initialised = true;
+        }
+    }
+
+    protected abstract void initialise();
 
     @Override
     public boolean isLowerLayerVisible() {

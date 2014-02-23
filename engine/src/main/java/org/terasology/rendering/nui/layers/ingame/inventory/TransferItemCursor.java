@@ -38,62 +38,66 @@ import org.terasology.world.block.items.BlockItemComponent;
 public class TransferItemCursor extends CursorAttachment implements ControlWidget {
 
     private Binding<EntityRef> item = new DefaultBinding<>(EntityRef.NULL);
+    private boolean initialised;
 
     @In
     private LocalPlayer localPlayer;
 
     @Override
-    public void initialise() {
-        ItemIcon icon = new ItemIcon();
-        setAttachment(icon);
-        icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
-            @Override
-            public TextureRegion get() {
-                if (getItem().exists()) {
+    public void onOpened() {
+        if (!initialised) {
+            initialised = true;
+            ItemIcon icon = new ItemIcon();
+            setAttachment(icon);
+            icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
+                @Override
+                public TextureRegion get() {
+                    if (getItem().exists()) {
+                        ItemComponent itemComp = getItem().getComponent(ItemComponent.class);
+                        if (itemComp != null) {
+                            return itemComp.icon;
+                        }
+                        BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
+                        if (blockItemComp == null) {
+                            return Assets.getTextureRegion("engine:items.questionMark");
+                        }
+                    }
+                    return null;
+                }
+            });
+            icon.bindMesh(new ReadOnlyBinding<Mesh>() {
+                @Override
+                public Mesh get() {
+                    BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
+                    if (blockItemComp != null) {
+                        return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
+                    }
+                    return null;
+                }
+            });
+            icon.setMeshTexture(Assets.getTexture("engine:terrain"));
+            icon.bindQuantity(new ReadOnlyBinding<Integer>() {
+                @Override
+                public Integer get() {
                     ItemComponent itemComp = getItem().getComponent(ItemComponent.class);
                     if (itemComp != null) {
-                        return itemComp.icon;
+                        return UnsignedBytes.toInt(itemComp.stackCount);
                     }
-                    BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
-                    if (blockItemComp == null) {
-                        return Assets.getTextureRegion("engine:items.questionMark");
-                    }
+                    return 1;
                 }
-                return null;
-            }
-        });
-        icon.bindMesh(new ReadOnlyBinding<Mesh>() {
-            @Override
-            public Mesh get() {
-                BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
-                if (blockItemComp != null) {
-                    return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
-                }
-                return null;
-            }
-        });
-        icon.setMeshTexture(Assets.getTexture("engine:terrain"));
-        icon.bindQuantity(new ReadOnlyBinding<Integer>() {
-            @Override
-            public Integer get() {
-                ItemComponent itemComp = getItem().getComponent(ItemComponent.class);
-                if (itemComp != null) {
-                    return UnsignedBytes.toInt(itemComp.stackCount);
-                }
-                return 1;
-            }
-        });
+            });
 
-        bindItem(new ReadOnlyBinding<EntityRef>() {
-            @Override
-            public EntityRef get() {
-                CharacterComponent charComp = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
-                if (charComp != null) {
-                    return InventoryUtils.getItemAt(charComp.movingItem, 0);
+            bindItem(new ReadOnlyBinding<EntityRef>() {
+                @Override
+                public EntityRef get() {
+                    CharacterComponent charComp = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
+                    if (charComp != null) {
+                        return InventoryUtils.getItemAt(charComp.movingItem, 0);
+                    }
+                    return EntityRef.NULL;
                 }
-                return EntityRef.NULL;
-            }
-        });
+            });
+        }
     }
 
     public void bindItem(Binding<EntityRef> binding) {

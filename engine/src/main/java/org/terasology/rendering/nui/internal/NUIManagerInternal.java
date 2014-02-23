@@ -498,7 +498,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     private void prepare(ControlWidget screen) {
         InjectionHelper.inject(screen);
-        screen.initialise();
+        screen.onOpened();
     }
 
 }
