@@ -213,7 +213,7 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public boolean isArray() {
-        return !isNull();
+        return true;
     }
 
     @Override
