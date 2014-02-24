@@ -19,6 +19,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -51,13 +52,16 @@ public final class ChunkTessellator {
 
     private WorldProvider generatingChunkProvider;
 
-    public ChunkTessellator(WorldProvider generatingChunkProvider) {
+    private GLBufferPool bufferPool;
+
+    public ChunkTessellator(WorldProvider generatingChunkProvider, GLBufferPool bufferPool) {
         this.generatingChunkProvider = generatingChunkProvider;
+        this.bufferPool = bufferPool;
     }
 
     public ChunkMesh generateMesh(ChunkView chunkView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
-        ChunkMesh mesh = new ChunkMesh();
+        ChunkMesh mesh = new ChunkMesh(bufferPool);
 
         Vector3f chunkOffset = new Vector3f(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z);
 
@@ -94,7 +98,7 @@ public final class ChunkTessellator {
 
     public ChunkMesh generateMinaturizedMesh(MiniatureChunk miniatureChunk) {
         PerformanceMonitor.startActivity("GenerateMinuatureMesh");
-        ChunkMesh mesh = new ChunkMesh();
+        ChunkMesh mesh = new ChunkMesh(bufferPool);
 
         MiniatureChunk[] chunks = {miniatureChunk};
         ChunkViewCoreImpl localChunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
@@ -125,13 +129,13 @@ public final class ChunkTessellator {
         for (ChunkMesh.RenderType type : ChunkMesh.RenderType.values()) {
             ChunkMesh.VertexElements elements = mesh.getVertexElements(type);
             // Vertices double to account for light info
-            elements.finalVertices = BufferUtils.createByteBuffer(
-                    elements.vertices.size() * 4 + /* POSITION */
-                            elements.tex.size() * 4 + /* TEX0 (UV0 and flags) */
-                            elements.tex.size() * 4 + /* TEX1 (lighting data) */
-                            elements.flags.size() * 4 + /* FLAGS */
-                            elements.color.size() * 4 + /* COLOR */
-                            elements.normals.size() * 4 /* NORMALS */
+            elements.finalVertices = BufferUtils.createIntBuffer(
+                    elements.vertices.size() + /* POSITION */
+                            elements.tex.size() + /* TEX0 (UV0 and flags) */
+                            elements.tex.size()  + /* TEX1 (lighting data) */
+                            elements.flags.size()  + /* FLAGS */
+                            elements.color.size()  + /* COLOR */
+                            elements.normals.size()  /* NORMALS */
             );
 
             int cTex = 0;
@@ -144,25 +148,25 @@ public final class ChunkTessellator {
                         elements.vertices.get(i + 2));
 
                 /* POSITION */
-                elements.finalVertices.putFloat(vertexPos.x);
-                elements.finalVertices.putFloat(vertexPos.y);
-                elements.finalVertices.putFloat(vertexPos.z);
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.x));
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.y));
+                elements.finalVertices.put(Float.floatToIntBits(vertexPos.z));
 
                 /* UV0 - TEX DATA 0 */
-                elements.finalVertices.putFloat(elements.tex.get(cTex));
-                elements.finalVertices.putFloat(elements.tex.get(cTex + 1));
+                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(cTex)));
+                elements.finalVertices.put(Float.floatToIntBits(elements.tex.get(cTex + 1)));
 
                 /* FLAGS */
-                elements.finalVertices.putFloat(elements.flags.get(cFlags));
+                elements.finalVertices.put(Float.floatToIntBits(elements.flags.get(cFlags)));
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(elements.normals.get(i), elements.normals.get(i + 1), elements.normals.get(i + 2));
                 calcLightingValuesForVertexPos(chunkView, vertexPos, result, normal);
 
                 /* LIGHTING DATA / TEX DATA 1 */
-                elements.finalVertices.putFloat(result[0]);
-                elements.finalVertices.putFloat(result[1]);
-                elements.finalVertices.putFloat(result[2]);
+                elements.finalVertices.put(Float.floatToIntBits(result[0]));
+                elements.finalVertices.put(Float.floatToIntBits(result[1]));
+                elements.finalVertices.put(Float.floatToIntBits(result[2]));
 
                 /* PACKED COLOR */
                 final int packedColor = RenderMath.packColor(
@@ -170,12 +174,12 @@ public final class ChunkTessellator {
                         elements.color.get(cColor + 1),
                         elements.color.get(cColor + 2),
                         elements.color.get(cColor + 3));
-                elements.finalVertices.putInt(packedColor);
+                elements.finalVertices.put(packedColor);
 
                 /* NORMALS */
-                elements.finalVertices.putFloat(normal.x);
-                elements.finalVertices.putFloat(normal.y);
-                elements.finalVertices.putFloat(normal.z);
+                elements.finalVertices.put(Float.floatToIntBits(normal.x));
+                elements.finalVertices.put(Float.floatToIntBits(normal.y));
+                elements.finalVertices.put(Float.floatToIntBits(normal.z));
             }
 
             elements.finalIndices = BufferUtils.createIntBuffer(elements.indices.size());

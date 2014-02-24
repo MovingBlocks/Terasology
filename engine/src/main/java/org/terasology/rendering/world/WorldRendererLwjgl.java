@@ -24,6 +24,7 @@ import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.Time;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -184,11 +185,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Initializes a new (local) world for the single player mode.
      */
-    public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
+    public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(worldProvider);
+        chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTessellator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);

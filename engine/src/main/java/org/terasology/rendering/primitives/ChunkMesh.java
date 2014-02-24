@@ -20,13 +20,12 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.rendering.VertexBufferObjectUtil;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
@@ -112,7 +111,10 @@ public class ChunkMesh {
     private int timeToGenerateBlockVertices;
     private int timeToGenerateOptimizedBuffers;
 
-    public ChunkMesh() {
+    private GLBufferPool bufferPool;
+
+    public ChunkMesh(GLBufferPool bufferPool) {
+        this.bufferPool = bufferPool;
         for (RenderType type : RenderType.values()) {
             vertexElements.put(type, new VertexElements());
         }
@@ -161,10 +163,8 @@ public class ChunkMesh {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
         if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            IntBuffer buffer = BufferUtils.createIntBuffer(2);
-            GL15.glGenBuffers(buffer);
-            vertexBuffers[id] = buffer.get(0);
-            idxBuffers[id] = buffer.get(1);
+            vertexBuffers[id] = bufferPool.get();
+            idxBuffers[id] = bufferPool.get();
             vertexCount[id] = elements.finalIndices.limit();
 
             VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
@@ -206,13 +206,15 @@ public class ChunkMesh {
 
                 GL11.glDrawElements(GL11.GL_TRIANGLES, vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
 
+
+                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+
                 glDisableClientState(GL_NORMAL_ARRAY);
                 glDisableClientState(GL_COLOR_ARRAY);
                 glDisableClientState(GL_TEXTURE_COORD_ARRAY);
                 glDisableClientState(GL_VERTEX_ARRAY);
 
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
             } finally {
                 lock.unlock();
             }
@@ -242,12 +244,16 @@ public class ChunkMesh {
             if (!disposed) {
                 for (int i = 0; i < vertexBuffers.length; i++) {
                     int id = vertexBuffers[i];
-                    GL15.glDeleteBuffers(id);
-                    vertexBuffers[i] = 0;
+                    if (id != 0) {
+                        bufferPool.dispose(id);
+                        vertexBuffers[i] = 0;
+                    }
 
                     id = idxBuffers[i];
-                    GL15.glDeleteBuffers(id);
-                    idxBuffers[i] = 0;
+                    if (id != 0) {
+                        bufferPool.dispose(id);
+                        idxBuffers[i] = 0;
+                    }
                 }
 
                 disposed = true;
@@ -309,7 +315,7 @@ public class ChunkMesh {
         public final TIntList flags;
         public int vertexCount;
 
-        public ByteBuffer finalVertices;
+        public IntBuffer finalVertices;
         public IntBuffer finalIndices;
 
         public VertexElements() {

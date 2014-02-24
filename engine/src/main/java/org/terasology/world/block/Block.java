@@ -551,7 +551,6 @@ public final class Block {
     }
 
     public Mesh getMesh() {
-        logger.info("Getting block mesh");
         if (mesh == null || mesh.isDisposed()) {
             generateMesh();
         }
@@ -628,7 +627,6 @@ public final class Block {
     }
 
     public void renderWithLightValue(float sunlight, float blockLight) {
-        logger.info("Rendering block mesh");
         if (isInvisible()) {
             return;
         }
@@ -657,9 +655,10 @@ public final class Block {
         for (BlockPart dir : BlockPart.values()) {
             BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
-                tessellator.addMeshPart(part);
                 if (doubleSided) {
-                    tessellator.addMeshPartReversed(part);
+                    tessellator.addMeshPartDoubleSided(part);
+                } else {
+                    tessellator.addMeshPart(part);
                 }
             }
         }

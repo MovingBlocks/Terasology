@@ -84,6 +84,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
+    private GLBufferPool bufferPool = new GLBufferPool();
+
     @Override
     public void preInitialise() {
         super.preInitialise();
@@ -91,7 +93,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Config config) {
-        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
+        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice();
         CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
@@ -196,13 +198,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data);
+                return new OpenGLMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data);
+                return new OpenGLSkeletalMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {

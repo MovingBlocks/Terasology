@@ -32,7 +32,6 @@ import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.persistence.ModuleContext;
-import org.terasology.rendering.assets.mesh.Mesh;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -350,17 +349,8 @@ public class AssetManager {
         }
 
         for (Asset asset : dispose) {
-            if (!(asset instanceof Mesh)) {
-                logger.info("Disposing {}", asset.getURI());
-                asset.dispose();
-            }
-        }
-
-        for (Asset asset : dispose) {
-            if (asset instanceof Mesh) {
-                logger.info("Disposing {}", asset.getURI());
-                asset.dispose();
-            }
+            logger.debug("Disposing {}", asset.getURI());
+            asset.dispose();
         }
     }
 
@@ -377,7 +367,7 @@ public class AssetManager {
         }
         Asset asset = assetCache.get(uri);
         if (asset != null) {
-            logger.info("Reloading {} with newly generated data", uri);
+            logger.debug("Reloading {} with newly generated data", uri);
             asset.reload(data);
         } else {
             asset = assetFactory.buildAsset(uri, data);
