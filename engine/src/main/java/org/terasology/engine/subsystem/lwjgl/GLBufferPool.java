@@ -30,6 +30,8 @@ public class GLBufferPool {
 
     private static final int BUFFER_FETCH_SIZE = 16;
 
+    private int totalPoolSize = 0;
+
     private TIntList pool = new TIntArrayList();
 
     public int get() {
@@ -39,6 +41,7 @@ public class GLBufferPool {
             for (int i = 0; i < BUFFER_FETCH_SIZE; ++i) {
                 pool.add(buffer.get(i));
             }
+            totalPoolSize += BUFFER_FETCH_SIZE;
         }
 
         return pool.removeAt(pool.size() - 1);
@@ -53,6 +56,10 @@ public class GLBufferPool {
             VertexBufferObjectUtil.bufferVboData(buffer, dataBuffer, GL15.GL_STATIC_DRAW);
             dataBuffer.flip();
         }
+    }
+
+    public int getActivePoolSize() {
+        return totalPoolSize - pool.size();
     }
 
 }
