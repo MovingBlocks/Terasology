@@ -18,7 +18,8 @@
  * Brick is Brick
  */
 {
-    "mass" : 128,
-    "categories" : ["stone"],
-    "hardness" : 4
+"mass" : 128,
+"categories" : ["stone"],
+"hardness" : 4,
+"displayName": "Brick"
 }
