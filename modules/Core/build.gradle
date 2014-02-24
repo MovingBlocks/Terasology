@@ -27,12 +27,18 @@ buildscript {
     // This needs to be in here as well for some reason - can't just inherit?
     repositories {
         mavenCentral()
+        maven {
+            url 'http://repo.jfrog.org/artifactory/libs-snapshots/'
+        }
     }
 
     // Dependencies at build script level
     dependencies {
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
+
+        // Artifactory magic
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.1.x-SNAPSHOT')
     }
 }
 
