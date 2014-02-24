@@ -89,4 +89,6 @@ public interface SoundPool<SOUND extends Sound, SOUND_SOURCE extends SoundSource
 
     float getVolume();
 
+    void purge(Sound sound);
+
 }

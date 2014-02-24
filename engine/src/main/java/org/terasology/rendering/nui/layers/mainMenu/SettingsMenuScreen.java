@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;

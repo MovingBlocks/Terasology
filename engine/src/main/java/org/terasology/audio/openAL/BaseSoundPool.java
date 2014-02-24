@@ -182,4 +182,13 @@ public abstract class BaseSoundPool implements SoundPool {
         }
     }
 
+    @Override
+    public void purge(Sound sound) {
+        for (SoundSource source : soundSources.keySet()) {
+            if (sound.equals(source.getAudio())) {
+                source.purge();
+            }
+        }
+    }
+
 }

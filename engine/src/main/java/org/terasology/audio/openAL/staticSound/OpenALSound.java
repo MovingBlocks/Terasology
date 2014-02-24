@@ -18,7 +18,6 @@ package org.terasology.audio.openAL.staticSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
@@ -87,12 +86,12 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
 
     @Override
     public void dispose() {
-//        if (bufferId != 0) {
-//            // TODO: need to ensure the sound is not in use, or stop it?
-//            alDeleteBuffers(bufferId);
-//            bufferId = 0;
-//            OpenALException.checkState("Deleting buffer data");
-//        }
+        if (bufferId != 0) {
+            audioManager.purgeSound(this);
+            alDeleteBuffers(bufferId);
+            bufferId = 0;
+            OpenALException.checkState("Deleting buffer data");
+        }
     }
 
     @Override
@@ -103,20 +102,18 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     @Override
     public void reload(StaticSoundData data) {
         if (bufferId == 0) {
-            if (bufferId == 0) {
-                bufferId = alGenBuffers();
-            } else {
-                audioManager.stopSound(bufferId);
-            }
-
-            AL10.alBufferData(bufferId, data.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, data.getData(), data.getSampleRate());
-            OpenALException.checkState("Allocating sound buffer");
-
-            int bits = data.getBufferBits();
-            int size = getBufferSize();
-            int channels = getChannels();
-            int frequency = getSamplingRate();
-            length = (float) size / channels / (bits / 8) / frequency;
+            bufferId = alGenBuffers();
+        } else {
+            audioManager.purgeSound(this);
         }
+
+        AL10.alBufferData(bufferId, data.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, data.getData(), data.getSampleRate());
+        OpenALException.checkState("Allocating sound buffer");
+
+        int bits = data.getBufferBits();
+        int size = getBufferSize();
+        int channels = getChannels();
+        int frequency = getSamplingRate();
+        length = (float) size / channels / (bits / 8) / frequency;
     }
 }

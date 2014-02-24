@@ -30,7 +30,7 @@ public class GLBufferPool {
 
     private static final int BUFFER_FETCH_SIZE = 16;
 
-    private int totalPoolSize = 0;
+    private int totalPoolSize;
 
     private TIntList pool = new TIntArrayList();
 
