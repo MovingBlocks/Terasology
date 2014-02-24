@@ -9,6 +9,10 @@ apply from: "$rootDir/config/gradle/common.gradle"
 // For modules apply the separate dependencies file that is unique per repo (and supposed to be empty for Core)
 apply from: 'dependencies.gradle'
 
+// New stuff for publishing to Artifactory hopefully including dependency info :-)
+apply plugin: 'maven-publish'
+apply plugin: 'artifactory-publish'
+
 import groovy.json.JsonSlurper
 
 ext {
