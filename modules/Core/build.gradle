@@ -37,8 +37,9 @@ buildscript {
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
 
-        // Artifactory magic
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.1.x-SNAPSHOT')
+        // Artifactory magic - tricky to get this working right, this did the trick locally ...
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-client', version: '+')
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '+')
     }
 }
 
@@ -171,6 +172,8 @@ dependencies {
 task createSkeleton() {
     mkdir('assets')
     mkdir('assets/animations')
+    mkdir('assets/atlas')
+    mkdir('assets/behaviors')
     mkdir('assets/blocks')
     mkdir('assets/blockTiles')
     mkdir('assets/fonts')
@@ -181,8 +184,10 @@ task createSkeleton() {
     mkdir('assets/shaders')
     mkdir('assets/shapes')
     mkdir('assets/skeletalMesh')
+    mkdir('assets/skins')
     mkdir('assets/sounds')
     mkdir('assets/textures')
+    mkdir('assets/ui')
     mkdir('src/main/java')
     mkdir('src/test/java')
 }
@@ -212,6 +217,15 @@ jar {
         copy {
             from 'module.txt'
             into 'build/classes'
+        }
+    }
+}
+
+// For Artifactory
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
 }
