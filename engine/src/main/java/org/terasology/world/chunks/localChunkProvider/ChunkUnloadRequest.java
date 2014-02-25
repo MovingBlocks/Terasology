@@ -42,7 +42,7 @@ public class ChunkUnloadRequest implements Task {
     }
 
     @Override
-    public void enact() {
+    public void run() {
         if (!shutdown) {
             chunkProvider.gatherBlockPositionsForDeactivate(chunk);
         }
