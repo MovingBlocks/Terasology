@@ -75,14 +75,14 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {
-            vboPosNormBuffer = bufferPool.get();
+            vboPosNormBuffer = bufferPool.get(getURI().toSimpleString());
         }
 
         IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
         indexBuffer.put(newData.getIndices().toArray());
         indexBuffer.flip();
         if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get();
+            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
@@ -94,7 +94,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         uvBuffer.flip();
 
         if (vboUVBuffer == 0) {
-            vboUVBuffer = bufferPool.get();
+            vboUVBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }

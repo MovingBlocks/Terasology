@@ -115,8 +115,8 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return String.format("total vus: %s | active threads: %s | worldTime: %.2f",
-                            ChunkTessellator.getVertexArrayUpdateCount(), engine.getActiveTaskCount(),
+                    return String.format("total vus: %s | worldTime: %.2f",
+                            ChunkTessellator.getVertexArrayUpdateCount(),
                             worldProvider.getTime().getDays());
                 }
             });

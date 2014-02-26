@@ -84,7 +84,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
-    private GLBufferPool bufferPool = new GLBufferPool();
+    private GLBufferPool bufferPool = new GLBufferPool(false);
 
     @Override
     public void preInitialise() {

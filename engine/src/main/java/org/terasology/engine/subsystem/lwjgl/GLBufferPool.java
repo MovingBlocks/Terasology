@@ -17,6 +17,8 @@ package org.terasology.engine.subsystem.lwjgl;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
 import org.terasology.rendering.VertexBufferObjectUtil;
@@ -30,11 +32,22 @@ public class GLBufferPool {
 
     private static final int BUFFER_FETCH_SIZE = 16;
 
+    private boolean traceBufferUsage;
     private int totalPoolSize;
 
     private TIntList pool = new TIntArrayList();
 
-    public int get() {
+    private TIntObjectMap<String> usageTracker;
+
+    public GLBufferPool(boolean traceBufferUsage) {
+        this.traceBufferUsage = traceBufferUsage;
+        if (traceBufferUsage) {
+            usageTracker = new TIntObjectHashMap<>();
+        }
+    }
+
+
+    public int get(String forUseBy) {
         if (pool.isEmpty()) {
             IntBuffer buffer = BufferUtils.createIntBuffer(BUFFER_FETCH_SIZE);
             GL15.glGenBuffers(buffer);
@@ -44,7 +57,11 @@ public class GLBufferPool {
             totalPoolSize += BUFFER_FETCH_SIZE;
         }
 
-        return pool.removeAt(pool.size() - 1);
+        int result = pool.removeAt(pool.size() - 1);
+        if (traceBufferUsage) {
+            usageTracker.put(result, forUseBy);
+        }
+        return result;
     }
 
     public void dispose(int buffer) {
@@ -55,11 +72,22 @@ public class GLBufferPool {
             dataBuffer.flip();
             VertexBufferObjectUtil.bufferVboData(buffer, dataBuffer, GL15.GL_STATIC_DRAW);
             dataBuffer.flip();
+
+            if (traceBufferUsage) {
+                usageTracker.remove(buffer);
+            }
         }
     }
 
     public int getActivePoolSize() {
         return totalPoolSize - pool.size();
+    }
+
+    public String getUsageMap() {
+        if (traceBufferUsage) {
+            return usageTracker.toString();
+        }
+        return "Tracing disabled";
     }
 
 }

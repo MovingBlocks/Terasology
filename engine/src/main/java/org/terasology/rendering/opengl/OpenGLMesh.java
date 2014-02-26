@@ -298,7 +298,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         }
         vertexBuffer.flip();
         if (vboVertexBuffer == 0) {
-            vboVertexBuffer = bufferPool.get();
+            vboVertexBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         vertexBuffer.flip();
@@ -313,7 +313,7 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         indexBuffer.flip();
 
         if (vboIndexBuffer == 0) {
-            vboIndexBuffer = bufferPool.get();
+            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
         indexBuffer.flip();

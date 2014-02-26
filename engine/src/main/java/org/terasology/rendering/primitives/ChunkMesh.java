@@ -163,8 +163,8 @@ public class ChunkMesh {
         VertexElements elements = vertexElements.get(type);
         int id = type.getIndex();
         if (!disposed && elements.finalIndices.limit() > 0 && elements.finalVertices.limit() > 0) {
-            vertexBuffers[id] = bufferPool.get();
-            idxBuffers[id] = bufferPool.get();
+            vertexBuffers[id] = bufferPool.get("chunkMesh");
+            idxBuffers[id] = bufferPool.get("chunkMesh");
             vertexCount[id] = elements.finalIndices.limit();
 
             VertexBufferObjectUtil.bufferVboElementData(idxBuffers[id], elements.finalIndices, GL15.GL_STATIC_DRAW);
