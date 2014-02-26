@@ -72,7 +72,7 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
  */
 public class DisplayEnvironment extends HeadlessEnvironment {
 
-    private GLBufferPool bufferPool = new GLBufferPool();
+    private GLBufferPool bufferPool = new GLBufferPool(true);
     
     @Override
     protected void setupDisplay() {
