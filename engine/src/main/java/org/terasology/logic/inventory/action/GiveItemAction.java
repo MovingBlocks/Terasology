@@ -19,6 +19,9 @@ import org.terasology.engine.API;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This action adds the item into the inventory of the entity it was sent to. The item is either completely consumed
  * or not modified at all. If it was consumed, the isConsumed() will return <code>true</code>.
@@ -29,7 +32,7 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 public class GiveItemAction extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef item;
-    private Integer slot;
+    private List<Integer> slots;
 
     public GiveItemAction(EntityRef instigator, EntityRef item) {
         this.instigator = instigator;
@@ -37,17 +40,21 @@ public class GiveItemAction extends AbstractConsumableEvent {
     }
 
     public GiveItemAction(EntityRef instigator, EntityRef item, int slot) {
+        this(instigator, item, Arrays.asList(slot));
+    }
+
+    public GiveItemAction(EntityRef instigator, EntityRef item, List<Integer> slots) {
         this.instigator = instigator;
         this.item = item;
-        this.slot = slot;
+        this.slots = slots;
     }
 
     public EntityRef getItem() {
         return item;
     }
 
-    public Integer getSlot() {
-        return slot;
+    public List<Integer> getSlots() {
+        return slots;
     }
 
     public EntityRef getInstigator() {
