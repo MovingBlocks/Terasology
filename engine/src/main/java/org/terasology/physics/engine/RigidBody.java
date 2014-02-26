@@ -39,6 +39,14 @@ public interface RigidBody {
     void applyImpulse(Vector3f impulse);
 
     /**
+     * Applies an force to this rigid body. The force is applied to the
+     * centre of mass. Force is stored as reference, not by value.
+     *
+     * @param force the force to apply.
+     */
+    void applyForce(Vector3f force);
+
+    /**
      * Changes to location of this rigid body by the given translation. Note
      * that velocities and orientation remain the same.
      *

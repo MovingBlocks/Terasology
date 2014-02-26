@@ -39,6 +39,12 @@ public class RigidBodyComponent implements Component {
     @Replicate(initialOnly = true)
     public Vector3f velocity = new Vector3f();
 
+    @Replicate
+    public float angularFactor = 1f;
+
+    @Replicate
+    public float friction = 0.5f;
+
     @Replicate(initialOnly = true)
     public Vector3f angularVelocity = new Vector3f();
 

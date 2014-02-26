@@ -231,7 +231,7 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public void update(float delta) {
         processQueuedBodies();
-        applyPendingImpulses();
+        applyPendingImpulsesAndForces();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
             if (discreteDynamicsWorld.stepSimulation(delta, 8) != 0) {
@@ -261,6 +261,7 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public boolean updateRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBodyComponent rb = entity.getComponent(RigidBodyComponent.class);
         BulletRigidBody rigidBody = entityRigidBodies.get(entity);
 
         if (location == null) {
@@ -273,6 +274,9 @@ public class BulletPhysics implements PhysicsEngine {
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
+            }else{
+                rigidBody.rb.setAngularFactor(rb.angularFactor);
+                rigidBody.rb.setFriction(rb.friction);
             }
 
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
@@ -466,9 +470,12 @@ public class BulletPhysics implements PhysicsEngine {
             }
             Vector3f fallInertia = new Vector3f();
             shape.calculateLocalInertia(rigidBody.mass, fallInertia);
+
             RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
+            collider.rb.setAngularFactor(rigidBody.angularFactor);
+            collider.rb.setFriction(rigidBody.friction);
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
             addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
@@ -537,13 +544,18 @@ public class BulletPhysics implements PhysicsEngine {
      * Applies all pending impulses to the corresponding rigidBodies and clears
      * the pending impulses.
      */
-    private void applyPendingImpulses() {
+    private void applyPendingImpulsesAndForces() {
         for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
             BulletRigidBody body = entree.getValue();
             body.rb.applyCentralImpulse(body.pendingImpulse);
+            body.rb.applyCentralForce(body.pendingForce);
             body.pendingImpulse.x = 0;
             body.pendingImpulse.y = 0;
             body.pendingImpulse.z = 0;
+
+            body.pendingForce.x = 0;
+            body.pendingForce.y = 0;
+            body.pendingForce.z = 0;
         }
     }
 
@@ -698,6 +710,7 @@ public class BulletPhysics implements PhysicsEngine {
         public final com.bulletphysics.dynamics.RigidBody rb;
         private final Transform temp = new Transform();
         private final Vector3f pendingImpulse = new Vector3f();
+        private final Vector3f pendingForce = new Vector3f();
 
         BulletRigidBody(RigidBodyConstructionInfo info) {
             rb = new com.bulletphysics.dynamics.RigidBody(info);
@@ -706,6 +719,11 @@ public class BulletPhysics implements PhysicsEngine {
         @Override
         public void applyImpulse(Vector3f impulse) {
             pendingImpulse.add(impulse);
+        }
+
+        @Override
+        public void applyForce(Vector3f force) {
+            pendingForce.add(force);
         }
 
         @Override
