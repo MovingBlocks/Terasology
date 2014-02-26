@@ -80,6 +80,12 @@ public class DebugControlSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
+    public void onToggleViewDistance(ToggleViewDistanceButton button, EntityRef entity) {
+        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
+        button.consume();
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
@@ -143,10 +149,6 @@ public class DebugControlSystem extends BaseComponentSystem {
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
-            case Keyboard.KeyId.F:
-                toggleViewingDistance();
-                event.consume();
-                break;
             case Keyboard.KeyId.F4:
                 overlay.toggleMetricsMode();
                 event.consume();
@@ -155,7 +157,4 @@ public class DebugControlSystem extends BaseComponentSystem {
         }
     }
 
-    private void toggleViewingDistance() {
-        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
-    }
 }
