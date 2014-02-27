@@ -19,6 +19,9 @@ import org.terasology.engine.API;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Removed the specified item from the inventory of the entity it was sent to. If the remove was successful, the
  * event will be consumed.
@@ -28,27 +31,35 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 @API
 public class RemoveItemAction extends AbstractConsumableEvent {
     private EntityRef instigator;
-    private EntityRef item;
+    private List<EntityRef> items;
     private boolean destroyRemoved;
     private Integer count;
 
     private EntityRef removedItem;
 
     public RemoveItemAction(EntityRef instigator, EntityRef item, boolean destroyRemoved) {
-        this.instigator = instigator;
-        this.item = item;
-        this.destroyRemoved = destroyRemoved;
+        this(instigator, Arrays.asList(item), destroyRemoved);
     }
 
     public RemoveItemAction(EntityRef instigator, EntityRef item, boolean destroyRemoved, int count) {
+        this(instigator, Arrays.asList(item), destroyRemoved, count);
+    }
+
+    public RemoveItemAction(EntityRef instigator, List<EntityRef> items, boolean destroyRemoved) {
         this.instigator = instigator;
-        this.item = item;
+        this.items = items;
+        this.destroyRemoved = destroyRemoved;
+    }
+
+    public RemoveItemAction(EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count) {
+        this.instigator = instigator;
+        this.items = items;
         this.destroyRemoved = destroyRemoved;
         this.count = count;
     }
 
-    public EntityRef getItem() {
-        return item;
+    public List<EntityRef> getItems() {
+        return items;
     }
 
     public Integer getCount() {
