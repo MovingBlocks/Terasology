@@ -45,6 +45,10 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @ReceiveEvent(components = {InventoryComponent.class})
     public void switchItem(SwitchItemAction event, EntityRef entity) {
         InventoryUtils.moveItem(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo());
@@ -138,7 +142,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         if (shrinkSlotNo > -1) {
             EntityRef itemAt = InventoryUtils.getItemAt(entity, shrinkSlotNo);
-            removedCount += InventoryUtils.getSlotCount(itemAt) - shrinkCountResult;
+            removedCount += InventoryUtils.getStackCount(itemAt) - shrinkCountResult;
             if (event.isDestroyRemoved()) {
                 InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
             } else {
@@ -151,8 +155,10 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         if (removed != null) {
             ItemComponent item = removed.getComponent(ItemComponent.class);
-            item.stackCount = (byte) removedCount;
-            removed.saveComponent(item);
+            if (item.stackCount != removedCount) {
+                item.stackCount = (byte) removedCount;
+                removed.saveComponent(item);
+            }
             event.setRemovedItem(removed);
         }
         return true;
