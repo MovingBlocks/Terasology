@@ -17,12 +17,12 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.WorldBiomeProvider;
+import org.terasology.math.Region3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generator.FirstPassGenerator;
 
 import java.util.HashMap;
@@ -37,9 +37,7 @@ import java.util.Map;
 public class FlatTerrainGenerator implements FirstPassGenerator {
 
     // TODO FlatTerrainGenerator: What is a good value for MAX_Y?
-    public static final int MAX_HEIGHT = ChunkConstants.SIZE_Y - 100;
-    public static final int MIN_HEIGHT = 0;
-    public static final int DEFAULT_HEIGHT = 50;
+    public static final int DEFAULT_HEIGHT = 8;
 
     private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerator.class);
     private static final String INIT_PARAMETER_HEIGHT = "height";
@@ -71,17 +69,7 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
     }
 
     public void setSurfaceHeight(int surfaceHeight) {
-        if (surfaceHeight < FlatTerrainGenerator.MIN_HEIGHT) {
-            this.surfaceHeight = FlatTerrainGenerator.MIN_HEIGHT;
-        } else if (surfaceHeight > FlatTerrainGenerator.MAX_HEIGHT) {
-            this.surfaceHeight = FlatTerrainGenerator.MAX_HEIGHT;
-        } else {
-            this.surfaceHeight = surfaceHeight;
-        }
-    }
-
-    public boolean isValidHeight(int height) {
-        return height >= FlatTerrainGenerator.MIN_HEIGHT && height <= FlatTerrainGenerator.MAX_HEIGHT;
+        this.surfaceHeight = surfaceHeight;
     }
 
     /**
@@ -120,59 +108,58 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
 
     @Override
     public void generateChunk(final Chunk chunk) {
-        for (int x = 0; x < chunk.getChunkSizeX(); x++) {
-            for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
-                final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
+        Region3i chunkRegion = chunk.getRegion();
+        if (surfaceHeight >= chunkRegion.min().y) {
+            for (int x = 0; x < chunk.getChunkSizeX(); x++) {
+                for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
+                    final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
-                for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
-                    if (y == 0) {
-                        // bedrock/mantle
-                        chunk.setBlock(x, y, z, mantle);
-                    } else if (y < surfaceHeight) {
-                        // underground
-                        switch (type) {
-                            case FOREST:
-                                chunk.setBlock(x, y, z, dirt);
-                                break;
-                            case PLAINS:
-                                chunk.setBlock(x, y, z, dirt);
-                                break;
-                            case MOUNTAINS:
-                                chunk.setBlock(x, y, z, stone);
-                                break;
-                            case SNOW:
-                                chunk.setBlock(x, y, z, snow);
-                                break;
-                            case DESERT:
-                                chunk.setBlock(x, y, z, sand);
-                                break;
+                    for (int y = 0; y < chunk.getChunkSizeY() && y + chunkRegion.min().y < surfaceHeight + 1; y++) {
+                        int worldY = y + +chunkRegion.min().y;
+                        if (worldY < surfaceHeight) {
+                            // underground
+                            switch (type) {
+                                case FOREST:
+                                    chunk.setBlock(x, y, z, dirt);
+                                    break;
+                                case PLAINS:
+                                    chunk.setBlock(x, y, z, dirt);
+                                    break;
+                                case MOUNTAINS:
+                                    chunk.setBlock(x, y, z, stone);
+                                    break;
+                                case SNOW:
+                                    chunk.setBlock(x, y, z, snow);
+                                    break;
+                                case DESERT:
+                                    chunk.setBlock(x, y, z, sand);
+                                    break;
+                            }
+                        } else if (worldY == surfaceHeight) {
+                            // surface
+                            switch (type) {
+                                case FOREST:
+                                    chunk.setBlock(x, y, z, dirt);
+                                    break;
+                                case PLAINS:
+                                    chunk.setBlock(x, y, z, grass);
+                                    break;
+                                case MOUNTAINS:
+                                    chunk.setBlock(x, y, z, stone);
+                                    break;
+                                case SNOW:
+                                    chunk.setBlock(x, y, z, snow);
+                                    break;
+                                case DESERT:
+                                    chunk.setBlock(x, y, z, sand);
+                                    break;
+                            }
                         }
-                    } else if (y == surfaceHeight) {
-                        // surface
-                        switch (type) {
-                            case FOREST:
-                                chunk.setBlock(x, y, z, dirt);
-                                break;
-                            case PLAINS:
-                                chunk.setBlock(x, y, z, grass);
-                                break;
-                            case MOUNTAINS:
-                                chunk.setBlock(x, y, z, stone);
-                                break;
-                            case SNOW:
-                                chunk.setBlock(x, y, z, snow);
-                                break;
-                            case DESERT:
-                                chunk.setBlock(x, y, z, sand);
-                                break;
-                        }
-                    } else {
-                        // air
-                        chunk.setBlock(x, y, z, air);
                     }
                 }
             }
         }
+
     }
 
 }

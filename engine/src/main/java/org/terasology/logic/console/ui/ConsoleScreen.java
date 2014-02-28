@@ -62,7 +62,6 @@ public class ConsoleScreen extends CoreScreenLayer {
         scrollArea.moveToBottom();
 
         commandLine = find("commandLine", UICommandEntry.class);
-        getManager().setFocus(commandLine);
         commandLine.setTabCompletionEngine(new ConsoleTabCompletionEngine(console));
         commandLine.bindCommandHistory(new ReadOnlyBinding<List<String>>() {
             @Override
@@ -96,7 +95,13 @@ public class ConsoleScreen extends CoreScreenLayer {
                 return messageList.toString();
             }
         });
+    }
 
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        commandLine = find("commandLine", UICommandEntry.class);
+        getManager().setFocus(commandLine);
     }
 
     @Override

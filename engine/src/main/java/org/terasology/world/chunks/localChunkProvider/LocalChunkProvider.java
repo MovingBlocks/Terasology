@@ -20,16 +20,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -39,6 +36,7 @@ import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.BeforeDeactivateBlocks;
@@ -150,14 +148,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
         Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
+        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
     }
 
     @Override
     public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
+            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
         }
         return null;
     }
@@ -169,7 +167,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
                 return null;
             }
-            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
+            chunkPos.sub(region.min());
+            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset);
@@ -180,12 +179,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, int distance) {
+    public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
         addRelevanceEntity(entity, distance, null);
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
+        Vector3i finalDist = new Vector3i(distance);
+        finalDist.add(ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE);
+
         if (!entity.exists()) {
             return;
         }
@@ -193,14 +195,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setRelevanceDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
+                region.setRelevanceDistance(finalDist);
                 return;
             }
         } finally {
             regionLock.readLock().unlock();
         }
 
-        ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, distance + ChunkConstants.FULL_GENERATION_DISTANCE);
+        ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, finalDist);
         if (listener != null) {
             region.setListener(listener);
         }
@@ -216,16 +218,18 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 region.chunkReady(chunk);
             }
         }
-        pipeline.requestProduction(region.getRegion().expand(new Vector3i(2, 0, 2)));
+        pipeline.requestProduction(region.getRegion().expand(2));
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, int distance) {
+    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+        Vector3i finalDist = new Vector3i(distance);
+        finalDist.add(ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE);
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setRelevanceDistance(distance + ChunkConstants.FULL_GENERATION_DISTANCE);
+                region.setRelevanceDistance(finalDist);
             }
         } finally {
             regionLock.readLock().unlock();
@@ -291,7 +295,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 Vector3i pos = iterator.next();
                 boolean keep = false;
                 for (ChunkRelevanceRegion region : regions.values()) {
-                    if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
+                    if (region.getRegion().expand(2).encompasses(pos)) {
                         keep = true;
                         break;
                     }
@@ -350,7 +354,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     }
                 }
                 if (produceChunks) {
-                    pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
+                    pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(2));
                 }
                 chunkRelevanceRegion.setUpToDate();
             }
@@ -509,7 +513,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
         nearCache.clear();
         storageManager.purgeChunks();
-        
+
         worldEntity.send(new PurgeWorldEvent());
 
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
@@ -517,21 +521,22 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
-            pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
+            pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(2));
             chunkRelevanceRegion.setUpToDate();
         }
     }
 
     @Override
     public ChunkViewCore getViewAround(Vector3i pos) {
-        Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
-        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().z];
+        Region3i region = Region3i.createFromCenterExtents(pos, 1);
+        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = getChunkForProcessing(chunkPos);
             if (chunk == null) {
                 return null;
             }
-            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
+            chunkPos.sub(region.min());
+            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, Vector3i.one());

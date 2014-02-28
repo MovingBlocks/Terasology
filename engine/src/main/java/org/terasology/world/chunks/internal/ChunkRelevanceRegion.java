@@ -23,10 +23,8 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkRegionListener;
 
-import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -34,10 +32,10 @@ import java.util.Set;
  * @author Immortius
  */
 public class ChunkRelevanceRegion {
-    private int unloadLeeway = 2;
+    private static final int UNLOAD_LEEWAY = 2;
 
     private EntityRef entity;
-    private int relevanceDistance;
+    private Vector3i relevanceDistance = new Vector3i();
     private boolean dirty;
     private Vector3i center = new Vector3i();
     private Region3i region = Region3i.EMPTY;
@@ -45,15 +43,15 @@ public class ChunkRelevanceRegion {
 
     private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
 
-    public ChunkRelevanceRegion(EntityRef entity, int relevanceDistance) {
+    public ChunkRelevanceRegion(EntityRef entity, Vector3i relevanceDistance) {
         this.entity = entity;
-        this.relevanceDistance = relevanceDistance;
+        this.relevanceDistance.set(relevanceDistance);
 
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc == null) {
             dirty = false;
         } else {
-            center.set(worldToChunkPos(loc.getWorldPosition()));
+            center.set(TeraMath.calcChunkPos(loc.getWorldPosition()));
             region = calculateRegion();
             dirty = true;
         }
@@ -63,17 +61,15 @@ public class ChunkRelevanceRegion {
         return new Vector3i(center);
     }
 
-    public void setRelevanceDistance(int distance) {
-        if (distance < this.relevanceDistance) {
-            reviewRelevantChunks(distance);
-        }
-        this.relevanceDistance = distance;
+    public void setRelevanceDistance(Vector3i distance) {
+        reviewRelevantChunks(distance);
+        this.relevanceDistance.set(distance);
         this.region = calculateRegion();
         dirty = true;
     }
 
-    private void reviewRelevantChunks(int distance) {
-        Vector3i extents = new Vector3i(TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway, 0, TeraMath.ceilToInt(distance / 2.0f) + unloadLeeway);
+    private void reviewRelevantChunks(Vector3i distance) {
+        Vector3i extents = new Vector3i(distance.x / 2 + UNLOAD_LEEWAY, distance.y / 2 + UNLOAD_LEEWAY, distance.z / 2 + UNLOAD_LEEWAY);
         Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
         Iterator<Vector3i> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
@@ -118,8 +114,8 @@ public class ChunkRelevanceRegion {
     private Region3i calculateRegion() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            Vector3i extents = new Vector3i(TeraMath.ceilToInt(relevanceDistance / 2.0f), 0, TeraMath.ceilToInt(relevanceDistance / 2.0f));
-            return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), extents);
+            Vector3i extents = new Vector3i(relevanceDistance.x / 2, relevanceDistance.y / 2, relevanceDistance.z / 2);
+            return Region3i.createFromCenterExtents(TeraMath.calcChunkPos(loc.getWorldPosition()), extents);
         }
         return Region3i.EMPTY;
     }
@@ -127,16 +123,9 @@ public class ChunkRelevanceRegion {
     private Vector3i calculateCenter() {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
-            return worldToChunkPos(loc.getWorldPosition());
+            return TeraMath.calcChunkPos(loc.getWorldPosition());
         }
         return new Vector3i();
-    }
-
-    private Vector3i worldToChunkPos(Vector3f worldPos) {
-        worldPos.x /= ChunkConstants.SIZE_X;
-        worldPos.y = 0;
-        worldPos.z /= ChunkConstants.SIZE_Z;
-        return new Vector3i(worldPos);
     }
 
     public void setListener(ChunkRegionListener listener) {

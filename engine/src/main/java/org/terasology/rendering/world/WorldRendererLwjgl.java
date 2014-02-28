@@ -68,6 +68,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -105,7 +106,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance() * ViewDistance.MEGA.getChunkDistance();
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRendererLwjgl.class);
 
@@ -134,8 +135,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private ChunkTessellator chunkTessellator;
     private boolean pendingChunks;
     private final List<ChunkImpl> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
-    private int chunkPosX;
-    private int chunkPosZ;
+    private Vector3i chunkPos = new Vector3i();
 
     /* RENDERING */
     private final PriorityQueue<ChunkImpl> renderQueueChunksOpaque = new PriorityQueue<>(MAX_CHUNKS, new ChunkFrontToBackComparator());
@@ -158,10 +158,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     /* EVENTS */
     private final WorldTimeEventManager worldTimeEventManager;
-
-    /* PHYSICS */
-    // TODO: Remove physics handling from world renderer
-    private final BulletPhysics bulletPhysics;
 
     /* STATISTICS */
     private int statDirtyChunks;
@@ -188,7 +184,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
-        bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTessellator, worldProvider);
@@ -223,63 +218,48 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      * @return True if the list was changed
      */
     public boolean updateChunksInProximity(boolean force) {
-        int newChunkPosX = calcCamChunkOffsetX();
-        int newChunkPosZ = calcCamChunkOffsetZ();
+        Vector3i newChunkPos = calcCamChunkOffset();
 
         // TODO: This should actually be done based on events from the ChunkProvider on new chunk availability/old chunk removal
-        int viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-
         boolean chunksCurrentlyPending = false;
-        if (chunkPosX != newChunkPosX || chunkPosZ != newChunkPosZ || force || pendingChunks) {
+        if (!newChunkPos.equals(chunkPos) || force || pendingChunks) {
+            Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
+            Region3i viewRegion = Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2));
             if (chunksInProximity.size() == 0 || force || pendingChunks) {
                 // just add all visible chunks
                 chunksInProximity.clear();
-                for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
-                    for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
-                        ChunkImpl c = chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
-                        if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
-                            chunksInProximity.add(c);
-                        } else {
-                            chunksCurrentlyPending = true;
-                        }
+                for (Vector3i pos : viewRegion) {
+                    ChunkImpl c = chunkProvider.getChunk(pos);
+                    if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                        chunksInProximity.add(c);
+                    } else {
+                        chunksCurrentlyPending = true;
                     }
                 }
             } else {
-                // adjust proximity chunk list
-                int vd2 = viewingDistance / 2;
+                Region3i oldRegion = Region3i.createFromCenterExtents(chunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2));
 
-                Rect2i oldView = Rect2i.createFromMinAndSize(chunkPosX - vd2, chunkPosZ - vd2, viewingDistance, viewingDistance);
-                Rect2i newView = Rect2i.createFromMinAndSize(newChunkPosX - vd2, newChunkPosZ - vd2, viewingDistance, viewingDistance);
-
-                // remove
-                List<Rect2i> removeRects = Rect2i.difference(oldView, newView);
-                for (Rect2i r : removeRects) {
-                    for (int x = r.minX(); x <= r.maxX(); ++x) {
-                        for (int y = r.minY(); y <= r.maxY(); ++y) {
-                            ChunkImpl c = chunkProvider.getChunk(x, 0, y);
-                            if (c != null) {
-                                chunksInProximity.remove(c);
-                                c.disposeMesh();
-                            }
-                        }
+                Iterator<Vector3i> removeChunks = oldRegion.subtract(viewRegion);
+                while (removeChunks.hasNext()) {
+                    Vector3i pos = removeChunks.next();
+                    ChunkImpl c = chunkProvider.getChunk(pos);
+                    if (c != null) {
+                        chunksInProximity.remove(c);
+                        c.disposeMesh();
                     }
                 }
 
-                // add
-                for (int x = newView.minX(); x <= newView.maxX(); ++x) {
-                    for (int y = newView.minY(); y <= newView.maxY(); ++y) {
-                        ChunkImpl c = chunkProvider.getChunk(x, 0, y);
-                        if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
-                            chunksInProximity.add(c);
-                        } else {
-                            chunksCurrentlyPending = true;
-                        }
+                for (Vector3i pos : viewRegion) {
+                    ChunkImpl c = chunkProvider.getChunk(pos);
+                    if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                        chunksInProximity.add(c);
+                    } else {
+                        chunksCurrentlyPending = true;
                     }
                 }
             }
 
-            chunkPosX = newChunkPosX;
-            chunkPosZ = newChunkPosZ;
+            chunkPos.set(newChunkPos);
             pendingChunks = chunksCurrentlyPending;
 
             Collections.sort(chunksInProximity, new ChunkFrontToBackComparator());
@@ -1067,38 +1047,14 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     /**
-     * Returns the maximum height at a given position.
-     *
-     * @param x The X-coordinate
-     * @param z The Z-coordinate
-     * @return The maximum height
-     */
-    public int maxHeightAt(int x, int z) {
-        for (int y = ChunkConstants.SIZE_Y - 1; y >= 0; y--) {
-            if (!worldProvider.getBlock(x, y, z).isInvisible()) {
-                return y;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
      * Chunk position of the player.
      *
-     * @return The player offset on the x-axis
+     * @return The player offset chunk
      */
-    private int calcCamChunkOffsetX() {
-        return (int) (getActiveCamera().getPosition().x / ChunkConstants.SIZE_X);
-    }
-
-    /**
-     * Chunk position of the player.
-     *
-     * @return The player offset on the z-axis
-     */
-    private int calcCamChunkOffsetZ() {
-        return (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z);
+    private Vector3i calcCamChunkOffset() {
+        return new Vector3i((int) (getActiveCamera().getPosition().x / ChunkConstants.SIZE_X),
+                (int) (getActiveCamera().getPosition().y / ChunkConstants.SIZE_Y),
+                (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
     }
 
     /**
@@ -1133,12 +1089,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      */
     public boolean pregenerateChunks() {
         boolean complete = true;
-        int newChunkPosX = calcCamChunkOffsetX();
-        int newChunkPosZ = calcCamChunkOffsetZ();
-        int viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
+        Vector3i newChunkPos = calcCamChunkOffset();
+        Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
 
         chunkProvider.update();
-        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance / 2, 0, viewingDistance / 2))) {
+        for (Vector3i pos : Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2))) {
             ChunkImpl chunk = chunkProvider.getChunk(pos);
             if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
                 complete = false;
@@ -1274,14 +1229,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     public float getTick() {
         return tick;
-    }
-
-    public List<ChunkImpl> getChunksInProximity() {
-        return chunksInProximity;
-    }
-
-    public BulletPhysics getBulletRenderer() {
-        return bulletPhysics;
     }
 
     public Camera getActiveCamera() {

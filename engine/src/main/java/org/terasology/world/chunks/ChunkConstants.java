@@ -28,10 +28,11 @@ import org.terasology.math.Vector3i;
  */
 @API
 public final class ChunkConstants {
-    public static final int SIZE_X = 16;
-    public static final int SIZE_Y = 256;
-    public static final int SIZE_Z = 16;
+    public static final int SIZE_X = 32;
+    public static final int SIZE_Y = 64;
+    public static final int SIZE_Z = 32;
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_Y = TeraMath.ceilPowerOfTwo(SIZE_Y) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Y = TeraMath.sizeOfPower(SIZE_Y);
@@ -41,16 +42,15 @@ public final class ChunkConstants {
 
     public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, POWER_Y, POWER_Z);
     public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
-    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, INNER_CHUNK_POS_FILTER_Y, INNER_CHUNK_POS_FILTER_Z);
     public static final Region3i CHUNK_REGION = Region3i.createFromMinAndSize(Vector3i.zero(), CHUNK_SIZE);
 
-    public static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 0, 1);
+    public static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 1, 1);
+
     /**
      * How many chunks around a chunk must be relevant to guarantee it is fully generated.
      */
-    public static final int FULL_GENERATION_DISTANCE = 2;
-
-    public static final int REMOTE_GENERATION_DISTANCE = 2;
+    public static final int GENERATION_DISTANCE = 2;
 
     private ChunkConstants() {
     }

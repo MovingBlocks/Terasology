@@ -71,9 +71,6 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
-        CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
-
         CoreRegistry.get(NetworkSystem.class).setRemoteWorldProvider(chunkProvider);
 
         return true;

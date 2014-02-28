@@ -16,6 +16,7 @@
 package org.terasology.world.chunks;
 
 import org.terasology.engine.API;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
@@ -63,4 +64,6 @@ public interface Chunk {
     int getChunkSizeY();
 
     int getChunkSizeZ();
+
+    Region3i getRegion();
 }

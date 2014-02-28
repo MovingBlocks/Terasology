@@ -209,10 +209,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public LiquidData getLiquid(int x, int y, int z) {
-        if (y >= ChunkConstants.SIZE_Y || y < 0) {
-            return new LiquidData();
-        }
-
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         ChunkImpl chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -225,11 +221,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        if (y >= ChunkConstants.SIZE_Y || y < 0) {
-            // Happens if you are moving around above the world
-            return BlockManager.getAir();
-        }
-
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         ChunkImpl chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -242,11 +233,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getLight(int x, int y, int z) {
-        if (y >= ChunkConstants.SIZE_Y || y < 0) {
-            logger.warn("Accessed light value outside of the height range");
-            return 0;
-        }
-
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         ChunkImpl chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -259,11 +245,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getSunlight(int x, int y, int z) {
-        if (y >= ChunkConstants.SIZE_Y || y < 0) {
-            logger.warn("Accessed sunlight value outside of the height range");
-            return 0;
-        }
-
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         ChunkImpl chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -276,11 +257,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
-        if (y >= ChunkConstants.SIZE_Y || y < 0) {
-            logger.warn("Accessed total light value outside of the height range");
-            return 0;
-        }
-
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         ChunkImpl chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {

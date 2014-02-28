@@ -96,33 +96,6 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    public ChunkMesh generateMinaturizedMesh(MiniatureChunk miniatureChunk) {
-        PerformanceMonitor.startActivity("GenerateMinuatureMesh");
-        ChunkMesh mesh = new ChunkMesh(bufferPool);
-
-        MiniatureChunk[] chunks = {miniatureChunk};
-        ChunkViewCoreImpl localChunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
-        localChunkView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
-
-        for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
-            for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {
-                for (int y = 0; y < MiniatureChunk.SIZE_Y; y++) {
-                    Block block = miniatureChunk.getBlock(x, y, z);
-
-                    if (block != null && !block.isInvisible()) {
-                        generateBlockVertices(localChunkView, mesh, x, y, z, 0.0f, 0.0f);
-                    }
-                }
-            }
-        }
-
-        generateOptimizedBuffers(localChunkView, mesh);
-        statVertexArrayUpdateCount++;
-
-        PerformanceMonitor.endActivity();
-        return mesh;
-    }
-
     private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 

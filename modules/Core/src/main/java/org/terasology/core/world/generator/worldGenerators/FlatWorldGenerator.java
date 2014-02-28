@@ -37,10 +37,10 @@ public class FlatWorldGenerator extends AbstractBaseWorldGenerator {
     @Override
     public void initialize() {
         register(new FlatTerrainGenerator());
-        register(new FloraGenerator());
-        register(new LiquidsGenerator());
+        //register(new FloraGenerator());
+        //register(new LiquidsGenerator());
         ForestGenerator forestGenerator = new ForestGenerator();
         DefaultGenerators.addDefaultForestGenerators(forestGenerator);
-        register(forestGenerator);
+        //register(forestGenerator);
     }
 }

@@ -40,10 +40,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     private ChunkImpl[] chunks;
 
     private Vector3i chunkPower;
-    private Vector3i chunkSize;
     private Vector3i chunkFilterSize;
 
-    private ThreadLocal<Boolean> locked = new ThreadLocal<Boolean>();
+    private ThreadLocal<Boolean> locked = new ThreadLocal<>();
 
     public ChunkViewCoreImpl(ChunkImpl[] chunks, Region3i chunkRegion, Vector3i offset) {
         locked.set(false);
@@ -213,9 +212,9 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void setDirtyAround(Region3i region) {
         Vector3i minPos = new Vector3i(region.min());
-        minPos.sub(1, 0, 1);
+        minPos.sub(1, 1, 1);
         Vector3i maxPos = new Vector3i(region.max());
-        maxPos.add(1, 0, 1);
+        maxPos.add(1, 1, 1);
 
         Vector3i minChunk = TeraMath.calcChunkPos(minPos, chunkPower);
         Vector3i maxChunk = TeraMath.calcChunkPos(maxPos, chunkPower);
@@ -260,18 +259,19 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         return true;
     }
 
-    int relChunkIndex(int x, int y, int z) {
-        return TeraMath.calcChunkPosX(x, chunkPower.x) + offset.x + chunkRegion.size().x * (TeraMath.calcChunkPosZ(z, chunkPower.z) + offset.z);
+    protected int relChunkIndex(int x, int y, int z) {
+        return TeraMath.calculate3DArrayIndex(TeraMath.calcChunkPosX(x, chunkPower.x) + offset.x,
+                TeraMath.calcChunkPosY(y, chunkPower.y) + offset.y,
+                TeraMath.calcChunkPosZ(z, chunkPower.z) + offset.z, chunkRegion.size());
     }
 
     public void setChunkSize(Vector3i chunkSize) {
-        this.chunkSize = chunkSize;
-        this.chunkFilterSize = new Vector3i(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, 0, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
-        this.chunkPower = new Vector3i(TeraMath.sizeOfPower(chunkSize.x), 0, TeraMath.sizeOfPower(chunkSize.z));
+        this.chunkFilterSize = new Vector3i(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, TeraMath.ceilPowerOfTwo(chunkSize.y) - 1, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
+        this.chunkPower = new Vector3i(TeraMath.sizeOfPower(chunkSize.x), TeraMath.sizeOfPower(chunkSize.y), TeraMath.sizeOfPower(chunkSize.z));
 
         Vector3i blockMin = new Vector3i();
         blockMin.sub(offset);
-        blockMin.mult(chunkSize.x, 0, chunkSize.z);
+        blockMin.mult(chunkSize.x, chunkSize.y, chunkSize.z);
         Vector3i blockSize = chunkRegion.size();
         blockSize.mult(chunkSize.x, chunkSize.y, chunkSize.z);
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
@@ -279,7 +279,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public Vector3i toWorldPos(Vector3i localPos) {
-        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y,
+        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y + (offset.y + chunkRegion.min().y) * ChunkConstants.SIZE_Y,
                 localPos.z + (offset.z + chunkRegion.min().z) * ChunkConstants.SIZE_Z);
     }
 }

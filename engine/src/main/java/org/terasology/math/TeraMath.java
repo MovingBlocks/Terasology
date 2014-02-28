@@ -492,21 +492,6 @@ public final class TeraMath {
     public static int calcChunkPosX(int x, int chunkPowerX) {
         return (x >> chunkPowerX);
     }
-
-    public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, ChunkConstants.POWER_X);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate
-     *
-     * @param y
-     * @return The Y-coordinate of the chunk
-     */
-    public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, ChunkConstants.POWER_Y);
-    }
-
     /**
      * Returns the chunk position of a given coordinate.
      *
@@ -514,8 +499,7 @@ public final class TeraMath {
      * @return The Y-coordinate of the chunk
      */
     public static int calcChunkPosY(int y, int chunkPowerY) {
-        return 0;
-        //return (y >> chunkPowerY);
+        return (y >> chunkPowerY);
     }
 
     /**
@@ -528,18 +512,12 @@ public final class TeraMath {
         return (z >> chunkPowerZ);
     }
 
-    /**
-     * Returns the chunk position of a given coordinate
-     *
-     * @param z The Z-coordinate of the block
-     * @return The Z-coordinate of the chunk
-     */
-    public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, ChunkConstants.POWER_Z);
-    }
-
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
+    }
+
+    public static Vector3i calcChunkPos(Vector3f pos) {
+        return calcChunkPos(new Vector3i(pos, 0.5f));
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -564,13 +542,8 @@ public final class TeraMath {
         return blockX & chunkPosFilterX;
     }
 
-
-    public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER_X);
-    }
-
-    public static int calcBlockPosY(int blockY) {
-        return blockY;
+    public static int calcBlockPosY(int blockY, int chunkPosFilterY) {
+        return blockY & chunkPosFilterY;
     }
 
     /**
@@ -583,10 +556,6 @@ public final class TeraMath {
         return blockZ & chunkPosFilterZ;
     }
 
-    public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER_Z);
-    }
-
     public static Vector3i calcBlockPos(Vector3i worldPos) {
         return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
@@ -596,13 +565,13 @@ public final class TeraMath {
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
-        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y), calcBlockPosZ(z, chunkFilterSize.z));
+        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent, 0, -extent);
+        Vector3i minPos = new Vector3i(-extent, -extent, -extent);
         minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, 0, extent);
+        Vector3i maxPos = new Vector3i(extent, extent, extent);
         maxPos.add(pos);
 
         Vector3i minChunk = TeraMath.calcChunkPos(minPos);
@@ -744,5 +713,13 @@ public final class TeraMath {
             edgeMax.z = max.z;
         }
         return Region3i.createFromMinMax(edgeMin, edgeMax);
+    }
+
+    public static int calculate3DArrayIndex(Vector3i pos, Vector3i size) {
+        return calculate3DArrayIndex(pos.x, pos.y, pos.z, size);
+    }
+
+    public static int calculate3DArrayIndex(int x, int y, int z, Vector3i size) {
+        return x + size.x * (z + size.z * (y));
     }
 }

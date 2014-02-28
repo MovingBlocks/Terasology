@@ -152,14 +152,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
         Region3i region = TeraMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
+        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
     }
 
     @Override
     public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z));
+            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
         }
         return null;
     }
@@ -171,7 +171,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
                 return null;
             }
-            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
+            chunkPos.sub(region.min());
+            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, offset);
@@ -183,15 +184,15 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, int distance) {
+    public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener chunkRegionListener) {
+    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener chunkRegionListener) {
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, int distance) {
+    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
     }
 
     @Override
@@ -201,14 +202,15 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public ChunkViewCore getViewAround(Vector3i pos) {
-        Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
-        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().z];
+        Region3i region = Region3i.createFromCenterExtents(pos, 1);
+        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = getChunkForProcessing(chunkPos);
             if (chunk == null) {
                 return null;
             }
-            int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
+            chunkPos.sub(region.min());
+            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
         return new ChunkViewCoreImpl(chunks, region, Vector3i.one());

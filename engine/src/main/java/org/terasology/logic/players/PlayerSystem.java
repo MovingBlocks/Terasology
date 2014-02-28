@@ -37,6 +37,7 @@ import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
+import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -102,10 +103,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             Location.attachChild(playerCharacter, clientEntity, new Vector3f(), new Quat4f(0, 0, 0, 1));
 
             Client clientListener = networkSystem.getOwner(clientEntity);
-            int distance = clientListener.getViewDistance().getChunkDistance();
-            if (!clientListener.isLocal()) {
-                distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
-            }
+            Vector3i distance = clientListener.getViewDistance().getChunkDistance();
             worldRenderer.getChunkProvider().updateRelevanceEntity(clientEntity, distance);
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
@@ -118,7 +116,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(connected.getPlayerStore().getRelevanceLocation());
         entity.saveComponent(loc);
-        worldRenderer.getChunkProvider().addRelevanceEntity(entity, 4, networkSystem.getOwner(entity));
+        worldRenderer.getChunkProvider().addRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance(), networkSystem.getOwner(entity));
         if (connected.getPlayerStore().hasCharacter()) {
             if (worldRenderer.getWorldProvider().isBlockRelevant(connected.getPlayerStore().getRelevanceLocation())) {
                 restoreCharacter(entity, connected.getPlayerStore());
@@ -146,11 +144,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
         } else {
             Client clientListener = networkSystem.getOwner(entity);
-            int distance = clientListener.getViewDistance().getChunkDistance();
-            if (!clientListener.isLocal()) {
-                distance += ChunkConstants.REMOTE_GENERATION_DISTANCE;
-            }
-            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, distance);
+            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);
@@ -187,7 +181,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 loc.setWorldPosition(new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
                 entity.saveComponent(loc);
-                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, 4);
+                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
 
                 SpawningClientInfo info = new SpawningClientInfo(entity, new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
                 clientsPreparingToSpawn.add(info);

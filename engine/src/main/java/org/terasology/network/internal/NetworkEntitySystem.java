@@ -33,7 +33,6 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.chunks.ChunkConstants;
 
 /**
  * This system handles a number of events relevant to the Network System:
@@ -87,7 +86,7 @@ public class NetworkEntitySystem extends BaseComponentSystem {
         Client client = networkSystem.getOwner(entity);
         if (client != null) {
             client.setViewDistanceMode(request.getNewViewRange());
-            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance().getChunkDistance() + ChunkConstants.FULL_GENERATION_DISTANCE);
+            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, client.getViewDistance().getChunkDistance());
         }
     }
 

@@ -17,23 +17,24 @@ package org.terasology.rendering.world;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND("Legally Blind", 0, 4),
-    NEAR("Near", 1, 8),
-    MODERATE("Moderate", 2, 16),
-    FAR("Far", 3, 32),
-    ULTRA("Ultra", 4, 64),
-    MEGA("Mega", 5, 128);
+    LEGALLY_BLIND("Legally Blind", 0, new Vector3i(4, 2, 4)),
+    NEAR("Near", 1, new Vector3i(8, 2, 8)),
+    MODERATE("Moderate", 2, new Vector3i(12, 4, 12)),
+    FAR("Far", 3, new Vector3i(16, 4, 16)),
+    ULTRA("Ultra", 4, new Vector3i(24, 4, 24)),
+    MEGA("Mega", 5, new Vector3i(32, 4, 32));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 
     private String displayName;
-    private int chunkDistance;
+    private Vector3i chunkDistance;
     private int index;
 
     static {
@@ -42,13 +43,13 @@ public enum ViewDistance {
         }
     }
 
-    private ViewDistance(String displayName, int index, int chunkDistance) {
+    private ViewDistance(String displayName, int index, Vector3i chunkDistance) {
         this.displayName = displayName;
         this.index = index;
         this.chunkDistance = chunkDistance;
     }
 
-    public int getChunkDistance() {
+    public Vector3i getChunkDistance() {
         return chunkDistance;
     }
 

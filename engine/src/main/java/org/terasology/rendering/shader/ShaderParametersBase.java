@@ -41,7 +41,7 @@ public class ShaderParametersBase implements ShaderParameters {
     @Override
     public void applyParameters(Material program) {
 
-        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance() * 8.0f);
+        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().getX() * 8.0f);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);

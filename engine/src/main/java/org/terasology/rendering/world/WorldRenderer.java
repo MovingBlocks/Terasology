@@ -50,8 +50,6 @@ public interface WorldRenderer {
 
     void dispose();
 
-    PhysicsEngine getBulletRenderer();
-
     boolean pregenerateChunks();
 
     WorldProvider getWorldProvider();
