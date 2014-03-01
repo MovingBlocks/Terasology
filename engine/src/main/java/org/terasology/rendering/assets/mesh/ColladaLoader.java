@@ -37,7 +37,6 @@ import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
 import org.eaxy.Xml;
-import org.newdawn.slick.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -54,21 +53,21 @@ import com.google.common.base.Charsets;
  * @author mkienenb@gmail.com
  */
 
-public class ColladaMeshLoader implements AssetLoader<MeshData> {
+public class ColladaLoader implements AssetLoader<MeshData> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ColladaMeshLoader.class);
+    private static final Logger logger = LoggerFactory.getLogger(ColladaLoader.class);
 
     public static void main(String[] args) {
-        ColladaMeshLoader loader = new ColladaMeshLoader();
+        ColladaLoader loader = new ColladaLoader();
         try {
-            String contents = slurp(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
+            String contents = loadDataAsString(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
             loader.parseMeshData(contents);
         } catch (IOException | ColladaParseException e) {
             e.printStackTrace();
         }
     }
 
-    static private String slurp(File file) throws IOException {
+    private static String loadDataAsString(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file), 1024);
         if (file.getName().endsWith(".gz")) {
             reader.close();
@@ -76,10 +75,10 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
                     new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), 1024);
         }
 
-        return slurpFromBufferedReader(reader);
+        return loadDataAsString(reader);
     }
 
-    private static String slurpFromBufferedReader(BufferedReader reader) throws IOException, FileNotFoundException {
+    private static String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
         StringBuilder result = new StringBuilder();
         try {
             int c;
@@ -90,12 +89,6 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
             reader.close();
         }
         return result.toString();
-    }
-
-    private class ColladaParseException extends Exception {
-        public ColladaParseException(String msg) {
-            super(msg);
-        }
     }
 
     private MeshData parseMeshData(String contents) throws ColladaParseException {
@@ -134,7 +127,8 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
 
                     ElementSet vCountSet = polylist.find("vcount");
                     if (1 != vCountSet.size()) {
-                        throw new ColladaParseException("Found " + vCountSet.size() + " vcount sets for polylist in geometry id=" + geometry.id() + " name=" + geometry.name());
+                        throw new ColladaParseException("Found " + vCountSet.size() + " vcount sets for polylist in geometry id="
+                                                        + geometry.id() + " name=" + geometry.name());
                     }
                     Element vCount = vCountSet.first();
 
@@ -155,8 +149,9 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
         return result;
     }
 
-    private int parseTriangles(TFloatList vertices, TFloatList texCoord0, TFloatList normals, TIntList indices, int vertCount, Element geometry, Element mesh,
+    private int parseTriangles(TFloatList vertices, TFloatList texCoord0, TFloatList normals, TIntList indices, int vertCountParam, Element geometry, Element mesh,
                                Element triangles) throws ColladaParseException {
+        int vertCount = vertCountParam;
         String triangleCountString = triangles.attr("count");
         int triangleCount = Integer.parseInt(triangleCountString);
         ElementSet triangleInputSet = triangles.find("input");
@@ -307,17 +302,6 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
         return vertCount;
     }
 
-    class Input {
-        public String semantic;
-        public String sourceName;
-        public int offset;
-
-        public MeshDataSource vertexPositionSource = null;
-        public MeshDataSource vertexNormalSource = null;
-        public MeshDataSource normalSource = null;
-        public MeshDataSource texCoordSource = null;
-    }
-
     private List<Input> parseInputs(ElementSet inputElementSet) {
         List<Input> inputList = new ArrayList<Input>();
         for (Element inputElement : inputElementSet) {
@@ -333,14 +317,6 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
         }
 
         return inputList;
-    }
-
-    class MeshDataSource {
-        public float[] values;
-        public int count;
-        public int stride;
-        String[] parameterNames;
-        String[] parameterTypes;
     }
 
     private MeshDataSource parseSource(Element sourceElement) throws ColladaParseException {
@@ -390,14 +366,14 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
     }
 
     private String[] getItemsInString(String dataString) {
-        dataString = dataString.replaceAll("\n", " ");
-        dataString = dataString.replaceAll("\t", " ");
-        dataString = dataString.replaceAll("\r", " ");
-        while (dataString.contains("  ")) {
-            dataString = dataString.replaceAll("  ", " ");
+        String string = dataString.replaceAll("\n", " ");
+        string = string.replaceAll("\t", " ");
+        string = string.replaceAll("\r", " ");
+        while (string.contains("  ")) {
+            string = string.replaceAll("  ", " ");
         }
-        dataString = dataString.trim();
-        String[] floatStrings = dataString.split(" ");
+        string = string.trim();
+        String[] floatStrings = string.split(" ");
         return floatStrings;
     }
 
@@ -405,7 +381,7 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
     public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
 
-        String contents = slurpFromBufferedReader(reader);
+        String contents = loadDataAsString(reader);
         MeshData data;
         try {
             data = parseMeshData(contents);
@@ -426,4 +402,30 @@ public class ColladaMeshLoader implements AssetLoader<MeshData> {
 
         return data;
     }
+
+    private class Input {
+        public String semantic;
+        public String sourceName;
+        public int offset;
+
+        public MeshDataSource vertexPositionSource;
+        public MeshDataSource vertexNormalSource;
+        public MeshDataSource normalSource;
+        public MeshDataSource texCoordSource;
+    }
+
+    private class MeshDataSource {
+        public float[] values;
+        public int count;
+        public int stride;
+        String[] parameterNames;
+        String[] parameterTypes;
+    }
+
+    private class ColladaParseException extends Exception {
+        public ColladaParseException(String msg) {
+            super(msg);
+        }
+    }
+
 }

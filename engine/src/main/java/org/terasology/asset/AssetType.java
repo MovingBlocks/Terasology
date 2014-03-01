@@ -27,7 +27,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
-import org.terasology.rendering.assets.mesh.ColladaMeshLoader;
+import org.terasology.rendering.assets.mesh.ColladaLoader;
 import org.terasology.rendering.assets.mesh.ObjMeshLoader;
 import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
@@ -54,7 +54,7 @@ public enum AssetType {
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader()),
-    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}),
+    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaLoader()}),
     TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader()),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
