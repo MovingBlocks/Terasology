@@ -20,6 +20,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.registry.CoreRegistry;
@@ -56,7 +57,40 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
 
     private WorldConfigurator worldConfig;
 
-    private PropertyLayout properties;
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        
+        PropertyLayout properties = find("properties", PropertyLayout.class);
+        properties.setOrdering(PropertyOrdering.byLabel());
+        properties.clear();
+        
+        SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
+        WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
+        Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
+        
+        try {
+            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
+            WorldGenerator wg = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
+
+            if (wg.getConfigurator().isPresent()) {
+                worldConfig = wg.getConfigurator().get();
+
+                Map<String, ?> props = worldConfig.getProperties();
+                for (String label : props.keySet()) {
+                    PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));
+                    properties.addPropertyProvider(label, provider);
+                }
+            } else {
+                logger.info(info.getUri().toString() + " does not support configuration");
+                return;
+            }
+        } catch (UnresolvedWorldGeneratorException e) {
+            logger.error("Unable to load world generator: " + info.getUri().toString());
+        } finally {
+            moduleManager.disableAllModules();
+        }
+    }
 
     @Override
     public void initialise() {
@@ -66,36 +100,6 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
-
-        WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
-        Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
-        try {
-            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
-            WorldGenerator wg = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
-
-            if (wg.getConfigurator().isPresent()) {
-                worldConfig = wg.getConfigurator().get();
-            } else {
-                logger.info(info.getUri().toString() + " does not support configuration");
-                return;
-            }
-        } catch (UnresolvedWorldGeneratorException e) {
-            // if errors happen, don't enable this feature
-            logger.error("Unable to load world generator: " + info.getUri().toString());
-        } finally {
-            moduleManager.disableAllModules();
-        }
-
-        properties = find("properties", PropertyLayout.class);
-        if (properties != null) {
-            properties.setOrdering(PropertyOrdering.byLabel());
-            Map<String, ?> props = worldConfig.getProperties();
-            for (String label : props.keySet()) {
-                PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));
-                properties.addPropertyProvider(label, provider);
-            }
-        }
-
 
     }
 }
