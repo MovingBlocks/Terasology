@@ -64,6 +64,10 @@ public class ChunkRelevanceRegion {
     }
 
     public void setRelevanceDistance(int distance) {
+        if (distance == this.relevanceDistance) {
+            return;
+        }
+        
         if (distance < this.relevanceDistance) {
             reviewRelevantChunks(distance);
         }
