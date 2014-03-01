@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.assets.mesh;
+package org.terasology.rendering.collada;
 
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,9 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,13 +39,9 @@ import org.eaxy.ElementSet;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
-
-import com.google.common.base.Charsets;
 
 /**
- * Importer for Collada data exchange model files.  Supports mesh data
+ * Importer for Collada data exchange model files.
  * 
  * The development of this loader was greatly influenced by 
  * http://www.wazim.com/Collada_Tutorial_1.htm
@@ -53,37 +49,18 @@ import com.google.common.base.Charsets;
  * @author mkienenb@gmail.com
  */
 
-public class ColladaLoader implements AssetLoader<MeshData> {
+public class ColladaLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(ColladaLoader.class);
 
-    @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+    protected TFloatList vertices;
+    protected TFloatList texCoord0;
+    protected TFloatList texCoord1;
+    protected TFloatList normals;
+    protected TFloatList colors;
+    protected TIntList indices;
 
-        String contents = loadDataAsString(reader);
-        MeshData data;
-        try {
-            data = parseMeshData(contents);
-        } catch (ColladaParseException e) {
-            logger.error("Unable to load mesh", e);
-            return null;
-        }
-
-        if (data.getVertices() == null) {
-            throw new IOException("No vertices define");
-        }
-        //if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
-        //    throw new IOException("The number of normals does not match the number of vertices.");
-        //}
-        if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
-            throw new IOException("The number of tex coords does not match the number of vertices.");
-        }
-
-        return data;
-    }
-
-    private String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
+    protected String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
         StringBuilder result = new StringBuilder();
         try {
             int c;
@@ -96,18 +73,20 @@ public class ColladaLoader implements AssetLoader<MeshData> {
         return result.toString();
     }
 
-    private MeshData parseMeshData(String contents) throws ColladaParseException {
+    protected void parseData(String contents) throws ColladaParseException {
+
+        vertices = new TFloatArrayList();
+        texCoord0 = new TFloatArrayList();
+        texCoord1 = new TFloatArrayList();
+        normals = new TFloatArrayList();
+        colors = new TFloatArrayList();
+        indices = new TIntArrayList();
+        int vertCount = 0;
+
         Document document = Xml.xml(contents);
         Element rootElement = document.getRootElement();
 
         // TODO: we shouldn't just cram everything into a single mesh, but should expect separate meshes with differing materials
-
-        MeshData result = new MeshData();
-        TFloatList vertices = result.getVertices();
-        TFloatList texCoord0 = result.getTexCoord0();
-        TFloatList normals = result.getNormals();
-        TIntList indices = result.getIndices();
-        int vertCount = 0;
 
         ElementSet geometrySet = rootElement.find("library_geometries", "geometry");
         for (Element geometry : geometrySet) {
@@ -150,11 +129,9 @@ public class ColladaLoader implements AssetLoader<MeshData> {
                 }
             }
         }
-
-        return result;
     }
 
-    private int parseTriangles(TFloatList vertices, TFloatList texCoord0, TFloatList normals, TIntList indices, int vertCountParam, Element geometry, Element mesh,
+    private int parseTriangles(TFloatList verticesParam, TFloatList texCoord0Param, TFloatList normalsParam, TIntList indicesParam, int vertCountParam, Element geometry, Element mesh,
                                Element triangles) throws ColladaParseException {
         int vertCount = vertCountParam;
         String triangleCountString = triangles.attr("count");
@@ -246,9 +223,9 @@ public class ColladaLoader implements AssetLoader<MeshData> {
                         float vertexX = triangleInput.vertexPositionSource.values[index * vertexStride + 0];
                         float vertexY = triangleInput.vertexPositionSource.values[index * vertexStride + 1];
                         float vertexZ = triangleInput.vertexPositionSource.values[index * vertexStride + 2];
-                        vertices.add(vertexX);
-                        vertices.add(vertexY);
-                        vertices.add(vertexZ);
+                        verticesParam.add(vertexX);
+                        verticesParam.add(vertexY);
+                        verticesParam.add(vertexZ);
 
                         // TODO: Sometimes we get the normal attached to the triangle, sometimes to the vertex
                         if (null != triangleInput.vertexNormalSource) {
@@ -262,12 +239,12 @@ public class ColladaLoader implements AssetLoader<MeshData> {
                             float normalX = triangleInput.vertexNormalSource.values[index * normalStride + 0];
                             float normalY = triangleInput.vertexNormalSource.values[index * normalStride + 1];
                             float normalZ = triangleInput.vertexNormalSource.values[index * normalStride + 2];
-                            normals.add(normalX);
-                            normals.add(normalY);
-                            normals.add(normalZ);
+                            normalsParam.add(normalX);
+                            normalsParam.add(normalY);
+                            normalsParam.add(normalZ);
                         }
 
-                        indices.add(vertCount++);
+                        indicesParam.add(vertCount++);
                     } else if ("NORMAL".equals(triangleInput.semantic)) {
                         // TODO: Sometimes we get the normal attached to the triangle, sometimes to the vertex
 
@@ -281,9 +258,9 @@ public class ColladaLoader implements AssetLoader<MeshData> {
                         float normalX = triangleInput.normalSource.values[index * normalStride + 0];
                         float normalY = triangleInput.normalSource.values[index * normalStride + 1];
                         float normalZ = triangleInput.normalSource.values[index * normalStride + 2];
-                        normals.add(normalX);
-                        normals.add(normalY);
-                        normals.add(normalZ);
+                        normalsParam.add(normalX);
+                        normalsParam.add(normalY);
+                        normalsParam.add(normalZ);
                     } else if ("TEXCOORD".equals(triangleInput.semantic)) {
                         int texCoordStride = triangleInput.texCoordSource.stride;
                         if (2 != texCoordStride) {
@@ -294,8 +271,8 @@ public class ColladaLoader implements AssetLoader<MeshData> {
                         // TODO: probably should consider parameter indexes instead of assuming S,T order
                         float texCoordS = triangleInput.texCoordSource.values[index * texCoordStride + 0];
                         float texCoordT = triangleInput.texCoordSource.values[index * texCoordStride + 1];
-                        texCoord0.add(texCoordS);
-                        texCoord0.add(1 - texCoordT);
+                        texCoord0Param.add(texCoordS);
+                        texCoord0Param.add(1 - texCoordT);
                         // texCoord0.add(texCoordT);
                     } else {
                         throw new ColladaParseException("Found unexpected triangle Input semantic " + triangleInput.semantic +
@@ -397,7 +374,7 @@ public class ColladaLoader implements AssetLoader<MeshData> {
         ColladaLoader loader = new ColladaLoader();
         try {
             String contents = loader.loadDataAsString(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
-            loader.parseMeshData(contents);
+            loader.parseData(contents);
         } catch (IOException | ColladaParseException e) {
             e.printStackTrace();
         }
@@ -422,7 +399,9 @@ public class ColladaLoader implements AssetLoader<MeshData> {
         String[] parameterTypes;
     }
 
-    private class ColladaParseException extends Exception {
+    protected class ColladaParseException extends Exception {
+        private static final long serialVersionUID = 1L;
+
         public ColladaParseException(String msg) {
             super(msg);
         }

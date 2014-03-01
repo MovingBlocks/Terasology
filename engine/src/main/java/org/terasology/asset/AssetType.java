@@ -20,6 +20,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
@@ -27,7 +28,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
-import org.terasology.rendering.assets.mesh.ColladaLoader;
+import org.terasology.rendering.assets.mesh.ColladaMeshLoader;
 import org.terasology.rendering.assets.mesh.ObjMeshLoader;
 import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
@@ -54,7 +55,7 @@ public enum AssetType {
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader()),
-    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaLoader()}),
+    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}),
     TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader()),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
