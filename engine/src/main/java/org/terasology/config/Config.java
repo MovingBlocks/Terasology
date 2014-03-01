@@ -16,6 +16,7 @@
 
 package org.terasology.config;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,9 +29,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.input.Input;
@@ -63,9 +66,9 @@ public final class Config {
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
+    private Map<SimpleUri, Map<String, ?>> worldGenerationConfigs = Maps.newHashMap();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
-
 
     /**
      * Create a new, empty config
@@ -193,6 +196,21 @@ public final class Config {
                 target.add(entry.getKey(), entry.getValue());
             }
         }
+    }
+
+    /**
+     * @return the config params for the world generator
+     */
+    public Map<String, ?> getWorldGenerationConfigs(SimpleUri generatorUri) {
+        return worldGenerationConfigs.get(generatorUri);
+    }
+
+    /**
+     * @param generatorUri the generator Uri 
+     * @param configs the new config params for the world generator
+     */
+    public void setWorldGenerationConfigs(SimpleUri generatorUri, Map<String, ?> configs) {
+        this.worldGenerationConfigs.put(generatorUri, configs);
     }
 
     private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {

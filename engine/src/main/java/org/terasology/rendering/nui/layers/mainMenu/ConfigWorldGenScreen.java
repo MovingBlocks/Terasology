@@ -23,6 +23,8 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -68,15 +70,24 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
         Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
-        
+
+        Map<String, ?> props = config.getWorldGenerationConfigs(generatorUri);
+
         try {
-            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
-            WorldGenerator wg = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
+            if (props == null) {
+                moduleManager.enableModuleAndDependencies(worldGeneratorModule);
+                WorldGenerator wg = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
+    
+                if (wg.getConfigurator().isPresent()) {
+                    worldConfig = wg.getConfigurator().get();
+    
+                    props = worldConfig.getProperties();
+                }
+            }
+            
+            if (props != null) {
+                config.setWorldGenerationConfigs(generatorUri, props);
 
-            if (wg.getConfigurator().isPresent()) {
-                worldConfig = wg.getConfigurator().get();
-
-                Map<String, ?> props = worldConfig.getProperties();
                 for (String label : props.keySet()) {
                     PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));
                     properties.addPropertyProvider(label, provider);
@@ -100,8 +111,8 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
-
     }
+    
 }
 
 
