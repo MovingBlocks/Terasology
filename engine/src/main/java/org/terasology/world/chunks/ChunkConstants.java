@@ -29,7 +29,7 @@ import org.terasology.math.Vector3i;
 @API
 public final class ChunkConstants {
     public static final int SIZE_X = 32;
-    public static final int SIZE_Y = 64;
+    public static final int SIZE_Y = 128;
     public static final int SIZE_Z = 32;
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Y = TeraMath.ceilPowerOfTwo(SIZE_Y) - 1;
@@ -50,7 +50,7 @@ public final class ChunkConstants {
     /**
      * How many chunks around a chunk must be relevant to guarantee it is fully generated.
      */
-    public static final int GENERATION_DISTANCE = 2;
+    public static final int GENERATION_DISTANCE = 0;
 
     private ChunkConstants() {
     }

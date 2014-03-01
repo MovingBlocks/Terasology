@@ -85,7 +85,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
     // TODO: Dynamically calculate this
-    private static final int CACHE_SIZE = (int) (1.5 * Runtime.getRuntime().maxMemory() / 1048576);
+    private static final int CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 1048576);
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
 

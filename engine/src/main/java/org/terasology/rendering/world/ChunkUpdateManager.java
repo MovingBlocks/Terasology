@@ -15,19 +15,24 @@
  */
 package org.terasology.rendering.world;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
+import java.util.Deque;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,15 +42,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ChunkUpdateManager {
 
-    public enum UpdateType {
-        DEFAULT, PLAYER_TRIGGERED
-    }
-
     /* CONST */
     private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
 
     /* CHUNK UPDATES */
-    private final Set<ChunkImpl> currentlyProcessedChunks = Sets.newSetFromMap(new ConcurrentHashMap<ChunkImpl, Boolean>());
+    private final Set<ChunkImpl> chunksProcessing = Sets.newSetFromMap(new ConcurrentHashMap<ChunkImpl, Boolean>());
+
+    private final BlockingDeque<ChunkImpl> chunksComplete = Queues.newLinkedBlockingDeque();
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
@@ -59,14 +62,14 @@ public final class ChunkUpdateManager {
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
      * is reached, the chunk update is ignored. Chunk updates can be forced though.
      *
+     *
      * @param chunk The chunk to update
-     * @param type  The chunk update type
      * @return True if a chunk update was executed
      */
     // TODO: Review this system
-    public boolean queueChunkUpdate(ChunkImpl chunk, final UpdateType type) {
+    public boolean queueChunkUpdate(ChunkImpl chunk) {
 
-        if (!currentlyProcessedChunks.contains(chunk) && (currentlyProcessedChunks.size() < MAX_THREADS || type != UpdateType.DEFAULT)) {
+        if (!chunksProcessing.contains(chunk)) {
             executeChunkUpdate(chunk);
             return true;
         }
@@ -74,14 +77,21 @@ public final class ChunkUpdateManager {
         return false;
     }
 
+    public List<ChunkImpl> availableChunksForUpdate() {
+        List<ChunkImpl> result = Lists.newArrayListWithExpectedSize(chunksComplete.size());
+        chunksComplete.drainTo(result);
+        chunksProcessing.removeAll(result);
+        return result;
+    }
+
     private void executeChunkUpdate(final ChunkImpl c) {
-        currentlyProcessedChunks.add(c);
+        chunksProcessing.add(c);
 
         CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider, this));
     }
 
     private void finishedProcessing(ChunkImpl c) {
-        currentlyProcessedChunks.remove(c);
+        chunksComplete.add(c);
     }
 
 

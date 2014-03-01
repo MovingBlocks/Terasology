@@ -70,6 +70,16 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
+    public void onChunkLoaded(Vector3i pos) {
+
+    }
+
+    @Override
+    public void onChunkUnloaded(Vector3i pos) {
+
+    }
+
+    @Override
     public Camera getActiveCamera() {
         return noCamera;
     }
@@ -210,6 +220,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public WorldRenderingStage getCurrentRenderStage() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public String getMetrics() {
+        return "";
     }
 
     /**
