@@ -53,4 +53,23 @@ public class RigidBodyComponent implements Component {
     @Replicate
     public List<CollisionGroup> collidesWith =
             Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
+
+    private Vector3f newLinearVelocity = new Vector3f();
+    private Vector3f newAngularVelocity = new Vector3f();
+
+    public void setLinearVelocity( Vector3f linearVelocity ){
+        newLinearVelocity.set(linearVelocity);
+    }
+
+    public void setAngularVelocity( Vector3f angularVelocity ){
+        newAngularVelocity.set(angularVelocity);
+    }
+
+    public Vector3f getNewLinearVelocity( ){
+        return newLinearVelocity;
+    }
+
+    public Vector3f getNewAngularVelocity( ){
+        return newAngularVelocity;
+    }
 }

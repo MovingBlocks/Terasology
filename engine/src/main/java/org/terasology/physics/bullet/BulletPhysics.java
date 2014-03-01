@@ -277,6 +277,15 @@ public class BulletPhysics implements PhysicsEngine {
             }else{
                 rigidBody.rb.setAngularFactor(rb.angularFactor);
                 rigidBody.rb.setFriction(rb.friction);
+                if ( rb.getNewAngularVelocity().length() > 0 ){
+                    rigidBody.rb.setAngularVelocity( rb.getNewAngularVelocity() );
+                    rb.setAngularVelocity(new Vector3f());
+                }
+
+                if ( rb.getNewLinearVelocity().length() > 0 ){
+                    rigidBody.rb.setLinearVelocity( rb.getNewLinearVelocity() );
+                    rb.setLinearVelocity(new Vector3f());
+                }
             }
 
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
@@ -476,6 +485,17 @@ public class BulletPhysics implements PhysicsEngine {
             collider.rb.setUserPointer(entity);
             collider.rb.setAngularFactor(rigidBody.angularFactor);
             collider.rb.setFriction(rigidBody.friction);
+
+            if ( rigidBody.getNewAngularVelocity().length() > 0 ){
+                collider.rb.setAngularVelocity( rigidBody.getNewAngularVelocity() );
+                rigidBody.setAngularVelocity(new Vector3f());
+            }
+
+            if ( rigidBody.getNewLinearVelocity().length() > 0 ){
+                collider.rb.setLinearVelocity( rigidBody.getNewLinearVelocity() );
+                rigidBody.setLinearVelocity(new Vector3f());
+            }
+
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
             addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
