@@ -57,28 +57,33 @@ public class ColladaLoader implements AssetLoader<MeshData> {
 
     private static final Logger logger = LoggerFactory.getLogger(ColladaLoader.class);
 
-    public static void main(String[] args) {
-        ColladaLoader loader = new ColladaLoader();
+    @Override
+    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+
+        String contents = loadDataAsString(reader);
+        MeshData data;
         try {
-            String contents = loadDataAsString(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
-            loader.parseMeshData(contents);
-        } catch (IOException | ColladaParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static String loadDataAsString(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file), 1024);
-        if (file.getName().endsWith(".gz")) {
-            reader.close();
-            reader = new BufferedReader(
-                    new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), 1024);
+            data = parseMeshData(contents);
+        } catch (ColladaParseException e) {
+            logger.error("Unable to load mesh", e);
+            return null;
         }
 
-        return loadDataAsString(reader);
+        if (data.getVertices() == null) {
+            throw new IOException("No vertices define");
+        }
+        //if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
+        //    throw new IOException("The number of normals does not match the number of vertices.");
+        //}
+        if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
+            throw new IOException("The number of tex coords does not match the number of vertices.");
+        }
+
+        return data;
     }
 
-    private static String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
+    private String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
         StringBuilder result = new StringBuilder();
         try {
             int c;
@@ -377,30 +382,25 @@ public class ColladaLoader implements AssetLoader<MeshData> {
         return floatStrings;
     }
 
-    @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+    private String loadDataAsString(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file), 1024);
+        if (file.getName().endsWith(".gz")) {
+            reader.close();
+            reader = new BufferedReader(
+                    new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), 1024);
+        }
 
-        String contents = loadDataAsString(reader);
-        MeshData data;
+        return loadDataAsString(reader);
+    }
+
+    public static void main(String[] args) {
+        ColladaLoader loader = new ColladaLoader();
         try {
-            data = parseMeshData(contents);
-        } catch (ColladaParseException e) {
-            logger.error("Unable to load mesh", e);
-            return null;
+            String contents = loader.loadDataAsString(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
+            loader.parseMeshData(contents);
+        } catch (IOException | ColladaParseException e) {
+            e.printStackTrace();
         }
-
-        if (data.getVertices() == null) {
-            throw new IOException("No vertices define");
-        }
-        //if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
-        //    throw new IOException("The number of normals does not match the number of vertices.");
-        //}
-        if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
-            throw new IOException("The number of tex coords does not match the number of vertices.");
-        }
-
-        return data;
     }
 
     private class Input {
