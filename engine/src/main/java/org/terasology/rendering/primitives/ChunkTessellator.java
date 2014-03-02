@@ -313,10 +313,6 @@ public final class ChunkTessellator {
             drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), block, side);
         }
 
-        if (y == 0) {
-            drawDir[Side.BOTTOM.ordinal()] = false;
-        }
-
         // If the block is lowered, some more faces may have to be drawn
         if (block.isLiquid()) {
             Block bottomBlock = adjacentBlocks.get(Side.BOTTOM);
