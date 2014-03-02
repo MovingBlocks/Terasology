@@ -17,10 +17,8 @@
 package org.terasology.core.world.generator.chunkGenerators;
 
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,12 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.FirstPassGenerator;
+import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -42,8 +39,8 @@ import org.terasology.world.liquid.LiquidType;
  *
  * @author Nym Traveel
  */
-public class BasicHMTerrainGenerator implements FirstPassGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerator.class);
+public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
+    private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerationPass.class);
 
     private WorldBiomeProvider biomeProvider;
     private Block air = BlockManager.getAir();
@@ -56,7 +53,7 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
     private ClimateSimulator climate;
     private float[][] heightmap;
 
-    public BasicHMTerrainGenerator() {
+    public BasicHMTerrainGenerationPass() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         mantle = blockManager.getBlock("core:MantleStone");
         water = blockManager.getBlock("core:water");

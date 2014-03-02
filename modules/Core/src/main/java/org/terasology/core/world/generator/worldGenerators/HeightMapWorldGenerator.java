@@ -16,9 +16,9 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
-import org.terasology.core.world.generator.chunkGenerators.BasicHMTerrainGenerator;
-import org.terasology.core.world.generator.chunkGenerators.FloraGenerator;
-import org.terasology.core.world.liquid.LiquidsGenerator;
+import org.terasology.core.world.generator.chunkGenerators.BasicHMTerrainGenerationPass;
+import org.terasology.core.world.generator.chunkGenerators.FloraGenerationPass;
+import org.terasology.core.world.liquid.LiquidsGenerationPass;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.RegisterWorldGenerator;
 
@@ -34,9 +34,9 @@ public class HeightMapWorldGenerator extends AbstractBaseWorldGenerator {
 
     @Override
     public void initialize() {
-        register(new BasicHMTerrainGenerator());
-        register(new FloraGenerator());
-        register(new LiquidsGenerator());
+        register(new BasicHMTerrainGenerationPass());
+        register(new FloraGenerationPass());
+        register(new LiquidsGenerationPass());
         /*ForestGenerator forestGenerator = new ForestGenerator();
         DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         register(forestGenerator);*/

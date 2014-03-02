@@ -26,7 +26,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.generator.FirstPassGenerator;
+import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzeo@me.com>
  */
-public class PerlinTerrainGenerator implements FirstPassGenerator {
+public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
@@ -60,7 +60,7 @@ public class PerlinTerrainGenerator implements FirstPassGenerator {
     private Block snow;
     private Block dirt;
 
-    public PerlinTerrainGenerator() {
+    public PerlinTerrainGenerationPass() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
         mantle = blockManager.getBlock("core:MantleStone");

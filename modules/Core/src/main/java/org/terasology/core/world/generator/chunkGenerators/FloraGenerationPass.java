@@ -24,7 +24,7 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.FirstPassGenerator;
+import org.terasology.world.generator.ChunkGenerationPass;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Map;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class FloraGenerator implements FirstPassGenerator {
+public class FloraGenerationPass implements ChunkGenerationPass {
 
     private static final String[] FLOWER_BLOCKS = new String[]{"core:YellowFlower", "core:RedFlower", "core:BrownShroom", "core:BigBrownShroom", "core:RedShroom",
             "core:RedClover", "core:Lavender", "core:Iris", "core:GlowbellBloom", "core:Glowbell",
@@ -55,7 +55,7 @@ public class FloraGenerator implements FirstPassGenerator {
 
     private WorldGenerationConfig config = new WorldGenerationConfig();
 
-    public FloraGenerator() {
+    public FloraGenerationPass() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         airBlock = BlockManager.getAir();
         grassBlock = blockManager.getBlock("core:Grass");

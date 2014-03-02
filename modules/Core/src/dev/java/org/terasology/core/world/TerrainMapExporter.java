@@ -18,7 +18,7 @@ package org.terasology.core.world;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.core.TerasologyDevelopment;
-import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerator;
+import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerationPass;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
@@ -51,11 +51,11 @@ public final class TerrainMapExporter {
     private static final Vector2f POSITION = new Vector2f(0.0f, 0.0f);
 
     private final WorldBiomeProvider biomeProvider;
-    private PerlinTerrainGenerator generator;
+    private PerlinTerrainGenerationPass generator;
 
     public TerrainMapExporter(final String seed) {
         biomeProvider = new WorldBiomeProviderImpl(seed);
-        generator = new PerlinTerrainGenerator();
+        generator = new PerlinTerrainGenerationPass();
         generator.setWorldSeed(seed);
     }
 

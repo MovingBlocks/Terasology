@@ -17,13 +17,14 @@
 package org.terasology.world.generator;
 
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.chunks.Chunk;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public interface BaseChunkGenerator {
+public interface ChunkGenerationPass {
 
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
@@ -32,5 +33,13 @@ public interface BaseChunkGenerator {
     Map<String, String> getInitParameters();
 
     void setInitParameters(Map<String, String> initParameters);
+
+    /**
+     * Generate the local contents of a chunk. This should be purely deterministic from the chunk contents, chunk
+     * position and world seed - should not depend on external state or other data.
+     *
+     * @param chunk
+     */
+    void generateChunk(Chunk chunk);
 
 }

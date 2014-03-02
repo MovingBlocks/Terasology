@@ -23,7 +23,7 @@ import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.FirstPassGenerator;
+import org.terasology.world.generator.ChunkGenerationPass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +34,12 @@ import java.util.Map;
  *
  * @author Mathias Kalb
  */
-public class FlatTerrainGenerator implements FirstPassGenerator {
+public class FlatTerrainGenerationPass implements ChunkGenerationPass {
 
-    // TODO FlatTerrainGenerator: What is a good value for MAX_Y?
+    // TODO FlatTerrainGenerationPass: What is a good value for MAX_Y?
     public static final int DEFAULT_HEIGHT = 8;
 
-    private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerationPass.class);
     private static final String INIT_PARAMETER_HEIGHT = "height";
 
     private WorldBiomeProvider biomeProvider;
@@ -55,11 +55,11 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
     private Block snow = blockManager.getBlock("core:Snow");
     private Block dirt = blockManager.getBlock("core:Dirt");
 
-    public FlatTerrainGenerator() {
-        surfaceHeight = FlatTerrainGenerator.DEFAULT_HEIGHT;
+    public FlatTerrainGenerationPass() {
+        surfaceHeight = FlatTerrainGenerationPass.DEFAULT_HEIGHT;
     }
 
-    public FlatTerrainGenerator(int surfaceHeight) {
+    public FlatTerrainGenerationPass(int surfaceHeight) {
         this();
         setSurfaceHeight(surfaceHeight);
     }
@@ -87,14 +87,14 @@ public class FlatTerrainGenerator implements FirstPassGenerator {
     @Override
     public Map<String, String> getInitParameters() {
         final Map<String, String> initParameters = new HashMap<String, String>();
-        initParameters.put(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT, String.valueOf(surfaceHeight));
+        initParameters.put(FlatTerrainGenerationPass.INIT_PARAMETER_HEIGHT, String.valueOf(surfaceHeight));
         return initParameters;
     }
 
     @Override
     public void setInitParameters(Map<String, String> initParameters) {
         if (initParameters != null) {
-            final String heightStr = initParameters.get(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT);
+            final String heightStr = initParameters.get(FlatTerrainGenerationPass.INIT_PARAMETER_HEIGHT);
             if (heightStr != null) {
                 try {
                     setSurfaceHeight(Integer.parseInt(heightStr));

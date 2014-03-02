@@ -22,8 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.BaseChunkGenerator;
-import org.terasology.world.generator.FirstPassGenerator;
+import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
@@ -37,7 +36,7 @@ import java.util.List;
 public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
-    private final List<FirstPassGenerator> firstPassGenerators = Lists.newArrayList();
+    private final List<ChunkGenerationPass> generationPasses = Lists.newArrayList();
     private final SimpleUri uri;
 
     public AbstractBaseWorldGenerator(SimpleUri uri) {
@@ -55,29 +54,29 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
         biomeProvider = new WorldBiomeProviderImpl(seed);
-        for (final BaseChunkGenerator generator : firstPassGenerators) {
+        for (final ChunkGenerationPass generator : generationPasses) {
             setBiome(generator);
             generator.setWorldSeed(seed);
         }
     }
 
-    protected final void register(final FirstPassGenerator generator) {
-        registerBaseChunkGenerator(generator);
-        firstPassGenerators.add(generator);
+    protected final void register(final ChunkGenerationPass generator) {
+        registerPass(generator);
+        generationPasses.add(generator);
     }
 
-    private void registerBaseChunkGenerator(final BaseChunkGenerator generator) {
+    private void registerPass(final ChunkGenerationPass generator) {
         setBiome(generator);
         generator.setWorldSeed(worldSeed);
     }
 
-    private void setBiome(BaseChunkGenerator generator) {
+    private void setBiome(ChunkGenerationPass generator) {
         generator.setWorldBiomeProvider(biomeProvider);
     }
 
     @Override
     public void createChunk(final Chunk chunk) {
-        for (final FirstPassGenerator generator : firstPassGenerators) {
+        for (final ChunkGenerationPass generator : generationPasses) {
             generator.generateChunk(chunk);
         }
     }
