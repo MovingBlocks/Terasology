@@ -103,10 +103,10 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
-        if (event.getAngularVelocity().length() > 0) {
+        if (event.getAngularVelocity() != null) {
             physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
         }
-        if (event.getLinearVelocity().length() > 0) {
+        if (event.getLinearVelocity() != null) {
             physics.getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
         }
     }

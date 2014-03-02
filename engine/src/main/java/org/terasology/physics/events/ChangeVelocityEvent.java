@@ -30,7 +30,7 @@ public class ChangeVelocityEvent implements Event {
     private Vector3f angularVelocity;
 
     public ChangeVelocityEvent(Vector3f linearVelocity) {
-        this(linearVelocity, new Vector3f());
+        this(linearVelocity, null);
     }
 
     public ChangeVelocityEvent(Vector3f linearVelocity, Vector3f angularVelocity) {
