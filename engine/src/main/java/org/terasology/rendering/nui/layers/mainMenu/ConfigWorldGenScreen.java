@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.registry.CoreRegistry;
@@ -71,7 +72,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
         Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
 
-        Map<String, ?> props = config.getWorldGenerationConfigs(generatorUri);
+        Map<String, Component> props = config.getWorldGenerationConfigs(generatorUri);
 
         try {
             if (props == null) {

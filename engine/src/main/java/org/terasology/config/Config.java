@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.input.Input;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
@@ -48,6 +49,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -66,7 +68,7 @@ public final class Config {
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
-    private Map<SimpleUri, Map<String, ?>> worldGenerationConfigs = Maps.newHashMap();
+    private Map<SimpleUri, Map<String, Component>> worldGenerationConfigs = Maps.newHashMap();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
 
@@ -199,17 +201,22 @@ public final class Config {
     }
 
     /**
-     * @return the config params for the world generator
+     * @return a read-only view on the config params for the world generator or <code>null</code>
      */
-    public Map<String, ?> getWorldGenerationConfigs(SimpleUri generatorUri) {
-        return worldGenerationConfigs.get(generatorUri);
+    public Map<String, Component> getWorldGenerationConfigs(SimpleUri generatorUri) {
+        Map<String, Component> map = worldGenerationConfigs.get(generatorUri);
+        if (map == null) {
+            return null;
+        } else {
+            return Collections.unmodifiableMap(map);
+        }
     }
 
     /**
      * @param generatorUri the generator Uri 
      * @param configs the new config params for the world generator
      */
-    public void setWorldGenerationConfigs(SimpleUri generatorUri, Map<String, ?> configs) {
+    public void setWorldGenerationConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
         this.worldGenerationConfigs.put(generatorUri, configs);
     }
 

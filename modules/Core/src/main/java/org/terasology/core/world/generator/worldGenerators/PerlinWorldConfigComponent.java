@@ -16,6 +16,7 @@
 
 package org.terasology.core.world.generator.worldGenerators;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.rendering.nui.properties.TextField;
 
@@ -23,7 +24,7 @@ import org.terasology.rendering.nui.properties.TextField;
  * Some configs for {@link PerlinWorldGenerator}
  * @author Martin Steiger
  */
-public class PerlinWorldConfigComponent {
+public class PerlinWorldConfigComponent implements Component {
 
     @TextField(label = "World Title")
     private String worldTitle = "New World";
