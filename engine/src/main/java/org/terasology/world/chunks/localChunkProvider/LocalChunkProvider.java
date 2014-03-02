@@ -86,6 +86,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
+    private static final int LOAD_PER_FRAME = 2;
     private static final int UNLOAD_PER_FRAME = 4;
     private final Vector3i unloadLeeway;
 
@@ -259,8 +260,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         readyChunks.drainTo(sortedReadyChunks);
         if (!sortedReadyChunks.isEmpty()) {
             Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
-            ReadyChunkInfo readyChunkInfo = sortedReadyChunks.remove(sortedReadyChunks.size() - 1);
-            makeChunkAvailable(readyChunkInfo);
+            for (int i = 0; i < LOAD_PER_FRAME && !sortedReadyChunks.isEmpty(); ++i) {
+                ReadyChunkInfo readyChunkInfo = sortedReadyChunks.remove(sortedReadyChunks.size() - 1);
+                makeChunkAvailable(readyChunkInfo);
+            }
             for (BatchPropagator propagator : loadEdgePropagators) {
                 propagator.process();
             }
