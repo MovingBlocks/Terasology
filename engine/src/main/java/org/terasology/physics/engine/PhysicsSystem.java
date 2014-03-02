@@ -36,6 +36,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
+import org.terasology.physics.events.ChangeVelocityEvent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.events.ForceEvent;
 import org.terasology.physics.events.ImpulseEvent;
@@ -98,6 +99,16 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onForce(ForceEvent event, EntityRef entity) {
         physics.getRigidBody(entity).applyForce(event.getForce());
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class})
+    public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
+        if (event.getAngularVelocity().length() > 0) {
+            physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
+        }
+        if (event.getLinearVelocity().length() > 0) {
+            physics.getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
+        }
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
