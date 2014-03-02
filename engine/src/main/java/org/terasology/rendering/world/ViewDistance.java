@@ -24,12 +24,12 @@ import org.terasology.math.Vector3i;
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND("Legally Blind", 0, new Vector3i(4, 2, 4)),
-    NEAR("Near", 1, new Vector3i(8, 2, 8)),
-    MODERATE("Moderate", 2, new Vector3i(12, 2, 12)),
-    FAR("Far", 3, new Vector3i(16, 2, 16)),
-    ULTRA("Ultra", 4, new Vector3i(24, 2, 24)),
-    MEGA("Mega", 5, new Vector3i(32, 2, 32));
+    LEGALLY_BLIND("Legally Blind", 0, new Vector3i(4, 4, 4)),
+    NEAR("Near", 1, new Vector3i(8, 4, 8)),
+    MODERATE("Moderate", 2, new Vector3i(12, 4, 12)),
+    FAR("Far", 3, new Vector3i(16, 4, 16)),
+    ULTRA("Ultra", 4, new Vector3i(24, 4, 24)),
+    MEGA("Mega", 5, new Vector3i(32, 4, 32));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 

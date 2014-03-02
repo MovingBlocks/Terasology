@@ -21,20 +21,17 @@ import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
-import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
-import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.internal.ChunkViewCoreImpl;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -105,9 +102,9 @@ public final class ChunkTessellator {
             elements.finalVertices = BufferUtils.createIntBuffer(
                     elements.vertices.size() + /* POSITION */
                             elements.tex.size() + /* TEX0 (UV0 and flags) */
-                            elements.tex.size()  + /* TEX1 (lighting data) */
-                            elements.flags.size()  + /* FLAGS */
-                            elements.color.size()  + /* COLOR */
+                            elements.tex.size() + /* TEX1 (lighting data) */
+                            elements.flags.size() + /* FLAGS */
+                            elements.color.size() + /* COLOR */
                             elements.normals.size()  /* NORMALS */
             );
 

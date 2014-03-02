@@ -133,7 +133,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     private void checkReadyForSecondPass(ChunkImpl chunk) {
         Vector3i pos = chunk.getPos();
         if (chunk.getChunkState() == ChunkImpl.State.ADJACENCY_GENERATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.SECOND_PASS_EXTENTS)) {
                 if (!adjPos.equals(pos)) {
                     ChunkImpl adjChunk = provider.getChunkForProcessing(adjPos);
                     if (adjChunk == null) {
@@ -150,7 +150,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
         Vector3i pos = chunk.getPos();
         if (chunk.getChunkState() == ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
             if (CoreRegistry.get(NetworkSystem.class).getMode().isAuthority()) {
-                for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
+                for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.SECOND_PASS_EXTENTS)) {
                     if (!adjPos.equals(pos)) {
                         ChunkImpl adjChunk = provider.getChunkForProcessing(adjPos);
                         if (adjChunk == null || adjChunk.getChunkState().compareTo(ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {

@@ -81,7 +81,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     public void receiveChunk(ChunkImpl chunk) {
         chunkCache.put(chunk.getPos(), chunk);
-        pipeline.requestReview(Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.LOCAL_REGION_EXTENTS));
+        pipeline.requestReview(Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.SECOND_PASS_EXTENTS));
     }
 
     public void invalidateChunks(Vector3i pos) {

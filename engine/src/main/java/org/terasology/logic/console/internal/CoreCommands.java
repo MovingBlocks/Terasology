@@ -136,11 +136,6 @@ public class CoreCommands extends BaseComponentSystem {
 
     }
 
-    @Command(shortDescription = "Forces the chunk manager to purge unused chunks")
-    public void clearChunkCache() {
-        ((LocalChunkProvider) worldRenderer.getChunkProvider()).requestCleanup();
-    }
-
     @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
     public void kill(EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);

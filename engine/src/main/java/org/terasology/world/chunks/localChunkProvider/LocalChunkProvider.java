@@ -84,10 +84,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
-    // TODO: Dynamically calculate this
-    private static final int CACHE_SIZE = (int) (Runtime.getRuntime().maxMemory() / 1048576);
-
     private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
+    private static final int UNLOAD_PER_FRAME = 4;
+    private final Vector3i unloadLeeway;
 
     private StorageManager storageManager;
 
@@ -103,14 +102,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
 
+    private List<ChunkRelevanceRegion> pendingRemoveRegions = Lists.newArrayList();
+
     private EntityRef worldEntity = EntityRef.NULL;
 
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     private BlockManager blockManager;
     private BlockEntityRegistry registry;
-
-    private boolean forceCleanup;
 
     private List<BatchPropagator> loadEdgePropagators = Lists.newArrayList();
 
@@ -119,21 +118,18 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         this.storageManager = storageManager;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
-        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
+        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         ChunkMonitor.fireChunkProviderInitialized(this);
-
-        logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
 
         loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
         loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
+
+        unloadLeeway = new Vector3i(ChunkConstants.GENERATION_EXTENTS);
+        unloadLeeway.add(Vector3i.one());
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
         this.registry = value;
-    }
-
-    public void requestCleanup() {
-        forceCleanup = true;
     }
 
     @Override
@@ -185,9 +181,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     @Override
     public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
-        Vector3i finalDist = new Vector3i(distance);
-        finalDist.add(ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE);
-
         if (!entity.exists()) {
             return;
         }
@@ -195,14 +188,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setRelevanceDistance(finalDist);
+                region.setRelevanceDistance(distance);
                 return;
             }
         } finally {
             regionLock.readLock().unlock();
         }
 
-        ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, finalDist);
+        ChunkRelevanceRegion region = new ChunkRelevanceRegion(entity, distance);
         if (listener != null) {
             region.setListener(listener);
         }
@@ -212,24 +205,22 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         } finally {
             regionLock.writeLock().unlock();
         }
-        for (Vector3i pos : region.getRegion()) {
+        for (Vector3i pos : region.getCurrentRegion()) {
             ChunkImpl chunk = getChunk(pos);
             if (chunk != null) {
                 region.chunkReady(chunk);
             }
         }
-        pipeline.requestProduction(region.getRegion().expand(2));
+        pipeline.requestProduction(region.getCurrentRegion().expand(ChunkConstants.GENERATION_EXTENTS));
     }
 
     @Override
     public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
-        Vector3i finalDist = new Vector3i(distance);
-        finalDist.add(ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE, ChunkConstants.GENERATION_DISTANCE);
         regionLock.readLock().lock();
         try {
             ChunkRelevanceRegion region = regions.get(entity);
             if (region != null) {
-                region.setRelevanceDistance(finalDist);
+                region.setRelevanceDistance(distance);
             }
         } finally {
             regionLock.readLock().unlock();
@@ -240,7 +231,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void removeRelevanceEntity(EntityRef entity) {
         regionLock.writeLock().lock();
         try {
-            regions.remove(entity);
+            ChunkRelevanceRegion region = regions.remove(entity);
+            if (region != null) {
+                pendingRemoveRegions.add(region);
+            }
         } finally {
             regionLock.writeLock().unlock();
         }
@@ -252,8 +246,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         try {
             updateRelevance();
             makeChunksAvailable();
-            checkForUnload();
             deactivateBlocks();
+            checkForUnload();
         } finally {
             regionLock.readLock().unlock();
         }
@@ -286,54 +280,54 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void checkForUnload() {
-        PerformanceMonitor.startActivity("Review cache size");
-        if (nearCache.size() > CACHE_SIZE || forceCleanup) {
-            forceCleanup = false;
-            logger.debug("Compacting cache");
-            Iterator<Vector3i> iterator = nearCache.keySet().iterator();
-            while (iterator.hasNext()) {
-                Vector3i pos = iterator.next();
-                boolean keep = false;
-                for (ChunkRelevanceRegion region : regions.values()) {
-                    if (region.getRegion().expand(2).encompasses(pos)) {
-                        keep = true;
-                        break;
-                    }
+        PerformanceMonitor.startActivity("Unloading irrelevant chunks");
+        int unloaded = 0;
+        logger.debug("Compacting cache");
+        Iterator<Vector3i> iterator = nearCache.keySet().iterator();
+        while (iterator.hasNext()) {
+            Vector3i pos = iterator.next();
+            boolean keep = false;
+            for (ChunkRelevanceRegion region : regions.values()) {
+                if (region.getCurrentRegion().expand(unloadLeeway).encompasses(pos)) {
+                    keep = true;
+                    break;
                 }
-                if (!keep) {
-                    // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
-                    // Note: Above won't matter if all changes are on the main thread
-                    ChunkImpl chunk = nearCache.get(pos);
-                    if (chunk.isLocked()) {
+            }
+            if (!keep) {
+                // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
+                // Note: Above won't matter if all changes are on the main thread
+                ChunkImpl chunk = nearCache.get(pos);
+                if (chunk.isLocked()) {
+                    continue;
+                }
+                chunk.lock();
+                try {
+                    if (chunk.getChunkState() == ChunkImpl.State.COMPLETE && !chunk.isReady()) {
+                        // Chunk is complete, but hasn't had events sent out/entities loaded.
                         continue;
                     }
-                    chunk.lock();
-                    try {
-                        if (chunk.getChunkState() == ChunkImpl.State.COMPLETE && !chunk.isReady()) {
-                            // Chunk is complete, but hasn't had events sent out/entities loaded.
-                            continue;
+                    if (chunk.getChunkState() == ChunkImpl.State.COMPLETE) {
+                        worldEntity.send(new BeforeChunkUnload(pos));
+                        for (ChunkRelevanceRegion region : regions.values()) {
+                            region.chunkUnloaded(pos);
                         }
-                        if (chunk.getChunkState() == ChunkImpl.State.COMPLETE) {
-                            worldEntity.send(new BeforeChunkUnload(pos));
-                            for (ChunkRelevanceRegion region : regions.values()) {
-                                region.chunkUnloaded(pos);
-                            }
-                        }
-                        ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-                        store.storeAllEntities();
-                        store.save();
-
-                        chunk.dispose();
-
-                        try {
-                            unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
-                        } catch (InterruptedException e) {
-                            logger.error("Failed to enqueue unload request for {}", chunk.getPos(), e);
-                        }
-                        iterator.remove();
-                    } finally {
-                        chunk.unlock();
                     }
+                    ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+                    store.storeAllEntities();
+                    store.save();
+
+                    chunk.dispose();
+                    try {
+                        unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
+                    } catch (InterruptedException e) {
+                        logger.error("Failed to enqueue unload request for {}", chunk.getPos(), e);
+                    }
+                    iterator.remove();
+                    if (++unloaded >= UNLOAD_PER_FRAME) {
+                        break;
+                    }
+                } finally {
+                    chunk.unlock();
                 }
             }
         }
@@ -354,7 +348,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     }
                 }
                 if (produceChunks) {
-                    pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(2));
+                    pipeline.requestProduction(chunkRelevanceRegion.getCurrentRegion().expand(ChunkConstants.GENERATION_EXTENTS));
                 }
                 chunkRelevanceRegion.setUpToDate();
             }
@@ -521,7 +515,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
-            pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(2));
+            pipeline.requestProduction(chunkRelevanceRegion.getCurrentRegion().expand(ChunkConstants.GENERATION_EXTENTS));
             chunkRelevanceRegion.setUpToDate();
         }
     }
@@ -581,7 +575,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                                     chunk.setChunkState(ChunkImpl.State.COMPLETE);
                                     readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
                                 } else {
-                                    pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
+                                    pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.SECOND_PASS_EXTENTS));
                                 }
                             } finally {
                                 chunk.unlock();
@@ -604,7 +598,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }
                             preparingChunks.remove(getPosition());
-                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.LOCAL_REGION_EXTENTS));
+                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.SECOND_PASS_EXTENTS));
                         }
                     });
                 }

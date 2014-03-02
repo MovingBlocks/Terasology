@@ -32,13 +32,12 @@ import java.util.Set;
  * @author Immortius
  */
 public class ChunkRelevanceRegion {
-    private static final int UNLOAD_LEEWAY = 2;
-
     private EntityRef entity;
     private Vector3i relevanceDistance = new Vector3i();
     private boolean dirty;
     private Vector3i center = new Vector3i();
-    private Region3i region = Region3i.EMPTY;
+    private Region3i currentRegion = Region3i.EMPTY;
+    private Region3i previousRegion = Region3i.EMPTY;
     private ChunkRegionListener listener;
 
     private Set<Vector3i> relevantChunks = Sets.newLinkedHashSet();
@@ -52,7 +51,7 @@ public class ChunkRelevanceRegion {
             dirty = false;
         } else {
             center.set(TeraMath.calcChunkPos(loc.getWorldPosition()));
-            region = calculateRegion();
+            currentRegion = calculateRegion();
             dirty = true;
         }
     }
@@ -62,14 +61,16 @@ public class ChunkRelevanceRegion {
     }
 
     public void setRelevanceDistance(Vector3i distance) {
-        reviewRelevantChunks(distance);
-        this.relevanceDistance.set(distance);
-        this.region = calculateRegion();
-        dirty = true;
+        if (!distance.equals(this.relevanceDistance)) {
+            reviewRelevantChunks(distance);
+            this.relevanceDistance.set(distance);
+            this.currentRegion = calculateRegion();
+            dirty = true;
+        }
     }
 
     private void reviewRelevantChunks(Vector3i distance) {
-        Vector3i extents = new Vector3i(distance.x / 2 + UNLOAD_LEEWAY, distance.y / 2 + UNLOAD_LEEWAY, distance.z / 2 + UNLOAD_LEEWAY);
+        Vector3i extents = new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2);
         Region3i retainRegion = Region3i.createFromCenterExtents(center, extents);
         Iterator<Vector3i> iter = relevantChunks.iterator();
         while (iter.hasNext()) {
@@ -91,10 +92,15 @@ public class ChunkRelevanceRegion {
 
     public void setUpToDate() {
         dirty = false;
+        previousRegion = currentRegion;
     }
 
-    public Region3i getRegion() {
-        return region;
+    public Region3i getCurrentRegion() {
+        return currentRegion;
+    }
+
+    public Region3i getPreviousRegion() {
+        return previousRegion;
     }
 
     public void update() {
@@ -105,7 +111,7 @@ public class ChunkRelevanceRegion {
             if (!newCenter.equals(center)) {
                 dirty = true;
                 center.set(newCenter);
-                region = calculateRegion();
+                currentRegion = calculateRegion();
                 reviewRelevantChunks(relevanceDistance);
             }
         }
@@ -162,7 +168,7 @@ public class ChunkRelevanceRegion {
     }
 
     public void chunkReady(ChunkImpl chunk) {
-        if (region.encompasses(chunk.getPos()) && !relevantChunks.contains(chunk.getPos())) {
+        if (currentRegion.encompasses(chunk.getPos()) && !relevantChunks.contains(chunk.getPos())) {
             relevantChunks.add(chunk.getPos());
             sendChunkRelevant(chunk);
         }
@@ -186,7 +192,7 @@ public class ChunkRelevanceRegion {
 
     private class NeededChunksIterator implements Iterator<Vector3i> {
         Vector3i nextChunkPos;
-        Iterator<Vector3i> regionPositions = region.iterator();
+        Iterator<Vector3i> regionPositions = currentRegion.iterator();
 
         public NeededChunksIterator() {
             calculateNext();
