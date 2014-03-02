@@ -69,6 +69,7 @@ import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightWorldView;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +101,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
+    private List<ReadyChunkInfo> sortedReadyChunks = Lists.newArrayList();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
 
     private List<ChunkRelevanceRegion> pendingRemoveRegions = Lists.newArrayList();
@@ -254,8 +256,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void makeChunksAvailable() {
-        ReadyChunkInfo readyChunkInfo = readyChunks.poll();
-        if (readyChunkInfo != null) {
+        readyChunks.drainTo(sortedReadyChunks);
+        if (!sortedReadyChunks.isEmpty()) {
+            Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
+            ReadyChunkInfo readyChunkInfo = sortedReadyChunks.remove(sortedReadyChunks.size() - 1);
             makeChunkAvailable(readyChunkInfo);
             for (BatchPropagator propagator : loadEdgePropagators) {
                 propagator.process();
@@ -654,4 +658,34 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             return pos.gridDistance(regionCenter);
         }
     }
+
+    private class ReadyChunkRelevanceComparator implements Comparator<ReadyChunkInfo> {
+
+        @Override
+        public int compare(ReadyChunkInfo o1, ReadyChunkInfo o2) {
+            return score(o2.getPos()) - score(o1.getPos());
+        }
+
+        private int score(Vector3i chunk) {
+            int score = Integer.MAX_VALUE;
+
+            regionLock.readLock().lock();
+            try {
+                for (ChunkRelevanceRegion region : regions.values()) {
+                    int dist = distFromRegion(chunk, region.getCenter());
+                    if (dist < score) {
+                        score = dist;
+                    }
+                }
+                return score;
+            } finally {
+                regionLock.readLock().unlock();
+            }
+        }
+
+        private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
+            return pos.gridDistance(regionCenter);
+        }
+    }
+
 }
