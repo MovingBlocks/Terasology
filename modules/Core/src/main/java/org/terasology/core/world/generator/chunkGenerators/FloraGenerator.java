@@ -83,10 +83,13 @@ public class FloraGenerator implements FirstPassGenerator {
     public void generateChunk(Chunk c) {
         // TODO: Better seeding mechanism
         FastRandom random = new FastRandom(worldSeed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
-        for (int y = 0; y < c.getChunkSizeY(); y++) {
+
             for (int x = 0; x < c.getChunkSizeX(); x++) {
                 for (int z = 0; z < c.getChunkSizeZ(); z++) {
-                    generateGrassAndFlowers(c, x, y, z, random);
+                    for (int y = c.getChunkSizeY() - 2; y >= 0; y--) {
+                        if (generateGrassAndFlowers(c, x, y, z, random)) {
+                            break;
+                    }
                 }
             }
         }
@@ -100,7 +103,7 @@ public class FloraGenerator implements FirstPassGenerator {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateGrassAndFlowers(Chunk c, int x, int y, int z, Random random) {
+    private boolean generateGrassAndFlowers(Chunk c, int x, int y, int z, Random random) {
         Block targetBlock = c.getBlock(x, y, z);
         if ((targetBlock.equals(grassBlock) || targetBlock.equals(sandBlock) || targetBlock.equals(snowBlock)) && c.getBlock(x, y + 1, z).equals(airBlock)) {
 
@@ -127,7 +130,9 @@ public class FloraGenerator implements FirstPassGenerator {
                     c.setBlock(x, y + 1, z, random.nextItem(flowers));
                 }
             }
+            return true;
         }
+        return false;
     }
 
     @Override

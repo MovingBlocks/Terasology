@@ -213,7 +213,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     @Override
     public void onChunkLoaded(Vector3i pos) {
         if (renderRegion.encompasses(pos)) {
-            // generate mesh
             ChunkImpl chunk = chunkProvider.getChunk(pos);
             chunksInProximity.add(chunk);
             Collections.sort(chunksInProximity, new ChunkFrontToBackComparator());
@@ -484,7 +483,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     private boolean processChunkUpdate(ChunkImpl c) {
-        if ((c.isDirty() || c.getMesh() == null) && isChunkValidForRender(c)) {
+        if ((c.isDirty() || c.getMesh() == null)) {
             statDirtyChunks++;
             chunkUpdateManager.queueChunkUpdate(c);
             return true;

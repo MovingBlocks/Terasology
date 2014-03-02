@@ -16,6 +16,8 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.ChunkView;
@@ -27,6 +29,7 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
  * @author Immortius
  */
 public class SecondPassChunkTask extends AbstractChunkTask {
+    private static final Logger logger = LoggerFactory.getLogger(SecondPassChunkTask.class);
 
     public SecondPassChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
         super(pipeline, position, provider);
@@ -39,7 +42,7 @@ public class SecondPassChunkTask extends AbstractChunkTask {
 
     @Override
     public void run() {
-        ChunkView view = getProvider().getViewAround(getPosition());
+        ChunkView view = getProvider().getSecondPassView(getPosition());
         if (view == null) {
             return;
         }

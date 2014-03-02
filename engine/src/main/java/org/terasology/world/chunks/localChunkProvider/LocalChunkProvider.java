@@ -44,6 +44,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -105,8 +106,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private List<ReadyChunkInfo> sortedReadyChunks = Lists.newArrayList();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
 
-    private List<ChunkRelevanceRegion> pendingRemoveRegions = Lists.newArrayList();
-
     private EntityRef worldEntity = EntityRef.NULL;
 
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
@@ -142,6 +141,32 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             return createWorldView(region, Vector3i.one());
         }
         return null;
+    }
+
+    public void checkChunkStatus() {
+        for (ChunkRelevanceRegion region : regions.values()) {
+            Region3i current = region.getCurrentRegion();
+            Region3i fullGenerationRegion = current.expand(ChunkConstants.GENERATION_EXTENTS);
+            for (Vector3i pos : fullGenerationRegion) {
+                if (!nearCache.containsKey(pos)) {
+                    logger.info("Missing chunk {}", pos);
+                }
+            }
+
+            for (Vector3i pos : current.expand(ChunkConstants.SECOND_PASS_EXTENTS)) {
+                ChunkImpl chunk = nearCache.get(pos);
+                if (chunk == null || chunk.getChunkState().compareTo(ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
+                    logger.info("Chunk expected to be ready for internal light: {}", pos);
+                }
+            }
+
+            for (Vector3i pos : current) {
+                ChunkImpl chunk = nearCache.get(pos);
+                if (chunk == null || !chunk.isReady()) {
+                    logger.info("Chunk expected to be complete: {}", pos);
+                }
+            }
+        }
     }
 
     @Override
@@ -234,10 +259,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void removeRelevanceEntity(EntityRef entity) {
         regionLock.writeLock().lock();
         try {
-            ChunkRelevanceRegion region = regions.remove(entity);
-            if (region != null) {
-                pendingRemoveRegions.add(region);
-            }
+            regions.remove(entity);
         } finally {
             regionLock.writeLock().unlock();
         }
@@ -528,8 +550,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public ChunkViewCore getViewAround(Vector3i pos) {
-        Region3i region = Region3i.createFromCenterExtents(pos, 1);
+    public ChunkViewCore getSecondPassView(Vector3i pos) {
+        Region3i region = Region3i.createFromCenterExtents(pos, ChunkConstants.SECOND_PASS_EXTENTS);
         ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = getChunkForProcessing(chunkPos);
@@ -582,7 +604,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                                     chunk.setChunkState(ChunkImpl.State.COMPLETE);
                                     readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
                                 } else {
-                                    pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.SECOND_PASS_EXTENTS));
+                                    pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.GENERATION_EXTENTS));
                                 }
                             } finally {
                                 chunk.unlock();
@@ -605,7 +627,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }
                             preparingChunks.remove(getPosition());
-                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.SECOND_PASS_EXTENTS));
+                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), ChunkConstants.GENERATION_EXTENTS));
                         }
                     });
                 }

@@ -16,6 +16,8 @@
 
 package org.terasology.world.chunks.pipeline;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -25,6 +27,7 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
  * @author Immortius
  */
 public class InternalLightingChunkTask extends AbstractChunkTask {
+    private static final Logger logger = LoggerFactory.getLogger(InternalLightingChunkTask.class);
 
     public InternalLightingChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
         super(pipeline, position, provider);

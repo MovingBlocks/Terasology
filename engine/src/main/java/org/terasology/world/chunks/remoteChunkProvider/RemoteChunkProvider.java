@@ -201,8 +201,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkViewCore getViewAround(Vector3i pos) {
-        Region3i region = Region3i.createFromCenterExtents(pos, 1);
+    public ChunkViewCore getSecondPassView(Vector3i pos) {
+        Region3i region = Region3i.createFromCenterExtents(pos, ChunkConstants.SECOND_PASS_EXTENTS);
         ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = getChunkForProcessing(chunkPos);

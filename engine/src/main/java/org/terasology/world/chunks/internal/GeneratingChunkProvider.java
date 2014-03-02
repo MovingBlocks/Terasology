@@ -50,7 +50,7 @@ public interface GeneratingChunkProvider extends ChunkProvider {
      * @param chunkPos
      * @return A local chunk view, or null if some of the chunks are unavailable.
      */
-    ChunkViewCore getViewAround(Vector3i chunkPos);
+    ChunkViewCore getSecondPassView(Vector3i chunkPos);
 
     /**
      * Causes the creation or loading of a chunk.
