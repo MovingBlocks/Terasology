@@ -64,7 +64,6 @@ public class ChunkImpl implements Chunk {
 
 
     public static enum State {
-        ADJACENCY_GENERATION_PENDING(EntityData.ChunkState.ADJACENCY_GENERATION_PENDING),
         INTERNAL_LIGHT_GENERATION_PENDING(EntityData.ChunkState.INTERNAL_LIGHT_GENERATION_PENDING),
         COMPLETE(EntityData.ChunkState.COMPLETE);
 
@@ -103,7 +102,7 @@ public class ChunkImpl implements Chunk {
     private TeraArray extraData;
 
     private boolean initialGenerationComplete;
-    private State chunkState = State.ADJACENCY_GENERATION_PENDING;
+    private State chunkState = State.INTERNAL_LIGHT_GENERATION_PENDING;
     private boolean dirty;
     private boolean animated;
     private AABB aabb;

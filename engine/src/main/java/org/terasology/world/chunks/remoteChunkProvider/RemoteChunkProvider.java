@@ -29,6 +29,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.world.chunks.pipeline.InternalLightingChunkTask;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.chunks.ChunkConstants;
@@ -67,7 +68,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private RemoteWorldGenerator remoteWorldGenerator;
 
     public RemoteChunkProvider() {
-        pipeline = new ChunkGenerationPipeline(this, null, new ChunkTaskRelevanceComparator());
+        pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
         loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
         ChunkMonitor.fireChunkProviderInitialized(this);
@@ -81,7 +82,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     public void receiveChunk(ChunkImpl chunk) {
         chunkCache.put(chunk.getPos(), chunk);
-        pipeline.requestReview(Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.SECOND_PASS_EXTENTS));
+        pipeline.doTask(new InternalLightingChunkTask(pipeline, chunk.getPos(), this));
     }
 
     public void invalidateChunks(Vector3i pos) {
@@ -198,22 +199,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void removeRelevanceEntity(EntityRef entity) {
 
-    }
-
-    @Override
-    public ChunkViewCore getSecondPassView(Vector3i pos) {
-        Region3i region = Region3i.createFromCenterExtents(pos, ChunkConstants.SECOND_PASS_EXTENTS);
-        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
-        for (Vector3i chunkPos : region) {
-            ChunkImpl chunk = getChunkForProcessing(chunkPos);
-            if (chunk == null) {
-                return null;
-            }
-            chunkPos.sub(region.min());
-            int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
-            chunks[index] = chunk;
-        }
-        return new ChunkViewCoreImpl(chunks, region, Vector3i.one());
     }
 
     @Override

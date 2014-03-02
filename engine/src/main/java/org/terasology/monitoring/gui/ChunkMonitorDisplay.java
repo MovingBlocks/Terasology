@@ -674,8 +674,6 @@ public class ChunkMonitorDisplay extends JPanel {
             }
 
             switch (chunk.getChunkState()) {
-                case ADJACENCY_GENERATION_PENDING:
-                    return COLOR_ADJACENCY_GENERATION_PENDING;
                 case INTERNAL_LIGHT_GENERATION_PENDING:
                     return COLOR_INTERNAL_LIGHT_GENERATION_PENDING;
                 case COMPLETE:

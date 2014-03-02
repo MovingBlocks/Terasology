@@ -23,14 +23,13 @@ import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.ChunkView;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.generator.SecondPassGenerator;
 
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-public class ForestGenerator implements SecondPassGenerator {
+/*public class ForestGenerator implements SecondPassGenerator {
     private String seed;
     private WorldBiomeProvider biomeProvider;
 
@@ -83,4 +82,4 @@ public class ForestGenerator implements SecondPassGenerator {
     public void setInitParameters(final Map<String, String> initParameters) {
     }
 
-}
+}  */

@@ -15,19 +15,7 @@
  */
 package org.terasology.core.logic.generators;
 
-import com.google.common.collect.ImmutableMap;
-import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
-import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
-import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
-import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.math.LSystemRule;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.block.BlockManager;
-
-import java.util.Map;
-
-public abstract class DefaultGenerators {
+/*public abstract class DefaultGenerators {
 
     public static void addDefaultForestGenerators(ForestGenerator mngr) {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
@@ -83,4 +71,4 @@ public abstract class DefaultGenerators {
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
     }
-}
+}*/

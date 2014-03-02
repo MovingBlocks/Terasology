@@ -17,19 +17,13 @@ package org.terasology.core.world.generator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.Color;
-import org.terasology.world.ChunkView;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.FirstPassGenerator;
-import org.terasology.world.generator.SecondPassGenerator;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
@@ -41,12 +35,9 @@ import java.util.List;
  * @author Immortius
  */
 public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
-
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
     private final List<FirstPassGenerator> firstPassGenerators = Lists.newArrayList();
-    private final List<SecondPassGenerator> secondPassGenerators = Lists.newArrayList();
     private final SimpleUri uri;
 
     public AbstractBaseWorldGenerator(SimpleUri uri) {
@@ -68,20 +59,11 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
             setBiome(generator);
             generator.setWorldSeed(seed);
         }
-        for (final BaseChunkGenerator generator : secondPassGenerators) {
-            setBiome(generator);
-            generator.setWorldSeed(seed);
-        }
     }
 
     protected final void register(final FirstPassGenerator generator) {
         registerBaseChunkGenerator(generator);
         firstPassGenerators.add(generator);
-    }
-
-    protected final void register(final SecondPassGenerator generator) {
-        registerBaseChunkGenerator(generator);
-        secondPassGenerators.add(generator);
     }
 
     private void registerBaseChunkGenerator(final BaseChunkGenerator generator) {
@@ -97,13 +79,6 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     public void createChunk(final Chunk chunk) {
         for (final FirstPassGenerator generator : firstPassGenerators) {
             generator.generateChunk(chunk);
-        }
-    }
-
-    @Override
-    public void applySecondPass(final Vector3i chunkPos, final ChunkView view) {
-        for (final SecondPassGenerator generator : secondPassGenerators) {
-            generator.postProcessChunk(chunkPos, view);
         }
     }
 
@@ -156,7 +131,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     public Iterable<String> getLayers() {
         return Arrays.asList("Biome", "Humidity", "Temperature");
     }
-    
+
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();

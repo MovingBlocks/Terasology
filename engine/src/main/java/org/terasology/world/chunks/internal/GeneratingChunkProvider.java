@@ -44,15 +44,6 @@ public interface GeneratingChunkProvider extends ChunkProvider {
     ChunkImpl getChunkForProcessing(Vector3i pos);
 
     /**
-     * Obtains a local chunk view of the chunk at the given position and the immediately surrounding chunks.
-     * Block positions are offset so that the origin is at minimum coords of the target chunk.
-     *
-     * @param chunkPos
-     * @return A local chunk view, or null if some of the chunks are unavailable.
-     */
-    ChunkViewCore getSecondPassView(Vector3i chunkPos);
-
-    /**
      * Causes the creation or loading of a chunk.
      *
      * @param position

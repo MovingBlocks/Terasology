@@ -47,9 +47,4 @@ public final class ShutdownChunkTask implements ChunkTask {
     public GeneratingChunkProvider getProvider() {
         return null;
     }
-
-    @Override
-    public ChunkGenerationPipeline getPipeline() {
-        return null;
-    }
 }

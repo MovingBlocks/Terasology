@@ -43,10 +43,6 @@ public class RemoteWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public void applySecondPass(Vector3i chunkPos, ChunkView view) {
-    }
-
-    @Override
     public void createChunk(Chunk chunk) {
     }
 

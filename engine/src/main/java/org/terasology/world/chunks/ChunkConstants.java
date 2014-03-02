@@ -46,8 +46,6 @@ public final class ChunkConstants {
     public static final Region3i CHUNK_REGION = Region3i.createFromMinAndSize(Vector3i.zero(), CHUNK_SIZE);
 
     public static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 1, 1);
-    public static final Vector3i SECOND_PASS_EXTENTS = new Vector3i(1, 0, 1);
-    public static final Vector3i GENERATION_EXTENTS = new Vector3i(2, 0, 2);
 
     private ChunkConstants() {
     }

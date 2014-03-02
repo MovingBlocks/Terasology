@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.terasology.world.generator;
+package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
+import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
  */
-public interface SecondPassGenerator extends BaseChunkGenerator {
-    void postProcessChunk(Vector3i chunkPos, ChunkView view);
+public class CreateOrLoadChunkTask extends AbstractChunkTask {
+
+    public CreateOrLoadChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
+        super(position, provider);
+    }
+
+    @Override
+    public String getName() {
+        return "Create or Load Chunk";
+    }
+
+    @Override
+    public void run() {
+        getProvider().createOrLoadChunk(getPosition());
+    }
 }

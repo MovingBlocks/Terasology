@@ -30,7 +30,7 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
     private static final Logger logger = LoggerFactory.getLogger(InternalLightingChunkTask.class);
 
     public InternalLightingChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
-        super(pipeline, position, provider);
+        super(position, provider);
     }
 
     @Override

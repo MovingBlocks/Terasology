@@ -25,10 +25,8 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 public abstract class AbstractChunkTask implements ChunkTask {
     private final Vector3i position;
     private final GeneratingChunkProvider provider;
-    private final ChunkGenerationPipeline pipeline;
 
-    public AbstractChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, GeneratingChunkProvider provider) {
-        this.pipeline = pipeline;
+    public AbstractChunkTask(Vector3i position, GeneratingChunkProvider provider) {
         this.position = new Vector3i(position);
         this.provider = provider;
     }
@@ -46,10 +44,5 @@ public abstract class AbstractChunkTask implements ChunkTask {
     @Override
     public boolean isTerminateSignal() {
         return false;
-    }
-
-    @Override
-    public ChunkGenerationPipeline getPipeline() {
-        return pipeline;
     }
 }

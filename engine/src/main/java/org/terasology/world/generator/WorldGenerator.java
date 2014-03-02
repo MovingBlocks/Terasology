@@ -30,8 +30,6 @@ public interface WorldGenerator {
 
     void setWorldSeed(String seed);
 
-    void applySecondPass(Vector3i chunkPos, ChunkView view);
-
     void createChunk(Chunk chunk);
 
     float getFog(float x, float y, float z);

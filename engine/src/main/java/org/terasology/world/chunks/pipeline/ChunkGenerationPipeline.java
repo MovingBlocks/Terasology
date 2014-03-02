@@ -29,37 +29,13 @@ import java.util.Comparator;
  * @author Immortius
  */
 public class ChunkGenerationPipeline {
-    private static final int NUM_REVIEW_THREADS = 1;
     private static final int NUM_TASK_THREADS = 8;
     private static final Logger logger = LoggerFactory.getLogger(ChunkGenerationPipeline.class);
 
-    private TaskMaster<ChunkRequest> chunkReviewer;
     private TaskMaster<ChunkTask> chunkGenerator;
 
-    private WorldGenerator generator;
-    private GeneratingChunkProvider provider;
-
-    public ChunkGenerationPipeline(GeneratingChunkProvider provider, WorldGenerator generator, Comparator<ChunkTask> taskComparator) {
-        this.provider = provider;
-        this.generator = generator;
-        chunkReviewer = TaskMaster.createPriorityTaskMaster("Chunk-Reviewer", NUM_REVIEW_THREADS, 64);
+    public ChunkGenerationPipeline(Comparator<ChunkTask> taskComparator) {
         chunkGenerator = TaskMaster.createPriorityTaskMaster("Chunk-Generator", NUM_TASK_THREADS, 128, taskComparator);
-    }
-
-    public void requestReview(Region3i region) {
-        try {
-            chunkReviewer.put(new ChunkRequest(this, provider, ChunkRequest.Type.REVIEW, region));
-        } catch (InterruptedException e) {
-            logger.error("Failed to enqueue review request for region {}", region, e);
-        }
-    }
-
-    public void requestProduction(Region3i region) {
-        try {
-            chunkReviewer.put(new ChunkRequest(this, provider, ChunkRequest.Type.PRODUCE, region));
-        } catch (InterruptedException e) {
-            logger.error("Failed to enqueue production request for region {}", region, e);
-        }
     }
 
     public void doTask(ChunkTask task) {
@@ -71,13 +47,7 @@ public class ChunkGenerationPipeline {
     }
 
     public void shutdown() {
-        chunkReviewer.shutdown(new ChunkRequest(this, provider, ChunkRequest.Type.EXIT, Region3i.EMPTY), false);
         chunkGenerator.shutdown(new ShutdownChunkTask(), false);
     }
-
-    public WorldGenerator getWorldGenerator() {
-        return generator;
-    }
-
 
 }

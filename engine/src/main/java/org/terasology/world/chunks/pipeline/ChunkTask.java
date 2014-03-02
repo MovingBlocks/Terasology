@@ -28,6 +28,4 @@ public interface ChunkTask extends Task {
     Vector3i getPosition();
 
     GeneratingChunkProvider getProvider();
-
-    ChunkGenerationPipeline getPipeline();
 }
