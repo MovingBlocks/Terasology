@@ -28,10 +28,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 import org.eaxy.Document;
 import org.eaxy.Element;
@@ -39,6 +45,11 @@ import org.eaxy.ElementSet;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
+
+import com.google.common.collect.Lists;
 
 /**
  * Importer for Collada data exchange model files.
@@ -60,6 +71,8 @@ public class ColladaLoader {
     protected TFloatList colors;
     protected TIntList indices;
 
+    protected SkeletalMeshDataBuilder skeletonBuilder;
+
     protected String loadDataAsString(BufferedReader reader) throws IOException, FileNotFoundException {
         StringBuilder result = new StringBuilder();
         try {
@@ -74,6 +87,229 @@ public class ColladaLoader {
     }
 
     protected void parseData(String contents) throws ColladaParseException {
+        Document document = Xml.xml(contents);
+        Element rootElement = document.getRootElement();
+
+        parseSkeletalMeshData(rootElement);
+        parseMeshData(rootElement);
+    }
+
+    private static class MD5Joint {
+        String name;
+        int parent;
+        Vector3f position;
+        Quat4f orientation;
+    }
+
+    private static class MD5Vertex {
+        Vector2f uv;
+        int startWeight;
+        int countWeight;
+    }
+
+    private static class MD5Weight {
+        int jointIndex;
+        float bias;
+        Vector3f position;
+    }
+
+    protected void parseSkeletalMeshData(Element rootElement) throws ColladaParseException {
+
+        skeletonBuilder = new SkeletalMeshDataBuilder();
+        ElementSet controllerSet = rootElement.find("library_controllers", "controller");
+        for (Element controller : controllerSet) {
+            ElementSet skinSet = controller.find("skin");
+            if (1 != skinSet.size()) {
+                throw new ColladaParseException("Found " + skinSet.size() + " skin sets for controller id=" + controller.id() + " name=" + controller.name());
+            }
+            Element skin = skinSet.first();
+
+            ElementSet jointsSet = skin.find("joints");
+            if (1 != jointsSet.size()) {
+                throw new ColladaParseException("Found " + jointsSet.size() + " joints sets for controller id=" + controller.id() + " name=" + controller.name());
+            }
+            Element joints = jointsSet.first();
+
+            ElementSet vertexWeightsSet = skin.find("vertex_weights");
+            if (1 != vertexWeightsSet.size()) {
+                throw new ColladaParseException("Found " + vertexWeightsSet.size() + " vertex weights sets for controller id=" + controller.id() + " name=" + controller.name());
+            }
+            Element vertexWeights = vertexWeightsSet.first();
+            String vertexWeightsCountString = vertexWeights.attr("count");
+            int vertexWeightsCount = Integer.parseInt(vertexWeightsCountString);
+            
+            String[] jointNameArray = null;
+            float[] inverseBindMatrixArray;
+            Quat4f[] rotationArray;
+            ElementSet jointsInputSet = joints.find("input");
+            List<Input> inputList = parseInputs(jointsInputSet);
+            for (Input jointsInput : inputList) {
+                if ("JOINT".equals(jointsInput.semantic)) {
+                    Element jointNameSourceElement =  skin.select(jointsInput.sourceName);
+                    Source jointNameSource = parseSource(jointNameSourceElement);
+                    jointNameArray = jointNameSource.nameValues;
+                }
+                if ("INV_BIND_MATRIX".equals(jointsInput.semantic)) {
+                    Element jointMatrixSourceElement =  skin.select(jointsInput.sourceName);
+                    Source jointMatrixSource = parseSource(jointMatrixSourceElement);
+                    inverseBindMatrixArray = jointMatrixSource.floatValues;
+                    
+                    rotationArray = new Quat4f[inverseBindMatrixArray.length / 16];
+                    for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
+                        int offset = i * 16;
+                        Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
+                        Quat4f rotation = new Quat4f();
+                        rotation.set(matrix4f);
+                        rotationArray[i] = rotation;
+                    }
+                }
+            }
+            
+            float[] weightsArray = null;
+
+            ElementSet vertexWeightsInputSet = vertexWeights.find("input");
+            List<Input> vertexWeightsInputList = parseInputs(vertexWeightsInputSet);
+            
+            // TODO: for now, assume the offsets will always perfectly match the sorted-by-offset list indexes
+            Collections.sort(vertexWeightsInputList, new Comparator<Input>() {
+                @Override
+                public int compare(Input i1, Input i2) {
+                    return i1.offset - i2.offset;
+                }
+            });
+            for (int i = 0; i < vertexWeightsInputList.size(); i++) {
+                Input input = vertexWeightsInputList.get(i);
+                if (input.offset != i) {
+                    throw new ColladaParseException("vertex weights input list offset does not match list index for vertex weights input " + input
+                            + " for controller id=" + controller.id() + " name=" + controller.name());
+                }
+            }
+
+            for (Input vertexWeightsInput : vertexWeightsInputList) {
+//                if ("JOINT".equals(vertexWeightsInput.semantic)) {
+//                    Element jointNameSourceElement =  skin.select(vertexWeightsInput.sourceName);
+//                    Source jointNameSource = parseSource(jointNameSourceElement);
+//                    jointNameArray = jointNameSource.nameValues;
+//                }
+                if ("WEIGHT".equals(vertexWeightsInput.semantic)) {
+                    Element jointMatrixSourceElement =  skin.select(vertexWeightsInput.sourceName);
+                    Source weightsArraySource = parseSource(jointMatrixSourceElement);
+                    weightsArray = weightsArraySource.floatValues;
+                }
+            }
+
+            ElementSet vertexWeightsVCountDataSet = vertexWeights.find("vcount");
+            if (1 != vertexWeightsVCountDataSet.size()) {
+                throw new ColladaParseException("Found " + vertexWeightsVCountDataSet.size()
+                        + " vertex weights vcount sets for controller id=" + controller.id() + " name=" + controller.name());
+            }
+            Element vertexWeightsVCountData = vertexWeightsVCountDataSet.first();
+            String vertexWeightsVCountString = vertexWeightsVCountData.text();
+            String[] vertexWeightsVCountStrings = getItemsInString(vertexWeightsVCountString);
+            if (vertexWeightsVCountStrings.length != vertexWeightsCount) {
+                throw new ColladaParseException("Expected " + vertexWeightsCount + " but was "
+                                                + vertexWeightsVCountStrings.length + " for controller id=" + controller.id() + " name=" + controller.name());
+            }
+
+            ElementSet vertexWeightsVDataSet = vertexWeights.find("v");
+            if (1 != vertexWeightsVDataSet.size()) {
+                throw new ColladaParseException("Found " + vertexWeightsVDataSet.size()
+                        + " vertex weights v sets for controller id=" + controller.id() + " name=" + controller.name());
+            }
+            Element vertexWeightsVData = vertexWeightsVDataSet.first();
+            String vertexWeightsVDataString = vertexWeightsVData.text();
+            String[] vertexWeightsVStrings = getItemsInString(vertexWeightsVDataString);
+//            if (vertexWeightsVStrings.length != (vertexWeightsCount * vertexWeightsInputList.size())) {
+//                throw new ColladaParseException("Expected " + vertexWeightsCount + " * input count of "
+//                                                + vertexWeightsInputList.size() + " but was "
+//                                                + vertexWeightsVStrings.length + " for controller id=" + controller.id() + " name=" + controller.name());
+//            }
+
+            
+            String[] vertexWeightsJointNameArray = new String[vertexWeightsCount];
+            float[] vertexWeightsArray = new float[vertexWeightsCount];
+
+            int vertexWeightsVDataIndex = -1;
+            for (int vertexWeightsIndex = 0; vertexWeightsIndex < vertexWeightsCount; vertexWeightsIndex++) {
+                String vCountString = vertexWeightsVCountStrings[vertexWeightsIndex];
+                int vCount = Integer.parseInt(vCountString);
+                for (int vCountIndex = 0; vCountIndex < vCount; vCountIndex++) {
+                    for (int vertexWeightsInputOffset = 0; vertexWeightsInputOffset < vertexWeightsInputList.size(); vertexWeightsInputOffset++) {
+                        Input vertexWeightsInput = vertexWeightsInputList.get(vertexWeightsInputOffset);
+    
+                        // vCount varies each time
+//                      int vertexWeightsVDataIndex = (vertexWeightsIndex * vertexWeightsInputList.size() * vCount) + (vCountIndex * vertexWeightsInputList.size()) + vertexWeightsInputOffset;
+                        ++vertexWeightsVDataIndex;
+                        
+                        String indexString = vertexWeightsVStrings[vertexWeightsVDataIndex];
+                        int index = Integer.parseInt(indexString);
+                        if (-1 == index) {
+                            throw new ColladaParseException("We do not support indexing into the bind shape yet");
+                        }
+
+                        if ("JOINT".equals(vertexWeightsInput.semantic)) {
+                            vertexWeightsJointNameArray[vertexWeightsIndex] = jointNameArray[index];
+//                            logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "jointName=" + vertexWeightsJointNameArray[vertexWeightsIndex]);
+                        } else if ("WEIGHT".equals(vertexWeightsInput.semantic)) {
+                            vertexWeightsArray[vertexWeightsIndex] = weightsArray[index];
+//                            logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "weight=" + vertexWeightsArray[vertexWeightsIndex]);
+                        } else {
+                            throw new ColladaParseException("Found unexpected vertex weights Input semantic " + vertexWeightsInput.semantic +
+                                                            " for controller id=" + controller.id() + " name=" + controller.name());
+                        }
+                    }
+                }
+            }
+        }
+
+        ElementSet nodeSet = rootElement.find("library_visual_scenes", "visual_scene", "node", "instance_controller", "skeleton");
+
+        
+        ElementSet nodeSet = rootElement.find("library_visual_scenes", "visual_scene", "node");
+        for (Element node : node) {
+            
+        }
+
+//        List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
+//        for (int i = 0; i < md5.numJoints; ++i) {
+//            MD5Joint joint = md5.joints[i];
+//            Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
+//            bones.add(bone);
+//            if (joint.parent != -1) {
+//                bones.get(joint.parent).addChild(bone);
+//            }
+//            skeletonBuilder.addBone(bone);
+//        }
+//        if (md5.meshes.length > 0) {
+//            // TODO: Support multiple mesh somehow?
+//            MD5Mesh mesh = md5.meshes[0];
+//            for (MD5Weight weight : mesh.weightList) {
+//                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+//            }
+//
+//            List<Vector2f> uvs = Lists.newArrayList();
+//            TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
+//            TIntList vertexWeightCount = new TIntArrayList(mesh.numVertices);
+//            for (MD5Vertex vert : mesh.vertexList) {
+//                uvs.add(vert.uv);
+//                vertexStartWeight.add(vert.startWeight);
+//                vertexWeightCount.add(vert.countWeight);
+//            }
+//            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
+//            skeletonBuilder.setUvs(uvs);
+//            TIntList indices = new TIntArrayList(mesh.indexList.length);
+//            for (int i = 0; i < mesh.numTriangles; ++i) {
+//                indices.add(mesh.indexList[i * 3]);
+//                indices.add(mesh.indexList[i * 3 + 2]);
+//                indices.add(mesh.indexList[i * 3 + 1]);
+//            }
+//            skeletonBuilder.setIndices(indices);
+//        }
+//
+//        return skeletonBuilder.build();
+    }
+
+    protected void parseMeshData(Element rootElement) throws ColladaParseException {
 
         vertices = new TFloatArrayList();
         texCoord0 = new TFloatArrayList();
@@ -82,9 +318,6 @@ public class ColladaLoader {
         colors = new TFloatArrayList();
         indices = new TIntArrayList();
         int vertCount = 0;
-
-        Document document = Xml.xml(contents);
-        Element rootElement = document.getRootElement();
 
         // TODO: we shouldn't just cram everything into a single mesh, but should expect separate meshes with differing materials
 
@@ -212,6 +445,7 @@ public class ColladaLoader {
                     String indexString = trianglesStrings[triangleDataIndex];
                     int index = Integer.parseInt(indexString);
 
+                    
                     if ("VERTEX".equals(triangleInput.semantic)) {
                         int vertexStride = triangleInput.vertexPositionSource.stride;
                         if (3 != vertexStride) {
@@ -220,9 +454,9 @@ public class ColladaLoader {
                                                             " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
-                        float vertexX = triangleInput.vertexPositionSource.values[index * vertexStride + 0];
-                        float vertexY = triangleInput.vertexPositionSource.values[index * vertexStride + 1];
-                        float vertexZ = triangleInput.vertexPositionSource.values[index * vertexStride + 2];
+                        float vertexX = triangleInput.vertexPositionSource.floatValues[index * vertexStride + 0];
+                        float vertexY = triangleInput.vertexPositionSource.floatValues[index * vertexStride + 1];
+                        float vertexZ = triangleInput.vertexPositionSource.floatValues[index * vertexStride + 2];
                         verticesParam.add(vertexX);
                         verticesParam.add(vertexY);
                         verticesParam.add(vertexZ);
@@ -236,15 +470,24 @@ public class ColladaLoader {
                                                                 " for geometry id=" + geometry.id() + " name=" + geometry.name());
                             }
                             // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
-                            float normalX = triangleInput.vertexNormalSource.values[index * normalStride + 0];
-                            float normalY = triangleInput.vertexNormalSource.values[index * normalStride + 1];
-                            float normalZ = triangleInput.vertexNormalSource.values[index * normalStride + 2];
+                            float normalX = triangleInput.vertexNormalSource.floatValues[index * normalStride + 0];
+                            float normalY = triangleInput.vertexNormalSource.floatValues[index * normalStride + 1];
+                            float normalZ = triangleInput.vertexNormalSource.floatValues[index * normalStride + 2];
                             normalsParam.add(normalX);
                             normalsParam.add(normalY);
                             normalsParam.add(normalZ);
                         }
 
+                        // TODO: how to triangulate faces on the fly
                         indicesParam.add(vertCount++);
+//                      for (int i = 0; i < face.length - 2; ++i) {
+//                          indices.add(vertCount);
+//                          indices.add(vertCount + i + 1);
+//                          indices.add(vertCount + i + 2);
+//                      }
+//                      vertCount += face.length;
+
+                      
                     } else if ("NORMAL".equals(triangleInput.semantic)) {
                         // TODO: Sometimes we get the normal attached to the triangle, sometimes to the vertex
 
@@ -255,9 +498,9 @@ public class ColladaLoader {
                                                             " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
-                        float normalX = triangleInput.normalSource.values[index * normalStride + 0];
-                        float normalY = triangleInput.normalSource.values[index * normalStride + 1];
-                        float normalZ = triangleInput.normalSource.values[index * normalStride + 2];
+                        float normalX = triangleInput.normalSource.floatValues[index * normalStride + 0];
+                        float normalY = triangleInput.normalSource.floatValues[index * normalStride + 1];
+                        float normalZ = triangleInput.normalSource.floatValues[index * normalStride + 2];
                         normalsParam.add(normalX);
                         normalsParam.add(normalY);
                         normalsParam.add(normalZ);
@@ -269,8 +512,11 @@ public class ColladaLoader {
                                                             " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming S,T order
-                        float texCoordS = triangleInput.texCoordSource.values[index * texCoordStride + 0];
-                        float texCoordT = triangleInput.texCoordSource.values[index * texCoordStride + 1];
+                        float texCoordS = triangleInput.texCoordSource.floatValues[index * texCoordStride + 0];
+                        float texCoordT = triangleInput.texCoordSource.floatValues[index * texCoordStride + 1];
+                        
+                        // For texture coordinates, COLLADA’s right-handed coordinate system applies;
+                        // therefore, an ST texture coordinate of [0,0] maps to the lower-left texel of a texture image
                         texCoord0Param.add(texCoordS);
                         texCoord0Param.add(1 - texCoordT);
                         // texCoord0.add(texCoordT);
@@ -301,8 +547,8 @@ public class ColladaLoader {
         return inputList;
     }
 
-    private MeshDataSource parseSource(Element sourceElement) throws ColladaParseException {
-        MeshDataSource meshDataSource = new MeshDataSource();
+    private Source parseSource(Element sourceElement) throws ColladaParseException {
+        Source source = new Source();
 
         ElementSet accessorSet = sourceElement.find("technique_common", "accessor");
         if (1 != accessorSet.size()) {
@@ -310,41 +556,62 @@ public class ColladaLoader {
         }
         Element accessor = accessorSet.first();
         String accessorCount = accessor.attr("count");
-        meshDataSource.count = Integer.parseInt(accessorCount);
+        source.count = Integer.parseInt(accessorCount);
         String accessorStride = accessor.attr("stride");
-        meshDataSource.stride = Integer.parseInt(accessorStride);
+        if (null != accessorStride) {
+            source.stride = Integer.parseInt(accessorStride);
+        }
         String accessorSource = accessor.attr("source");
+        source.accessorSource = accessorSource;
 
-        ElementSet paramSet = sourceElement.find("param");
+        ElementSet paramSet = accessor.find("param");
         int paramSize = paramSet.size();
-        meshDataSource.parameterNames = new String[paramSize];
-        meshDataSource.parameterTypes = new String[paramSize];
+        source.parameterNames = new String[paramSize];
+        source.parameterTypes = new String[paramSize];
         for (int i = 0; i < paramSize; i++) {
             Element param = paramSet.get(i);
-            meshDataSource.parameterNames[i] = param.attr("name");
-            meshDataSource.parameterTypes[i] = param.attr("type");
+            source.parameterNames[i] = param.attr("name");
+            source.parameterTypes[i] = param.attr("type");
         }
 
-        Element floatArray = sourceElement.select(accessorSource);
-        if (null == floatArray) {
+        Element objectArray = sourceElement.select(accessorSource);
+        if (null == objectArray) {
             throw new ColladaParseException("Unable to find id " + accessorSource + " for float array in sourceElement id=" + sourceElement.id() + " name="
                                             + sourceElement.name());
         }
-        String arraySizeString = floatArray.attr("count");
+        String arraySizeString = objectArray.attr("count");
         int arraySize = Integer.parseInt(arraySizeString);
-        meshDataSource.values = new float[arraySize];
-        String floatArrayDataString = floatArray.text().trim();
-        String[] floatStrings = getItemsInString(floatArrayDataString);
-        if (floatStrings.length != arraySize) {
-            throw new ColladaParseException("Expected float array size " + arraySize + " but was " + floatStrings.length + " for sourceElement id=" + sourceElement.id()
-                                            + " name="
-                                            + sourceElement.name());
+        String objectArrayDataString = objectArray.text().trim();
+
+        // TODO: we should really parse each parameter type, but we'll assume they are homogeneneous for now
+        if ( ("float".equalsIgnoreCase(source.parameterTypes[0]))
+          || ("float4x4".equalsIgnoreCase(source.parameterTypes[0])) ) {
+            source.floatValues = new float[arraySize];
+            String[] floatStrings = getItemsInString(objectArrayDataString);
+            if (floatStrings.length != arraySize) {
+                throw new ColladaParseException("Expected float array size " + arraySize + " but was " + floatStrings.length + " for sourceElement id=" + sourceElement.id()
+                                                + " name="
+                                                + sourceElement.name());
+            }
+            for (int i = 0; i < floatStrings.length; i++) {
+                String floatString = floatStrings[i];
+                source.floatValues[i] = Float.parseFloat(floatString);
+            }
+        } else if ("name".equalsIgnoreCase(source.parameterTypes[0])) {
+            source.nameValues = new String[arraySize];
+            String[] nameStrings = getItemsInString(objectArrayDataString);
+            if (nameStrings.length != arraySize) {
+                throw new ColladaParseException("Expected name array size " + arraySize + " but was " + nameStrings.length + " for sourceElement id=" + sourceElement.id()
+                                                + " name="
+                                                + sourceElement.name());
+            }
+            for (int i = 0; i < nameStrings.length; i++) {
+                source.nameValues[i] = nameStrings[i];
+            }
+        } else {
+            throw new ColladaParseException("Unsupported parameter type " + source.parameterTypes[0]);
         }
-        for (int i = 0; i < floatStrings.length; i++) {
-            String floatString = floatStrings[i];
-            meshDataSource.values[i] = Float.parseFloat(floatString);
-        }
-        return meshDataSource;
+        return source;
     }
 
     private String[] getItemsInString(String dataString) {
@@ -385,14 +652,16 @@ public class ColladaLoader {
         public String sourceName;
         public int offset;
 
-        public MeshDataSource vertexPositionSource;
-        public MeshDataSource vertexNormalSource;
-        public MeshDataSource normalSource;
-        public MeshDataSource texCoordSource;
+        public Source vertexPositionSource;
+        public Source vertexNormalSource;
+        public Source normalSource;
+        public Source texCoordSource;
     }
 
-    private class MeshDataSource {
-        public float[] values;
+    private class Source {
+        public float[] floatValues;
+        public String[] nameValues;
+        public String accessorSource;
         public int count;
         public int stride;
         String[] parameterNames;
