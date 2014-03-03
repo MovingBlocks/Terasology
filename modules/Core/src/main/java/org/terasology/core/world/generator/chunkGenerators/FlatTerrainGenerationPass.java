@@ -139,7 +139,7 @@ public class FlatTerrainGenerationPass implements ChunkGenerationPass {
                             // surface
                             switch (type) {
                                 case FOREST:
-                                    chunk.setBlock(x, y, z, dirt);
+                                    chunk.setBlock(x, y, z, grass);
                                     break;
                                 case PLAINS:
                                     chunk.setBlock(x, y, z, grass);

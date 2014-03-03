@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerationPass;
 import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerationPass;
-import org.terasology.core.world.liquid.LiquidsGenerationPass;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.WorldConfigurator;
@@ -41,7 +40,6 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
     public void initialize() {
         register(new PerlinTerrainGenerationPass());
         register(new FloraGenerationPass());
-        register(new LiquidsGenerationPass());
         //ForestGenerator forestGenerator = new ForestGenerator();
         //DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         //register(forestGenerator);

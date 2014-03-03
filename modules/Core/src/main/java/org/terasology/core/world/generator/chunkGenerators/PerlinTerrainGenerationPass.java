@@ -41,6 +41,7 @@ import java.util.Map;
 public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
+    private static final int HEIGHT_FACTOR = 256;
 
     private Noise3D pGen1;
     private Noise3D pGen2;
@@ -103,7 +104,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
         for (int x = 0; x <= chunk.getChunkSizeX(); x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= chunk.getChunkSizeZ(); z += SAMPLE_RATE_3D_HOR) {
                 for (int y = 0; y <= chunk.getChunkSizeY(); y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcDensity(chunk.getBlockWorldPosX(x), y, chunk.getBlockWorldPosZ(z));
+                    densityMap[x][y][z] = calcDensity(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosY(y), chunk.getBlockWorldPosZ(z));
                 }
             }
         }
@@ -121,18 +122,15 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
+                int yOffset = chunk.getChunkSizeY() * chunk.getPos().y;
+
                 for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
-
-                    if (y == 0) { // The very deepest layer of the world is an indestructible mantle
-                        chunk.setBlock(x, y, z, mantle);
-                        break;
-                    }
-
-                    if (y <= 32 && y > 0) { // Ocean
+                    int yPos = yOffset + y;
+                    if (yPos <= 32) { // Ocean
                         chunk.setBlock(x, y, z, water);
                         chunk.setLiquid(x, y, z, new LiquidData(LiquidType.WATER, LiquidData.MAX_LIQUID_DEPTH));
 
-                        if (y == 32) {
+                        if (yPos == 32) {
                             // Ice layer
                             if (type == WorldBiomeProvider.Biome.SNOW) {
                                 chunk.setBlock(x, y, z, ice);
@@ -149,7 +147,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), y, chunk.getBlockWorldPosZ(z)) > -0.7) {
+                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), yPos, chunk.getBlockWorldPosZ(z)) > -0.7) {
                             generateOuterLayer(x, y, z, firstBlockHeight, chunk, type);
                         } else {
                             chunk.setBlock(x, y, z, air);
@@ -163,7 +161,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), y, chunk.getBlockWorldPosZ(z)) > -0.6) {
+                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), yPos, chunk.getBlockWorldPosZ(z)) > -0.6) {
                             generateInnerLayer(x, y, z, chunk, type);
                         } else {
                             chunk.setBlock(x, y, z, air);
@@ -187,19 +185,20 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     private void generateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, WorldBiomeProvider.Biome type) {
 
         int depth = (firstBlockHeight - y);
+        int yPos = c.getBlockWorldPosY(y);
 
         switch (type) {
             case FOREST:
             case PLAINS:
             case MOUNTAINS:
                 // Beach
-                if (y >= 28 && y <= 34) {
+                if (yPos >= 28 && yPos <= 34) {
                     c.setBlock(x, y, z, sand);
-                } else if (depth == 0 && y > 32 && y < 128) {
+                } else if (depth == 0 && yPos > 32 && yPos < 128) {
                     // Grass on top
                     c.setBlock(x, y, z, grass);
-                } else if (depth == 0 && y >= 128) {
-                    // Grass on top
+                } else if (depth == 0 && yPos >= 128) {
+                    // Snow on top
                     c.setBlock(x, y, z, snow);
                 } else if (depth > 32) {
                     // Stone
@@ -211,7 +210,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
 
                 break;
             case SNOW:
-                if (depth == 0.0 && y > 32) {
+                if (depth == 0.0 && yPos > 32) {
                     // Snow on top
                     c.setBlock(x, y, z, snow);
                 } else if (depth > 32) {
@@ -274,10 +273,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
         double densityMountains = calcMountainDensity(x, y, z) * mIntens;
         double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
-        int plateauArea = (int) (ChunkConstants.SIZE_Y * 0.10);
-        double flatten = TeraMath.clamp(((ChunkConstants.SIZE_Y - 16) - y) / plateauArea);
-
-        return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0) * flatten;
+        return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0);
     }
 
     private double calcBaseTerrain(double x, double z) {

@@ -35,7 +35,6 @@ public class FlatWorldGenerator extends AbstractBaseWorldGenerator {
     public void initialize() {
         register(new FlatTerrainGenerationPass());
         register(new FloraGenerationPass());
-        //register(new LiquidsGenerationPass());
         //ForestGenerator forestGenerator = new ForestGenerator();
         //DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         //register(forestGenerator);

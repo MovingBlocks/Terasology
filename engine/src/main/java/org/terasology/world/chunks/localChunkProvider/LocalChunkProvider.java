@@ -397,7 +397,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             });
             PerformanceMonitor.endActivity();
 
-            for (Side side : Side.horizontalSides()) {
+            for (Side side : Side.values()) {
                 Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
                 ChunkImpl adjChunk = getChunk(adjChunkPos);
                 if (adjChunk != null) {

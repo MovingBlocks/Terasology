@@ -41,6 +41,7 @@ import org.terasology.world.liquid.LiquidType;
  */
 public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
     private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerationPass.class);
+    private static final int MAX_HEIGHT = 256;
 
     private WorldBiomeProvider biomeProvider;
     private Block air = BlockManager.getAir();
@@ -50,7 +51,6 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
     private Block sand;
     private Block grass;
     private Block snow;
-    private ClimateSimulator climate;
     private float[][] heightmap;
 
     public BasicHMTerrainGenerationPass() {
@@ -85,11 +85,6 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
         }
         
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
-        //try also other combinations with shift and rotate
-        //heightmap = rotateArray(heightmap);
-
-        //initialize Climate/humiditymap
-        //climate = new ClimateSimulator(heightmap);
 
     }
 
@@ -119,7 +114,7 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
         int hmX = (((chunk.getChunkWorldPosX() / chunk.getChunkSizeX()) % 512) + 512) % 512;
         int hmZ = (((chunk.getChunkWorldPosZ() / chunk.getChunkSizeZ()) % 512) + 512) % 512;
 
-        double scaleFactor = 0.05 * chunk.getChunkSizeY();
+        double scaleFactor = 0.05 * MAX_HEIGHT;
 
         double p00 = heightmap[hmX][hmZ] * scaleFactor;
         double p10 = heightmap[(hmX - 1 + 512) % 512][(hmZ) % 512] * scaleFactor;
@@ -128,8 +123,6 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
 
         for (int x = 0; x < chunk.getChunkSizeX(); x++) {
             for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
-                WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(
-                        chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
                 //calculate avg height
                 double interpolatedHeight = lerp(x / (double) chunk.getChunkSizeX(), lerp(z / (double) chunk.getChunkSizeZ(), p10, p11),
@@ -140,23 +133,20 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
                 //ToDo: Change this formula in later implementation of vertical chunks
                 double threshold = Math.floor(interpolatedHeight);
 
-                for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
-                    if (y == 0) { // The very deepest layer of the world is an
-                        // indestructible mantle
-                        chunk.setBlock(x, y, z, mantle);
-                        break;
-                    } else if (y < threshold) {
+                for (int y = 0; y < chunk.getChunkSizeY(); ++y) {
+                    int worldHeight = y + chunk.getChunkSizeY() * chunk.getPos().y;
+                    if (worldHeight < threshold) {
                         chunk.setBlock(x, y, z, stone);
-                    } else if (y == threshold) {
-                        if (y < chunk.getChunkSizeY() * 0.05 + 1) {
+                    } else if (worldHeight == threshold) {
+                        if (worldHeight < 13) {
                             chunk.setBlock(x, y, z, sand);
-                        } else if (y < chunk.getChunkSizeY() * 0.05 * 12) {
+                        } else if (worldHeight < 152) {
                             chunk.setBlock(x, y, z, grass);
                         } else {
                             chunk.setBlock(x, y, z, snow);
                         }
                     } else {
-                        if (y <= chunk.getChunkSizeY() / 20) { // Ocean
+                        if (worldHeight <= 12) { // Ocean
                             chunk.setBlock(x, y, z, water);
                             chunk.setLiquid(x, y, z, new LiquidData(LiquidType.WATER,
                                     LiquidData.MAX_LIQUID_DEPTH));

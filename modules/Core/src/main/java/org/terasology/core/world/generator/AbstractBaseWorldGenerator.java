@@ -17,6 +17,8 @@ package org.terasology.core.world.generator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.Color;
@@ -34,6 +36,8 @@ import java.util.List;
  * @author Immortius
  */
 public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
+
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
     private final List<ChunkGenerationPass> generationPasses = Lists.newArrayList();
@@ -77,7 +81,11 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public void createChunk(final Chunk chunk) {
         for (final ChunkGenerationPass generator : generationPasses) {
-            generator.generateChunk(chunk);
+            try {
+                generator.generateChunk(chunk);
+            } catch (Throwable e) {
+                logger.error("Error during generation pass {}", generator, e);
+            }
         }
     }
 
