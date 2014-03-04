@@ -384,7 +384,11 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public Module getActiveModule(String id) {
         String normalisedName = UriUtil.normalise(id);
-        return activeModules.get(normalisedName);
+        Module module = activeModules.get(normalisedName);
+        if (null == module) {
+            logger.error("Reference to missing active module id: {}", id);
+        }
+        return module;
     }
 
     @Override
@@ -512,7 +516,11 @@ public class ModuleManagerImpl implements ModuleManager {
         if (UriUtil.normalise(moduleId).equals(TerasologyConstants.ENGINE_MODULE)) {
             return engineModule;
         }
-        return modules.get(moduleId, version);
+        ExtensionModule extensionModule = modules.get(moduleId, version);
+        if (null == extensionModule) {
+            logger.error("Reference to missing module id: {}", moduleId);
+        }
+        return extensionModule;
     }
 
     @Override
