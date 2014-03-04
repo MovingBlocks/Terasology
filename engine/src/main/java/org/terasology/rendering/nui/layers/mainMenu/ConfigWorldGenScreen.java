@@ -24,9 +24,6 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -40,6 +37,8 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+
+import com.google.common.collect.Maps;
 
 /**
  * A config screen for world generation
@@ -58,7 +57,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private WorldConfigurator worldConfig;
+    private Map<String, Component> params;
 
     @Override
     public void onOpened() {
@@ -72,25 +71,25 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
         Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
 
-        Map<String, Component> props = config.getWorldGenerationConfigs(generatorUri);
-
         try {
-            if (props == null) {
-                moduleManager.enableModuleAndDependencies(worldGeneratorModule);
-                WorldGenerator wg = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
-    
-                if (wg.getConfigurator().isPresent()) {
-                    worldConfig = wg.getConfigurator().get();
-    
-                    props = worldConfig.getProperties();
-                }
-            }
-            
-            if (props != null) {
-                config.setWorldGenerationConfigs(generatorUri, props);
+            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
+            WorldGenerator wg = worldGeneratorManager.createGenerator(info.getUri());
 
-                for (String label : props.keySet()) {
-                    PropertyProvider<?> provider = new PropertyProvider<>(props.get(label));
+            if (wg.getConfigurator().isPresent()) {
+                WorldConfigurator worldConfig = wg.getConfigurator().get();
+
+                params = Maps.newHashMap(worldConfig.getProperties());
+                
+                for (String key : params.keySet()) {
+                    Class<? extends Component> clazz = params.get(key).getClass();
+                    Component comp = config.getModuleConfig(generatorUri, key, clazz);
+                    if (comp != null) {
+                        params.put(key, comp);       // use the data from the config instead of defaults
+                    }
+                }
+
+                for (String label : params.keySet()) {
+                    PropertyProvider<?> provider = new PropertyProvider<>(params.get(label));
                     properties.addPropertyProvider(label, provider);
                 }
             } else {
@@ -102,6 +101,14 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         } finally {
             moduleManager.disableAllModules();
         }
+    }
+    
+    @Override
+    public void onClosed() {
+        SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
+        config.setModuleConfigs(generatorUri, params);
+        params = null;
+        super.onClosed();
     }
 
     @Override

@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
@@ -68,7 +69,7 @@ public final class Config {
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
-    private Map<SimpleUri, Map<String, Component>> worldGenerationConfigs = Maps.newHashMap();
+    private Map<SimpleUri, Map<String, JsonElement>> moduleConfigs = Maps.newHashMap();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
 
@@ -201,25 +202,48 @@ public final class Config {
     }
 
     /**
-     * @return a read-only view on the config params for the world generator or <code>null</code>
+     * @param uri the uri to look uo
+     * @return a set that contains all keys for that uri, never <code>null</code>
      */
-    public Map<String, Component> getWorldGenerationConfigs(SimpleUri generatorUri) {
-        Map<String, Component> map = worldGenerationConfigs.get(generatorUri);
+    public Set<String> getModuleConfigKeys(SimpleUri uri) {
+        Map<String, JsonElement> map = moduleConfigs.get(uri);
+        if (map == null) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(map.keySet());
+    }
+    
+    /**
+     * @param uri the uri to look up
+     * @param key the look-up key
+     * @param clazz the class to convert the data to
+     * @return a config component for the given uri and class or <code>null</code>
+     */
+    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+        Map<String, JsonElement> map = moduleConfigs.get(uri);
         if (map == null) {
             return null;
-        } else {
-            return Collections.unmodifiableMap(map);
-        }
+        } 
+        
+        JsonElement element = map.get(key);
+        Gson gson = new Gson();
+        return gson.fromJson(element, clazz);
     }
 
     /**
      * @param generatorUri the generator Uri 
      * @param configs the new config params for the world generator
      */
-    public void setWorldGenerationConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
-        this.worldGenerationConfigs.put(generatorUri, configs);
+    public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
+        Gson gson = new Gson();
+        Map<String, JsonElement> map = Maps.newHashMap();
+        for (String key : configs.keySet()) {
+            JsonElement json = gson.toJsonTree(configs.get(key));
+            map.put(key, json);
+        }
+        this.moduleConfigs.put(generatorUri, map);
     }
-
+    
     private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
 
         @Override

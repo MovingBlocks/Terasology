@@ -24,10 +24,14 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
+
+import com.google.common.base.Optional;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -54,14 +58,20 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
 
             // transfer all world generation parameters from Config to WorldEntity
             WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
-            Config config = CoreRegistry.get(Config.class);
+            Optional<WorldConfigurator> ocf = worldGenerator.getConfigurator();
             
-            SimpleUri uri = worldGenerator.getUri();
-            Map<String, Component> params = config.getWorldGenerationConfigs(uri);
-            
-            for (Component comp : params.values()) {
-                worldEntity.addComponent(comp);
+            if (ocf.isPresent()) {
+                SimpleUri generatorUri = worldGenerator.getUri();
+                Config config = CoreRegistry.get(Config.class);
+                Map<String, Component> params = ocf.get().getProperties();
+                
+                for (String key : params.keySet()) {
+                    Class<? extends Component> clazz = params.get(key).getClass();
+                    Component comp = config.getModuleConfig(generatorUri, key, clazz);
+                    worldEntity.addComponent(comp);
+                }
             }
+            
         }
         
         
