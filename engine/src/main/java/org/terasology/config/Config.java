@@ -185,6 +185,13 @@ public final class Config {
                 .setPrettyPrinting().create();
     }
 
+    private static Gson createGsonForModules() {
+        return new GsonBuilder()
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapterFactory(new UriTypeAdapterFactory())
+                .setPrettyPrinting().create();
+    }
+    
     private static void merge(JsonObject target, JsonObject from) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -226,7 +233,7 @@ public final class Config {
         } 
         
         JsonElement element = map.get(key);
-        Gson gson = new Gson();
+        Gson gson = createGsonForModules();
         return gson.fromJson(element, clazz);
     }
 
@@ -235,7 +242,7 @@ public final class Config {
      * @param configs the new config params for the world generator
      */
     public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
-        Gson gson = new Gson();
+        Gson gson = createGsonForModules();
         Map<String, JsonElement> map = Maps.newHashMap();
         for (String key : configs.keySet()) {
             JsonElement json = gson.toJsonTree(configs.get(key));

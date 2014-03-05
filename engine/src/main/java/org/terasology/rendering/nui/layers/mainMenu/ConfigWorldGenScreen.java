@@ -106,8 +106,10 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     @Override
     public void onClosed() {
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
-        config.setModuleConfigs(generatorUri, params);
-        params = null;
+        if (params != null) {
+            config.setModuleConfigs(generatorUri, params);
+            params = null;
+        }
         super.onClosed();
     }
 
