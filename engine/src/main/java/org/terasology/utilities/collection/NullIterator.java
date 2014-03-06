@@ -16,6 +16,7 @@
 package org.terasology.utilities.collection;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -42,7 +43,7 @@ public final class NullIterator<T> implements Iterator<T>, Iterable<T> {
     }
 
     public T next() {
-        return null;
+        throw new NoSuchElementException();
     }
 
     public void remove() {

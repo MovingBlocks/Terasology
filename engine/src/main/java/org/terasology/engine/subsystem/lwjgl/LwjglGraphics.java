@@ -161,8 +161,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             Display.create(rc.getPixelFormat());
             Display.setVSyncEnabled(rc.isVSync());
         } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
+            throw new RuntimeException("Can not initialize graphics device.", e);
         }
     }
 
@@ -246,7 +245,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";
             logger.error(message);
             JOptionPane.showMessageDialog(null, message, "Mandatory OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+            throw new RuntimeException(message);
         }
 
     }

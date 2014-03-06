@@ -333,7 +333,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         Path path = PathManager.getInstance().getShaderLogPath().resolve(debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
         try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
             writer.write(shader.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Failed to dump shader source.");
         }
 

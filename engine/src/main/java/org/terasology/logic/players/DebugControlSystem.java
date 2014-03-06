@@ -107,6 +107,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                     world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -137,6 +139,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
+                default:
+                    break;
             }
         }
 
@@ -152,6 +156,8 @@ public class DebugControlSystem extends BaseComponentSystem {
             case Keyboard.KeyId.F4:
                 overlay.toggleMetricsMode();
                 event.consume();
+                break;
+            default:
                 break;
 
         }

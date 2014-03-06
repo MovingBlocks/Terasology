@@ -23,7 +23,7 @@ package org.terasology.input;
  */
 public enum InputType {
     NONE {
-        private final UnknownInput noneNone = new UnknownInput(this, 0);
+        private final transient UnknownInput noneNone = new UnknownInput(this, 0);
 
         @Override
         public Input getInput(int id) {

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory.block;
 
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -28,6 +29,7 @@ import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
@@ -41,11 +43,14 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockInventorySystem extends BaseComponentSystem {
 
+    @In
+    private EntityManager entityManager;
+
     private PickupBuilder pickupBuilder;
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
 

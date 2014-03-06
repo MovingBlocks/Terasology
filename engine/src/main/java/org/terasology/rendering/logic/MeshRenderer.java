@@ -287,9 +287,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
                         material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
-                        if (lastMesh != null) {
-                            lastMesh.doRender();
-                        }
+                        lastMesh.doRender();
                     }
                 }
             }

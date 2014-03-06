@@ -244,9 +244,9 @@ public final class Config {
     public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
         Gson gson = createGsonForModules();
         Map<String, JsonElement> map = Maps.newHashMap();
-        for (String key : configs.keySet()) {
-            JsonElement json = gson.toJsonTree(configs.get(key));
-            map.put(key, json);
+        for (Map.Entry<String, Component> entry : configs.entrySet()) {
+            JsonElement json = gson.toJsonTree(entry.getValue());
+            map.put(entry.getKey(), json);
         }
         this.moduleConfigs.put(generatorUri, map);
     }

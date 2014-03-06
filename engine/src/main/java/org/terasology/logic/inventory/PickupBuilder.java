@@ -33,12 +33,9 @@ import javax.vecmath.Vector3f;
 public final class PickupBuilder {
 
     private EntityManager entityManager;
-    private InventoryManager inventoryManager;
 
-
-    public PickupBuilder() {
-        this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.inventoryManager = CoreRegistry.get(InventoryManager.class);
+    public PickupBuilder(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan) {

@@ -65,9 +65,9 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 Config config = CoreRegistry.get(Config.class);
                 Map<String, Component> params = ocf.get().getProperties();
                 
-                for (String key : params.keySet()) {
-                    Class<? extends Component> clazz = params.get(key).getClass();
-                    Component comp = config.getModuleConfig(generatorUri, key, clazz);
+                for (Map.Entry<String, Component> entry : params.entrySet()) {
+                    Class<? extends Component> clazz = entry.getValue().getClass();
+                    Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
                     worldEntity.addComponent(comp);
                 }
             }

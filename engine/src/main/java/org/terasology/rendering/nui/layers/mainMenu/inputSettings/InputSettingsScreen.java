@@ -50,6 +50,7 @@ import org.terasology.rendering.nui.widgets.UISpace;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -221,7 +222,28 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         @Override
         public int compareTo(ExtensionBind o) {
-            return bind.description().compareTo(o.bind.description());
+            int descriptionOrder = bind.description().compareTo(o.bind.description());
+            if (descriptionOrder == 0) {
+                return uri.compareTo(o.uri);
+            }
+            return descriptionOrder;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof ExtensionBind) {
+                ExtensionBind other = (ExtensionBind) obj;
+                return Objects.equals(bind.description(), other.bind.description()) && Objects.equals(uri, other.uri);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uri, bind.description());
         }
     }
 

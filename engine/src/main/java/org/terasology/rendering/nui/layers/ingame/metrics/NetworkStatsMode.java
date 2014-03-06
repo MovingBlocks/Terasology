@@ -51,10 +51,10 @@ final class NetworkStatsMode extends MetricsMode {
             builder.append("Out Msg: 0\n");
             builder.append("Out Bytes: 0\n");
         } else if (currentSecond - lastSecond == 1) {
-            builder.append(String.format("In Msg: %d\n", networkSystem.getIncomingMessagesDelta()));
-            builder.append(String.format("In Bytes: %d\n", networkSystem.getIncomingBytesDelta()));
-            builder.append(String.format("Out Msg: %d\n", networkSystem.getOutgoingMessagesDelta()));
-            builder.append(String.format("Out Bytes: %d\n", networkSystem.getOutgoingBytesDelta()));
+            builder.append(String.format("In Msg: %d%n", networkSystem.getIncomingMessagesDelta()));
+            builder.append(String.format("In Bytes: %d%n", networkSystem.getIncomingBytesDelta()));
+            builder.append(String.format("Out Msg: %d%n", networkSystem.getOutgoingMessagesDelta()));
+            builder.append(String.format("Out Bytes: %d%n", networkSystem.getOutgoingBytesDelta()));
         }
         lastSecond = currentSecond;
         return builder.toString();

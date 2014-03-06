@@ -359,28 +359,7 @@ public class ColladaLoader {
         return floatStrings;
     }
 
-    private String loadDataAsString(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file), 1024);
-        if (file.getName().endsWith(".gz")) {
-            reader.close();
-            reader = new BufferedReader(
-                    new InputStreamReader(new GZIPInputStream(new FileInputStream(file))), 1024);
-        }
-
-        return loadDataAsString(reader);
-    }
-
-    public static void main(String[] args) {
-        ColladaLoader loader = new ColladaLoader();
-        try {
-            String contents = loader.loadDataAsString(new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml"));
-            loader.parseData(contents);
-        } catch (IOException | ColladaParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private class Input {
+    private static class Input {
         public String semantic;
         public String sourceName;
         public int offset;
@@ -391,7 +370,7 @@ public class ColladaLoader {
         public MeshDataSource texCoordSource;
     }
 
-    private class MeshDataSource {
+    private static class MeshDataSource {
         public float[] values;
         public int count;
         public int stride;
@@ -399,7 +378,7 @@ public class ColladaLoader {
         String[] parameterTypes;
     }
 
-    protected class ColladaParseException extends Exception {
+    protected static class ColladaParseException extends Exception {
         private static final long serialVersionUID = 1L;
 
         public ColladaParseException(String msg) {

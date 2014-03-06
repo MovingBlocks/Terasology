@@ -224,9 +224,6 @@ public enum AssetType {
 
             for (String extension : type.getFileExtension()) {
                 AssetLoader loader = type.getAssetLoader(extension);
-                if (loaders == null) {
-                    continue; // No loader has been assigned to this AssetType's file extension
-                }
                 assetManager.register(
                         type,
                         extension,

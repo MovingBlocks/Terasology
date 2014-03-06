@@ -141,15 +141,6 @@ public class Matrix4i implements Serializable {
     }
 
     /**
-     * Clones this matrix
-     *
-     * @return a copy of this matrix
-     */
-    public Matrix4i clone() {
-        return new Matrix4i(this);
-    }
-
-    /**
      * Sets the value of this matrix to a counter clockwise rotation about the x axis.
      *
      * @param angle

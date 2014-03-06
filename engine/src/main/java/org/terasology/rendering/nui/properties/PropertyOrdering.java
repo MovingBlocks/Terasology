@@ -34,13 +34,9 @@ public final class PropertyOrdering {
             public int compare(Property<?, ?> p1, Property<?, ?> p2) {
                 String o1 = p1.getLabel().getText();
                 String o2 = p2.getLabel().getText();
-                
-                if (o1 == o2) {
-                    return 0;
-                }
-        
+
                 if (o1 == null) {
-                    return -1;
+                    return (o2 == null) ? 0 : -1;
                 }
         
                 if (o2 == null) {

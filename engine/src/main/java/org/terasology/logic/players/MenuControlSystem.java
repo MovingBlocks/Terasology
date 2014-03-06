@@ -81,6 +81,8 @@ public class MenuControlSystem extends BaseComponentSystem {
                 DefaultRenderingProcess.getInstance().takeScreenshot();
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
                 break;
+            default:
+                break;
         }
     }
 

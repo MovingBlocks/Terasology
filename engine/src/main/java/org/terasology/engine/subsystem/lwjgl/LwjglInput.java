@@ -84,8 +84,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             inputSystem.setMouseDevice(new LwjglMouseDevice());
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
         } catch (LWJGLException e) {
-            logger.error("Could not initialize controls.", e);
-            System.exit(1);
+            throw new RuntimeException("Could not initialize controls.", e);
         }
     }
 

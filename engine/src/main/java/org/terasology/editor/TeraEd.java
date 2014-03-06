@@ -87,7 +87,6 @@ public final class TeraEd extends JWindow {
         } catch (Throwable t) {
             logger.error("Uncaught Exception", t);
         }
-        System.exit(0);
     }
 
     public GameEngine getEngine() {
