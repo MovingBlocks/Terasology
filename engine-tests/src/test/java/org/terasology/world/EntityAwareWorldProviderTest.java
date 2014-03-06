@@ -97,6 +97,7 @@ public class EntityAwareWorldProviderTest {
     private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
 
+    private Block plainBlock;
     private Block blockWithString;
     private Block blockWithDifferentString;
     private Block blockWithRetainedComponent;
@@ -130,6 +131,9 @@ public class EntityAwareWorldProviderTest {
         entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
         worldStub = new WorldProviderCoreStub(BlockManager.getAir());
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
+
+        plainBlock = new Block();
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:plainBlock"), plainBlock), true);
 
         blockWithString = new Block();
         PrefabData prefabData = new PrefabData();
@@ -427,6 +431,31 @@ public class EntityAwareWorldProviderTest {
         entity.addComponent(new IntegerComponent());
         worldProvider.setBlockRetainComponent(Vector3i.zero(), blockWithString, IntegerComponent.class);
         assertNotNull(entity.getComponent(IntegerComponent.class));
+    }
+
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyAlteredOnChangeToDifferentPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
+        assertEquals(blockWithDifferentString.getPrefab(), entity.getPrefabURI().toSimpleString());
+    }
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyRemovedOnChangeToBlockWithNoPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), plainBlock);
+        assertEquals(null, entity.getParentPrefab());
+    }
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyAddedOnChangeToBlockWithPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), plainBlock);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        assertEquals(blockWithString.getPrefab(), entity.getParentPrefab().getURI().toSimpleString());
     }
 
     public static class LifecycleEventChecker {

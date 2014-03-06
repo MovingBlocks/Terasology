@@ -69,7 +69,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
-            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
+            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class);
 
     private EngineEntityManager entityManager;
 
@@ -280,6 +280,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         for (Component comp : newEntityBuilder.iterateComponents()) {
             copyIntoPrefab(blockEntity, comp, retainComponents);
         }
+
+
     }
 
     @SuppressWarnings("unchecked")
