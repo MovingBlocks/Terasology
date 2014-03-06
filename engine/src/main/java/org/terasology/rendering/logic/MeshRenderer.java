@@ -51,8 +51,8 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -232,17 +232,17 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
-        for (Map.Entry<Material, Collection<EntityRef>> materialEntries : meshByMaterial.asMap().entrySet()) {
-            Material material = materialEntries.getKey();
+        for (Material material : meshByMaterial.keySet()) {
             OpenGLMesh lastMesh = null;
             material.enable();
             material.setFloat("sunlight", 1.0f);
             material.setFloat("blockLight", 1.0f);
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
-            lastRendered = materialEntries.getValue().size();
 
-            for (EntityRef entity : materialEntries.getValue()) {
+            Set<EntityRef> entities = meshByMaterial.get(material);
+            lastRendered = entities.size();
+            for (EntityRef entity : entities) {
                 MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                 LocationComponent location = entity.getComponent(LocationComponent.class);
 
