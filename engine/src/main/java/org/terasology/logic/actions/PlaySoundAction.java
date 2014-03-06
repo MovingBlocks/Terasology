@@ -47,11 +47,11 @@ public class PlaySoundAction extends BaseComponentSystem {
         if (sound != null) {
             Vector3f pos = null;
             switch (playSound.relativeTo) {
-                case Instigator:
-                    pos = event.getInstigatorLocation();
-                    break;
                 case Target:
                     pos = event.getTargetLocation();
+                    break;
+                default:
+                    pos = event.getInstigatorLocation();
                     break;
             }
             if (pos == null) {

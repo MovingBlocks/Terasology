@@ -83,7 +83,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
     @Command(shortDescription = "Reloads a skin")

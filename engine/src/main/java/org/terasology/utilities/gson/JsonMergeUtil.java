@@ -29,14 +29,8 @@ public final class JsonMergeUtil {
 
     public static void mergeOnto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
-            if (entry.getValue().isJsonObject()) {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
-            } else {
-                if (!to.has(entry.getKey())) {
-                    to.add(entry.getKey(), entry.getValue());
-                }
+            if (!to.has(entry.getKey())) {
+                to.add(entry.getKey(), entry.getValue());
             }
         }
     }

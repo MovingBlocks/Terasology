@@ -235,6 +235,8 @@ public class ChunkMesh {
             case REFRACTIVE:
                 renderVbo(3);
                 break;
+            default:
+                break;
         }
     }
 

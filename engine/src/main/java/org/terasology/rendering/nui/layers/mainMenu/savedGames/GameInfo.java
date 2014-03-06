@@ -42,7 +42,7 @@ public class GameInfo {
     }
 
     public Date getTimestamp() {
-        return timestamp;
+        return new Date(timestamp.getTime());
     }
 
     public GameManifest getManifest() {

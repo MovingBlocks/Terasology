@@ -169,6 +169,9 @@ public class GLSLMaterial extends BaseMaterial {
                 case 4:
                     setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
                     break;
+                default:
+                    logger.error("MaterialData contains float array entry of size > 4");
+                    break;
             }
         }
     }

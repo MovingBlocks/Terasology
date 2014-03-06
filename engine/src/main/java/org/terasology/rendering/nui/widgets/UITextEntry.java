@@ -55,7 +55,7 @@ public class UITextEntry<T> extends UIText {
             if (result != null) {
                 value.set(result);
             }
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             // ignore
         }
     }

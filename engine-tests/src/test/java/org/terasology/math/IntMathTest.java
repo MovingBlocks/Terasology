@@ -113,9 +113,8 @@ public class IntMathTest {
         );
 
 
-        int expectedValue = (currentPowerOfTwo == 1) ? 0 :
-                (currentPowerOfTwo == 2) ? 1 :
-                        currentPowerOfTwo;
+        int expectedValue = (currentPowerOfTwo == 1) ? 0
+                : (currentPowerOfTwo == 2) ? 1 : currentPowerOfTwo;
 
         assertEquals("input " + currentPowerOfTwo + " - 1",
                 expectedValue, TeraMath.ceilPowerOfTwo(currentPowerOfTwo - 1)
@@ -131,7 +130,7 @@ public class IntMathTest {
      *
      * @return list of powers of two
      */
-    private static List<Integer> generateAllPowersOfTwo() {
+    private static final List<Integer> generateAllPowersOfTwo() {
         List<Integer> powersOfTwo = new ArrayList<>();
 
         int value = 1;

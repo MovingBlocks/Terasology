@@ -64,7 +64,7 @@ public class RenderingConfig {
     private boolean cloudShadows = true;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
-    private int meshLimit = 20;
+    private int meshLimit = 400;
     private boolean inscattering = true;
     private boolean localReflections;
     private boolean vSync;

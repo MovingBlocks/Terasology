@@ -51,8 +51,6 @@ import com.google.common.collect.Maps;
 import gnu.trove.iterator.TFloatIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.physics.engine.PhysicsLiquidWrapper;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.location.LocationComponent;
@@ -66,6 +64,7 @@ import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.PhysicsLiquidWrapper;
 import org.terasology.physics.engine.PhysicsSystem;
 import org.terasology.physics.engine.PhysicsWorldWrapper;
 import org.terasology.physics.engine.RigidBody;
@@ -74,6 +73,7 @@ import org.terasology.physics.shapes.CapsuleShapeComponent;
 import org.terasology.physics.shapes.CylinderShapeComponent;
 import org.terasology.physics.shapes.HullShapeComponent;
 import org.terasology.physics.shapes.SphereShapeComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 
@@ -274,7 +274,7 @@ public class BulletPhysics implements PhysicsEngine {
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
-            }else{
+            } else {
                 rigidBody.rb.setAngularFactor(rb.angularFactor);
                 rigidBody.rb.setFriction(rb.friction);
             }

@@ -297,7 +297,8 @@ public class EventSystemImpl implements EventSystem {
                 case SERVER:
                     sendEventToServer(entity, event);
                     break;
-
+                default:
+                    break;
             }
         }
     }

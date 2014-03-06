@@ -52,6 +52,7 @@ import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -231,16 +232,17 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
 
-        for (Material material : meshByMaterial.keys()) {
+        for (Material material : meshByMaterial.keySet()) {
             OpenGLMesh lastMesh = null;
             material.enable();
             material.setFloat("sunlight", 1.0f);
             material.setFloat("blockLight", 1.0f);
             material.setMatrix4("projectionMatrix", worldRenderer.getActiveCamera().getProjectionMatrix());
             material.bindTextures();
-            lastRendered = meshByMaterial.get(material).size();
 
-            for (EntityRef entity : meshByMaterial.get(material)) {
+            Set<EntityRef> entities = meshByMaterial.get(material);
+            lastRendered = entities.size();
+            for (EntityRef entity : entities) {
                 MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                 LocationComponent location = entity.getComponent(LocationComponent.class);
 
@@ -285,9 +287,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
                         material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
-                        if (lastMesh != null) {
-                            lastMesh.doRender();
-                        }
+                        lastMesh.doRender();
                     }
                 }
             }

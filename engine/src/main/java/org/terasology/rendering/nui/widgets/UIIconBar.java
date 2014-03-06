@@ -101,7 +101,7 @@ public class UIIconBar extends CoreWidget {
         canvas.setPart(ICON_PART);
         if (icon != null) {
             Vector2i iconSize = getIconSize(canvas);
-            int maxHorizontalIcons = TeraMath.floorToInt(sizeHint.x / iconSize.x);
+            int maxHorizontalIcons = sizeHint.x / iconSize.x;
             int rows = ((maxIcons - 1) / maxHorizontalIcons) + 1;
             int columns = Math.min(maxIcons, maxHorizontalIcons);
             return new Vector2i(columns * iconSize.x + (columns - 1) * spacing, rows * iconSize.y + (rows - 1) * spacing);

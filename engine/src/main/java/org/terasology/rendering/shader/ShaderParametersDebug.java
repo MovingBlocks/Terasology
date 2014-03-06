@@ -114,6 +114,8 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
                 program.setInt("texDebug", texId++, true);
                 break;
+            default:
+                break;
         }
 
         program.setInt("debugRenderingStage", CoreRegistry.get(Config.class).getRendering().getDebug().getStage().getIndex());

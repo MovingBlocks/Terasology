@@ -21,6 +21,7 @@ import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerationPass;
 import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerationPass;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.Component;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.WorldConfigurator;
 
@@ -51,9 +52,9 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
         WorldConfigurator wc = new WorldConfigurator() {
 
             @Override
-            public Map<String, Object> getProperties() {
+            public Map<String, Component> getProperties() {
                 PerlinWorldConfigComponent configComp = new PerlinWorldConfigComponent();
-                Map<String, Object> map = Maps.newHashMap();
+                Map<String, Component> map = Maps.newHashMap();
                 map.put("General", configComp);
                 return map;
             }

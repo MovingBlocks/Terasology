@@ -76,6 +76,7 @@ configurations {
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
+    compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
     compile group: 'com.google.guava', name: 'guava', version: '15.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'

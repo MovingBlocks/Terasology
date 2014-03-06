@@ -569,6 +569,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         server.setComponentDirty(netComp.getNetworkId(), component);
                     }
                     break;
+                default:
+                    break;
             }
         }
         updatedOwnedEntities(entity, component, metadata);

@@ -97,26 +97,27 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
 
         List<Integer> slotsTotallyConsumed = new LinkedList<>();
 
+        int removesRemaining = toRemove;
         for (int slot : slotsWithItem) {
             EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
             ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
-            if (itemAt.stackCount <= toRemove) {
+            if (itemAt.stackCount <= removesRemaining) {
                 if (canRemoveItemFromSlot(event.getInstigator(), entity, itemAtEntity, slot)) {
                     slotsTotallyConsumed.add(slot);
-                    toRemove -= itemAt.stackCount;
+                    removesRemaining -= itemAt.stackCount;
                 }
             } else {
                 shrinkSlotNo = slot;
-                shrinkCountResult = itemAt.stackCount - toRemove;
-                toRemove = 0;
+                shrinkCountResult = itemAt.stackCount - removesRemaining;
+                removesRemaining = 0;
             }
 
-            if (toRemove == 0) {
+            if (removesRemaining == 0) {
                 break;
             }
         }
 
-        if (toRemove > 0) {
+        if (removesRemaining > 0) {
             return false;
         }
 

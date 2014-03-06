@@ -258,7 +258,7 @@ public class InventoryAuthoritySystemTest {
         Mockito.when(inventory.send(Matchers.any(BeforeItemRemovedFromInventory.class))).then(
                 new Answer<Object>() {
                     @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
+                    public Object answer(InvocationOnMock invocation) throws Exception {
                         BeforeItemRemovedFromInventory event = (BeforeItemRemovedFromInventory) invocation.getArguments()[0];
                         event.consume();
                         return null;
@@ -382,7 +382,7 @@ public class InventoryAuthoritySystemTest {
         Mockito.when(inventory.send(Matchers.any(BeforeItemPutInInventory.class))).then(
                 new Answer<Object>() {
                     @Override
-                    public Object answer(InvocationOnMock invocation) throws Throwable {
+                    public Object answer(InvocationOnMock invocation) throws Exception {
                         BeforeItemPutInInventory event = (BeforeItemPutInInventory) invocation.getArguments()[0];
                         event.consume();
                         return null;
