@@ -131,8 +131,8 @@ public class ColladaLoader {
         }
     }
 
-    private int parseTriangles(TFloatList verticesParam, TFloatList texCoord0Param, TFloatList normalsParam, TIntList indicesParam, int vertCountParam, Element geometry, Element mesh,
-                               Element triangles) throws ColladaParseException {
+    private int parseTriangles(TFloatList verticesParam, TFloatList texCoord0Param, TFloatList normalsParam, TIntList indicesParam, int vertCountParam,
+                               Element geometry, Element mesh, Element triangles) throws ColladaParseException {
         int vertCount = vertCountParam;
         String triangleCountString = triangles.attr("count");
         int triangleCount = Integer.parseInt(triangleCountString);

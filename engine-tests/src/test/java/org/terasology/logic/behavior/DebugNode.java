@@ -23,9 +23,10 @@ import org.terasology.logic.behavior.tree.Task;
  * Created by synopia on 18.01.14.
  */
 public class DebugNode extends Node {
-    private int limit;
     public DebugTask lastTask;
     public DebugTask lastTask2;
+    private int limit;
+
 
     public DebugNode(int limit) {
         this.limit = limit;
@@ -39,17 +40,20 @@ public class DebugNode extends Node {
     }
 
     public static class DebugTask extends Task {
-        private int count;
         public boolean updateCalled;
         public boolean terminateCalled;
         public boolean initializeCalled;
+        private int count;
+
 
         public DebugTask(Node node) {
             super(node);
         }
 
         public void reset() {
-            terminateCalled = initializeCalled = updateCalled = false;
+            terminateCalled = false;
+            initializeCalled = false;
+            updateCalled = false;
         }
 
         @Override
