@@ -47,6 +47,7 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.gson.VersionTypeAdapter;
+import org.terasology.version.TerasologyVersion;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,7 +61,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -106,7 +110,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
         config = CoreRegistry.get(Config.class);
 
-        Path filename = PathManager.getInstance().getHomePath().resolve("engine-reflections.xml");
+        String filename = "engine-reflections";
 
         engineReflections = loadReflectionsFromCacheFile(filename);
 
@@ -132,32 +136,50 @@ public class ModuleManagerImpl implements ModuleManager {
         refresh();
     }
 
-    private Reflections loadReflectionsFromCacheFile(Path filename) {
+    private Reflections loadReflectionsFromCacheFile(String filename) {
         boolean useCache = config.getSystem().isReflectionsCacheEnabled();
+
+        if (useCache) {
         
-        if (useCache && Files.exists(filename, LinkOption.NOFOLLOW_LINKS)) {
-            logger.info("Reading reflection content from file {}", filename);
-            Stopwatch sw = Stopwatch.createStarted();
-            try (InputStream is = Files.newInputStream(filename, StandardOpenOption.READ)) {
-                engineReflections = new Reflections(new ConfigurationBuilder());
-                engineReflections.collect(is);
-                logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
-                return engineReflections;
-            } catch (IOException e) {
-                logger.warn("Failed to read from cache");
+            String version = TerasologyVersion.getInstance().getGitCommit();
+            Path root = PathManager.getInstance().getHomePath().resolve("cache");
+            Path path = root.resolve(filename + version + ".xml");
+            
+            if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+                logger.info("Reading reflection content from file {}", filename);
+                Stopwatch sw = Stopwatch.createStarted();
+                try (InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
+                    engineReflections = new Reflections(new ConfigurationBuilder());
+                    engineReflections.collect(is);
+                    logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+                    return engineReflections;
+                } catch (IOException e) {
+                    logger.warn("Failed to read from cache");
+                }
             }
-        } 
+        }
+        
         return null;
     }
     
-    private void saveReflectionsToCacheFile(Reflections reflections, Path filename) {
+    private void saveReflectionsToCacheFile(Reflections reflections, String filename) {
         boolean useCache = config.getSystem().isReflectionsCacheEnabled();
         
         if (useCache) {
-            logger.info("Reading reflection content from file {}", filename);
-            Stopwatch sw = Stopwatch.createStarted();
-            reflections.save(filename.toString());
-            logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+            String version = TerasologyVersion.getInstance().getGitCommit();
+            Path root = PathManager.getInstance().getHomePath().resolve("cache");
+            Path path = root.resolve(filename + version + ".xml");
+
+            try {
+                Files.createDirectories(root);
+            
+                logger.info("Reading reflection content from file {}", path);
+                Stopwatch sw = Stopwatch.createStarted();
+                reflections.save(path.toString());
+                logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+            } catch (IOException e) {
+                logger.warn("Could not create folder " + root, e);
+            }
         }
     }
 
@@ -228,7 +250,7 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public Reflections loadInactiveReflections() {
         if (allReflections == null) {
-            Path filename = PathManager.getInstance().getHomePath().resolve("all-reflections.xml");
+            String filename = "all-reflections";
 
             allReflections = loadReflectionsFromCacheFile(filename);
             
