@@ -16,8 +16,10 @@
 
 package org.terasology.engine;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -80,6 +82,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Immortius
@@ -118,6 +121,8 @@ public class TerasologyEngine implements GameEngine {
         if (initialised) {
             return;
         }
+        
+        Stopwatch sw = Stopwatch.createStarted();
 
         try {
             logger.info("Initializing Terasology...");
@@ -166,6 +171,8 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Failed to initialise Terasology", t);
             throw new RuntimeException("Failed to initialise Terasology", t);
         }
+        
+        logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
     }
 
     private void initAssets() {

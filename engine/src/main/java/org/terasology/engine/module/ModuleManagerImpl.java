@@ -17,6 +17,7 @@
 package org.terasology.engine.module;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -29,6 +30,7 @@ import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -39,13 +41,16 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
+import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.gson.VersionTypeAdapter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Modifier;
@@ -53,7 +58,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -61,6 +68,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -86,6 +94,7 @@ public class ModuleManagerImpl implements ModuleManager {
     private Reflections activeModuleReflections;
 
     private ClassLoader[] engineClassLoaders;
+    private Config config;
 
     public ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager) {
         this(moduleSecurityManager, ModuleManagerImpl.class.getClassLoader());
@@ -95,21 +104,61 @@ public class ModuleManagerImpl implements ModuleManager {
         this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
         this.moduleSecurityManager = moduleSecurityManager;
 
-        ConfigurationBuilder builder = new ConfigurationBuilder()
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+        config = CoreRegistry.get(Config.class);
 
-        for (ClassLoader loader : engineClassLoaders) {
-            builder.addClassLoader(loader)
-                    .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
+        Path filename = PathManager.getInstance().getHomePath().resolve("engine-reflections.xml");
+
+        engineReflections = loadReflectionsFromCacheFile(filename);
+
+        if (engineReflections == null) {
+            ConfigurationBuilder builder = new ConfigurationBuilder()
+                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+    
+            for (ClassLoader loader : engineClassLoaders) {
+                builder.addClassLoader(loader)
+                        .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
+            }
+            engineReflections = new Reflections(builder);
+            
+            saveReflectionsToCacheFile(engineReflections, filename);
         }
-        engineReflections = new Reflections(builder);
-        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream("/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt"),
-                Charsets.UTF_8)) {
+        
+        String modulePath = "/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt";
+        try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(modulePath), Charsets.UTF_8)) {
             engineModule = new EngineModule(engineReflections, new Gson().fromJson(reader, ModuleInfo.class));
         } catch (Exception e) {
             throw new RuntimeException("Failed to load engine module info", e);
         }
         refresh();
+    }
+
+    private Reflections loadReflectionsFromCacheFile(Path filename) {
+        boolean useCache = config.getSystem().isReflectionsCacheEnabled();
+        
+        if (useCache && Files.exists(filename, LinkOption.NOFOLLOW_LINKS)) {
+            logger.info("Reading reflection content from file {}", filename);
+            Stopwatch sw = Stopwatch.createStarted();
+            try (InputStream is = Files.newInputStream(filename, StandardOpenOption.READ)) {
+                engineReflections = new Reflections(new ConfigurationBuilder());
+                engineReflections.collect(is);
+                logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+                return engineReflections;
+            } catch (IOException e) {
+                logger.warn("Failed to read from cache");
+            }
+        } 
+        return null;
+    }
+    
+    private void saveReflectionsToCacheFile(Reflections reflections, Path filename) {
+        boolean useCache = config.getSystem().isReflectionsCacheEnabled();
+        
+        if (useCache) {
+            logger.info("Reading reflection content from file {}", filename);
+            Stopwatch sw = Stopwatch.createStarted();
+            reflections.save(filename.toString());
+            logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+        }
     }
 
     private Reflections getEngineReflections() {
@@ -179,26 +228,34 @@ public class ModuleManagerImpl implements ModuleManager {
     @Override
     public Reflections loadInactiveReflections() {
         if (allReflections == null) {
-            List<URL> urls = Lists.newArrayList();
-            for (ExtensionModule module : getExtensionModules()) {
-                if (module.isCodeModule()) {
-                    urls.add(module.getModuleClasspathUrl());
-                }
-            }
+            Path filename = PathManager.getInstance().getHomePath().resolve("all-reflections.xml");
 
-            ConfigurationBuilder builder = new ConfigurationBuilder()
-                    .addUrls(urls)
-                    .addClassLoader(allModuleClassLoader);
-            for (ClassLoader engineLoader : engineClassLoaders) {
-                builder.addClassLoader(engineLoader)
-                        .addUrls(ClasspathHelper.forPackage("org.terasology", engineLoader));
-            }
-            allReflections = new Reflections(builder);
-            allReflections.merge(getEngineReflections());
-            for (Module module : getModules()) {
-                if (module.isCodeModule()) {
-                    allReflections.merge(module.getReflections());
+            allReflections = loadReflectionsFromCacheFile(filename);
+            
+            if (allReflections == null) {
+                List<URL> urls = Lists.newArrayList();
+                for (ExtensionModule module : getExtensionModules()) {
+                    if (module.isCodeModule()) {
+                        urls.add(module.getModuleClasspathUrl());
+                    }
                 }
+    
+                ConfigurationBuilder builder = new ConfigurationBuilder()
+                        .addUrls(urls)
+                        .addClassLoader(allModuleClassLoader);
+                for (ClassLoader engineLoader : engineClassLoaders) {
+                    builder.addClassLoader(engineLoader)
+                            .addUrls(ClasspathHelper.forPackage("org.terasology", engineLoader));
+                }
+                allReflections = new Reflections(builder);
+                allReflections.merge(getEngineReflections());
+                for (Module module : getModules()) {
+                    if (module.isCodeModule()) {
+                        allReflections.merge(module.getReflections());
+                    }
+                }
+                
+                saveReflectionsToCacheFile(allReflections, filename);
             }
         }
         return allReflections;
