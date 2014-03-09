@@ -6,14 +6,12 @@ import org.ajoberstar.gradle.git.tasks.*
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/common.gradle"
 
-// For modules apply the separate dependencies file that is unique per repo (and supposed to be empty for Core)
-apply from: 'dependencies.gradle'
-
-// New stuff for publishing to Artifactory hopefully including dependency info :-)
-apply plugin: 'maven-publish'
-apply plugin: 'artifactory-publish'
+// Artifactory publishing requires these two (without maven we'd get no .pom with dependency info published)
+apply plugin: 'maven'
+apply plugin: 'artifactory'
 
 import groovy.json.JsonSlurper
+import java.text.SimpleDateFormat;
 
 ext {
     // Read environment variables, including variables passed by jenkins continuous integration server
@@ -28,7 +26,7 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            url 'http://repo.jfrog.org/artifactory/libs-snapshots/'
+            url 'http://dl.bintray.com/jfrog/jfrog-jars'
         }
     }
 
@@ -37,12 +35,10 @@ buildscript {
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
 
-        // Artifactory magic - tricky to get this working right, this did the trick locally ...
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-client', version: '+')
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '+')
+        // Artifactory
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
     }
 }
-
 
 def moduleDepends = [];
 def moduleFile = file('module.txt')
@@ -51,27 +47,30 @@ def moduleFile = file('module.txt')
 if (!moduleFile.exists()) {
     println "Y U NO EXIST MODULE.TXT!"
     throw new GradleException("Failed to find module.txt for " + project.name)
-// Otherwise, retrieve dependencies information from it
+}
+
+//println "Scanning for dependencies in module.txt for " + project.name
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
+for (dependency in moduleConfig.dependencies) {
+    if (dependency.id != 'engine') {
+        moduleDepends += dependency.id
+    }
+}
+
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+version = moduleConfig.version
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.nanoware.modules'
+
+// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+if (env.BUILD_NUMBER != null) {
+    version += '-SNAPSHOT+' + env.BUILD_NUMBER
 } else {
-    //println "Scanning for dependencies in module.txt for " + project.name
-    def slurper = new JsonSlurper()
-    def moduleConfig = slurper.parseText(moduleFile.text)
-    for (dependency in moduleConfig.dependencies) {
-        if (dependency.id != 'engine') {
-            moduleDepends += dependency.id
-        }
-    }
-
-    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-    version = moduleConfig.version
-
-    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-    group = 'org.nanoware.modules'
-
-    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-    if (env.BUILD_NUMBER != null) {
-        version += '-SNAPSHOT+' + env.BUILD_NUMBER
-    }
+    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
+    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
+    println "Fancy local version: $version"
 }
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
@@ -108,8 +107,8 @@ dependencies {
             // TODO: module jars with version info (maybe supplied by user) won't match. Artifactory fetches get renamed
             File wouldBeModuleJar = new File(rootDir, 'modules/' + dependency + '.jar')
 
-            //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
-            //println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
+            println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
+            println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
 
             // First see if we have an actual source module project in the Gradle project tree (user addModule'ed it)
             if (wouldBeSrcPath.exists()) {
@@ -118,7 +117,9 @@ dependencies {
                 println "Found " + wouldBeSrcPath.getAbsolutePath() + ", setting a direct project dependency"
                 compile project(':modules:' + dependency)
 
-            } else if (wouldBeModuleJar.exists()) {
+            } else if (false) { //wouldBeModuleJar.exists()) {
+                // TODO: With transitive dependencies this will fail to catch updates after the first time the jar is fetched
+                // TODO: Move to where only the game launching cares for module jars and dependency management always uses Gradle cache?
 
                 // Alternatively might find the dependency in the modules dir as a binary (manually placed or fetched)
                 println "Found " + wouldBeModuleJar.getAbsoluteFile() + ", it will be included via file dependency"
@@ -137,12 +138,16 @@ dependencies {
                 // NOTE: Referencing resolvedArtifacts actually resolves the involved artifacts at this time (early)
                 configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
                     def id = artifact.moduleVersion.id
-                    if (id.group == 'org.nanoware.modules') {
-                        println "Remotely resolved $id.group - $id.name at version $id.version"
+                    // Look for any modules (other than core) and copy the jar to /modules for runtime purposes
+                    if (id.group == 'org.nanoware.modules' && id.name != "Core") {
+                        println "$project.name remotely resolved $id.group - $id.name at version $id.version"
 
                         // This copies the jar from the Gradle cache to the game's module dir for runtime usage
-                        wouldBeModuleJar.createNewFile()
-                        wouldBeModuleJar << artifact.file.bytes
+                        //TODO: This needs to be able to support multiple module jar copies (transient dependencies)
+                        File runtimeModuleJar = new File(rootDir, 'modules/' + id.name + '.jar')
+                        // TODO: Version check the module.txt if the jar exists and don't recopy if already current?
+                        runtimeModuleJar.createNewFile()
+                        runtimeModuleJar << artifact.file.bytes
                         // After this has run the next execution will match the local binary case instead
 
                         // TODO: Make the project clean task delete such transient module jars? They'll re-resolve
@@ -157,14 +162,12 @@ dependencies {
         compile fileTree(dir: 'libs', include: '*.jar', exclude: 'engine.tests-*.jar')
         testCompile fileTree(dir: 'libs', include: 'engine.tests-*.jar')
 
-        /* Should be possible to exclude this now in favor of a module's dependencies.gradle
         // To get Terasology module dependencies we simply declare them against Artifactory and wait - no runtime need
         moduleDepends.each {
             println "*** Attempting to fetch dependency module from Artifactory: " + project.name + ": " + it
             // The '+' is satisfied by any version
             compile(group: 'org.nanoware.modules', name: it, version: '+')
         }
-        */
     }
 }
 
@@ -221,11 +224,52 @@ jar {
     }
 }
 
-// For Artifactory
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
+configurations {
+    published
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+artifactoryPublish {
+    dependsOn sourceJar, javadocJar
+}
+
+// Unsure if this is ever needed, relates to whether the publish will happen automatically (otherwise have to explicitly call artifactoryPublish)
+//artifactoryPublish.skip = true
+
+// Add the sourceJars to non-extractor modules
+artifacts {
+    published sourceJar
+    published javadocJar
+}
+
+artifactory {
+    contextUrl = 'http://artifactory.movingblocks.net/artifactory'
+
+    publish {
+        repository {
+            repoKey = 'terasology-snapshot-local'
+            // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
+            // Note that republishing artifacts under the same name (without an incremented SNAPSHOT for instance) may fail with "Forbidden"
+            username = "$artifactoryUser"
+            password = "$artifactoryPass"
+        }
+
+        defaults {
+            publishConfigs('archives', 'published')
+        }
+    }
+
+    resolve {
+        repository {
+            repoKey = 'terasology-snapshot-local'
         }
     }
 }
@@ -252,7 +296,7 @@ task (updateModule, type: GitPull)  {
     description = 'Updates source for the module from its home (most likely GitHub)'
 
     // Base whether the task executes on two things
-    // 1 - we actually asked for it ("gradlew updateModule") - otherwise we don't want it to run
+    // 1 - we actually asked for it ("gradlew updateModule") - otherwise we don't want it to run TODO: Test for abbreviations?
     // 2 - this is not the Core module, which lives with the engine and needs no updates
     boolean enabled = "updateModule" in project.gradle.startParameter.taskNames && !project.name.equals("Core")
     // TODO: Used to cheat with declaring tasks using << but that defers everything (including config) to execution phase

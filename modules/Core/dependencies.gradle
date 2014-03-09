@@ -1,6 +1,0 @@
-// NOTE: In the Core module this is a template / sample file for other modules, present empty to it can be referred to
-// In other modules this is available to the module author(s) to include dependencies on other modules or library jars
-
-dependencies {
-
-}

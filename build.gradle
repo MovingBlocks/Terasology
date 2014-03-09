@@ -8,6 +8,7 @@
 // Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
 apply from: 'utility.gradle'
 apply from: 'ide.gradle'
+// TODO: Add a different common.gradle here then make modules BOTH apply that and the old common renamed to "module" ?
 
 // Needed for extending the "clean" task to also delete custom stuff defined here like natives
 apply plugin: 'base'
@@ -17,6 +18,56 @@ apply plugin: 'idea'
 
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
 //apply plugin: 'eclipse'
+
+// For publishing to Artifactory - needed in the root project
+apply plugin: 'artifactory'
+
+buildscript {
+
+    // This needs to be in here as well for some reason - can't just inherit?
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://dl.bintray.com/jfrog/jfrog-jars'
+        }
+    }
+
+    // Dependencies at build script level
+    dependencies {
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+
+        // Artifactory
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+    }
+}
+
+artifactory {
+    contextUrl = 'http://artifactory.movingblocks.net/artifactory'
+
+    publish {
+        repository {
+            repoKey = 'terasology-snapshot-local'
+            // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
+            // Note that republishing artifacts under the same name (without an incremented SNAPSHOT for instance) may fail with "Forbidden"
+            username = "$artifactoryUser"
+            password = "$artifactoryPass"
+        }
+
+        defaults {
+            publishConfigs('archives', 'published')
+        }
+    }
+
+    resolve {
+        repository {
+            repoKey = 'terasology-snapshot-local'
+        }
+    }
+}
+
+// The root project doesn't publish anything
+artifactoryPublish.skip = true
 
 /*
  * To Update Gradle Wrapper:
