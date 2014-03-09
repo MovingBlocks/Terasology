@@ -134,20 +134,6 @@ task distLibs (type: Sync) {
     from configurations.runtime
 }
 
-task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, resources)"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'sources'
-    from sourceSets.main.output
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = "Create a JAR with the JavaDoc for the java sources"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,21 +143,22 @@ def moduleFile = file('src/main/resources/assets/module.txt')
 
 if (!moduleFile.exists()) {
     println "Y U NO EXIST MODULE.TXT!"
-} else {
-    println "Scanning for version in module.txt for engine"
-    def slurper = new JsonSlurper()
-    def moduleConfig = slurper.parseText(moduleFile.text)
+    throw new GradleException("Failed to find module.txt for engine")
+}
 
-    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-    version = moduleConfig.version
+println "Scanning for version in module.txt for engine"
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
 
-    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-    group = 'org.terasology.engine'
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+version = moduleConfig.version
 
-    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-    if (env.BUILD_NUMBER != null) {
-        version += '-SNAPSHOT+' + env.BUILD_NUMBER
-    }
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.engine'
+
+// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+if (env.BUILD_NUMBER != null) {
+    version += '-SNAPSHOT+' + env.BUILD_NUMBER
 }
 
 // This version info file actually goes inside the built jar and can be used at runtime

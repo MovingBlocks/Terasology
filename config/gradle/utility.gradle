@@ -1,26 +1,23 @@
 // This extra build file is mainly for structural setup of the project using Git to import other repos from GitHub
 
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+    }
+}
+
 // Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
 
 ext {
     // TODO: Huh, why can't this be resolved from the main build.gradle anymore? It used to be accessible
     templatesDir = 'templates'
-}
-
-// The special build script section here ties dependencies to running the Gradle script itself
-buildscript {
-
-    // This needs to be in here as well for some reason - can't just inherit?
-    repositories {
-        mavenCentral()
-    }
-
-    // Dependencies at build script level
-    dependencies {
-        // Git plugin for Gradle
-        classpath 'org.ajoberstar:gradle-git:0.6.3'
-    }
 }
 
 // Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)

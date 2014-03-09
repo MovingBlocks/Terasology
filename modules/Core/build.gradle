@@ -1,28 +1,17 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
-// Git plugin details at https://github.com/ajoberstar/gradle-git
-import org.ajoberstar.gradle.git.tasks.*
-
-// Grab all the common stuff like plugins to use, artifact repositories, code analysis config
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 apply from: "$rootDir/config/gradle/common.gradle"
-
-// Artifactory publishing requires these two (without maven we'd get no .pom with dependency info published)
-apply plugin: 'maven'
-apply plugin: 'artifactory'
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
 import java.text.SimpleDateFormat;
 
-ext {
-    // Read environment variables, including variables passed by jenkins continuous integration server
-    env = System.getenv()
-}
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
 
-// TODO: Move this Gitty stuff off to the common.gradle under config as well?
-// The special build script section here ties dependencies to running the Gradle script itself
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
-
-    // This needs to be in here as well for some reason - can't just inherit?
     repositories {
         mavenCentral()
         maven {
@@ -30,14 +19,18 @@ buildscript {
         }
     }
 
-    // Dependencies at build script level
     dependencies {
+        // Artifactory plugin
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
-
-        // Artifactory
-        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
     }
+}
+
+ext {
+    // Read environment variables, including variables passed by jenkins continuous integration server
+    env = System.getenv()
 }
 
 def moduleDepends = [];
@@ -224,54 +217,19 @@ jar {
     }
 }
 
+// A configuration for publishing artifacts
 configurations {
     published
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    from javadoc.destinationDir
-    classifier = 'javadoc'
-}
-
-artifactoryPublish {
-    dependsOn sourceJar, javadocJar
-}
-
-// Unsure if this is ever needed, relates to whether the publish will happen automatically (otherwise have to explicitly call artifactoryPublish)
-//artifactoryPublish.skip = true
-
-// Add the sourceJars to non-extractor modules
+// Define the artifacts we want to publish (in addition to the main jar and the .pom the Maven plugin will include)
 artifacts {
     published sourceJar
     published javadocJar
 }
 
-artifactory {
-    contextUrl = 'http://artifactory.movingblocks.net/artifactory'
-
-    publish {
-        repository {
-            repoKey = 'terasology-snapshot-local'
-            // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
-            // Note that republishing artifacts under the same name (without an incremented SNAPSHOT for instance) may fail with "Forbidden"
-            username = "$artifactoryUser"
-            password = "$artifactoryPass"
-        }
-
-        defaults {
-            publishConfigs('archives', 'published')
-        }
-    }
-
-    resolve {
-        repository {
-            repoKey = 'terasology-snapshot-local'
-        }
-    }
+artifactoryPublish {
+    dependsOn sourceJar, javadocJar
 }
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
