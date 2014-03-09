@@ -85,6 +85,7 @@
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
                                     "columns" : 2,
+                                    "autoSizeColumns" : false,
                                     "columnWidths" : [0.3, 0.7],
                                     "verticalSpacing" : 8,
                                     "contents" : [
