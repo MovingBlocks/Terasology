@@ -15,30 +15,75 @@
  */
 package org.terasology.logic.delay;
 
+import gnu.trove.TCollections;
+import gnu.trove.map.TObjectLongMap;
+import gnu.trove.map.hash.TObjectLongHashMap;
+import gnu.trove.procedure.TObjectLongProcedure;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @ForceBlockActive
 public final class DelayedActionComponent implements Component {
-    private long worldTime;
-    private String actionId;
+    private TObjectLongMap<String> actionIdsWakeUp = new TObjectLongHashMap<>();
+    private long lowestWakeUp = Long.MAX_VALUE;
 
     public DelayedActionComponent() {
     }
 
-    public DelayedActionComponent(long worldTime, String actionId) {
-        this.worldTime = worldTime;
-        this.actionId = actionId;
+    public void addActionId(String actionId, long wakeUp) {
+        lowestWakeUp = Math.min(lowestWakeUp, wakeUp);
     }
 
-    public String getActionId() {
-        return actionId;
+    public void removeActionId(String actionId) {
+        final long removedWakeUp = actionIdsWakeUp.remove(actionId);
+        if (removedWakeUp == lowestWakeUp) {
+            lowestWakeUp = findSmallestWakeUp();
+        }
     }
 
-    public long getWorldTime() {
-        return worldTime;
+    public Set<String> removeActionsUpTo(final long worldTime) {
+        final Set<String> result = new HashSet<>();
+        actionIdsWakeUp.forEachEntry(
+                new TObjectLongProcedure<String>() {
+                    @Override
+                    public boolean execute(String actionId, long time) {
+                        if (time <= worldTime) {
+                            result.add(actionId);
+                        }
+                        return true;
+                    }
+                });
+        for (String actionId : result) {
+            actionIdsWakeUp.remove(actionId);
+        }
+        lowestWakeUp = findSmallestWakeUp();
+
+        return result;
+    }
+
+    public long getLowestWakeUp() {
+        return lowestWakeUp;
+    }
+
+    private long findSmallestWakeUp() {
+        long result = Long.MAX_VALUE;
+        for (long value : actionIdsWakeUp.values()) {
+            result = Math.min(result, value);
+        }
+        return result;
+    }
+
+    public boolean isEmpty() {
+        return actionIdsWakeUp.isEmpty();
+    }
+
+    public TObjectLongMap<String> getActionIdsWakeUp() {
+        return TCollections.unmodifiableMap(actionIdsWakeUp);
     }
 }
