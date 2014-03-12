@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,7 +39,8 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class DelayedActionSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+@Share(value = {DelayManager.class})
+public class DelayedActionSystem extends BaseComponentSystem implements UpdateSubscriberSystem, DelayManager {
     @In
     private Time time;
 
@@ -99,25 +101,27 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void getDelayedAction(HasDelayedActionEvent event, EntityRef entity) {
-        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        event.setResult(delayedComponent.getActionIdsWakeUp().containsKey(event.getActionId()));
+        event.setResult(hasDelayedAction(entity, event.getActionId()));
     }
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void cancelDelayedAction(CancelDelayedActionEvent event, EntityRef entity) {
-        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        delayedComponent.removeActionId(event.getActionId());
-        saveOrRemoveComponent(entity, delayedComponent);
+        cancelDelayedAction(entity, event.getActionId());
     }
 
     @ReceiveEvent
     public void addDelayedAction(AddDelayedActionEvent event, EntityRef entity) {
-        long scheduleTime = time.getGameTimeInMs() + event.getDelay();
+        addDelayedAction(entity, event.getActionId(), event.getDelay());
+    }
+
+    @Override
+    public void addDelayedAction(EntityRef entity, String actionId, long delay) {
+        long scheduleTime = time.getGameTimeInMs() + delay;
 
         DelayedActionComponent delayedActionComponent = entity.getComponent(DelayedActionComponent.class);
         if (delayedActionComponent != null) {
             final long oldWakeUp = delayedActionComponent.getLowestWakeUp();
-            delayedActionComponent.addActionId(event.getActionId(), scheduleTime);
+            delayedActionComponent.addActionId(actionId, scheduleTime);
             entity.saveComponent(delayedActionComponent);
             final long newWakeUp = delayedActionComponent.getLowestWakeUp();
             if (oldWakeUp < newWakeUp) {
@@ -126,8 +130,22 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             }
         } else {
             delayedActionComponent = new DelayedActionComponent();
-            delayedActionComponent.addActionId(event.getActionId(), scheduleTime);
+            delayedActionComponent.addActionId(actionId, scheduleTime);
             entity.addComponent(delayedActionComponent);
         }
     }
+
+    @Override
+    public void cancelDelayedAction(EntityRef entity, String actionId) {
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        delayedComponent.removeActionId(actionId);
+        saveOrRemoveComponent(entity, delayedComponent);
+    }
+
+    @Override
+    public boolean hasDelayedAction(EntityRef entity, String actionId) {
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        return delayedComponent.getActionIdsWakeUp().containsKey(actionId);
+    }
+
 }

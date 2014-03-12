@@ -19,7 +19,9 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use DelayManager::addDelayedAction instead.
  */
+@Deprecated
 public class AddDelayedActionEvent implements Event {
     private String actionId;
     private long delay;
