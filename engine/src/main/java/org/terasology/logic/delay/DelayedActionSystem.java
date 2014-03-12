@@ -32,7 +32,7 @@ import org.terasology.registry.In;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -42,12 +42,12 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
     @In
     private Time time;
 
-    private SortedSetMultimap<Long, DelayedOperation> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
+    private SortedSetMultimap<Long, EntityRef> delayedOperationsSortedByTime = TreeMultimap.create(Ordering.natural(), Ordering.arbitrary());
 
     @Override
     public void update(float delta) {
-        long currentWorldTime = time.getGameTimeInMs();
-        List<DelayedOperation> operationsToInvoke = new LinkedList<>();
+        final long currentWorldTime = time.getGameTimeInMs();
+        List<EntityRef> operationsToInvoke = new LinkedList<>();
         Iterator<Long> scheduledOperationsIterator = delayedOperationsSortedByTime.keySet().iterator();
         long processedTime;
         while (scheduledOperationsIterator.hasNext()) {
@@ -59,71 +59,75 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
             scheduledOperationsIterator.remove();
         }
 
-        for (DelayedOperation delayedOperation : operationsToInvoke) {
-            if (delayedOperation.entityRef.exists()) {
-                delayedOperation.entityRef.removeComponent(DelayedActionComponent.class);
-                delayedOperation.entityRef.send(new DelayedActionTriggeredEvent(delayedOperation.operationId));
+        for (EntityRef delayedEntity : operationsToInvoke) {
+            if (delayedEntity.exists()) {
+                final DelayedActionComponent delayedActions = delayedEntity.getComponent(DelayedActionComponent.class);
+
+                final Set<String> actionIds = delayedActions.removeActionsUpTo(currentWorldTime);
+                saveOrRemoveComponent(delayedEntity, delayedActions);
+
+                if (!delayedActions.isEmpty()) {
+                    delayedOperationsSortedByTime.put(delayedActions.getLowestWakeUp(), delayedEntity);
+                }
+
+                for (String actionId : actionIds) {
+                    delayedEntity.send(new DelayedActionTriggeredEvent(actionId));
+                }
             }
+        }
+    }
+
+    private void saveOrRemoveComponent(EntityRef delayedEntity, DelayedActionComponent delayedActionComponent) {
+        if (delayedActionComponent.isEmpty()) {
+            delayedEntity.removeComponent(DelayedActionComponent.class);
+        } else {
+            delayedEntity.saveComponent(delayedActionComponent);
         }
     }
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void componentActivated(OnActivatedComponent event, EntityRef entity) {
         DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        delayedOperationsSortedByTime.put(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
+        delayedOperationsSortedByTime.put(delayedComponent.getLowestWakeUp(), entity);
     }
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void componentDeactivated(BeforeDeactivateComponent event, EntityRef entity) {
         DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        delayedOperationsSortedByTime.remove(delayedComponent.getWorldTime(), new DelayedOperation(entity, delayedComponent.getActionId()));
+        delayedOperationsSortedByTime.remove(delayedComponent.getLowestWakeUp(), entity);
     }
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
-    public void getDelayedAction(GetDelayedActionEvent event, EntityRef entity) {
+    public void getDelayedAction(HasDelayedActionEvent event, EntityRef entity) {
         DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        event.setActionId(delayedComponent.getActionId());
+        event.setResult(delayedComponent.getActionIdsWakeUp().containsKey(event.getActionId()));
     }
 
     @ReceiveEvent(components = {DelayedActionComponent.class})
     public void cancelDelayedAction(CancelDelayedActionEvent event, EntityRef entity) {
-        entity.removeComponent(DelayedActionComponent.class);
+        DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
+        delayedComponent.removeActionId(event.getActionId());
+        saveOrRemoveComponent(entity, delayedComponent);
     }
 
     @ReceiveEvent
     public void addDelayedAction(AddDelayedActionEvent event, EntityRef entity) {
-        if (entity.hasComponent(DelayedActionComponent.class)) {
-            throw new IllegalStateException("This component is already queued for delayed action");
-        }
         long scheduleTime = time.getGameTimeInMs() + event.getDelay();
-        DelayedActionComponent delayedComponent = new DelayedActionComponent(scheduleTime, event.getActionId());
-        entity.addComponent(delayedComponent);
-    }
 
-    private static final class DelayedOperation {
-        private String operationId;
-        private EntityRef entityRef;
-
-        private DelayedOperation(EntityRef entityRef, String operationId) {
-            this.operationId = operationId;
-            this.entityRef = entityRef;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
+        DelayedActionComponent delayedActionComponent = entity.getComponent(DelayedActionComponent.class);
+        if (delayedActionComponent != null) {
+            final long oldWakeUp = delayedActionComponent.getLowestWakeUp();
+            delayedActionComponent.addActionId(event.getActionId(), scheduleTime);
+            entity.saveComponent(delayedActionComponent);
+            final long newWakeUp = delayedActionComponent.getLowestWakeUp();
+            if (oldWakeUp < newWakeUp) {
+                delayedOperationsSortedByTime.remove(oldWakeUp, entity);
+                delayedOperationsSortedByTime.put(newWakeUp, entity);
             }
-            if (o instanceof DelayedOperation) {
-                DelayedOperation other = (DelayedOperation) o;
-                return Objects.equals(other.entityRef, entityRef) && Objects.equals(other.operationId, operationId);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(operationId, entityRef);
+        } else {
+            delayedActionComponent = new DelayedActionComponent();
+            delayedActionComponent.addActionId(event.getActionId(), scheduleTime);
+            entity.addComponent(delayedActionComponent);
         }
     }
 }
