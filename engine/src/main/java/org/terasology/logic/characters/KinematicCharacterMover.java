@@ -110,7 +110,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
             }
 
-            if (result.getMode() != MovementMode.GHOSTING) {
+            if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
                 checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
         }
@@ -169,8 +169,8 @@ public class KinematicCharacterMover implements CharacterMover {
      */
     private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                            final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
-        //If we are ghosting, the mode cannot be changed.
-        if (state.getMode() == MovementMode.GHOSTING) {
+        //If we are ghosting or we can't move, the mode cannot be changed.
+        if (state.getMode() == MovementMode.GHOSTING || state.getMode() == MovementMode.NONE) {
             return;
         }
 
@@ -622,6 +622,8 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             case CLIMBING:
                 climb(movementComp, state, input, entity);
+                break;
+            case NONE:
                 break;
             default:
                 walk(movementComp, state, input, entity);

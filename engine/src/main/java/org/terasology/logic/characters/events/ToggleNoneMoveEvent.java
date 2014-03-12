@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.characters.events;
 
-package org.terasology.logic.characters;
+import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
+ * @author Adeon
  */
-public enum MovementMode {
-    WALKING,
-    CLIMBING,
-    SWIMMING,
-    GHOSTING,
-    NONE
+public class ToggleNoneMoveEvent implements Event {
+    private boolean canMove;
+
+    public ToggleNoneMoveEvent(boolean canMove) {
+        this.canMove = canMove;
+    }
+
+    public boolean canMove(){
+        return canMove;
+    }
 }
