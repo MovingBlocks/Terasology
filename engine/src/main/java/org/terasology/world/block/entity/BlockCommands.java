@@ -30,7 +30,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
@@ -296,9 +295,8 @@ public class BlockCommands extends BaseComponentSystem {
             return "Unknown block or item";
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-        GiveItemAction action = new GiveItemAction(playerEntity, item);
-        playerEntity.send(action);
-        if (!action.isConsumed()) {
+
+        if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
             item.destroy();
         }
 
