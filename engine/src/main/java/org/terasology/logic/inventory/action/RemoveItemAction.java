@@ -27,8 +27,10 @@ import java.util.List;
  * event will be consumed.
  *
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use InventoryManager method instead.
  */
 @API
+@Deprecated
 public class RemoveItemAction extends AbstractConsumableEvent {
     private EntityRef instigator;
     private List<EntityRef> items;

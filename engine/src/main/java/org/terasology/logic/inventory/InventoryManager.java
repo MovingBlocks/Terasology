@@ -18,6 +18,8 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.List;
+
 /**
  * @author Immortius
  */
@@ -55,4 +57,22 @@ public interface InventoryManager {
      * @return The number of slots the given entity has
      */
     int getNumSlots(EntityRef inventoryEntity);
+
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item);
+
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, int slot);
+
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, List<Integer> slots);
+
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved);
+
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved, int count);
+
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved);
+
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count);
+
+    void moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count);
+
+    void switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo);
 }
