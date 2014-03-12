@@ -332,6 +332,13 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     }
 
     private EntityRef removeItemInternal(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, Integer count) {
+        final EntityRef firstItem = items.get(0);
+        for (EntityRef item : items) {
+            if (item != firstItem && !InventoryUtils.isSameItem(firstItem, item)) {
+                return null;
+            }
+        }
+
         for (EntityRef item : items) {
             ItemComponent itemToRemove = item.getComponent(ItemComponent.class);
             if (itemToRemove == null) {
