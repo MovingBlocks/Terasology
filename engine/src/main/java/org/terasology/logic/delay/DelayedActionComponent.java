@@ -15,14 +15,14 @@
  */
 package org.terasology.logic.delay;
 
-import gnu.trove.TCollections;
-import gnu.trove.map.TObjectLongMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
-import gnu.trove.procedure.TObjectLongProcedure;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 @ForceBlockActive
 public final class DelayedActionComponent implements Component {
-    private TObjectLongMap<String> actionIdsWakeUp = new TObjectLongHashMap<>();
+    private Map<String, Long> actionIdsWakeUp = new HashMap<>();
     private long lowestWakeUp = Long.MAX_VALUE;
 
     public DelayedActionComponent() {
@@ -49,18 +49,13 @@ public final class DelayedActionComponent implements Component {
 
     public Set<String> removeActionsUpTo(final long worldTime) {
         final Set<String> result = new HashSet<>();
-        actionIdsWakeUp.forEachEntry(
-                new TObjectLongProcedure<String>() {
-                    @Override
-                    public boolean execute(String actionId, long time) {
-                        if (time <= worldTime) {
-                            result.add(actionId);
-                        }
-                        return true;
-                    }
-                });
-        for (String actionId : result) {
-            actionIdsWakeUp.remove(actionId);
+        final Iterator<Map.Entry<String, Long>> entryIterator = actionIdsWakeUp.entrySet().iterator();
+        while (entryIterator.hasNext()) {
+            final Map.Entry<String, Long> entry = entryIterator.next();
+            if (entry.getValue() <= worldTime) {
+                result.add(entry.getKey());
+                entryIterator.remove();
+            }
         }
         lowestWakeUp = findSmallestWakeUp();
 
@@ -83,7 +78,7 @@ public final class DelayedActionComponent implements Component {
         return actionIdsWakeUp.isEmpty();
     }
 
-    public TObjectLongMap<String> getActionIdsWakeUp() {
-        return TCollections.unmodifiableMap(actionIdsWakeUp);
+    public Map<String, Long> getActionIdsWakeUp() {
+        return Collections.unmodifiableMap(actionIdsWakeUp);
     }
 }
