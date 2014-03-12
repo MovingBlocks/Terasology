@@ -360,12 +360,12 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     }
 
     @Override
-    public void moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
-        InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count);
+    public boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
+        return InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count);
     }
 
     @Override
-    public void switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo) {
-        InventoryUtils.moveItem(instigator, fromInventory, slotFrom, toInventory, slotTo);
+    public boolean switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo) {
+        return InventoryUtils.moveItem(instigator, fromInventory, slotFrom, toInventory, slotTo);
     }
 }

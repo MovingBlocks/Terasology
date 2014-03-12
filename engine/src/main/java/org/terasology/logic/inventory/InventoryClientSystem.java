@@ -140,25 +140,29 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
     }
 
     @Override
-    public void moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
+    public boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
         if (!InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count)) {
-            return;
+            return false;
         }
 
         MoveItemAmountRequest request = new MoveItemAmountRequest(instigator, fromInventory,
                 slotFrom, toInventory, slotTo, count, changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
+
+        return true;
     }
 
     @Override
-    public void switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo) {
+    public boolean switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo) {
         if (!InventoryUtils.moveItem(instigator, fromInventory, slotFrom, toInventory, slotTo)) {
-            return;
+            return false;
         }
 
         MoveItemRequest request = new MoveItemRequest(instigator, fromInventory, slotFrom, toInventory, slotTo, changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
+
+        return true;
     }
 }
