@@ -24,7 +24,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
-import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
@@ -53,9 +52,7 @@ public class ItemCommands extends BaseComponentSystem {
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
             EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-            GiveItemAction event = new GiveItemAction(playerEntity, item);
-            playerEntity.send(event);
-            if (!event.isConsumed()) {
+            if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
                 item.destroy();
             }
             return "You received an item of " + prefab.getName();

@@ -23,10 +23,10 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -45,6 +45,8 @@ public class BlockInventorySystem extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
+    @In
+    private InventoryManager inventoryManager;
 
     private PickupBuilder pickupBuilder;
 
@@ -60,7 +62,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
         int slotCount = InventoryUtils.getSlotCount(blockEntity);
         inventoryItem.addComponent(new InventoryComponent(slotCount));
         for (int i = 0; i < slotCount; i++) {
-            blockEntity.send(new SwitchItemAction(blockEntity, i, inventoryItem, i));
+            inventoryManager.switchItem(blockEntity, blockEntity, i, inventoryItem, i);
         }
         ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
         if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
@@ -73,7 +75,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
     public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
         int slotCount = InventoryUtils.getSlotCount(itemEntity);
         for (int i = 0; i < slotCount; i++) {
-            event.getPlacedBlock().send(new SwitchItemAction(itemEntity, i, itemEntity, i));
+            inventoryManager.switchItem(event.getPlacedBlock(), itemEntity, i, itemEntity, i);
         }
     }
 

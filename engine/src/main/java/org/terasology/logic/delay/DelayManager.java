@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,30 +15,15 @@
  */
 package org.terasology.logic.delay;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
- * @deprecated Use DelayManager::hasDelayedAction instead.
  */
-@Deprecated
-public class HasDelayedActionEvent implements Event {
-    private String actionId;
-    private boolean result;
+public interface DelayManager {
+    void addDelayedAction(EntityRef entity, String actionId, long delay);
 
-    public HasDelayedActionEvent(String actionId) {
-        this.actionId = actionId;
-    }
+    void cancelDelayedAction(EntityRef entity, String actionId);
 
-    public String getActionId() {
-        return actionId;
-    }
-
-    public boolean hasAction() {
-        return result;
-    }
-
-    public void setResult(boolean result) {
-        this.result = result;
-    }
+    boolean hasDelayedAction(EntityRef entity, String actionId);
 }

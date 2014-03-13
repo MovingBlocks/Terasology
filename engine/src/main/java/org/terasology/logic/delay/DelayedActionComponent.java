@@ -37,6 +37,7 @@ public final class DelayedActionComponent implements Component {
     }
 
     public void addActionId(String actionId, long wakeUp) {
+        actionIdsWakeUp.put(actionId, wakeUp);
         lowestWakeUp = Math.min(lowestWakeUp, wakeUp);
     }
 

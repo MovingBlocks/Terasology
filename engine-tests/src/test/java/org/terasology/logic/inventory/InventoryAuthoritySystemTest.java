@@ -84,8 +84,10 @@ public class InventoryAuthoritySystemTest {
         assertEquals(1, itemCompCopy.stackCount);
 
         Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item, new AtLeast(0)).iterateComponents();
         Mockito.verify(item).saveComponent(itemComp);
         Mockito.verify(itemCopy, new AtLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(itemCopy, new AtLeast(0)).iterateComponents();
         Mockito.verify(itemCopy).saveComponent(itemCompCopy);
         Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
@@ -115,6 +117,7 @@ public class InventoryAuthoritySystemTest {
 
         Mockito.verify(item, new AtLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item, new AtLeast(0)).exists();
+        Mockito.verify(item, new AtLeast(0)).iterateComponents();
         Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
         Mockito.verify(inventory, new Times(2)).send(Matchers.any(BeforeItemRemovedFromInventory.class));
@@ -199,8 +202,10 @@ public class InventoryAuthoritySystemTest {
 
         Mockito.verify(item1, new AtLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, new AtLeast(0)).exists();
+        Mockito.verify(item1, new AtLeast(0)).iterateComponents();
         Mockito.verify(item1).saveComponent(itemComp1);
         Mockito.verify(item2, new AtLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, new AtLeast(0)).iterateComponents();
         Mockito.verify(item2).saveComponent(itemComp2);
         Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
@@ -235,8 +240,10 @@ public class InventoryAuthoritySystemTest {
 
         Mockito.verify(item1, new AtLeast(0)).getComponent(ItemComponent.class);
         Mockito.verify(item1, new AtLeast(0)).exists();
+        Mockito.verify(item1, new AtLeast(0)).iterateComponents();
         Mockito.verify(item1).destroy();
         Mockito.verify(item2, new AtLeast(0)).getComponent(ItemComponent.class);
+        Mockito.verify(item2, new AtLeast(0)).iterateComponents();
         Mockito.verify(item2).saveComponent(itemComp2);
         Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).saveComponent(inventoryComp);
