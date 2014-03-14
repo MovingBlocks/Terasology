@@ -272,7 +272,7 @@ public class BulletPhysics implements PhysicsEngine {
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON ||
-                rigidBody.rb.getCollisionFlags() != combineGroups(rb.collidesWith))
+                rigidBody.collidesWith != combineGroups(rb.collidesWith))
             {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
@@ -478,6 +478,7 @@ public class BulletPhysics implements PhysicsEngine {
             collider.rb.setUserPointer(entity);
             collider.rb.setAngularFactor(rigidBody.angularFactor);
             collider.rb.setFriction(rigidBody.friction);
+            collider.collidesWith = combineGroups(rigidBody.collidesWith);
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
             addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
@@ -710,6 +711,7 @@ public class BulletPhysics implements PhysicsEngine {
     public static class BulletRigidBody implements RigidBody {
 
         public final com.bulletphysics.dynamics.RigidBody rb;
+        public short collidesWith = 0;
         private final Transform temp = new Transform();
         private final Vector3f pendingImpulse = new Vector3f();
         private final Vector3f pendingForce = new Vector3f();
