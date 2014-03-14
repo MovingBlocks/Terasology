@@ -64,11 +64,15 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.LocalChunkView;
+import org.terasology.world.propagation.PropagationRules;
+import org.terasology.world.propagation.PropagatorWorldView;
+import org.terasology.world.propagation.StandardBatchPropagator;
+import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightPropagationRules;
-import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
-import org.terasology.world.propagation.light.SunlightWorldView;
+import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -113,7 +117,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private BlockManager blockManager;
     private BlockEntityRegistry registry;
 
-    private List<BatchPropagator> loadEdgePropagators = Lists.newArrayList();
+    private ChunkImpl nullChunk;
 
     public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
@@ -123,8 +127,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
-        loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
-        loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
+        nullChunk = new ChunkImpl(Vector3i.zero());
+        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+            nullChunk.setSunlight(pos, (byte) -1);
+            nullChunk.setSunlightRegen(pos, (byte) -1);
+            nullChunk.setLight(pos, (byte) -1);
+        }
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
@@ -159,7 +167,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = nearCache.get(chunkPos);
-            if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
+            if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE || !chunk.isReady()) {
                 return null;
             }
             chunkPos.sub(region.min());
@@ -257,9 +265,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             for (int i = 0; i < LOAD_PER_FRAME && !sortedReadyChunks.isEmpty(); ++i) {
                 ReadyChunkInfo readyChunkInfo = sortedReadyChunks.remove(sortedReadyChunks.size() - 1);
                 makeChunkAvailable(readyChunkInfo);
-            }
-            for (BatchPropagator propagator : loadEdgePropagators) {
-                propagator.process();
             }
         }
     }
@@ -397,15 +402,47 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             });
             PerformanceMonitor.endActivity();
 
-            for (Side side : Side.values()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
-                ChunkImpl adjChunk = getChunk(adjChunkPos);
-                if (adjChunk != null) {
-                    for (BatchPropagator propagator : loadEdgePropagators) {
+
+            PerformanceMonitor.startActivity("Light Merge");
+            ChunkImpl[] localChunks = new ChunkImpl[27];
+            int index = 0;
+            for (int z = -1; z < 2; ++z) {
+                for (int y = -1; y < 2; ++y) {
+                    for (int x = -1; x < 2; ++x) {
+                        localChunks[index] = getChunk(chunk.getPos().x + x, chunk.getPos().y + y, chunk.getPos().z + z);
+                        if (localChunks[index] == null || !localChunks[index].isReady()) {
+                            localChunks[index] = nullChunk;
+                        }
+                        index++;
+                    }
+                }
+            }
+            List<BatchPropagator> propagators = Lists.newArrayList();
+            LightPropagationRules lightRules = new LightPropagationRules();
+            SunlightRegenPropagationRules sunlightRegenRules = new SunlightRegenPropagationRules();
+            propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks, lightRules)));
+            PropagatorWorldView regenWorldView = new LocalChunkView(localChunks, sunlightRegenRules);
+            PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
+            PropagatorWorldView sunlightWorldView = new LocalChunkView(localChunks, sunlightRules);
+            BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
+            propagators.add(new SunlightRegenBatchPropagator(sunlightRegenRules, regenWorldView, sunlightPropagator, sunlightWorldView));
+            propagators.add(sunlightPropagator);
+            for (BatchPropagator propagator : propagators) {
+                for (Side side : Side.values()) {
+                    Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
+                    ChunkImpl adjChunk = getChunk(adjChunkPos);
+                    if (adjChunk != null && adjChunk.isReady()) {
                         propagator.propagateBetween(chunk, adjChunk, side);
                     }
                 }
             }
+            for (BatchPropagator propagator : propagators) {
+                //PerformanceMonitor.startActivity(propagator.toString());
+                propagator.process();
+                //PerformanceMonitor.endActivity();
+            }
+            PerformanceMonitor.endActivity();
+
 
             if (!loaded) {
                 worldEntity.send(new OnChunkGenerated(readyChunkInfo.getPos()));

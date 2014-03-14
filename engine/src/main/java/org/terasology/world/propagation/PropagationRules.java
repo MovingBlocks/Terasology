@@ -31,7 +31,7 @@ public interface PropagationRules {
      * @param block
      * @return The value of provided by the given block
      */
-    byte getBlockValue(Block block);
+    byte getFixedValue(Block block, Vector3i pos);
 
     /**
      * @param newBlock

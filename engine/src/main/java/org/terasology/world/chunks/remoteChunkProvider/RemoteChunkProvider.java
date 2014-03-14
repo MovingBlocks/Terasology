@@ -42,9 +42,15 @@ import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.internal.RemoteWorldGenerator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.PropagationRules;
+import org.terasology.world.propagation.PropagatorWorldView;
+import org.terasology.world.propagation.StandardBatchPropagator;
+import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 
 import java.util.Comparator;
@@ -69,8 +75,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
-        loadEdgePropagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
-        loadEdgePropagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(this)));
+        loadEdgePropagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LightWorldView(this)));
+        PropagatorWorldView regenWorldView = new SunlightRegenWorldView(this);
+        PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
+        PropagatorWorldView sunlightWorldView = new SunlightWorldView(this);
+        BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
+        loadEdgePropagators.add(new SunlightRegenBatchPropagator(new SunlightRegenPropagationRules(), regenWorldView, sunlightPropagator, sunlightWorldView));
+        loadEdgePropagators.add(sunlightPropagator);
         ChunkMonitor.fireChunkProviderInitialized(this);
 
         remoteWorldGenerator = new RemoteWorldGenerator();

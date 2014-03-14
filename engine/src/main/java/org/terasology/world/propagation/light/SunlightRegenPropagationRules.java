@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,43 +20,56 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.propagation.PropagatorWorldView;
-import org.terasology.world.propagation.SingleChunkView;
+import org.terasology.world.propagation.PropagationComparison;
 
 /**
  * @author Immortius
  */
-public class SunlightPropagationRules extends CommonLightPropagationRules {
+public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
 
-    private PropagatorWorldView regenWorldView;
-
-    public SunlightPropagationRules(PropagatorWorldView regenWorldView) {
-        this.regenWorldView = regenWorldView;
-    }
-
-    public SunlightPropagationRules(ChunkImpl chunk) {
-        this.regenWorldView = new SingleChunkView(new SunlightRegenPropagationRules(), chunk);
-    }
-
+    @Override
     public byte getFixedValue(Block block, Vector3i pos) {
-        byte lightVal = (byte) (regenWorldView.getValueAt(pos) - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
-        return (lightVal > 0) ? lightVal : 0;
+        return 0;
     }
 
+    @Override
     public byte propagateValue(byte existingValue, Side side, Block from) {
-        return (existingValue > 0) ? (byte) (existingValue - 1) : 0;
+        if (side == Side.BOTTOM) {
+            return (existingValue == ChunkConstants.MAX_SUNLIGHT_REGEN) ? existingValue : (byte) (existingValue + 1);
+        }
+        return 0;
     }
 
+    @Override
     public byte getMaxValue() {
-        return ChunkConstants.MAX_SUNLIGHT;
+        return ChunkConstants.MAX_SUNLIGHT_REGEN;
     }
 
+    @Override
     public byte getValue(ChunkImpl chunk, Vector3i pos) {
-        return chunk.getSunlight(pos);
+        return chunk.getSunlightRegen(pos);
     }
 
+    @Override
     public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {
-        chunk.setSunlight(pos, value);
+        chunk.setSunlightRegen(pos, value);
     }
 
+    @Override
+    public PropagationComparison comparePropagation(Block newBlock, Block oldBlock, Side side) {
+        if (!side.isVertical()) {
+            return PropagationComparison.IDENTICAL;
+        }
+        return super.comparePropagation(newBlock, oldBlock, side);
+    }
+
+    @Override
+    public boolean canSpreadOutOf(Block block, Side side) {
+        return side == Side.BOTTOM && !block.isLiquid() && (super.canSpreadOutOf(block, side));
+    }
+
+    @Override
+    public boolean canSpreadInto(Block block, Side side) {
+        return !block.isLiquid() && super.canSpreadInto(block, side);
+    }
 }

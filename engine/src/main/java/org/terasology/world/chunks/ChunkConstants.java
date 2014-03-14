@@ -39,6 +39,9 @@ public final class ChunkConstants {
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
+    public static final byte MAX_SUNLIGHT = 0x0f;
+    public static final byte MAX_SUNLIGHT_REGEN = 63;
+    public static final byte SUNLIGHT_REGEN_THRESHOLD = 48;
 
     public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, POWER_Y, POWER_Z);
     public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);

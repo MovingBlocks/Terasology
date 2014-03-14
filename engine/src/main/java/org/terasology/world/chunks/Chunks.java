@@ -42,6 +42,7 @@ public final class Chunks {
 
     private final TeraArrays.Entry blockDataEntry;
     private final TeraArrays.Entry sunlightDataEntry;
+    private final TeraArrays.Entry sunlightRegenDataEntry;
     private final TeraArrays.Entry lightDataEntry;
     private final TeraArrays.Entry extraDataEntry;
 
@@ -53,6 +54,7 @@ public final class Chunks {
         final TeraArrays t = TeraArrays.getInstance();
         blockDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray16Bit);
         sunlightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
+        sunlightRegenDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
         lightDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
         extraDataEntry = t.getEntry(ChunksProtobuf.Type.DenseArray8Bit);
 
@@ -67,6 +69,10 @@ public final class Chunks {
 
     public TeraArrays.Entry getSunlightDataEntry() {
         return sunlightDataEntry;
+    }
+
+    public TeraArrays.Entry getSunlightRegenDataEntry() {
+        return sunlightRegenDataEntry;
     }
 
     public TeraArrays.Entry getLightDataEntry() {

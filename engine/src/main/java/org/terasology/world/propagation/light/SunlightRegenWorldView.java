@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.terasology.world.propagation.light;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.propagation.AbstractFullWorldView;
@@ -24,20 +23,19 @@ import org.terasology.world.propagation.AbstractFullWorldView;
 /**
  * @author Immortius
  */
-public class SunlightWorldView extends AbstractFullWorldView {
+public class SunlightRegenWorldView extends AbstractFullWorldView {
 
-    public SunlightWorldView(ChunkProvider chunkProvider) {
+    public SunlightRegenWorldView(ChunkProvider chunkProvider) {
         super(chunkProvider);
     }
 
     @Override
     protected byte getValueAt(ChunkImpl chunk, Vector3i pos) {
-        return chunk.getSunlight(pos);
+        return chunk.getSunlightRegen(pos);
     }
 
     @Override
     protected void setValueAt(ChunkImpl chunk, Vector3i pos, byte value) {
-        chunk.setSunlight(pos, value);
+        chunk.setSunlightRegen(pos, value);
     }
-
 }

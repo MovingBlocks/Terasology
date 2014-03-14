@@ -98,6 +98,7 @@ public class ChunkImpl implements Chunk {
 
     private TeraArray blockData;
     private TeraArray sunlightData;
+    private TeraArray sunlightRegenData;
     private TeraArray lightData;
     private TeraArray extraData;
 
@@ -122,6 +123,7 @@ public class ChunkImpl implements Chunk {
         final Chunks c = Chunks.getInstance();
         blockData = c.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
@@ -141,13 +143,15 @@ public class ChunkImpl implements Chunk {
         this(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
-    public ChunkImpl(Vector3i chunkPos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid, boolean loaded) {
+    public ChunkImpl(Vector3i chunkPos, State chunkState, TeraArray blocks, TeraArray liquid, boolean loaded) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
-        this.sunlightData = Preconditions.checkNotNull(sunlight);
-        this.lightData = Preconditions.checkNotNull(light);
         this.extraData = Preconditions.checkNotNull(liquid);
         this.chunkState = Preconditions.checkNotNull(chunkState);
+        final Chunks c = Chunks.getInstance();
+        sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
@@ -214,6 +218,7 @@ public class ChunkImpl implements Chunk {
     public int getEstimatedMemoryConsumptionInBytes() {
         return blockData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
+                + sunlightRegenData.getEstimatedMemoryConsumptionInBytes()
                 + lightData.getEstimatedMemoryConsumptionInBytes()
                 + extraData.getEstimatedMemoryConsumptionInBytes();
     }
@@ -257,8 +262,25 @@ public class ChunkImpl implements Chunk {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT);
         return sunlightData.set(x, y, z, amount) != amount;
+    }
+
+    public byte getSunlightRegen(Vector3i pos) {
+        return getSunlightRegen(pos.x, pos.y, pos.z);
+    }
+
+    public byte getSunlightRegen(int x, int y, int z) {
+        return (byte) sunlightRegenData.get(x, y, z);
+    }
+
+    public boolean setSunlightRegen(Vector3i pos, byte amount) {
+        return setSunlightRegen(pos.x, pos.y, pos.z, amount);
+    }
+
+    public boolean setSunlightRegen(int x, int y, int z, byte amount) {
+        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT_REGEN);
+        return sunlightRegenData.set(x, y, z, amount) != amount;
     }
 
     public byte getLight(Vector3i pos) {
@@ -274,7 +296,7 @@ public class ChunkImpl implements Chunk {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
         return lightData.set(x, y, z, amount) != amount;
     }
 
@@ -362,23 +384,27 @@ public class ChunkImpl implements Chunk {
             if (logger.isDebugEnabled()) {
                 int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
                 int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
+                int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
                 int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
                 int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
+                int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
 
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);
+                sunlightRegenData = def.deflate(sunlightRegenData);
                 lightData = def.deflate(lightData);
                 extraData = def.deflate(extraData);
 
                 int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
                 int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
+                int sunlightRegenReduced = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
                 int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
                 int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
+                int totalReduced = blocksReduced + sunlightRegenReduced + sunlightReduced + lightReduced + liquidReduced;
 
                 double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
                 double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+                double sunlightRegenPercent = 100d - (100d / sunlightRegenSize * sunlightRegenReduced);
                 double lightPercent = 100d - (100d / lightSize * lightReduced);
                 double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
@@ -389,6 +415,7 @@ public class ChunkImpl implements Chunk {
                         "bytes, total-deflated-by: {}%, " +
                         "blocks-deflated-by={}%, " +
                         "sunlight-deflated-by={}%, " +
+                        "sunlight-regen-deflated-by={}%, " +
                         "light-deflated-by={}%, " +
                         "liquid-deflated-by={}%",
                         chunkPos,
@@ -397,6 +424,7 @@ public class ChunkImpl implements Chunk {
                         PERCENT_FORMAT.format(totalPercent),
                         PERCENT_FORMAT.format(blocksPercent),
                         PERCENT_FORMAT.format(sunlightPercent),
+                        PERCENT_FORMAT.format(sunlightRegenPercent),
                         PERCENT_FORMAT.format(lightPercent),
                         PERCENT_FORMAT.format(liquidPercent));
                 ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
@@ -404,6 +432,7 @@ public class ChunkImpl implements Chunk {
                 final int oldSize = getEstimatedMemoryConsumptionInBytes();
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);
+                sunlightRegenData = def.deflate(sunlightRegenData);
                 lightData = def.deflate(lightData);
                 extraData = def.deflate(extraData);
                 ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
@@ -474,6 +503,7 @@ public class ChunkImpl implements Chunk {
             disposed = false;
             Chunks c = Chunks.getInstance();
             sunlightData = c.getSunlightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
             lightData = c.getLightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         }
     }
@@ -489,6 +519,7 @@ public class ChunkImpl implements Chunk {
         }
         lightData = null;
         sunlightData = null;
+        sunlightRegenData = null;
         ChunkMonitor.fireChunkDisposed(this);
     }
 
@@ -571,8 +602,6 @@ public class ChunkImpl implements Chunk {
             final TeraArray blockData = t.decode(message.getBlockData());
 
             Chunks c = Chunks.getInstance();
-            TeraArray sunlightData = c.getSunlightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            TeraArray lightData = c.getLightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
             TeraArray extraData;
             if (message.hasLiquidData()) {
                 extraData = t.decode(message.getLiquidData());
@@ -584,7 +613,7 @@ public class ChunkImpl implements Chunk {
             if (previouslyComplete) {
                 state = State.INTERNAL_LIGHT_GENERATION_PENDING;
             }
-            return new ChunkImpl(pos, state, blockData, sunlightData, lightData, extraData, previouslyComplete);
+            return new ChunkImpl(pos, state, blockData, extraData, previouslyComplete);
         }
     }
 }

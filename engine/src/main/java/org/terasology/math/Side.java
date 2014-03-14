@@ -40,6 +40,7 @@ public enum Side {
 
     private static EnumMap<Side, Side> reverseMap;
     private static Side[] horizontalSides;
+    private static Side[] verticalSides;
     private static EnumMap<Side, Side> clockwiseYawSide;
     private static EnumMap<Side, Side> anticlockwiseYawSide;
     private static EnumMap<Side, Side> clockwisePitchSide;
@@ -99,6 +100,7 @@ public enum Side {
         anticlockwiseRollSide.put(Side.RIGHT, Side.BOTTOM);
 
         horizontalSides = new Side[]{LEFT, RIGHT, FRONT, BACK};
+        verticalSides = new Side[]{TOP, BOTTOM};
     }
 
     private Vector3i vector3iDir;
@@ -118,6 +120,10 @@ public enum Side {
      */
     public static Side[] horizontalSides() {
         return horizontalSides;
+    }
+
+    public static Side[] verticalSides() {
+        return verticalSides;
     }
 
     public static Side inDirection(int x, int y, int z) {
@@ -277,4 +283,10 @@ public enum Side {
             return this;
         }
     }
+
+    public boolean isVertical() {
+        return !canYaw;
+    }
+
+
 }

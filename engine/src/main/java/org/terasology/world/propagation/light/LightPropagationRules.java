@@ -26,7 +26,7 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 public class LightPropagationRules extends CommonLightPropagationRules {
 
     @Override
-    public byte getBlockValue(Block block) {
+    public byte getFixedValue(Block block, Vector3i pos) {
         return block.getLuminance();
     }
 

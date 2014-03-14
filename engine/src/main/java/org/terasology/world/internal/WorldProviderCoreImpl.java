@@ -33,16 +33,21 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
+import org.terasology.world.propagation.PropagationRules;
+import org.terasology.world.propagation.PropagatorWorldView;
+import org.terasology.world.propagation.StandardBatchPropagator;
+import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
+import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
@@ -81,8 +86,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
 
-        propagators.add(new BatchPropagator(new LightPropagationRules(), new LightWorldView(chunkProvider)));
-        propagators.add(new BatchPropagator(new SunlightPropagationRules(), new SunlightWorldView(chunkProvider)));
+        propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LightWorldView(chunkProvider)));
+        PropagatorWorldView regenWorldView = new SunlightRegenWorldView(chunkProvider);
+        PropagationRules sunlightRules = new SunlightPropagationRules(regenWorldView);
+        PropagatorWorldView sunlightWorldView = new SunlightWorldView(chunkProvider);
+        BatchPropagator sunlightPropagator = new StandardBatchPropagator(sunlightRules, sunlightWorldView);
+        propagators.add(new SunlightRegenBatchPropagator(new SunlightRegenPropagationRules(), regenWorldView, sunlightPropagator, sunlightWorldView));
+        propagators.add(sunlightPropagator);
     }
 
     public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider) {
