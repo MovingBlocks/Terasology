@@ -20,6 +20,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
+import java.util.Set;
+
 /**
  * @author Immortius
  */
@@ -28,7 +30,7 @@ public interface BatchPropagator {
 
     void process(Iterable<BlockChange> blockChanges);
 
-    void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side);
+    void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal);
 
     void propagateFrom(Vector3i pos, Block block);
 

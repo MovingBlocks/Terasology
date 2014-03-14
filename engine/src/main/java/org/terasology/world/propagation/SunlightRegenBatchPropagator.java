@@ -214,11 +214,14 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
-        if (!side.isVertical()) {
-            return;
+    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal) {
+        if (side == Side.BOTTOM) {
+            propagateDown(chunk, adjChunk);
         }
-        Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+    }
+
+    private void propagateDown(ChunkImpl fromChunk, ChunkImpl toChunk) {
+        /*Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
         Vector3i adjPos = new Vector3i();
         for (Vector3i pos : edgeRegion) {
             adjPos.set(pos);
@@ -250,7 +253,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
             }
 
 
-        }
+        }     */
     }
 
     @Override

@@ -76,6 +76,7 @@ import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -117,8 +118,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private BlockManager blockManager;
     private BlockEntityRegistry registry;
 
-    private ChunkImpl nullChunk;
-
     public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
@@ -126,13 +125,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
         ChunkMonitor.fireChunkProviderInitialized(this);
-
-        nullChunk = new ChunkImpl(Vector3i.zero());
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            nullChunk.setSunlight(pos, (byte) -1);
-            nullChunk.setSunlightRegen(pos, (byte) -1);
-            nullChunk.setLight(pos, (byte) -1);
-        }
     }
 
     public void setBlockEntityRegistry(BlockEntityRegistry value) {
@@ -409,14 +401,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             for (int z = -1; z < 2; ++z) {
                 for (int y = -1; y < 2; ++y) {
                     for (int x = -1; x < 2; ++x) {
-                        localChunks[index] = getChunk(chunk.getPos().x + x, chunk.getPos().y + y, chunk.getPos().z + z);
-                        if (localChunks[index] == null || !localChunks[index].isReady()) {
-                            localChunks[index] = nullChunk;
+                        ChunkImpl localChunk = getChunk(chunk.getPos().x + x, chunk.getPos().y + y, chunk.getPos().z + z);
+                        if (localChunk != null && localChunk.isReady()) {
+                            localChunks[index] = localChunk;
                         }
                         index++;
                     }
                 }
             }
+
             List<BatchPropagator> propagators = Lists.newArrayList();
             LightPropagationRules lightRules = new LightPropagationRules();
             SunlightRegenPropagationRules sunlightRegenRules = new SunlightRegenPropagationRules();
@@ -428,11 +421,36 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             propagators.add(new SunlightRegenBatchPropagator(sunlightRegenRules, regenWorldView, sunlightPropagator, sunlightWorldView));
             propagators.add(sunlightPropagator);
             for (BatchPropagator propagator : propagators) {
+                // Propagate Inwards
                 for (Side side : Side.values()) {
                     Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
                     ChunkImpl adjChunk = getChunk(adjChunkPos);
                     if (adjChunk != null && adjChunk.isReady()) {
-                        propagator.propagateBetween(chunk, adjChunk, side);
+                        propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
+                    }
+                }
+
+                // Propagate Outwards
+                for (Side side : Side.values()) {
+                    Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
+                    ChunkImpl adjChunk = getChunk(adjChunkPos);
+                    if (adjChunk != null && adjChunk.isReady()) {
+                        propagator.propagateBetween(chunk, adjChunk, side, false);
+                    }
+                }
+
+                // Propagate Further
+                for (Side side : Side.values()) {
+                    Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
+                    ChunkImpl adjChunk = getChunk(adjChunkPos);
+                    if (adjChunk != null && adjChunk.isReady()) {
+                        for (Side tangentSide : side.tangents()) {
+                            Vector3i tangentChunkPos = tangentSide.getAdjacentPos(adjChunkPos);
+                            ChunkImpl tangentChunk = getChunk(tangentChunkPos);
+                            if (tangentChunk != null && tangentChunk.isReady()) {
+                                propagator.propagateBetween(adjChunk, tangentChunk, tangentSide, true);
+                            }
+                        }
                     }
                 }
             }

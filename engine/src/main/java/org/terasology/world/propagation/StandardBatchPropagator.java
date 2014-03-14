@@ -237,63 +237,77 @@ public class StandardBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
-        propagateSide(chunk, adjChunk, side);
-        propagateSide(adjChunk, chunk, side.reverse());
-    }
+    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal) {
+        IndexProvider indexProvider = createIndexProvider(side);
 
-    private void propagateSide(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
         Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
 
         int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
         int[] depth = new int[edgeSize];
 
-        Vector3i adjPos = new Vector3i();
-        for (Vector3i pos : edgeRegion) {
-            int depthIndex = getIndexFor(pos, side, edgeRegion);
-            adjPos.set(pos);
-            adjPos.add(chunkEdgeDeltas.get(side));
-            Block lastBlock = chunk.getBlock(pos);
-            byte expectedValue = rules.propagateValue(rules.getValue(chunk, pos), side, lastBlock);
+        propagateSide(chunk, adjChunk, side, indexProvider, edgeRegion, depth);
+        propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
+    }
 
-            int depthCounter = 0;
-            while (expectedValue > 0 && rules.canSpreadOutOf(lastBlock, side)) {
-                Block currentBlock = adjChunk.getBlock(adjPos);
-                if (rules.canSpreadInto(currentBlock, side.reverse()) && expectedValue > rules.getValue(adjChunk, adjPos)) {
-                    lastBlock = currentBlock;
-                    rules.setValue(adjChunk, adjPos, expectedValue);
-                    adjPos.add(side.getVector3i());
-                    depthCounter++;
-                    expectedValue = rules.propagateValue(expectedValue, side, lastBlock);
-                } else {
-                    break;
-                }
+    private void propagateDepth(ChunkImpl adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+        Vector3i adjPos = new Vector3i();
+        int[] adjDepth = new int[depths.length];
+        int dimA = (side == Side.LEFT || side == Side.RIGHT) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_X;
+        int dimB = (side == Side.FRONT || side == Side.BACK) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_Z;
+        System.arraycopy(depths, 0, adjDepth, 0, depths.length);
+
+        // x == 0, y == 0
+        adjDepth[0] = Math.min(depths[1], depths[dimA]);
+
+        // 0 < x < dimA - 1, y == 0
+        for (int x = 1; x < dimA - 1; ++x) {
+            adjDepth[x] = Math.min(depths[x - 1], Math.min(depths[x + 1], depths[x + dimA]));
+        }
+
+        // x == dimA - 1, y == 0
+        adjDepth[dimA - 1] = Math.min(depths[2 * dimA - 1], depths[dimA - 2]);
+
+        // 0 < y < dimB - 1
+        for (int y = 1; y < dimB - 1; ++y) {
+            // x == 0
+            adjDepth[y * dimA] = Math.min(depths[dimA * (y - 1)], Math.min(depths[dimA * (y + 1)], depths[1 + dimA * y]));
+            // 0 < x < dimA - 1
+            for (int x = 1; x < dimA - 1; ++x) {
+                adjDepth[x + y * dimA] = Math.min(Math.min(depths[x + (y - 1) * dimA], depths[x + (y + 1) * dimA]),
+                        Math.min(depths[x + 1 + y * dimA], depths[x - 1 + y * dimA]));
             }
-            depth[depthIndex] = depthCounter;
+            // x == dimA - 1
+            adjDepth[dimA - 1 + y * dimA] = Math.min(depths[dimA - 1 + dimA * (y - 1)], Math.min(depths[dimA - 1 + dimA * (y + 1)], depths[dimA - 2 + dimA * y]));
+        }
+        // x == 0, y == dimB - 1
+        adjDepth[dimA * (dimB - 1)] = Math.min(depths[1 + dimA * (dimB - 1)], depths[dimA * (dimB - 2)]);
+
+        // 0 < x < dimA - 1; y == dimB - 1
+        for (int x = 1; x < dimA - 1; ++x) {
+            adjDepth[x + dimA * (dimB - 1)] = Math.min(depths[x - 1 + dimA * (dimB - 1)], Math.min(depths[x + 1 + dimA * (dimB - 1)], depths[x + dimA * (dimB - 2)]));
+        }
+
+        // x == dimA - 1; y == dimB - 1
+        adjDepth[dimA - 1 + dimA * (dimB - 1)] = Math.min(depths[dimA - 2 + dimA * (dimB - 1)], depths[dimA - 1 + dimA * (dimB - 2)]);
+
+        if (propagateExternal) {
+            for (int y = 0; y < dimB; ++y) {
+                adjDepth[y * dimA] = 0;
+                adjDepth[dimA - 1 + y * dimA] = 0;
+            }
+            for (int x = 0; x < dimA; ++x) {
+                adjDepth[x] = 0;
+                adjDepth[x + dimA * (dimB - 1)] = 0;
+            }
         }
         for (Vector3i pos : edgeRegion) {
-            int depthIndex = getIndexFor(pos, side, edgeRegion);
-            int adjacentDepth = depth[depthIndex];
-
-            for (Side adj : side.tangents()) {
-                adjPos.set(pos);
-                adjPos.add(adj.getVector3i());
-                if (!ChunkConstants.CHUNK_REGION.encompasses(adjPos)) {
-                    adjacentDepth = 0;
-                    break;
-                } else {
-                    adjacentDepth = Math.min(adjacentDepth, depth[getIndexFor(adjPos, side, edgeRegion)]);
-                }
-            }
-
-            for (int i = adjacentDepth; i < depth[depthIndex] - 1; ++i) {
+            int depthIndex = indexProvider.getIndexFor(pos);
+            int adjacentDepth = adjDepth[depthIndex];
+            for (int i = adjacentDepth; i < depths[depthIndex] - 1; ++i) {
                 adjPos.set(side.getVector3i());
                 adjPos.mult(i + 1);
                 adjPos.add(pos);
                 adjPos.add(chunkEdgeDeltas.get(side));
-                if (!ChunkConstants.CHUNK_REGION.encompasses(adjPos)) {
-                    break;
-                }
                 byte value = rules.getValue(adjChunk, adjPos);
                 if (value > 1) {
                     queueSpreadValue(adjChunk.getBlockWorldPos(adjPos), value);
@@ -302,17 +316,72 @@ public class StandardBatchPropagator implements BatchPropagator {
         }
     }
 
-    private int getIndexFor(Vector3i pos, Side side, Region3i region) {
+    private void propagateSide(ChunkImpl chunk, ChunkImpl adjChunk, Side side, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+        Vector3i adjPos = new Vector3i();
+        for (Vector3i pos : edgeRegion) {
+            int depthIndex = indexProvider.getIndexFor(pos);
+            adjPos.set(pos);
+            adjPos.add(chunkEdgeDeltas.get(side));
+
+            byte expectedValue = (byte) (rules.getValue(chunk, pos) - 1);
+            if (expectedValue < 1) {
+                continue;
+            }
+
+            int depth = 0;
+            Block lastBlock = chunk.getBlock(pos);
+            while (expectedValue > 0 && rules.canSpreadOutOf(lastBlock, side)) {
+                byte adjValue = rules.getValue(adjChunk, adjPos);
+                if (expectedValue > adjValue && adjValue != PropagatorWorldView.UNAVAILABLE) {
+                    lastBlock = adjChunk.getBlock(adjPos);
+                    if (rules.canSpreadInto(lastBlock, side.reverse())) {
+                        rules.setValue(adjChunk, adjPos, expectedValue);
+                        adjPos.add(side.getVector3i());
+                        depth++;
+                        expectedValue--;
+                    } else {
+                        expectedValue = 0;
+                    }
+                } else {
+                    expectedValue = 0;
+                }
+            }
+            depths[depthIndex] = depth;
+        }
+    }
+
+    private IndexProvider createIndexProvider(Side side) {
+        IndexProvider indexProvider;
         switch (side) {
             case TOP:
             case BOTTOM:
-                return pos.x + region.size().x * pos.z;
+                indexProvider = new IndexProvider() {
+                    @Override
+                    public int getIndexFor(Vector3i pos) {
+                        return pos.x + ChunkConstants.SIZE_X * pos.z;
+                    }
+                };
+                break;
             case LEFT:
             case RIGHT:
-                return pos.y + region.size().y * pos.z;
+                indexProvider = new IndexProvider() {
+                    @Override
+                    public int getIndexFor(Vector3i pos) {
+                        return pos.y + ChunkConstants.SIZE_Y * pos.z;
+                    }
+                };
+                break;
             default:
-                return pos.x + region.size().x * pos.y;
+                indexProvider = new IndexProvider() {
+
+                    @Override
+                    public int getIndexFor(Vector3i pos) {
+                        return pos.x + ChunkConstants.SIZE_X * pos.y;
+                    }
+                };
+                break;
         }
+        return indexProvider;
     }
 
     @Override
@@ -328,5 +397,9 @@ public class StandardBatchPropagator implements BatchPropagator {
     @Override
     public void regenerate(Vector3i pos, byte value) {
         reduce(pos, value);
+    }
+
+    private interface IndexProvider {
+        int getIndexFor(Vector3i pos);
     }
 }

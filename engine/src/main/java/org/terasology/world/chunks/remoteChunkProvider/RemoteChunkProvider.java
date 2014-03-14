@@ -112,7 +112,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                     ChunkImpl adjChunk = getChunk(adjChunkPos);
                     if (adjChunk != null) {
                         for (BatchPropagator propagator : loadEdgePropagators) {
-                            propagator.propagateBetween(chunk, adjChunk, side);
+                            propagator.propagateBetween(chunk, adjChunk, side, true);
                         }
                     }
                 }

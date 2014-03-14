@@ -110,7 +110,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
             topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
-        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM);
+        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
         sunlightPropagator.process();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
@@ -136,7 +136,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
 
-        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM);
+        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
         propagator.process();
         sunlightPropagator.process();
         assertEquals(14, bottomChunk.getSunlight(16, 47, 0));

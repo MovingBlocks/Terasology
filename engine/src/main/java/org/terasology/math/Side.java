@@ -33,11 +33,11 @@ import java.util.EnumMap;
  */
 public enum Side {
     TOP(Vector3i.up(), true, false, true),
+    BOTTOM(Vector3i.down(), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
-    BACK(new Vector3i(0, 0, 1), true, true, false),
-    BOTTOM(Vector3i.down(), true, false, true);
+    BACK(new Vector3i(0, 0, 1), true, true, false);
 
     private static EnumMap<Side, Side> reverseMap;
     private static Side[] horizontalSides;

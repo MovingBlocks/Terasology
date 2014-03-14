@@ -262,7 +262,7 @@ public class ChunkImpl implements Chunk {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT);
+        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT);
         return sunlightData.set(x, y, z, amount) != amount;
     }
 
@@ -279,7 +279,7 @@ public class ChunkImpl implements Chunk {
     }
 
     public boolean setSunlightRegen(int x, int y, int z, byte amount) {
-        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT_REGEN);
+        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT_REGEN);
         return sunlightRegenData.set(x, y, z, amount) != amount;
     }
 
@@ -296,7 +296,7 @@ public class ChunkImpl implements Chunk {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        //Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
+        Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
         return lightData.set(x, y, z, amount) != amount;
     }
 

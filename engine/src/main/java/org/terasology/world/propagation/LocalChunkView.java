@@ -45,16 +45,28 @@ public class LocalChunkView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        return rules.getValue(chunks[chunkIndexOf(pos)], TeraMath.calcBlockPos(pos));
+        ChunkImpl chunk = chunks[chunkIndexOf(pos)];
+        if (chunk != null) {
+            return rules.getValue(chunk, TeraMath.calcBlockPos(pos));
+        }
+        return UNAVAILABLE;
     }
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        rules.setValue(chunks[chunkIndexOf(pos)], TeraMath.calcBlockPos(pos), value);
+        ChunkImpl chunk = chunks[chunkIndexOf(pos)];
+        if (chunk != null) {
+            rules.setValue(chunk, TeraMath.calcBlockPos(pos), value);
+        }
     }
 
     @Override
     public Block getBlockAt(Vector3i pos) {
-        return chunks[chunkIndexOf(pos)].getBlock(TeraMath.calcBlockPos(pos));
+        int index = chunkIndexOf(pos);
+        ChunkImpl chunk = chunks[index];
+        if (chunk != null) {
+            return chunk.getBlock(TeraMath.calcBlockPos(pos));
+        }
+        return null;
     }
 }
