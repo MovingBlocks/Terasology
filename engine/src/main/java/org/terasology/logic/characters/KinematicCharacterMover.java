@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
@@ -110,7 +111,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
             }
 
-            if (result.getMode() != MovementMode.GHOSTING) {
+            if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
                 checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
         }
@@ -169,8 +170,8 @@ public class KinematicCharacterMover implements CharacterMover {
      */
     private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                            final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
-        //If we are ghosting, the mode cannot be changed.
-        if (state.getMode() == MovementMode.GHOSTING) {
+        //If we are ghosting or we can't move, the mode cannot be changed.
+        if (state.getMode() == MovementMode.GHOSTING || state.getMode() == MovementMode.NONE) {
             return;
         }
 
@@ -334,6 +335,16 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
         return direction;
+    }
+
+    private void followToParent(final CharacterStateEvent state, EntityRef entity) {
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        if (!locationComponent.getParent().equals(EntityRef.NULL)) {
+            Vector3f velocity = new Vector3f(locationComponent.getWorldPosition());
+            velocity.sub(state.getPosition());
+            state.getVelocity().set(velocity);
+            state.getPosition().set(locationComponent.getWorldPosition());
+        }
     }
 
     private void ghost(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
@@ -622,6 +633,9 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             case CLIMBING:
                 climb(movementComp, state, input, entity);
+                break;
+            case NONE:
+                followToParent(state, entity);
                 break;
             default:
                 walk(movementComp, state, input, entity);

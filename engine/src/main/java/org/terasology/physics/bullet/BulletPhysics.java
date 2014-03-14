@@ -271,7 +271,9 @@ public class BulletPhysics implements PhysicsEngine {
             return false;
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
-            if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
+            if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON ||
+                rigidBody.rb.getCollisionFlags() != combineGroups(rb.collidesWith))
+            {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
