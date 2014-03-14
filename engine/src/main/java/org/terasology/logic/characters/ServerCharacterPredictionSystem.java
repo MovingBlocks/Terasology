@@ -31,8 +31,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.events.ToggleNoClipEvent;
-import org.terasology.logic.characters.events.ToggleNoneMoveEvent;
+import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -100,30 +99,19 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     }
 
     @ReceiveEvent
-    public void onToggleNoClip(ToggleNoClipEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
+    public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setSequenceNumber(lastState.getSequenceNumber());
-        if (lastState.getMode() != MovementMode.GHOSTING) {
-            newState.setMode(MovementMode.GHOSTING);
+        if (event.getMode() == MovementMode.GHOSTING) {
+            if (lastState.getMode() != MovementMode.GHOSTING) {
+                newState.setMode(MovementMode.GHOSTING);
+            } else {
+                newState.setMode(MovementMode.WALKING);
+            }
         } else {
-            newState.setMode(MovementMode.WALKING);
-        }
-        stateBuffer.add(newState);
-        CharacterStateEvent.setToState(character, newState);
-    }
-
-    @ReceiveEvent
-    public void onToggleNoneMove(ToggleNoneMoveEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
-        CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
-        CharacterStateEvent lastState = stateBuffer.getLast();
-        CharacterStateEvent newState = new CharacterStateEvent(lastState);
-        newState.setSequenceNumber(lastState.getSequenceNumber());
-        if (event.canMove()) {
-            newState.setMode(MovementMode.WALKING);
-        } else {
-            newState.setMode(MovementMode.NONE);
+            newState.setMode(event.getMode());
         }
         stateBuffer.add(newState);
         CharacterStateEvent.setToState(character, newState);

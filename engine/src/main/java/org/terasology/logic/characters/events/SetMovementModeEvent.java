@@ -16,18 +16,19 @@
 package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.logic.characters.MovementMode;
 
 /**
  * @author Adeon
  */
-public class ToggleNoneMoveEvent implements Event {
-    private boolean canMove;
+public class SetMovementModeEvent implements Event {
+    private MovementMode mode;
 
-    public ToggleNoneMoveEvent(boolean canMove) {
-        this.canMove = canMove;
+    public SetMovementModeEvent(MovementMode mode) {
+        this.mode = mode;
     }
 
-    public boolean canMove(){
-        return canMove;
+    public MovementMode getMode() {
+        return mode;
     }
 }
