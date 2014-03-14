@@ -145,7 +145,11 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
     @Override
     public boolean hasDelayedAction(EntityRef entity, String actionId) {
         DelayedActionComponent delayedComponent = entity.getComponent(DelayedActionComponent.class);
-        return delayedComponent.getActionIdsWakeUp().containsKey(actionId);
+        if( delayedComponent != null) {
+            return delayedComponent.getActionIdsWakeUp().containsKey(actionId);
+        }else {
+            return false;
+        }
     }
 
 }
