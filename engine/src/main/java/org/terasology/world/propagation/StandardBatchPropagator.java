@@ -238,27 +238,80 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     @Override
     public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
+        propagateSide(chunk, adjChunk, side);
+        propagateSide(adjChunk, chunk, side.reverse());
+    }
+
+    private void propagateSide(ChunkImpl chunk, ChunkImpl adjChunk, Side side) {
         Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
+
+        int edgeSize = edgeRegion.size().x * edgeRegion.size().y * edgeRegion.size().z;
+        int[] depth = new int[edgeSize];
+
         Vector3i adjPos = new Vector3i();
         for (Vector3i pos : edgeRegion) {
+            int depthIndex = getIndexFor(pos, side, edgeRegion);
             adjPos.set(pos);
             adjPos.add(chunkEdgeDeltas.get(side));
+            Block lastBlock = chunk.getBlock(pos);
+            byte expectedValue = rules.propagateValue(rules.getValue(chunk, pos), side, lastBlock);
 
-            Block block = chunk.getBlock(pos);
-            byte value = rules.getValue(chunk, pos);
-            Block adjBlock = adjChunk.getBlock(adjPos);
-            byte adjValue = rules.getValue(adjChunk, adjPos);
+            int depthCounter = 0;
+            while (expectedValue > 0 && rules.canSpreadOutOf(lastBlock, side)) {
+                Block currentBlock = adjChunk.getBlock(adjPos);
+                if (rules.canSpreadInto(currentBlock, side.reverse()) && expectedValue > rules.getValue(adjChunk, adjPos)) {
+                    lastBlock = currentBlock;
+                    rules.setValue(adjChunk, adjPos, expectedValue);
+                    adjPos.add(side.getVector3i());
+                    depthCounter++;
+                    expectedValue = rules.propagateValue(expectedValue, side, lastBlock);
+                } else {
+                    break;
+                }
+            }
+            depth[depthIndex] = depthCounter;
+        }
+        for (Vector3i pos : edgeRegion) {
+            int depthIndex = getIndexFor(pos, side, edgeRegion);
+            int adjacentDepth = depth[depthIndex];
 
-            byte expectedAdjValue = rules.propagateValue(value, side, block);
-            if (rules.canSpreadOutOf(block, side) && rules.canSpreadInto(adjBlock, side.reverse()) && adjValue < expectedAdjValue) {
-                rules.setValue(adjChunk, adjPos, expectedAdjValue);
-                queueSpreadValue(adjChunk.getBlockWorldPos(adjPos), expectedAdjValue);
+            for (Side adj : side.tangents()) {
+                adjPos.set(pos);
+                adjPos.add(adj.getVector3i());
+                if (!ChunkConstants.CHUNK_REGION.encompasses(adjPos)) {
+                    adjacentDepth = 0;
+                    break;
+                } else {
+                    adjacentDepth = Math.min(adjacentDepth, depth[getIndexFor(adjPos, side, edgeRegion)]);
+                }
             }
-            byte expectedValue = rules.propagateValue(adjValue, side.reverse(), adjBlock);
-            if (rules.canSpreadInto(block, side) && rules.canSpreadOutOf(adjBlock, side.reverse()) && value < expectedValue) {
-                rules.setValue(chunk, pos, expectedValue);
-                queueSpreadValue(chunk.getBlockWorldPos(pos), expectedValue);
+
+            for (int i = adjacentDepth; i < depth[depthIndex] - 1; ++i) {
+                adjPos.set(side.getVector3i());
+                adjPos.mult(i + 1);
+                adjPos.add(pos);
+                adjPos.add(chunkEdgeDeltas.get(side));
+                if (!ChunkConstants.CHUNK_REGION.encompasses(adjPos)) {
+                    break;
+                }
+                byte value = rules.getValue(adjChunk, adjPos);
+                if (value > 1) {
+                    queueSpreadValue(adjChunk.getBlockWorldPos(adjPos), value);
+                }
             }
+        }
+    }
+
+    private int getIndexFor(Vector3i pos, Side side, Region3i region) {
+        switch (side) {
+            case TOP:
+            case BOTTOM:
+                return pos.x + region.size().x * pos.z;
+            case LEFT:
+            case RIGHT:
+                return pos.y + region.size().y * pos.z;
+            default:
+                return pos.x + region.size().x * pos.y;
         }
     }
 

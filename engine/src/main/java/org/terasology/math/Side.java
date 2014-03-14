@@ -15,6 +15,7 @@
  */
 package org.terasology.math;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import javax.vecmath.Vector3f;
@@ -48,8 +49,17 @@ public enum Side {
     private static EnumMap<Side, Side> clockwiseRollSide;
     private static EnumMap<Side, Side> anticlockwiseRollSide;
     private static EnumMap<Side, Direction> conversionMap;
+    private static EnumMap<Side, ImmutableList<Side>> tangents;
 
     static {
+        tangents = new EnumMap<>(Side.class);
+        tangents.put(TOP, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        tangents.put(BOTTOM, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        tangents.put(LEFT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        tangents.put(RIGHT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        tangents.put(FRONT, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+        tangents.put(BACK, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+
         reverseMap = new EnumMap<>(Side.class);
         reverseMap.put(TOP, BOTTOM);
         reverseMap.put(LEFT, RIGHT);
@@ -289,4 +299,7 @@ public enum Side {
     }
 
 
+    public Iterable<Side> tangents() {
+        return tangents.get(this);
+    }
 }
