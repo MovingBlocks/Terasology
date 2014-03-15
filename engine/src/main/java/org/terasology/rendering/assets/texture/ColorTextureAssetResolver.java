@@ -16,12 +16,11 @@
 
 package org.terasology.rendering.assets.texture;
 
-import java.awt.Color;
-
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetResolver;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.rendering.nui.Color;
 
 /**
  * Resolves references to engine:color.RRGGBBAA texture assets,
