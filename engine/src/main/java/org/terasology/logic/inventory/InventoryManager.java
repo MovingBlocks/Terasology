@@ -18,6 +18,8 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.List;
+
 /**
  * @author Immortius
  */
@@ -55,4 +57,111 @@ public interface InventoryManager {
      * @return The number of slots the given entity has
      */
     int getNumSlots(EntityRef inventoryEntity);
+
+    /**
+     * Puts item into an inventory.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item);
+
+    /**
+     * Puts item into an inventory, into specified slot.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @param slot       Slot to which put the item into.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, int slot);
+
+    /**
+     * Puts item into an inventory, into specified range of slots.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @param slots      Range of slots to which put the item into.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, List<Integer> slots);
+
+    /**
+     * Removes whole stack of item from an inventory.
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param item           Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved);
+
+    /**
+     * Removes specified amount of the item from an inventory.
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param item           Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @param count          Amount of items to remove.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved, int count);
+
+    /**
+     * Removes whole stacks of item from an inventory. Items passed should be the same (indistinguishable).
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param items          Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved);
+
+    /**
+     * Removes specified amount of item from an inventory. Items passed should be the same (indistinguishable).
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param items          Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @param count          Amount of items to remove.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count);
+
+    /**
+     * Moves a specified amount of items from one inventory to another.
+     *
+     * @param fromInventory Inventory to move item from.
+     * @param instigator    Instigator of the action.
+     * @param slotFrom      Slot to move from.
+     * @param toInventory   Inventory to move item to.
+     * @param slotTo        Slot to move to.
+     * @param count         Amount of items to move.
+     * @return If the action was successful.
+     */
+    boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count);
+
+    /**
+     * Switches items in two inventories.
+     *
+     * @param fromInventory Inventory to switch item from.
+     * @param instigator    Instigator of the action.
+     * @param slotFrom      Slot to switch item from.
+     * @param toInventory   Inventory switch item to.
+     * @param slotTo        Slot to switch item to.
+     * @return If the action was successful.
+     */
+    boolean switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo);
 }

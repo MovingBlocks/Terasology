@@ -19,7 +19,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.characters.events.ToggleNoClipEvent;
+import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.health.HealthComponent;
@@ -34,7 +35,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true)
     public void ghost(EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        clientComp.character.send(new ToggleNoClipEvent());
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.GHOSTING));
     }
 
     @Command(shortDescription = "Set ground friction", runOnServer = true)

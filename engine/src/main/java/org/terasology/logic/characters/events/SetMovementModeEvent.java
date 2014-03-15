@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.characters.events;
 
-package org.terasology.logic.characters;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.logic.characters.MovementMode;
 
 /**
- * @author Immortius
+ * @author Adeon
  */
-public enum MovementMode {
-    WALKING,
-    CLIMBING,
-    SWIMMING,
-    GHOSTING,
-    NONE
+public class SetMovementModeEvent implements Event {
+    private MovementMode mode;
+
+    public SetMovementModeEvent(MovementMode mode) {
+        this.mode = mode;
+    }
+
+    public MovementMode getMode() {
+        return mode;
+    }
 }

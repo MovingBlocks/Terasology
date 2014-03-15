@@ -129,7 +129,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent health) {
         BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
         if (!beforeDamage.isConsumed()) {
-            int damageAmount = calculateTotal(beforeDamage.getBaseDamage(), beforeDamage.getMultipliers(), beforeDamage.getModifiers());
+            int damageAmount = TeraMath.floorToInt(beforeDamage.getResultValue());
             if (damageAmount > 0) {
                 doDamage(entity, damageAmount, damageType, instigator, directCause, health);
             } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
+package org.terasology.entitySystem.event;
 
-import org.terasology.entitySystem.event.Event;
+import org.terasology.network.NoReplicate;
 
-/**
- * @author Immortius
- */
-public class ToggleNoClipEvent implements Event {
+public abstract class AbstractConsumableValueModifiableEvent extends AbstractValueModifiableEvent implements ConsumableEvent {
+    @NoReplicate
+    protected boolean consumed;
+
+    protected AbstractConsumableValueModifiableEvent(float baseValue) {
+        super(baseValue);
+    }
+
+    @Override
+    public void consume() {
+        consumed = true;
+    }
+
+    @Override
+    public boolean isConsumed() {
+        return consumed;
+    }
 }
