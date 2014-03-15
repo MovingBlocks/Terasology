@@ -24,6 +24,7 @@ import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -59,7 +60,6 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         Color color = config.getPlayer().getColor();
         
         img = find("image", UIImage.class);
-        img.setImage(createTexture(10, 10, color));
 
         sliderRed = find("red", UISlider.class);
         sliderGreen = find("green", UISlider.class);
@@ -75,41 +75,25 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+        
+        updateImage();
     }
     
-    /**
-     * 
-     */
-    public void update() {
+    private void updateImage() {
         float red = sliderRed.getValue();
         float green = sliderGreen.getValue();
         float blue = sliderBlue.getValue();
 
-        Color c = new Color(red, green, blue);
+        Color color = new Color(red, green, blue);
 
-        config.getPlayer().setColor(c);
+        config.getPlayer().setColor(color);
         
-        img.setImage(createTexture(10, 10, c));
+        AssetUri uri = TextureUtil.getTextureUriForColor(color);
+        Texture tex =  (Texture) Assets.get(uri);
+
+        img.setImage(tex);
     }
 
-    private Texture createTexture(int width, int height, Color color) {
-        int size = 4 * width * height;
-
-        ByteBuffer buf = ByteBuffer.allocateDirect(size);
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                color.addToBuffer(buf);
-            }
-        }
-        buf.flip();
-
-        ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:colorPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-
-        return Assets.generateAsset(uri, texData, Texture.class);
-    }
-    
     /**
      * Calls update() in parent class when the slider value changes
      */
@@ -123,7 +107,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         public void set(Float v) {
             super.set(v);
             
-            update();
+            updateImage();
         }
     }
 }
