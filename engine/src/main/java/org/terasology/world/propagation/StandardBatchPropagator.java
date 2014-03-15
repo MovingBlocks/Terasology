@@ -251,44 +251,11 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private void propagateDepth(ChunkImpl adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
+
         int[] adjDepth = new int[depths.length];
         int dimA = (side == Side.LEFT || side == Side.RIGHT) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_X;
         int dimB = (side == Side.FRONT || side == Side.BACK) ? ChunkConstants.SIZE_Y : ChunkConstants.SIZE_Z;
-        System.arraycopy(depths, 0, adjDepth, 0, depths.length);
-
-        // x == 0, y == 0
-        adjDepth[0] = Math.min(depths[1], depths[dimA]);
-
-        // 0 < x < dimA - 1, y == 0
-        for (int x = 1; x < dimA - 1; ++x) {
-            adjDepth[x] = Math.min(depths[x - 1], Math.min(depths[x + 1], depths[x + dimA]));
-        }
-
-        // x == dimA - 1, y == 0
-        adjDepth[dimA - 1] = Math.min(depths[2 * dimA - 1], depths[dimA - 2]);
-
-        // 0 < y < dimB - 1
-        for (int y = 1; y < dimB - 1; ++y) {
-            // x == 0
-            adjDepth[y * dimA] = Math.min(depths[dimA * (y - 1)], Math.min(depths[dimA * (y + 1)], depths[1 + dimA * y]));
-            // 0 < x < dimA - 1
-            for (int x = 1; x < dimA - 1; ++x) {
-                adjDepth[x + y * dimA] = Math.min(Math.min(depths[x + (y - 1) * dimA], depths[x + (y + 1) * dimA]),
-                        Math.min(depths[x + 1 + y * dimA], depths[x - 1 + y * dimA]));
-            }
-            // x == dimA - 1
-            adjDepth[dimA - 1 + y * dimA] = Math.min(depths[dimA - 1 + dimA * (y - 1)], Math.min(depths[dimA - 1 + dimA * (y + 1)], depths[dimA - 2 + dimA * y]));
-        }
-        // x == 0, y == dimB - 1
-        adjDepth[dimA * (dimB - 1)] = Math.min(depths[1 + dimA * (dimB - 1)], depths[dimA * (dimB - 2)]);
-
-        // 0 < x < dimA - 1; y == dimB - 1
-        for (int x = 1; x < dimA - 1; ++x) {
-            adjDepth[x + dimA * (dimB - 1)] = Math.min(depths[x - 1 + dimA * (dimB - 1)], Math.min(depths[x + 1 + dimA * (dimB - 1)], depths[x + dimA * (dimB - 2)]));
-        }
-
-        // x == dimA - 1; y == dimB - 1
-        adjDepth[dimA - 1 + dimA * (dimB - 1)] = Math.min(depths[dimA - 2 + dimA * (dimB - 1)], depths[dimA - 1 + dimA * (dimB - 2)]);
+        TeraMath.populateMinAdjacent2D(depths, adjDepth, dimA, dimB, !propagateExternal);
 
         if (propagateExternal) {
             for (int y = 0; y < dimB; ++y) {
@@ -300,10 +267,11 @@ public class StandardBatchPropagator implements BatchPropagator {
                 adjDepth[x + dimA * (dimB - 1)] = 0;
             }
         }
+
         for (Vector3i pos : edgeRegion) {
             int depthIndex = indexProvider.getIndexFor(pos);
             int adjacentDepth = adjDepth[depthIndex];
-            for (int i = adjacentDepth; i < depths[depthIndex] - 1; ++i) {
+            for (int i = adjacentDepth; i < depths[depthIndex]; ++i) {
                 adjPos.set(side.getVector3i());
                 adjPos.mult(i + 1);
                 adjPos.add(pos);
@@ -340,10 +308,10 @@ public class StandardBatchPropagator implements BatchPropagator {
                         depth++;
                         expectedValue--;
                     } else {
-                        expectedValue = 0;
+                        break;
                     }
                 } else {
-                    expectedValue = 0;
+                    break;
                 }
             }
             depths[depthIndex] = depth;

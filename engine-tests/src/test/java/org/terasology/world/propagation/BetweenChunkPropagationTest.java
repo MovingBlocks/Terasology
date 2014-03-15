@@ -47,6 +47,7 @@ import org.terasology.world.propagation.light.SunlightWorldView;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Immortius
@@ -136,10 +137,44 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
         InternalLightProcessor.generateInternalLighting(bottomChunk);
 
-        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
+        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, false);
         propagator.process();
         sunlightPropagator.process();
-        assertEquals(14, bottomChunk.getSunlight(16, 47, 0));
+        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+            assertEquals(14, bottomChunk.getSunlight(16, 47, z));
+        }
+        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+            assertEquals(13, bottomChunk.getSunlight(17, 47, z));
+        }
+    }
+
+    @Test
+    public void propagateSunlightAppearingMidChunk() {
+        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+
+        provider.addChunk(topChunk);
+        provider.addChunk(bottomChunk);
+
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(pos, (byte) 0);
+            topChunk.setSunlightRegen(pos, (byte) 0);
+        }
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(8, 0, 8), new Vector3i(ChunkConstants.SIZE_X - 16, 1, ChunkConstants.SIZE_Z - 16))) {
+            topChunk.setSunlight(pos, (byte) 0);
+            topChunk.setSunlightRegen(pos, (byte) 32);
+        }
+        InternalLightProcessor.generateInternalLighting(bottomChunk);
+
+        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, false);
+        propagator.process();
+        sunlightPropagator.process();
+        for (int i = 0; i < 15; ++i) {
+            assertEquals("Incorrect value at " + (33 + i), 14 - i, bottomChunk.getSunlight(7, 33 + i, 16));
+        }
+        for (int i = 2; i < 33; ++i) {
+            assertEquals("Incorrect value at " + i, 14, bottomChunk.getSunlight(7, i, 16));
+        }
     }
 
     private static class SelectChunkProvider implements ChunkProvider {
