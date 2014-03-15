@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-uniform sampler2D diffuse;
-
-// TODO: Add normal mapping support
-//uniform sampler2D normalMap;
-
 uniform float blockLight = 1.0;
 uniform float sunlight = 1.0;
 
