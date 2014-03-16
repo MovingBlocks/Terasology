@@ -23,7 +23,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.persistence.serializers.EntitySerializer;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.EntityRefTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;

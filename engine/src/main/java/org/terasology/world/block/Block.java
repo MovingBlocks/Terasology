@@ -551,7 +551,7 @@ public final class Block {
     }
 
     public Mesh getMesh() {
-        if (mesh == null) {
+        if (mesh == null || mesh.isDisposed()) {
             generateMesh();
         }
         return mesh;
@@ -638,7 +638,7 @@ public final class Block {
         mat.setFloat("sunlight", sunlight);
         mat.setFloat("blockLight", blockLight);
 
-        if (mesh == null) {
+        if (mesh == null || mesh.isDisposed()) {
             generateMesh();
         } else if (mesh.isDisposed()) {
             logger.error("Cannot render disposed mesh");
@@ -655,9 +655,10 @@ public final class Block {
         for (BlockPart dir : BlockPart.values()) {
             BlockMeshPart part = primaryAppearance.getPart(dir);
             if (part != null) {
-                tessellator.addMeshPart(part);
                 if (doubleSided) {
-                    tessellator.addMeshPartReversed(part);
+                    tessellator.addMeshPartDoubleSided(part);
+                } else {
+                    tessellator.addMeshPart(part);
                 }
             }
         }

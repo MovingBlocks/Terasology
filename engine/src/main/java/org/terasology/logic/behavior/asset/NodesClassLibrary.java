@@ -40,7 +40,7 @@ public class NodesClassLibrary extends AbstractClassLibrary<Node> {
 
     public void scan(ModuleManager moduleManager) {
         for (Map.Entry<String, Class<? extends Node>> entry : moduleManager.findAllSubclassesOf(Node.class).entries()) {
-            logger.info("Found node class {}", entry.getValue());
+            logger.debug("Found node class {}", entry.getValue());
             register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
         }
     }

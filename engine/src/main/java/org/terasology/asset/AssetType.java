@@ -20,6 +20,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
@@ -27,6 +28,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
+import org.terasology.rendering.assets.mesh.ColladaMeshLoader;
 import org.terasology.rendering.assets.mesh.ObjMeshLoader;
 import org.terasology.rendering.assets.shader.GLSLShaderLoader;
 import org.terasology.rendering.assets.texture.PNGTextureLoader;
@@ -53,7 +55,7 @@ public enum AssetType {
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader()),
-    MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
+    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}),
     TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader()),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
@@ -101,9 +103,9 @@ public enum AssetType {
     private List<String> fileExtensions;
 
     /**
-     * An instance of the asset loader for the current asset type.
+     * An instance of the asset loaders for the current asset type.
      */
-    private AssetLoader assetLoader;
+    private List<AssetLoader> assetLoaderList;
 
     static {
         typeIdLookup = Maps.newHashMap();
@@ -127,28 +129,38 @@ public enum AssetType {
         this.typeId = typeId;
         this.subDirs = ImmutableList.of(subDir);
         this.fileExtensions = ImmutableList.of(fileExtension);
-        this.assetLoader = assetLoader;
+        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
     }
 
     private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader assetLoader) {
         this.typeId = typeId;
         this.subDirs = ImmutableList.copyOf(subDirs);
         this.fileExtensions = ImmutableList.copyOf(fileExtensions);
-        this.assetLoader = assetLoader;
+        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
     }
 
     private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader assetLoader) {
         this.typeId = typeId;
         this.subDirs = ImmutableList.of(subDir);
         this.fileExtensions = ImmutableList.copyOf(fileExtensions);
-        this.assetLoader = assetLoader;
+        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
     }
 
     private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
         this.subDirs = ImmutableList.copyOf(subDirs);
         this.fileExtensions = ImmutableList.of(fileExtension);
-        this.assetLoader = assetLoader;
+        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
+    }
+
+    /**
+     * We're going to assume that there's exactly one file extension per asset loader specified in the case of multiple asset loaders
+     */
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader[] assetLoaders) {
+        this.typeId = typeId;
+        this.subDirs = ImmutableList.of(subDir);
+        this.fileExtensions = ImmutableList.copyOf(fileExtensions);
+        this.assetLoaderList = ImmutableList.copyOf(assetLoaders);
     }
 
     public String getTypeId() {
@@ -163,11 +175,23 @@ public enum AssetType {
         return fileExtensions;
     }
 
+    public Collection<AssetLoader> getAssetLoaders() {
+        return assetLoaderList;
+    }
+
     /**
      * Returns an instance of the asset loader class assigned to this asset type.
      */
-    public AssetLoader getAssetLoader() {
-        return assetLoader;
+    public AssetLoader getAssetLoader(String fileExtension) {
+        if (1 == assetLoaderList.size()) {
+            return assetLoaderList.get(0);
+        }
+
+        int index = fileExtensions.indexOf(fileExtension);
+        if (-1 == index) {
+            throw new RuntimeException("Log an error here and maybe pick first assetLoader when I clean this up");
+        }
+        return assetLoaderList.get(index);
     }
 
     public AssetUri getUri(String sourceId, String item) {
@@ -193,12 +217,13 @@ public enum AssetType {
      */
     public static void registerAssetTypes(AssetManager assetManager) {
         for (AssetType type : AssetType.values()) {
-            AssetLoader loader = type.getAssetLoader();
-            if (loader == null) {
+            Collection<AssetLoader> loaders = type.getAssetLoaders();
+            if ((loaders == null) || (loaders.isEmpty())) {
                 continue; // No loader has been assigned to this AssetType
             }
 
             for (String extension : type.getFileExtension()) {
+                AssetLoader loader = type.getAssetLoader(extension);
                 assetManager.register(
                         type,
                         extension,

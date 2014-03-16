@@ -1,0 +1,14 @@
+{
+    "texture" : "engine:icons",
+    "textureSize" : [256, 256],
+    "grid" : {
+        "tileSize" : [9, 9],
+        "gridDimensions" : [12, 3],
+        "gridOffset" : [16, 0],
+        "tileNames" : [
+            "darkHeartOutline", "whiteHeartOutline", "redHeartOutline", "", "redHeart", "halfRedHeart", "pinkHeart", "halfPinkHeart", "blueHeart", "halfBlueHeart", "greenHeart", "halfGreenHeart",
+            "noArmor", "halfArmor", "fullArmor", "", "", "", "", "", "", "", "", "",
+            "bubble", "burstBubble", "", "", "", "", "", "", "", "", "", ""
+        ]
+    }
+}

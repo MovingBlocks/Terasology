@@ -25,12 +25,13 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateCompon
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.logic.characters.events.ToggleNoClipEvent;
+import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
@@ -98,15 +99,19 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
     }
 
     @ReceiveEvent
-    public void onToggleNoClip(ToggleNoClipEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
+    public void onSetMovementModeEvent(SetMovementModeEvent event, EntityRef character, CharacterMovementComponent movementComponent) {
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(character);
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setSequenceNumber(lastState.getSequenceNumber());
-        if (lastState.getMode() != MovementMode.GHOSTING) {
-            newState.setMode(MovementMode.GHOSTING);
+        if (event.getMode() == MovementMode.GHOSTING) {
+            if (lastState.getMode() != MovementMode.GHOSTING) {
+                newState.setMode(MovementMode.GHOSTING);
+            } else {
+                newState.setMode(MovementMode.WALKING);
+            }
         } else {
-            newState.setMode(MovementMode.WALKING);
+            newState.setMode(event.getMode());
         }
         stateBuffer.add(newState);
         CharacterStateEvent.setToState(character, newState);
@@ -114,6 +119,11 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
+        CharacterCollider characterCollider = physics.getCharacterCollider(entity);
+        if (characterCollider.isPending()) {
+            logger.debug("Skipping input, collision not yet established");
+            return;
+        }
         CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
         CharacterStateEvent lastState = stateBuffer.getLast();
         if (input.getDelta() + lastState.getTime() < time.getGameTimeInMs() + MAX_INPUT_OVERFLOW) {

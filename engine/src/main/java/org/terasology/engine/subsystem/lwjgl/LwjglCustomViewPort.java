@@ -41,8 +41,7 @@ public class LwjglCustomViewPort extends BaseLwjglSubsystem {
         try {
             Display.setParent(customViewPort);
         } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
+            throw new RuntimeException("Can not initialize graphics device.", e);
         }
     }
 

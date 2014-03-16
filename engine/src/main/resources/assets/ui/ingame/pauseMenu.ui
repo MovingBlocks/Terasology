@@ -10,7 +10,7 @@
                 "contents" : [
                     {
                         "type" : "UILabel",
-                        "text" : "Paused"
+                        "text" : "Ingame Menu"
                     },
                     {
                         "type" : "UISpace",

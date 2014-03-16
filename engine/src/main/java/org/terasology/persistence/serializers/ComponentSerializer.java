@@ -20,6 +20,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.module.Module;
@@ -27,9 +28,15 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.ReplicatedFieldMetadata;
-import org.terasology.persistence.typeSerialization.Serializer;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.DeserializationContext;
+import org.terasology.persistence.typeHandling.PersistedData;
+import org.terasology.persistence.typeHandling.Serializer;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufDeserializationContext;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufPersistedData;
+import org.terasology.persistence.typeHandling.protobuf.ProtobufSerializationContext;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.metadata.FieldMetadata;
 
 import java.util.Map;
 
@@ -52,6 +59,8 @@ public class ComponentSerializer {
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     private boolean usingFieldIds;
     private TypeSerializationLibrary typeSerializationLibrary;
+    private ProtobufSerializationContext serializationContext;
+    private ProtobufDeserializationContext deserializationContext;
 
     /**
      * Creates the component serializer.
@@ -61,6 +70,8 @@ public class ComponentSerializer {
     public ComponentSerializer(ComponentLibrary componentLibrary, TypeSerializationLibrary typeSerializationLibrary) {
         this.componentLibrary = componentLibrary;
         this.typeSerializationLibrary = typeSerializationLibrary;
+        this.serializationContext = new ProtobufSerializationContext(typeSerializationLibrary);
+        this.deserializationContext = new ProtobufDeserializationContext(typeSerializationLibrary);
     }
 
     public void setUsingFieldIds(boolean usingFieldIds) {
@@ -174,7 +185,22 @@ public class ComponentSerializer {
     private <T extends Component> Component deserializeOnto(Component targetComponent, EntityData.Component componentData,
                                                             ComponentMetadata<T> componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
-        serializer.deserializeOnto(targetComponent, componentData.getFieldList(), fieldCheck);
+        DeserializationContext context = new ProtobufDeserializationContext(typeSerializationLibrary);
+        Map<FieldMetadata<?, ?>, PersistedData> dataMap = Maps.newHashMapWithExpectedSize(componentData.getFieldCount());
+        for (EntityData.NameValue field : componentData.getFieldList()) {
+            FieldMetadata<?, ?> fieldInfo = null;
+            if (field.hasNameIndex()) {
+                fieldInfo = componentMetadata.getField(field.getNameIndex());
+            } else if (field.hasName()) {
+                fieldInfo = componentMetadata.getField(field.getName());
+            }
+            if (fieldInfo != null) {
+                dataMap.put(fieldInfo, new ProtobufPersistedData(field.getValue()));
+            } else if (field.hasNameIndex()) {
+                logger.warn("Cannot deserialize unknown field '{}' onto '{}'", field.getName(), componentMetadata.getUri());
+            }
+        }
+        serializer.deserializeOnto(targetComponent, dataMap, context, fieldCheck);
         return targetComponent;
     }
 
@@ -208,9 +234,14 @@ public class ComponentSerializer {
         Serializer serializer = typeSerializationLibrary.getSerializerFor(componentMetadata);
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (check.shouldSerializeField(field, component)) {
-                EntityData.NameValue fieldData = serializer.serializeNameValue(field, component, usingFieldIds);
-                if (fieldData != null) {
-                    componentMessage.addField(fieldData);
+                PersistedData result = serializer.serialize(field, component, serializationContext);
+                if (!result.isNull()) {
+                    EntityData.Value itemValue = ((ProtobufPersistedData) result).getValue();
+                    if (usingFieldIds) {
+                        componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(itemValue));
+                    } else {
+                        componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(itemValue));
+                    }
                 }
             }
         }
@@ -264,12 +295,13 @@ public class ComponentSerializer {
                 Object deltaValue = field.getValue(delta);
 
                 if (!Objects.equal(origValue, deltaValue)) {
-                    EntityData.Value value = serializer.serializeValue(field, deltaValue);
-                    if (value != null) {
+                    PersistedData value = serializer.serializeValue(field, deltaValue, serializationContext);
+                    if (!value.isNull()) {
+                        EntityData.Value dataValue = ((ProtobufPersistedData) value).getValue();
                         if (usingFieldIds) {
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(value).build());
+                            componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(dataValue).build());
                         } else {
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(dataValue).build());
                         }
                         changed = true;
                     }

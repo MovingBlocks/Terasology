@@ -50,7 +50,7 @@ public final class GameProvider {
                      Files.newDirectoryStream(savedGames)) {
             for (Path entry : stream) {
                 if (Files.isRegularFile(entry.resolve(GameManifest.DEFAULT_FILE_NAME))) {
-                    savedGamePaths.put(Files.getLastModifiedTime(entry), entry);
+                    savedGamePaths.put(Files.getLastModifiedTime(entry.resolve(GameManifest.DEFAULT_FILE_NAME)), entry);
                 }
             }
         } catch (IOException e) {

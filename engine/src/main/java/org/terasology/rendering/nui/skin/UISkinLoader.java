@@ -185,7 +185,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
         }
     }
 
-    private class OptionalTextureRegionTypeAdapter implements JsonDeserializer<Optional> {
+    private static class OptionalTextureRegionTypeAdapter implements JsonDeserializer<Optional> {
         @Override
         public Optional deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return Optional.fromNullable(Assets.getTextureRegion(json.getAsString()));

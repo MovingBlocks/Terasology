@@ -56,6 +56,18 @@ public class BindCommands extends BaseComponentSystem {
         return "Changed key bindings to AZERTY keyboard layout.";
     }
 
+    @Command(shortDescription = "Switches to typical keybinds for DVORAK")
+    public String dvorak() {
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:left"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
+
+        return "Changed key bindings to DVORAK keyboard layout.";
+    }
+
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")
     public String neo() {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));

@@ -120,4 +120,15 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
         return this;
     }
 
+    @Override
+    public void purge() {
+        boolean playing = this.isPlaying();
+        if (playing) {
+            alSourceStop(this.sourceId);
+            alSourceRewind(this.sourceId);
+        }
+
+        alSourcei(this.getSourceId(), AL_BUFFER, 0);
+    }
+
 }

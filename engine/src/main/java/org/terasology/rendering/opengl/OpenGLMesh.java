@@ -26,10 +26,13 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.AABB;
-import org.terasology.rendering.VertexBufferObjectManager;
+import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -54,6 +57,8 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
  * @author Immortius
  */
 public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
+    private static final Logger logger = LoggerFactory.getLogger(OpenGLMesh.class);
+
     private static final int FLOAT_SIZE = 4;
     private AABB aabb;
 
@@ -75,33 +80,34 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     private int vboIndexBuffer;
     private int indexCount;
 
-    public OpenGLMesh(AssetUri uri, MeshData data) {
+    private GLBufferPool bufferPool;
+
+    public OpenGLMesh(AssetUri uri, MeshData data, GLBufferPool bufferPool) {
         super(uri);
+        this.bufferPool = bufferPool;
         reload(data);
     }
 
     @Override
     public void reload(MeshData newData) {
-        dispose();
         buildMesh(newData);
     }
 
     @Override
     public void dispose() {
-        // TODO: Fix disposal
-        /*hasTexCoord0 = false;
+        hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;
         hasNormal = false;
         indexCount = 0;
         if (vboVertexBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboVertexBuffer);
+            bufferPool.dispose(vboVertexBuffer);
             vboVertexBuffer = 0;
         }
         if (vboIndexBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboIndexBuffer);
+            bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;
-        }  */
+        }
     }
 
     @Override
@@ -120,64 +126,80 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     public void preRender() {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        if (hasTexCoord0 || hasTexCoord1) {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
-        if (hasColor) {
-            glEnableClientState(GL_COLOR_ARRAY);
-        }
-        if (hasNormal) {
-            glEnableClientState(GL_NORMAL_ARRAY);
-        }
+        if (!isDisposed()) {
+            glEnableClientState(GL_VERTEX_ARRAY);
+            if (hasTexCoord0 || hasTexCoord1) {
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            }
+            if (hasColor) {
+                glEnableClientState(GL_COLOR_ARRAY);
+            }
+            if (hasNormal) {
+                glEnableClientState(GL_NORMAL_ARRAY);
+            }
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboVertexBuffer);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboIndexBuffer);
 
-        glVertexPointer(VERTEX_SIZE, GL11.GL_FLOAT, stride, vertexOffset);
+            glVertexPointer(VERTEX_SIZE, GL11.GL_FLOAT, stride, vertexOffset);
 
-        if (hasTexCoord0) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-            glTexCoordPointer(TEX_COORD_0_SIZE, GL11.GL_FLOAT, stride, texCoord0Offset);
-        }
+            if (hasTexCoord0) {
+                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+                glTexCoordPointer(TEX_COORD_0_SIZE, GL11.GL_FLOAT, stride, texCoord0Offset);
+            }
 
-        if (hasTexCoord1) {
-            GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-            glTexCoordPointer(TEX_COORD_1_SIZE, GL11.GL_FLOAT, stride, texCoord1Offset);
-        }
+            if (hasTexCoord1) {
+                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+                glTexCoordPointer(TEX_COORD_1_SIZE, GL11.GL_FLOAT, stride, texCoord1Offset);
+            }
 
-        if (hasColor) {
-            glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
-        }
-        if (hasNormal) {
-            glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+            if (hasColor) {
+                glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
+            }
+            if (hasNormal) {
+                glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+            }
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
         }
     }
 
     public void postRender() {
-        if (hasNormal) {
-            glDisableClientState(GL_NORMAL_ARRAY);
-        }
-        if (hasColor) {
-            glDisableClientState(GL_COLOR_ARRAY);
-        }
-        if (hasTexCoord0 || hasTexCoord1) {
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
-        glDisableClientState(GL_VERTEX_ARRAY);
+        if (!isDisposed()) {
+            if (hasNormal) {
+                glDisableClientState(GL_NORMAL_ARRAY);
+            }
+            if (hasColor) {
+                glDisableClientState(GL_COLOR_ARRAY);
+            }
+            if (hasTexCoord0 || hasTexCoord1) {
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+            }
+            glDisableClientState(GL_VERTEX_ARRAY);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public void doRender() {
-        GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        if (!isDisposed()) {
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public void render() {
-        preRender();
-        doRender();
-        postRender();
+        if (!isDisposed()) {
+            preRender();
+            doRender();
+            postRender();
+        } else {
+            logger.error("Attempted to render disposed mesh: {}", getURI());
+        }
     }
 
     public int addToBatch(Transform transform, Transform normalTransform, TFloatList vertexData, TIntList indexData, int indexOffset) {
@@ -275,8 +297,10 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             }
         }
         vertexBuffer.flip();
-        vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
+        if (vboVertexBuffer == 0) {
+            vboVertexBuffer = bufferPool.get(getURI().toSimpleString());
+        }
+        VertexBufferObjectUtil.bufferVboData(vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         vertexBuffer.flip();
     }
 
@@ -288,8 +312,10 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
         }
         indexBuffer.flip();
 
-        vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+        if (vboIndexBuffer == 0) {
+            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
+        }
+        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
         indexBuffer.flip();
     }
 

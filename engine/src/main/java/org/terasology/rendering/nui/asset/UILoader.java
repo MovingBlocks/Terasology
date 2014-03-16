@@ -45,7 +45,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.Color4fTypeHanlder;
+import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
@@ -72,6 +72,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
@@ -82,7 +83,6 @@ import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -90,6 +90,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
@@ -117,7 +118,7 @@ public class UILoader implements AssetLoader<UIData> {
         TypeSerializationLibrary library = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         library.add(BlockFamily.class, new BlockFamilyTypeHandler());
         library.add(Block.class, new BlockTypeHandler());
-        library.add(Color4f.class, new Color4fTypeHanlder());
+        library.add(Color.class, new ColorTypeHandler());
         library.add(Quat4f.class, new Quat4fTypeHandler());
         library.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         library.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
@@ -248,7 +249,8 @@ public class UILoader implements AssetLoader<UIData> {
                             LayoutHint hint = null;
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
-                                if (layoutHintType != null && childObject.has(LAYOUT_INFO_FIELD)) {
+                                if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
+                                        && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }

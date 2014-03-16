@@ -17,12 +17,11 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 
 /**
@@ -43,9 +42,6 @@ public class InitialiseSystems extends SingleStepLoadProcess {
         CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
         ComponentSystemManager csm = CoreRegistry.get(ComponentSystemManager.class);
         csm.initialise();
-        for (ComponentSystem system : csm.iterateAll()) {
-            system.preBegin();
-        }
 
         return true;
     }

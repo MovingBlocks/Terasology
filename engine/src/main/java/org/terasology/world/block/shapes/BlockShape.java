@@ -31,6 +31,11 @@ import javax.vecmath.Vector3f;
 public interface BlockShape extends Asset<BlockShapeData> {
 
     /**
+     * @return The display name for the shape - used as a suffix for blocks automatically generated using the shape.
+     */
+    String getDisplayName();
+
+    /**
      * @param part
      * @return The mesh part for the given part of the block, or null if it has none
      */

@@ -21,8 +21,10 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use InventoryManager method instead.
  */
 @API
+@Deprecated
 public class MoveItemAction implements Event {
     private EntityRef instigator;
     private EntityRef to;

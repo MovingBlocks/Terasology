@@ -28,16 +28,12 @@ import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.GameEngine;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.GUIManagerLwjgl;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
-import org.terasology.rendering.VertexBufferObjectManager;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
@@ -45,6 +41,7 @@ import org.terasology.rendering.assets.atlas.Atlas;
 import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.font.FontData;
+import org.terasology.rendering.assets.font.FontImpl;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -65,7 +62,6 @@ import org.terasology.rendering.nui.internal.LwjglCanvasRenderer;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
-import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
@@ -88,6 +84,8 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglGraphics.class);
 
+    private GLBufferPool bufferPool = new GLBufferPool(false);
+
     @Override
     public void preInitialise() {
         super.preInitialise();
@@ -95,17 +93,15 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void postInitialise(Config config) {
-        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory());
+        CoreRegistry.putPermanently(RenderingSubsystemFactory.class, new LwjglRenderingSubsystemFactory(bufferPool));
 
         LwjglDisplayDevice lwjglDisplay = new LwjglDisplayDevice();
         CoreRegistry.putPermanently(DisplayDevice.class, lwjglDisplay);
 
         initDisplay(config, lwjglDisplay);
-        initOpenGL(lwjglDisplay);
+        initOpenGL();
 
-        GameEngine engine = CoreRegistry.get(GameEngine.class);
-        CoreRegistry.putPermanently(GUIManager.class, new GUIManagerLwjgl(engine));
-        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class), new LwjglCanvasRenderer()));
+        CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(new LwjglCanvasRenderer()));
     }
 
     @Override
@@ -165,26 +161,25 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             Display.create(rc.getPixelFormat());
             Display.setVSyncEnabled(rc.isVSync());
         } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
+            throw new RuntimeException("Can not initialize graphics device.", e);
         }
     }
 
-    private void initOpenGL(LwjglDisplayDevice lwjglDisplay) {
+    private void initOpenGL() {
         checkOpenGL();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
         initOpenGLParams();
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
+        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
+            @Override
+            public Font buildAsset(AssetUri uri, FontData data) {
+                return new FontImpl(uri, data);
+            }
+        });
         assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
             @Override
             public Texture buildAsset(AssetUri uri, TextureData data) {
                 return new OpenGLTexture(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new OpenGLFont(uri, data);
             }
         });
         assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
@@ -202,13 +197,13 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data);
+                return new OpenGLMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data);
+                return new OpenGLSkeletalMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
@@ -234,8 +229,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         assetManager.addResolver(AssetType.MESH, new IconMeshResolver());
         CoreRegistry.putPermanently(ShaderManager.class, new ShaderManagerLwjgl());
         CoreRegistry.get(ShaderManager.class).initShaders();
-        VertexBufferObjectManager.getInstance();
-
     }
 
     private void checkOpenGL() {
@@ -252,7 +245,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";
             logger.error(message);
             JOptionPane.showMessageDialog(null, message, "Mandatory OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
+            throw new RuntimeException(message);
         }
 
     }

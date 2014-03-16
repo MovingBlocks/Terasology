@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
@@ -45,7 +46,10 @@ public class Game {
     private String name = "";
     private String seed = "";
 
-    public Game(EngineTime time) {
+    private TerasologyEngine terasologyEngine;
+
+    public Game(TerasologyEngine terasologyEngine, EngineTime time) {
+        this.terasologyEngine = terasologyEngine;
         this.time = time;
     }
 
@@ -65,6 +69,7 @@ public class Game {
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.preSave();
         }
+        terasologyEngine.stopThreads();
 
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
@@ -101,6 +106,8 @@ public class Game {
             }
             storageManager.shutdown();
         }
+
+        terasologyEngine.restartThreads();
 
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.postSave();

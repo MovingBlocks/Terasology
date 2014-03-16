@@ -20,5 +20,5 @@ import java.util.Map;
 import org.terasology.entitySystem.Component;
 
 public final class OrderedMapTestComponent implements Component {
-    public Map<String,Long> orderedMap;
+    public Map<String, Long> orderedMap;
 }

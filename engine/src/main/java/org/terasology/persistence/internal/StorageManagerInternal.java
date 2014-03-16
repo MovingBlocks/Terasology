@@ -432,7 +432,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 }
 
                 @Override
-                public void enact() {
+                public void run() {
                     EntityData.ChunkStore store = chunkStore.getStore();
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try (GZIPOutputStream gzipOut = new GZIPOutputStream(baos)) {

@@ -25,7 +25,6 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
@@ -54,9 +53,7 @@ public class ItemPickupSystem extends BaseComponentSystem {
     public void onBump(CollideEvent event, EntityRef entity) {
         PickupComponent pickupComponent = entity.getComponent(PickupComponent.class);
 
-        GiveItemAction action = new GiveItemAction(entity, pickupComponent.itemEntity);
-        event.getOtherEntity().send(action);
-        if (action.isConsumed()) {
+        if (inventoryManager.giveItem(event.getOtherEntity(), entity, pickupComponent.itemEntity)) {
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
             pickupComponent.itemEntity = EntityRef.NULL;
             entity.destroy();

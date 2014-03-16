@@ -116,6 +116,8 @@ public final class IconMeshFactory {
                                         newA = buffer.get((posY + newY) * stride + (posX + newX) * 4 + 3) & 255;
                                     }
                                     break;
+                                default:
+                                    break;
                             }
 
                             if (newA < alphaLimit) {

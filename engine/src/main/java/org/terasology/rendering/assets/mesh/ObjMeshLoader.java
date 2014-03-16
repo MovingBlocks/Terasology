@@ -215,7 +215,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
                         logger.warn("Skipping unsupported obj statement on line {}:\"{}\"", lineNum, line);
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new IOException(String.format("Failed to process line %d:\"%s\"", lineNum, line), e);
         }
     }

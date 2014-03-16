@@ -29,11 +29,8 @@ import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.rendering.world.ViewDistance;
@@ -78,12 +75,14 @@ public class DebugControlSystem extends BaseComponentSystem {
             config.getRendering().getDebug().setFirstPersonElementsHidden(hide);
             config.getRendering().getDebug().setHudHidden(hide);
 
-            for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                element.setVisible(!hide);
-            }
-
             event.consume();
         }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onToggleViewDistance(ToggleViewDistanceButton button, EntityRef entity) {
+        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
+        button.consume();
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -107,6 +106,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                 case Keyboard.KeyId.LEFT:
                     world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
+                    break;
+                default:
                     break;
             }
         }
@@ -138,6 +139,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
+                default:
+                    break;
             }
         }
 
@@ -150,19 +153,14 @@ public class DebugControlSystem extends BaseComponentSystem {
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
-            case Keyboard.KeyId.F:
-                toggleViewingDistance();
-                event.consume();
-                break;
             case Keyboard.KeyId.F4:
                 overlay.toggleMetricsMode();
                 event.consume();
+                break;
+            default:
                 break;
 
         }
     }
 
-    private void toggleViewingDistance() {
-        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
-    }
 }

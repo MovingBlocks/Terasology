@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory.block;
 
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -22,12 +23,13 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
@@ -41,11 +43,16 @@ import javax.vecmath.Vector3f;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockInventorySystem extends BaseComponentSystem {
 
+    @In
+    private EntityManager entityManager;
+    @In
+    private InventoryManager inventoryManager;
+
     private PickupBuilder pickupBuilder;
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
 
@@ -55,7 +62,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
         int slotCount = InventoryUtils.getSlotCount(blockEntity);
         inventoryItem.addComponent(new InventoryComponent(slotCount));
         for (int i = 0; i < slotCount; i++) {
-            blockEntity.send(new SwitchItemAction(blockEntity, i, inventoryItem, i));
+            inventoryManager.switchItem(blockEntity, blockEntity, i, inventoryItem, i);
         }
         ItemComponent itemComponent = inventoryItem.getComponent(ItemComponent.class);
         if (itemComponent != null && !itemComponent.stackId.isEmpty()) {
@@ -68,7 +75,7 @@ public class BlockInventorySystem extends BaseComponentSystem {
     public void onPlaced(OnBlockItemPlaced event, EntityRef itemEntity) {
         int slotCount = InventoryUtils.getSlotCount(itemEntity);
         for (int i = 0; i < slotCount; i++) {
-            event.getPlacedBlock().send(new SwitchItemAction(itemEntity, i, itemEntity, i));
+            inventoryManager.switchItem(event.getPlacedBlock(), itemEntity, i, itemEntity, i);
         }
     }
 

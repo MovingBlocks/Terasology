@@ -26,7 +26,6 @@ import org.terasology.logic.health.DoDestroyEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
-import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
@@ -58,7 +57,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
     @Override
     public void initialise() {
         blockItemFactory = new BlockItemFactory(entityManager);
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
         random = new FastRandom();
     }
 
@@ -134,9 +133,7 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
     }
 
     private boolean giveItem(EntityRef instigator, EntityRef dropItem) {
-        GiveItemAction giveEvent = new GiveItemAction(instigator, dropItem);
-        instigator.send(giveEvent);
-        return giveEvent.isConsumed();
+        return inventoryManager.giveItem(instigator, instigator, dropItem);
     }
 
     private void createDrop(EntityRef item, Vector3f location, boolean applyMovement) {

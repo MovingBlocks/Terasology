@@ -27,13 +27,13 @@ import org.terasology.engine.modes.GameState;
 import org.terasology.input.InputSystem;
 import org.terasology.input.lwjgl.LwjglKeyboardDevice;
 import org.terasology.input.lwjgl.LwjglMouseDevice;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 
 public class LwjglInput extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglInput.class);
+    private boolean mouseGrabbed;
 
     @Override
     public void preInitialise() {
@@ -44,16 +44,20 @@ public class LwjglInput extends BaseLwjglSubsystem {
     public void postInitialise(Config config) {
         initControls();
         updateInputConfig(config);
+        Mouse.setGrabbed(false);
     }
 
     @Override
     public void preUpdate(GameState currentState, float delta) {
-        GUIManager guiManager = CoreRegistry.get(GUIManager.class);
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         GameEngine engine = CoreRegistry.get(GameEngine.class);
 
         // TODO: this originally occurred before GameThread.processWaitingProcesses();
-        Mouse.setGrabbed(engine.hasMouseFocus() && !(nuiManager.isReleasingMouse() || guiManager.isReleasingMouse()));
+        boolean newGrabbed = engine.hasMouseFocus() && !(nuiManager.isReleasingMouse());
+        if (newGrabbed != mouseGrabbed) {
+            Mouse.setGrabbed(newGrabbed);
+            mouseGrabbed = newGrabbed;
+        }
     }
 
     @Override
@@ -80,8 +84,7 @@ public class LwjglInput extends BaseLwjglSubsystem {
             inputSystem.setMouseDevice(new LwjglMouseDevice());
             inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
         } catch (LWJGLException e) {
-            logger.error("Could not initialize controls.", e);
-            System.exit(1);
+            throw new RuntimeException("Could not initialize controls.", e);
         }
     }
 

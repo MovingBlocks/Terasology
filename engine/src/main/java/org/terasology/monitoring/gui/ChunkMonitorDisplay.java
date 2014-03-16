@@ -43,6 +43,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -89,8 +90,8 @@ public class ChunkMonitorDisplay extends JPanel {
     private Vector3i selectedChunk;
 
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
-    private final ExecutorService executor;
-    private final Runnable renderTask;
+    private final transient ExecutorService executor;
+    private final transient Runnable renderTask;
 
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
         Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");

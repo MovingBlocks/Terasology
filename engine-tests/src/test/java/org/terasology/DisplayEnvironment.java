@@ -28,6 +28,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -37,8 +38,6 @@ import org.terasology.rendering.ShaderManagerLwjgl;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationImpl;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontData;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -53,7 +52,6 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.opengl.GLSLMaterial;
 import org.terasology.rendering.opengl.GLSLShader;
-import org.terasology.rendering.opengl.OpenGLFont;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.opengl.OpenGLTexture;
@@ -73,6 +71,8 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
  * @author Martin Steiger
  */
 public class DisplayEnvironment extends HeadlessEnvironment {
+
+    private GLBufferPool bufferPool = new GLBufferPool(true);
     
     @Override
     protected void setupDisplay() {
@@ -118,12 +118,6 @@ public class DisplayEnvironment extends HeadlessEnvironment {
                 return new OpenGLTexture(uri, data);
             }
         });
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new OpenGLFont(uri, data);
-            }
-        });
         assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
             @Override
             public Shader buildAsset(AssetUri uri, ShaderData data) {
@@ -139,13 +133,13 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data);
+                return new OpenGLMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data);
+                return new OpenGLSkeletalMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {

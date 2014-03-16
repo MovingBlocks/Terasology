@@ -44,6 +44,9 @@ public class SubtextureFromAtlasResolver implements AssetResolver<Subtexture, Su
         String[] parts = uri.getAssetName().split("\\.", 2);
         if (parts.length == 2) {
             Atlas atlas = Assets.get(new AssetUri(AssetType.ATLAS, uri.getModuleName(), parts[0]), Atlas.class);
+            if (atlas == null) {
+                return null;
+            }
             return atlas.getSubtexture(parts[1]);
         }
         return null;

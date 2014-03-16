@@ -1,10 +1,12 @@
 {
     "type" : "HudToolbar",
+    "skin" : "HUD",
     "contents" : {
         "type" : "relativeLayout",
         "contents" : [
             {
                 "type" : "flowLayout",
+                "id" : "toolbar",
                 "contents" : [
                     {
                         "type" : "InventoryCell",
@@ -54,6 +56,70 @@
                     "position-bottom" : {
                         "target" : "BOTTOM"
                     }
+                }
+            },
+            {
+                "type" : "UIIconBar",
+                "id" : "healthBar",
+                "family" : "healthBar",
+                "icon" : "engine:icons.redHeart",
+                "halfIconMode" : "split",
+                "spacing" : 2,
+                "maxIcons" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-right" : {
+                        "target" : "CENTER"
+                    },
+                    "position-left" : {
+                        "target" : "LEFT",
+                        "widget" : "toolbar"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "toolbar",
+                        "offset" : 1
+                    }
+                }
+            },
+            {
+                "type" : "UIIconBar",
+                "id" : "breathBar",
+                "icon" : "engine:icons.bubble",
+                "family" : "breathBar",
+                "emptyIcon" : "engine:icons.burstBubble",
+                "halfIconMode" : "shrink",
+                "spacing" : 2,
+                "maxIcons" : 10,
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-left" : {
+                        "target" : "CENTER"
+                    },
+                    "position-right" : {
+                        "target" : "RIGHT",
+                        "widget" : "toolbar"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "toolbar",
+                        "offset" : 1
+                    }
+                }
+            },
+            {
+                "type" : "UICrosshair",
+                "id" : "crosshair",
+                "crosshairIcon" : "engine:gui.crosshair",
+                "chargeStages" : ["engine:gui.crosshairCharge1","engine:gui.crosshairCharge2","engine:gui.crosshairCharge3","engine:gui.crosshairCharge4",
+                                  "engine:gui.crosshairCharge5","engine:gui.crosshairCharge6","engine:gui.crosshairCharge7","engine:gui.crosshairCharge8"],
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-center" : {}
                 }
             }
         ]

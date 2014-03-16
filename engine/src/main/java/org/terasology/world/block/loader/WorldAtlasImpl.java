@@ -16,9 +16,11 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.math.IntMath;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TObjectIntProcedure;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +29,16 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.assets.atlas.Atlas;
+import org.terasology.rendering.assets.atlas.AtlasData;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
@@ -46,6 +52,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -197,6 +204,34 @@ public class WorldAtlasImpl implements WorldAtlas {
         terrainMatData.setParam("colorOffset", new float[]{1, 1, 1});
         terrainMatData.setParam("textured", true);
         Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMatData, Material.class);
+
+        createTextureAtlas(terrainTex);
+    }
+
+    private void createTextureAtlas(final Texture texture) {
+        final Map<String, Map<String, SubtextureData>> textureAtlases = Maps.newHashMap();
+        final Vector2f texSize = new Vector2f(getRelativeTileSize(), getRelativeTileSize());
+        tileIndexes.forEachEntry(new TObjectIntProcedure<AssetUri>() {
+            @Override
+            public boolean execute(AssetUri tileUri, int index) {
+                Vector2f coords = getTexCoords(index);
+                SubtextureData subtextureData = new SubtextureData(texture, Rect2f.createFromMinAndSize(coords, texSize));
+
+                Map<String, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getNormalisedModuleName());
+                if (textureAtlas == null) {
+                    textureAtlas = Maps.newHashMap();
+                    textureAtlases.put(tileUri.getNormalisedModuleName(), textureAtlas);
+                }
+                textureAtlas.put(tileUri.getAssetName(), subtextureData);
+
+                return true;
+            }
+        });
+
+        for (Map.Entry<String, Map<String, SubtextureData>> atlas : textureAtlases.entrySet()) {
+            AtlasData data = new AtlasData(atlas.getValue());
+            Assets.generateAsset(new AssetUri(AssetType.ATLAS, atlas.getKey(), "terrain"), data, Atlas.class);
+        }
     }
 
     private ByteBuffer[] createAtlasMipmaps(int numMipMaps, Color initialColor, List<TileData> tileImages, String screenshotName) {

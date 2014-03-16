@@ -74,16 +74,5 @@ public final class BlockParticleEffectComponent implements Component {
         public Vector2f texOffset = new Vector2f(0, 0);
         public Vector2f texSize = new Vector2f(1, 1);
         public Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-        public Particle clone() {
-            Particle particle = new Particle();
-            particle.velocity.set(velocity);
-            particle.position.set(position);
-            particle.size = size;
-            particle.lifeRemaining = lifeRemaining;
-            particle.texOffset.set(texOffset);
-            particle.texSize.set(texSize);
-            return particle;
-        }
     }
 }

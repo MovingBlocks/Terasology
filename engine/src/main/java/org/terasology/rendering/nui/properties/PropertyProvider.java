@@ -147,6 +147,18 @@ public class PropertyProvider<T> {
                     fieldMetadata.setValue(target, value);
                 }
             };
+        } else if (type == Double.class || type == double.class) {
+            return new Binding<Float>() {
+                @Override
+                public Float get() {
+                    return ((Double) fieldMetadata.getValueChecked(target)).floatValue();
+                }
+
+                @Override
+                public void set(Float value) {
+                    fieldMetadata.setValue(target, value.doubleValue());
+                }
+            };
         } else {
             throw new IllegalArgumentException("Cannot create Binding<Float> for a field of type " + type);
         }

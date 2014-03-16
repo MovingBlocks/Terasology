@@ -62,8 +62,7 @@ public class LwjglDisplayDevice implements DisplayDevice {
                 Display.setResizable(true);
             }
         } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
+            throw new RuntimeException("Can not initialize graphics device.", e);
         }
         if (resize) {
             glViewport(0, 0, Display.getWidth(), Display.getHeight());

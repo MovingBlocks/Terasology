@@ -38,13 +38,9 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.reflection.metadata.ClassLibrary;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.config.Config;
 import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
@@ -76,8 +72,12 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.NetData;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
@@ -214,18 +214,20 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         for (Client client : clientList) {
             processRemovedClient(client);
         }
-        mode = NetworkMode.NONE;
         server = null;
         nextNetId = 1;
         netIdToEntityId.clear();
-        if (this.entityManager != null) {
-            for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
-                NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                netComp.setNetworkId(0);
-                entity.saveComponent(netComp);
+        if (mode != NetworkMode.CLIENT) {
+            if (this.entityManager != null) {
+                for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
+                    NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                    netComp.setNetworkId(0);
+                    entity.saveComponent(netComp);
+                }
+                this.entityManager.unsubscribe(this);
             }
-            this.entityManager.unsubscribe(this);
         }
+        mode = NetworkMode.NONE;
         entityManager = null;
         entitySystemLibrary = null;
         eventSerializer = null;
@@ -349,24 +351,25 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         server.setRemoteWorldProvider(remoteWorldProvider);
     }
 
+    public void registerClientNetworkEntity(int netId, int entityId) {
+        int oldId = netIdToEntityId.put(netId, entityId);
+        if (oldId != NULL_NET_ID && oldId != entityId) {
+            logger.error("Registered duplicate network id: {}", netId);
+        } else {
+            logger.debug("Registered Network Entity: {}", netId);
+        }
+    }
+
     public void registerNetworkEntity(EntityRef entity) {
         if (mode == NetworkMode.NONE) {
             return;
         }
 
-        NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
         if (mode == NetworkMode.SERVER) {
+            NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
             netComponent.setNetworkId(nextNetId++);
             entity.saveComponent(netComponent);
-        }
-
-        logger.debug("Registered Network Entity: {}", entity);
-
-        if (NULL_NET_ID != netIdToEntityId.put(netComponent.getNetworkId(), entity.getId())) {
-            logger.error("Registered duplicate network id");
-        }
-
-        if (mode == NetworkMode.SERVER) {
+            netIdToEntityId.put(netComponent.getNetworkId(), entity.getId());
             switch (netComponent.replicateMode) {
                 case OWNER:
                     NetClient clientPlayer = getNetOwner(entity);
@@ -450,18 +453,24 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
+    public void unregisterClientNetworkEntity(int netId) {
+        netIdToEntityId.remove(netId);
+    }
+
     public void unregisterNetworkEntity(EntityRef entity) {
-        NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
-        if (netComponent != null) {
-            logger.debug("Unregistering network entity: {} with netId {}", entity, netComponent.getNetworkId());
-            netIdToEntityId.remove(netComponent.getNetworkId());
-            if (mode == NetworkMode.SERVER) {
-                for (NetClient client : netClientList) {
-                    client.setNetRemoved(netComponent.getNetworkId());
+        if (mode != NetworkMode.CLIENT) {
+            NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
+            if (netComponent != null) {
+                logger.debug("Unregistering network entity: {} with netId {}", entity, netComponent.getNetworkId());
+                netIdToEntityId.remove(netComponent.getNetworkId());
+                if (mode == NetworkMode.SERVER) {
+                    for (NetClient client : netClientList) {
+                        client.setNetRemoved(netComponent.getNetworkId());
+                    }
                 }
+                netComponent.setNetworkId(NULL_NET_ID);
+                entity.saveComponent(netComponent);
             }
-            netComponent.setNetworkId(NULL_NET_ID);
-            entity.saveComponent(netComponent);
         }
         ownerLookup.remove(entity);
     }
@@ -489,6 +498,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
+            entityManager.setEntityRefStrategy(new NetworkClientRefStrategy(this));
             applySerializationTables();
         }
 
@@ -558,6 +568,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                     if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getClientEntity())) {
                         server.setComponentDirty(netComp.getNetworkId(), component);
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -653,10 +665,22 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    EntityRef getEntity(int netId) {
-        int entityId = netIdToEntityId.get(netId);
-        if (entityId != 0) {
-            return entityManager.getEntity(entityId);
+    int getEntityId(int netId) {
+        return netIdToEntityId.get(netId);
+    }
+
+    public EntityRef getEntity(int netId) {
+        if (mode == NetworkMode.CLIENT) {
+            if (entityManager != null) {
+                return new NetEntityRef(netId, this, entityManager);
+            } else {
+                logger.error("Requesting entity before entity manager set up");
+            }
+        } else {
+            int entityId = netIdToEntityId.get(netId);
+            if (entityManager != null && entityId != NULL_NET_ID) {
+                return entityManager.getEntity(entityId);
+            }
         }
         return EntityRef.NULL;
     }

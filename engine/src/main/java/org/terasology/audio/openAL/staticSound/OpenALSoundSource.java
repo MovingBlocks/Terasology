@@ -135,4 +135,18 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
         return this;
     }
+
+    @Override
+    public void purge() {
+        boolean playing = isPlaying();
+        if (playing) {
+            stop();
+        }
+
+        reset();
+
+        audio = null;
+        AL10.alSourcei(getSourceId(), AL10.AL_BUFFER, 0);
+        OpenALException.checkState("Clearing source");
+    }
 }

@@ -23,11 +23,6 @@ import org.terasology.engine.SimpleUri;
  */
 public class WorldGenerationConfig {
     private String worldTitle = "New World";
-    private float forestGrassDensity = 0.3f;
-    private float plainsGrassDensity = 0.2f;
-    private float snowGrassDensity = 0.001f;
-    private float mountainGrassDensity = 0.2f;
-    private float desertGrassDensity = 0.001f;
     private String defaultSeed = "Terasology";
 
     private SimpleUri defaultGenerator = new SimpleUri("core:perlin");

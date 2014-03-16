@@ -185,10 +185,22 @@ public class BlockLoader implements BlockBuilderHelper {
             def.shape = (shape.getURI().toSimpleString());
             if (shape.isCollisionYawSymmetric()) {
                 Block block = constructSingleBlock(blockDefUri, def);
+                if (block.getDisplayName().isEmpty()) {
+                    block.setDisplayName(shape.getDisplayName());
+                } else if (!shape.getDisplayName().isEmpty()) {
+                    block.setDisplayName(block.getDisplayName() + " " + shape.getDisplayName());
+                }
                 return new SymmetricFamily(uri, block, def.categories);
             } else {
                 Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                 constructHorizontalBlocks(blockDefUri, def, blockMap);
+                for (Block block : blockMap.values()) {
+                    if (block.getDisplayName().isEmpty()) {
+                        block.setDisplayName(shape.getDisplayName());
+                    } else if (!shape.getDisplayName().isEmpty()) {
+                        block.setDisplayName(block.getDisplayName() + " " + shape.getDisplayName());
+                    }
+                }
                 return new HorizontalBlockFamily(uri, blockMap, def.categories);
             }
         } catch (Exception e) {
@@ -525,6 +537,10 @@ public class BlockLoader implements BlockBuilderHelper {
         if (jsonObj.has("right")) {
             T value = context.deserialize(jsonObj.get("right"), type);
             target.put(BlockPart.RIGHT, value);
+        }
+        if (jsonObj.has("center")) {
+            T value = context.deserialize(jsonObj.get("center"), type);
+            target.put(BlockPart.CENTER, value);
         }
     }
 

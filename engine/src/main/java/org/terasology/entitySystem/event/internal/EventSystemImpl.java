@@ -297,7 +297,8 @@ public class EventSystemImpl implements EventSystem {
                 case SERVER:
                     sendEventToServer(entity, event);
                     break;
-
+                default:
+                    break;
             }
         }
     }
@@ -348,7 +349,9 @@ public class EventSystemImpl implements EventSystem {
         } else {
             SetMultimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
             if (handlers != null) {
-                for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
+                List<EventHandlerInfo> eventHandlers = Lists.newArrayList(handlers.get(component.getClass()));
+                Collections.sort(eventHandlers, priorityComparator);
+                for (EventHandlerInfo eventHandler : eventHandlers) {
                     if (eventHandler.isValidFor(entity)) {
                         eventHandler.invoke(entity, event);
                     }

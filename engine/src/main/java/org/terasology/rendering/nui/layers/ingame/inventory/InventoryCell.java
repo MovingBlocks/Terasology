@@ -22,10 +22,9 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.action.MoveItemAction;
-import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
@@ -55,6 +54,7 @@ public class InventoryCell extends CoreWidget {
     private ItemIcon icon = new ItemIcon();
 
     private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+    private InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
         @Override
@@ -76,10 +76,10 @@ public class InventoryCell extends CoreWidget {
 
             //move item to the transfer slot
             if (wheelTurns > 0) {
-                takeAmount(amount);
+                giveAmount(amount);
             } else {
                 //get item from transfer slot
-                giveAmount(amount);
+                takeAmount(amount);
             }
             return true;
         }
@@ -101,7 +101,7 @@ public class InventoryCell extends CoreWidget {
             public TextureRegion get() {
                 if (getTargetItem().exists()) {
                     ItemComponent itemComp = getTargetItem().getComponent(ItemComponent.class);
-                    if (itemComp != null) {
+                    if (itemComp != null && itemComp.icon != null) {
                         return itemComp.icon;
                     }
                     BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
@@ -137,6 +137,8 @@ public class InventoryCell extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
+        getTargetItem().send(new BeforeInventoryCellRendered(canvas));
+
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         canvas.drawWidget(icon);
 
@@ -202,15 +204,15 @@ public class InventoryCell extends CoreWidget {
     }
 
     private void swapItem() {
-        getTransferEntity().send(new SwitchItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot()));
+        inventoryManager.switchItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot());
     }
 
     private void giveAmount(int amount) {
-        getTargetInventory().send(new MoveItemAction(localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount));
+        inventoryManager.moveItem(getTargetInventory(), localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount);
     }
 
     private void takeAmount(int amount) {
-        getTransferEntity().send(new MoveItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount));
+        inventoryManager.moveItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
     }
 
     private EntityRef getTransferEntity() {

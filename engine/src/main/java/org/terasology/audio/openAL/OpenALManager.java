@@ -295,4 +295,10 @@ public class OpenALManager implements AudioManager {
             }
         };
     }
+
+    public void purgeSound(Sound sound) {
+        for (SoundPool pool : pools.values()) {
+            pool.purge(sound);
+        }
+    }
 }

@@ -23,12 +23,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.sources.AssetSourceCollection;
 import org.terasology.engine.API;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.persistence.ModuleContext;
 
 import java.io.IOException;
@@ -223,6 +225,13 @@ public class AssetManager {
         return loadAsset(uri, true);
     }
 
+    public void reload(Asset asset) {
+        AssetData data = loadAssetData(asset.getURI(), false);
+        if (data != null) {
+            asset.reload(data);
+        }
+    }
+
     public <T extends Asset> T loadAsset(AssetUri uri, Class<T> assetClass) {
         Asset result = loadAsset(uri, true);
         if (assetClass.isInstance(result)) {
@@ -297,7 +306,7 @@ public class AssetManager {
         for (AssetResolver resolver : resolvers.get(uri.getAssetType())) {
             Asset result = resolver.resolve(uri, factory);
             if (result != null) {
-                assetCache.put(uri, asset);
+                assetCache.put(uri, result);
                 return result;
             }
         }
@@ -318,26 +327,31 @@ public class AssetManager {
         return asset;
     }
 
-    public void clear() {
-        Iterator<Asset> iterator = assetCache.values().iterator();
-        while (iterator.hasNext()) {
-            Asset asset = iterator.next();
-            if (asset instanceof Prefab) {
-                asset.dispose();
-                iterator.remove();
+    public void refresh() {
+        List<Asset> keepAndReload = Lists.newArrayList();
+        List<Asset> dispose = Lists.newArrayList();
+
+        for (Asset asset : assetCache.values()) {
+            if (asset.getURI().getNormalisedModuleName().equals(TerasologyConstants.ENGINE_MODULE) && !(asset instanceof Prefab) && !(asset instanceof BehaviorTree)) {
+                keepAndReload.add(asset);
+            } else {
+                dispose.add(asset);
             }
         }
-        // TODO: Fix disposal
-//        Iterator<Asset> iterator = assetCache.values().iterator();
-//        while (iterator.hasNext()) {
-//            Asset asset = iterator.next();
-//
-//            // Don't dispose engine assets, all sorts of systems have references to them
-//            if (!asset.getURI().getModuleName().equals(ModuleManager.ENGINE_MODULE)) {
-//                asset.dispose();
-//                iterator.remove();
-//            }
-//        }
+        assetCache.clear();
+
+        for (Asset asset : keepAndReload) {
+            assetCache.put(asset.getURI(), asset);
+        }
+
+        for (Asset asset : keepAndReload) {
+            reload(asset);
+        }
+
+        for (Asset asset : dispose) {
+            logger.debug("Disposing {}", asset.getURI());
+            asset.dispose();
+        }
     }
 
     public void dispose(Asset asset) {
@@ -353,7 +367,7 @@ public class AssetManager {
         }
         Asset asset = assetCache.get(uri);
         if (asset != null) {
-            logger.info("Reloading {} with newly generated data", uri);
+            logger.debug("Reloading {} with newly generated data", uri);
             asset.reload(data);
         } else {
             asset = assetFactory.buildAsset(uri, data);
@@ -368,9 +382,17 @@ public class AssetManager {
         return generateAsset(new AssetUri(type, "temp", UUID.randomUUID().toString()), data);
     }
 
-    public void addAssetSource(AssetSource source) {
-        assetSources.put(source.getSourceId().toLowerCase(Locale.ENGLISH), source);
-        for (AssetUri asset : source.list()) {
+    public void addAssetSource(AssetSource newSource) {
+        String idKey = newSource.getSourceId().toLowerCase(Locale.ENGLISH);
+        AssetSource originalSource = assetSources.get(idKey);
+        if (null == originalSource) {
+            assetSources.put(idKey, newSource);
+        } else {
+            AssetSourceCollection combinedSource = new AssetSourceCollection(idKey, originalSource, newSource);
+            assetSources.put(idKey, combinedSource);
+        }
+        // only need to add entries from new source
+        for (AssetUri asset : newSource.list()) {
             uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
         }
     }

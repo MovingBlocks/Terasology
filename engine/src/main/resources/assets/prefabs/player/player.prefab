@@ -8,13 +8,13 @@
         "replicateMode" : "ALWAYS"
     },
     "Health" : {
-        "currentHealth" : 255,
-        "maxHealth" : 255,
+        "currentHealth" : 100,
+        "maxHealth" : 100,
         "regenRate" : 3,
         "waitBeforeRegen" : 10,
-        "excessSpeedDamageMultiplier" : 20,
-        "fallingDamageSpeedThreshold" : 15,
-        "horizontalDamageSpeedThreshold" : 100
+        "excessSpeedDamageMultiplier" : 5,
+        "fallingDamageSpeedThreshold" : 18,
+        "horizontalDamageSpeedThreshold" : 50
     },
     "CharacterMovement" : {
         "groundFriction" : 16,

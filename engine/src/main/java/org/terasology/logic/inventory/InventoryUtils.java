@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
@@ -22,6 +23,11 @@ import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
 import org.terasology.registry.CoreRegistry;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -76,14 +82,62 @@ public final class InventoryUtils {
             return true;
         }
 
-        if (!isSameItem(itemFrom, itemTo)) {
+        return isSameItem(from, to) && itemFrom.stackCount + itemTo.stackCount <= itemFrom.maxStackSize;
+    }
+
+    public static boolean isSameItem(EntityRef item1, EntityRef item2) {
+        ItemComponent itemComp1 = item1.getComponent(ItemComponent.class);
+        ItemComponent itemComp2 = item2.getComponent(ItemComponent.class);
+
+        if (itemComp1 == null || itemComp2 == null) {
             return false;
         }
 
-        return itemFrom.stackCount + itemTo.stackCount <= itemFrom.maxStackSize;
+        if (!isSameStackId(itemComp1, itemComp2)) {
+            return false;
+        }
+
+        if (!hasSameAttributes(item1, item2)) {
+            return false;
+        }
+
+        return true;
     }
 
-    public static boolean isSameItem(ItemComponent item1, ItemComponent item2) {
+    private static boolean hasSameAttributes(EntityRef from, EntityRef to) {
+        Set<Component> differentiatingComponentsFrom = new HashSet<>();
+        for (Component component : from.iterateComponents()) {
+            if (component.getClass().getAnnotation(ItemDifferentiating.class) != null) {
+                differentiatingComponentsFrom.add(component);
+            }
+        }
+
+        Map<Class<?>, Component> differentiatingComponentsTo = new HashMap<>();
+        for (Component component : to.iterateComponents()) {
+            if (component.getClass().getAnnotation(ItemDifferentiating.class) != null) {
+                differentiatingComponentsTo.put(component.getClass(), component);
+            }
+        }
+
+        if (differentiatingComponentsFrom.size() != differentiatingComponentsTo.size()) {
+            return false;
+        }
+
+        for (Component component : differentiatingComponentsFrom) {
+            Component componentInTarget = differentiatingComponentsTo.get(component.getClass());
+            if (componentInTarget == null) {
+                return false;
+            }
+
+            if (!component.equals(componentInTarget)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isSameStackId(ItemComponent item1, ItemComponent item2) {
         if (item1.stackId == null || item1.stackId.isEmpty() || item2.stackId == null || item2.stackId.isEmpty()) {
             return false;
         }
@@ -135,7 +189,7 @@ public final class InventoryUtils {
         ItemComponent itemFrom = InventoryUtils.getItemAt(from, slotFrom).getComponent(ItemComponent.class);
         ItemComponent itemTo = InventoryUtils.getItemAt(to, slotTo).getComponent(ItemComponent.class);
 
-        if (itemFrom == null || (itemTo != null && !InventoryUtils.isSameItem(itemFrom, itemTo))) {
+        if (itemFrom == null || (itemTo != null && !InventoryUtils.isSameStackId(itemFrom, itemTo))) {
             return false;
         }
         int countOnFrom = itemFrom.stackCount;
@@ -244,8 +298,8 @@ public final class InventoryUtils {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         EntityRef oldItem = inventory.itemSlots.get(slot);
         inventory.itemSlots.set(slot, item);
-        entity.send(new InventorySlotChangedEvent(slot, oldItem, item));
         entity.saveComponent(inventory);
+        entity.send(new InventorySlotChangedEvent(slot, oldItem, item));
     }
 
     static void adjustStackSize(EntityRef entity, int slot, int newCount) {
@@ -254,7 +308,7 @@ public final class InventoryUtils {
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);
         byte oldSize = itemComponent.stackCount;
         itemComponent.stackCount = (byte) newCount;
-        entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
         item.saveComponent(itemComponent);
+        entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
     }
 }

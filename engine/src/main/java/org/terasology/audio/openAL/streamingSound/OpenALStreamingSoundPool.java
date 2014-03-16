@@ -31,4 +31,5 @@ public class OpenALStreamingSoundPool extends BaseSoundPool {
     protected SoundSource createSoundSource() {
         return new OpenALStreamingSoundSource(this);
     }
+
 }

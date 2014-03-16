@@ -109,7 +109,7 @@ public class DrowningSystem extends BaseComponentSystem implements UpdateSubscri
     private void setBreathing(boolean isBreathing, DrowningComponent drowning, DrownsComponent drowns) {
         long gameTime = time.getGameTimeInMs();
         // if this is a new drowning component, set to 0% so that it starts from the current time
-        float currentPercentage = drowning.startTime != 0 ? drowning.getPercentageBreath(gameTime) : 1f;
+        float currentPercentage = drowning.startTime != 0 ? drowning.getRemainingBreath(gameTime) : 1f;
         if (!isBreathing) {
             currentPercentage = 1f - currentPercentage;
         }

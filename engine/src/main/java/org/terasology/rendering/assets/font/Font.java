@@ -26,8 +26,6 @@ import java.util.List;
  */
 public interface Font extends Asset<FontData> {
 
-    void drawString(int x, int y, String text, org.newdawn.slick.Color color);
-
     int getWidth(String text);
 
     int getWidth(Character c);

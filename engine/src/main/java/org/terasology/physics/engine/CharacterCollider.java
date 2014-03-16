@@ -26,6 +26,8 @@ import javax.vecmath.Vector3f;
  */
 public interface CharacterCollider {
 
+    boolean isPending();
+
     /**
      * Retrieves the location of this collider.
      *

@@ -78,7 +78,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
     }
 
     @Override
-    public void initialise() {
+    public void postBegin() {
         refreshLibrary();
     }
 
@@ -134,12 +134,13 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         Collection<Prefab> prefabs = prefabManager.listPrefabs(BehaviorNodeComponent.class);
         for (Prefab prefab : prefabs) {
             EntityRef entityRef = entityManager.create(prefab);
+            entityRef.setPersistent(false);
             BehaviorNodeComponent component = entityRef.getComponent(BehaviorNodeComponent.class);
             ClassMetadata<? extends Node, ?> classMetadata = nodesClassLibrary.resolve(component.type);
             if (classMetadata != null) {
                 if (classMetadata.isConstructable()) {
                     nodes.put(classMetadata, component);
-                    logger.info("Found behavior node for class " + component.type + " name=" + component.name);
+                    logger.debug("Found behavior node for class " + component.type + " name=" + component.name);
                     List<BehaviorNodeComponent> list = categoryComponents.get(component.category);
                     if (list == null) {
                         list = Lists.newArrayList();

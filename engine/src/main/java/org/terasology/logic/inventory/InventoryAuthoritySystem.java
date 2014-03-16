@@ -31,116 +31,189 @@ import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
 import org.terasology.logic.inventory.events.MoveItemAmountRequest;
 import org.terasology.logic.inventory.events.MoveItemRequest;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class InventoryAuthoritySystem extends BaseComponentSystem {
+@Share(value = {InventoryManager.class})
+public class InventoryAuthoritySystem extends BaseComponentSystem implements InventoryManager {
     @In
     private EntityManager entityManager;
 
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @ReceiveEvent(components = {InventoryComponent.class})
     public void switchItem(SwitchItemAction event, EntityRef entity) {
-        InventoryUtils.moveItem(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo());
+        switchItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo());
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void moveItem(MoveItemAction event, EntityRef entity) {
-        InventoryUtils.moveItemAmount(event.getInstigator(), entity, event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
+        moveItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void removeItem(RemoveItemAction event, EntityRef entity) {
-        ItemComponent itemToRemove = event.getItem().getComponent(ItemComponent.class);
-        if (itemToRemove == null) {
-            event.consume();
-            return;
-        }
-
-        int slotWithItem = InventoryUtils.getSlotWithItem(entity, event.getItem());
-        if (slotWithItem == -1) {
-            return;
-        }
-
-        Integer count = event.getCount();
-        if (count != null) {
-            if (count > itemToRemove.stackCount) {
-                return;
+        final EntityRef result = removeItemInternal(entity, event.getInstigator(), event.getItems(), event.isDestroyRemoved(), event.getCount());
+        if (result != null) {
+            if (result != EntityRef.NULL) {
+                event.setRemovedItem(result);
             }
+            event.consume();
         }
+    }
 
-        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(event.getInstigator(), event.getItem(), slotWithItem);
-        entity.send(removeFrom);
-        if (removeFrom.isConsumed()) {
-            return;
-        }
+    private EntityRef removeItemFromSlots(EntityRef instigator, boolean destroyRemoved, EntityRef entity, List<Integer> slotsWithItem, int toRemove) {
+        int shrinkSlotNo = -1;
+        int shrinkCountResult = 0;
 
-        if (count == null || count == itemToRemove.stackCount) {
-            InventoryUtils.putItemIntoSlot(entity, EntityRef.NULL, slotWithItem);
+        List<Integer> slotsTotallyConsumed = new LinkedList<>();
 
-            if (event.isDestroyRemoved()) {
-                event.getItem().destroy();
+        int removesRemaining = toRemove;
+        for (int slot : slotsWithItem) {
+            EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
+            ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
+            if (itemAt.stackCount <= removesRemaining) {
+                if (canRemoveItemFromSlot(instigator, entity, itemAtEntity, slot)) {
+                    slotsTotallyConsumed.add(slot);
+                    removesRemaining -= itemAt.stackCount;
+                }
             } else {
-                event.setRemovedItem(event.getItem());
-            }
-            event.consume();
-        } else {
-            if (!event.isDestroyRemoved()) {
-                EntityRef copy = entityManager.copy(event.getItem());
-                ItemComponent copyItem = copy.getComponent(ItemComponent.class);
-                copyItem.stackCount = count.byteValue();
-                copy.saveComponent(copyItem);
-
-                event.setRemovedItem(copy);
+                shrinkSlotNo = slot;
+                shrinkCountResult = itemAt.stackCount - removesRemaining;
+                removesRemaining = 0;
             }
 
-            InventoryUtils.adjustStackSize(entity, slotWithItem, itemToRemove.stackCount - count);
-            event.consume();
+            if (removesRemaining == 0) {
+                break;
+            }
         }
+
+        if (removesRemaining > 0) {
+            return null;
+        }
+
+        EntityRef removed = null;
+        int removedCount = 0;
+        for (int slot : slotsTotallyConsumed) {
+            EntityRef itemAt = InventoryUtils.getItemAt(entity, slot);
+            removedCount += InventoryUtils.getStackCount(itemAt);
+
+            if (destroyRemoved) {
+                InventoryUtils.putItemIntoSlot(entity, EntityRef.NULL, slot);
+                itemAt.destroy();
+            } else {
+                if (removed == null) {
+                    InventoryUtils.putItemIntoSlot(entity, EntityRef.NULL, slot);
+                    removed = itemAt;
+                } else {
+                    InventoryUtils.putItemIntoSlot(entity, EntityRef.NULL, slot);
+                    itemAt.destroy();
+                }
+            }
+        }
+
+        if (shrinkSlotNo > -1) {
+            EntityRef itemAt = InventoryUtils.getItemAt(entity, shrinkSlotNo);
+            removedCount += InventoryUtils.getStackCount(itemAt) - shrinkCountResult;
+            if (destroyRemoved) {
+                InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
+            } else {
+                if (removed == null) {
+                    removed = entityManager.copy(itemAt);
+                }
+                InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
+            }
+        }
+
+        if (removed != null) {
+            ItemComponent item = removed.getComponent(ItemComponent.class);
+            if (item.stackCount != removedCount) {
+                item.stackCount = (byte) removedCount;
+                removed.saveComponent(item);
+            }
+            return removed;
+        }
+        return EntityRef.NULL;
     }
 
     @ReceiveEvent(components = {InventoryComponent.class})
     public void giveItem(GiveItemAction event, EntityRef entity) {
-        ItemComponent itemToGive = event.getItem().getComponent(ItemComponent.class);
-        if (itemToGive == null) {
+        if (giveItem(entity, event.getInstigator(), event.getItem(), event.getSlots())) {
             event.consume();
-            return;
-        }
-
-        Integer slot = event.getSlot();
-        if (slot != null) {
-            giveItemToSlot(event, entity, itemToGive, slot);
-            return;
-        }
-
-        int slotCount = InventoryUtils.getSlotCount(entity);
-        for (int i = 0; i < slotCount; i++) {
-            if (giveItemToSlot(event, entity, itemToGive, i)) {
-                event.consume();
-                return;
-            }
         }
     }
 
-    private boolean giveItemToSlot(GiveItemAction event, EntityRef entity, ItemComponent itemToGive, int slot) {
-        EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
-        ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
-        if (itemAt == null || InventoryUtils.isSameItem(itemAt, itemToGive)) {
-            if (itemAt == null) {
-                if (canPutItemIntoSlot(event.getInstigator(), entity, event.getItem(), slot)) {
-                    InventoryUtils.putItemIntoSlot(entity, event.getItem(), slot);
-                    return true;
-                }
-            } else {
-                if (itemAt.stackCount + itemToGive.stackCount <= itemToGive.maxStackSize) {
-                    InventoryUtils.adjustStackSize(entity, slot, itemAt.stackCount + itemToGive.stackCount);
-                    event.getItem().destroy();
-                    return true;
+    private boolean giveItemToSlots(EntityRef instigator, EntityRef entity, EntityRef item, List<Integer> slots) {
+        int toConsume = InventoryUtils.getStackCount(item);
+        Map<Integer, Integer> consumableCount = new LinkedHashMap<>();
+
+        // First: check which slots we can merge into
+        for (int slot : slots) {
+            EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
+            ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
+            if (itemAt != null && InventoryUtils.isSameItem(item, itemAtEntity)) {
+                int spaceInSlot = itemAt.maxStackSize - itemAt.stackCount;
+                int toAdd = Math.min(toConsume, spaceInSlot);
+                if (toAdd > 0) {
+                    consumableCount.put(slot, toAdd);
+                    toConsume -= toAdd;
+                    if (toConsume == 0) {
+                        break;
+                    }
                 }
             }
         }
-        return false;
+
+        int emptySlotNo = -1;
+        int emptySlotCount = toConsume;
+        if (toConsume > 0) {
+            // Next: check which slots are empty and figure out where to add
+            for (int slot : slots) {
+                EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
+                ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
+                if (itemAt == null && canPutItemIntoSlot(instigator, entity, item, slot)) {
+                    emptySlotNo = slot;
+                    emptySlotCount = toConsume;
+                    toConsume = 0;
+                    break;
+                }
+            }
+        }
+
+        if (toConsume > 0) {
+            return false;
+        }
+
+        for (Map.Entry<Integer, Integer> slotCount : consumableCount.entrySet()) {
+            int slot = slotCount.getKey();
+            int count = slotCount.getValue();
+            EntityRef itemAtEntity = InventoryUtils.getItemAt(entity, slot);
+            ItemComponent itemAt = itemAtEntity.getComponent(ItemComponent.class);
+            InventoryUtils.adjustStackSize(entity, slot, itemAt.stackCount + count);
+        }
+
+        if (emptySlotNo > -1) {
+            ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+            sourceItem.stackCount = (byte) emptySlotCount;
+            item.saveComponent(sourceItem);
+
+            InventoryUtils.putItemIntoSlot(entity, item, emptySlotNo);
+        } else {
+            item.destroy();
+        }
+
+        return true;
     }
 
     private boolean canPutItemIntoSlot(EntityRef instigator, EntityRef entity, EntityRef item, int slot) {
@@ -150,6 +223,15 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
         BeforeItemPutInInventory itemPut = new BeforeItemPutInInventory(instigator, item, slot);
         entity.send(itemPut);
         return !itemPut.isConsumed();
+    }
+
+    private boolean canRemoveItemFromSlot(EntityRef instigator, EntityRef entity, EntityRef item, int slot) {
+        if (!item.exists()) {
+            return true;
+        }
+        BeforeItemRemovedFromInventory itemRemoved = new BeforeItemRemovedFromInventory(instigator, item, slot);
+        entity.send(itemRemoved);
+        return !itemRemoved.isConsumed();
     }
 
     @ReceiveEvent
@@ -172,5 +254,125 @@ public class InventoryAuthoritySystem extends BaseComponentSystem {
         } finally {
             entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
         }
+    }
+
+    @Override
+    public boolean canStackTogether(EntityRef itemA, EntityRef itemB) {
+        return InventoryUtils.canStackInto(itemA, itemB);
+    }
+
+    @Override
+    public int getStackSize(EntityRef item) {
+        return InventoryUtils.getStackCount(item);
+    }
+
+    @Override
+    public EntityRef getItemInSlot(EntityRef inventoryEntity, int slot) {
+        return InventoryUtils.getItemAt(inventoryEntity, slot);
+    }
+
+    @Override
+    public int findSlotWithItem(EntityRef inventoryEntity, EntityRef item) {
+        return InventoryUtils.getSlotWithItem(inventoryEntity, item);
+    }
+
+    @Override
+    public int getNumSlots(EntityRef inventoryEntity) {
+        return InventoryUtils.getSlotCount(inventoryEntity);
+    }
+
+    @Override
+    public boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item) {
+        return giveItem(inventory, instigator, item, null);
+    }
+
+    @Override
+    public boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, int slot) {
+        return giveItem(inventory, instigator, item, Arrays.asList(slot));
+    }
+
+    @Override
+    public boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, List<Integer> slots) {
+        ItemComponent itemToGive = item.getComponent(ItemComponent.class);
+        if (itemToGive == null) {
+            return true;
+        }
+
+        if (slots == null) {
+            int slotCount = InventoryUtils.getSlotCount(inventory);
+            slots = new LinkedList<>();
+            for (int slot = 0; slot < slotCount; slot++) {
+                slots.add(slot);
+            }
+        }
+        if (giveItemToSlots(instigator, inventory, item, slots)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved) {
+        return removeItemInternal(inventory, instigator, Arrays.asList(item), destroyRemoved, null);
+    }
+
+    @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved, int count) {
+        return removeItemInternal(inventory, instigator, Arrays.asList(item), destroyRemoved, count);
+    }
+
+    @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved) {
+        return removeItemInternal(inventory, instigator, items, destroyRemoved, null);
+    }
+
+    @Override
+    public EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count) {
+        return removeItemInternal(inventory, instigator, items, destroyRemoved, count);
+    }
+
+    private EntityRef removeItemInternal(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, Integer count) {
+        final EntityRef firstItem = items.get(0);
+        for (EntityRef item : items) {
+            if (item != firstItem && !InventoryUtils.isSameItem(firstItem, item)) {
+                return null;
+            }
+        }
+
+        for (EntityRef item : items) {
+            ItemComponent itemToRemove = item.getComponent(ItemComponent.class);
+            if (itemToRemove == null) {
+                return EntityRef.NULL;
+            }
+        }
+
+        List<Integer> slotsWithItem = new LinkedList<>();
+        for (EntityRef item : items) {
+            int slotWithItem = InventoryUtils.getSlotWithItem(inventory, item);
+            if (slotWithItem == -1) {
+                return null;
+            }
+            slotsWithItem.add(slotWithItem);
+        }
+
+        Integer toRemove = count;
+        if (toRemove == null) {
+            toRemove = 0;
+            for (EntityRef item : items) {
+                toRemove += InventoryUtils.getStackCount(item);
+            }
+        }
+
+        return removeItemFromSlots(instigator, destroyRemoved, inventory, slotsWithItem, toRemove);
+    }
+
+    @Override
+    public boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
+        return InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count);
+    }
+
+    @Override
+    public boolean switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo) {
+        return InventoryUtils.moveItem(instigator, fromInventory, slotFrom, toInventory, slotTo);
     }
 }

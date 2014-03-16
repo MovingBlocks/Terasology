@@ -21,7 +21,8 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.VertexBufferObjectManager;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
+import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -61,24 +62,29 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     private int vboUVBuffer;
     private int vboIndexBuffer;
 
-    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
+    private GLBufferPool bufferPool;
+
+    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
         super(uri);
+        this.bufferPool = bufferPool;
         reload(data);
     }
 
     @Override
     public void reload(SkeletalMeshData newData) {
-        dispose();
-
         this.data = newData;
 
-        vboPosNormBuffer = VertexBufferObjectManager.getInstance().getVboId();
+        if (vboPosNormBuffer == 0) {
+            vboPosNormBuffer = bufferPool.get(getURI().toSimpleString());
+        }
 
         IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
         indexBuffer.put(newData.getIndices().toArray());
         indexBuffer.flip();
-        vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
+        if (vboIndexBuffer == 0) {
+            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
+        }
+        VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
         FloatBuffer uvBuffer = BufferUtils.createFloatBuffer(newData.getUVs().size() * 2);
         for (Vector2f uv : newData.getUVs()) {
@@ -86,22 +92,25 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
             uvBuffer.put(uv.y);
         }
         uvBuffer.flip();
-        vboUVBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        VertexBufferObjectManager.getInstance().bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
+
+        if (vboUVBuffer == 0) {
+            vboUVBuffer = bufferPool.get(getURI().toSimpleString());
+        }
+        VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }
 
     @Override
     public void dispose() {
         if (vboIndexBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboIndexBuffer);
+            bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;
         }
         if (vboPosNormBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboPosNormBuffer);
+            bufferPool.dispose(vboPosNormBuffer);
             vboPosNormBuffer = 0;
         }
         if (vboUVBuffer != 0) {
-            VertexBufferObjectManager.getInstance().putVboId(vboUVBuffer);
+            bufferPool.dispose(vboUVBuffer);
             vboUVBuffer = 0;
         }
     }
@@ -145,7 +154,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
             vertBuffer.put(norm.z);
         }
         vertBuffer.flip();
-        VertexBufferObjectManager.getInstance().bufferVboData(vboPosNormBuffer, vertBuffer, GL15.GL_DYNAMIC_DRAW);
+        VertexBufferObjectUtil.bufferVboData(vboPosNormBuffer, vertBuffer, GL15.GL_DYNAMIC_DRAW);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboPosNormBuffer);
         glVertexPointer(VECTOR3_SIZE, GL_FLOAT, STRIDE, 0);

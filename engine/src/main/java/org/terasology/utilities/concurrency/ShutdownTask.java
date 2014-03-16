@@ -25,7 +25,7 @@ public class ShutdownTask implements Task {
     }
 
     @Override
-    public void enact() {
+    public void run() {
     }
 
     @Override

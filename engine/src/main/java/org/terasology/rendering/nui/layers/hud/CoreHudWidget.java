@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.hud;
 
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
+import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
@@ -27,12 +28,12 @@ import java.util.Iterator;
 /**
  * @author Immortius
  */
-public abstract class CoreHudWidget extends CoreWidget {
+public abstract class CoreHudWidget extends CoreWidget implements ControlWidget {
 
     @LayoutConfig
     private UIWidget contents;
 
-    public abstract void initialise();
+    private boolean initialised;
 
     public void setContents(UIWidget contents) {
         this.contents = contents;
@@ -40,6 +41,20 @@ public abstract class CoreHudWidget extends CoreWidget {
 
     public UIWidget getContents() {
         return contents;
+    }
+
+    @Override
+    public void onOpened() {
+        if (!initialised) {
+            initialise();
+            initialised = true;
+        }
+    }
+
+    protected abstract void initialise();
+
+    @Override
+    public void onClosed() {
     }
 
     public void onDraw(Canvas canvas) {

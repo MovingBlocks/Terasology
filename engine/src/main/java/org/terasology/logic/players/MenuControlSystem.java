@@ -16,6 +16,8 @@
 
 package org.terasology.logic.players;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,7 +34,10 @@ import org.terasology.logic.characters.events.DeathEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.ingame.inventory.TransferItemCursor;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 
@@ -49,7 +54,8 @@ public class MenuControlSystem extends BaseComponentSystem {
     public void initialise() {
         nuiManager.getHUD().addHUDElement("toolbar");
         TransferItemCursor cursor = new TransferItemCursor();
-        nuiManager.addOverlay(cursor);
+        UIElement cursorElement = Assets.generateAsset(new AssetUri(AssetType.UI_ELEMENT, "engine:transferItemCursor"), new UIData(cursor), UIElement.class);
+        nuiManager.addOverlay(cursorElement, ControlWidget.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -74,6 +80,8 @@ public class MenuControlSystem extends BaseComponentSystem {
             case Keyboard.KeyId.F12:
                 DefaultRenderingProcess.getInstance().takeScreenshot();
                 CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera"));
+                break;
+            default:
                 break;
         }
     }

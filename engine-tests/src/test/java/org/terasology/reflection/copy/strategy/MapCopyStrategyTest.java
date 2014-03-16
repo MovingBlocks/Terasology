@@ -15,35 +15,21 @@
  */
 package org.terasology.reflection.copy.strategy;
 
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.Maps;
+import org.junit.Test;
+import org.terasology.reflection.copy.CopyStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
-import org.terasology.reflection.copy.CopyStrategy;
-
-import com.google.common.collect.Maps;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author mkienenb
  */
 public class MapCopyStrategyTest {
-
-    /**
-     * The default copy strategy - returns the original value.
-     *
-     * @param <T>
-     */
-    private static class ReturnAsIsStrategy<T> implements CopyStrategy<T> {
-
-        @Override
-        public T copy(T value) {
-            return value;
-        }
-    }
 
     @Test
     public void testOrderedMapCopyStrategy() throws NoSuchMethodException {
@@ -69,5 +55,18 @@ public class MapCopyStrategyTest {
         assertEquals(Long.valueOf(2), copiedMap.get("two"));
         assertEquals(Long.valueOf(3), copiedMap.get("three"));
         assertEquals(Long.valueOf(4), copiedMap.get("four"));
+    }
+
+    /**
+     * The default copy strategy - returns the original value.
+     *
+     * @param <T>
+     */
+    private static class ReturnAsIsStrategy<T> implements CopyStrategy<T> {
+
+        @Override
+        public T copy(T value) {
+            return value;
+        }
     }
 }

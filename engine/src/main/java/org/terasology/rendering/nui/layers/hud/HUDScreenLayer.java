@@ -68,13 +68,13 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     public <T extends ControlWidget> T addHUDElement(AssetUri uri, T widget, Rect2f region) {
         InjectionHelper.inject(widget);
-        widget.initialise();
-        elementsLookup.put(uri, new HUDElement(uri, widget, region));
+        widget.onOpened();
+        elementsLookup.put(uri, new HUDElement(widget, region));
         return widget;
     }
 
     public ControlWidget getHUDElement(String uri) {
-        return getHUDElement(new AssetUri(uri));
+        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri));
     }
 
     public ControlWidget getHUDElement(AssetUri uri) {
@@ -86,7 +86,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public <T extends ControlWidget> T getHUDElement(String uri, Class<T> type) {
-        return getHUDElement(new AssetUri(uri), type);
+        return getHUDElement(new AssetUri(AssetType.UI_ELEMENT, uri), type);
     }
 
     public <T extends ControlWidget> T getHUDElement(AssetUri uri, Class<T> type) {
@@ -98,14 +98,21 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public boolean removeHUDElement(AssetUri uri) {
-        return elementsLookup.remove(uri) != null;
+        HUDElement removed = elementsLookup.remove(uri);
+        if (removed != null) {
+            removed.widget.onClosed();
+            return true;
+        }
+        return false;
     }
 
     public boolean removeHUDElement(ControlWidget element) {
         Iterator<Map.Entry<AssetUri, HUDElement>> iterator = elementsLookup.entrySet().iterator();
         while (iterator.hasNext()) {
-            if (iterator.next().getValue().widget.equals(element)) {
+            Map.Entry<AssetUri, HUDElement> item = iterator.next();
+            if (item.getValue().widget.equals(element)) {
                 iterator.remove();
+                item.getValue().widget.onClosed();
                 return true;
             }
         }
@@ -113,6 +120,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     public void clear() {
+        for (HUDElement value : elementsLookup.values()) {
+            value.widget.onClosed();
+        }
         elementsLookup.clear();
     }
 
@@ -181,7 +191,11 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     @Override
-    public void initialise() {
+    public void onOpened() {
+    }
+
+    @Override
+    protected void initialise() {
     }
 
     @Override
@@ -190,12 +204,10 @@ public class HUDScreenLayer extends CoreScreenLayer {
     }
 
     private static final class HUDElement {
-        AssetUri uri;
         ControlWidget widget;
         Rect2f region;
 
-        private HUDElement(AssetUri uri, ControlWidget widget, Rect2f region) {
-            this.uri = uri;
+        private HUDElement(ControlWidget widget, Rect2f region) {
             this.widget = widget;
             this.region = region;
         }

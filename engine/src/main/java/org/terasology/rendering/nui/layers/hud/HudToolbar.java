@@ -16,13 +16,18 @@
 package org.terasology.rendering.nui.layers.hud;
 
 import com.google.common.collect.Lists;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.drowning.DrowningComponent;
+import org.terasology.logic.drowning.DrownsComponent;
+import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layers.ingame.inventory.InventoryCell;
+import org.terasology.rendering.nui.widgets.UIIconBar;
 
 import java.util.List;
 
@@ -34,7 +39,11 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
     @In
     private LocalPlayer localPlayer;
 
+    @In
+    private Time time;
+
     private List<InventoryCell> cells = Lists.newArrayList();
+    private UICrosshair crosshair;
 
     @Override
     public void initialise() {
@@ -47,6 +56,55 @@ public class HudToolbar extends CoreHudWidget implements ControlWidget {
                 }
             });
         }
+
+        UIIconBar healthBar = find("healthBar", UIIconBar.class);
+        healthBar.bindValue(new ReadOnlyBinding<Float>() {
+            @Override
+            public Float get() {
+                HealthComponent healthComponent = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
+                if (healthComponent != null) {
+                    return (float) healthComponent.currentHealth;
+                }
+                return 0f;
+            }
+        });
+        healthBar.bindMaxValue(new ReadOnlyBinding<Float>() {
+            @Override
+            public Float get() {
+                HealthComponent healthComponent = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
+                if (healthComponent != null) {
+                    return (float) healthComponent.maxHealth;
+                }
+                return 0f;
+            }
+        });
+
+        UIIconBar breathBar = find("breathBar", UIIconBar.class);
+        breathBar.bindVisible(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                EntityRef characterEntity = localPlayer.getCharacterEntity();
+                return characterEntity.hasComponent(DrowningComponent.class) && characterEntity.hasComponent(DrownsComponent.class);
+            }
+        });
+        breathBar.setMaxValue(1.0f);
+        breathBar.bindValue(new ReadOnlyBinding<Float>() {
+            @Override
+            public Float get() {
+                DrowningComponent drowningComponent = localPlayer.getCharacterEntity().getComponent(DrowningComponent.class);
+
+                if (drowningComponent != null) {
+                    return drowningComponent.getRemainingBreath(time.getGameTimeInMs());
+                }
+                return 0f;
+            }
+        });
+
+        crosshair = find("crosshair", UICrosshair.class);
+    }
+
+    public void setChargeAmount(float amount) {
+        crosshair.setChargeAmount(amount);
     }
 
 

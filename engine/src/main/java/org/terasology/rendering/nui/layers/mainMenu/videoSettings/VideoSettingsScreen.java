@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -115,6 +115,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
         }
 
+        UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);
+        if (cameraSetting != null) {
+            cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
+            cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
+        }
+
         WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
@@ -122,11 +128,15 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                logger.info("Video Settings: " + config.getRendering().toString());
-                CoreRegistry.get(ShaderManager.class).recompileAllShaders();
                 getManager().popScreen();
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        logger.info("Video Settings: " + config.getRendering().toString());
+        CoreRegistry.get(ShaderManager.class).recompileAllShaders();
     }
 
     @Override

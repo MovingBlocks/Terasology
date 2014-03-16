@@ -191,4 +191,6 @@ public interface SoundSource<T extends Sound> {
     SoundSource fade(float targetGain);
 
     SoundSource reset();
+
+    void purge();
 }

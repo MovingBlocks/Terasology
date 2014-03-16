@@ -37,6 +37,7 @@ import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.random.FastRandom;
@@ -178,6 +179,13 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         });
 
+        UIButton previewSeed = find("previewSeed", UIButton.class);
+        previewSeed.bindVisible(new ReadOnlyBinding<Boolean>() {
+            @Override
+            public Boolean get() {
+                return worldGenerator != null && worldGenerator.getSelection() != null;
+            }
+        });
         WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
