@@ -27,16 +27,19 @@ public class ReadyChunkInfo {
     private Vector3i pos;
     private TShortObjectMap<TIntList> blockPositionMapppings;
     private ChunkStore chunkStore;
+    private boolean newChunk;
 
     public ReadyChunkInfo(Vector3i pos, TShortObjectMap<TIntList> blockPositionMapppings) {
         this.pos = pos;
         this.blockPositionMapppings = blockPositionMapppings;
+        this.newChunk = true;
     }
 
     public ReadyChunkInfo(Vector3i pos, TShortObjectMap<TIntList> blockPositionMapppings, ChunkStore chunkStore) {
         this.pos = pos;
         this.blockPositionMapppings = blockPositionMapppings;
         this.chunkStore = chunkStore;
+        this.newChunk = false;
     }
 
     public Vector3i getPos() {
@@ -50,4 +53,9 @@ public class ReadyChunkInfo {
     public ChunkStore getChunkStore() {
         return chunkStore;
     }
+
+    public boolean isNewChunk() {
+        return newChunk;
+    }
+
 }

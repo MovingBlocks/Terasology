@@ -24,8 +24,6 @@ import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.bullet.BulletPhysics;
-import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
@@ -246,7 +244,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {
                     ChunkImpl c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                    if (c != null && c.isReady() && worldProvider.getLocalView(c.getPos()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
@@ -269,7 +267,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // add
                 for (Vector3i chunkPosition : viewRegion) {
                     ChunkImpl c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                    if (c != null && c.isReady() && worldProvider.getLocalView(c.getPos()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;

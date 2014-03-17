@@ -17,15 +17,14 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -41,7 +40,6 @@ import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
 import java.text.DecimalFormat;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -62,36 +60,6 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-
-    public static enum State {
-        INTERNAL_LIGHT_GENERATION_PENDING(EntityData.ChunkState.INTERNAL_LIGHT_GENERATION_PENDING),
-        COMPLETE(EntityData.ChunkState.COMPLETE);
-
-        private static final Map<EntityData.ChunkState, State> LOOKUP;
-
-        private final EntityData.ChunkState protobufState;
-
-        static {
-            LOOKUP = Maps.newHashMap();
-            for (State s : State.values()) {
-                LOOKUP.put(s.protobufState, s);
-            }
-        }
-
-        private State(EntityData.ChunkState protobufState) {
-            this.protobufState = Preconditions.checkNotNull(protobufState);
-        }
-
-        public static State lookup(EntityData.ChunkState state) {
-            State result = LOOKUP.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
-            if (result == null) {
-                return INTERNAL_LIGHT_GENERATION_PENDING;
-            }
-            return result;
-        }
-    }
-
-
     private final Vector3i chunkPos = new Vector3i();
 
     private BlockManager blockManager;
@@ -102,22 +70,20 @@ public class ChunkImpl implements Chunk {
     private TeraArray lightData;
     private TeraArray extraData;
 
-    private boolean initialGenerationComplete;
-    private State chunkState = State.INTERNAL_LIGHT_GENERATION_PENDING;
-    private boolean dirty;
-    private boolean animated;
     private AABB aabb;
     private Region3i region;
+
+    private ReentrantLock lock = new ReentrantLock();
+
+    private boolean disposed;
+    private boolean ready;
+    private boolean dirty;
+    private boolean animated;
 
     // Rendering
     private ChunkMesh[] activeMesh;
     private ChunkMesh[] pendingMesh;
     private AABB[] subMeshAABB;
-
-    private ReentrantLock lock = new ReentrantLock();
-    private boolean disposed;
-
-    private boolean ready;
 
     protected ChunkImpl() {
         final Chunks c = Chunks.getInstance();
@@ -143,11 +109,10 @@ public class ChunkImpl implements Chunk {
         this(chunkPos.x, chunkPos.y, chunkPos.z);
     }
 
-    public ChunkImpl(Vector3i chunkPos, State chunkState, TeraArray blocks, TeraArray liquid, boolean loaded) {
+    public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid) {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(liquid);
-        this.chunkState = Preconditions.checkNotNull(chunkState);
         final Chunks c = Chunks.getInstance();
         sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
@@ -156,7 +121,6 @@ public class ChunkImpl implements Chunk {
         blockManager = CoreRegistry.get(BlockManager.class);
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
                 ChunkConstants.CHUNK_SIZE);
-        initialGenerationComplete = loaded;
         ChunkMonitor.fireChunkCreated(this);
     }
 
@@ -178,28 +142,6 @@ public class ChunkImpl implements Chunk {
 
     public boolean isInBounds(int x, int y, int z) {
         return x >= 0 && y >= 0 && z >= 0 && x < getChunkSizeX() && y < getChunkSizeY() && z < getChunkSizeZ();
-    }
-
-    public State getChunkState() {
-        return chunkState;
-    }
-
-    public void setChunkState(State chunkState) {
-        Preconditions.checkNotNull(chunkState);
-        if (chunkState != this.chunkState) {
-            State old = this.chunkState;
-            this.chunkState = chunkState;
-            ChunkMonitor.fireStateChanged(this, old);
-        }
-
-    }
-
-    public boolean isInitialGenerationComplete() {
-        return initialGenerationComplete;
-    }
-
-    public void setInitialGenerationComplete() {
-        initialGenerationComplete = true;
     }
 
     public boolean isDirty() {
@@ -576,7 +518,6 @@ public class ChunkImpl implements Chunk {
             final TeraArrays t = TeraArrays.getInstance();
             final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
                     .setX(chunk.chunkPos.x).setY(chunk.chunkPos.y).setZ(chunk.chunkPos.z)
-                    .setState(chunk.chunkState.protobufState)
                     .setBlockData(t.encode(chunk.blockData));
             if (!coreOnly) {
                 b.setLiquidData(t.encode(chunk.extraData));
@@ -590,10 +531,6 @@ public class ChunkImpl implements Chunk {
                 throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
             }
             Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
-            if (!message.hasState()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk state.");
-            }
-            State state = State.lookup(message.getState());
             if (!message.hasBlockData()) {
                 throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
             }
@@ -609,11 +546,7 @@ public class ChunkImpl implements Chunk {
                 extraData = c.getExtraDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
             }
 
-            boolean previouslyComplete = state == State.COMPLETE;
-            if (previouslyComplete) {
-                state = State.INTERNAL_LIGHT_GENERATION_PENDING;
-            }
-            return new ChunkImpl(pos, state, blockData, extraData, previouslyComplete);
+            return new ChunkImpl(pos, blockData, extraData);
         }
     }
 }

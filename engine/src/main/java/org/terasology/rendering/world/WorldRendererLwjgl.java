@@ -857,7 +857,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     private void renderChunk(ChunkImpl chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
-        if (chunk.getChunkState() == ChunkImpl.State.COMPLETE && chunk.getMesh() != null) {
+        if (chunk.isReady() && chunk.getMesh() != null) {
             Material shader = null;
 
             final Vector3f cameraPosition = camera.getPosition();
@@ -1116,7 +1116,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         chunkProvider.update();
         for (Vector3i pos : Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2))) {
             ChunkImpl chunk = chunkProvider.getChunk(pos);
-            if (chunk == null || chunk.getChunkState() != ChunkImpl.State.COMPLETE) {
+            if (chunk == null || !chunk.isReady()) {
                 complete = false;
             } else if (chunk.isDirty()) {
                 ChunkView view = worldProvider.getLocalView(chunk.getPos());

@@ -47,12 +47,11 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
 
         chunk.lock();
         try {
-            if (chunk.isDisposed() || chunk.getChunkState() != ChunkImpl.State.INTERNAL_LIGHT_GENERATION_PENDING) {
+            if (chunk.isDisposed()) {
                 return;
             }
             InternalLightProcessor.generateInternalLighting(chunk);
             chunk.deflate();
-            chunk.setChunkState(ChunkImpl.State.COMPLETE);
             getProvider().onChunkIsReady(chunk.getPos());
         } finally {
             chunk.unlock();
