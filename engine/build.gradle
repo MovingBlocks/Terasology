@@ -92,7 +92,7 @@ dependencies {
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
     compile group: 'org.newdawn.slick', name: 'slick', version: '237'
-    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.2'
+    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.4'
     compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
     compile group: 'ec.util', name: 'MersenneTwister', version: '20'
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.1'
