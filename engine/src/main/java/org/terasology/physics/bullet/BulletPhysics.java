@@ -275,7 +275,12 @@ public class BulletPhysics implements PhysicsEngine {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
-                rigidBody.rb.setAngularFactor(rb.angularFactor);
+                if (!rigidBody.rb.getAngularFactor().equals(rb.angularFactor)) {
+                    rigidBody.rb.setAngularFactor(rb.angularFactor);
+                }
+                if (!rigidBody.rb.getLinearFactor().equals(rb.linearFactor)) {
+                    rigidBody.rb.setLinearFactor(rb.linearFactor);
+                }
                 rigidBody.rb.setFriction(rb.friction);
             }
 
@@ -475,6 +480,7 @@ public class BulletPhysics implements PhysicsEngine {
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
             collider.rb.setAngularFactor(rigidBody.angularFactor);
+            collider.rb.setLinearFactor(rigidBody.linearFactor);
             collider.rb.setFriction(rigidBody.friction);
             updateKinematicSettings(rigidBody, collider);
             BulletRigidBody oldBody = entityRigidBodies.put(entity, collider);
