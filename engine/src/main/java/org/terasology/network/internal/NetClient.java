@@ -175,7 +175,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     public void setColor(Color color) {
         this.color = color;
 
-        // why is getEntity() different from client.clientInfo ?
         ClientComponent client = getEntity().getComponent(ClientComponent.class);
         if (client != null) {
             ColorComponent colorInfo = client.clientInfo.getComponent(ColorComponent.class);

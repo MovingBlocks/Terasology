@@ -20,11 +20,11 @@ import org.terasology.entitySystem.Component;
 import org.terasology.rendering.nui.Color;
 
 /**
- * A component that contains a single color element 
- *
+ * A component that provides a color to describe an entity
  * @author Martin Steiger
  */
 public class ColorComponent implements Component {
 
+    @Replicate
     public Color color;
 }
