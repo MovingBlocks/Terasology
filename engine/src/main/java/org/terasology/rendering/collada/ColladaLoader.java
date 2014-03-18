@@ -28,24 +28,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
-//import javax.vecmath.Vector2f;
-//import javax.vecmath.Vector3f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
+import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import org.terasology.rendering.assets.skeletalmesh.Bone;
-//import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
-//import com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 /**
  * Importer for Collada data exchange model files.
@@ -53,6 +58,10 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
  * The development of this loader was greatly influenced by 
  * http://www.wazim.com/Collada_Tutorial_1.htm
  *
+ * TODO: Consider documenting this class similar to what has been done at this web page:
+ * 
+ * http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
+ * 
  * @author mkienenb@gmail.com
  */
 
@@ -69,36 +78,61 @@ public class ColladaLoader {
 
     protected SkeletalMeshDataBuilder skeletonBuilder;
 
-    protected void parseData(InputStream inputStream) throws ColladaParseException, IOException {
+    protected void parseSkeletalMeshData(InputStream inputStream) throws ColladaParseException, IOException {
         Document document = Xml.readAndClose(inputStream);
         Element rootElement = document.getRootElement();
 
-        //        parseSkeletalMeshData(rootElement);
+        parseMeshData(rootElement);
+        parseSkeletalMeshData(rootElement);
+    }
+
+    protected void parseMeshData(InputStream inputStream) throws ColladaParseException, IOException {
+        Document document = Xml.readAndClose(inputStream);
+        Element rootElement = document.getRootElement();
+
         parseMeshData(rootElement);
     }
 
-//    private static class MD5Joint {
-//        String name;
-//        int parent;
-//        Vector3f position;
-//        Quat4f orientation;
-//    }
-//
-//    private static class MD5Vertex {
-//        Vector2f uv;
-//        int startWeight;
-//        int countWeight;
-//    }
-//
-//    private static class MD5Weight {
-//        int jointIndex;
-//        float bias;
-//        Vector3f position;
-//    }
+    private void createMd5JointForElementAndParent(Map<String, MD5Joint> md5JointBySidMap,
+                                                   Element element, MD5Joint parentMD5Joint) throws ColladaParseException {
+        MD5Joint joint = createMD5Joint(element);
+        joint.element = element;
+        joint.parent = parentMD5Joint;
+
+        if (null != parentMD5Joint) {
+            parentMD5Joint.addChild(joint);
+        }
+
+        ElementSet elementChildSet = element.find("node");
+        for (Element childElement : elementChildSet) {
+            createMd5JointForElementAndParent(md5JointBySidMap, childElement, joint);
+        }
+
+        String sid = element.attr("sid");
+        if (null != sid) {
+            md5JointBySidMap.put(sid, joint);
+        }
+    }
 
     protected void parseSkeletalMeshData(Element rootElement) throws ColladaParseException {
 
+        List<MD5Joint> md5JointList = new ArrayList<MD5Joint>();
+        List<MD5Mesh> md5MeshList = new ArrayList<MD5Mesh>();
+
         skeletonBuilder = new SkeletalMeshDataBuilder();
+
+        // TODO: we need a better way to construct the parent/child nodes, especially for the non-joint nodes
+        // MAYBE we can construct all of the nodes up-front, and then fill in the missing data for the ones of type JOINT later
+        // And only keep the MD5 nodes in the final list if they are used?
+
+        Map<String, MD5Joint> md5JointBySidMap = new HashMap<String, MD5Joint>();
+
+        MD5Joint parentMD5Joint = null;
+        ElementSet nodeParentSet = rootElement.find("library_visual_scenes", "visual_scene", "node");
+        for (Element element : nodeParentSet) {
+            createMd5JointForElementAndParent(md5JointBySidMap, element, parentMD5Joint);
+        }
+
         ElementSet controllerSet = rootElement.find("library_controllers", "controller");
         for (Element controller : controllerSet) {
             ElementSet skinSet = controller.find("skin");
@@ -138,16 +172,11 @@ public class ColladaLoader {
                     Source jointMatrixSource = parseSource(jointMatrixSourceElement);
                     inverseBindMatrixArray = jointMatrixSource.floatValues;
 
-                    rotationArray = new Quat4f[inverseBindMatrixArray.length / 16];
-                    for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
-                        int offset = i * 16;
-                        Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-                        Quat4f rotation = new Quat4f();
-                        rotation.set(matrix4f);
-                        rotationArray[i] = rotation;
-                    }
+                    rotationArray = quad4fArrayFromFloat16ArrayData(inverseBindMatrixArray);
                 }
             }
+
+            List<MD5Weight> md5WeightList = Lists.newArrayList();
 
             float[] weightsArray = null;
 
@@ -209,11 +238,21 @@ public class ColladaLoader {
             //                                                + vertexWeightsVStrings.length + " for controller id=" + controller.id() + " name=" + controller.name());
             //            }
 
+            // TODO: these aren't actually needed once we are populating MD5Weight records
             String[] vertexWeightsJointNameArray = new String[vertexWeightsCount];
             float[] vertexWeightsArray = new float[vertexWeightsCount];
 
             int vertexWeightsVDataIndex = -1;
             for (int vertexWeightsIndex = 0; vertexWeightsIndex < vertexWeightsCount; vertexWeightsIndex++) {
+
+                MD5Weight md5Weight = new MD5Weight();
+                Vector3f vertexPosition = new Vector3f();
+                vertexPosition.x = vertices.get(3 * vertexWeightsIndex + 0);
+                vertexPosition.y = vertices.get(3 * vertexWeightsIndex + 1);
+                vertexPosition.z = vertices.get(3 * vertexWeightsIndex + 2);
+                md5Weight.position = vertexPosition;
+                md5WeightList.add(md5Weight);
+
                 String vCountString = vertexWeightsVCountStrings[vertexWeightsIndex];
                 int vCount = Integer.parseInt(vCountString);
                 for (int vCountIndex = 0; vCountIndex < vCount; vCountIndex++) {
@@ -230,11 +269,13 @@ public class ColladaLoader {
                         }
 
                         if ("JOINT".equals(vertexWeightsInput.semantic)) {
+                            md5Weight.jointIndex = index;
                             vertexWeightsJointNameArray[vertexWeightsIndex] = jointNameArray[index];
-//                            logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "jointName=" + vertexWeightsJointNameArray[vertexWeightsIndex]);
+                            // logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "jointName=" + vertexWeightsJointNameArray[vertexWeightsIndex]);
                         } else if ("WEIGHT".equals(vertexWeightsInput.semantic)) {
+                            md5Weight.bias = weightsArray[index];
                             vertexWeightsArray[vertexWeightsIndex] = weightsArray[index];
-//                            logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "weight=" + vertexWeightsArray[vertexWeightsIndex]);
+                            // logger.debug(String.valueOf(vertexWeightsVDataIndex) + ": " + "weight=" + vertexWeightsArray[vertexWeightsIndex]);
                         } else {
                             throw new ColladaParseException("Found unexpected vertex weights Input semantic " + vertexWeightsInput.semantic +
                                                             " for controller id=" + controller.id() + " name=" + controller.name());
@@ -242,52 +283,222 @@ public class ColladaLoader {
                     }
                 }
             }
+
+            MD5Mesh md5Mesh = new MD5Mesh();
+            md5Mesh.weightList = md5WeightList;
+
+            // Find a node with sid="joint-name"
+            for (String jointName : jointNameArray) {
+
+                MD5Joint md5Joint = md5JointBySidMap.get(jointName);
+
+                if (null == md5Joint) {
+                    throw new ColladaParseException("Cannot find joint node for node sid value for joint " + jointName + " in nodes for library_visual_scenes");
+                }
+
+                md5JointList.add(md5Joint);
+            }
         }
 
-        ElementSet nodeSet = rootElement.find("library_visual_scenes", "visual_scene", "node", "instance_controller", "skeleton");
-        /*
-                ElementSet nodeSet = rootElement.find("library_visual_scenes", "visual_scene", "node");
-                for (Element node : node) {
+        Deque<MD5Joint> jointsToProcess = new LinkedList<MD5Joint>(md5JointList);
+        while (!jointsToProcess.isEmpty()) {
+            MD5Joint joint = jointsToProcess.pop();
+            MD5Joint parentJoint = joint.parent;
+            if (null != parentJoint) {
+                if (!md5JointList.contains(parentJoint)) {
+                    md5JointList.add(parentJoint);
+                    jointsToProcess.push(parentJoint);
                 }
-        */
+            }
+        }
 
-        //        List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
-        //        for (int i = 0; i < md5.numJoints; ++i) {
-        //            MD5Joint joint = md5.joints[i];
-        //            Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
-        //            bones.add(bone);
-        //            if (joint.parent != -1) {
-        //                bones.get(joint.parent).addChild(bone);
-        //            }
-        //            skeletonBuilder.addBone(bone);
+        for (MD5Joint joint : md5JointList) {
+            if (null == joint.position) {
+                throw new ColladaParseException("no joint position for joint with element id " + joint.element.id());
+            }
+            if (null == joint.orientation) {
+                throw new ColladaParseException("no joint orientation for joint with element id " + joint.element.id());
+            }
+            // index argument is not used for anything currently, so we'll just set it to -1
+            joint.bone = new Bone(-1, joint.name, joint.position, joint.orientation);
+        }
+
+        for (MD5Joint joint : md5JointList) {
+            for (MD5Joint childJoint : joint.childList) {
+                // We can probably skip unused end nodes
+                if (null != childJoint.bone) {
+                    joint.bone.addChild(childJoint.bone);
+                }
+            }
+        }
+
+        for (MD5Joint joint : md5JointList) {
+            skeletonBuilder.addBone(joint.bone);
+        }
+
+        if (md5MeshList.size() > 0) {
+            // TODO: Support multiple mesh somehow?
+            MD5Mesh mesh = md5MeshList.get(0);
+            for (MD5Weight weight : mesh.weightList) {
+                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+            }
+
+            List<Vector2f> uvs = Lists.newArrayList();
+
+            TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
+            TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
+            //            for (MD5Vertex vert : mesh.vertexList) {
+            //                uvs.add(vert.uv);
+            //                vertexStartWeight.add(vert.startWeight);
+            //                vertexWeightCount.add(vert.countWeight);
+            //            }
+
+            for (int i = 0; i < vertices.size() / 3; i++) {
+                vertexStartWeight.add(i);
+                vertexWeightCount.add(1);
+            }
+
+            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
+
+            for (int i = 0; i < normals.size() / 2; i++) {
+                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
+            }
+            skeletonBuilder.setUvs(uvs);
+            skeletonBuilder.setIndices(indices);
+        }
+
+        // Now if you have come this far, you should be able to read the geometry data,
+        // as well as the skeleton and skinning data from COLLADA documents. And you should be able to draw 
+        // the model in raw triangles, as well as draw the skeleton. Although I haven't discussed how you
+        // can accumulate the world matrices for each joint and then draw in world coordinates for debugging
+        // purposes but I think I gave a hint that we have to multiply parent joint's world matrix with current 
+        // joint's Joint matrix and save the result in current joint's world matrix. We have to start this
+        // process from the root bone. So that we don't have dirty world matrices from parents, and the root
+        // Joint's world matrix becomes the Joint matrix, since root don't have any parent. If you are also 
+        // reading the COLLADA specification version 1.5 you can find the skinning equation so you should also
+        // be able to put the model in bind shape. How can we animate this model is still not covered and will
+        // be covered in the following sections.
+
+        // THIS IS THE TARGET GOAL:
+
+        /*
+        Bones
+        - String name
+        - int index
+        - V3 object position
+        - Quat4f obj rotation
+        - parent / children bones
+
+        SkeletalMesh
+
+        
+        // This part may not be required if we can implement SkeletalMeshData methods without it
+
+        //////////////
+        
+        public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights,
+           List<Vector2f> uvs,
+           TIntList vertexStartWeights, TIntList vertexWeightCounts,
+           TIntList indices) {
+
+        BoneWeight
+        Vector3f position = new Vector3f();
+        float bias;
+        int boneIndex;
+        Vector3f normal = new Vector3f();
+
+        //////////////
+
+
+           public Collection<Bone> getBones();
+           public Bone getRootBone();
+           public Bone getBone(String name);
+
+           public int getVertexCount();
+
+           public List<Vector3f> getBindPoseVertexPositions();
+           public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
+
+           public List<Vector3f> getBindPoseVertexNormals();
+           public List<Vector3f> getVertexNormals(List<Vector3f> bonePositions, List<Quat4f> boneRotations);
+
+           public TIntList getIndices();
+           public List<Vector2f> getUVs();
+         */
+    }
+
+    private MD5Joint createMD5Joint(Element jointNodeElement) throws ColladaParseException {
+        MD5Joint md5Joint = new MD5Joint();
+
+        ElementSet matrixSet = jointNodeElement.find("matrix");
+        if (1 == matrixSet.size()) {
+            Element matrix = matrixSet.first();
+
+            String floatStringArray = matrix.text();
+            String[] floatStrings = getItemsInString(floatStringArray);
+            if (floatStrings.length != 16) {
+                throw new ColladaParseException("Found float list of " + floatStrings.length + " instead of 16 for joint matrix sets for element " + jointNodeElement.id());
+            }
+            float[] matrixDataArray = new float[16];
+            for (int i = 0; i < floatStrings.length; i++) {
+                String floatString = floatStrings[i];
+                matrixDataArray[i] = Float.parseFloat(floatString);
+            }
+
+            Quat4f[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
+            Vector3f[] positionVectorArray = positionFromFloat16ArrayData(matrixDataArray);
+            md5Joint.position = positionVectorArray[0];
+            md5Joint.orientation = jointMatrix[0];
+        } else if (1 < matrixSet.size()) {
+            throw new ColladaParseException("Found " + matrixSet.size() + " joint matrix sets for element " + jointNodeElement.id());
+        // } else {
+            // TODO: Might be translation, rotation pairs instead of a matrix
+            // Or might be an unused joint node
+            //            throw new ColladaParseException("Found " + matrixSet.size() + " joint matrix sets for element " + jointNodeElement.id());
+        }
+
+        //        boolean isJointNode;
+        //        String jointType = jointNodeElement.attr("type");
+        //        if ("JOINT".equals(jointType)) {
+        //            isJointNode = true;
+        //        } else if ("NODE".equals(jointType)) {
+        //            isJointNode = false;
+        //        } else {
+        //            throw new ColladaParseException("Found unknown node type of " + jointType + " for joint matrix sets" + errorLocation);
         //        }
-        //        if (md5.meshes.length > 0) {
-        //            // TODO: Support multiple mesh somehow?
-        //            MD5Mesh mesh = md5.meshes[0];
-        //            for (MD5Weight weight : mesh.weightList) {
-        //                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
-        //            }
-        //
-        //            List<Vector2f> uvs = Lists.newArrayList();
-        //            TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
-        //            TIntList vertexWeightCount = new TIntArrayList(mesh.numVertices);
-        //            for (MD5Vertex vert : mesh.vertexList) {
-        //                uvs.add(vert.uv);
-        //                vertexStartWeight.add(vert.startWeight);
-        //                vertexWeightCount.add(vert.countWeight);
-        //            }
-        //            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
-        //            skeletonBuilder.setUvs(uvs);
-        //            TIntList indices = new TIntArrayList(mesh.indexList.length);
-        //            for (int i = 0; i < mesh.numTriangles; ++i) {
-        //                indices.add(mesh.indexList[i * 3]);
-        //                indices.add(mesh.indexList[i * 3 + 2]);
-        //                indices.add(mesh.indexList[i * 3 + 1]);
-        //            }
-        //            skeletonBuilder.setIndices(indices);
-        //        }
-        //
-        //        return skeletonBuilder.build();
+
+        md5Joint.element = jointNodeElement;
+        md5Joint.name = jointNodeElement.id();
+
+        md5Joint.childList = new ArrayList<MD5Joint>();
+
+        return md5Joint;
+    }
+
+    private Quat4f[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+        Quat4f[] rotationArray = new Quat4f[inverseBindMatrixArray.length / 16];
+        for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
+            int offset = i * 16;
+            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
+            Quat4f rotation = new Quat4f();
+            rotation.set(matrix4f);
+            rotationArray[i] = rotation;
+        }
+
+        return rotationArray;
+    }
+
+    private Vector3f[] positionFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+        Vector3f[] translationVectorArray = new Vector3f[inverseBindMatrixArray.length / 16];
+        for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
+            int offset = i * 16;
+            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
+            Vector3f translationVector = new Vector3f();
+            matrix4f.get(translationVector);
+            translationVectorArray[i] = translationVector;
+        }
+
+        return translationVectorArray;
     }
 
     protected void parseMeshData(Element rootElement) throws ColladaParseException {
@@ -395,47 +606,53 @@ public class ColladaLoader {
             }
             Element libraryMaterials = libraryMaterialsSet.first();
 
-            Element material = libraryMaterials.select("#" + facesMaterial);
-            if (null == material) {
-                throw new ColladaParseException("No material for " + facesMaterial + " for geometry id=" + geometry.id() + " name=" + geometry.name());
-            }
-            ElementSet instanceEffectSet = material.find("instance_effect");
-            if (1 != instanceEffectSet.size()) {
-                throw new ColladaParseException("Found " + instanceEffectSet.size() + " instance_effect sets for material " + facesMaterial + " for geometry id="
-                                                + geometry.id() + " name=" + geometry.name());
-            }
-            Element instanceEffect = instanceEffectSet.first();
-
-            String effectUrl = instanceEffect.attr("url");
-
-            ElementSet libraryEffectsSet = rootElement.find("library_effects");
-            if (0 != libraryEffectsSet.size()) {
-                if (1 != libraryEffectsSet.size()) {
-                    throw new ColladaParseException("Found " + libraryEffectsSet.size() + " library effects sets for geometry id=" + geometry.id() + " name="
-                                                    + geometry.name());
+            Element material;
+            try {
+                // TODO: this one isn't standard like the others, and sometimes it doesn't exist
+                material = libraryMaterials.select("#" + facesMaterial);
+                if (null == material) {
+                    throw new ColladaParseException("No material for " + facesMaterial + " for geometry id=" + geometry.id() + " name=" + geometry.name());
                 }
-                Element libraryEffects = libraryEffectsSet.first();
-
-                Element effect = libraryEffects.select(effectUrl);
-                if (null == effect) {
-                    throw new ColladaParseException("No effect for " + effectUrl + " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                ElementSet instanceEffectSet = material.find("instance_effect");
+                if (1 != instanceEffectSet.size()) {
+                    throw new ColladaParseException("Found " + instanceEffectSet.size() + " instance_effect sets for material " + facesMaterial + " for geometry id="
+                                                    + geometry.id() + " name=" + geometry.name());
                 }
+                Element instanceEffect = instanceEffectSet.first();
 
-                ElementSet colorSet = effect.find("profile_COMMON", "technique", "lambert", "diffuse", "color");
-                if (1 == colorSet.size()) {
-                    Element color = colorSet.first();
+                String effectUrl = instanceEffect.attr("url");
 
-                    String colorListString = color.text();
-                    String[] colorString = getItemsInString(colorListString);
-                    if (4 != colorString.length) {
-                        throw new ColladaParseException("mesh only supports 4-float color arrays but color list was '" + colorListString + "' for geometry id="
-                                                        + geometry.id() + " name=" + geometry.name());
+                ElementSet libraryEffectsSet = rootElement.find("library_effects");
+                if (0 != libraryEffectsSet.size()) {
+                    if (1 != libraryEffectsSet.size()) {
+                        throw new ColladaParseException("Found " + libraryEffectsSet.size() + " library effects sets for geometry id=" + geometry.id() + " name="
+                                                        + geometry.name());
                     }
-                    vertexColors = new float[colorString.length];
-                    for (int i = 0; i < colorString.length; i++) {
-                        vertexColors[i] = Float.parseFloat(colorString[i]);
+                    Element libraryEffects = libraryEffectsSet.first();
+
+                    Element effect = libraryEffects.select(effectUrl);
+                    if (null == effect) {
+                        throw new ColladaParseException("No effect for " + effectUrl + " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                    }
+
+                    ElementSet colorSet = effect.find("profile_COMMON", "technique", "lambert", "diffuse", "color");
+                    if (1 == colorSet.size()) {
+                        Element color = colorSet.first();
+
+                        String colorListString = color.text();
+                        String[] colorString = getItemsInString(colorListString);
+                        if (4 != colorString.length) {
+                            throw new ColladaParseException("mesh only supports 4-float color arrays but color list was '" + colorListString + "' for geometry id="
+                                                            + geometry.id() + " name=" + geometry.name());
+                        }
+                        vertexColors = new float[colorString.length];
+                        for (int i = 0; i < colorString.length; i++) {
+                            vertexColors[i] = Float.parseFloat(colorString[i]);
+                        }
                     }
                 }
+            } catch (NonMatchingPathException e) {
+                // If we don't find the material, then we're done.
             }
         }
 
@@ -471,6 +688,14 @@ public class ColladaLoader {
             } else if ("TEXCOORD".equals(faceInput.semantic)) {
                 Element texCoordSourceElement = mesh.select(faceInput.sourceName);
                 faceInput.texCoordSource = parseSource(texCoordSourceElement);
+
+                if (2 != faceInput.texCoordSource.stride) {
+                    logger.warn("Found non-2 stride of " + faceInput.texCoordSource.stride
+                                + " for vertex Input semantic " + faceInput.semantic +
+                                " for geometry id=" + geometry.id() + " name=" + geometry.name()
+                                + ". Ignoring all but first two texture coordinate values.");
+                }
+
             } else {
                 throw new ColladaParseException("Found unexpected triangle Input semantic " + faceInput.semantic +
                                                 " for geometry id=" + geometry.id() + " name=" + geometry.name());
@@ -524,6 +749,8 @@ public class ColladaLoader {
                         float vertexX = faceInput.vertexPositionSource.floatValues[index * vertexStride + 0];
                         float vertexY = faceInput.vertexPositionSource.floatValues[index * vertexStride + 1];
                         float vertexZ = faceInput.vertexPositionSource.floatValues[index * vertexStride + 2];
+                        // See http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
+                        // for up_axis coordinate systems
                         if (yUp) {
                             verticesParam.add(vertexX);
                             verticesParam.add(vertexY);
@@ -531,7 +758,12 @@ public class ColladaLoader {
                         } else if (zUp) {
                             verticesParam.add(vertexX);
                             verticesParam.add(vertexZ);
-                            verticesParam.add(vertexY);
+                            verticesParam.add(vertexY); // negated compared to z in yUp
+                            // TODO: Y is not negated relative to the orgin like it probably needs to be.
+                            //                        } else if (xUp) {
+                            //                            verticesParam.add(vertexY); // negated compared to x in yUp
+                            //                            verticesParam.add(vertexX);
+                            //                            verticesParam.add(vertexZ);
                         }
 
                         if (null != vertexColors) {
@@ -590,7 +822,7 @@ public class ColladaLoader {
                         }
                     } else if ("TEXCOORD".equals(faceInput.semantic)) {
                         int texCoordStride = faceInput.texCoordSource.stride;
-                        if (2 != texCoordStride) {
+                        if (2 > texCoordStride) {
                             throw new ColladaParseException("Found non-2 stride of " + faceInput.texCoordSource.stride
                                                             + " for vertex Input semantic " + faceInput.semantic +
                                                             " for geometry id=" + geometry.id() + " name=" + geometry.name());
@@ -722,7 +954,7 @@ public class ColladaLoader {
         ColladaLoader loader = new ColladaLoader();
         try {
             File file = new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml");
-            loader.parseData(new FileInputStream(file));
+            loader.parseMeshData(new FileInputStream(file));
         } catch (IOException | ColladaParseException e) {
             e.printStackTrace();
         }
@@ -757,4 +989,43 @@ public class ColladaLoader {
         }
     }
 
+    private static class MD5Joint {
+        private String name;
+        private Vector3f position;
+        private Quat4f orientation;
+
+        private Element element;
+        private MD5Joint parent;
+        private List<MD5Joint> childList = new ArrayList<MD5Joint>();
+        private Bone bone;
+
+        public void addChild(MD5Joint joint) {
+            childList.add(joint);
+        }
+
+        @Override
+        public String toString() {
+            return "name=" + name
+                   + ", element=" + element
+                   + ", position=" + position
+                   + ", orientation=" + orientation;
+        }
+    }
+
+    private static class MD5Weight {
+        int jointIndex;
+        float bias;
+        Vector3f position;
+
+        @Override
+        public String toString() {
+            return "jointIndex=" + jointIndex
+                   + ", bias=" + bias
+                   + ", position=" + position;
+        }
+    }
+
+    private static class MD5Mesh {
+        List<MD5Weight> weightList;
+    }
 }

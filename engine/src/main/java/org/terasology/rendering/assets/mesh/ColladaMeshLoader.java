@@ -44,10 +44,12 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
 
     @Override
     public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+        logger.info("Loading mesh for " + urls);
+
         try {
-            parseData(stream);
+            parseMeshData(stream);
         } catch (ColladaParseException e) {
-            logger.error("Unable to load mesh", e);
+            logger.error("Unable to load mesh for " + urls, e);
             return null;
         }
 
