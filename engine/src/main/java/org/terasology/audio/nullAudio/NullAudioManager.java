@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.terasology.audio.nullAudio;
 
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.StaticSound;
@@ -69,6 +70,14 @@ public class NullAudioManager implements AudioManager {
 
     @Override
     public void playMusic(Sound sound) {
+    }
+
+    @Override
+    public void playSound(Sound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    }
+
+    @Override
+    public void playMusic(Sound sound, AudioEndListener endListener) {
     }
 
     @Override

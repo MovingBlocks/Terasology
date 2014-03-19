@@ -22,31 +22,26 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
-import org.terasology.rendering.nui.properties.Range;
-
-import javax.vecmath.Vector3f;
 
 /**
- * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>
+ * <b>Properties</b>: <b>music</b><br/>
  * <br/>
- * <b>RUNNING</b>: while sound is playing<br/>
- * <b>SUCCESS</b>: once sound ends playing<br/>
+ * <b>RUNNING</b>: while music is playing<br/>
+ * <b>SUCCESS</b>: once music ends playing<br/>
  * <b>FAILURE</b>: otherwise<br/>
  * <br/>
  * Auto generated javadoc - modify README.markdown instead!
  */
-public class PlaySoundNode extends Node {
-    @OneOf.Provider(name = "sounds")
-    private AssetUri sound;
-    @Range(min = 0, max = 1)
-    private float volume;
+public class PlayMusicNode extends Node {
+    @OneOf.Provider(name = "music")
+    private AssetUri music;
 
     @Override
     public Task createTask() {
-        return new PlaySoundTask(this);
+        return new PlayMusicTask(this);
     }
 
-    public static class PlaySoundTask extends Task implements AudioEndListener {
+    public static class PlayMusicTask extends Task implements AudioEndListener {
         @In
         private AudioManager audioManager;
         @In
@@ -54,22 +49,17 @@ public class PlaySoundNode extends Node {
         private boolean playing;
         private boolean finished;
 
-        public PlaySoundTask(Node node) {
+        public PlayMusicTask(Node node) {
             super(node);
         }
 
         @Override
         public void onInitialize() {
-            AssetUri uri = getNode().sound;
+            AssetUri uri = getNode().music;
             if (uri != null) {
-                Sound snd = assetManager.loadAsset(uri, Sound.class);
-                if (snd != null) {
-                    if (actor().hasLocation()) {
-                        Vector3f worldPosition = actor().location().getWorldPosition();
-                        audioManager.playSound(snd, worldPosition, getNode().volume, AudioManager.PRIORITY_NORMAL, this);
-                    } else {
-                        audioManager.playSound(snd, new Vector3f(), getNode().volume, AudioManager.PRIORITY_NORMAL, this);
-                    }
+                Sound asset = assetManager.loadAsset(uri, Sound.class);
+                if (asset != null) {
+                    audioManager.playMusic(asset, this);
                     playing = true;
                 }
             }
@@ -93,12 +83,11 @@ public class PlaySoundNode extends Node {
 
         @Override
         public void handle(Status result) {
-
         }
 
         @Override
-        public PlaySoundNode getNode() {
-            return (PlaySoundNode) super.getNode();
+        public PlayMusicNode getNode() {
+            return (PlayMusicNode) super.getNode();
         }
     }
 }

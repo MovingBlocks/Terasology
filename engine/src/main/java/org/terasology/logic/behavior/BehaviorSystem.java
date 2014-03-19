@@ -64,6 +64,7 @@ import java.util.Map;
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
+
     @In
     private EntityManager entityManager;
     @In
