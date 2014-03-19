@@ -96,4 +96,9 @@ public final class InputAction {
     public Vector2i getMousePosition() {
         return mousePosition;
     }
+    
+    @Override
+    public String toString() {
+        return "InputAction [" + this.input + " \'" + inputChar + "' (" + state + "), mouse: " + mousePosition + "]";
+    }
 }
