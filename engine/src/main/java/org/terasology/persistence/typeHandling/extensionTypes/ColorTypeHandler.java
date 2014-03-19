@@ -16,6 +16,7 @@
 package org.terasology.persistence.typeHandling.extensionTypes;
 
 import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
@@ -39,7 +40,13 @@ public class ColorTypeHandler extends SimpleTypeHandler<Color> {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {
                 TFloatList floats = dataArray.getAsFloatArray();
-                return new Color(floats.get(0), floats.get(1), floats.get(2), floats.get(3));
+                if (floats.size() == dataArray.size()) {
+                    return new Color(floats.get(0), floats.get(1), floats.get(2), floats.get(3));
+                }
+                TIntList ints = dataArray.getAsIntegerArray();
+                if (ints.size() == dataArray.size()) {
+                    return new Color(ints.get(0), ints.get(1), ints.get(2), ints.get(3));
+                }
             }
         }
         return null;
