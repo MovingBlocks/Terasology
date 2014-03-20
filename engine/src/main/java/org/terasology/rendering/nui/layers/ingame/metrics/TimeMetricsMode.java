@@ -31,6 +31,7 @@ public abstract class TimeMetricsMode extends MetricsMode {
 
     private int limit;
     private NumberFormat format;
+    private String unit = "ms";
 
 
     public TimeMetricsMode(String name, int limit) {
@@ -38,6 +39,11 @@ public abstract class TimeMetricsMode extends MetricsMode {
         this.limit = limit;
         format = NumberFormat.getInstance();
         format.setMaximumFractionDigits(2);
+    }
+
+    public TimeMetricsMode(String name, int limit, String unit) {
+        this(name, limit);
+        this.limit = limit;
     }
 
     public String getMetrics() {
@@ -59,7 +65,8 @@ public abstract class TimeMetricsMode extends MetricsMode {
             builder.append(activities.get(i));
             builder.append(": ");
             builder.append(format.format(values.get(i)));
-            builder.append("ms\n");
+            builder.append(unit);
+            builder.append("\n");
         }
     }
 

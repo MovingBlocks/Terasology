@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
+
+package org.terasology.rendering.nui.layers.ingame.metrics;
 
 import gnu.trove.map.TObjectDoubleMap;
+import org.terasology.monitoring.PerformanceMonitor;
 
 /**
- * Base interface for performance monitor implementations.
- *
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public interface PerformanceMonitorInternal {
-    void rollCycle();
+final class AllocationsMode extends TimeMetricsMode {
 
-    void startActivity(String activity);
+    public AllocationsMode() {
+        super("Memory Allocations", 10, "bytes");
+    }
 
-    void endActivity();
+    @Override
+    protected TObjectDoubleMap<String> gatherMetrics() {
+        return PerformanceMonitor.getAllocationMean();
+    }
 
-    TObjectDoubleMap<String> getRunningMean();
+    @Override
+    public boolean isAvailable() {
+        return true;
+    }
 
-    TObjectDoubleMap<String> getDecayingSpikes();
-
-    TObjectDoubleMap<String> getAllocationMean();
+    @Override
+    public boolean isPerformanceManagerMode() {
+        return true;
+    }
 }

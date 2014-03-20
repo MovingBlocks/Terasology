@@ -17,23 +17,18 @@ package org.terasology.monitoring.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
-import gnu.trove.TCollections;
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.map.hash.TObjectLongHashMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
-import gnu.trove.procedure.TObjectIntProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
-
-import java.util.Deque;
-import java.util.List;
-
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.registry.CoreRegistry;
+
+import java.util.Deque;
+import java.util.List;
 
 /**
  * Active implementation of Performance Monitor
@@ -48,14 +43,14 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     private Deque<Activity> activityStack;
     private List<TObjectLongMap<String>> metricData;
+    private List<TObjectLongMap<String>> allocationData;
     private TObjectLongMap<String> currentData;
+    private TObjectLongMap<String> currentMemData;
     private TObjectLongMap<String> runningTotals;
-    private TObjectIntMap<String> runningThreads;
-    private TObjectIntMap<String> stoppedThreads;
+    private TObjectLongMap<String> runningAllocationTotals;
     private long timerTicksPerSecond;
     private TObjectDoubleMap<String> spikeData;
     private double timeFactor;
-    private TObjectIntMap<String> lastRunningThreads;
 
     private Thread mainThread;
     private EngineTime timer;
@@ -64,13 +59,13 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         timer = (EngineTime) CoreRegistry.get(Time.class);
         activityStack = Queues.newArrayDeque();
         metricData = Lists.newLinkedList();
+        allocationData = Lists.newLinkedList();
         runningTotals = new TObjectLongHashMap<>();
+        runningAllocationTotals = new TObjectLongHashMap<>();
         timerTicksPerSecond = 1000;
         currentData = new TObjectLongHashMap<>();
+        currentMemData = new TObjectLongHashMap<>();
         spikeData = new TObjectDoubleHashMap<>();
-        runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
-        stoppedThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
-        lastRunningThreads = new TObjectIntHashMap<>();
         timeFactor = 1000.0 / timerTicksPerSecond;
         mainThread = Thread.currentThread();
 
@@ -78,6 +73,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
 
     public void rollCycle() {
         metricData.add(currentData);
+        allocationData.add(currentMemData);
         spikeData.forEachEntry(new TObjectDoubleProcedure<String>() {
             public boolean execute(String s, double v) {
                 spikeData.put(s, v * DECAY_RATE);
@@ -97,6 +93,13 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             }
         });
 
+        currentMemData.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String s, long v) {
+                runningAllocationTotals.adjustOrPutValue(s, v, v);
+                return true;
+            }
+        });
+
         while (metricData.size() > RETAINED_CYCLES) {
             metricData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
                 public boolean execute(String s, long v) {
@@ -106,24 +109,17 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             });
             metricData.remove(0);
         }
-        currentData = new TObjectLongHashMap<String>();
-
-        runningThreads.forEachEntry(new TObjectIntProcedure<String>() {
-            public boolean execute(String s, int i) {
-                lastRunningThreads.adjustOrPutValue(s, i, i);
-                return true;
-            }
-        });
-        TObjectIntMap<String> temp = runningThreads;
-        temp.clear();
-        runningThreads = stoppedThreads;
-        stoppedThreads = temp;
-        lastRunningThreads.retainEntries(new TObjectIntProcedure<String>() {
-            public boolean execute(String s, int i) {
-                return i > 0;
-            }
-        });
-
+        while (allocationData.size() > RETAINED_CYCLES) {
+            allocationData.get(0).forEachEntry(new TObjectLongProcedure<String>() {
+                public boolean execute(String s, long v) {
+                    runningAllocationTotals.adjustValue(s, -v);
+                    return true;
+                }
+            });
+            allocationData.remove(0);
+        }
+        currentData = new TObjectLongHashMap<>();
+        currentMemData = new TObjectLongHashMap<>();
     }
 
     public void startActivity(String activity) {
@@ -133,9 +129,11 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         Activity newActivity = new Activity();
         newActivity.name = activity;
         newActivity.startTime = timer.getRawTimeInMs();
+        newActivity.startMem = Runtime.getRuntime().freeMemory();
         if (!activityStack.isEmpty()) {
             Activity currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
+            currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0) ? currentActivity.startMem - newActivity.startMem : 0;
         }
 
         activityStack.push(newActivity);
@@ -150,10 +148,14 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         long time = timer.getRawTimeInMs();
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
         currentData.adjustOrPutValue(oldActivity.name, total, total);
+        long endMem = Runtime.getRuntime().freeMemory();
+        long totalMem = (oldActivity.startMem - endMem > 0) ? oldActivity.startMem - endMem + oldActivity.ownMem : oldActivity.ownMem;
+        currentMemData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {
             Activity currentActivity = activityStack.peek();
             currentActivity.resumeTime = time;
+            currentActivity.startMem = endMem;
         }
     }
 
@@ -175,16 +177,19 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         return spikeData;
     }
 
-    public void startThread(String name) {
-        runningThreads.adjustOrPutValue(name, 1, 1);
-    }
-
-    public void endThread(String name) {
-        stoppedThreads.adjustOrPutValue(name, -1, -1);
-    }
-
-    public TObjectIntMap<String> getRunningThreads() {
-        return lastRunningThreads;
+    @Override
+    public TObjectDoubleMap<String> getAllocationMean() {
+        final TObjectDoubleMap<String> result = new TObjectDoubleHashMap<String>();
+        final double factor = 1.0 / allocationData.size();
+        runningAllocationTotals.forEachEntry(new TObjectLongProcedure<String>() {
+            public boolean execute(String s, long l) {
+                if (l > 0) {
+                    result.put(s, l * factor);
+                }
+                return true;
+            }
+        });
+        return result;
     }
 
     private static class Activity {
@@ -192,5 +197,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         public long startTime;
         public long resumeTime;
         public long ownTime;
+        public long startMem;
+        public long ownMem;
     }
 }

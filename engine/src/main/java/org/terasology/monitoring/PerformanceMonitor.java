@@ -16,6 +16,7 @@
 package org.terasology.monitoring;
 
 import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.TObjectLongMap;
 import org.terasology.monitoring.impl.NullPerformanceMonitor;
 import org.terasology.monitoring.impl.PerformanceMonitorImpl;
 import org.terasology.monitoring.impl.PerformanceMonitorInternal;
@@ -78,6 +79,13 @@ public final class PerformanceMonitor {
      */
     public static TObjectDoubleMap<String> getDecayingSpikes() {
         return instance.getDecayingSpikes();
+    }
+
+    /**
+     * @return A mapping of activities to a running mean of memory allocation
+     */
+    public static TObjectDoubleMap<String> getAllocationMean() {
+        return instance.getAllocationMean();
     }
 
     /**
