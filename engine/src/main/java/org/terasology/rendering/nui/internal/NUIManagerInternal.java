@@ -466,7 +466,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         }
         for (UIScreenLayer screen : screens) {
             if (screen.isModal()) {
-                event.consume();
+//                event.consume();
                 return;
             }
         }
