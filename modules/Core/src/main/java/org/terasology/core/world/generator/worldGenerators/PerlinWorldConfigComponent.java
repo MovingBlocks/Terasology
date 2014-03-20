@@ -22,13 +22,14 @@ import org.terasology.rendering.nui.properties.TextField;
 
 /**
  * Some configs for {@link PerlinWorldGenerator}
+ *
  * @author Martin Steiger
  */
 public class PerlinWorldConfigComponent implements Component {
 
     @TextField(label = "World Title")
     private String worldTitle = "New World";
-    
+
     @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for forests")
     private float forestGrassDensity = 0.3f;
 
@@ -43,5 +44,23 @@ public class PerlinWorldConfigComponent implements Component {
 
     @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the grass density for deserts")
     private float desertGrassDensity = 0.001f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the coal density")
+    private float coalDensity = 0.050f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the iron density")
+    private float ironDensity = 0.010f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the copper density")
+    private float copperDensity = 0.010f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the gold density")
+    private float goldDensity = 0.005f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the diamond density")
+    private float diamondDensity = 0.001f;
+
+    @Range(min = 0, max = 1.0f, increment = 0.001f, precision = 3, description = "Define the gravel density")
+    private float gravelDensity = 0.050f;
 
 }
