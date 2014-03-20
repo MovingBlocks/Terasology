@@ -42,7 +42,12 @@ public class LightPropagationRules extends CommonLightPropagationRules {
 
     @Override
     public byte getValue(ChunkImpl chunk, Vector3i pos) {
-        return chunk.getLight(pos);
+        return getValue(chunk, pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public byte getValue(ChunkImpl chunk, int x, int y, int z) {
+        return chunk.getLight(x, y, z);
     }
 
     @Override

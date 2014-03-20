@@ -113,11 +113,36 @@ public final class Region3i implements Iterable<Vector3i> {
         return new Vector3i(min);
     }
 
+    public int minX() {
+        return min.x;
+    }
+
+    public int minY() {
+        return min.y;
+    }
+
+    public int minZ() {
+        return min.z;
+    }
+
     /**
      * @return The size of the region
      */
     public Vector3i size() {
         return new Vector3i(size);
+    }
+
+
+    public int sizeX() {
+        return size.x;
+    }
+
+    public int sizeY() {
+        return size.y;
+    }
+
+    public int sizeZ() {
+        return size.z;
     }
 
     /**
@@ -128,6 +153,18 @@ public final class Region3i implements Iterable<Vector3i> {
         max.add(size);
         max.sub(1, 1, 1);
         return max;
+    }
+
+    public int maxX() {
+        return min.x + size.x - 1;
+    }
+
+    public int maxY() {
+        return min.y + size.y - 1;
+    }
+
+    public int maxZ() {
+        return min.z + size.z - 1;
     }
 
     /**

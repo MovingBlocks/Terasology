@@ -167,12 +167,18 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public final Block getBlock(Vector3i pos) {
-        return blockManager.getBlock((short) blockData.get(pos.x, pos.y, pos.z));
+        short id = (short) blockData.get(pos.x, pos.y, pos.z);
+        return blockManager.getBlock(id);
     }
 
     @Override
     public final Block getBlock(int x, int y, int z) {
-        return blockManager.getBlock((short) blockData.get(x, y, z));
+        short id = (short) blockData.get(x, y, z);
+        return blockManager.getBlock(id);
+    }
+
+    public final short getBlockId(int x, int y, int z) {
+        return (short) blockData.get(x, y, z);
     }
 
     @Override
@@ -320,67 +326,92 @@ public class ChunkImpl implements Chunk {
     }
 
     public void deflate() {
-        lock();
-        try {
-            final TeraDeflator def = new TeraStandardDeflator();
-            if (logger.isDebugEnabled()) {
-                int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
-                int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
-                int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
+        final TeraDeflator def = new TeraStandardDeflator();
+        if (logger.isDebugEnabled()) {
+            int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
+            int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
+            int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
+            int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
+            int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
 
-                blockData = def.deflate(blockData);
-                sunlightData = def.deflate(sunlightData);
-                sunlightRegenData = def.deflate(sunlightRegenData);
-                lightData = def.deflate(lightData);
-                extraData = def.deflate(extraData);
+            blockData = def.deflate(blockData);
+            lightData = def.deflate(lightData);
+            extraData = def.deflate(extraData);
 
-                int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
-                int sunlightRegenReduced = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
-                int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
-                int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
-                int totalReduced = blocksReduced + sunlightRegenReduced + sunlightReduced + lightReduced + liquidReduced;
+            int blocksReduced = blockData.getEstimatedMemoryConsumptionInBytes();
+            int lightReduced = lightData.getEstimatedMemoryConsumptionInBytes();
+            int liquidReduced = extraData.getEstimatedMemoryConsumptionInBytes();
+            int totalReduced = blocksReduced + sunlightRegenSize + sunlightSize + lightReduced + liquidReduced;
 
-                double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
-                double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
-                double sunlightRegenPercent = 100d - (100d / sunlightRegenSize * sunlightRegenReduced);
-                double lightPercent = 100d - (100d / lightSize * lightReduced);
-                double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
-                double totalPercent = 100d - (100d / totalSize * totalReduced);
+            double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
+            double lightPercent = 100d - (100d / lightSize * lightReduced);
+            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
+            double totalPercent = 100d - (100d / totalSize * totalReduced);
 
-                logger.debug("chunk {}: " +
-                        "size-before: {} " +
-                        "bytes, size-after: {} " +
-                        "bytes, total-deflated-by: {}%, " +
-                        "blocks-deflated-by={}%, " +
-                        "sunlight-deflated-by={}%, " +
-                        "sunlight-regen-deflated-by={}%, " +
-                        "light-deflated-by={}%, " +
-                        "liquid-deflated-by={}%",
-                        chunkPos,
-                        SIZE_FORMAT.format(totalSize),
-                        SIZE_FORMAT.format(totalReduced),
-                        PERCENT_FORMAT.format(totalPercent),
-                        PERCENT_FORMAT.format(blocksPercent),
-                        PERCENT_FORMAT.format(sunlightPercent),
-                        PERCENT_FORMAT.format(sunlightRegenPercent),
-                        PERCENT_FORMAT.format(lightPercent),
-                        PERCENT_FORMAT.format(liquidPercent));
-                ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
-            } else {
-                final int oldSize = getEstimatedMemoryConsumptionInBytes();
-                blockData = def.deflate(blockData);
-                sunlightData = def.deflate(sunlightData);
-                sunlightRegenData = def.deflate(sunlightRegenData);
-                lightData = def.deflate(lightData);
-                extraData = def.deflate(extraData);
-                ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
-            }
-        } finally {
-            unlock();
+            logger.debug("chunk {}: " +
+                    "size-before: {} " +
+                    "bytes, size-after: {} " +
+                    "bytes, total-deflated-by: {}%, " +
+                    "blocks-deflated-by={}%, " +
+                    "light-deflated-by={}%, " +
+                    "liquid-deflated-by={}%",
+                    chunkPos,
+                    SIZE_FORMAT.format(totalSize),
+                    SIZE_FORMAT.format(totalReduced),
+                    PERCENT_FORMAT.format(totalPercent),
+                    PERCENT_FORMAT.format(blocksPercent),
+                    PERCENT_FORMAT.format(lightPercent),
+                    PERCENT_FORMAT.format(liquidPercent));
+            ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
+        } else {
+            final int oldSize = getEstimatedMemoryConsumptionInBytes();
+            blockData = def.deflate(blockData);
+            lightData = def.deflate(lightData);
+            extraData = def.deflate(extraData);
+            ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
+        }
+    }
+
+    public void deflateSunlight() {
+        final TeraDeflator def = new TeraStandardDeflator();
+        if (logger.isDebugEnabled()) {
+            int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
+            int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
+            int sunlightRegenSize = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
+            int lightSize = lightData.getEstimatedMemoryConsumptionInBytes();
+            int liquidSize = extraData.getEstimatedMemoryConsumptionInBytes();
+            int totalSize = blocksSize + sunlightRegenSize + sunlightSize + lightSize + liquidSize;
+
+            sunlightData = def.deflate(sunlightData);
+            sunlightRegenData = def.deflate(sunlightRegenData);
+
+            int sunlightReduced = sunlightData.getEstimatedMemoryConsumptionInBytes();
+            int sunlightRegenReduced = sunlightRegenData.getEstimatedMemoryConsumptionInBytes();
+            int totalReduced = blocksSize + sunlightRegenReduced + sunlightReduced + lightSize + liquidSize;
+
+            double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+            double sunlightRegenPercent = 100d - (100d / sunlightRegenSize * sunlightRegenReduced);
+            double totalPercent = 100d - (100d / totalSize * totalReduced);
+
+            logger.debug("chunk {}: " +
+                    "size-before: {} " +
+                    "bytes, size-after: {} " +
+                    "bytes, total-deflated-by: {}%, " +
+                    "sunlight-deflated-by={}%, " +
+                    "sunlight-regen-deflated-by={}%, " +
+                    chunkPos,
+                    SIZE_FORMAT.format(totalSize),
+                    SIZE_FORMAT.format(totalReduced),
+                    PERCENT_FORMAT.format(totalPercent),
+                    PERCENT_FORMAT.format(sunlightPercent),
+                    PERCENT_FORMAT.format(sunlightRegenPercent));
+            ChunkMonitor.fireChunkDeflated(this, totalSize, totalReduced);
+        } else {
+            final int oldSize = getEstimatedMemoryConsumptionInBytes();
+            sunlightData = def.deflate(sunlightData);
+            sunlightRegenData = def.deflate(sunlightRegenData);
+            ChunkMonitor.fireChunkDeflated(this, oldSize, getEstimatedMemoryConsumptionInBytes());
         }
     }
 

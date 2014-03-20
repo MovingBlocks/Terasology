@@ -76,6 +76,8 @@ public interface PropagationRules {
      */
     byte getValue(ChunkImpl chunk, Vector3i pos);
 
+    byte getValue(ChunkImpl chunk, int x, int y, int z);
+
     /**
      * Sets the value for a given chunk position
      * @param chunk

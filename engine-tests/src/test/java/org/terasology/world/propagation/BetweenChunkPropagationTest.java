@@ -121,6 +121,26 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     @Test
+    public void betweenChunksSimpleSunlightRegenOnly() {
+        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+
+        provider.addChunk(topChunk);
+        provider.addChunk(bottomChunk);
+
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
+            topChunk.setSunlight(pos, ChunkConstants.MAX_SUNLIGHT);
+            topChunk.setSunlightRegen(pos, ChunkConstants.MAX_SUNLIGHT_REGEN);
+        }
+        InternalLightProcessor.generateInternalLighting(bottomChunk);
+        propagator.propagateBetween(topChunk, bottomChunk, Side.BOTTOM, true);
+        propagator.process();
+        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+            assertEquals("Incorrect at position " + pos, ChunkConstants.MAX_SUNLIGHT_REGEN, bottomChunk.getSunlightRegen(pos));
+        }
+    }
+
+    @Test
     public void betweenChunksWithOverhang() {
         ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
         ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));

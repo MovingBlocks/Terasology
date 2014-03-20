@@ -81,7 +81,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -103,9 +102,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
 
-    private ConcurrentMap<Vector3i, ChunkImpl> nearCache = Maps.newConcurrentMap();
+    private Map<Vector3i, ChunkImpl> nearCache = Maps.newConcurrentMap();
 
-    private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
+    private final Set<Vector3i> preparingChunks = Sets.newHashSet();
     private final BlockingQueue<ReadyChunkInfo> readyChunks = Queues.newLinkedBlockingQueue();
     private List<ReadyChunkInfo> sortedReadyChunks = Lists.newArrayList();
     private final BlockingQueue<TShortObjectMap<TIntList>> deactivateBlocksQueue = Queues.newLinkedBlockingQueue();
@@ -155,13 +154,13 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
+        ChunkImpl[] chunks = new ChunkImpl[region.sizeX() * region.sizeY() * region.sizeZ()];
         for (Vector3i chunkPos : region) {
             ChunkImpl chunk = nearCache.get(chunkPos);
             if (chunk == null || !chunk.isReady()) {
                 return null;
             }
-            chunkPos.sub(region.min());
+            chunkPos.sub(region.minX(), region.minY(), region.minZ());
             int index = TeraMath.calculate3DArrayIndex(chunkPos, region.size());
             chunks[index] = chunk;
         }
@@ -208,7 +207,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             if (chunk != null) {
                 region.chunkReady(chunk);
             } else {
-                pipeline.doTask(new CreateOrLoadChunkTask(pipeline, pos, this));
+                createOrLoadChunk(pos);
+                //pipeline.doTask(new CreateOrLoadChunkTask(pipeline, pos, this));
             }
         }
     }
@@ -250,12 +250,26 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void makeChunksAvailable() {
-        readyChunks.drainTo(sortedReadyChunks);
-        if (!sortedReadyChunks.isEmpty()) {
+        List<ReadyChunkInfo> newReadyChunks = Lists.newArrayListWithExpectedSize(readyChunks.size());
+        readyChunks.drainTo(newReadyChunks);
+        for (ReadyChunkInfo readyChunkInfo : newReadyChunks) {
+            nearCache.put(readyChunkInfo.getPos(), readyChunkInfo.getChunk());
+            preparingChunks.remove(readyChunkInfo.getPos());
+        }
+        if (!newReadyChunks.isEmpty()) {
+            sortedReadyChunks.addAll(newReadyChunks);
             Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
-            for (int i = 0; i < LOAD_PER_FRAME && !sortedReadyChunks.isEmpty(); ++i) {
-                ReadyChunkInfo readyChunkInfo = sortedReadyChunks.remove(sortedReadyChunks.size() - 1);
-                makeChunkAvailable(readyChunkInfo);
+        }
+        if (!sortedReadyChunks.isEmpty()) {
+            int loaded = 0;
+            for (int i = sortedReadyChunks.size() - 1; i >= 0 && loaded < LOAD_PER_FRAME; i--) {
+                ReadyChunkInfo chunkInfo = sortedReadyChunks.get(i);
+                PerformanceMonitor.startActivity("Make Chunk Available");
+                if (makeChunkAvailable(chunkInfo)) {
+                    sortedReadyChunks.remove(i);
+                    loaded++;
+                }
+                PerformanceMonitor.endActivity();
             }
         }
     }
@@ -301,7 +315,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 try {
                     if (!chunk.isReady()) {
                         // Chunk hasn't been finished or changed, so just drop it.
-                        nearCache.remove(pos);
+                        iterator.remove();
+                        Iterator<ReadyChunkInfo> infoIterator = sortedReadyChunks.iterator();
+                        while (infoIterator.hasNext()) {
+                            ReadyChunkInfo next = infoIterator.next();
+                            if (next.getPos().equals(chunk.getPos())) {
+                                infoIterator.remove();
+                                break;
+                            }
+                        }
                         continue;
                     }
                     worldEntity.send(new BeforeChunkUnload(pos));
@@ -347,11 +369,17 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
     }
 
-    private void makeChunkAvailable(ReadyChunkInfo readyChunkInfo) {
+    private boolean makeChunkAvailable(ReadyChunkInfo readyChunkInfo) {
         ChunkImpl chunk = nearCache.get(readyChunkInfo.getPos());
         if (chunk == null) {
-            return;
+            return false;
         }
+        for (Vector3i pos : Region3i.createFromCenterExtents(readyChunkInfo.getPos(), 1)) {
+            if (nearCache.get(pos) == null) {
+                return false;
+            }
+        }
+
         chunk.lock();
         try {
             chunk.markReady();
@@ -398,7 +426,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 for (int y = -1; y < 2; ++y) {
                     for (int x = -1; x < 2; ++x) {
                         ChunkImpl localChunk = getChunk(chunk.getPos().x + x, chunk.getPos().y + y, chunk.getPos().z + z);
-                        if (localChunk != null && localChunk.isReady()) {
+                        if (localChunk != null) {
                             localChunks[index] = localChunk;
                         }
                         index++;
@@ -420,8 +448,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 // Propagate Inwards
                 for (Side side : Side.values()) {
                     Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
-                    ChunkImpl adjChunk = getChunk(adjChunkPos);
-                    if (adjChunk != null && adjChunk.isReady()) {
+                    ChunkImpl adjChunk = nearCache.get(adjChunkPos);
+                    if (adjChunk != null) {
                         propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
                     }
                 }
@@ -430,31 +458,15 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                 for (Side side : Side.values()) {
                     Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
                     ChunkImpl adjChunk = getChunk(adjChunkPos);
-                    if (adjChunk != null && adjChunk.isReady()) {
-                        propagator.propagateBetween(chunk, adjChunk, side, false);
-                    }
-                }
-
-                // Propagate Further
-                for (Side side : Side.values()) {
-                    Vector3i adjChunkPos = side.getAdjacentPos(readyChunkInfo.getPos());
-                    ChunkImpl adjChunk = getChunk(adjChunkPos);
-                    if (adjChunk != null && adjChunk.isReady()) {
-                        for (Side tangentSide : side.tangents()) {
-                            Vector3i tangentChunkPos = tangentSide.getAdjacentPos(adjChunkPos);
-                            ChunkImpl tangentChunk = getChunk(tangentChunkPos);
-                            if (tangentChunk != null && tangentChunk.isReady()) {
-                                propagator.propagateBetween(adjChunk, tangentChunk, tangentSide, true);
-                            }
-                        }
+                    if (adjChunk != null) {
+                        propagator.propagateBetween(chunk, adjChunk, side, true);
                     }
                 }
             }
             for (BatchPropagator propagator : propagators) {
-                //PerformanceMonitor.startActivity(propagator.toString());
                 propagator.process();
-                //PerformanceMonitor.endActivity();
             }
+            chunk.deflateSunlight();
             PerformanceMonitor.endActivity();
 
 
@@ -468,6 +480,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         } finally {
             chunk.unlock();
         }
+        return true;
     }
 
     // Generates all non-temporary block entities
@@ -578,69 +591,56 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     @Override
     public void createOrLoadChunk(Vector3i chunkPos) {
         ChunkImpl chunk = nearCache.get(chunkPos);
-        if (chunk == null) {
-            PerformanceMonitor.startActivity("Check chunk in cache");
-            if (preparingChunks.add(chunkPos)) {
-                if (nearCache.get(chunkPos) != null) {
-                    // This happens if the chunk is completed right before checking if it is in preparing chunks. Fun.
-                    preparingChunks.remove(chunkPos);
-                } else if (storageManager.containsChunkStoreFor(chunkPos)) {
-                    pipeline.doTask(new AbstractChunkTask(chunkPos, this) {
-                        @Override
-                        public String getName() {
-                            return "Load Chunk";
-                        }
+        if (chunk == null && !preparingChunks.contains(chunkPos)) {
+            preparingChunks.add(chunkPos);
+            if (storageManager.containsChunkStoreFor(chunkPos)) {
+                pipeline.doTask(new AbstractChunkTask(chunkPos, this) {
+                    @Override
+                    public String getName() {
+                        return "Load Chunk";
+                    }
 
-                        @Override
-                        public void run() {
-                            ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
-                            ChunkImpl chunk = chunkStore.getChunk();
+                    @Override
+                    public void run() {
+                        ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
+                        ChunkImpl chunk = chunkStore.getChunk();
 
-                            try {
-                                chunk.lock();
+                        try {
+                            chunk.lock();
 
-                                if (nearCache.putIfAbsent(getPosition(), chunkStore.getChunk()) != null) {
-                                    logger.warn("Chunk {} is already in the near cache", getPosition());
-                                }
-                                preparingChunks.remove(getPosition());
-                                InternalLightProcessor.generateInternalLighting(chunk);
-                                chunk.deflate();
-                                readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk), chunkStore));
-                            } finally {
-                                chunk.unlock();
-                            }
-                        }
-                    });
-                } else {
-                    pipeline.doTask(new AbstractChunkTask(chunkPos, this) {
-
-                        @Override
-                        public String getName() {
-                            return "Generate Chunk";
-                        }
-
-                        @Override
-                        public void run() {
-                            ChunkImpl chunk = new ChunkImpl(getPosition());
-                            generator.createChunk(chunk);
-                            if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
-                                logger.warn("Chunk {} is already in the near cache", getPosition());
-                            }
                             InternalLightProcessor.generateInternalLighting(chunk);
                             chunk.deflate();
-                            readyChunks.offer(new ReadyChunkInfo(chunk.getPos(), createBatchBlockEventMappings(chunk)));
-                            preparingChunks.remove(getPosition());
+                            readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), chunkStore));
+                        } finally {
+                            chunk.unlock();
                         }
-                    });
-                }
+                    }
+                });
+            } else {
+                pipeline.doTask(new AbstractChunkTask(chunkPos, this) {
+
+                    @Override
+                    public String getName() {
+                        return "Generate Chunk";
+                    }
+
+                    @Override
+                    public void run() {
+                        ChunkImpl chunk = new ChunkImpl(getPosition());
+                        generator.createChunk(chunk);
+
+                        InternalLightProcessor.generateInternalLighting(chunk);
+                        chunk.deflate();
+                        readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk)));
+                    }
+                });
             }
-            PerformanceMonitor.endActivity();
         }
     }
 
     @Override
-    public void onChunkIsReady(Vector3i position) {
-        readyChunks.offer(new ReadyChunkInfo(position, createBatchBlockEventMappings(nearCache.get(position))));
+    public void onChunkIsReady(ChunkImpl chunk) {
+        readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk)));
     }
 
     @Override

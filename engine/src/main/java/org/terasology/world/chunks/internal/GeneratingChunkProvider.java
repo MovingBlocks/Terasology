@@ -53,9 +53,9 @@ public interface GeneratingChunkProvider extends ChunkProvider {
     /**
      * Notifies the chunk provider that a chunk is ready.
      *
-     * @param position
+     * @param chunk
      */
-    void onChunkIsReady(Vector3i position);
+    void onChunkIsReady(ChunkImpl chunk);
 
     WorldGenerator getWorldGenerator();
 }

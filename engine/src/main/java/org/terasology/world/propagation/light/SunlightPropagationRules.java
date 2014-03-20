@@ -52,7 +52,12 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
     }
 
     public byte getValue(ChunkImpl chunk, Vector3i pos) {
-        return chunk.getSunlight(pos);
+        return getValue(chunk, pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public byte getValue(ChunkImpl chunk, int x, int y, int z) {
+        return chunk.getSunlight(x, y, z);
     }
 
     public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {

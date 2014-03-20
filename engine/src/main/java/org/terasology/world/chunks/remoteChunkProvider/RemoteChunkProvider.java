@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
@@ -29,9 +28,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ChunkMonitor;
-import org.terasology.world.chunks.pipeline.InternalLightingChunkTask;
-import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.internal.ChunkViewCoreImpl;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
@@ -39,8 +36,11 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.internal.RemoteWorldGenerator;
+import org.terasology.world.chunks.pipeline.InternalLightingChunkTask;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.internal.RemoteWorldGenerator;
+import org.terasology.world.internal.ChunkViewCore;
+import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.PropagationRules;
 import org.terasology.world.propagation.PropagatorWorldView;
@@ -65,7 +65,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, ChunkImpl> chunkCache = Maps.newHashMap();
-    private final BlockingQueue<Vector3i> readyChunks = Queues.newLinkedBlockingQueue();
+    private final BlockingQueue<ChunkImpl> readyChunks = Queues.newLinkedBlockingQueue();
     private ChunkReadyListener listener;
 
     private ChunkGenerationPipeline pipeline;
@@ -103,12 +103,11 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void update() {
         if (listener != null) {
-            Vector3i pos = readyChunks.poll();
-            if (pos != null) {
-                ChunkImpl chunk = chunkCache.get(pos);
+            ChunkImpl chunk = readyChunks.poll();
+            if (chunk != null) {
                 chunk.markReady();
                 for (Side side : Side.horizontalSides()) {
-                    Vector3i adjChunkPos = side.getAdjacentPos(pos);
+                    Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPos());
                     ChunkImpl adjChunk = getChunk(adjChunkPos);
                     if (adjChunk != null) {
                         for (BatchPropagator propagator : loadEdgePropagators) {
@@ -119,7 +118,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                 for (BatchPropagator propagator : loadEdgePropagators) {
                     propagator.process();
                 }
-                listener.onChunkReady(pos);
+                listener.onChunkReady(chunk.getPos());
             }
         }
     }
@@ -150,7 +149,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void purgeChunks() {
-   }
+    }
 
     @Override
     public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
@@ -222,9 +221,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void onChunkIsReady(Vector3i position) {
+    public void onChunkIsReady(ChunkImpl chunk) {
         try {
-            readyChunks.put(position);
+            readyChunks.put(chunk);
         } catch (InterruptedException e) {
             logger.warn("Failed to add chunk to ready queue", e);
         }

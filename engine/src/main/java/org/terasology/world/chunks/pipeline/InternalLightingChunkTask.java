@@ -52,7 +52,7 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
             }
             InternalLightProcessor.generateInternalLighting(chunk);
             chunk.deflate();
-            getProvider().onChunkIsReady(chunk.getPos());
+            getProvider().onChunkIsReady(chunk);
         } finally {
             chunk.unlock();
         }

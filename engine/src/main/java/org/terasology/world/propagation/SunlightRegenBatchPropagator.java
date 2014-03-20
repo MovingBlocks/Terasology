@@ -215,61 +215,32 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     @Override
     public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal) {
         if (side == Side.BOTTOM) {
-            propagateDown(chunk, adjChunk, propagateExternal);
+            int[] depth = new int[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z];
+            int[] startingRegen = new int[depth.length];
+            propagateSweep(chunk, adjChunk, depth, startingRegen);
+
+            int[] adjDepths = new int[depth.length];
+            TeraMath.populateMinAdjacent2D(depth, adjDepths, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, !propagateExternal);
+            if (propagateExternal) {
+                for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+                    adjDepths[z * ChunkConstants.SIZE_X] = 0;
+                    adjDepths[ChunkConstants.SIZE_X - 1 + z * ChunkConstants.SIZE_X] = 0;
+                }
+                for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
+                    adjDepths[x] = 0;
+                    adjDepths[x + ChunkConstants.SIZE_X * (ChunkConstants.SIZE_Z - 1)] = 0;
+                }
+            }
+
+            int[] adjStartingRegen = new int[depth.length];
+            TeraMath.populateMinAdjacent2D(startingRegen, adjStartingRegen, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, true);
+
+            markForPropagation(adjChunk, depth, startingRegen, adjDepths, adjStartingRegen);
         }
     }
 
-    private void propagateDown(ChunkImpl fromChunk, ChunkImpl toChunk, boolean propagateExternal) {
-        int[] depth = new int[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Z];
-        int[] startingRegen = new int[depth.length];
+    private void markForPropagation(ChunkImpl toChunk, int[] depth, int[] startingRegen, int[] adjDepths, int[] adjStartingRegen) {
         Vector3i pos = new Vector3i();
-        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
-            for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
-                int depthIndex = x + ChunkConstants.SIZE_X * z;
-                startingRegen[depthIndex] = regenRules.getValue(fromChunk, new Vector3i(x, 0, z));
-                byte expectedValue = (byte) Math.min(startingRegen[depthIndex] + 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
-                Block prevBlock = fromChunk.getBlock(x, 0, z);
-                pos.set(x, ChunkConstants.SIZE_Y - 1, z);
-
-                int currentValue = regenRules.getValue(toChunk, pos);
-                while (expectedValue > currentValue && regenRules.canSpreadOutOf(prevBlock, Side.BOTTOM)) {
-                    prevBlock = toChunk.getBlock(pos);
-                    if (regenRules.canSpreadInto(prevBlock, Side.TOP)) {
-                        regenRules.setValue(toChunk, pos, expectedValue);
-                        depth[depthIndex]++;
-                        byte sunlight = (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
-                        if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
-                            toChunk.setSunlight(pos, sunlight);
-                            //sunlightPropagator.propagateFrom(toChunk.getBlockWorldPos(pos), sunlight);
-                        }
-                        if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
-                            expectedValue++;
-                        }
-                        pos.y--;
-                        currentValue = regenRules.getValue(toChunk, pos);
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-
-        int[] adjDepths = new int[depth.length];
-        TeraMath.populateMinAdjacent2D(depth, adjDepths, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, !propagateExternal);
-        if (propagateExternal) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
-                adjDepths[z * ChunkConstants.SIZE_X] = 0;
-                adjDepths[ChunkConstants.SIZE_X - 1 + z * ChunkConstants.SIZE_X] = 0;
-            }
-            for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
-                adjDepths[x] = 0;
-                adjDepths[x + ChunkConstants.SIZE_X * (ChunkConstants.SIZE_Z - 1)] = 0;
-            }
-        }
-
-        int[] adjStartingRegen = new int[depth.length];
-        TeraMath.populateMinAdjacent2D(startingRegen, adjStartingRegen, ChunkConstants.SIZE_X, ChunkConstants.SIZE_Z, true);
-
         for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
             for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
                 int depthIndex = x + ChunkConstants.SIZE_X * z;
@@ -300,6 +271,40 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
                     }
                 }
 
+            }
+        }
+    }
+
+    private void propagateSweep(ChunkImpl fromChunk, ChunkImpl toChunk, int[] depth, int[] startingRegen) {
+        Vector3i pos = new Vector3i();
+        for (int z = 0; z < ChunkConstants.SIZE_Z; ++z) {
+            for (int x = 0; x < ChunkConstants.SIZE_X; ++x) {
+                int depthIndex = x + ChunkConstants.SIZE_X * z;
+                startingRegen[depthIndex] = regenRules.getValue(fromChunk, new Vector3i(x, 0, z));
+                byte expectedValue = (byte) Math.min(startingRegen[depthIndex] + 1, ChunkConstants.MAX_SUNLIGHT_REGEN);
+                Block fromBlock = fromChunk.getBlock(x, 0, z);
+                Block toBlock = toChunk.getBlock(x, ChunkConstants.SIZE_Y - 1, z);
+                if (!(regenRules.canSpreadOutOf(fromBlock, Side.BOTTOM) && regenRules.canSpreadInto(toBlock, Side.TOP))) {
+                    continue;
+                }
+                byte predictedValue = 0;
+                pos.set(x, ChunkConstants.SIZE_Y - 1, z);
+
+                int currentValue = regenRules.getValue(toChunk, pos);
+                while (currentValue == predictedValue && expectedValue > currentValue) {
+                    regenRules.setValue(toChunk, pos, expectedValue);
+                    depth[depthIndex]++;
+                    byte sunlight = (byte) (expectedValue - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
+                    if (sunlight > 0 && sunlight > toChunk.getSunlight(pos)) {
+                        toChunk.setSunlight(pos, sunlight);
+                    }
+                    if (expectedValue < ChunkConstants.MAX_SUNLIGHT_REGEN) {
+                        expectedValue++;
+                    }
+                    predictedValue++;
+                    pos.y--;
+                    currentValue = regenRules.getValue(toChunk, pos);
+                }
             }
         }
     }
