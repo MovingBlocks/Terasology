@@ -16,6 +16,9 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -30,6 +33,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -41,6 +45,9 @@ import java.util.Collection;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
+    
+    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
+    
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
@@ -83,6 +90,7 @@ public final class Terasology {
             }
             engine.dispose();
         } catch (Throwable t) {
+            logger.error("Fatal Error", t);
             String text = getNestedMessageText(t);
             JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
         }
