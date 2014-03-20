@@ -101,6 +101,12 @@ public class ConsoleScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void onOpened() {
+        super.onOpened();
+        getManager().setFocus(commandLine);
+    }
+
+    @Override
     protected InteractionListener getScreenListener() {
         return screenListener;
     }
