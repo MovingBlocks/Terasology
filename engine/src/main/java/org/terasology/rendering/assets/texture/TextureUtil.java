@@ -17,11 +17,12 @@
 package org.terasology.rendering.assets.texture;
 
 import com.google.common.primitives.UnsignedBytes;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rect2i;
+import org.terasology.rendering.nui.Color;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
@@ -56,25 +57,25 @@ public final class TextureUtil {
      * @return hexColorName RRGGBBAA in lower-case hex notation
      */
     private static void appendColorName(StringBuilder sb, Color color) {
-        int red = color.getRed();
+        int red = color.r();
         if (red < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(red));
 
-        int green = color.getGreen();
+        int green = color.g();
         if (green < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(green));
 
-        int blue = color.getBlue();
+        int blue = color.b();
         if (blue < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(blue));
 
-        int alpha = color.getAlpha();
+        int alpha = color.a();
         if (alpha < 16) {
             sb.append('0');
         }

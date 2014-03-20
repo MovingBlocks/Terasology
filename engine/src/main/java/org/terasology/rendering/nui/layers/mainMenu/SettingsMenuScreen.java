@@ -44,6 +44,12 @@ public class SettingsMenuScreen extends CoreScreenLayer {
         inputScreen.setSkin(getSkin());
         UIData inputScreenData = new UIData(inputScreen);
         Assets.generateAsset(INPUT_SCREEN_URI, inputScreenData, UIElement.class);
+        WidgetUtil.trySubscribe(this, "player", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget button) {
+                getManager().pushScreen("engine:PlayerMenuScreen");
+            }
+        });
         WidgetUtil.trySubscribe(this, "video", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

@@ -16,11 +16,14 @@
 
 package org.terasology.config;
 
+import org.terasology.rendering.nui.Color;
+
 /**
  * @author Immortius
  */
 public class PlayerConfig {
     private String name = "Player";
+    private Color color = Color.RED;
 
     public String getName() {
         return name;
@@ -28,5 +31,13 @@ public class PlayerConfig {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+    
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

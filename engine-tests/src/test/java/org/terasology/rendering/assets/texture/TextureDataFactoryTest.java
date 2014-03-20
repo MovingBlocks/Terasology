@@ -17,12 +17,12 @@ package org.terasology.rendering.assets.texture;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Color;
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
+import org.terasology.rendering.nui.Color;
 
 /**
  * @author mkienenb@gmail.com

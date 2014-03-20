@@ -16,36 +16,15 @@
 
 package org.terasology.network;
 
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.Component;
 import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.world.ViewDistance;
-import org.terasology.world.chunks.ChunkRegionListener;
 
 /**
- * A client is the connection between a player (local or remote) and the game.
- *
- * @author Immortius
+ * A component that provides a color to describe an entity
+ * @author Martin Steiger
  */
-public interface Client extends ChunkRegionListener {
+public class ColorComponent implements Component {
 
-    String getName();
-
-    String getId();
-
-    Color getColor();
-
-    void disconnect();
-
-    void update(boolean netTick);
-
-    EntityRef getEntity();
-
-    void send(Event event, EntityRef target);
-
-    ViewDistance getViewDistance();
-
-    boolean isLocal();
-
-    void setViewDistanceMode(ViewDistance viewDistance);
+    @Replicate
+    public Color color;
 }

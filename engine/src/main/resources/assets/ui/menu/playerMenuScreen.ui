@@ -1,5 +1,5 @@
 {
-    "type" : "AudioSettingsScreen",
+    "type" : "PlayerSettingsScreen",
     "skin" : "mainmenu",
     "contents" : {
         "type" : "relativeLayout",
@@ -20,7 +20,7 @@
             },
             {
                 "type" : "UILabel",
-                "text" : "Audio Settings",
+                "text" : "Player Settings",
                 "family" : "title",
                 "id" : "subtitle",
                 "layoutInfo" : {
@@ -41,42 +41,45 @@
                     "column-widths" : [0.35, 0.65],
                     "verticalSpacing" : 8,
                     "horizontalSpacing" : 8,
-                    "layoutInfo" : {
-                        "width" : 360,
-                        "height" : 192,
-                        "position-horizontal-center" : {},
-                        "position-top" : {
-                            "target" : "BOTTOM",
-                            "offset" : 16,
-                            "widget" : "subtitle"
-                        },
-                        "position-bottom" : {
-                            "target" : "TOP",
-                            "offset" : 32,
-                            "widget" : "close"
-                        }
-                    },
+
                     "contents" : [
                         {
                             "type" : "UILabel",
-                            "text" : "Sound Volume:"
+                            "text" : "Player Name:"
                         },
                         {
-                            "type" : "UISlider",
-                            "id" : "sound"
+                            "type" : "UIText",
+                            "id"   : "playername"
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Music Volume:"
+                            "text" : "Player Color (RGB):"
                         },
                         {
-                            "type" : "UISlider",
-                            "id" : "music"
+                            "type" : "RowLayout",
+                            "contents" : [
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "red"
+                                },
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "green"
+                                },
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "blue"
+                                },
+                                {
+                                    "type" : "UIImage",
+                                    "id"   : "image"
+                                }
+                            ]
                         }
                     ]
                 },
                 "layoutInfo" : {
-                    "width" : 400,
+                    "width" : 450,
                     "use-content-height" : true,
                     "position-horizontal-center" : {},
                     "position-top" : {

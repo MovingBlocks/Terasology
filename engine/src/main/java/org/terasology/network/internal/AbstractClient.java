@@ -21,6 +21,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
+import org.terasology.rendering.nui.Color;
 
 /**
  * The common behaviour of all clients - whether local or remote
@@ -45,7 +47,7 @@ public abstract class AbstractClient implements Client {
         clientEntity.destroy();
     }
 
-    protected void createEntity(String name, EntityManager entityManager) {
+    protected void createEntity(String name, Color color, EntityManager entityManager) {
         // Create player entity
         clientEntity = entityManager.create("engine:client");
 
@@ -54,6 +56,10 @@ public abstract class AbstractClient implements Client {
         DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
         displayInfo.name = name;
         clientInfo.saveComponent(displayInfo);
+        
+        ColorComponent colorComp = new ColorComponent();
+        colorComp.color = color;
+        clientInfo.addComponent(colorComp);
 
         ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
         clientComponent.clientInfo = clientInfo;

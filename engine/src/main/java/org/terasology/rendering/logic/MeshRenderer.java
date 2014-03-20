@@ -284,6 +284,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                         MatrixUtils.matrixToFloatBuffer(MatrixUtils.calcNormalMatrix(modelViewMatrix), tempMatrixBuffer33);
                         material.setMatrix3("normalMatrix", tempMatrixBuffer33, true);
 
+                        material.setFloat3("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), true);
                         material.setFloat("sunlight", worldRenderer.getSunlightValueAt(worldPos), true);
                         material.setFloat("blockLight", worldRenderer.getBlockLightValueAt(worldPos), true);
 
