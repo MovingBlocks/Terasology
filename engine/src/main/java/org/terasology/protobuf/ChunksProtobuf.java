@@ -8,171 +8,62 @@ public final class ChunksProtobuf {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  /**
-   * Protobuf enum {@code Type}
-   */
-  public enum Type
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>Unknown = 0;</code>
-     */
-    Unknown(0, 0),
-    /**
-     * <code>DenseArray4Bit = 1;</code>
-     */
-    DenseArray4Bit(1, 1),
-    /**
-     * <code>DenseArray8Bit = 2;</code>
-     */
-    DenseArray8Bit(2, 2),
-    /**
-     * <code>DenseArray16Bit = 3;</code>
-     */
-    DenseArray16Bit(3, 3),
-    /**
-     * <code>SparseArray4Bit = 4;</code>
-     */
-    SparseArray4Bit(4, 4),
-    /**
-     * <code>SparseArray8Bit = 5;</code>
-     */
-    SparseArray8Bit(5, 5),
-    /**
-     * <code>SparseArray16Bit = 6;</code>
-     */
-    SparseArray16Bit(6, 6),
-    ;
-
-    /**
-     * <code>Unknown = 0;</code>
-     */
-    public static final int Unknown_VALUE = 0;
-    /**
-     * <code>DenseArray4Bit = 1;</code>
-     */
-    public static final int DenseArray4Bit_VALUE = 1;
-    /**
-     * <code>DenseArray8Bit = 2;</code>
-     */
-    public static final int DenseArray8Bit_VALUE = 2;
-    /**
-     * <code>DenseArray16Bit = 3;</code>
-     */
-    public static final int DenseArray16Bit_VALUE = 3;
-    /**
-     * <code>SparseArray4Bit = 4;</code>
-     */
-    public static final int SparseArray4Bit_VALUE = 4;
-    /**
-     * <code>SparseArray8Bit = 5;</code>
-     */
-    public static final int SparseArray8Bit_VALUE = 5;
-    /**
-     * <code>SparseArray16Bit = 6;</code>
-     */
-    public static final int SparseArray16Bit_VALUE = 6;
-
-
-    public final int getNumber() { return value; }
-
-    public static Type valueOf(int value) {
-      switch (value) {
-        case 0: return Unknown;
-        case 1: return DenseArray4Bit;
-        case 2: return DenseArray8Bit;
-        case 3: return DenseArray16Bit;
-        case 4: return SparseArray4Bit;
-        case 5: return SparseArray8Bit;
-        case 6: return SparseArray16Bit;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<Type>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static com.google.protobuf.Internal.EnumLiteMap<Type>
-        internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<Type>() {
-            public Type findValueByNumber(int number) {
-              return Type.valueOf(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(index);
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return org.terasology.protobuf.ChunksProtobuf.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final Type[] VALUES = values();
-
-    public static Type valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int index;
-    private final int value;
-
-    private Type(int index, int value) {
-      this.index = index;
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:Type)
-  }
-
   public interface TeraArrayOrBuilder extends
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<TeraArray> {
 
-    // optional .Type type = 1;
+    // optional sint32 deprecated_1 = 1;
     /**
-     * <code>optional .Type type = 1;</code>
+     * <code>optional sint32 deprecated_1 = 1;</code>
      */
-    boolean hasType();
+    boolean hasDeprecated1();
     /**
-     * <code>optional .Type type = 1;</code>
+     * <code>optional sint32 deprecated_1 = 1;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.Type getType();
+    int getDeprecated1();
 
-    // optional string class_name = 2;
+    // optional string deprecated_2 = 2;
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
-    boolean hasClassName();
+    boolean hasDeprecated2();
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
-    java.lang.String getClassName();
+    java.lang.String getDeprecated2();
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
     com.google.protobuf.ByteString
-        getClassNameBytes();
+        getDeprecated2Bytes();
 
     // optional bytes data = 3;
     /**
      * <code>optional bytes data = 3;</code>
+     *
+     * <pre>
+     * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+     * </pre>
      */
     boolean hasData();
     /**
      * <code>optional bytes data = 3;</code>
+     *
+     * <pre>
+     * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+     * </pre>
      */
     com.google.protobuf.ByteString getData();
+
+    // optional sint32 bytesPerElement = 4;
+    /**
+     * <code>optional sint32 bytesPerElement = 4;</code>
+     */
+    boolean hasBytesPerElement();
+    /**
+     * <code>optional sint32 bytesPerElement = 4;</code>
+     */
+    int getBytesPerElement();
   }
   /**
    * Protobuf type {@code TeraArray}
@@ -226,24 +117,23 @@ public final class ChunksProtobuf {
               break;
             }
             case 8: {
-              int rawValue = input.readEnum();
-              org.terasology.protobuf.ChunksProtobuf.Type value = org.terasology.protobuf.ChunksProtobuf.Type.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(1, rawValue);
-              } else {
-                bitField0_ |= 0x00000001;
-                type_ = value;
-              }
+              bitField0_ |= 0x00000001;
+              deprecated1_ = input.readSInt32();
               break;
             }
             case 18: {
               bitField0_ |= 0x00000002;
-              className_ = input.readBytes();
+              deprecated2_ = input.readBytes();
               break;
             }
             case 26: {
               bitField0_ |= 0x00000004;
               data_ = input.readBytes();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              bytesPerElement_ = input.readSInt32();
               break;
             }
           }
@@ -286,36 +176,36 @@ public final class ChunksProtobuf {
     }
 
     private int bitField0_;
-    // optional .Type type = 1;
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private org.terasology.protobuf.ChunksProtobuf.Type type_;
+    // optional sint32 deprecated_1 = 1;
+    public static final int DEPRECATED_1_FIELD_NUMBER = 1;
+    private int deprecated1_;
     /**
-     * <code>optional .Type type = 1;</code>
+     * <code>optional sint32 deprecated_1 = 1;</code>
      */
-    public boolean hasType() {
+    public boolean hasDeprecated1() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .Type type = 1;</code>
+     * <code>optional sint32 deprecated_1 = 1;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.Type getType() {
-      return type_;
+    public int getDeprecated1() {
+      return deprecated1_;
     }
 
-    // optional string class_name = 2;
-    public static final int CLASS_NAME_FIELD_NUMBER = 2;
-    private java.lang.Object className_;
+    // optional string deprecated_2 = 2;
+    public static final int DEPRECATED_2_FIELD_NUMBER = 2;
+    private java.lang.Object deprecated2_;
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
-    public boolean hasClassName() {
+    public boolean hasDeprecated2() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
-    public java.lang.String getClassName() {
-      java.lang.Object ref = className_;
+    public java.lang.String getDeprecated2() {
+      java.lang.Object ref = deprecated2_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
@@ -323,22 +213,22 @@ public final class ChunksProtobuf {
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
-          className_ = s;
+          deprecated2_ = s;
         }
         return s;
       }
     }
     /**
-     * <code>optional string class_name = 2;</code>
+     * <code>optional string deprecated_2 = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getClassNameBytes() {
-      java.lang.Object ref = className_;
+        getDeprecated2Bytes() {
+      java.lang.Object ref = deprecated2_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        className_ = b;
+        deprecated2_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -350,21 +240,46 @@ public final class ChunksProtobuf {
     private com.google.protobuf.ByteString data_;
     /**
      * <code>optional bytes data = 3;</code>
+     *
+     * <pre>
+     * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+     * </pre>
      */
     public boolean hasData() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional bytes data = 3;</code>
+     *
+     * <pre>
+     * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+     * </pre>
      */
     public com.google.protobuf.ByteString getData() {
       return data_;
     }
 
+    // optional sint32 bytesPerElement = 4;
+    public static final int BYTESPERELEMENT_FIELD_NUMBER = 4;
+    private int bytesPerElement_;
+    /**
+     * <code>optional sint32 bytesPerElement = 4;</code>
+     */
+    public boolean hasBytesPerElement() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional sint32 bytesPerElement = 4;</code>
+     */
+    public int getBytesPerElement() {
+      return bytesPerElement_;
+    }
+
     private void initFields() {
-      type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
-      className_ = "";
+      deprecated1_ = 0;
+      deprecated2_ = "";
       data_ = com.google.protobuf.ByteString.EMPTY;
+      bytesPerElement_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -386,13 +301,16 @@ public final class ChunksProtobuf {
         .ExtendableMessage<org.terasology.protobuf.ChunksProtobuf.TeraArray>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, type_.getNumber());
+        output.writeSInt32(1, deprecated1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getClassNameBytes());
+        output.writeBytes(2, getDeprecated2Bytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(3, data_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeSInt32(4, bytesPerElement_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -406,15 +324,19 @@ public final class ChunksProtobuf {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, type_.getNumber());
+          .computeSInt32Size(1, deprecated1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getClassNameBytes());
+          .computeBytesSize(2, getDeprecated2Bytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(3, data_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(4, bytesPerElement_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -533,12 +455,14 @@ public final class ChunksProtobuf {
 
       public Builder clear() {
         super.clear();
-        type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
+        deprecated1_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        className_ = "";
+        deprecated2_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         data_ = com.google.protobuf.ByteString.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
+        bytesPerElement_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -570,15 +494,19 @@ public final class ChunksProtobuf {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.type_ = type_;
+        result.deprecated1_ = deprecated1_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.className_ = className_;
+        result.deprecated2_ = deprecated2_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
         result.data_ = data_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.bytesPerElement_ = bytesPerElement_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -595,16 +523,19 @@ public final class ChunksProtobuf {
 
       public Builder mergeFrom(org.terasology.protobuf.ChunksProtobuf.TeraArray other) {
         if (other == org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) return this;
-        if (other.hasType()) {
-          setType(other.getType());
+        if (other.hasDeprecated1()) {
+          setDeprecated1(other.getDeprecated1());
         }
-        if (other.hasClassName()) {
+        if (other.hasDeprecated2()) {
           bitField0_ |= 0x00000002;
-          className_ = other.className_;
+          deprecated2_ = other.deprecated2_;
           onChanged();
         }
         if (other.hasData()) {
           setData(other.getData());
+        }
+        if (other.hasBytesPerElement()) {
+          setBytesPerElement(other.getBytesPerElement());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -638,112 +569,109 @@ public final class ChunksProtobuf {
       }
       private int bitField0_;
 
-      // optional .Type type = 1;
-      private org.terasology.protobuf.ChunksProtobuf.Type type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
+      // optional sint32 deprecated_1 = 1;
+      private int deprecated1_ ;
       /**
-       * <code>optional .Type type = 1;</code>
+       * <code>optional sint32 deprecated_1 = 1;</code>
        */
-      public boolean hasType() {
+      public boolean hasDeprecated1() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional .Type type = 1;</code>
+       * <code>optional sint32 deprecated_1 = 1;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.Type getType() {
-        return type_;
+      public int getDeprecated1() {
+        return deprecated1_;
       }
       /**
-       * <code>optional .Type type = 1;</code>
+       * <code>optional sint32 deprecated_1 = 1;</code>
        */
-      public Builder setType(org.terasology.protobuf.ChunksProtobuf.Type value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
+      public Builder setDeprecated1(int value) {
         bitField0_ |= 0x00000001;
-        type_ = value;
+        deprecated1_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .Type type = 1;</code>
+       * <code>optional sint32 deprecated_1 = 1;</code>
        */
-      public Builder clearType() {
+      public Builder clearDeprecated1() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
+        deprecated1_ = 0;
         onChanged();
         return this;
       }
 
-      // optional string class_name = 2;
-      private java.lang.Object className_ = "";
+      // optional string deprecated_2 = 2;
+      private java.lang.Object deprecated2_ = "";
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
-      public boolean hasClassName() {
+      public boolean hasDeprecated2() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
-      public java.lang.String getClassName() {
-        java.lang.Object ref = className_;
+      public java.lang.String getDeprecated2() {
+        java.lang.Object ref = deprecated2_;
         if (!(ref instanceof java.lang.String)) {
           java.lang.String s = ((com.google.protobuf.ByteString) ref)
               .toStringUtf8();
-          className_ = s;
+          deprecated2_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getClassNameBytes() {
-        java.lang.Object ref = className_;
+          getDeprecated2Bytes() {
+        java.lang.Object ref = deprecated2_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          className_ = b;
+          deprecated2_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
-      public Builder setClassName(
+      public Builder setDeprecated2(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        className_ = value;
+        deprecated2_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
-      public Builder clearClassName() {
+      public Builder clearDeprecated2() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        className_ = getDefaultInstance().getClassName();
+        deprecated2_ = getDefaultInstance().getDeprecated2();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string class_name = 2;</code>
+       * <code>optional string deprecated_2 = 2;</code>
        */
-      public Builder setClassNameBytes(
+      public Builder setDeprecated2Bytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000002;
-        className_ = value;
+        deprecated2_ = value;
         onChanged();
         return this;
       }
@@ -752,18 +680,30 @@ public final class ChunksProtobuf {
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       /**
        * <code>optional bytes data = 3;</code>
+       *
+       * <pre>
+       * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+       * </pre>
        */
       public boolean hasData() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional bytes data = 3;</code>
+       *
+       * <pre>
+       * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+       * </pre>
        */
       public com.google.protobuf.ByteString getData() {
         return data_;
       }
       /**
        * <code>optional bytes data = 3;</code>
+       *
+       * <pre>
+       * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+       * </pre>
        */
       public Builder setData(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -776,10 +716,47 @@ public final class ChunksProtobuf {
       }
       /**
        * <code>optional bytes data = 3;</code>
+       *
+       * <pre>
+       * This data is run length encoded - a sequence of sint32 run length + value pairs, where each value uses bytePerElement bytes.
+       * </pre>
        */
       public Builder clearData() {
         bitField0_ = (bitField0_ & ~0x00000004);
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      // optional sint32 bytesPerElement = 4;
+      private int bytesPerElement_ ;
+      /**
+       * <code>optional sint32 bytesPerElement = 4;</code>
+       */
+      public boolean hasBytesPerElement() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional sint32 bytesPerElement = 4;</code>
+       */
+      public int getBytesPerElement() {
+        return bytesPerElement_;
+      }
+      /**
+       * <code>optional sint32 bytesPerElement = 4;</code>
+       */
+      public Builder setBytesPerElement(int value) {
+        bitField0_ |= 0x00000008;
+        bytesPerElement_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional sint32 bytesPerElement = 4;</code>
+       */
+      public Builder clearBytesPerElement() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        bytesPerElement_ = 0;
         onChanged();
         return this;
       }
@@ -1504,15 +1481,12 @@ public final class ChunksProtobuf {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014Chunks.proto\"M\n\tTeraArray\022\023\n\004type\030\001 \001(" +
-      "\0162\005.Type\022\022\n\nclass_name\030\002 \001(\t\022\014\n\004data\030\003 \001" +
-      "(\014*\t\010\210\'\020\200\200\200\200\002\":\n\007ModData\022\n\n\002id\030\001 \001(\t\022\030\n\004" +
-      "data\030\002 \001(\0132\n.TeraArray*\t\010\210\'\020\200\200\200\200\002*\220\001\n\004Ty" +
-      "pe\022\013\n\007Unknown\020\000\022\022\n\016DenseArray4Bit\020\001\022\022\n\016D" +
-      "enseArray8Bit\020\002\022\023\n\017DenseArray16Bit\020\003\022\023\n\017" +
-      "SparseArray4Bit\020\004\022\023\n\017SparseArray8Bit\020\005\022\024" +
-      "\n\020SparseArray16Bit\020\006B+\n\027org.terasology.p" +
-      "rotobufB\016ChunksProtobufH\001"
+      "\n\014Chunks.proto\"i\n\tTeraArray\022\024\n\014deprecate" +
+      "d_1\030\001 \001(\021\022\024\n\014deprecated_2\030\002 \001(\t\022\014\n\004data\030" +
+      "\003 \001(\014\022\027\n\017bytesPerElement\030\004 \001(\021*\t\010\210\'\020\200\200\200\200" +
+      "\002\":\n\007ModData\022\n\n\002id\030\001 \001(\t\022\030\n\004data\030\002 \001(\0132\n" +
+      ".TeraArray*\t\010\210\'\020\200\200\200\200\002B+\n\027org.terasology." +
+      "protobufB\016ChunksProtobufH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1524,7 +1498,7 @@ public final class ChunksProtobuf {
           internal_static_TeraArray_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_TeraArray_descriptor,
-              new java.lang.String[] { "Type", "ClassName", "Data", });
+              new java.lang.String[] { "Deprecated1", "Deprecated2", "Data", "BytesPerElement", });
           internal_static_ModData_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_ModData_fieldAccessorTable = new

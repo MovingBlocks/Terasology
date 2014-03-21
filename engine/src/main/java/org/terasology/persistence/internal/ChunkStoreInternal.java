@@ -120,7 +120,7 @@ final class ChunkStoreInternal implements ChunkStore {
     public EntityData.ChunkStore getStore() {
         chunk.lock();
         try {
-            EntityData.ChunkStore.Builder encoded = new ChunkImpl.ProtobufHandler().encode(chunk, false);
+            EntityData.ChunkStore.Builder encoded = new ChunkImpl.ProtobufHandler().encode(chunk);
             encoded.setStore(entityStore);
             return encoded.build();
         } finally {

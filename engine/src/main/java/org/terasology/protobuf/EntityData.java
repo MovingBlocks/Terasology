@@ -90,115 +90,6 @@ public final class EntityData {
     // @@protoc_insertion_point(enum_scope:StoreType)
   }
 
-  /**
-   * Protobuf enum {@code ChunkState}
-   */
-  public enum ChunkState
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>ADJACENCY_GENERATION_PENDING = 0;</code>
-     */
-    ADJACENCY_GENERATION_PENDING(0, 0),
-    /**
-     * <code>INTERNAL_LIGHT_GENERATION_PENDING = 1;</code>
-     */
-    INTERNAL_LIGHT_GENERATION_PENDING(1, 1),
-    /**
-     * <code>DEPRECATED_1 = 2;</code>
-     */
-    DEPRECATED_1(2, 2),
-    /**
-     * <code>DEPRECATED_2 = 3;</code>
-     */
-    DEPRECATED_2(3, 3),
-    /**
-     * <code>COMPLETE = 4;</code>
-     */
-    COMPLETE(4, 4),
-    ;
-
-    /**
-     * <code>ADJACENCY_GENERATION_PENDING = 0;</code>
-     */
-    public static final int ADJACENCY_GENERATION_PENDING_VALUE = 0;
-    /**
-     * <code>INTERNAL_LIGHT_GENERATION_PENDING = 1;</code>
-     */
-    public static final int INTERNAL_LIGHT_GENERATION_PENDING_VALUE = 1;
-    /**
-     * <code>DEPRECATED_1 = 2;</code>
-     */
-    public static final int DEPRECATED_1_VALUE = 2;
-    /**
-     * <code>DEPRECATED_2 = 3;</code>
-     */
-    public static final int DEPRECATED_2_VALUE = 3;
-    /**
-     * <code>COMPLETE = 4;</code>
-     */
-    public static final int COMPLETE_VALUE = 4;
-
-
-    public final int getNumber() { return value; }
-
-    public static ChunkState valueOf(int value) {
-      switch (value) {
-        case 0: return ADJACENCY_GENERATION_PENDING;
-        case 1: return INTERNAL_LIGHT_GENERATION_PENDING;
-        case 2: return DEPRECATED_1;
-        case 3: return DEPRECATED_2;
-        case 4: return COMPLETE;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<ChunkState>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static com.google.protobuf.Internal.EnumLiteMap<ChunkState>
-        internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<ChunkState>() {
-            public ChunkState findValueByNumber(int number) {
-              return ChunkState.valueOf(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(index);
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return org.terasology.protobuf.EntityData.getDescriptor().getEnumTypes().get(1);
-    }
-
-    private static final ChunkState[] VALUES = values();
-
-    public static ChunkState valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int index;
-    private final int value;
-
-    private ChunkState(int index, int value) {
-      this.index = index;
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:ChunkState)
-  }
-
   public interface ValueOrBuilder extends
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Value> {
@@ -11932,71 +11823,83 @@ public final class EntityData {
      */
     int getZ();
 
-    // optional .ChunkState state = 5;
+    // optional int32 deprecated_data_3 = 5;
     /**
-     * <code>optional .ChunkState state = 5;</code>
+     * <code>optional int32 deprecated_data_3 = 5;</code>
      */
-    boolean hasState();
+    boolean hasDeprecatedData3();
     /**
-     * <code>optional .ChunkState state = 5;</code>
+     * <code>optional int32 deprecated_data_3 = 5;</code>
      */
-    org.terasology.protobuf.EntityData.ChunkState getState();
+    int getDeprecatedData3();
 
-    // optional .TeraArray block_data = 6;
+    // optional bytes deprecated_data_4 = 6;
     /**
-     * <code>optional .TeraArray block_data = 6;</code>
+     * <code>optional bytes deprecated_data_4 = 6;</code>
      */
-    boolean hasBlockData();
+    boolean hasDeprecatedData4();
     /**
-     * <code>optional .TeraArray block_data = 6;</code>
+     * <code>optional bytes deprecated_data_4 = 6;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getBlockData();
-    /**
-     * <code>optional .TeraArray block_data = 6;</code>
-     */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getBlockDataOrBuilder();
+    com.google.protobuf.ByteString getDeprecatedData4();
 
-    // optional .TeraArray deprecated_data_1 = 7;
+    // optional bytes deprecated_data_1 = 7;
     /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
+     * <code>optional bytes deprecated_data_1 = 7;</code>
      */
     boolean hasDeprecatedData1();
     /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
+     * <code>optional bytes deprecated_data_1 = 7;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1();
-    /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-     */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder();
+    com.google.protobuf.ByteString getDeprecatedData1();
 
-    // optional .TeraArray deprecated_data_2 = 8;
+    // optional bytes deprecated_data_2 = 8;
     /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
+     * <code>optional bytes deprecated_data_2 = 8;</code>
      */
     boolean hasDeprecatedData2();
     /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
+     * <code>optional bytes deprecated_data_2 = 8;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2();
-    /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-     */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder();
+    com.google.protobuf.ByteString getDeprecatedData2();
 
-    // optional .TeraArray liquid_data = 9;
+    // optional bytes deprecated_data_5 = 9;
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional bytes deprecated_data_5 = 9;</code>
+     */
+    boolean hasDeprecatedData5();
+    /**
+     * <code>optional bytes deprecated_data_5 = 9;</code>
+     */
+    com.google.protobuf.ByteString getDeprecatedData5();
+
+    // optional .RunLengthEncoding16 block_data = 10;
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    boolean hasBlockData();
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    org.terasology.protobuf.EntityData.RunLengthEncoding16 getBlockData();
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBlockDataOrBuilder();
+
+    // optional .RunLengthEncoding8 liquid_data = 11;
+    /**
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
      */
     boolean hasLiquidData();
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquidData();
+    org.terasology.protobuf.EntityData.RunLengthEncoding8 getLiquidData();
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
      */
-    org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLiquidDataOrBuilder();
+    org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder getLiquidDataOrBuilder();
   }
   /**
    * Protobuf type {@code ChunkStore}
@@ -12078,66 +11981,54 @@ public final class EntityData {
               break;
             }
             case 40: {
-              int rawValue = input.readEnum();
-              org.terasology.protobuf.EntityData.ChunkState value = org.terasology.protobuf.EntityData.ChunkState.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(5, rawValue);
-              } else {
-                bitField0_ |= 0x00000010;
-                state_ = value;
-              }
+              bitField0_ |= 0x00000010;
+              deprecatedData3_ = input.readInt32();
               break;
             }
             case 50: {
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+              bitField0_ |= 0x00000020;
+              deprecatedData4_ = input.readBytes();
+              break;
+            }
+            case 58: {
+              bitField0_ |= 0x00000040;
+              deprecatedData1_ = input.readBytes();
+              break;
+            }
+            case 66: {
+              bitField0_ |= 0x00000080;
+              deprecatedData2_ = input.readBytes();
+              break;
+            }
+            case 74: {
+              bitField0_ |= 0x00000100;
+              deprecatedData5_ = input.readBytes();
+              break;
+            }
+            case 82: {
+              org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000200) == 0x00000200)) {
                 subBuilder = blockData_.toBuilder();
               }
-              blockData_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
+              blockData_ = input.readMessage(org.terasology.protobuf.EntityData.RunLengthEncoding16.PARSER, extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(blockData_);
                 blockData_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000200;
               break;
             }
-            case 58: {
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                subBuilder = deprecatedData1_.toBuilder();
-              }
-              deprecatedData1_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(deprecatedData1_);
-                deprecatedData1_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000040;
-              break;
-            }
-            case 66: {
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000080) == 0x00000080)) {
-                subBuilder = deprecatedData2_.toBuilder();
-              }
-              deprecatedData2_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(deprecatedData2_);
-                deprecatedData2_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000080;
-              break;
-            }
-            case 74: {
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000100) == 0x00000100)) {
+            case 90: {
+              org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000400) == 0x00000400)) {
                 subBuilder = liquidData_.toBuilder();
               }
-              liquidData_ = input.readMessage(org.terasology.protobuf.ChunksProtobuf.TeraArray.PARSER, extensionRegistry);
+              liquidData_ = input.readMessage(org.terasology.protobuf.EntityData.RunLengthEncoding8.PARSER, extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(liquidData_);
                 liquidData_ = subBuilder.buildPartial();
               }
-              bitField0_ |= 0x00000100;
+              bitField0_ |= 0x00000400;
               break;
             }
           }
@@ -12250,107 +12141,127 @@ public final class EntityData {
       return z_;
     }
 
-    // optional .ChunkState state = 5;
-    public static final int STATE_FIELD_NUMBER = 5;
-    private org.terasology.protobuf.EntityData.ChunkState state_;
+    // optional int32 deprecated_data_3 = 5;
+    public static final int DEPRECATED_DATA_3_FIELD_NUMBER = 5;
+    private int deprecatedData3_;
     /**
-     * <code>optional .ChunkState state = 5;</code>
+     * <code>optional int32 deprecated_data_3 = 5;</code>
      */
-    public boolean hasState() {
+    public boolean hasDeprecatedData3() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional .ChunkState state = 5;</code>
+     * <code>optional int32 deprecated_data_3 = 5;</code>
      */
-    public org.terasology.protobuf.EntityData.ChunkState getState() {
-      return state_;
+    public int getDeprecatedData3() {
+      return deprecatedData3_;
     }
 
-    // optional .TeraArray block_data = 6;
-    public static final int BLOCK_DATA_FIELD_NUMBER = 6;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray blockData_;
+    // optional bytes deprecated_data_4 = 6;
+    public static final int DEPRECATED_DATA_4_FIELD_NUMBER = 6;
+    private com.google.protobuf.ByteString deprecatedData4_;
     /**
-     * <code>optional .TeraArray block_data = 6;</code>
+     * <code>optional bytes deprecated_data_4 = 6;</code>
      */
-    public boolean hasBlockData() {
+    public boolean hasDeprecatedData4() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional .TeraArray block_data = 6;</code>
+     * <code>optional bytes deprecated_data_4 = 6;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getBlockData() {
-      return blockData_;
-    }
-    /**
-     * <code>optional .TeraArray block_data = 6;</code>
-     */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getBlockDataOrBuilder() {
-      return blockData_;
+    public com.google.protobuf.ByteString getDeprecatedData4() {
+      return deprecatedData4_;
     }
 
-    // optional .TeraArray deprecated_data_1 = 7;
+    // optional bytes deprecated_data_1 = 7;
     public static final int DEPRECATED_DATA_1_FIELD_NUMBER = 7;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData1_;
+    private com.google.protobuf.ByteString deprecatedData1_;
     /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
+     * <code>optional bytes deprecated_data_1 = 7;</code>
      */
     public boolean hasDeprecatedData1() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
+     * <code>optional bytes deprecated_data_1 = 7;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1() {
-      return deprecatedData1_;
-    }
-    /**
-     * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-     */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder() {
+    public com.google.protobuf.ByteString getDeprecatedData1() {
       return deprecatedData1_;
     }
 
-    // optional .TeraArray deprecated_data_2 = 8;
+    // optional bytes deprecated_data_2 = 8;
     public static final int DEPRECATED_DATA_2_FIELD_NUMBER = 8;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData2_;
+    private com.google.protobuf.ByteString deprecatedData2_;
     /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
+     * <code>optional bytes deprecated_data_2 = 8;</code>
      */
     public boolean hasDeprecatedData2() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
+     * <code>optional bytes deprecated_data_2 = 8;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2() {
-      return deprecatedData2_;
-    }
-    /**
-     * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-     */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder() {
+    public com.google.protobuf.ByteString getDeprecatedData2() {
       return deprecatedData2_;
     }
 
-    // optional .TeraArray liquid_data = 9;
-    public static final int LIQUID_DATA_FIELD_NUMBER = 9;
-    private org.terasology.protobuf.ChunksProtobuf.TeraArray liquidData_;
+    // optional bytes deprecated_data_5 = 9;
+    public static final int DEPRECATED_DATA_5_FIELD_NUMBER = 9;
+    private com.google.protobuf.ByteString deprecatedData5_;
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional bytes deprecated_data_5 = 9;</code>
      */
-    public boolean hasLiquidData() {
+    public boolean hasDeprecatedData5() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional bytes deprecated_data_5 = 9;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquidData() {
+    public com.google.protobuf.ByteString getDeprecatedData5() {
+      return deprecatedData5_;
+    }
+
+    // optional .RunLengthEncoding16 block_data = 10;
+    public static final int BLOCK_DATA_FIELD_NUMBER = 10;
+    private org.terasology.protobuf.EntityData.RunLengthEncoding16 blockData_;
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    public boolean hasBlockData() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    public org.terasology.protobuf.EntityData.RunLengthEncoding16 getBlockData() {
+      return blockData_;
+    }
+    /**
+     * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+     */
+    public org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBlockDataOrBuilder() {
+      return blockData_;
+    }
+
+    // optional .RunLengthEncoding8 liquid_data = 11;
+    public static final int LIQUID_DATA_FIELD_NUMBER = 11;
+    private org.terasology.protobuf.EntityData.RunLengthEncoding8 liquidData_;
+    /**
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
+     */
+    public boolean hasLiquidData() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
+     */
+    public org.terasology.protobuf.EntityData.RunLengthEncoding8 getLiquidData() {
       return liquidData_;
     }
     /**
-     * <code>optional .TeraArray liquid_data = 9;</code>
+     * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
      */
-    public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLiquidDataOrBuilder() {
+    public org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder getLiquidDataOrBuilder() {
       return liquidData_;
     }
 
@@ -12359,11 +12270,13 @@ public final class EntityData {
       x_ = 0;
       y_ = 0;
       z_ = 0;
-      state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
-      blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      liquidData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      deprecatedData3_ = 0;
+      deprecatedData4_ = com.google.protobuf.ByteString.EMPTY;
+      deprecatedData1_ = com.google.protobuf.ByteString.EMPTY;
+      deprecatedData2_ = com.google.protobuf.ByteString.EMPTY;
+      deprecatedData5_ = com.google.protobuf.ByteString.EMPTY;
+      blockData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+      liquidData_ = org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12378,18 +12291,6 @@ public final class EntityData {
       }
       if (hasBlockData()) {
         if (!getBlockData().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasDeprecatedData1()) {
-        if (!getDeprecatedData1().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasDeprecatedData2()) {
-        if (!getDeprecatedData2().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -12427,19 +12328,25 @@ public final class EntityData {
         output.writeSInt32(4, z_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeEnum(5, state_.getNumber());
+        output.writeInt32(5, deprecatedData3_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeMessage(6, blockData_);
+        output.writeBytes(6, deprecatedData4_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(7, deprecatedData1_);
+        output.writeBytes(7, deprecatedData1_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeMessage(8, deprecatedData2_);
+        output.writeBytes(8, deprecatedData2_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeMessage(9, liquidData_);
+        output.writeBytes(9, deprecatedData5_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeMessage(10, blockData_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeMessage(11, liquidData_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -12469,23 +12376,31 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(5, state_.getNumber());
+          .computeInt32Size(5, deprecatedData3_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, blockData_);
+          .computeBytesSize(6, deprecatedData4_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, deprecatedData1_);
+          .computeBytesSize(7, deprecatedData1_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, deprecatedData2_);
+          .computeBytesSize(8, deprecatedData2_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(9, liquidData_);
+          .computeBytesSize(9, deprecatedData5_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, blockData_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(11, liquidData_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -12598,8 +12513,6 @@ public final class EntityData {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getStoreFieldBuilder();
           getBlockDataFieldBuilder();
-          getDeprecatedData1FieldBuilder();
-          getDeprecatedData2FieldBuilder();
           getLiquidDataFieldBuilder();
         }
       }
@@ -12621,32 +12534,28 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000004);
         z_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
+        deprecatedData3_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
+        deprecatedData4_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        deprecatedData1_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        deprecatedData2_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000080);
+        deprecatedData5_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000100);
         if (blockDataBuilder_ == null) {
-          blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+          blockData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
         } else {
           blockDataBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
-        if (deprecatedData1Builder_ == null) {
-          deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-        } else {
-          deprecatedData1Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000040);
-        if (deprecatedData2Builder_ == null) {
-          deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-        } else {
-          deprecatedData2Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000200);
         if (liquidDataBuilder_ == null) {
-          liquidData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+          liquidData_ = org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
         } else {
           liquidDataBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -12698,33 +12607,33 @@ public final class EntityData {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.state_ = state_;
+        result.deprecatedData3_ = deprecatedData3_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
+        }
+        result.deprecatedData4_ = deprecatedData4_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.deprecatedData1_ = deprecatedData1_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.deprecatedData2_ = deprecatedData2_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.deprecatedData5_ = deprecatedData5_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
         }
         if (blockDataBuilder_ == null) {
           result.blockData_ = blockData_;
         } else {
           result.blockData_ = blockDataBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-          to_bitField0_ |= 0x00000040;
-        }
-        if (deprecatedData1Builder_ == null) {
-          result.deprecatedData1_ = deprecatedData1_;
-        } else {
-          result.deprecatedData1_ = deprecatedData1Builder_.build();
-        }
-        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-          to_bitField0_ |= 0x00000080;
-        }
-        if (deprecatedData2Builder_ == null) {
-          result.deprecatedData2_ = deprecatedData2_;
-        } else {
-          result.deprecatedData2_ = deprecatedData2Builder_.build();
-        }
-        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-          to_bitField0_ |= 0x00000100;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
         }
         if (liquidDataBuilder_ == null) {
           result.liquidData_ = liquidData_;
@@ -12759,17 +12668,23 @@ public final class EntityData {
         if (other.hasZ()) {
           setZ(other.getZ());
         }
-        if (other.hasState()) {
-          setState(other.getState());
+        if (other.hasDeprecatedData3()) {
+          setDeprecatedData3(other.getDeprecatedData3());
+        }
+        if (other.hasDeprecatedData4()) {
+          setDeprecatedData4(other.getDeprecatedData4());
+        }
+        if (other.hasDeprecatedData1()) {
+          setDeprecatedData1(other.getDeprecatedData1());
+        }
+        if (other.hasDeprecatedData2()) {
+          setDeprecatedData2(other.getDeprecatedData2());
+        }
+        if (other.hasDeprecatedData5()) {
+          setDeprecatedData5(other.getDeprecatedData5());
         }
         if (other.hasBlockData()) {
           mergeBlockData(other.getBlockData());
-        }
-        if (other.hasDeprecatedData1()) {
-          mergeDeprecatedData1(other.getDeprecatedData1());
-        }
-        if (other.hasDeprecatedData2()) {
-          mergeDeprecatedData2(other.getDeprecatedData2());
         }
         if (other.hasLiquidData()) {
           mergeLiquidData(other.getLiquidData());
@@ -12788,18 +12703,6 @@ public final class EntityData {
         }
         if (hasBlockData()) {
           if (!getBlockData().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasDeprecatedData1()) {
-          if (!getDeprecatedData1().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasDeprecatedData2()) {
-          if (!getDeprecatedData2().isInitialized()) {
             
             return false;
           }
@@ -13052,56 +12955,197 @@ public final class EntityData {
         return this;
       }
 
-      // optional .ChunkState state = 5;
-      private org.terasology.protobuf.EntityData.ChunkState state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
+      // optional int32 deprecated_data_3 = 5;
+      private int deprecatedData3_ ;
       /**
-       * <code>optional .ChunkState state = 5;</code>
+       * <code>optional int32 deprecated_data_3 = 5;</code>
        */
-      public boolean hasState() {
+      public boolean hasDeprecatedData3() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional .ChunkState state = 5;</code>
+       * <code>optional int32 deprecated_data_3 = 5;</code>
        */
-      public org.terasology.protobuf.EntityData.ChunkState getState() {
-        return state_;
+      public int getDeprecatedData3() {
+        return deprecatedData3_;
       }
       /**
-       * <code>optional .ChunkState state = 5;</code>
+       * <code>optional int32 deprecated_data_3 = 5;</code>
        */
-      public Builder setState(org.terasology.protobuf.EntityData.ChunkState value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
+      public Builder setDeprecatedData3(int value) {
         bitField0_ |= 0x00000010;
-        state_ = value;
+        deprecatedData3_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .ChunkState state = 5;</code>
+       * <code>optional int32 deprecated_data_3 = 5;</code>
        */
-      public Builder clearState() {
+      public Builder clearDeprecatedData3() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        state_ = org.terasology.protobuf.EntityData.ChunkState.ADJACENCY_GENERATION_PENDING;
+        deprecatedData3_ = 0;
         onChanged();
         return this;
       }
 
-      // optional .TeraArray block_data = 6;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> blockDataBuilder_;
+      // optional bytes deprecated_data_4 = 6;
+      private com.google.protobuf.ByteString deprecatedData4_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional bytes deprecated_data_4 = 6;</code>
        */
-      public boolean hasBlockData() {
+      public boolean hasDeprecatedData4() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional bytes deprecated_data_4 = 6;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getBlockData() {
+      public com.google.protobuf.ByteString getDeprecatedData4() {
+        return deprecatedData4_;
+      }
+      /**
+       * <code>optional bytes deprecated_data_4 = 6;</code>
+       */
+      public Builder setDeprecatedData4(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        deprecatedData4_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes deprecated_data_4 = 6;</code>
+       */
+      public Builder clearDeprecatedData4() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        deprecatedData4_ = getDefaultInstance().getDeprecatedData4();
+        onChanged();
+        return this;
+      }
+
+      // optional bytes deprecated_data_1 = 7;
+      private com.google.protobuf.ByteString deprecatedData1_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes deprecated_data_1 = 7;</code>
+       */
+      public boolean hasDeprecatedData1() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>optional bytes deprecated_data_1 = 7;</code>
+       */
+      public com.google.protobuf.ByteString getDeprecatedData1() {
+        return deprecatedData1_;
+      }
+      /**
+       * <code>optional bytes deprecated_data_1 = 7;</code>
+       */
+      public Builder setDeprecatedData1(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        deprecatedData1_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes deprecated_data_1 = 7;</code>
+       */
+      public Builder clearDeprecatedData1() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        deprecatedData1_ = getDefaultInstance().getDeprecatedData1();
+        onChanged();
+        return this;
+      }
+
+      // optional bytes deprecated_data_2 = 8;
+      private com.google.protobuf.ByteString deprecatedData2_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes deprecated_data_2 = 8;</code>
+       */
+      public boolean hasDeprecatedData2() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional bytes deprecated_data_2 = 8;</code>
+       */
+      public com.google.protobuf.ByteString getDeprecatedData2() {
+        return deprecatedData2_;
+      }
+      /**
+       * <code>optional bytes deprecated_data_2 = 8;</code>
+       */
+      public Builder setDeprecatedData2(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        deprecatedData2_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes deprecated_data_2 = 8;</code>
+       */
+      public Builder clearDeprecatedData2() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        deprecatedData2_ = getDefaultInstance().getDeprecatedData2();
+        onChanged();
+        return this;
+      }
+
+      // optional bytes deprecated_data_5 = 9;
+      private com.google.protobuf.ByteString deprecatedData5_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes deprecated_data_5 = 9;</code>
+       */
+      public boolean hasDeprecatedData5() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional bytes deprecated_data_5 = 9;</code>
+       */
+      public com.google.protobuf.ByteString getDeprecatedData5() {
+        return deprecatedData5_;
+      }
+      /**
+       * <code>optional bytes deprecated_data_5 = 9;</code>
+       */
+      public Builder setDeprecatedData5(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        deprecatedData5_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes deprecated_data_5 = 9;</code>
+       */
+      public Builder clearDeprecatedData5() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        deprecatedData5_ = getDefaultInstance().getDeprecatedData5();
+        onChanged();
+        return this;
+      }
+
+      // optional .RunLengthEncoding16 block_data = 10;
+      private org.terasology.protobuf.EntityData.RunLengthEncoding16 blockData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder> blockDataBuilder_;
+      /**
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+       */
+      public boolean hasBlockData() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
+       */
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16 getBlockData() {
         if (blockDataBuilder_ == null) {
           return blockData_;
         } else {
@@ -13109,9 +13153,9 @@ public final class EntityData {
         }
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
-      public Builder setBlockData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+      public Builder setBlockData(org.terasology.protobuf.EntityData.RunLengthEncoding16 value) {
         if (blockDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -13121,32 +13165,32 @@ public final class EntityData {
         } else {
           blockDataBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
       public Builder setBlockData(
-          org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
+          org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder builderForValue) {
         if (blockDataBuilder_ == null) {
           blockData_ = builderForValue.build();
           onChanged();
         } else {
           blockDataBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
-      public Builder mergeBlockData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+      public Builder mergeBlockData(org.terasology.protobuf.EntityData.RunLengthEncoding16 value) {
         if (blockDataBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
-              blockData_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
+          if (((bitField0_ & 0x00000200) == 0x00000200) &&
+              blockData_ != org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance()) {
             blockData_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(blockData_).mergeFrom(value).buildPartial();
+              org.terasology.protobuf.EntityData.RunLengthEncoding16.newBuilder(blockData_).mergeFrom(value).buildPartial();
           } else {
             blockData_ = value;
           }
@@ -13154,34 +13198,34 @@ public final class EntityData {
         } else {
           blockDataBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000200;
         return this;
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
       public Builder clearBlockData() {
         if (blockDataBuilder_ == null) {
-          blockData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+          blockData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
           onChanged();
         } else {
           blockDataBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getBlockDataBuilder() {
-        bitField0_ |= 0x00000020;
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder getBlockDataBuilder() {
+        bitField0_ |= 0x00000200;
         onChanged();
         return getBlockDataFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getBlockDataOrBuilder() {
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBlockDataOrBuilder() {
         if (blockDataBuilder_ != null) {
           return blockDataBuilder_.getMessageOrBuilder();
         } else {
@@ -13189,14 +13233,14 @@ public final class EntityData {
         }
       }
       /**
-       * <code>optional .TeraArray block_data = 6;</code>
+       * <code>optional .RunLengthEncoding16 block_data = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
+          org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder> 
           getBlockDataFieldBuilder() {
         if (blockDataBuilder_ == null) {
           blockDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
+              org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder>(
                   blockData_,
                   getParentForChildren(),
                   isClean());
@@ -13205,254 +13249,20 @@ public final class EntityData {
         return blockDataBuilder_;
       }
 
-      // optional .TeraArray deprecated_data_1 = 7;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+      // optional .RunLengthEncoding8 liquid_data = 11;
+      private org.terasology.protobuf.EntityData.RunLengthEncoding8 liquidData_ = org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> deprecatedData1Builder_;
+          org.terasology.protobuf.EntityData.RunLengthEncoding8, org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder> liquidDataBuilder_;
       /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public boolean hasDeprecatedData1() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData1() {
-        if (deprecatedData1Builder_ == null) {
-          return deprecatedData1_;
-        } else {
-          return deprecatedData1Builder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public Builder setDeprecatedData1(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (deprecatedData1Builder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          deprecatedData1_ = value;
-          onChanged();
-        } else {
-          deprecatedData1Builder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public Builder setDeprecatedData1(
-          org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
-        if (deprecatedData1Builder_ == null) {
-          deprecatedData1_ = builderForValue.build();
-          onChanged();
-        } else {
-          deprecatedData1Builder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public Builder mergeDeprecatedData1(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (deprecatedData1Builder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
-              deprecatedData1_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
-            deprecatedData1_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(deprecatedData1_).mergeFrom(value).buildPartial();
-          } else {
-            deprecatedData1_ = value;
-          }
-          onChanged();
-        } else {
-          deprecatedData1Builder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public Builder clearDeprecatedData1() {
-        if (deprecatedData1Builder_ == null) {
-          deprecatedData1_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-          onChanged();
-        } else {
-          deprecatedData1Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000040);
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getDeprecatedData1Builder() {
-        bitField0_ |= 0x00000040;
-        onChanged();
-        return getDeprecatedData1FieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData1OrBuilder() {
-        if (deprecatedData1Builder_ != null) {
-          return deprecatedData1Builder_.getMessageOrBuilder();
-        } else {
-          return deprecatedData1_;
-        }
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_1 = 7;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
-          getDeprecatedData1FieldBuilder() {
-        if (deprecatedData1Builder_ == null) {
-          deprecatedData1Builder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
-                  deprecatedData1_,
-                  getParentForChildren(),
-                  isClean());
-          deprecatedData1_ = null;
-        }
-        return deprecatedData1Builder_;
-      }
-
-      // optional .TeraArray deprecated_data_2 = 8;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> deprecatedData2Builder_;
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public boolean hasDeprecatedData2() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getDeprecatedData2() {
-        if (deprecatedData2Builder_ == null) {
-          return deprecatedData2_;
-        } else {
-          return deprecatedData2Builder_.getMessage();
-        }
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public Builder setDeprecatedData2(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (deprecatedData2Builder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          deprecatedData2_ = value;
-          onChanged();
-        } else {
-          deprecatedData2Builder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000080;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public Builder setDeprecatedData2(
-          org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
-        if (deprecatedData2Builder_ == null) {
-          deprecatedData2_ = builderForValue.build();
-          onChanged();
-        } else {
-          deprecatedData2Builder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000080;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public Builder mergeDeprecatedData2(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
-        if (deprecatedData2Builder_ == null) {
-          if (((bitField0_ & 0x00000080) == 0x00000080) &&
-              deprecatedData2_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
-            deprecatedData2_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(deprecatedData2_).mergeFrom(value).buildPartial();
-          } else {
-            deprecatedData2_ = value;
-          }
-          onChanged();
-        } else {
-          deprecatedData2Builder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000080;
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public Builder clearDeprecatedData2() {
-        if (deprecatedData2Builder_ == null) {
-          deprecatedData2_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-          onChanged();
-        } else {
-          deprecatedData2Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000080);
-        return this;
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getDeprecatedData2Builder() {
-        bitField0_ |= 0x00000080;
-        onChanged();
-        return getDeprecatedData2FieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getDeprecatedData2OrBuilder() {
-        if (deprecatedData2Builder_ != null) {
-          return deprecatedData2Builder_.getMessageOrBuilder();
-        } else {
-          return deprecatedData2_;
-        }
-      }
-      /**
-       * <code>optional .TeraArray deprecated_data_2 = 8;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
-          getDeprecatedData2FieldBuilder() {
-        if (deprecatedData2Builder_ == null) {
-          deprecatedData2Builder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
-                  deprecatedData2_,
-                  getParentForChildren(),
-                  isClean());
-          deprecatedData2_ = null;
-        }
-        return deprecatedData2Builder_;
-      }
-
-      // optional .TeraArray liquid_data = 9;
-      private org.terasology.protobuf.ChunksProtobuf.TeraArray liquidData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> liquidDataBuilder_;
-      /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
       public boolean hasLiquidData() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquidData() {
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8 getLiquidData() {
         if (liquidDataBuilder_ == null) {
           return liquidData_;
         } else {
@@ -13460,9 +13270,9 @@ public final class EntityData {
         }
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
-      public Builder setLiquidData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+      public Builder setLiquidData(org.terasology.protobuf.EntityData.RunLengthEncoding8 value) {
         if (liquidDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -13472,32 +13282,32 @@ public final class EntityData {
         } else {
           liquidDataBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
       public Builder setLiquidData(
-          org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder builderForValue) {
+          org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder builderForValue) {
         if (liquidDataBuilder_ == null) {
           liquidData_ = builderForValue.build();
           onChanged();
         } else {
           liquidDataBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
-      public Builder mergeLiquidData(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
+      public Builder mergeLiquidData(org.terasology.protobuf.EntityData.RunLengthEncoding8 value) {
         if (liquidDataBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) == 0x00000100) &&
-              liquidData_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
+          if (((bitField0_ & 0x00000400) == 0x00000400) &&
+              liquidData_ != org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance()) {
             liquidData_ =
-              org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(liquidData_).mergeFrom(value).buildPartial();
+              org.terasology.protobuf.EntityData.RunLengthEncoding8.newBuilder(liquidData_).mergeFrom(value).buildPartial();
           } else {
             liquidData_ = value;
           }
@@ -13505,34 +13315,34 @@ public final class EntityData {
         } else {
           liquidDataBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000400;
         return this;
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
       public Builder clearLiquidData() {
         if (liquidDataBuilder_ == null) {
-          liquidData_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
+          liquidData_ = org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
           onChanged();
         } else {
           liquidDataBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getLiquidDataBuilder() {
-        bitField0_ |= 0x00000100;
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder getLiquidDataBuilder() {
+        bitField0_ |= 0x00000400;
         onChanged();
         return getLiquidDataFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
-      public org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLiquidDataOrBuilder() {
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder getLiquidDataOrBuilder() {
         if (liquidDataBuilder_ != null) {
           return liquidDataBuilder_.getMessageOrBuilder();
         } else {
@@ -13540,14 +13350,14 @@ public final class EntityData {
         }
       }
       /**
-       * <code>optional .TeraArray liquid_data = 9;</code>
+       * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> 
+          org.terasology.protobuf.EntityData.RunLengthEncoding8, org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder> 
           getLiquidDataFieldBuilder() {
         if (liquidDataBuilder_ == null) {
           liquidDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder>(
+              org.terasology.protobuf.EntityData.RunLengthEncoding8, org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder>(
                   liquidData_,
                   getParentForChildren(),
                   isClean());
@@ -13565,6 +13375,1248 @@ public final class EntityData {
     }
 
     // @@protoc_insertion_point(class_scope:ChunkStore)
+  }
+
+  public interface RunLengthEncoding16OrBuilder extends
+      com.google.protobuf.GeneratedMessage.
+          ExtendableMessageOrBuilder<RunLengthEncoding16> {
+
+    // repeated sint32 runLengths = 1 [packed = true];
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    java.util.List<java.lang.Integer> getRunLengthsList();
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    int getRunLengthsCount();
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    int getRunLengths(int index);
+
+    // repeated sint32 values = 2 [packed = true];
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    java.util.List<java.lang.Integer> getValuesList();
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    int getValuesCount();
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    int getValues(int index);
+  }
+  /**
+   * Protobuf type {@code RunLengthEncoding16}
+   */
+  public static final class RunLengthEncoding16 extends
+      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+        RunLengthEncoding16> implements RunLengthEncoding16OrBuilder {
+    // Use RunLengthEncoding16.newBuilder() to construct.
+    private RunLengthEncoding16(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.EntityData.RunLengthEncoding16, ?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private RunLengthEncoding16(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RunLengthEncoding16 defaultInstance;
+    public static RunLengthEncoding16 getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public RunLengthEncoding16 getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RunLengthEncoding16(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                runLengths_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              runLengths_.add(input.readSInt32());
+              break;
+            }
+            case 10: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+                runLengths_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                runLengths_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 16: {
+              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                values_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              values_.add(input.readSInt32());
+              break;
+            }
+            case 18: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
+                values_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                values_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = java.util.Collections.unmodifiableList(runLengths_);
+        }
+        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          values_ = java.util.Collections.unmodifiableList(values_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding16_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding16_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.terasology.protobuf.EntityData.RunLengthEncoding16.class, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<RunLengthEncoding16> PARSER =
+        new com.google.protobuf.AbstractParser<RunLengthEncoding16>() {
+      public RunLengthEncoding16 parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RunLengthEncoding16(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RunLengthEncoding16> getParserForType() {
+      return PARSER;
+    }
+
+    // repeated sint32 runLengths = 1 [packed = true];
+    public static final int RUNLENGTHS_FIELD_NUMBER = 1;
+    private java.util.List<java.lang.Integer> runLengths_;
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getRunLengthsList() {
+      return runLengths_;
+    }
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public int getRunLengthsCount() {
+      return runLengths_.size();
+    }
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public int getRunLengths(int index) {
+      return runLengths_.get(index);
+    }
+    private int runLengthsMemoizedSerializedSize = -1;
+
+    // repeated sint32 values = 2 [packed = true];
+    public static final int VALUES_FIELD_NUMBER = 2;
+    private java.util.List<java.lang.Integer> values_;
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getValuesList() {
+      return values_;
+    }
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    public int getValuesCount() {
+      return values_.size();
+    }
+    /**
+     * <code>repeated sint32 values = 2 [packed = true];</code>
+     */
+    public int getValues(int index) {
+      return values_.get(index);
+    }
+    private int valuesMemoizedSerializedSize = -1;
+
+    private void initFields() {
+      runLengths_ = java.util.Collections.emptyList();
+      values_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      com.google.protobuf.GeneratedMessage
+        .ExtendableMessage<org.terasology.protobuf.EntityData.RunLengthEncoding16>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
+      if (getRunLengthsList().size() > 0) {
+        output.writeRawVarint32(10);
+        output.writeRawVarint32(runLengthsMemoizedSerializedSize);
+      }
+      for (int i = 0; i < runLengths_.size(); i++) {
+        output.writeSInt32NoTag(runLengths_.get(i));
+      }
+      if (getValuesList().size() > 0) {
+        output.writeRawVarint32(18);
+        output.writeRawVarint32(valuesMemoizedSerializedSize);
+      }
+      for (int i = 0; i < values_.size(); i++) {
+        output.writeSInt32NoTag(values_.get(i));
+      }
+      extensionWriter.writeUntil(536870912, output);
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < runLengths_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(runLengths_.get(i));
+        }
+        size += dataSize;
+        if (!getRunLengthsList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        runLengthsMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < values_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(values_.get(i));
+        }
+        size += dataSize;
+        if (!getValuesList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        valuesMemoizedSerializedSize = dataSize;
+      }
+      size += extensionsSerializedSize();
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding16 parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.EntityData.RunLengthEncoding16 prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RunLengthEncoding16}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+          org.terasology.protobuf.EntityData.RunLengthEncoding16, Builder> implements org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding16_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding16_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.terasology.protobuf.EntityData.RunLengthEncoding16.class, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder.class);
+      }
+
+      // Construct using org.terasology.protobuf.EntityData.RunLengthEncoding16.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        runLengths_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        values_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding16_descriptor;
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16 getDefaultInstanceForType() {
+        return org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16 build() {
+        org.terasology.protobuf.EntityData.RunLengthEncoding16 result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16 buildPartial() {
+        org.terasology.protobuf.EntityData.RunLengthEncoding16 result = new org.terasology.protobuf.EntityData.RunLengthEncoding16(this);
+        int from_bitField0_ = bitField0_;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = java.util.Collections.unmodifiableList(runLengths_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.runLengths_ = runLengths_;
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          values_ = java.util.Collections.unmodifiableList(values_);
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.values_ = values_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.EntityData.RunLengthEncoding16) {
+          return mergeFrom((org.terasology.protobuf.EntityData.RunLengthEncoding16)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.terasology.protobuf.EntityData.RunLengthEncoding16 other) {
+        if (other == org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance()) return this;
+        if (!other.runLengths_.isEmpty()) {
+          if (runLengths_.isEmpty()) {
+            runLengths_ = other.runLengths_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureRunLengthsIsMutable();
+            runLengths_.addAll(other.runLengths_);
+          }
+          onChanged();
+        }
+        if (!other.values_.isEmpty()) {
+          if (values_.isEmpty()) {
+            values_ = other.values_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureValuesIsMutable();
+            values_.addAll(other.values_);
+          }
+          onChanged();
+        }
+        this.mergeExtensionFields(other);
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!extensionsAreInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.terasology.protobuf.EntityData.RunLengthEncoding16 parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.terasology.protobuf.EntityData.RunLengthEncoding16) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated sint32 runLengths = 1 [packed = true];
+      private java.util.List<java.lang.Integer> runLengths_ = java.util.Collections.emptyList();
+      private void ensureRunLengthsIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = new java.util.ArrayList<java.lang.Integer>(runLengths_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getRunLengthsList() {
+        return java.util.Collections.unmodifiableList(runLengths_);
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public int getRunLengthsCount() {
+        return runLengths_.size();
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public int getRunLengths(int index) {
+        return runLengths_.get(index);
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder setRunLengths(
+          int index, int value) {
+        ensureRunLengthsIsMutable();
+        runLengths_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder addRunLengths(int value) {
+        ensureRunLengthsIsMutable();
+        runLengths_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder addAllRunLengths(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureRunLengthsIsMutable();
+        super.addAll(values, runLengths_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder clearRunLengths() {
+        runLengths_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      // repeated sint32 values = 2 [packed = true];
+      private java.util.List<java.lang.Integer> values_ = java.util.Collections.emptyList();
+      private void ensureValuesIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          values_ = new java.util.ArrayList<java.lang.Integer>(values_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getValuesList() {
+        return java.util.Collections.unmodifiableList(values_);
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public int getValuesCount() {
+        return values_.size();
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public int getValues(int index) {
+        return values_.get(index);
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public Builder setValues(
+          int index, int value) {
+        ensureValuesIsMutable();
+        values_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public Builder addValues(int value) {
+        ensureValuesIsMutable();
+        values_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public Builder addAllValues(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureValuesIsMutable();
+        super.addAll(values, values_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 values = 2 [packed = true];</code>
+       */
+      public Builder clearValues() {
+        values_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:RunLengthEncoding16)
+    }
+
+    static {
+      defaultInstance = new RunLengthEncoding16(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:RunLengthEncoding16)
+  }
+
+  public interface RunLengthEncoding8OrBuilder extends
+      com.google.protobuf.GeneratedMessage.
+          ExtendableMessageOrBuilder<RunLengthEncoding8> {
+
+    // repeated sint32 runLengths = 1 [packed = true];
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    java.util.List<java.lang.Integer> getRunLengthsList();
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    int getRunLengthsCount();
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    int getRunLengths(int index);
+
+    // optional bytes values = 2;
+    /**
+     * <code>optional bytes values = 2;</code>
+     */
+    boolean hasValues();
+    /**
+     * <code>optional bytes values = 2;</code>
+     */
+    com.google.protobuf.ByteString getValues();
+  }
+  /**
+   * Protobuf type {@code RunLengthEncoding8}
+   */
+  public static final class RunLengthEncoding8 extends
+      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+        RunLengthEncoding8> implements RunLengthEncoding8OrBuilder {
+    // Use RunLengthEncoding8.newBuilder() to construct.
+    private RunLengthEncoding8(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.EntityData.RunLengthEncoding8, ?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private RunLengthEncoding8(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final RunLengthEncoding8 defaultInstance;
+    public static RunLengthEncoding8 getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public RunLengthEncoding8 getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RunLengthEncoding8(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                runLengths_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              runLengths_.add(input.readSInt32());
+              break;
+            }
+            case 10: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001) && input.getBytesUntilLimit() > 0) {
+                runLengths_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                runLengths_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000001;
+              values_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = java.util.Collections.unmodifiableList(runLengths_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding8_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding8_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.terasology.protobuf.EntityData.RunLengthEncoding8.class, org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<RunLengthEncoding8> PARSER =
+        new com.google.protobuf.AbstractParser<RunLengthEncoding8>() {
+      public RunLengthEncoding8 parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RunLengthEncoding8(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RunLengthEncoding8> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // repeated sint32 runLengths = 1 [packed = true];
+    public static final int RUNLENGTHS_FIELD_NUMBER = 1;
+    private java.util.List<java.lang.Integer> runLengths_;
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getRunLengthsList() {
+      return runLengths_;
+    }
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public int getRunLengthsCount() {
+      return runLengths_.size();
+    }
+    /**
+     * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+     */
+    public int getRunLengths(int index) {
+      return runLengths_.get(index);
+    }
+    private int runLengthsMemoizedSerializedSize = -1;
+
+    // optional bytes values = 2;
+    public static final int VALUES_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString values_;
+    /**
+     * <code>optional bytes values = 2;</code>
+     */
+    public boolean hasValues() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional bytes values = 2;</code>
+     */
+    public com.google.protobuf.ByteString getValues() {
+      return values_;
+    }
+
+    private void initFields() {
+      runLengths_ = java.util.Collections.emptyList();
+      values_ = com.google.protobuf.ByteString.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      com.google.protobuf.GeneratedMessage
+        .ExtendableMessage<org.terasology.protobuf.EntityData.RunLengthEncoding8>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
+      if (getRunLengthsList().size() > 0) {
+        output.writeRawVarint32(10);
+        output.writeRawVarint32(runLengthsMemoizedSerializedSize);
+      }
+      for (int i = 0; i < runLengths_.size(); i++) {
+        output.writeSInt32NoTag(runLengths_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(2, values_);
+      }
+      extensionWriter.writeUntil(536870912, output);
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < runLengths_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(runLengths_.get(i));
+        }
+        size += dataSize;
+        if (!getRunLengthsList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        runLengthsMemoizedSerializedSize = dataSize;
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, values_);
+      }
+      size += extensionsSerializedSize();
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.EntityData.RunLengthEncoding8 parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.EntityData.RunLengthEncoding8 prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code RunLengthEncoding8}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+          org.terasology.protobuf.EntityData.RunLengthEncoding8, Builder> implements org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding8_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding8_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.terasology.protobuf.EntityData.RunLengthEncoding8.class, org.terasology.protobuf.EntityData.RunLengthEncoding8.Builder.class);
+      }
+
+      // Construct using org.terasology.protobuf.EntityData.RunLengthEncoding8.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        runLengths_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        values_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.EntityData.internal_static_RunLengthEncoding8_descriptor;
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8 getDefaultInstanceForType() {
+        return org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8 build() {
+        org.terasology.protobuf.EntityData.RunLengthEncoding8 result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.terasology.protobuf.EntityData.RunLengthEncoding8 buildPartial() {
+        org.terasology.protobuf.EntityData.RunLengthEncoding8 result = new org.terasology.protobuf.EntityData.RunLengthEncoding8(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = java.util.Collections.unmodifiableList(runLengths_);
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.runLengths_ = runLengths_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.values_ = values_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.EntityData.RunLengthEncoding8) {
+          return mergeFrom((org.terasology.protobuf.EntityData.RunLengthEncoding8)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.terasology.protobuf.EntityData.RunLengthEncoding8 other) {
+        if (other == org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance()) return this;
+        if (!other.runLengths_.isEmpty()) {
+          if (runLengths_.isEmpty()) {
+            runLengths_ = other.runLengths_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureRunLengthsIsMutable();
+            runLengths_.addAll(other.runLengths_);
+          }
+          onChanged();
+        }
+        if (other.hasValues()) {
+          setValues(other.getValues());
+        }
+        this.mergeExtensionFields(other);
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!extensionsAreInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.terasology.protobuf.EntityData.RunLengthEncoding8 parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.terasology.protobuf.EntityData.RunLengthEncoding8) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // repeated sint32 runLengths = 1 [packed = true];
+      private java.util.List<java.lang.Integer> runLengths_ = java.util.Collections.emptyList();
+      private void ensureRunLengthsIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          runLengths_ = new java.util.ArrayList<java.lang.Integer>(runLengths_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getRunLengthsList() {
+        return java.util.Collections.unmodifiableList(runLengths_);
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public int getRunLengthsCount() {
+        return runLengths_.size();
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public int getRunLengths(int index) {
+        return runLengths_.get(index);
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder setRunLengths(
+          int index, int value) {
+        ensureRunLengthsIsMutable();
+        runLengths_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder addRunLengths(int value) {
+        ensureRunLengthsIsMutable();
+        runLengths_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder addAllRunLengths(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureRunLengthsIsMutable();
+        super.addAll(values, runLengths_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 runLengths = 1 [packed = true];</code>
+       */
+      public Builder clearRunLengths() {
+        runLengths_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+
+      // optional bytes values = 2;
+      private com.google.protobuf.ByteString values_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>optional bytes values = 2;</code>
+       */
+      public boolean hasValues() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional bytes values = 2;</code>
+       */
+      public com.google.protobuf.ByteString getValues() {
+        return values_;
+      }
+      /**
+       * <code>optional bytes values = 2;</code>
+       */
+      public Builder setValues(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        values_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bytes values = 2;</code>
+       */
+      public Builder clearValues() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        values_ = getDefaultInstance().getValues();
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:RunLengthEncoding8)
+    }
+
+    static {
+      defaultInstance = new RunLengthEncoding8(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:RunLengthEncoding8)
   }
 
   public interface EntityStoreMetadataOrBuilder extends
@@ -16666,6 +17718,16 @@ public final class EntityData {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ChunkStore_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_RunLengthEncoding16_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_RunLengthEncoding16_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_RunLengthEncoding8_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_RunLengthEncoding8_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_EntityStoreMetadata_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -16684,62 +17746,63 @@ public final class EntityData {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020EntityData.proto\032\014Chunks.proto\"\313\001\n\005Val" +
-      "ue\022\022\n\006double\030\001 \003(\001B\002\020\001\022\021\n\005float\030\002 \003(\002B\002\020" +
-      "\001\022\023\n\007integer\030\003 \003(\021B\002\020\001\022\020\n\004long\030\004 \003(\022B\002\020\001" +
-      "\022\023\n\007boolean\030\005 \003(\010B\002\020\001\022\016\n\006string\030\006 \003(\t\022\r\n" +
-      "\005bytes\030\007 \001(\014\022\025\n\005value\030\010 \003(\0132\006.Value\022\036\n\nn" +
-      "ame_value\030\t \003(\0132\n.NameValue*\t\010\210\'\020\200\200\200\200\002\"D" +
-      "\n\tNameValue\022\014\n\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\013" +
-      "2\006.Value\022\022\n\nname_index\030\003 \001(\005\"S\n\tComponen" +
-      "t\022\022\n\ntype_index\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005f" +
-      "ield\030\002 \003(\0132\n.NameValue*\t\010\210\'\020\200\200\200\200\002\"\274\001\n\006En",
-      "tity\022\n\n\002id\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Co" +
-      "mponent\022#\n\027removed_component_index\030\003 \003(\005" +
-      "B\002\020\001\022\025\n\rparent_prefab\030\004 \001(\t\022\026\n\016alwaysRel" +
-      "evant\030\005 \001(\010\022\r\n\005owner\030\006 \001(\005\022\031\n\021removed_co" +
-      "mponent\030\017 \003(\t*\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014PackedEntit" +
-      "y\022\n\n\002id\030\001 \001(\005\022\027\n\013componentId\030\002 \003(\005B\002\020\001\022\034" +
-      "\n\024componentFieldCounts\030\003 \001(\014\022\020\n\010fieldIds" +
-      "\030\004 \001(\014\022\032\n\nfieldValue\030\005 \003(\0132\006.Value\022\034\n\020re" +
-      "movedComponent\030\006 \003(\005B\002\020\001\022\r\n\005owner\030\007 \001(\005\022" +
-      "\027\n\017parentPrefabUri\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006",
-      "Prefab\022\022\n\nname_index\030\001 \001(\005\022\035\n\tcomponent\030" +
-      "\002 \003(\0132\n.Component\022\026\n\ndeprecated\030\003 \003(\005B\002\020" +
-      "\001\022\027\n\tpersisted\030\004 \001(\010:\004true\022\030\n\020removedCom" +
-      "ponent\030\005 \003(\t\022\026\n\016alwaysRelevant\030\006 \001(\010\022\014\n\004" +
-      "name\030\017 \001(\t\022\023\n\013parent_name\030\020 \001(\t*\t\010\210\'\020\200\200\200" +
-      "\200\002\"N\n\005Event\022\014\n\004type\030\001 \001(\005\022\020\n\010fieldIds\030\002 " +
-      "\001(\014\022\032\n\nfieldValue\030\003 \003(\0132\006.Value*\t\010\210\'\020\200\200\200" +
-      "\200\002\"w\n\013EntityStore\022\027\n\006entity\030\001 \003(\0132\007.Enti" +
-      "ty\022\027\n\017component_class\030\003 \003(\t\022\022\n\nentityNam" +
-      "e\030\002 \003(\t\022\027\n\013entityNamed\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200",
-      "\200\200\002\"\220\001\n\013PlayerStore\022\033\n\005store\030\001 \001(\0132\014.Ent" +
-      "ityStore\022\025\n\rcharacterPosX\030\017 \001(\002\022\025\n\rchara" +
-      "cterPosY\030\020 \001(\002\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n" +
-      "\014hasCharacter\030\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\200\002\n\nChunk" +
-      "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030" +
-      "\002 \001(\021\022\t\n\001y\030\003 \001(\021\022\t\n\001z\030\004 \001(\021\022\032\n\005state\030\005 \001" +
-      "(\0162\013.ChunkState\022\036\n\nblock_data\030\006 \001(\0132\n.Te" +
-      "raArray\022%\n\021deprecated_data_1\030\007 \001(\0132\n.Ter" +
-      "aArray\022%\n\021deprecated_data_2\030\010 \001(\0132\n.Tera" +
-      "Array\022\037\n\013liquid_data\030\t \001(\0132\n.TeraArray*\t",
-      "\010\210\'\020\200\200\200\200\002\"\204\001\n\023EntityStoreMetadata\022\030\n\004typ" +
-      "e\030\001 \001(\0162\n.StoreType\022\025\n\rstoreStringId\030\002 \001" +
-      "(\t\022\032\n\016storeIntegerId\030\003 \003(\005B\002\020\001\022\025\n\trefere" +
-      "nce\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore" +
-      "\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(" +
-      "\0132\007.Prefab\022\027\n\017component_class\030\003 \003(\t\022\026\n\016n" +
-      "ext_entity_id\030\020 \001(\005\022\033\n\017freed_entity_id\030\021" +
-      " \003(\005B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t\022/\n\021storeRe" +
-      "ferenceSet\030\023 \003(\0132\024.EntityStoreMetadata*\t" +
-      "\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerStoreTyp",
-      "e\020\001\022\022\n\016ChunkStoreType\020\002*\207\001\n\nChunkState\022 " +
-      "\n\034ADJACENCY_GENERATION_PENDING\020\000\022%\n!INTE" +
-      "RNAL_LIGHT_GENERATION_PENDING\020\001\022\020\n\014DEPRE" +
-      "CATED_1\020\002\022\020\n\014DEPRECATED_2\020\003\022\014\n\010COMPLETE\020" +
-      "\004B\'\n\027org.terasology.protobufB\nEntityData" +
-      "H\001"
+      "\n\020EntityData.proto\"\313\001\n\005Value\022\022\n\006double\030\001" +
+      " \003(\001B\002\020\001\022\021\n\005float\030\002 \003(\002B\002\020\001\022\023\n\007integer\030\003" +
+      " \003(\021B\002\020\001\022\020\n\004long\030\004 \003(\022B\002\020\001\022\023\n\007boolean\030\005 " +
+      "\003(\010B\002\020\001\022\016\n\006string\030\006 \003(\t\022\r\n\005bytes\030\007 \001(\014\022\025" +
+      "\n\005value\030\010 \003(\0132\006.Value\022\036\n\nname_value\030\t \003(" +
+      "\0132\n.NameValue*\t\010\210\'\020\200\200\200\200\002\"D\n\tNameValue\022\014\n" +
+      "\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nna" +
+      "me_index\030\003 \001(\005\"S\n\tComponent\022\022\n\ntype_inde" +
+      "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
+      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\274\001\n\006Entity\022\n\n\002id\030\001 \001",
+      "(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
+      "oved_component_index\030\003 \003(\005B\002\020\001\022\025\n\rparent" +
+      "_prefab\030\004 \001(\t\022\026\n\016alwaysRelevant\030\005 \001(\010\022\r\n" +
+      "\005owner\030\006 \001(\005\022\031\n\021removed_component\030\017 \003(\t*" +
+      "\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\005\022" +
+      "\027\n\013componentId\030\002 \003(\005B\002\020\001\022\034\n\024componentFie" +
+      "ldCounts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfiel" +
+      "dValue\030\005 \003(\0132\006.Value\022\034\n\020removedComponent" +
+      "\030\006 \003(\005B\002\020\001\022\r\n\005owner\030\007 \001(\005\022\027\n\017parentPrefa" +
+      "bUri\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname",
+      "_index\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Compon" +
+      "ent\022\026\n\ndeprecated\030\003 \003(\005B\002\020\001\022\027\n\tpersisted" +
+      "\030\004 \001(\010:\004true\022\030\n\020removedComponent\030\005 \003(\t\022\026" +
+      "\n\016alwaysRelevant\030\006 \001(\010\022\014\n\004name\030\017 \001(\t\022\023\n\013" +
+      "parent_name\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"N\n\005Event\022\014\n" +
+      "\004type\030\001 \001(\005\022\020\n\010fieldIds\030\002 \001(\014\022\032\n\nfieldVa" +
+      "lue\030\003 \003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntitySt" +
+      "ore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\017componen" +
+      "t_class\030\003 \003(\t\022\022\n\nentityName\030\002 \003(\t\022\027\n\013ent" +
+      "ityNamed\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013Player",
+      "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rch" +
+      "aracterPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002" +
+      "\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030" +
+      "\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\260\002\n\nChunkStore\022\033\n\005store" +
+      "\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001" +
+      "(\021\022\t\n\001z\030\004 \001(\021\022\031\n\021deprecated_data_3\030\005 \001(\005" +
+      "\022\031\n\021deprecated_data_4\030\006 \001(\014\022\031\n\021deprecate" +
+      "d_data_1\030\007 \001(\014\022\031\n\021deprecated_data_2\030\010 \001(" +
+      "\014\022\031\n\021deprecated_data_5\030\t \001(\014\022(\n\nblock_da" +
+      "ta\030\n \001(\0132\024.RunLengthEncoding16\022(\n\013liquid",
+      "_data\030\013 \001(\0132\023.RunLengthEncoding8*\t\010\210\'\020\200\200" +
+      "\200\200\002\"L\n\023RunLengthEncoding16\022\026\n\nrunLengths" +
+      "\030\001 \003(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200\200\200" +
+      "\002\"G\n\022RunLengthEncoding8\022\026\n\nrunLengths\030\001 " +
+      "\003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\204\001\n\023E" +
+      "ntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.Store" +
+      "Type\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeInte" +
+      "gerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002\020\001*\t" +
+      "\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 \003(" +
+      "\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017c",
+      "omponent_class\030\003 \003(\t\022\026\n\016next_entity_id\030\020" +
+      " \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013pre" +
+      "fab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 \003(" +
+      "\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\tSt" +
+      "oreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkSto" +
+      "reType\020\002B\'\n\027org.terasology.protobufB\nEnt" +
+      "ityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -16805,15 +17868,27 @@ public final class EntityData {
           internal_static_ChunkStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ChunkStore_descriptor,
-              new java.lang.String[] { "Store", "X", "Y", "Z", "State", "BlockData", "DeprecatedData1", "DeprecatedData2", "LiquidData", });
-          internal_static_EntityStoreMetadata_descriptor =
+              new java.lang.String[] { "Store", "X", "Y", "Z", "DeprecatedData3", "DeprecatedData4", "DeprecatedData1", "DeprecatedData2", "DeprecatedData5", "BlockData", "LiquidData", });
+          internal_static_RunLengthEncoding16_descriptor =
             getDescriptor().getMessageTypes().get(10);
+          internal_static_RunLengthEncoding16_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_RunLengthEncoding16_descriptor,
+              new java.lang.String[] { "RunLengths", "Values", });
+          internal_static_RunLengthEncoding8_descriptor =
+            getDescriptor().getMessageTypes().get(11);
+          internal_static_RunLengthEncoding8_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_RunLengthEncoding8_descriptor,
+              new java.lang.String[] { "RunLengths", "Values", });
+          internal_static_EntityStoreMetadata_descriptor =
+            getDescriptor().getMessageTypes().get(12);
           internal_static_EntityStoreMetadata_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EntityStoreMetadata_descriptor,
               new java.lang.String[] { "Type", "StoreStringId", "StoreIntegerId", "Reference", });
           internal_static_GlobalStore_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(13);
           internal_static_GlobalStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_GlobalStore_descriptor,
@@ -16824,7 +17899,6 @@ public final class EntityData {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          org.terasology.protobuf.ChunksProtobuf.getDescriptor(),
         }, assigner);
   }
 

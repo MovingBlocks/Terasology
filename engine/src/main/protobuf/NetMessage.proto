@@ -3,7 +3,6 @@
  */
 
 import "EntityData.proto";
-import "Chunks.proto";
 
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "NetData";

@@ -54,7 +54,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.util.Collections;
@@ -91,6 +90,8 @@ public class ServerImpl implements Server {
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
+
+    private ChunkImpl.ProtobufHandler chunkSerializer = new ChunkImpl.ProtobufHandler();
 
     private EngineTime time;
 
@@ -288,7 +289,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            ChunkImpl chunk = Chunks.getInstance().decode(chunkInfo);
+            ChunkImpl chunk = chunkSerializer.decode(chunkInfo);
             chunkQueue.offer(chunk);
         }
     }

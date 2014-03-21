@@ -17,6 +17,9 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.protobuf.ByteString;
+import gnu.trove.list.TByteList;
+import gnu.trove.list.array.TByteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
@@ -31,9 +34,9 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkBlockIterator;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.Chunks;
 import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraArrays;
+import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
+import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.liquid.LiquidData;
@@ -86,12 +89,11 @@ public class ChunkImpl implements Chunk {
     private AABB[] subMeshAABB;
 
     protected ChunkImpl() {
-        final Chunks c = Chunks.getInstance();
-        blockData = c.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        blockData = new TeraDenseArray16Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        extraData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
     }
@@ -113,10 +115,9 @@ public class ChunkImpl implements Chunk {
         this.chunkPos.set(Preconditions.checkNotNull(chunkPos));
         this.blockData = Preconditions.checkNotNull(blocks);
         this.extraData = Preconditions.checkNotNull(liquid);
-        final Chunks c = Chunks.getInstance();
-        sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
         blockManager = CoreRegistry.get(BlockManager.class);
         region = Region3i.createFromMinAndSize(new Vector3i(chunkPos.x * ChunkConstants.SIZE_X, chunkPos.y * ChunkConstants.SIZE_Y, chunkPos.z * ChunkConstants.SIZE_Z),
@@ -474,10 +475,9 @@ public class ChunkImpl implements Chunk {
     public void prepareForReactivation() {
         if (disposed) {
             disposed = false;
-            Chunks c = Chunks.getInstance();
-            sunlightData = c.getSunlightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            sunlightRegenData = c.getSunlightRegenDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
-            lightData = c.getLightDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            sunlightRegenData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            lightData = new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
         }
     }
 
@@ -544,15 +544,14 @@ public class ChunkImpl implements Chunk {
      */
     public static class ProtobufHandler {
 
-        public EntityData.ChunkStore.Builder encode(ChunkImpl chunk, boolean coreOnly) {
+        public EntityData.ChunkStore.Builder encode(ChunkImpl chunk) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            final TeraArrays t = TeraArrays.getInstance();
+            Vector3i pos = chunk.getPos();
             final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                    .setX(chunk.chunkPos.x).setY(chunk.chunkPos.y).setZ(chunk.chunkPos.z)
-                    .setBlockData(t.encode(chunk.blockData));
-            if (!coreOnly) {
-                b.setLiquidData(t.encode(chunk.extraData));
-            }
+                    .setX(pos.x).setY(pos.y).setZ(pos.z);
+            b.setBlockData(runLengthEncode16(chunk.blockData));
+            b.setLiquidData(runLengthEncode8(chunk.extraData));
+
             return b;
         }
 
@@ -565,19 +564,98 @@ public class ChunkImpl implements Chunk {
             if (!message.hasBlockData()) {
                 throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
             }
-
-            final TeraArrays t = TeraArrays.getInstance();
-            final TeraArray blockData = t.decode(message.getBlockData());
-
-            Chunks c = Chunks.getInstance();
-            TeraArray extraData;
-            if (message.hasLiquidData()) {
-                extraData = t.decode(message.getLiquidData());
-            } else {
-                extraData = c.getExtraDataEntry().factory.create(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z);
+            if (!message.hasLiquidData()) {
+                throw new IllegalArgumentException("Ill-formed protobuf message. Missing liquid data.");
             }
 
-            return new ChunkImpl(pos, blockData, extraData);
+            final TeraArray blockData = runLengthDecode(message.getBlockData());
+            final TeraArray liquidData = runLengthDecode(message.getLiquidData());
+            return new ChunkImpl(pos, blockData, liquidData);
         }
+
+        public EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {
+            EntityData.RunLengthEncoding16.Builder builder = EntityData.RunLengthEncoding16.newBuilder();
+            short lastItem = (short) array.get(0, 0, 0);
+            int counter = 0;
+            for (int y = 0; y < array.getSizeY(); ++y) {
+                for (int z = 0; z < array.getSizeZ(); ++z) {
+                    for (int x = 0; x < array.getSizeX(); ++x) {
+                        short item = (short) array.get(x, y, z);
+                        if (lastItem != item) {
+                            builder.addRunLengths(counter);
+                            builder.addValues(lastItem & 0xFFFF);
+                            lastItem = item;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+                    }
+                }
+            }
+            if (lastItem != 0) {
+                builder.addRunLengths(counter);
+                builder.addValues(lastItem & 0xFFFF);
+            }
+            return builder.build();
+        }
+
+        public EntityData.RunLengthEncoding8 runLengthEncode8(TeraArray array) {
+            EntityData.RunLengthEncoding8.Builder builder = EntityData.RunLengthEncoding8.newBuilder();
+            TByteList values = new TByteArrayList(16384);
+            byte lastItem = (byte) array.get(0, 0, 0);
+            int counter = 0;
+            for (int y = 0; y < array.getSizeY(); ++y) {
+                for (int z = 0; z < array.getSizeZ(); ++z) {
+                    for (int x = 0; x < array.getSizeX(); ++x) {
+                        byte item = (byte) array.get(x, y, z);
+                        if (lastItem != item) {
+                            builder.addRunLengths(counter);
+                            values.add(lastItem);
+                            lastItem = item;
+                            counter = 1;
+                        } else {
+                            counter++;
+                        }
+                    }
+                }
+            }
+            if (lastItem != 0) {
+                builder.addRunLengths(counter);
+                values.add(lastItem);
+            }
+            builder.setValues(ByteString.copyFrom(values.toArray()));
+            return builder.build();
+        }
+
+        public TeraArray runLengthDecode(EntityData.RunLengthEncoding16 data) {
+            Preconditions.checkState(data.getValuesCount() == data.getRunLengthsCount(), "Expected same number of values as runs");
+            short[] decodedData = new short[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
+            int index = 0;
+            for (int pos = 0; pos < data.getValuesCount(); ++pos) {
+                int length = data.getRunLengths(pos);
+                short value = (short) data.getValues(pos);
+                for (int i = 0; i < length; ++i) {
+                    decodedData[index++] = value;
+                }
+            }
+            return new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
+        }
+
+        public TeraArray runLengthDecode(EntityData.RunLengthEncoding8 data) {
+            Preconditions.checkState(data.getValues().size() == data.getRunLengthsCount(), "Expected same number of values as runs");
+            byte[] decodedData = new byte[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
+            int index = 0;
+            ByteString.ByteIterator valueSource = data.getValues().iterator();
+            for (int pos = 0; pos < data.getRunLengthsCount(); ++pos) {
+                int length = data.getRunLengths(pos);
+                byte value = valueSource.nextByte();
+                for (int i = 0; i < length; ++i) {
+                    decodedData[index++] = value;
+                }
+            }
+            return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
+        }
+
+
     }
 }

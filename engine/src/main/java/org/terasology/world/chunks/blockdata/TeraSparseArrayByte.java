@@ -18,9 +18,6 @@ package org.terasology.world.chunks.blockdata;
 
 import com.google.common.base.Preconditions;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.nio.ByteBuffer;
 
 
@@ -95,22 +92,6 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
         }
         System.arraycopy(deflated, 0, def, 0, getSizeY());
         return createSparse(inf, def);
-    }
-
-    @Override
-    public final void writeExternal(ObjectOutput out) throws IOException {
-        writeExternalHeader(out);
-        out.writeObject(inflated);
-        out.writeObject(deflated);
-        out.writeByte(fill);
-    }
-
-    @Override
-    public final void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        readExternalHeader(in);
-        inflated = (byte[][]) in.readObject();
-        deflated = (byte[]) in.readObject();
-        fill = in.readByte();
     }
 
     protected abstract static class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
