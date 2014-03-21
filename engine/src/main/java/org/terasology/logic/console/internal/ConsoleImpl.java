@@ -78,14 +78,14 @@ public class ConsoleImpl implements Console {
     private boolean commandsSorted;
 
     public ConsoleImpl() {
-        addMessage("Welcome to the wonderful world of " + FontColor.toChar(ConsoleColors.TERASOLOGY) + "Terasology" + FontColor.getReset() + "!\n" +
-                "\n" +
-                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details.\n" +
-                "Text parameters should be in quotes, no commas needed between multiple parameters.\n" +
-                "Commands are case-sensitive, block names and such are not.\n" +
-                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:\n" +
-                "'gh' + 'tab' = 'ghost'\n" +
-                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)\n");
+        addMessage("Welcome to the wonderful world of " + FontColor.getColored("Terasology", ConsoleColors.TERASOLOGY) + "!" + Message.NEW_LINE +
+                Message.NEW_LINE +
+                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
+                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE + 
+                "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
+                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
+                "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
+                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
     }
 
     /**
@@ -249,6 +249,7 @@ public class ConsoleImpl implements Console {
                 String result = cmd.execute(params, callingClient);
                 if (result != null && !result.isEmpty()) {
                     if (callingClient.exists()) {
+                        result = FontColor.getColored(result, ConsoleColors.NOTIFICATION);
                         callingClient.send(new ConsoleMessageEvent(result));
                     } else {
                         addMessage(result);

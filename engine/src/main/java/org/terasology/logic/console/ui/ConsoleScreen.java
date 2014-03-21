@@ -89,10 +89,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                 while (messageIterator.hasNext()) {
                     Message message = messageIterator.next();
                     messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
-                    messageList.append("\n");
-                    if (messageIterator.hasNext()) {
-                        messageList.append("\n");
-                    }
+                    messageList.append(Message.NEW_LINE);
                 }
                 return messageList.toString();
             }

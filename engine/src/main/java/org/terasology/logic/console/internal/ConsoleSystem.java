@@ -26,6 +26,7 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
+import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -41,7 +42,7 @@ import java.util.List;
  */
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
-
+    
     @In
     private Console console;
 
@@ -65,11 +66,9 @@ public class ConsoleSystem extends BaseComponentSystem {
         List<CommandInfo> commands = console.getCommandList();
         for (CommandInfo cmd : commands) {
             if (!msg.toString().isEmpty()) {
-                msg.append("\n");
+                msg.append(Message.NEW_LINE);
             }
-            msg.append(FontColor.toChar(ConsoleColors.COMMAND));
-            msg.append(cmd.getUsageMessage());
-            msg.append(FontColor.getReset());
+            msg.append(FontColor.getColored(cmd.getUsageMessage(), ConsoleColors.COMMAND));
             msg.append(" - ");
             msg.append(cmd.getShortDescription());
         }
@@ -86,23 +85,23 @@ public class ConsoleSystem extends BaseComponentSystem {
 
             for (CommandInfo cmd : cmdCollection) {
                 msg.append("=====================================================================================================================");
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 msg.append(cmd.getUsageMessage());
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 msg.append("=====================================================================================================================");
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                 } else if (!cmd.getShortDescription().isEmpty()) {
                     msg.append(cmd.getShortDescription());
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                 }
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
             }
             return msg.toString();
         }

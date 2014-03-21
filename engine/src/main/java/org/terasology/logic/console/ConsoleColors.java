@@ -40,9 +40,9 @@ public final class ConsoleColors {
     public static final Color PLAYER = new Color(32, 32, 224);
     
     /**
-     * Area name color
+     * Notification color
      */
-    public static final Color AREA = new Color(32, 32, 224);
+    public static final Color NOTIFICATION = new Color(48, 48, 224);
 
 
     private ConsoleColors() {

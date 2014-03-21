@@ -18,6 +18,7 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -29,6 +30,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.Message;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
@@ -44,6 +46,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -135,7 +138,7 @@ public class BlockCommands extends BaseComponentSystem {
         StringBuilder items = new StringBuilder();
         for (String item : stringItems) {
             if (!items.toString().isEmpty()) {
-                items.append(System.lineSeparator());
+                items.append(Message.NEW_LINE);
             }
             items.append(item);
         }
@@ -147,24 +150,24 @@ public class BlockCommands extends BaseComponentSystem {
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
 
         stringBuilder.append("Available Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("----------------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
         for (BlockUri blockUri : availableBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -175,15 +178,15 @@ public class BlockCommands extends BaseComponentSystem {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
             stringBuilder.append("-----------");
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
             List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
             for (BlockUri uri : categoryBlocks) {
                 stringBuilder.append(uri.toString());
-                stringBuilder.append(System.lineSeparator());
+                stringBuilder.append(Message.NEW_LINE);
             }
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
         return stringBuilder.toString();
     }
@@ -192,13 +195,13 @@ public class BlockCommands extends BaseComponentSystem {
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.toSimpleString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -208,13 +211,13 @@ public class BlockCommands extends BaseComponentSystem {
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
