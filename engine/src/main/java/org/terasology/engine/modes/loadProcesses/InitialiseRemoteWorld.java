@@ -17,15 +17,13 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.network.NetworkSystem;
-import org.terasology.physics.Physics;
-import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;

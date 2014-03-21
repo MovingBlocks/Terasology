@@ -43,8 +43,4 @@ public final class ShutdownChunkTask implements ChunkTask {
         return Vector3i.zero();
     }
 
-    @Override
-    public GeneratingChunkProvider getProvider() {
-        return null;
-    }
 }

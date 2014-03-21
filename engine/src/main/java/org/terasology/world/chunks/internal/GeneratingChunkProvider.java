@@ -30,27 +30,6 @@ import org.terasology.world.generator.WorldGenerator;
 public interface GeneratingChunkProvider extends ChunkProvider {
 
     /**
-     * @param pos
-     * @return Whether this chunk is available and ready for use
-     */
-    boolean isChunkReady(Vector3i pos);
-
-    /**
-     * Obtains a chunk for pipeline processing. This should happen regardless of the state of the chunk.
-     *
-     * @param pos
-     * @return The requested chunk, or null if it isn't currently loaded.
-     */
-    ChunkImpl getChunkForProcessing(Vector3i pos);
-
-    /**
-     * Causes the creation or loading of a chunk.
-     *
-     * @param position
-     */
-    void createOrLoadChunk(Vector3i position);
-
-    /**
      * Notifies the chunk provider that a chunk is ready.
      *
      * @param chunk
@@ -58,4 +37,6 @@ public interface GeneratingChunkProvider extends ChunkProvider {
     void onChunkIsReady(ChunkImpl chunk);
 
     WorldGenerator getWorldGenerator();
+
+    ChunkImpl getChunkUnready(Vector3i pos);
 }

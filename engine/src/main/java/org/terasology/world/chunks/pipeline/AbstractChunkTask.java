@@ -17,28 +17,20 @@
 package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 
 /**
  * @author Immortius
  */
 public abstract class AbstractChunkTask implements ChunkTask {
     private final Vector3i position;
-    private final GeneratingChunkProvider provider;
 
-    public AbstractChunkTask(Vector3i position, GeneratingChunkProvider provider) {
+    public AbstractChunkTask(Vector3i position) {
         this.position = new Vector3i(position);
-        this.provider = provider;
     }
 
     @Override
     public Vector3i getPosition() {
         return position;
-    }
-
-    @Override
-    public GeneratingChunkProvider getProvider() {
-        return provider;
     }
 
     @Override

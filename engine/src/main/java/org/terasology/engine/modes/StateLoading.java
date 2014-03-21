@@ -26,6 +26,7 @@ import org.terasology.engine.Time;
 import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.engine.modes.loadProcesses.CacheBlocks;
 import org.terasology.engine.modes.loadProcesses.CacheTextures;
+import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
 import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
 import org.terasology.engine.modes.loadProcesses.InitialiseBlockTypeEntities;
 import org.terasology.engine.modes.loadProcesses.InitialiseCommandSystem;
@@ -153,6 +154,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialisePhysics());
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new PreBeginSystems());
+        loadProcesses.add(new CreateRemoteWorldEntity());
         loadProcesses.add(new PostBeginSystems());
         loadProcesses.add(new SetupRemotePlayer());
         loadProcesses.add(new AwaitCharacterSpawn());
