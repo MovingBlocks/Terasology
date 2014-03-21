@@ -66,7 +66,11 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                 for (Map.Entry<String, Component> entry : params.entrySet()) {
                     Class<? extends Component> clazz = entry.getValue().getClass();
                     Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
-                    worldEntity.addComponent(comp);
+                    if (comp != null) {
+                        worldEntity.addComponent(comp);
+                    } else {
+                        worldEntity.addComponent(entry.getValue());
+                    }
                 }
             }
 
