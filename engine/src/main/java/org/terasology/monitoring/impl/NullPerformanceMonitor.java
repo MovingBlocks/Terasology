@@ -16,11 +16,7 @@
 package org.terasology.monitoring.impl;
 
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.TObjectLongMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
 
 /**
  * @author Immortius <immortius@gmail.com>

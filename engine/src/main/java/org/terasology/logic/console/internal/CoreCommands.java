@@ -52,7 +52,6 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
-import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

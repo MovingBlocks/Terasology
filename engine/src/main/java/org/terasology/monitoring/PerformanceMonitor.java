@@ -16,7 +16,6 @@
 package org.terasology.monitoring;
 
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectLongMap;
 import org.terasology.monitoring.impl.NullPerformanceMonitor;
 import org.terasology.monitoring.impl.PerformanceMonitorImpl;
 import org.terasology.monitoring.impl.PerformanceMonitorInternal;

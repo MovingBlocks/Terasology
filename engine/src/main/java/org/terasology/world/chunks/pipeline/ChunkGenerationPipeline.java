@@ -18,10 +18,7 @@ package org.terasology.world.chunks.pipeline;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Region3i;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.generator.WorldGenerator;
 
 import java.util.Comparator;
 

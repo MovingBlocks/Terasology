@@ -15,7 +15,6 @@
  */
 package org.terasology.world.propagation;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
@@ -25,7 +24,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,33 +41,11 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
     private Set<Vector3i>[] reduceQueues;
     private Set<Vector3i>[] increaseQueues;
 
-    private Map<Side, Vector3i> chunkEdgeDeltas = Maps.newEnumMap(Side.class);
-
     public SunlightRegenBatchPropagator(PropagationRules regenRules, PropagatorWorldView regenWorld, BatchPropagator sunlightPropagator, PropagatorWorldView sunlightWorld) {
         this.regenRules = regenRules;
         this.regenWorld = regenWorld;
         this.sunlightPropagator = sunlightPropagator;
         this.sunlightWorld = sunlightWorld;
-
-        for (Side side : Side.values()) {
-            Vector3i delta = new Vector3i(side.getVector3i());
-            if (delta.x < 0) {
-                delta.x += ChunkConstants.SIZE_X;
-            } else if (delta.x > 0) {
-                delta.x -= ChunkConstants.SIZE_X;
-            }
-            if (delta.y < 0) {
-                delta.y += ChunkConstants.SIZE_Y;
-            } else if (delta.y > 0) {
-                delta.y -= ChunkConstants.SIZE_Y;
-            }
-            if (delta.z < 0) {
-                delta.z += ChunkConstants.SIZE_Z;
-            } else if (delta.z > 0) {
-                delta.z -= ChunkConstants.SIZE_Z;
-            }
-            chunkEdgeDeltas.put(side, delta);
-        }
 
         increaseQueues = new Set[regenRules.getMaxValue() + 1];
         reduceQueues = new Set[regenRules.getMaxValue() + 1];

@@ -15,12 +15,9 @@
  */
 package org.terasology.world.generator;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
-
 import com.google.common.base.Optional;
+import org.terasology.engine.SimpleUri;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius

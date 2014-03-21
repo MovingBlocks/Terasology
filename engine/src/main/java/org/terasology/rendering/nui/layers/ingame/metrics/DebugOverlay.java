@@ -29,7 +29,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -62,7 +61,8 @@ public class DebugOverlay extends CoreScreenLayer {
     @In
     private WorldProvider worldProvider;
 
-    private List<MetricsMode> metricsModes = Lists.newArrayList(new NullMetricsMode(), new RunningMeansMode(), new SpikesMode(), new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode());
+    private List<MetricsMode> metricsModes = Lists.newArrayList(new NullMetricsMode(), new RunningMeansMode(), new SpikesMode(),
+            new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode());
     private int currentMode;
     private UILabel metricsLabel;
 

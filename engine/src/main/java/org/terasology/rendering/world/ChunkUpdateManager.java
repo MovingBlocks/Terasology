@@ -29,7 +29,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingDeque;
@@ -61,7 +60,6 @@ public final class ChunkUpdateManager {
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
      * is reached, the chunk update is ignored. Chunk updates can be forced though.
-     *
      *
      * @param chunk The chunk to update
      * @return True if a chunk update was executed
