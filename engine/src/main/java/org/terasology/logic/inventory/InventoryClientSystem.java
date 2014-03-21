@@ -38,7 +38,7 @@ import java.util.Map;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
-@Share(value = {InventoryManager.class})
+@Share(value = InventoryManager.class)
 public class InventoryClientSystem extends BaseComponentSystem implements InventoryManager {
     @In
     private LocalPlayer localPlayer;

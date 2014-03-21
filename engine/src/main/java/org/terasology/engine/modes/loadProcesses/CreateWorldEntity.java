@@ -16,22 +16,20 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.registry.CoreRegistry;
+import com.google.common.base.Optional;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
-import com.google.common.base.Optional;
-
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Immortius
@@ -59,22 +57,22 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             // transfer all world generation parameters from Config to WorldEntity
             WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
             Optional<WorldConfigurator> ocf = worldGenerator.getConfigurator();
-            
+
             if (ocf.isPresent()) {
                 SimpleUri generatorUri = worldGenerator.getUri();
                 Config config = CoreRegistry.get(Config.class);
                 Map<String, Component> params = ocf.get().getProperties();
-                
+
                 for (Map.Entry<String, Component> entry : params.entrySet()) {
                     Class<? extends Component> clazz = entry.getValue().getClass();
                     Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
                     worldEntity.addComponent(comp);
                 }
             }
-            
+
         }
-        
-        
+
+
         return true;
     }
 

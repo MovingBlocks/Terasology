@@ -30,7 +30,6 @@ import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -61,10 +60,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -117,16 +113,16 @@ public class ModuleManagerImpl implements ModuleManager {
         if (engineReflections == null) {
             ConfigurationBuilder builder = new ConfigurationBuilder()
                     .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
-    
+
             for (ClassLoader loader : engineClassLoaders) {
                 builder.addClassLoader(loader)
                         .addUrls(ClasspathHelper.forPackage("org.terasology", loader));
             }
             engineReflections = new Reflections(builder);
-            
+
             saveReflectionsToCacheFile(engineReflections, filename);
         }
-        
+
         String modulePath = "/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt";
         try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(modulePath), Charsets.UTF_8)) {
             engineModule = new EngineModule(engineReflections, new Gson().fromJson(reader, ModuleInfo.class));
@@ -140,11 +136,11 @@ public class ModuleManagerImpl implements ModuleManager {
         boolean useCache = config.getSystem().isReflectionsCacheEnabled();
 
         if (useCache) {
-        
+
             String version = TerasologyVersion.getInstance().getGitCommit();
             Path root = PathManager.getInstance().getHomePath().resolve("cache");
             Path path = root.resolve(filename + version + ".xml");
-            
+
             if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
                 logger.info("Reading reflection content from file {}", filename);
                 Stopwatch sw = Stopwatch.createStarted();
@@ -158,13 +154,13 @@ public class ModuleManagerImpl implements ModuleManager {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     private void saveReflectionsToCacheFile(Reflections reflections, String filename) {
         boolean useCache = config.getSystem().isReflectionsCacheEnabled();
-        
+
         if (useCache) {
             String version = TerasologyVersion.getInstance().getGitCommit();
             Path root = PathManager.getInstance().getHomePath().resolve("cache");
@@ -172,7 +168,7 @@ public class ModuleManagerImpl implements ModuleManager {
 
             try {
                 Files.createDirectories(root);
-            
+
                 logger.info("Reading reflection content from file {}", path);
                 Stopwatch sw = Stopwatch.createStarted();
                 reflections.save(path.toString());
@@ -253,7 +249,7 @@ public class ModuleManagerImpl implements ModuleManager {
             String filename = "all-reflections";
 
             allReflections = loadReflectionsFromCacheFile(filename);
-            
+
             if (allReflections == null) {
                 List<URL> urls = Lists.newArrayList();
                 for (ExtensionModule module : getExtensionModules()) {
@@ -261,7 +257,7 @@ public class ModuleManagerImpl implements ModuleManager {
                         urls.add(module.getModuleClasspathUrl());
                     }
                 }
-    
+
                 ConfigurationBuilder builder = new ConfigurationBuilder()
                         .addUrls(urls)
                         .addClassLoader(allModuleClassLoader);
@@ -276,7 +272,7 @@ public class ModuleManagerImpl implements ModuleManager {
                         allReflections.merge(module.getReflections());
                     }
                 }
-                
+
                 saveReflectionsToCacheFile(allReflections, filename);
             }
         }

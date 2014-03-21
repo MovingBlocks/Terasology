@@ -25,12 +25,12 @@ import gnu.trove.list.array.TFloatArrayList;
 public abstract class AbstractValueModifiableEvent implements Event {
     private float baseValue;
 
+    private TFloatList multipliers = new TFloatArrayList();
+    private TFloatList modifiers = new TFloatArrayList();
+
     protected AbstractValueModifiableEvent(float baseValue) {
         this.baseValue = baseValue;
     }
-
-    private TFloatList multipliers = new TFloatArrayList();
-    private TFloatList modifiers = new TFloatArrayList();
 
     public float getBaseValue() {
         return baseValue;

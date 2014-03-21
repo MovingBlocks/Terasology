@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.inventory;
 
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -43,7 +44,7 @@ import java.util.Map;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-@Share(value = {InventoryManager.class})
+@Share(value = InventoryManager.class)
 public class InventoryAuthoritySystem extends BaseComponentSystem implements InventoryManager {
     @In
     private EntityManager entityManager;
@@ -298,17 +299,15 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
             return true;
         }
 
-        if (slots == null) {
+        List<Integer> fillSlots = slots;
+        if (fillSlots == null) {
             int slotCount = InventoryUtils.getSlotCount(inventory);
-            slots = new LinkedList<>();
+            fillSlots = Lists.newArrayList();
             for (int slot = 0; slot < slotCount; slot++) {
-                slots.add(slot);
+                fillSlots.add(slot);
             }
         }
-        if (giveItemToSlots(instigator, inventory, item, slots)) {
-            return true;
-        }
-        return false;
+        return giveItemToSlots(instigator, inventory, item, fillSlots);
     }
 
     @Override
