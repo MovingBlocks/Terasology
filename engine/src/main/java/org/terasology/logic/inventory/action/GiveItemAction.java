@@ -27,8 +27,10 @@ import java.util.List;
  * or not modified at all. If it was consumed, the isConsumed() will return <code>true</code>.
  *
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use InventoryManager method instead.
  */
 @API
+@Deprecated
 public class GiveItemAction extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef item;

@@ -15,7 +15,13 @@
  */
 package org.terasology.rendering.assets.font;
 
-import com.google.common.collect.Maps;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Map;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -23,9 +29,7 @@ import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 
-import javax.vecmath.Vector3f;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius
@@ -36,7 +40,6 @@ public class FontMeshBuilder {
 
     private Font font;
     private Color defaultColor;
-    private Color currentColor;
 
     public FontMeshBuilder(Font font) {
         this.font = font;
@@ -44,7 +47,6 @@ public class FontMeshBuilder {
 
     public Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlign alignment, Color baseColor, Color shadowColor) {
         this.defaultColor = baseColor;
-        this.currentColor = baseColor;
         Map<Material, MeshBuilder> meshBuilders = Maps.newLinkedHashMap();
         addLinesToMesh(lines, meshBuilders, width, alignment, shadowColor);
 
@@ -57,6 +59,9 @@ public class FontMeshBuilder {
 
     private void addLinesToMesh(List<String> lines, Map<Material, MeshBuilder> meshBuilders, int maxWidth, HorizontalAlign alignment, Color shadowColor) {
         int y = 0;
+        Deque<Color> prevColors = new ArrayDeque<>();
+        Color currentColor = defaultColor;
+        
         for (String line : lines) {
             int w = font.getWidth(line);
             int x = alignment.getOffset(w, maxWidth);
@@ -77,8 +82,11 @@ public class FontMeshBuilder {
                     x += character.getxAdvance();
                 } else if (FontColor.isValid(c)) {
                     if (c == FontColor.getReset()) {
-                        currentColor = defaultColor;
+                        if (!prevColors.isEmpty()) {
+                            currentColor = prevColors.removeLast();
+                        }
                     } else {
+                        prevColors.addLast(currentColor);
                         currentColor = FontColor.toColor(c);
                     }
                 }

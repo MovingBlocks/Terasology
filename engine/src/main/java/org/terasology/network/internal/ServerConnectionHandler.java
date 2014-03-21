@@ -17,6 +17,7 @@ package org.terasology.network.internal;
 
 import com.google.common.io.ByteStreams;
 import com.google.protobuf.ByteString;
+
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -28,6 +29,7 @@ import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.protobuf.NetData;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.io.IOException;
@@ -121,6 +123,7 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
         logger.info("Received Start Join");
         NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity);
         client.setName(message.getName());
+        client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
         channelHandlerContext.getPipeline().remove(this);
         serverHandler.connectionComplete(client);

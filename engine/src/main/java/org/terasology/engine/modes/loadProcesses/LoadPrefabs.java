@@ -43,7 +43,7 @@ public class LoadPrefabs extends StepBasedLoadProcess {
     public boolean step() {
         if (prefabs.hasNext()) {
             Assets.get(prefabs.next(), Prefab.class);
-            step();
+            stepDone();
         }
         return !prefabs.hasNext();
     }

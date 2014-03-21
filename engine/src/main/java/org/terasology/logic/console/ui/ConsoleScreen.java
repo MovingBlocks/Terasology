@@ -21,6 +21,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
+import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
@@ -86,7 +87,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                 Iterator<Message> messageIterator = console.getMessages().iterator();
                 while (messageIterator.hasNext()) {
                     Message message = messageIterator.next();
-                    messageList.append(message.getMessage());
+                    messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
                     messageList.append("\n");
                     if (messageIterator.hasNext()) {
                         messageList.append("\n");

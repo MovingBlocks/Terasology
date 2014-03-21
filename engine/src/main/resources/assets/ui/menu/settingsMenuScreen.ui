@@ -52,6 +52,15 @@
                 "contents" : [
                     {
                         "type" : "UIButton",
+                        "id" : "player",
+                        "text" : "Player"
+                    },
+                    {
+                        "type" : "UISpace",
+                        "size" : [1, 16]
+                    },
+                    {
+                        "type" : "UIButton",
                         "id" : "video",
                         "text" : "Video"
                     },

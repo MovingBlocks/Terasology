@@ -19,20 +19,6 @@ import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
-
 import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
@@ -40,10 +26,18 @@ import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * Importer for Collada data exchange model files.
- * 
- * The development of this loader was greatly influenced by 
+ * <p/>
+ * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
  *
  * @author mkienenb@gmail.com
@@ -112,7 +106,7 @@ public class ColladaLoader {
                     ElementSet vCountSet = polylist.find("vcount");
                     if (1 != vCountSet.size()) {
                         throw new ColladaParseException("Found " + vCountSet.size() + " vcount sets for polylist in geometry id="
-                                                        + geometry.id() + " name=" + geometry.name());
+                                + geometry.id() + " name=" + geometry.name());
                     }
                     Element vCount = vCountSet.first();
 
@@ -120,8 +114,8 @@ public class ColladaLoader {
                     for (String string : vCountStrings) {
                         if (!"3".equals(string)) {
                             throw new ColladaParseException("Found vertex count of " + string + " in polylist sets for geometry id=" + geometry.id() + " name="
-                                                            + geometry.name()
-                                                            + ".  polylist vertex counts other than 3 currently unsupported.  You must trianglulate the model.");
+                                    + geometry.name()
+                                    + ".  polylist vertex counts other than 3 currently unsupported.  You must trianglulate the model.");
                         }
                     }
 
@@ -157,7 +151,7 @@ public class ColladaLoader {
                         triangleInput.vertexNormalSource = parseSource(normalSourceElement);
                     } else {
                         throw new ColladaParseException("Found unexpected vertex Input semantic " + vertexInput.semantic +
-                                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
                     }
                 }
             } else if ("NORMAL".equals(triangleInput.semantic)) {
@@ -165,15 +159,15 @@ public class ColladaLoader {
                 triangleInput.normalSource = parseSource(normalSourceElement);
                 if (3 != triangleInput.normalSource.stride) {
                     throw new ColladaParseException("Found stride of " + triangleInput.normalSource.stride
-                                                    + " for triangle Input semantic " + triangleInput.semantic +
-                                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                            + " for triangle Input semantic " + triangleInput.semantic +
+                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
                 }
             } else if ("TEXCOORD".equals(triangleInput.semantic)) {
                 Element texCoordSourceElement = mesh.select(triangleInput.sourceName);
                 triangleInput.texCoordSource = parseSource(texCoordSourceElement);
             } else {
                 throw new ColladaParseException("Found unexpected triangle Input semantic " + triangleInput.semantic +
-                                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
             }
         }
         ElementSet triangleDataSet = triangles.find("p");
@@ -185,7 +179,7 @@ public class ColladaLoader {
         String[] trianglesStrings = getItemsInString(triangleDataString);
         if (trianglesStrings.length != (triangleCount * triangleInputs.size() * 3)) {
             throw new ColladaParseException("Expected String 3 vertices *  " + triangleCount + " * input count of " + triangleInputs.size() + " but was "
-                                            + trianglesStrings.length + " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                    + trianglesStrings.length + " for geometry id=" + geometry.id() + " name=" + geometry.name());
         }
 
         // TODO: for now, assume the offsets will always perfectly match the sorted-by-offset list indexes
@@ -199,7 +193,7 @@ public class ColladaLoader {
             Input input = triangleInputs.get(i);
             if (input.offset != i) {
                 throw new ColladaParseException("Triangle input list offset does not match list index for triangle input " + input + " for geometry id=" + geometry.id()
-                                                + " name=" + geometry.name());
+                        + " name=" + geometry.name());
             }
         }
 
@@ -216,8 +210,8 @@ public class ColladaLoader {
                         int vertexStride = triangleInput.vertexPositionSource.stride;
                         if (3 != vertexStride) {
                             throw new ColladaParseException("Found non-3 stride of " + triangleInput.vertexPositionSource.stride
-                                                            + " for vertex Input semantic " + triangleInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + triangleInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                         float vertexX = triangleInput.vertexPositionSource.values[index * vertexStride + 0];
@@ -232,8 +226,8 @@ public class ColladaLoader {
                             int normalStride = triangleInput.vertexNormalSource.stride;
                             if (3 != normalStride) {
                                 throw new ColladaParseException("Found non-3 stride of " + triangleInput.vertexNormalSource.stride
-                                                                + " for vertex Input semantic " + triangleInput.semantic +
-                                                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                        + " for vertex Input semantic " + triangleInput.semantic +
+                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
                             }
                             // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                             float normalX = triangleInput.vertexNormalSource.values[index * normalStride + 0];
@@ -251,8 +245,8 @@ public class ColladaLoader {
                         int normalStride = triangleInput.normalSource.stride;
                         if (3 != normalStride) {
                             throw new ColladaParseException("Found non-3 stride of " + triangleInput.normalSource.stride
-                                                            + " for vertex Input semantic " + triangleInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + triangleInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming X,Y,Z order
                         float normalX = triangleInput.normalSource.values[index * normalStride + 0];
@@ -265,8 +259,8 @@ public class ColladaLoader {
                         int texCoordStride = triangleInput.texCoordSource.stride;
                         if (2 != texCoordStride) {
                             throw new ColladaParseException("Found non-2 stride of " + triangleInput.texCoordSource.stride
-                                                            + " for vertex Input semantic " + triangleInput.semantic +
-                                                            " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                    + " for vertex Input semantic " + triangleInput.semantic +
+                                    " for geometry id=" + geometry.id() + " name=" + geometry.name());
                         }
                         // TODO: probably should consider parameter indexes instead of assuming S,T order
                         float texCoordS = triangleInput.texCoordSource.values[index * texCoordStride + 0];
@@ -276,7 +270,7 @@ public class ColladaLoader {
                         // texCoord0.add(texCoordT);
                     } else {
                         throw new ColladaParseException("Found unexpected triangle Input semantic " + triangleInput.semantic +
-                                                        " for geometry id=" + geometry.id() + " name=" + geometry.name());
+                                " for geometry id=" + geometry.id() + " name=" + geometry.name());
                     }
                 }
             }
@@ -328,7 +322,7 @@ public class ColladaLoader {
         Element floatArray = sourceElement.select(accessorSource);
         if (null == floatArray) {
             throw new ColladaParseException("Unable to find id " + accessorSource + " for float array in sourceElement id=" + sourceElement.id() + " name="
-                                            + sourceElement.name());
+                    + sourceElement.name());
         }
         String arraySizeString = floatArray.attr("count");
         int arraySize = Integer.parseInt(arraySizeString);
@@ -337,8 +331,8 @@ public class ColladaLoader {
         String[] floatStrings = getItemsInString(floatArrayDataString);
         if (floatStrings.length != arraySize) {
             throw new ColladaParseException("Expected float array size " + arraySize + " but was " + floatStrings.length + " for sourceElement id=" + sourceElement.id()
-                                            + " name="
-                                            + sourceElement.name());
+                    + " name="
+                    + sourceElement.name());
         }
         for (int i = 0; i < floatStrings.length; i++) {
             String floatString = floatStrings[i];

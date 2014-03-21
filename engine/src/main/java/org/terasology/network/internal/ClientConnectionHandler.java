@@ -16,6 +16,7 @@
 package org.terasology.network.internal;
 
 import com.google.common.collect.Sets;
+
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
@@ -204,8 +205,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private void sendJoin() {
         Config config = CoreRegistry.get(Config.class);
-        channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(NetData.JoinMessage.newBuilder().setName(config.getPlayer().getName())
-                .setViewDistanceLevel(config.getRendering().getViewDistance().getIndex())).build());
+        NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
+        NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
+        
+        bldr.setName(config.getPlayer().getName());
+        bldr.setViewDistanceLevel(config.getRendering().getViewDistance().getIndex());
+        bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
+        
+        channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }
 
     public void channelAuthenticated(ChannelHandlerContext ctx) {

@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.exceptions.HostingFailedException;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.internal.BlockRegistrationListener;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -38,7 +39,7 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     void shutdown();
 
-    Client joinLocal(String name);
+    Client joinLocal(String name, Color color);
 
     void update();
 

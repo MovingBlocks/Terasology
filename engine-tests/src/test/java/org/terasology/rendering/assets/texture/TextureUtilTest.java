@@ -17,11 +17,10 @@ package org.terasology.rendering.assets.texture;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Color;
-
 import org.junit.Test;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.rendering.nui.Color;
 
 /**
  * @author mkienenb@gmail.com

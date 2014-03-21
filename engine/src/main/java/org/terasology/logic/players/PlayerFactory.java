@@ -22,6 +22,9 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
+import org.terasology.rendering.logic.MeshComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -42,6 +45,14 @@ public class PlayerFactory {
         builder.setOwner(controller);
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
 
+        ClientComponent clientComp = controller.getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
+            
+            MeshComponent meshComp = builder.getComponent(MeshComponent.class);
+            meshComp.color = colorComp.color;
+        }
+        
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         playerComponent.movingItem = transferSlot;

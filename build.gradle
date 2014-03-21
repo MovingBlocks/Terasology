@@ -173,6 +173,17 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract the natives! 'gradlew extractNatives' or a dependent task"
 }
 
+task runProtobufWindows(type:Exec) {
+    description = "Run 'Protobuf Compiler' (Windows)"
+    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
+}
+
+// TODO: add linux protobuf compiler
+//task runProtobufLinux(type:Exec) {
+//    description = "Run 'Protobuf Compiler' (Linux)"
+//    commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java engine/src/main/protobuf/*'
+//}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

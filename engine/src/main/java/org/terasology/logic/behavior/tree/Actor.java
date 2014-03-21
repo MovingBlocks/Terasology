@@ -78,8 +78,16 @@ public class Actor {
         return minion.getComponent(SkeletalMeshComponent.class);
     }
 
+    public boolean hasMesh() {
+        return minion.hasComponent(SkeletalMeshComponent.class);
+    }
+
     public LocationComponent location() {
         return minion.getComponent(LocationComponent.class);
+    }
+
+    public boolean hasLocation() {
+        return minion.hasComponent(LocationComponent.class);
     }
 
     public void save(Component component) {

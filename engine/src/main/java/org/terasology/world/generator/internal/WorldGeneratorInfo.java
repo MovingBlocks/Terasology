@@ -17,7 +17,6 @@ package org.terasology.world.generator.internal;
 
 import org.terasology.engine.SimpleUri;
 
-import java.util.Locale;
 import java.util.Objects;
 
 /**

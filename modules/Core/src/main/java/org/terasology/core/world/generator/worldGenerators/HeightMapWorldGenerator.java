@@ -18,6 +18,7 @@ package org.terasology.core.world.generator.worldGenerators;
 import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.BasicHMTerrainGenerationPass;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerationPass;
+import org.terasology.core.world.generator.chunkGenerators.OreGenerator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.RegisterWorldGenerator;
 
@@ -35,8 +36,6 @@ public class HeightMapWorldGenerator extends AbstractBaseWorldGenerator {
     public void initialize() {
         register(new BasicHMTerrainGenerationPass());
         register(new FloraGenerationPass());
-        /*ForestGenerator forestGenerator = new ForestGenerator();
-        DefaultGenerators.addDefaultForestGenerators(forestGenerator);
-        register(forestGenerator);*/
+        register(new OreGenerator());
     }
 }

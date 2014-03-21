@@ -19,6 +19,17 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use DelayManager::cancelDelayedAction instead.
  */
+@Deprecated
 public class CancelDelayedActionEvent implements Event {
+    private String actionId;
+
+    public CancelDelayedActionEvent(String actionId) {
+        this.actionId = actionId;
+    }
+
+    public String getActionId() {
+        return actionId;
+    }
 }

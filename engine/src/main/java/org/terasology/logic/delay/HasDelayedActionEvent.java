@@ -19,15 +19,26 @@ import org.terasology.entitySystem.event.Event;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use DelayManager::hasDelayedAction instead.
  */
-public class GetDelayedActionEvent implements Event {
+@Deprecated
+public class HasDelayedActionEvent implements Event {
     private String actionId;
+    private boolean result;
+
+    public HasDelayedActionEvent(String actionId) {
+        this.actionId = actionId;
+    }
 
     public String getActionId() {
         return actionId;
     }
 
-    public void setActionId(String actionId) {
-        this.actionId = actionId;
+    public boolean hasAction() {
+        return result;
+    }
+
+    public void setResult(boolean result) {
+        this.result = result;
     }
 }
