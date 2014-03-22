@@ -16,6 +16,7 @@
 package org.terasology.logic.console.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
@@ -52,7 +53,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
-    @ReceiveEvent(components = ClientComponent.class, priority = 300)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
             nuiManager.toggleScreen("engine:console");

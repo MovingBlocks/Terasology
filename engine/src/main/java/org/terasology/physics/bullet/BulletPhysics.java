@@ -271,13 +271,17 @@ public class BulletPhysics implements PhysicsEngine {
             return false;
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
-            if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON ||
-                rigidBody.collidesWith != combineGroups(rb.collidesWith))
-            {
+            if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON
+                    || rigidBody.collidesWith != combineGroups(rb.collidesWith)) {
                 removeRigidBody(rigidBody);
                 newRigidBody(entity);
             } else {
-                rigidBody.rb.setAngularFactor(rb.angularFactor);
+                if (!rigidBody.rb.getAngularFactor().equals(rb.angularFactor)) {
+                    rigidBody.rb.setAngularFactor(rb.angularFactor);
+                }
+                if (!rigidBody.rb.getLinearFactor().equals(rb.linearFactor)) {
+                    rigidBody.rb.setLinearFactor(rb.linearFactor);
+                }
                 rigidBody.rb.setFriction(rb.friction);
             }
 
@@ -477,6 +481,7 @@ public class BulletPhysics implements PhysicsEngine {
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
             collider.rb.setAngularFactor(rigidBody.angularFactor);
+            collider.rb.setLinearFactor(rigidBody.linearFactor);
             collider.rb.setFriction(rigidBody.friction);
             collider.collidesWith = combineGroups(rigidBody.collidesWith);
             updateKinematicSettings(rigidBody, collider);
@@ -711,8 +716,8 @@ public class BulletPhysics implements PhysicsEngine {
     public static class BulletRigidBody implements RigidBody {
 
         public final com.bulletphysics.dynamics.RigidBody rb;
-        public short collidesWith = 0;
-        private final Transform temp = new Transform();
+        public short collidesWith;
+        private final Transform pooledTransform = new Transform();
         private final Vector3f pendingImpulse = new Vector3f();
         private final Vector3f pendingForce = new Vector3f();
 
@@ -767,16 +772,16 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public void setOrientation(Quat4f orientation) {
-            rb.getWorldTransform(temp);
-            temp.setRotation(orientation);
-            rb.proceedToTransform(temp);
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.setRotation(orientation);
+            rb.proceedToTransform(pooledTransform);
         }
 
         @Override
         public void setLocation(Vector3f location) {
-            rb.getWorldTransform(temp);
-            temp.origin.set(location);
-            rb.proceedToTransform(temp);
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.origin.set(location);
+            rb.proceedToTransform(pooledTransform);
         }
 
         @Override
@@ -787,10 +792,10 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public void setTransform(Vector3f location, Quat4f orientation) {
-            rb.getWorldTransform(temp);
-            temp.origin.set(location);
-            temp.setRotation(orientation);
-            rb.proceedToTransform(temp);
+            rb.getWorldTransform(pooledTransform);
+            pooledTransform.origin.set(location);
+            pooledTransform.setRotation(orientation);
+            rb.proceedToTransform(pooledTransform);
         }
 
         @Override

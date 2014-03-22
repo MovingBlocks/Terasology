@@ -20,6 +20,7 @@ import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FlatTerrainGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerator;
 import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
+import org.terasology.core.world.generator.chunkGenerators.OreGenerator;
 import org.terasology.core.world.liquid.LiquidsGenerator;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -39,6 +40,7 @@ public class FlatWorldGenerator extends AbstractBaseWorldGenerator {
         register(new FlatTerrainGenerator());
         register(new FloraGenerator());
         register(new LiquidsGenerator());
+        register(new OreGenerator());
         ForestGenerator forestGenerator = new ForestGenerator();
         DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         register(forestGenerator);

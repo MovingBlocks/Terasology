@@ -15,15 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.nio.ByteBuffer;
-
-import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.TextureUtil;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -32,7 +28,6 @@ import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -49,7 +44,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
     private UISlider sliderGreen;
     private UISlider sliderRed;
     private UIImage img;
-    
+
     @Override
     public void initialise() {
         UIText nametext = find("playername", UIText.class);
@@ -58,7 +53,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         }
 
         Color color = config.getPlayer().getColor();
-        
+
         img = find("image", UIImage.class);
 
         sliderRed = find("red", UISlider.class);
@@ -68,17 +63,17 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         sliderRed.bindValue(new NotifyingBinding(color.rf()));
         sliderGreen.bindValue(new NotifyingBinding(color.gf()));
         sliderBlue.bindValue(new NotifyingBinding(color.bf()));
-        
+
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
             }
         });
-        
+
         updateImage();
     }
-    
+
     private void updateImage() {
         float red = sliderRed.getValue();
         float green = sliderGreen.getValue();
@@ -87,9 +82,9 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         Color color = new Color(red, green, blue);
 
         config.getPlayer().setColor(color);
-        
+
         AssetUri uri = TextureUtil.getTextureUriForColor(color);
-        Texture tex =  (Texture) Assets.get(uri);
+        Texture tex = (Texture) Assets.get(uri);
 
         img.setImage(tex);
     }
@@ -106,7 +101,7 @@ public class PlayerSettingsScreen extends CoreScreenLayer {
         @Override
         public void set(Float v) {
             super.set(v);
-            
+
             updateImage();
         }
     }

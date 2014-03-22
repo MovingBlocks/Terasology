@@ -39,7 +39,7 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-@Share(value = {DelayManager.class})
+@Share(value = DelayManager.class)
 public class DelayedActionSystem extends BaseComponentSystem implements UpdateSubscriberSystem, DelayManager {
     @In
     private Time time;

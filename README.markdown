@@ -34,17 +34,17 @@ Note that these instructions are meant for the stable release. The latest develo
 * [Shift] - Hold to run
 * [Left click] - Activate left click action (default = remove block)
 * [Right click] - Activate right click action (default = place block)
-* [Mouse wheel up/down] - Cycle through toolbar slots
+* [Mouse wheel up/down] - Cycle through toolbar slots OR pick up / deposit items into stacks in an inventory one at a time
 * [1..0] - Change the active toolbar slot
 * [I] - Toggle inventory screen
 * [H] - Hide user interface
-* [F] - Toggle viewing distance (near, moderate, far, ultra)
+* [HOME] - Toggle viewing distance
 * [`] - Toggle developer console (the "grave" key, above tab)
 * [Tab] - Auto-completion in the console
 * [Escape] - Show/hide the game menu screen
 * [F1] - Toggle window focus
 * [F3] - Toggle debug mode and information
-* [F4] - Different debug metrics
+* [F5] - Show behavior tree editor
 * ~~[F5] - Show block picker GUI element~~
 
 Debug Features
@@ -55,6 +55,7 @@ Only works when the F3 debug mode is enabled (and may come and go)
 * [Arrow up/down] - Adjust the current time in small steps
 * [Arrow left/right] - Adjust the current time in larger steps
 * [R] - Debug render wire-frame
+* [F4] - Cycle advanced debug metrics
 * [F6] - Debug rendering enabled
 * [F7] - Cycle debug rendering stage
 * [F8] - Debug render chunk bounding boxes
@@ -70,12 +71,13 @@ May move slot or disappear as development continues
 * Railgun  - Bigger bada boom, in a straight line!
 * ~~Minituarizer (scissors) - Left click one block, then another, then somewhere else to "clone" your selection in a tiny accurate representation~~
 * Goodie chest - place it and open with 'e' for assorted goodies
-* Sapling - an organically growing tree (grows one or a few blocks at a time)
+
+More or completely alternative line-ups with certain modules / world types selected
 
 Console Commands
 --------
 
-Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like rS for restoreSpeed)
+Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes)
 
 * help - Show in-game help (more thorough)
 * ghost - fly / no-clip mode (old double-jump for "god" mode)
@@ -84,8 +86,7 @@ Press the `grave` key (usually the ony immediately above `tab`) to show the in-g
 * restoreSpeed - normalizes speed (both horizontal and vertical)
 * help "giveBlock" - Shows detailed help on the "giveBlock" command
 * giveBlock "Water" - Gives 16 water blocks
-* giveBlock "Stone" "Slope" - Gives you 16 clay blocks in the "slope" shape
-* giveBlock "Marble" "Stair" 99 - Gives you 99 marble stair blocks
+* giveBlock "Stone" "Stair" 99 - Gives you 99 stone stair blocks
 * giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
 * giveBlock "TNT" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * listBlocks - Lists all actively used blocks (have been loaded for the world)
@@ -125,6 +126,7 @@ Modules must be enabled during world creation by selecting them using the "Modul
 
 Here's a list of modules bundled with the game by default (as of this writing anyway - this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.movingblocks.net/view/Modules and you can download updated modules from there if needed.
 
+* [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
 * [CakeLie](https://github.com/Terasology/CakeLie) - the cake may be a lie, but these cake and candy blocks are delicious!
@@ -134,7 +136,9 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * Core - mandatory content needed for normal game launch
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [Fences](https://github.com/Terasology/Fences) - fences!
+* [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
+* [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
 * [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such
@@ -143,7 +147,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
-* [Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working :D
+* ~~[Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working (edit: not so much anymore, alas!) :D~~
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis)
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [MultiBlock](https://github.com/Terasology/MultiBlock) - supports the concept of multiple blocks being part of the same structure
@@ -153,12 +157,12 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Wood and Stone gameplay
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock "portal"`
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
-* [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
+* ~~[Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone~~
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
-* [Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons
+* ~~[Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons~~
 
 Some of the modules in action:
 
@@ -179,7 +183,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
 * World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias
