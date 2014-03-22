@@ -10,7 +10,7 @@
                 "contents" : [
                     {
                         "type" : "UILabel",
-                        "text" : "You are Dead"
+                        "text" : "You Are Dead"
                     },
                     {
                         "type" : "UISpace",
@@ -20,6 +20,21 @@
                         "type" : "UIButton",
                         "text" : "Respawn",
                         "id" : "respawn"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Settings",
+                        "id" : "settings"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Exit to Main Menu",
+                        "id" : "mainMenu"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Exit Teraslogy",
+                        "id" : "exitGame"
                     }
                 ],
                 "layoutInfo" : {
