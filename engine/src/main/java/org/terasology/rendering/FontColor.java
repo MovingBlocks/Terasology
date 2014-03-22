@@ -64,7 +64,9 @@ public final class FontColor {
      * Stores the color with (4 + 4 + 4) = 12 bit accuracy as Unicode char
      * @param color the color
      * @return the unicode char
+     * @deprecated use {@link FontColor#getColored(String, Color)} instead
      */
+    @Deprecated
     public static char toChar(org.terasology.rendering.nui.Color color) {
         return toChar(color.r(), color.g(), color.b());
     }
@@ -75,7 +77,9 @@ public final class FontColor {
      * @param g green in [0..255]
      * @param b blue in [0..255]
      * @return the unicode char
+     * @deprecated use {@link FontColor#getColored(String, Color)} instead
      */
+    @Deprecated
     public static char toChar(int r, int g, int b) {
         int rr = (r >> 4);
         int rg = (g >> 4);

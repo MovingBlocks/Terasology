@@ -104,7 +104,7 @@ public class BlockCommands extends BaseComponentSystem {
             blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
 
         } else if (matchingUris.isEmpty()) {
-            return "No block found for '" + blockName + "'";
+            throw new IllegalArgumentException("No block found for '" + blockName + "'");
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -121,7 +121,7 @@ public class BlockCommands extends BaseComponentSystem {
             builder.append((int) spawnPos.x).append((int) spawnPos.y).append((int) spawnPos.z).append(")");
             return builder.toString();
         }
-        return "Sorry, something went wrong!";
+        throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)")
@@ -235,7 +235,7 @@ public class BlockCommands extends BaseComponentSystem {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
             return giveBlock(blockFamily, quantity, client);
         } else if (matchingUris.isEmpty()) {
-            return "No block found for '" + uri + "'";
+            throw new IllegalArgumentException("No block found for '" + uri + "'");
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -250,7 +250,7 @@ public class BlockCommands extends BaseComponentSystem {
     public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity, EntityRef client) {
         List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
         if (resolvedBlockUris.isEmpty()) {
-            return "No block found for '" + uri + "'";
+            throw new IllegalArgumentException("No block found for '" + uri + "'");
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -259,7 +259,7 @@ public class BlockCommands extends BaseComponentSystem {
         }
         List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUri);
         if (resolvedShapeUris.isEmpty()) {
-            return "No shape found for '" + shapeUri + "'";
+            throw new IllegalArgumentException("No shape found for '" + shapeUri + "'");
         } else if (resolvedShapeUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique shape name, possible matches: ");
@@ -279,7 +279,7 @@ public class BlockCommands extends BaseComponentSystem {
             return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
         }
 
-        return "Invalid block or shape";
+        throw new IllegalArgumentException("Invalid block or shape");
     }
 
     /**
@@ -295,7 +295,7 @@ public class BlockCommands extends BaseComponentSystem {
 
         EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
-            return "Unknown block or item";
+            throw new IllegalArgumentException("Unknown block or item");
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
 

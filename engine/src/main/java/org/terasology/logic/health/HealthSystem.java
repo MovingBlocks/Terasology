@@ -207,9 +207,11 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
 
     // Debug commands
     @Command(shortDescription = "Reduce the player's health by an amount", runOnServer = true)
-    public void damage(@CommandParam("amount") int amount, EntityRef client) {
+    public String damage(@CommandParam("amount") int amount, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoDamageEvent(amount, EngineDamageTypes.DIRECT.get(), clientComp.character));
+        
+        return "Inflicted damage of " + amount;
     }
 
     @Command(shortDescription = "Restores your health to max", runOnServer = true)
@@ -226,22 +228,24 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     }
 
     @Command(shortDescription = "Set max health", runOnServer = true)
-    public void setMaxHealth(@CommandParam("max") int max, EntityRef client) {
+    public String setMaxHealth(@CommandParam("max") int max, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             doHeal(clientComp.character, health.maxHealth, clientComp.character, health);
         }
+        return "Max health set to " + max;
     }
 
     @Command(shortDescription = "Set regen rate", runOnServer = true)
-    public void setRegenRaterate(@CommandParam("rate") float rate, EntityRef client) {
+    public String setRegenRaterate(@CommandParam("rate") float rate, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             health.regenRate = rate;
             clientComp.character.saveComponent(health);
         }
+        return "Set regeneration rate to " + rate;
     }
 
     @Command(shortDescription = "Show your health")

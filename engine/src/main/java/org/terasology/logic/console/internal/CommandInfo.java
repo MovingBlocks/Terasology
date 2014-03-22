@@ -18,11 +18,14 @@ package org.terasology.logic.console.internal;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.ConsoleColors;
+import org.terasology.rendering.FontColor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -109,7 +112,7 @@ public class CommandInfo {
     }
 
     public String getUsageMessage() {
-        StringBuilder builder = new StringBuilder(name);
+        StringBuilder builder = new StringBuilder(FontColor.getColored(name, ConsoleColors.COMMAND));
         for (String param : parameterNames) {
             builder.append(" <");
             builder.append(param);
@@ -120,49 +123,50 @@ public class CommandInfo {
     }
 
     /**
-     * @param params
-     * @param callingClient
-     * @return
+     * @param params a set of string parameter
+     * @param callingClient the responsible client (passed as last parameter)
+     * @return the return value of the method call or an empty string, never <code>null</code>.
+     * @throws IllegalArgumentException if the method call was not successful 
+     * @throws Exception if something went seriously wrong
      */
-    public String execute(List<String> params, EntityRef callingClient) {
+    public String execute(List<String> params, EntityRef callingClient) throws Exception {
         Object[] processedParams = new Object[method.getParameterTypes().length];
         if (isClientEntityRequired()) {
             if (params.size() + 1 != method.getParameterTypes().length) {
-                return "Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1);
+                throw new IllegalArgumentException("Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1));
             }
 
             processedParams[processedParams.length - 1] = callingClient;
         } else if (params.size() != method.getParameterTypes().length) {
-            return "Incorrect number of parameters, expected " + (method.getParameterTypes().length);
+            throw new IllegalArgumentException("Incorrect number of parameters, expected " + (method.getParameterTypes().length));
         }
         for (int i = 0; i < params.size(); ++i) {
-            Class<?> type = method.getParameterTypes()[i];
-            if (type == Float.TYPE) {
-                try {
+            try {
+                Class<?> type = method.getParameterTypes()[i];
+                if (type == Float.TYPE) {
                     processedParams[i] = Float.parseFloat(params.get(i));
-                } catch (NumberFormatException e) {
-                    return "Bad argument '" + params.get(i) + "' - " + e.getMessage();
-                }
-            } else if (type == Integer.TYPE) {
-                try {
+                } else if (type == Integer.TYPE) {
                     processedParams[i] = Integer.parseInt(params.get(i));
-                } catch (NumberFormatException e) {
-                    return "Bad argument '" + params.get(i) + "' - " + e.getMessage();
+                } else if (type == String.class) {
+                    String value = params.get(i);
+
+                    // remove quotation marks
+                    if (value.startsWith("\"") && value.endsWith("\"")) {
+                        value = value.substring(1, value.length() - 1);
+                    }
+                    processedParams[i] = value;
                 }
-            } else if (type == String.class) {
-                String value = params.get(i);
-                if (value.startsWith("\"") && value.endsWith("\"")) {
-                    value = value.substring(1, value.length() - 1);
-                }
-                processedParams[i] = value;
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Bad argument '" + params.get(i) + "'");
             }
         }
         try {
             Object result = method.invoke(provider, processedParams);
             return (result != null) ? result.toString() : "";
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            logger.error("Error running command {} with parameters {}", name, params, e);
-            return "Error running command: " + e.getMessage();
+        } catch (InvocationTargetException ite) {
+            // we end up here, if the called method throws an exception (which is ok)
+            Throwable e = ite.getTargetException();
+            throw new IllegalArgumentException(e.getLocalizedMessage(), e);
         }
     }
 }
