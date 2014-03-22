@@ -228,7 +228,7 @@ public class SunlightRegenBatchPropagator implements BatchPropagator {
 
                     int strength = Math.min(start + initialDepth - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD + 1, ChunkConstants.MAX_SUNLIGHT);
 
-                    for (int i = initialDepth; i < finalDepth; ++i) {
+                    for (int i = initialDepth; i <= finalDepth; ++i) {
                         sunlightPropagator.propagateFrom(toChunk.chunkToWorldPosition(x, ChunkConstants.SIZE_Y - i - 1, z),
                                 (byte) (strength));
                         if (strength < ChunkConstants.MAX_SUNLIGHT) {

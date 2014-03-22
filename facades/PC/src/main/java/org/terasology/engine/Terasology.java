@@ -86,7 +86,6 @@ public final class Terasology {
             String text = getNestedMessageText(t);
             JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
         }
-        System.exit(0);
     }
 
     private static String getNestedMessageText(Throwable t) {
