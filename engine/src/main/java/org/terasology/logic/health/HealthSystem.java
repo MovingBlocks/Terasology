@@ -238,7 +238,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     }
 
     @Command(shortDescription = "Set regen rate", runOnServer = true)
-    public String setRegenRaterate(@CommandParam("rate") float rate, EntityRef client) {
+    public String setRegenRate(@CommandParam("rate") float rate, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {

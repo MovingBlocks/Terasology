@@ -15,18 +15,15 @@
  */
 package org.terasology.logic.console.ui;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.internal.CommandInfo;
-import org.terasology.utilities.CamelCaseMatcher;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.terasology.logic.console.Console;
+import org.terasology.utilities.CamelCaseMatcher;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * A stateless completion engine that returns the list of all matching commands
@@ -35,28 +32,18 @@ import java.util.List;
  */
 public class StatelessTabCompletionEngine implements TabCompletionEngine {
     private final Console console;
+    private final Collection<String> allNames;
 
-    public StatelessTabCompletionEngine(Console console) {
+    public StatelessTabCompletionEngine(Console console, Collection<String> allNames) {
         this.console = console;
+        this.allNames = allNames;
     }
 
     @Override
     public String complete(String text) {
         String cmdQuery = text.trim();
 
-        List<CommandInfo> commands = console.getCommandList();
-
-        // TODO: (Java8) replace with lamba expression
-        // Explicitly create a map String->CommandInfo if the CommandInfo is required later
-        Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
-
-            @Override
-            public String apply(CommandInfo input) {
-                return input.getName();
-            }
-        });
-        
-        List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(cmdQuery, commandNames));
+        List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(cmdQuery, allNames));
         Collections.sort(matches);
         
         //one match found

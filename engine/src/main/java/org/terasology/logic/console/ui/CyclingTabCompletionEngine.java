@@ -22,12 +22,9 @@ import java.util.List;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 /**
@@ -40,13 +37,15 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
 
     private final Console console;
     
+    private final Collection<String> allNames;
     private final List<String> matchList = Lists.newArrayList();
 
     private int index;
     private Message prevMessage;
 
-    public CyclingTabCompletionEngine(Console console) {
+    public CyclingTabCompletionEngine(Console console, Collection<String> allNames) {
         this.console = console;
+        this.allNames = allNames;
     }
 
     @Override
@@ -57,19 +56,8 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             
             String cmdQuery = text.trim();
     
-            List<CommandInfo> commands = console.getCommandList();
-    
-            // TODO: (Java8) replace with lamba expression
-            // Explicitly create a map String->CommandInfo if the CommandInfo is required later
-            Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
-    
-                @Override
-                public String apply(CommandInfo input) {
-                    return input.getName();
-                }
-            });
-            Collection<String> matches = CamelCaseMatcher.getMatches(cmdQuery, commandNames);
-    
+            Collection<String> matches = CamelCaseMatcher.getMatches(cmdQuery, allNames);
+
             if (matches.isEmpty()) {
                 return text;
             }

@@ -15,9 +15,14 @@
  */
 package org.terasology.logic.console.ui;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
+import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
@@ -31,8 +36,8 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 
 /**
  * @author Immortius
@@ -62,9 +67,21 @@ public class ConsoleScreen extends CoreScreenLayer {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
+        List<CommandInfo> commands = console.getCommandList();
+        
+        // TODO: (Java8) replace with lamba expression
+        // Explicitly create a map String->CommandInfo if the CommandInfo is required later
+        Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
+
+            @Override
+            public String apply(CommandInfo input) {
+                return input.getName();
+            }
+        });
+
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);
-        commandLine.setTabCompletionEngine(new CyclingTabCompletionEngine(console));
+        commandLine.setTabCompletionEngine(new CyclingTabCompletionEngine(console, commandNames));
         commandLine.bindCommandHistory(new ReadOnlyBinding<List<String>>() {
             @Override
             public List<String> get() {
