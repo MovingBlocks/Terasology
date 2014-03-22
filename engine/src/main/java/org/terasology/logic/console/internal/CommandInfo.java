@@ -116,6 +116,7 @@ public class CommandInfo {
         for (String param : parameterNames) {
             builder.append(" <");
             builder.append(param);
+            builder.append(param);
             builder.append(">");
         }
 

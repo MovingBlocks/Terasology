@@ -69,8 +69,7 @@ public class ConsoleScreen extends CoreScreenLayer {
 
         List<CommandInfo> commands = console.getCommandList();
         
-        // TODO: (Java8) replace with lamba expression
-        // Explicitly create a map String->CommandInfo if the CommandInfo is required later
+        // JAVA8: replace with lamba expression
         Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
 
             @Override

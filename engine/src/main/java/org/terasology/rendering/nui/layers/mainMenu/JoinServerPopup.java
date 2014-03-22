@@ -44,9 +44,6 @@ public class JoinServerPopup extends CoreScreenLayer {
 
     @Override
     public void initialise() {
-        UIText address = find("address", UIText.class);
-        getManager().setFocus(address);
-
         WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -70,4 +67,11 @@ public class JoinServerPopup extends CoreScreenLayer {
         });
     }
 
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        
+        UIText address = find("address", UIText.class);
+        getManager().setFocus(address);
+    }
 }

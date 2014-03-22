@@ -21,7 +21,7 @@ package org.terasology.logic.console;
 public class Message {
     /**
      * A newline constant for the console
-     * TODO: consider moving this to the {@link Console} interface as soon as Java 8 is around
+     * JAVA8: consider moving this to the {@link Console} interface as soon as Java 8 is around
      */
     public static final String NEW_LINE = "\n";
 

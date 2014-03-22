@@ -50,7 +50,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.groundFriction = amount;
             clientComp.character.saveComponent(move);
             
-            return "Ground friction set to " + amount + " ( was " + oldFric + " )"; 
+            return "Ground friction set to " + amount + " (was " + oldFric + ")"; 
         }
         
         return "";
@@ -65,7 +65,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.maxGroundSpeed = amount;
             clientComp.character.saveComponent(move);
 
-            return "Max ground speed set to " + amount + " ( was " + oldSpeed + " )"; 
+            return "Max ground speed set to " + amount + " (was " + oldSpeed + ")"; 
         }
         
         return "";
@@ -80,7 +80,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.maxGhostSpeed = amount;
             clientComp.character.saveComponent(move);
             
-            return "Max ghost speed set to " + amount + " ( was " + oldSpeed + " )"; 
+            return "Max ghost speed set to " + amount + " (was " + oldSpeed + ")"; 
         }
         
         return "";
@@ -95,7 +95,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.jumpSpeed = amount;
             clientComp.character.saveComponent(move);
             
-            return "Jump speed set to " + amount + " ( was " + oldSpeed + " )";
+            return "Jump speed set to " + amount + " (was " + oldSpeed + ")";
         }
         
         return "";
@@ -182,7 +182,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
                 move.slopeFactor = 0.9f;
             }
             clientComp.character.saveComponent(move);
-            return "Slope factor is now " + move.slopeFactor + " ( was " + oldFactor + " )";
+            return "Slope factor is now " + move.slopeFactor + " (was " + oldFactor + ")";
         }
         return "";
     }
@@ -196,7 +196,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
             move.stepHeight = amount;
             clientComp.character.saveComponent(move);
             
-            return "Ground friction set to " + amount + " ( was " + prevStepHeight + " )";
+            return "Ground friction set to " + amount + " (was " + prevStepHeight + ")";
         }
         
         return "";
