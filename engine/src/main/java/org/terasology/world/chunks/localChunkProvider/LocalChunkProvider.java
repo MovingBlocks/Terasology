@@ -31,8 +31,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
@@ -529,50 +529,31 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         Chunk chunk = nearCache.get(chunkPos);
         if (chunk == null && !preparingChunks.contains(chunkPos)) {
             preparingChunks.add(chunkPos);
-            if (storageManager.containsChunkStoreFor(chunkPos)) {
-                pipeline.doTask(new AbstractChunkTask(chunkPos) {
-                    @Override
-                    public String getName() {
-                        return "Load Chunk";
-                    }
+            pipeline.doTask(new AbstractChunkTask(chunkPos) {
+                @Override
+                public String getName() {
+                    return "Create or Load Chunk";
+                }
 
-                    @Override
-                    public void run() {
-                        ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
-                        Chunk chunk = chunkStore.getChunk();
-
-                        try {
-                            chunk.lock();
-
-                            InternalLightProcessor.generateInternalLighting(chunk);
-                            chunk.deflate();
-                            readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), chunkStore));
-                        } finally {
-                            chunk.unlock();
-                        }
-                    }
-                });
-            } else {
-                pipeline.doTask(new AbstractChunkTask(chunkPos) {
-
-                    @Override
-                    public String getName() {
-                        return "Generate Chunk";
-                    }
-
-                    @Override
-                    public void run() {
-                        Chunk chunk = new ChunkImpl(getPosition());
+                @Override
+                public void run() {
+                    ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
+                    Chunk chunk;
+                    if (chunkStore == null) {
+                        chunk = new ChunkImpl(getPosition());
                         generator.createChunk(chunk);
-
-                        InternalLightProcessor.generateInternalLighting(chunk);
-                        chunk.deflate();
-                        readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk)));
+                    } else {
+                        chunk = chunkStore.getChunk();
                     }
-                });
-            }
+
+                    InternalLightProcessor.generateInternalLighting(chunk);
+                    chunk.deflate();
+                    readyChunks.offer(new ReadyChunkInfo(chunk, createBatchBlockEventMappings(chunk), chunkStore));
+                }
+            });
         }
     }
+
 
     @Override
     public void onChunkIsReady(Chunk chunk) {
@@ -598,62 +579,62 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         return chunk != null && chunk.isReady();
     }
 
-    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
 
-        @Override
-        public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1.getPosition()) - score(o2.getPosition());
-        }
+    @Override
+    public int compare(ChunkTask o1, ChunkTask o2) {
+        return score(o1.getPosition()) - score(o2.getPosition());
+    }
 
-        private int score(Vector3i chunk) {
-            int score = Integer.MAX_VALUE;
+    private int score(Vector3i chunk) {
+        int score = Integer.MAX_VALUE;
 
-            regionLock.readLock().lock();
-            try {
-                for (ChunkRelevanceRegion region : regions.values()) {
-                    int dist = distFromRegion(chunk, region.getCenter());
-                    if (dist < score) {
-                        score = dist;
-                    }
+        regionLock.readLock().lock();
+        try {
+            for (ChunkRelevanceRegion region : regions.values()) {
+                int dist = distFromRegion(chunk, region.getCenter());
+                if (dist < score) {
+                    score = dist;
                 }
-                return score;
-            } finally {
-                regionLock.readLock().unlock();
             }
-        }
-
-        private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return score;
+        } finally {
+            regionLock.readLock().unlock();
         }
     }
 
-    private class ReadyChunkRelevanceComparator implements Comparator<ReadyChunkInfo> {
+    private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
+        return pos.gridDistance(regionCenter);
+    }
+}
 
-        @Override
-        public int compare(ReadyChunkInfo o1, ReadyChunkInfo o2) {
-            return score(o2.getPos()) - score(o1.getPos());
-        }
+private class ReadyChunkRelevanceComparator implements Comparator<ReadyChunkInfo> {
 
-        private int score(Vector3i chunk) {
-            int score = Integer.MAX_VALUE;
+    @Override
+    public int compare(ReadyChunkInfo o1, ReadyChunkInfo o2) {
+        return score(o2.getPos()) - score(o1.getPos());
+    }
 
-            regionLock.readLock().lock();
-            try {
-                for (ChunkRelevanceRegion region : regions.values()) {
-                    int dist = distFromRegion(chunk, region.getCenter());
-                    if (dist < score) {
-                        score = dist;
-                    }
+    private int score(Vector3i chunk) {
+        int score = Integer.MAX_VALUE;
+
+        regionLock.readLock().lock();
+        try {
+            for (ChunkRelevanceRegion region : regions.values()) {
+                int dist = distFromRegion(chunk, region.getCenter());
+                if (dist < score) {
+                    score = dist;
                 }
-                return score;
-            } finally {
-                regionLock.readLock().unlock();
             }
-        }
-
-        private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
-            return pos.gridDistance(regionCenter);
+            return score;
+        } finally {
+            regionLock.readLock().unlock();
         }
     }
+
+    private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
+        return pos.gridDistance(regionCenter);
+    }
+}
 
 }

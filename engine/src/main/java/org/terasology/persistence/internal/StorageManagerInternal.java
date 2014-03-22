@@ -294,26 +294,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return chunkData;
     }
 
-    @Override
-    public boolean containsChunkStoreFor(Vector3i chunkPos) {
-        if (pendingProcessingChunkStore.containsKey(chunkPos) || compressedChunkStore.containsKey(chunkPos)) {
-            return true;
-        }
-        if (storeChunksInZips) {
-            Path chunkZipPath = getWorldPath().resolve(getChunkZipFilename(getChunkZipPosition(chunkPos)));
-            if (Files.isRegularFile(chunkZipPath)) {
-                try (FileSystem zip = FileSystems.newFileSystem(chunkZipPath, null)) {
-                    return Files.isRegularFile(zip.getPath(getChunkFilename(chunkPos)));
-                } catch (IOException e) {
-                    logger.error("Failed to access chunk zip {}", chunkZipPath, e);
-                }
-            }
-            return false;
-        } else {
-            return Files.isRegularFile(getWorldPath().resolve(getChunkFilename(chunkPos)));
-        }
-    }
-
     private void flushChunkStores() throws IOException {
         // This is a little bit of a hack to get around a JAVA 7 bug (hopefully fixed in JAVA 8
         FileSystemProvider zipProvider = null;

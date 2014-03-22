@@ -42,7 +42,7 @@ public class ReadyChunkInfo {
         this.pos = chunk.getPosition();
         this.blockPositionMapppings = blockPositionMapppings;
         this.chunkStore = chunkStore;
-        this.newChunk = false;
+        this.newChunk = chunkStore == null;
         this.chunk = chunk;
     }
 
