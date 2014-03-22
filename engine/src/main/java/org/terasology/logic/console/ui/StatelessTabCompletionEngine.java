@@ -16,7 +16,9 @@
 package org.terasology.logic.console.ui;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
+
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.utilities.CamelCaseMatcher;
@@ -25,12 +27,14 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * A stateless completion engine that returns the list of all matching commands
+ * @author Martin Steiger
  * @author Immortius
  */
-public class ConsoleTabCompletionEngine implements TabCompletionEngine {
-    private Console console;
+public class StatelessTabCompletionEngine implements TabCompletionEngine {
+    private final Console console;
 
-    public ConsoleTabCompletionEngine(Console console) {
+    public StatelessTabCompletionEngine(Console console) {
         this.console = console;
     }
 
@@ -40,6 +44,7 @@ public class ConsoleTabCompletionEngine implements TabCompletionEngine {
 
         List<CommandInfo> commands = console.getCommandList();
 
+        // TODO: (Java8) replace with lamba expression
         // Explicitly create a map String->CommandInfo if the CommandInfo is required later
         Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
 
@@ -56,14 +61,7 @@ public class ConsoleTabCompletionEngine implements TabCompletionEngine {
         } else if (matches.size() > 1) {
             //multiple matches found
             //add list of available commands
-            StringBuilder commandMatches = new StringBuilder();
-            for (String cmd : matches) {
-                if (commandMatches.length() != 0) {
-                    commandMatches.append(" ");
-                }
-
-                commandMatches.append(cmd);
-            }
+            String commandMatches = Joiner.on(' ').join(matches);
             console.addMessage(commandMatches.toString());
         }
         return text;
