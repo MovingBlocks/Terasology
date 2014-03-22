@@ -31,6 +31,7 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -72,7 +73,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void unblockedSunlightRegenPropagation() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
         for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z))) {
@@ -83,7 +84,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void blockedSunlightRegenPropagationResets() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 60, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
@@ -104,7 +105,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void blockedAtTopSunlightRegenPropagationResets() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 63, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
@@ -118,7 +119,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void unblockedSunlightPropagationAfterHittingMaxRegen() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 15, 0), new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y - 15,
@@ -135,7 +136,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void blockedSunlightPropagation() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
@@ -149,7 +150,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void unblockedSunlightPropagation() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         InternalLightProcessor.generateInternalLighting(chunk);
 
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), new Vector3i(ChunkConstants.SIZE_X, 15,
@@ -160,7 +161,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void horizontalSunlightPropagation() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0, 4, 0), new Vector3i(ChunkConstants.SIZE_X, 1, ChunkConstants.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
@@ -181,7 +182,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
 
     @Test
     public void lightPropagation() {
-        ChunkImpl chunk = new ChunkImpl(0, 0, 0);
+        Chunk chunk = new ChunkImpl(0, 0, 0);
         chunk.setBlock(16, 32, 16, fullLight);
 
         InternalLightProcessor.generateInternalLighting(chunk);

@@ -17,7 +17,7 @@ package org.terasology.world.generator;
 
 import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 
 /**
  * @author Immortius
@@ -27,7 +27,7 @@ public interface WorldGenerator {
 
     void setWorldSeed(String seed);
 
-    void createChunk(Chunk chunk);
+    void createChunk(CoreChunk chunk);
 
     float getFog(float x, float y, float z);
 

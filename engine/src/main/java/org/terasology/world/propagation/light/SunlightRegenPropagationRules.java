@@ -19,7 +19,7 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagationComparison;
 
 /**
@@ -46,17 +46,17 @@ public class SunlightRegenPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, Vector3i pos) {
+    public byte getValue(LitChunk chunk, Vector3i pos) {
         return getValue(chunk, pos.x, pos.y, pos.z);
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, int x, int y, int z) {
+    public byte getValue(LitChunk chunk, int x, int y, int z) {
         return chunk.getSunlightRegen(x, y, z);
     }
 
     @Override
-    public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
         chunk.setSunlightRegen(pos, value);
     }
 

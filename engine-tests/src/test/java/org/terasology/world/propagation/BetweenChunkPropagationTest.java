@@ -32,13 +32,13 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.propagation.light.InternalLightProcessor;
-import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenWorldView;
@@ -100,8 +100,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void betweenChunksSimple() {
-        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
-        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -122,8 +122,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void betweenChunksSimpleSunlightRegenOnly() {
-        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
-        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -142,8 +142,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void betweenChunksWithOverhang() {
-        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
-        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -170,8 +170,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     @Test
     public void propagateSunlightAppearingMidChunk() {
-        ChunkImpl topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
-        ChunkImpl bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
+        Chunk topChunk = new ChunkImpl(new Vector3i(0, 1, 0));
+        Chunk bottomChunk = new ChunkImpl(new Vector3i(0, 0, 0));
 
         provider.addChunk(topChunk);
         provider.addChunk(bottomChunk);
@@ -198,16 +198,16 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
     }
 
     private static class SelectChunkProvider implements ChunkProvider {
-        private Map<Vector3i, ChunkImpl> chunks = Maps.newHashMap();
+        private Map<Vector3i, Chunk> chunks = Maps.newHashMap();
 
-        public SelectChunkProvider(ChunkImpl ... chunks) {
-            for (ChunkImpl chunk : chunks) {
-                this.chunks.put(chunk.getPos(), chunk);
+        public SelectChunkProvider(Chunk ... chunks) {
+            for (Chunk chunk : chunks) {
+                this.chunks.put(chunk.getPosition(), chunk);
             }
         }
 
-        public void addChunk(ChunkImpl chunk) {
-            chunks.put(chunk.getPos(), chunk);
+        public void addChunk(Chunk chunk) {
+            chunks.put(chunk.getPosition(), chunk);
         }
 
         @Override
@@ -261,12 +261,12 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public ChunkImpl getChunk(int x, int y, int z) {
+        public Chunk getChunk(int x, int y, int z) {
             return getChunk(new Vector3i(x, y, z));
         }
 
         @Override
-        public ChunkImpl getChunk(Vector3i chunkPos) {
+        public Chunk getChunk(Vector3i chunkPos) {
             return chunks.get(chunkPos);
         }
 

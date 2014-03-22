@@ -17,15 +17,12 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.protobuf.ByteString;
-import gnu.trove.list.TByteList;
-import gnu.trove.list.array.TByteArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -88,27 +85,13 @@ public class ChunkImpl implements Chunk {
     private ChunkMesh[] pendingMesh;
     private AABB[] subMeshAABB;
 
-    protected ChunkImpl() {
-        blockData = new TeraDenseArray16Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightRegenData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        lightData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        extraData = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        dirty = true;
-        blockManager = CoreRegistry.get(BlockManager.class);
-    }
-
     public ChunkImpl(int x, int y, int z) {
-        this();
-        chunkPos.x = x;
-        chunkPos.y = y;
-        chunkPos.z = z;
-        region = Region3i.createFromMinAndSize(new Vector3i(x * ChunkConstants.SIZE_X, y * ChunkConstants.SIZE_Y, z * ChunkConstants.SIZE_Z), ChunkConstants.CHUNK_SIZE);
-        ChunkMonitor.fireChunkCreated(this);
+        this(new Vector3i(x, y, z));
     }
 
     public ChunkImpl(Vector3i chunkPos) {
-        this(chunkPos.x, chunkPos.y, chunkPos.z);
+        this(chunkPos, new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z),
+                new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
     }
 
     public ChunkImpl(Vector3i chunkPos, TeraArray blocks, TeraArray liquid) {
@@ -125,30 +108,32 @@ public class ChunkImpl implements Chunk {
         ChunkMonitor.fireChunkCreated(this);
     }
 
+    @Override
     public void lock() {
         lock.lock();
     }
 
+    @Override
     public void unlock() {
         lock.unlock();
     }
 
+    @Override
     public boolean isLocked() {
         return lock.isLocked();
     }
 
-    public Vector3i getPos() {
+    @Override
+    public Vector3i getPosition() {
         return new Vector3i(chunkPos);
     }
 
-    public boolean isInBounds(int x, int y, int z) {
-        return x >= 0 && y >= 0 && z >= 0 && x < getChunkSizeX() && y < getChunkSizeY() && z < getChunkSizeZ();
-    }
-
+    @Override
     public boolean isDirty() {
         return dirty;
     }
 
+    @Override
     public void setDirty(boolean dirty) {
         lock();
         try {
@@ -158,6 +143,7 @@ public class ChunkImpl implements Chunk {
         }
     }
 
+    @Override
     public int getEstimatedMemoryConsumptionInBytes() {
         return blockData.getEstimatedMemoryConsumptionInBytes()
                 + sunlightData.getEstimatedMemoryConsumptionInBytes()
@@ -178,10 +164,6 @@ public class ChunkImpl implements Chunk {
         return blockManager.getBlock(id);
     }
 
-    public final short getBlockId(int x, int y, int z) {
-        return (short) blockData.get(x, y, z);
-    }
-
     @Override
     public Block setBlock(int x, int y, int z, Block block) {
         int oldValue = blockData.set(x, y, z, block.getId());
@@ -198,52 +180,64 @@ public class ChunkImpl implements Chunk {
         return setBlock(pos.x, pos.y, pos.z, block);
     }
 
+    @Override
     public byte getSunlight(Vector3i pos) {
         return getSunlight(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public byte getSunlight(int x, int y, int z) {
         return (byte) sunlightData.get(x, y, z);
     }
 
+    @Override
     public boolean setSunlight(Vector3i pos, byte amount) {
         return setSunlight(pos.x, pos.y, pos.z, amount);
     }
 
+    @Override
     public boolean setSunlight(int x, int y, int z, byte amount) {
         Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT);
         return sunlightData.set(x, y, z, amount) != amount;
     }
 
+    @Override
     public byte getSunlightRegen(Vector3i pos) {
         return getSunlightRegen(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public byte getSunlightRegen(int x, int y, int z) {
         return (byte) sunlightRegenData.get(x, y, z);
     }
 
+    @Override
     public boolean setSunlightRegen(Vector3i pos, byte amount) {
         return setSunlightRegen(pos.x, pos.y, pos.z, amount);
     }
 
+    @Override
     public boolean setSunlightRegen(int x, int y, int z, byte amount) {
         Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_SUNLIGHT_REGEN);
         return sunlightRegenData.set(x, y, z, amount) != amount;
     }
 
+    @Override
     public byte getLight(Vector3i pos) {
         return getLight(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public byte getLight(int x, int y, int z) {
         return (byte) lightData.get(x, y, z);
     }
 
+    @Override
     public boolean setLight(Vector3i pos, byte amount) {
         return setLight(pos.x, pos.y, pos.z, amount);
     }
 
+    @Override
     public boolean setLight(int x, int y, int z, byte amount) {
         Preconditions.checkArgument(amount >= 0 && amount <= ChunkConstants.MAX_LIGHT);
         return lightData.set(x, y, z, amount) != amount;
@@ -271,53 +265,54 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
-    public Vector3i getChunkWorldPos() {
-        return new Vector3i(getChunkWorldPosX(), getChunkWorldPosY(), getChunkWorldPosZ());
+    public Vector3i getChunkWorldOffset() {
+        return new Vector3i(getChunkWorldOffsetX(), getChunkWorldOffsetY(), getChunkWorldOffsetZ());
     }
 
     @Override
-    public int getChunkWorldPosX() {
+    public int getChunkWorldOffsetX() {
         return chunkPos.x * getChunkSizeX();
     }
 
     @Override
-    public int getChunkWorldPosY() {
+    public int getChunkWorldOffsetY() {
         return chunkPos.y * getChunkSizeY();
     }
 
     @Override
-    public int getChunkWorldPosZ() {
+    public int getChunkWorldOffsetZ() {
         return chunkPos.z * getChunkSizeZ();
     }
 
     @Override
-    public Vector3i getBlockWorldPos(Vector3i blockPos) {
-        return getBlockWorldPos(blockPos.x, blockPos.y, blockPos.z);
+    public Vector3i chunkToWorldPosition(Vector3i blockPos) {
+        return chunkToWorldPosition(blockPos.x, blockPos.y, blockPos.z);
     }
 
     @Override
-    public Vector3i getBlockWorldPos(int x, int y, int z) {
-        return new Vector3i(getBlockWorldPosX(x), getBlockWorldPosY(y), getBlockWorldPosZ(z));
+    public Vector3i chunkToWorldPosition(int x, int y, int z) {
+        return new Vector3i(chunkToWorldPositionX(x), chunkToWorldPositionY(y), chunkToWorldPositionZ(z));
     }
 
     @Override
-    public int getBlockWorldPosX(int x) {
-        return x + getChunkWorldPosX();
+    public int chunkToWorldPositionX(int x) {
+        return x + getChunkWorldOffsetX();
     }
 
     @Override
-    public int getBlockWorldPosY(int y) {
-        return y + getChunkWorldPosY();
+    public int chunkToWorldPositionY(int y) {
+        return y + getChunkWorldOffsetY();
     }
 
     @Override
-    public int getBlockWorldPosZ(int z) {
-        return z + getChunkWorldPosZ();
+    public int chunkToWorldPositionZ(int z) {
+        return z + getChunkWorldOffsetZ();
     }
 
+    @Override
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3f min = getChunkWorldPos().toVector3f();
+            Vector3f min = getChunkWorldOffset().toVector3f();
             Vector3f max = ChunkConstants.CHUNK_SIZE.toVector3f();
             max.add(min);
             aabb = AABB.createMinMax(min, max);
@@ -326,6 +321,7 @@ public class ChunkImpl implements Chunk {
         return aabb;
     }
 
+    @Override
     public void deflate() {
         final TeraDeflator def = new TeraStandardDeflator();
         if (logger.isDebugEnabled()) {
@@ -374,6 +370,7 @@ public class ChunkImpl implements Chunk {
         }
     }
 
+    @Override
     public void deflateSunlight() {
         final TeraDeflator def = new TeraStandardDeflator();
         if (logger.isDebugEnabled()) {
@@ -426,31 +423,37 @@ public class ChunkImpl implements Chunk {
         return Objects.hashCode(chunkPos);
     }
 
+    @Override
     public void setMesh(ChunkMesh[] mesh) {
         this.activeMesh = mesh;
     }
 
+    @Override
     public void setPendingMesh(ChunkMesh[] mesh) {
         this.pendingMesh = mesh;
     }
 
+    @Override
     public void setAnimated(boolean animated) {
         this.animated = animated;
     }
 
-    public boolean getAnimated() {
+    @Override
+    public boolean isAnimated() {
         return animated;
     }
 
-
+    @Override
     public ChunkMesh[] getMesh() {
         return activeMesh;
     }
 
+    @Override
     public ChunkMesh[] getPendingMesh() {
         return pendingMesh;
     }
 
+    @Override
     public AABB getSubMeshAABB(int subMesh) {
         if (subMeshAABB == null) {
             subMeshAABB = new AABB[ChunkConstants.VERTICAL_SEGMENTS];
@@ -459,7 +462,7 @@ public class ChunkImpl implements Chunk {
 
             for (int i = 0; i < subMeshAABB.length; i++) {
                 Vector3f dimensions = new Vector3f(8, heightHalf, 8);
-                Vector3f position = new Vector3f(getChunkWorldPosX() - 0.5f, (i * heightHalf * 2) - 0.5f, getChunkWorldPosZ() - 0.5f);
+                Vector3f position = new Vector3f(getChunkWorldOffsetX() - 0.5f, (i * heightHalf * 2) - 0.5f, getChunkWorldOffsetZ() - 0.5f);
                 position.add(dimensions);
                 subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
             }
@@ -468,10 +471,12 @@ public class ChunkImpl implements Chunk {
         return subMeshAABB[subMesh];
     }
 
+    @Override
     public void markReady() {
         ready = true;
     }
 
+    @Override
     public void prepareForReactivation() {
         if (disposed) {
             disposed = false;
@@ -481,6 +486,7 @@ public class ChunkImpl implements Chunk {
         }
     }
 
+    @Override
     public void dispose() {
         disposed = true;
         ready = false;
@@ -496,6 +502,7 @@ public class ChunkImpl implements Chunk {
         ChunkMonitor.fireChunkDisposed(this);
     }
 
+    @Override
     public void disposeMesh() {
         if (activeMesh != null) {
             for (ChunkMesh chunkMesh : activeMesh) {
@@ -505,14 +512,17 @@ public class ChunkImpl implements Chunk {
         }
     }
 
+    @Override
     public boolean isReady() {
         return ready;
     }
 
+    @Override
     public boolean isDisposed() {
         return disposed;
     }
 
+    @Override
     public Region3i getRegion() {
         return region;
     }
@@ -532,130 +542,13 @@ public class ChunkImpl implements Chunk {
         return ChunkConstants.SIZE_Z;
     }
 
+    @Override
     public ChunkBlockIterator getBlockIterator() {
-        return new ChunkBlockIteratorImpl(blockManager, getChunkWorldPos(), blockData);
+        return new ChunkBlockIteratorImpl(blockManager, getChunkWorldOffset(), blockData);
     }
 
-    /**
-     * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
-     *
-     * @author Manuel Brotz <manu.brotz@gmx.ch>
-     * @todo Add support for chunk data extensions.
-     */
-    public static class ProtobufHandler {
-
-        public EntityData.ChunkStore.Builder encode(ChunkImpl chunk) {
-            Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-            Vector3i pos = chunk.getPos();
-            final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
-                    .setX(pos.x).setY(pos.y).setZ(pos.z);
-            b.setBlockData(runLengthEncode16(chunk.blockData));
-            b.setLiquidData(runLengthEncode8(chunk.extraData));
-
-            return b;
-        }
-
-        public ChunkImpl decode(EntityData.ChunkStore message) {
-            Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
-            if (!message.hasX() || !message.hasY() || !message.hasZ()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing chunk position.");
-            }
-            Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
-            if (!message.hasBlockData()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing block data.");
-            }
-            if (!message.hasLiquidData()) {
-                throw new IllegalArgumentException("Ill-formed protobuf message. Missing liquid data.");
-            }
-
-            final TeraArray blockData = runLengthDecode(message.getBlockData());
-            final TeraArray liquidData = runLengthDecode(message.getLiquidData());
-            return new ChunkImpl(pos, blockData, liquidData);
-        }
-
-        public EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {
-            EntityData.RunLengthEncoding16.Builder builder = EntityData.RunLengthEncoding16.newBuilder();
-            short lastItem = (short) array.get(0, 0, 0);
-            int counter = 0;
-            for (int y = 0; y < array.getSizeY(); ++y) {
-                for (int z = 0; z < array.getSizeZ(); ++z) {
-                    for (int x = 0; x < array.getSizeX(); ++x) {
-                        short item = (short) array.get(x, y, z);
-                        if (lastItem != item) {
-                            builder.addRunLengths(counter);
-                            builder.addValues(lastItem & 0xFFFF);
-                            lastItem = item;
-                            counter = 1;
-                        } else {
-                            counter++;
-                        }
-                    }
-                }
-            }
-            if (lastItem != 0) {
-                builder.addRunLengths(counter);
-                builder.addValues(lastItem & 0xFFFF);
-            }
-            return builder.build();
-        }
-
-        public EntityData.RunLengthEncoding8 runLengthEncode8(TeraArray array) {
-            EntityData.RunLengthEncoding8.Builder builder = EntityData.RunLengthEncoding8.newBuilder();
-            TByteList values = new TByteArrayList(16384);
-            byte lastItem = (byte) array.get(0, 0, 0);
-            int counter = 0;
-            for (int y = 0; y < array.getSizeY(); ++y) {
-                for (int z = 0; z < array.getSizeZ(); ++z) {
-                    for (int x = 0; x < array.getSizeX(); ++x) {
-                        byte item = (byte) array.get(x, y, z);
-                        if (lastItem != item) {
-                            builder.addRunLengths(counter);
-                            values.add(lastItem);
-                            lastItem = item;
-                            counter = 1;
-                        } else {
-                            counter++;
-                        }
-                    }
-                }
-            }
-            if (lastItem != 0) {
-                builder.addRunLengths(counter);
-                values.add(lastItem);
-            }
-            builder.setValues(ByteString.copyFrom(values.toArray()));
-            return builder.build();
-        }
-
-        public TeraArray runLengthDecode(EntityData.RunLengthEncoding16 data) {
-            Preconditions.checkState(data.getValuesCount() == data.getRunLengthsCount(), "Expected same number of values as runs");
-            short[] decodedData = new short[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
-            int index = 0;
-            for (int pos = 0; pos < data.getValuesCount(); ++pos) {
-                int length = data.getRunLengths(pos);
-                short value = (short) data.getValues(pos);
-                for (int i = 0; i < length; ++i) {
-                    decodedData[index++] = value;
-                }
-            }
-            return new TeraDenseArray16Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
-        }
-
-        public TeraArray runLengthDecode(EntityData.RunLengthEncoding8 data) {
-            Preconditions.checkState(data.getValues().size() == data.getRunLengthsCount(), "Expected same number of values as runs");
-            byte[] decodedData = new byte[ChunkConstants.SIZE_X * ChunkConstants.SIZE_Y * ChunkConstants.SIZE_Z];
-            int index = 0;
-            ByteString.ByteIterator valueSource = data.getValues().iterator();
-            for (int pos = 0; pos < data.getRunLengthsCount(); ++pos) {
-                int length = data.getRunLengths(pos);
-                byte value = valueSource.nextByte();
-                for (int i = 0; i < length; ++i) {
-                    decodedData[index++] = value;
-                }
-            }
-            return new TeraDenseArray8Bit(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z, decodedData);
-        }
-
-
+    @Override
+    public EntityData.ChunkStore.Builder encode() {
+        return ChunkSerializer.encode(chunkPos, blockData, extraData);
     }
 }

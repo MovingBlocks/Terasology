@@ -22,7 +22,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 
 import java.util.HashMap;
@@ -107,12 +107,12 @@ public class FlatTerrainGenerationPass implements ChunkGenerationPass {
     }
 
     @Override
-    public void generateChunk(final Chunk chunk) {
+    public void generateChunk(final CoreChunk chunk) {
         Region3i chunkRegion = chunk.getRegion();
         if (surfaceHeight >= chunkRegion.min().y) {
             for (int x = 0; x < chunk.getChunkSizeX(); x++) {
                 for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
-                    final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
+                    final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.chunkToWorldPositionX(x), chunk.chunkToWorldPositionZ(z));
 
                     for (int y = 0; y < chunk.getChunkSizeY() && y + chunkRegion.min().y < surfaceHeight + 1; y++) {
                         int worldY = y + +chunkRegion.min().y;

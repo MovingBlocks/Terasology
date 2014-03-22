@@ -20,7 +20,7 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.PropagationRules;
 import org.terasology.world.propagation.SingleChunkView;
@@ -39,39 +39,13 @@ public final class InternalLightProcessor {
     private InternalLightProcessor() {
     }
 
-    public static void generateInternalLighting(ChunkImpl chunk) {
+    public static void generateInternalLighting(LitChunk chunk) {
         populateSunlightRegen(chunk);
         populateSunlight(chunk);
         populateLight(chunk);
-
-
-               /*
-        BatchPropagator lightPropagator = new BatchPropagator(LIGHT_RULES, new SingleChunkView(LIGHT_RULES, chunk));
-        for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
-            for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
-                if (tops[x + ChunkConstants.SIZE_X * z] < top) {
-                    Block block = chunk.getBlock(x, tops[x + ChunkConstants.SIZE_X * z] + 1, z);
-                    spreadSunlightInternal(chunk, x, tops[x + ChunkConstants.SIZE_X * z] + 1, z, block);
-                }
-                for (int y = top; y >= 0; y--) {
-                    Block block = chunk.getBlock(x, y, z);
-                    if (y > tops[x + ChunkConstants.SIZE_X * z] && ((x > 0 && tops[(x - 1) + ChunkConstants.SIZE_X * z] >= y)
-                            || (x < ChunkConstants.SIZE_X - 1 && tops[(x + 1) + ChunkConstants.SIZE_X * z] >= y)
-                            || (z > 0 && tops[x + ChunkConstants.SIZE_X * (z - 1)] >= y)
-                            || (z < ChunkConstants.SIZE_Z - 1 && tops[x + ChunkConstants.SIZE_X * (z + 1)] >= y))) {
-                        spreadSunlightInternal(chunk, x, y, z, block);
-                    }
-                    if (block.getLuminance() > 1) {
-                        lightPropagator.propagateFrom(new Vector3i(x, y, z), block);
-                    }
-                }
-            }
-        }
-
-        lightPropagator.process();    */
     }
 
-    private static void populateLight(ChunkImpl chunk) {
+    private static void populateLight(LitChunk chunk) {
         BatchPropagator lightPropagator = new StandardBatchPropagator(LIGHT_RULES, new SingleChunkView(LIGHT_RULES, chunk));
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
@@ -87,7 +61,7 @@ public final class InternalLightProcessor {
         lightPropagator.process();
     }
 
-    private static void populateSunlight(ChunkImpl chunk) {
+    private static void populateSunlight(LitChunk chunk) {
         PropagationRules sunlightRules = new SunlightPropagationRules(chunk);
         BatchPropagator lightPropagator = new StandardBatchPropagator(sunlightRules, new SingleChunkView(sunlightRules, chunk));
 
@@ -107,7 +81,7 @@ public final class InternalLightProcessor {
         lightPropagator.process();
     }
 
-    private static void populateSunlightRegen(ChunkImpl chunk) {
+    private static void populateSunlightRegen(LitChunk chunk) {
         int top = ChunkConstants.SIZE_Y - 1;
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {

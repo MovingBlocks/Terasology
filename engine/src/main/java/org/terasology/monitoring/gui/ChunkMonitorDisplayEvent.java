@@ -17,7 +17,7 @@ package org.terasology.monitoring.gui;
 
 import com.google.common.base.Preconditions;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.impl.ChunkMonitorEntry;
+import org.terasology.monitoring.chunk.ChunkMonitorEntry;
 
 public abstract class ChunkMonitorDisplayEvent {
 

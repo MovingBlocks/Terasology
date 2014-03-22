@@ -23,7 +23,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.LitChunk;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -237,7 +237,7 @@ public class StandardBatchPropagator implements BatchPropagator {
     }
 
     @Override
-    public void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal) {
+    public void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal) {
         IndexProvider indexProvider = createIndexProvider(side);
 
         Region3i edgeRegion = TeraMath.getEdgeRegion(Region3i.createFromMinAndSize(Vector3i.zero(), ChunkConstants.CHUNK_SIZE), side);
@@ -249,7 +249,7 @@ public class StandardBatchPropagator implements BatchPropagator {
         propagateDepth(adjChunk, side, propagateExternal, indexProvider, edgeRegion, depth);
     }
 
-    private void propagateDepth(ChunkImpl adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateDepth(LitChunk adjChunk, Side side, boolean propagateExternal, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
 
         int[] adjDepth = new int[depths.length];
@@ -278,13 +278,13 @@ public class StandardBatchPropagator implements BatchPropagator {
                 adjPos.add(chunkEdgeDeltas.get(side));
                 byte value = rules.getValue(adjChunk, adjPos);
                 if (value > 1) {
-                    queueSpreadValue(adjChunk.getBlockWorldPos(adjPos), value);
+                    queueSpreadValue(adjChunk.chunkToWorldPosition(adjPos), value);
                 }
             }
         }
     }
 
-    private void propagateSide(ChunkImpl chunk, ChunkImpl adjChunk, Side side, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
+    private void propagateSide(LitChunk chunk, LitChunk adjChunk, Side side, IndexProvider indexProvider, Region3i edgeRegion, int[] depths) {
         Vector3i adjPos = new Vector3i();
         for (int x = edgeRegion.minX(); x <= edgeRegion.maxX(); ++x) {
             for (int y = edgeRegion.minY(); y <= edgeRegion.maxY(); ++y) {
@@ -386,6 +386,7 @@ public class StandardBatchPropagator implements BatchPropagator {
 
     private interface IndexProvider {
         int getIndexFor(Vector3i pos);
+
         int getIndexFor(int x, int y, int z);
     }
 }

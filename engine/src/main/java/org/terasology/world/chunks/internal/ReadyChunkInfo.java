@@ -19,6 +19,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.map.TShortObjectMap;
 import org.terasology.math.Vector3i;
 import org.terasology.persistence.ChunkStore;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius
@@ -27,18 +28,18 @@ public class ReadyChunkInfo {
     private Vector3i pos;
     private TShortObjectMap<TIntList> blockPositionMapppings;
     private ChunkStore chunkStore;
-    private ChunkImpl chunk;
+    private Chunk chunk;
     private boolean newChunk;
 
-    public ReadyChunkInfo(ChunkImpl chunk, TShortObjectMap<TIntList> blockPositionMapppings) {
-        this.pos = chunk.getPos();
+    public ReadyChunkInfo(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings) {
+        this.pos = chunk.getPosition();
         this.blockPositionMapppings = blockPositionMapppings;
         this.newChunk = true;
         this.chunk = chunk;
     }
 
-    public ReadyChunkInfo(ChunkImpl chunk, TShortObjectMap<TIntList> blockPositionMapppings, ChunkStore chunkStore) {
-        this.pos = chunk.getPos();
+    public ReadyChunkInfo(Chunk chunk, TShortObjectMap<TIntList> blockPositionMapppings, ChunkStore chunkStore) {
+        this.pos = chunk.getPosition();
         this.blockPositionMapppings = blockPositionMapppings;
         this.chunkStore = chunkStore;
         this.newChunk = false;
@@ -61,7 +62,7 @@ public class ReadyChunkInfo {
         return newChunk;
     }
 
-    public ChunkImpl getChunk() {
+    public Chunk getChunk() {
         return chunk;
     }
 }

@@ -17,7 +17,7 @@ package org.terasology.world.generator.internal;
 
 import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -40,7 +40,7 @@ public class RemoteWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public void createChunk(Chunk chunk) {
+    public void createChunk(CoreChunk chunk) {
     }
 
     @Override

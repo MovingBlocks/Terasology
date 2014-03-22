@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring;
+package org.terasology.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.impl.ChunkMonitorEntry;
-import org.terasology.monitoring.impl.ChunkMonitorEvent;
 import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.List;
 import java.util.Map;
@@ -40,9 +38,9 @@ public final class ChunkMonitor {
         EVENT_BUS.post(event);
     }
 
-    private static synchronized ChunkMonitorEntry registerChunk(ChunkImpl chunk) {
+    private static synchronized ChunkMonitorEntry registerChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        final Vector3i pos = chunk.getPos();
+        final Vector3i pos = chunk.getPosition();
         ChunkMonitorEntry entry = CHUNKS.get(pos);
         if (entry == null) {
             entry = new ChunkMonitorEntry(pos);
@@ -66,7 +64,7 @@ public final class ChunkMonitor {
         post(new ChunkMonitorEvent.ChunkProviderDisposed(provider));
     }
 
-    public static void fireChunkCreated(ChunkImpl chunk) {
+    public static void fireChunkCreated(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
         final ChunkMonitorEntry entry = registerChunk(chunk);
         if (entry != null) {
@@ -74,19 +72,19 @@ public final class ChunkMonitor {
         }
     }
 
-    public static void fireChunkDisposed(ChunkImpl chunk) {
+    public static void fireChunkDisposed(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Disposed(chunk.getPos()));
+        post(new ChunkMonitorEvent.Disposed(chunk.getPosition()));
     }
 
-    public static void fireChunkRevived(ChunkImpl chunk) {
+    public static void fireChunkRevived(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Revived(chunk.getPos()));
+        post(new ChunkMonitorEvent.Revived(chunk.getPosition()));
     }
 
-    public static void fireChunkDeflated(ChunkImpl chunk, int oldSize, int newSize) {
+    public static void fireChunkDeflated(Chunk chunk, int oldSize, int newSize) {
         Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
-        post(new ChunkMonitorEvent.Deflated(chunk.getPos(), oldSize, newSize));
+        post(new ChunkMonitorEvent.Deflated(chunk.getPosition(), oldSize, newSize));
     }
 
     public static void fireChunkTessellated(Vector3i chunkPos, ChunkMesh[] mesh) {

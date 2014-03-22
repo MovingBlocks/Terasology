@@ -42,7 +42,7 @@ import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.Chunk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -234,7 +234,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public ChunkStore createChunkStoreForSave(ChunkImpl chunk) {
+    public ChunkStore createChunkStoreForSave(Chunk chunk) {
         return new ChunkStoreInternal(chunk, this, entityManager);
     }
 

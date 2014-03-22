@@ -24,7 +24,7 @@ import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
@@ -95,7 +95,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     }
 
     @Override
-    public void generateChunk(Chunk chunk) {
+    public void generateChunk(CoreChunk chunk) {
         double[][][] densityMap = new double[chunk.getChunkSizeX() + 1][chunk.getChunkSizeY() + 1][chunk.getChunkSizeZ() + 1];
 
         /*
@@ -104,7 +104,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
         for (int x = 0; x <= chunk.getChunkSizeX(); x += SAMPLE_RATE_3D_HOR) {
             for (int z = 0; z <= chunk.getChunkSizeZ(); z += SAMPLE_RATE_3D_HOR) {
                 for (int y = 0; y <= chunk.getChunkSizeY(); y += SAMPLE_RATE_3D_VERT) {
-                    densityMap[x][y][z] = calcDensity(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosY(y), chunk.getBlockWorldPosZ(z));
+                    densityMap[x][y][z] = calcDensity(chunk.chunkToWorldPositionX(x), chunk.chunkToWorldPositionY(y), chunk.chunkToWorldPositionZ(z));
                 }
             }
         }
@@ -119,10 +119,10 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
          */
         for (int x = 0; x < chunk.getChunkSizeX(); x++) {
             for (int z = 0; z < chunk.getChunkSizeZ(); z++) {
-                WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
+                WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.chunkToWorldPositionX(x), chunk.chunkToWorldPositionZ(z));
                 int firstBlockHeight = -1;
 
-                int yOffset = chunk.getChunkSizeY() * chunk.getPos().y;
+                int yOffset = chunk.getChunkSizeY() * chunk.getPosition().y;
 
                 for (int y = chunk.getChunkSizeY() - 1; y >= 0; y--) {
                     int yPos = yOffset + y;
@@ -147,7 +147,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), yPos, chunk.getBlockWorldPosZ(z)) > -0.7) {
+                        if (calcCaveDensity(chunk.chunkToWorldPositionX(x), yPos, chunk.chunkToWorldPositionZ(z)) > -0.7) {
                             generateOuterLayer(x, y, z, firstBlockHeight, chunk, type);
                         } else {
                             chunk.setBlock(x, y, z, air);
@@ -161,7 +161,7 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
                             firstBlockHeight = y;
                         }
 
-                        if (calcCaveDensity(chunk.getBlockWorldPosX(x), yPos, chunk.getBlockWorldPosZ(z)) > -0.6) {
+                        if (calcCaveDensity(chunk.chunkToWorldPositionX(x), yPos, chunk.chunkToWorldPositionZ(z)) > -0.6) {
                             generateInnerLayer(x, y, z, chunk, type);
                         } else {
                             chunk.setBlock(x, y, z, air);
@@ -177,15 +177,15 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
         }
     }
 
-    private void generateInnerLayer(int x, int y, int z, Chunk c, WorldBiomeProvider.Biome type) {
+    private void generateInnerLayer(int x, int y, int z, CoreChunk c, WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
         c.setBlock(x, y, z, stone);
     }
 
-    private void generateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, WorldBiomeProvider.Biome type) {
+    private void generateOuterLayer(int x, int y, int z, int firstBlockHeight, CoreChunk c, WorldBiomeProvider.Biome type) {
 
         int depth = (firstBlockHeight - y);
-        int yPos = c.getBlockWorldPosY(y);
+        int yPos = c.chunkToWorldPositionY(y);
 
         switch (type) {
             case FOREST:

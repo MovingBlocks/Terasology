@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.chunks;
+package org.terasology.world.propagation.light;
 
 import com.google.common.collect.Lists;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.LocalChunkView;
@@ -27,9 +28,6 @@ import org.terasology.world.propagation.PropagationRules;
 import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.StandardBatchPropagator;
 import org.terasology.world.propagation.SunlightRegenBatchPropagator;
-import org.terasology.world.propagation.light.LightPropagationRules;
-import org.terasology.world.propagation.light.SunlightPropagationRules;
-import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 
 import java.util.List;
 
@@ -46,9 +44,9 @@ public class LightMerger {
         this.chunkProvider = chunkProvider;
     }
 
-    public void merge(ChunkImpl chunk) {
+    public void merge(Chunk chunk) {
         PerformanceMonitor.startActivity("Light Merge");
-        ChunkImpl[] localChunks = assembleLocalChunks(chunk);
+        Chunk[] localChunks = assembleLocalChunks(chunk);
 
         List<BatchPropagator> propagators = Lists.newArrayList();
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LocalChunkView(localChunks, lightRules)));
@@ -62,8 +60,8 @@ public class LightMerger {
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
             for (Side side : Side.values()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPos());
-                ChunkImpl adjChunk = chunkProvider.getChunkUnready(adjChunkPos);
+                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                LitChunk adjChunk = chunkProvider.getChunkUnready(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
                 }
@@ -71,8 +69,8 @@ public class LightMerger {
 
             // Propagate Outwards
             for (Side side : Side.values()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPos());
-                ChunkImpl adjChunk = chunkProvider.getChunk(adjChunkPos);
+                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                LitChunk adjChunk = chunkProvider.getChunk(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(chunk, adjChunk, side, true);
                 }
@@ -85,13 +83,13 @@ public class LightMerger {
         PerformanceMonitor.endActivity();
     }
 
-    private ChunkImpl[] assembleLocalChunks(ChunkImpl chunk) {
-        ChunkImpl[] localChunks = new ChunkImpl[27];
+    private Chunk[] assembleLocalChunks(Chunk chunk) {
+        Chunk[] localChunks = new Chunk[27];
         int index = 0;
         for (int z = -1; z < 2; ++z) {
             for (int y = -1; y < 2; ++y) {
                 for (int x = -1; x < 2; ++x) {
-                    ChunkImpl localChunk = chunkProvider.getChunk(chunk.getPos().x + x, chunk.getPos().y + y, chunk.getPos().z + z);
+                    Chunk localChunk = chunkProvider.getChunk(chunk.getPosition().x + x, chunk.getPosition().y + y, chunk.getPosition().z + z);
                     if (localChunk != null) {
                         localChunks[index] = localChunk;
                     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.world.chunks;
 
-import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.engine.API;
+import org.terasology.math.AABB;
+import org.terasology.rendering.primitives.ChunkMesh;
 
 /**
  * @author Immortius
  */
-public interface ChunkRegionListener {
+@API
+public interface RenderableChunk extends LitChunk {
 
-    /**
-     * Invoked when a chunk has entered relevance for this chunk region (may be just loaded, or region may have moved
-     * to include it)
-     *
-     * @param pos
-     * @param chunk
-     */
-    void onChunkRelevant(Vector3i pos, Chunk chunk);
+    boolean isDirty();
 
-    /**
-     * Invoked when a chunk ceases to be relevant for this chunk region (
-     *
-     * @param pos
-     */
-    void onChunkIrrelevant(Vector3i pos);
+    void setDirty(boolean dirty);
+
+    AABB getAABB();
+
+    void setMesh(ChunkMesh[] mesh);
+
+    void setPendingMesh(ChunkMesh[] mesh);
+
+    void setAnimated(boolean animated);
+
+    boolean isAnimated();
+
+    ChunkMesh[] getMesh();
+
+    ChunkMesh[] getPendingMesh();
+
+    AABB getSubMeshAABB(int subMesh);
+
+    void disposeMesh();
 }

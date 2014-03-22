@@ -18,22 +18,22 @@ package org.terasology.world.propagation;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * @author Immortius
  */
 public class LocalChunkView implements PropagatorWorldView {
     private PropagationRules rules;
-    private ChunkImpl[] chunks;
+    private Chunk[] chunks;
 
     private Vector3i topLeft = new Vector3i();
 
-    public LocalChunkView(ChunkImpl[] chunks, PropagationRules rules) {
+    public LocalChunkView(Chunk[] chunks, PropagationRules rules) {
         this.chunks = chunks;
         this.rules = rules;
-        topLeft.set(chunks[13].getPos().x - 1, chunks[13].getPos().y - 1, chunks[13].getPos().z - 1);
+        topLeft.set(chunks[13].getPosition().x - 1, chunks[13].getPosition().y - 1, chunks[13].getPosition().z - 1);
 
     }
 
@@ -45,7 +45,7 @@ public class LocalChunkView implements PropagatorWorldView {
 
     @Override
     public byte getValueAt(Vector3i pos) {
-        ChunkImpl chunk = chunks[chunkIndexOf(pos)];
+        Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
             return rules.getValue(chunk, TeraMath.calcBlockPos(pos));
         }
@@ -54,7 +54,7 @@ public class LocalChunkView implements PropagatorWorldView {
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        ChunkImpl chunk = chunks[chunkIndexOf(pos)];
+        Chunk chunk = chunks[chunkIndexOf(pos)];
         if (chunk != null) {
             rules.setValue(chunk, TeraMath.calcBlockPos(pos), value);
         }
@@ -63,7 +63,7 @@ public class LocalChunkView implements PropagatorWorldView {
     @Override
     public Block getBlockAt(Vector3i pos) {
         int index = chunkIndexOf(pos);
-        ChunkImpl chunk = chunks[index];
+        Chunk chunk = chunks[index];
         if (chunk != null) {
             return chunk.getBlock(TeraMath.calcBlockPos(pos));
         }

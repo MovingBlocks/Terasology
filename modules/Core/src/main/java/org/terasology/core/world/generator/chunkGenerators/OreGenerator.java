@@ -22,7 +22,7 @@ import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 
 import java.util.Map;
@@ -64,9 +64,9 @@ public class OreGenerator implements ChunkGenerationPass {
     }
 
     @Override
-    public void generateChunk(Chunk c) {
+    public void generateChunk(CoreChunk c) {
         // TODO: Better seeding mechanism
-        FastRandom random = new FastRandom(worldSeed.hashCode() ^ (c.getPos().x + 39L * (c.getPos().y + 39L * c.getPos().z)));
+        FastRandom random = new FastRandom(worldSeed.hashCode() ^ (c.getPosition().x + 39L * (c.getPosition().y + 39L * c.getPosition().z)));
         for (int y = 0; y < c.getChunkSizeY(); y++) {
             for (int x = 0; x < c.getChunkSizeX(); x++) {
                 for (int z = 0; z < c.getChunkSizeZ(); z++) {
@@ -84,7 +84,7 @@ public class OreGenerator implements ChunkGenerationPass {
      * @param y Position on the y-axis
      * @param z Position on the z-axis
      */
-    private void generateOre(Chunk c, int x, int y, int z, Random random) {
+    private void generateOre(CoreChunk c, int x, int y, int z, Random random) {
         Block targetBlock = c.getBlock(x, y, z);
         if (targetBlock.equals(stoneBlock)) {
             if (random.nextFloat() < config.getDiamondDensity()) {

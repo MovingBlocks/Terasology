@@ -16,10 +16,35 @@
 package org.terasology.world.chunks;
 
 import org.terasology.engine.API;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
 @API
-public interface Chunk extends ManagedChunk, RenderableChunk {
+public interface LitChunk extends CoreChunk {
+
+    byte getSunlight(Vector3i pos);
+
+    byte getSunlight(int x, int y, int z);
+
+    boolean setSunlight(Vector3i pos, byte amount);
+
+    boolean setSunlight(int x, int y, int z, byte amount);
+
+    byte getSunlightRegen(Vector3i pos);
+
+    byte getSunlightRegen(int x, int y, int z);
+
+    boolean setSunlightRegen(Vector3i pos, byte amount);
+
+    boolean setSunlightRegen(int x, int y, int z, byte amount);
+
+    byte getLight(Vector3i pos);
+
+    byte getLight(int x, int y, int z);
+
+    boolean setLight(Vector3i pos, byte amount);
+
+    boolean setLight(int x, int y, int z, byte amount);
 }

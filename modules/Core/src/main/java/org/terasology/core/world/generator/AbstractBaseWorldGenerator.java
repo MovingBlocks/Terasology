@@ -23,7 +23,7 @@ import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
@@ -79,7 +79,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     @Override
-    public void createChunk(final Chunk chunk) {
+    public void createChunk(final CoreChunk chunk) {
         for (final ChunkGenerationPass generator : generationPasses) {
             try {
                 generator.generateChunk(chunk);

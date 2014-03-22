@@ -16,6 +16,7 @@
 package org.terasology.world.chunks.localChunkProvider;
 
 import org.terasology.utilities.concurrency.Task;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
@@ -23,11 +24,11 @@ import org.terasology.world.chunks.internal.ChunkImpl;
  */
 public class ChunkUnloadRequest implements Task {
 
-    private ChunkImpl chunk;
+    private Chunk chunk;
     private LocalChunkProvider chunkProvider;
     private boolean shutdown;
 
-    public ChunkUnloadRequest(ChunkImpl chunk, LocalChunkProvider localChunkProvider) {
+    public ChunkUnloadRequest(Chunk chunk, LocalChunkProvider localChunkProvider) {
         this.chunk = chunk;
         this.chunkProvider = localChunkProvider;
     }

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
+package org.terasology.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.Chunk;
 
 import java.lang.ref.WeakReference;
 import java.util.Deque;
@@ -32,7 +32,7 @@ public class ChunkMonitorEntry {
     private static final Logger logger = LoggerFactory.getLogger(ChunkMonitorEntry.class);
 
     private final Vector3i pos;
-    private Deque<WeakReference<ChunkImpl>> chunks = new LinkedList<>();
+    private Deque<WeakReference<Chunk>> chunks = new LinkedList<>();
     private List<ChunkMonitorEvent.BasicChunkEvent> events = new LinkedList<>();
 
     public ChunkMonitorEntry(Vector3i pos) {
@@ -43,9 +43,9 @@ public class ChunkMonitorEntry {
         if (chunks.size() == 0) {
             return;
         }
-        final Iterator<WeakReference<ChunkImpl>> it = chunks.iterator();
+        final Iterator<WeakReference<Chunk>> it = chunks.iterator();
         while (it.hasNext()) {
-            final WeakReference<ChunkImpl> w = it.next();
+            final WeakReference<Chunk> w = it.next();
             if (w.get() == null) {
                 it.remove();
             }
@@ -56,17 +56,17 @@ public class ChunkMonitorEntry {
         return new Vector3i(pos);
     }
 
-    public ChunkImpl getLatestChunk() {
-        final WeakReference<ChunkImpl> chunk = chunks.peekLast();
+    public Chunk getLatestChunk() {
+        final WeakReference<Chunk> chunk = chunks.peekLast();
         if (chunk != null) {
             return chunk.get();
         }
         return null;
     }
 
-    public void addChunk(ChunkImpl value) {
+    public void addChunk(Chunk value) {
         Preconditions.checkNotNull(value, "The parameter 'value' must not be null");
-        Preconditions.checkArgument(pos.equals(value.getPos()), "Expected chunk for position {} but got position {} instead", pos, value.getPos());
+        Preconditions.checkArgument(pos.equals(value.getPosition()), "Expected chunk for position {} but got position {} instead", pos, value.getPosition());
         purge();
         chunks.add(new WeakReference<>(value));
     }

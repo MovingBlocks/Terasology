@@ -34,7 +34,7 @@ import org.terasology.world.WorldCommands;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.RenderableChunk;
 
 import javax.vecmath.Vector3f;
 import java.util.Collections;
@@ -53,7 +53,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     /* CHUNKS */
     private boolean pendingChunks;
-    private final List<ChunkImpl> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
+    private final List<RenderableChunk> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
     private Vector3i chunkPos = new Vector3i();
 
     private Config config;
@@ -243,8 +243,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // just add all visible chunks
                 chunksInProximity.clear();
                 for (Vector3i chunkPosition : viewRegion) {
-                    ChunkImpl c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && c.isReady() && worldProvider.getLocalView(c.getPos()) != null) {
+                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
@@ -257,7 +257,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 // remove
                 while (chunksForRemove.hasNext()) {
                     Vector3i r = chunksForRemove.next();
-                    ChunkImpl c = chunkProvider.getChunk(r);
+                    RenderableChunk c = chunkProvider.getChunk(r);
                     if (c != null) {
                         chunksInProximity.remove(c);
                         c.disposeMesh();
@@ -266,8 +266,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
                 // add
                 for (Vector3i chunkPosition : viewRegion) {
-                    ChunkImpl c = chunkProvider.getChunk(chunkPosition);
-                    if (c != null && c.isReady() && worldProvider.getLocalView(c.getPos()) != null) {
+                    RenderableChunk c = chunkProvider.getChunk(chunkPosition);
+                    if (c != null && worldProvider.getLocalView(c.getPosition()) != null) {
                         chunksInProximity.add(c);
                     } else {
                         chunksCurrentlyPending = true;
@@ -297,8 +297,8 @@ public class HeadlessWorldRenderer implements WorldRenderer {
                 (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
     }
 
-    private static float distanceToCamera(ChunkImpl chunk) {
-        Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPos().z + 0.5f) * ChunkConstants.SIZE_Z);
+    private static float distanceToCamera(RenderableChunk chunk) {
+        Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X, 0, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
 
         Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         result.x -= cameraPos.x;
@@ -307,10 +307,10 @@ public class HeadlessWorldRenderer implements WorldRenderer {
         return result.length();
     }
 
-    private static class ChunkFrontToBackComparator implements Comparator<ChunkImpl> {
+    private static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
 
         @Override
-        public int compare(ChunkImpl o1, ChunkImpl o2) {
+        public int compare(RenderableChunk o1, RenderableChunk o2) {
             double distance = distanceToCamera(o1);
             double distance2 = distanceToCamera(o2);
 

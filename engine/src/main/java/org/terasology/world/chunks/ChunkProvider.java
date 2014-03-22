@@ -100,20 +100,22 @@ public interface ChunkProvider {
     /**
      * Returns the chunk at the given position if possible.
      *
+     *
      * @param x The chunk position on the x-axis
      * @param y The chunk position on the y-axis
      * @param z The chunk position on the z-axis
      * @return The chunk, or null if the chunk is not ready
      */
-    ChunkImpl getChunk(int x, int y, int z);
+    Chunk getChunk(int x, int y, int z);
 
     /**
      * Returns the chunk at the given position if possible.
      *
+     *
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready
      */
-    ChunkImpl getChunk(Vector3i chunkPos);
+    Chunk getChunk(Vector3i chunkPos);
 
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using

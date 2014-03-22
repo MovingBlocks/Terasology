@@ -29,7 +29,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -109,10 +109,10 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
      *
      * @param chunk
      */
-    public void generateChunk(Chunk chunk) {
+    public void generateChunk(CoreChunk chunk) {
 
-        int hmX = (((chunk.getChunkWorldPosX() / chunk.getChunkSizeX()) % 512) + 512) % 512;
-        int hmZ = (((chunk.getChunkWorldPosZ() / chunk.getChunkSizeZ()) % 512) + 512) % 512;
+        int hmX = (((chunk.getChunkWorldOffsetX() / chunk.getChunkSizeX()) % 512) + 512) % 512;
+        int hmZ = (((chunk.getChunkWorldOffsetZ() / chunk.getChunkSizeZ()) % 512) + 512) % 512;
 
         double scaleFactor = 0.05 * MAX_HEIGHT;
 
@@ -134,7 +134,7 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
                 double threshold = Math.floor(interpolatedHeight);
 
                 for (int y = 0; y < chunk.getChunkSizeY(); ++y) {
-                    int worldHeight = y + chunk.getChunkSizeY() * chunk.getPos().y;
+                    int worldHeight = y + chunk.getChunkSizeY() * chunk.getPosition().y;
                     if (worldHeight < threshold) {
                         chunk.setBlock(x, y, z, stone);
                     } else if (worldHeight == threshold) {

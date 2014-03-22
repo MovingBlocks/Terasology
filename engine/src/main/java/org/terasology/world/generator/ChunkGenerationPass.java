@@ -17,7 +17,7 @@
 package org.terasology.world.generator;
 
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Map;
 
@@ -40,6 +40,6 @@ public interface ChunkGenerationPass {
      *
      * @param chunk
      */
-    void generateChunk(Chunk chunk);
+    void generateChunk(CoreChunk chunk);
 
 }

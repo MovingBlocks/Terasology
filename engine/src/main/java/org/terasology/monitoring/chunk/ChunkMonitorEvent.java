@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
+package org.terasology.monitoring.chunk;
 
 import com.google.common.base.Preconditions;
 import org.terasology.math.Vector3i;

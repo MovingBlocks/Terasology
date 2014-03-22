@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
-import org.terasology.monitoring.impl.ChunkMonitorEntry;
-import org.terasology.monitoring.impl.ChunkMonitorEvent;
+import org.terasology.monitoring.chunk.ChunkMonitorEntry;
+import org.terasology.monitoring.chunk.ChunkMonitorEvent;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.Chunk;
 
 import javax.swing.*;
 import java.awt.*;
@@ -663,7 +663,7 @@ public class ChunkMonitorDisplay extends JPanel {
         }
 
         private Color calcChunkColor(ChunkMonitorEntry entry) {
-            final ChunkImpl chunk = entry.getLatestChunk();
+            final Chunk chunk = entry.getLatestChunk();
 
             if (chunk == null) {
                 return COLOR_DEAD;

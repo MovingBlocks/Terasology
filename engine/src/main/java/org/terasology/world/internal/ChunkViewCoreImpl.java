@@ -23,8 +23,9 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.liquid.LiquidData;
 
 /**
@@ -37,14 +38,14 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     private Vector3i offset;
     private Region3i chunkRegion;
     private Region3i blockRegion;
-    private ChunkImpl[] chunks;
+    private Chunk[] chunks;
 
     private Vector3i chunkPower;
     private Vector3i chunkFilterSize;
 
     private ThreadLocal<Boolean> locked = new ThreadLocal<>();
 
-    public ChunkViewCoreImpl(ChunkImpl[] chunks, Region3i chunkRegion, Vector3i offset) {
+    public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset) {
         locked.set(false);
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
@@ -227,7 +228,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     @Override
     public void lock() {
         if (!locked.get()) {
-            for (ChunkImpl chunk : chunks) {
+            for (RenderableChunk chunk : chunks) {
                 chunk.lock();
             }
             locked.set(true);
@@ -238,7 +239,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void unlock() {
         if (locked.get()) {
             locked.set(false);
-            for (ChunkImpl chunk : chunks) {
+            for (RenderableChunk chunk : chunks) {
                 chunk.unlock();
             }
         }
@@ -251,7 +252,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     @Override
     public boolean isValidView() {
-        for (ChunkImpl chunk : chunks) {
+        for (Chunk chunk : chunks) {
             if (chunk.isDisposed()) {
                 return false;
             }

@@ -19,7 +19,7 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.propagation.PropagatorWorldView;
 import org.terasology.world.propagation.SingleChunkView;
 
@@ -34,7 +34,7 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
         this.regenWorldView = regenWorldView;
     }
 
-    public SunlightPropagationRules(ChunkImpl chunk) {
+    public SunlightPropagationRules(LitChunk chunk) {
         this.regenWorldView = new SingleChunkView(new SunlightRegenPropagationRules(), chunk);
     }
 
@@ -51,16 +51,16 @@ public class SunlightPropagationRules extends CommonLightPropagationRules {
         return ChunkConstants.MAX_SUNLIGHT;
     }
 
-    public byte getValue(ChunkImpl chunk, Vector3i pos) {
+    public byte getValue(LitChunk chunk, Vector3i pos) {
         return getValue(chunk, pos.x, pos.y, pos.z);
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, int x, int y, int z) {
+    public byte getValue(LitChunk chunk, int x, int y, int z) {
         return chunk.getSunlight(x, y, z);
     }
 
-    public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
         chunk.setSunlight(pos, value);
     }
 

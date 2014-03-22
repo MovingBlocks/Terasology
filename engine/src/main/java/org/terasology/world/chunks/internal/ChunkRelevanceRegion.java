@@ -23,6 +23,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
 
 import java.util.Iterator;
@@ -138,9 +139,9 @@ public class ChunkRelevanceRegion {
         this.listener = listener;
     }
 
-    private void sendChunkRelevant(ChunkImpl chunk) {
+    private void sendChunkRelevant(Chunk chunk) {
         if (listener != null) {
-            listener.onChunkRelevant(chunk.getPos(), chunk);
+            listener.onChunkRelevant(chunk.getPosition(), chunk);
         }
     }
 
@@ -167,9 +168,9 @@ public class ChunkRelevanceRegion {
         return Objects.hashCode(entity);
     }
 
-    public void chunkReady(ChunkImpl chunk) {
-        if (currentRegion.encompasses(chunk.getPos()) && !relevantChunks.contains(chunk.getPos())) {
-            relevantChunks.add(chunk.getPos());
+    public void chunkReady(Chunk chunk) {
+        if (currentRegion.encompasses(chunk.getPosition()) && !relevantChunks.contains(chunk.getPosition())) {
+            relevantChunks.add(chunk.getPosition());
             sendChunkRelevant(chunk);
         }
     }

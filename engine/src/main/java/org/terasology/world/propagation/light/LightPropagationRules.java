@@ -18,7 +18,7 @@ package org.terasology.world.propagation.light;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.LitChunk;
 
 /**
  * @author Immortius
@@ -41,17 +41,17 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, Vector3i pos) {
+    public byte getValue(LitChunk chunk, Vector3i pos) {
         return getValue(chunk, pos.x, pos.y, pos.z);
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, int x, int y, int z) {
+    public byte getValue(LitChunk chunk, int x, int y, int z) {
         return chunk.getLight(x, y, z);
     }
 
     @Override
-    public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
         chunk.setLight(pos, value);
     }
 

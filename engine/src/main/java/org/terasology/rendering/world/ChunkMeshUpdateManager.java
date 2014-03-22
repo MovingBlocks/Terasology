@@ -18,16 +18,15 @@ package org.terasology.rendering.world;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
-import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.RenderableChunk;
 
 import java.util.List;
 import java.util.Set;
@@ -35,24 +34,21 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Provides the mechanism for updating and generating chunks.
+ * Provides the mechanism for updating and generating chunk meshes.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkUpdateManager {
-
-    /* CONST */
-    private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
+public final class ChunkMeshUpdateManager {
 
     /* CHUNK UPDATES */
-    private final Set<ChunkImpl> chunksProcessing = Sets.newSetFromMap(new ConcurrentHashMap<ChunkImpl, Boolean>());
+    private final Set<RenderableChunk> chunksProcessing = Sets.newSetFromMap(new ConcurrentHashMap<RenderableChunk, Boolean>());
 
-    private final BlockingDeque<ChunkImpl> chunksComplete = Queues.newLinkedBlockingDeque();
+    private final BlockingDeque<RenderableChunk> chunksComplete = Queues.newLinkedBlockingDeque();
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
 
-    public ChunkUpdateManager(ChunkTessellator tessellator, WorldProvider worldProvider) {
+    public ChunkMeshUpdateManager(ChunkTessellator tessellator, WorldProvider worldProvider) {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
     }
@@ -65,7 +61,7 @@ public final class ChunkUpdateManager {
      * @return True if a chunk update was executed
      */
     // TODO: Review this system
-    public boolean queueChunkUpdate(ChunkImpl chunk) {
+    public boolean queueChunkUpdate(RenderableChunk chunk) {
 
         if (!chunksProcessing.contains(chunk)) {
             executeChunkUpdate(chunk);
@@ -75,33 +71,33 @@ public final class ChunkUpdateManager {
         return false;
     }
 
-    public List<ChunkImpl> availableChunksForUpdate() {
-        List<ChunkImpl> result = Lists.newArrayListWithExpectedSize(chunksComplete.size());
+    public List<RenderableChunk> availableChunksForUpdate() {
+        List<RenderableChunk> result = Lists.newArrayListWithExpectedSize(chunksComplete.size());
         chunksComplete.drainTo(result);
         chunksProcessing.removeAll(result);
         return result;
     }
 
-    private void executeChunkUpdate(final ChunkImpl c) {
+    private void executeChunkUpdate(final RenderableChunk c) {
         chunksProcessing.add(c);
 
         CoreRegistry.get(GameEngine.class).submitTask("Chunk Update", new ChunkUpdater(c, tessellator, worldProvider, this));
     }
 
-    private void finishedProcessing(ChunkImpl c) {
+    private void finishedProcessing(RenderableChunk c) {
         chunksComplete.add(c);
     }
 
 
     private static class ChunkUpdater implements Runnable {
 
-        private ChunkImpl c;
+        private RenderableChunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
-        private ChunkUpdateManager chunkUpdateManager;
+        private ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        public ChunkUpdater(ChunkImpl chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkUpdateManager chunkUpdateManager) {
-            this.chunkUpdateManager = chunkUpdateManager;
+        public ChunkUpdater(RenderableChunk chunk, ChunkTessellator tessellator, WorldProvider worldProvider, ChunkMeshUpdateManager chunkMeshUpdateManager) {
+            this.chunkMeshUpdateManager = chunkMeshUpdateManager;
             this.c = chunk;
             this.tessellator = tessellator;
             this.worldProvider = worldProvider;
@@ -110,19 +106,19 @@ public final class ChunkUpdateManager {
         @Override
         public void run() {
             ChunkMesh[] newMeshes = new ChunkMesh[WorldRendererLwjgl.VERTICAL_SEGMENTS];
-            ChunkView chunkView = worldProvider.getLocalView(c.getPos());
+            ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
             if (chunkView != null) {
                 c.setDirty(false);
                 int meshHeight = ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS;
                 for (int seg = 0; seg < WorldRendererLwjgl.VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPos(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPosition(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
                 }
 
                 c.setPendingMesh(newMeshes);
-                ChunkMonitor.fireChunkTessellated(c.getPos(), newMeshes);
+                ChunkMonitor.fireChunkTessellated(c.getPosition(), newMeshes);
 
             }
-            chunkUpdateManager.finishedProcessing(c);
+            chunkMeshUpdateManager.finishedProcessing(c);
             // Clean these up because the task executor holds the object in memory.
             c = null;
             tessellator = null;

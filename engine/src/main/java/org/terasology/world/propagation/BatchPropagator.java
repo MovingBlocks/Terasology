@@ -18,6 +18,7 @@ package org.terasology.world.propagation;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
@@ -28,7 +29,7 @@ public interface BatchPropagator {
 
     void process(Iterable<BlockChange> blockChanges);
 
-    void propagateBetween(ChunkImpl chunk, ChunkImpl adjChunk, Side side, boolean propagateExternal);
+    void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal);
 
     void propagateFrom(Vector3i pos, Block block);
 

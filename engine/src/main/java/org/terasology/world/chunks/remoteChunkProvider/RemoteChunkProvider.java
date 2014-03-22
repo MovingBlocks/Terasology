@@ -26,15 +26,14 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.ChunkMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
-import org.terasology.world.chunks.LightMerger;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
@@ -44,6 +43,7 @@ import org.terasology.world.generator.internal.RemoteWorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
+import org.terasology.world.propagation.light.LightMerger;
 
 import javax.vecmath.Vector3f;
 import java.util.Collections;
@@ -59,9 +59,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private static final int LOAD_PER_FRAME = 1;
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
-    private Map<Vector3i, ChunkImpl> chunkCache = Maps.newHashMap();
-    private final BlockingQueue<ChunkImpl> readyChunks = Queues.newLinkedBlockingQueue();
-    private List<ChunkImpl> sortedReadyChunks = Lists.newArrayList();
+    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
+    private List<Chunk> sortedReadyChunks = Lists.newArrayList();
     private ChunkReadyListener listener;
     private EntityRef worldEntity = EntityRef.NULL;
 
@@ -81,8 +81,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         this.listener = chunkReadyListener;
     }
 
-    public void receiveChunk(final ChunkImpl chunk) {
-        pipeline.doTask(new AbstractChunkTask(chunk.getPos()) {
+    public void receiveChunk(final Chunk chunk) {
+        pipeline.doTask(new AbstractChunkTask(chunk.getPosition()) {
             @Override
             public String getName() {
                 return "Internal Light Generation";
@@ -98,7 +98,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     public void invalidateChunks(Vector3i pos) {
-        ChunkImpl removed = chunkCache.remove(pos);
+        Chunk removed = chunkCache.remove(pos);
         if (removed != null && !removed.isReady()) {
             sortedReadyChunks.remove(removed);
         }
@@ -108,13 +108,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void update() {
         if (listener != null) {
-            List<ChunkImpl> newReadyChunks = Lists.newArrayList();
+            List<Chunk> newReadyChunks = Lists.newArrayList();
             readyChunks.drainTo(newReadyChunks);
             if (!newReadyChunks.isEmpty()) {
                 sortedReadyChunks.addAll(newReadyChunks);
                 Collections.sort(sortedReadyChunks, new ReadyChunkRelevanceComparator());
-                for (ChunkImpl chunk : newReadyChunks) {
-                    ChunkImpl oldChunk = chunkCache.put(chunk.getPos(), chunk);
+                for (Chunk chunk : newReadyChunks) {
+                    Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
                     if (oldChunk != null) {
                         oldChunk.dispose();
                     }
@@ -123,7 +123,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             if (!sortedReadyChunks.isEmpty()) {
                 int loaded = 0;
                 for (int i = sortedReadyChunks.size() - 1; i >= 0 && loaded < LOAD_PER_FRAME; i--) {
-                    ChunkImpl chunkInfo = sortedReadyChunks.get(i);
+                    Chunk chunkInfo = sortedReadyChunks.get(i);
                     PerformanceMonitor.startActivity("Make Chunk Available");
                     if (makeChunkAvailable(chunkInfo)) {
                         sortedReadyChunks.remove(i);
@@ -135,28 +135,28 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
     }
 
-    private boolean makeChunkAvailable(ChunkImpl chunk) {
-        for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPos(), 1)) {
+    private boolean makeChunkAvailable(Chunk chunk) {
+        for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
             if (chunkCache.get(pos) == null) {
                 return false;
             }
         }
         chunk.markReady();
         lightMerger.merge(chunk);
-        listener.onChunkReady(chunk.getPos());
-        worldEntity.send(new OnChunkLoaded(chunk.getPos()));
+        listener.onChunkReady(chunk.getPosition());
+        worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         return true;
     }
 
 
     @Override
-    public ChunkImpl getChunk(int x, int y, int z) {
+    public Chunk getChunk(int x, int y, int z) {
         return getChunk(new Vector3i(x, y, z));
     }
 
     @Override
-    public ChunkImpl getChunk(Vector3i chunkPos) {
-        ChunkImpl chunk = chunkCache.get(chunkPos);
+    public Chunk getChunk(Vector3i chunkPos) {
+        Chunk chunk = chunkCache.get(chunkPos);
         if (chunk != null && chunk.isReady()) {
             return chunk;
         }
@@ -165,7 +165,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public boolean isChunkReady(Vector3i pos) {
-        ChunkImpl chunk = chunkCache.get(pos);
+        Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.isReady();
     }
 
@@ -203,9 +203,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
-        ChunkImpl[] chunks = new ChunkImpl[region.size().x * region.size().y * region.size().z];
+        Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
         for (Vector3i chunkPos : region) {
-            ChunkImpl chunk = chunkCache.get(chunkPos);
+            Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null || !chunk.isReady()) {
                 return null;
             }
@@ -238,7 +238,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void onChunkIsReady(ChunkImpl chunk) {
+    public void onChunkIsReady(Chunk chunk) {
         try {
             readyChunks.put(chunk);
         } catch (InterruptedException e) {
@@ -253,7 +253,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkImpl getChunkUnready(Vector3i pos) {
+    public Chunk getChunkUnready(Vector3i pos) {
         return chunkCache.get(pos);
     }
 
@@ -272,13 +272,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
     }
 
-    private class ReadyChunkRelevanceComparator implements Comparator<ChunkImpl> {
+    private class ReadyChunkRelevanceComparator implements Comparator<Chunk> {
 
         private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         @Override
-        public int compare(ChunkImpl o1, ChunkImpl o2) {
-            return TeraMath.floorToInt(Math.signum(score(o2.getPos())) - score(o1.getPos()));
+        public int compare(Chunk o1, Chunk o2) {
+            return TeraMath.floorToInt(Math.signum(score(o2.getPosition())) - score(o1.getPosition()));
         }
 
         private float score(Vector3i chunkPos) {
