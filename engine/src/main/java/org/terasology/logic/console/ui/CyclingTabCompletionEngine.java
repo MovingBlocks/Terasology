@@ -16,13 +16,14 @@
 package org.terasology.logic.console.ui;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.rendering.FontColor;
-import org.terasology.rendering.nui.Color;
 import org.terasology.utilities.CamelCaseMatcher;
 
 import com.google.common.base.Function;
@@ -39,9 +40,10 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
 
     private final Console console;
     
-    private int index;
     private final List<String> matchList = Lists.newArrayList();
-    private String query;
+
+    private int index;
+    private Message prevMessage;
 
     public CyclingTabCompletionEngine(Console console) {
         this.console = console;
@@ -51,6 +53,8 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     public String complete(String text) {
         
         if (!matchList.contains(text)) {
+            reset();
+            
             String cmdQuery = text.trim();
     
             List<CommandInfo> commands = console.getCommandList();
@@ -79,11 +83,11 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 return text;
             }
 
-            matchList.clear();
             matchList.addAll(matches);
-            index = 0;
+            Collections.sort(matchList);
         }
-        
+
+
         StringBuilder commandMatches = new StringBuilder();
         for (int i = 0; i < matchList.size(); i++) {
             if (commandMatches.length() != 0) {
@@ -93,15 +97,35 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             String name = matchList.get(i);
             
             if (index == i) {
-                name = FontColor.getColored(name, Color.BLACK);
+                name = FontColor.getColored(name, ConsoleColors.COMMAND);
             }
 
             commandMatches.append(name);
         }
-        console.addMessage(commandMatches.toString());
         
+        Message message = new Message(commandMatches.toString());
+        String cmd = matchList.get(index);
+
+        if (prevMessage != null) {
+            console.replaceMessage(prevMessage, message);
+        } else {
+            console.addMessage(message);
+        }
+        
+        prevMessage = message;
         index = (index + 1) % matchList.size(); 
         
-        return matchList.get(index);
+        return cmd;
+    }
+    
+    @Override
+    public void reset() {
+        if (prevMessage != null) {
+            console.removeMessage(prevMessage);
+        }
+        
+        prevMessage = null;
+        matchList.clear();
+        index = 0;
     }
 }

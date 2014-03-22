@@ -18,12 +18,14 @@ package org.terasology.logic.console.ui;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.utilities.CamelCaseMatcher;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,8 +55,10 @@ public class StatelessTabCompletionEngine implements TabCompletionEngine {
                 return input.getName();
             }
         });
-        Collection<String> matches = CamelCaseMatcher.getMatches(cmdQuery, commandNames);
-
+        
+        List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(cmdQuery, commandNames));
+        Collections.sort(matches);
+        
         //one match found
         if (matches.size() == 1) {
             return matches.iterator().next();
@@ -65,5 +69,10 @@ public class StatelessTabCompletionEngine implements TabCompletionEngine {
             console.addMessage(commandMatches.toString());
         }
         return text;
+    }
+    
+    @Override
+    public void reset() {
+        // nothing to do
     }
 }

@@ -157,6 +157,19 @@ public class ConsoleImpl implements Console {
             subscriber.onNewConsoleMessage(message);
         }
     }
+    
+    @Override
+    public void removeMessage(Message message) {
+        messageHistory.remove(message);
+    }
+    
+    @Override
+    public void replaceMessage(Message oldMsg, Message newMsg) {
+        int idx = messageHistory.indexOf(oldMsg);
+        if (idx >= 0) {
+            messageHistory.set(idx, newMsg);
+        }
+    }
 
     /**
      * @return An iterator over all messages in the console
