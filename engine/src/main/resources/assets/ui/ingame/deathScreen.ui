@@ -10,7 +10,7 @@
                 "contents" : [
                     {
                         "type" : "UILabel",
-                        "text" : "You Are Dead"
+                        "text" : "You are Dead"
                     },
                     {
                         "type" : "UISpace",
