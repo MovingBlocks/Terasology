@@ -63,7 +63,7 @@ if (env.BUILD_NUMBER != null) {
 } else {
     // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
     version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
-    println "Fancy local version: $version"
+    println "Fancy local MODULE version for $project.name: $version"
 }
 
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
@@ -152,8 +152,8 @@ dependencies {
         println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for everything"
 
         // In Jenkins we can expect to have a sort of "project harness" dumped into a libs dir (engine, engine libs ..)
-        compile fileTree(dir: 'libs', include: '*.jar', exclude: 'engine.tests-*.jar')
-        testCompile fileTree(dir: 'libs', include: 'engine.tests-*.jar')
+        // compile fileTree(dir: 'libs', include: '*.jar', exclude: 'engine.tests-*.jar')
+        // testCompile fileTree(dir: 'libs', include: 'engine.tests-*.jar')
 
         // To get Terasology module dependencies we simply declare them against Artifactory and wait - no runtime need
         moduleDepends.each {
@@ -222,14 +222,16 @@ configurations {
     published
 }
 
-// Define the artifacts we want to publish (in addition to the main jar and the .pom the Maven plugin will include)
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
 artifacts {
+    published jar
     published sourceJar
     published javadocJar
 }
 
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
 artifactoryPublish {
-    dependsOn sourceJar, javadocJar
+    dependsOn jar, sourceJar, javadocJar
 }
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D
