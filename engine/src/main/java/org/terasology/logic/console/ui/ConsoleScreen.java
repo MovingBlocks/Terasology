@@ -29,7 +29,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +80,8 @@ public class ConsoleScreen extends CoreScreenLayer {
             }
         });
 
-        final UILabel history = find("messageHistory", UILabel.class);
+        final UIText history = find("messageHistory", UIText.class);
+        history.setReadOnly(true);
         history.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
