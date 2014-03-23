@@ -15,9 +15,14 @@
  */
 package org.terasology.logic.console.ui;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
+import org.terasology.logic.console.internal.CommandInfo;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
@@ -31,8 +36,8 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 
 /**
  * @author Immortius
@@ -62,9 +67,20 @@ public class ConsoleScreen extends CoreScreenLayer {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
+        List<CommandInfo> commands = console.getCommandList();
+        
+        // JAVA8: replace with lamba expression
+        Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
+
+            @Override
+            public String apply(CommandInfo input) {
+                return input.getName();
+            }
+        });
+
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);
-        commandLine.setTabCompletionEngine(new ConsoleTabCompletionEngine(console));
+        commandLine.setTabCompletionEngine(new CyclingTabCompletionEngine(console, commandNames));
         commandLine.bindCommandHistory(new ReadOnlyBinding<List<String>>() {
             @Override
             public List<String> get() {
@@ -90,15 +106,18 @@ public class ConsoleScreen extends CoreScreenLayer {
                 while (messageIterator.hasNext()) {
                     Message message = messageIterator.next();
                     messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
-                    messageList.append("\n");
-                    if (messageIterator.hasNext()) {
-                        messageList.append("\n");
-                    }
+                    messageList.append(Message.NEW_LINE);
                 }
                 return messageList.toString();
             }
         });
 
+    }
+
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        getManager().setFocus(commandLine);
     }
 
     @Override

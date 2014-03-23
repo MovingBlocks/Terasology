@@ -16,6 +16,7 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -30,6 +31,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -41,6 +43,7 @@ import java.util.Collection;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
+    
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";

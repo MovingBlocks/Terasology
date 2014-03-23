@@ -25,4 +25,9 @@ public interface TabCompletionEngine {
      * @return The completed text, or the original text.
      */
     String complete(String text);
+
+    /**
+     * Resets the completion engine
+     */
+    void reset();
 }

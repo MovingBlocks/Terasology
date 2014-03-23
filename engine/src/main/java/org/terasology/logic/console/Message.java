@@ -19,11 +19,18 @@ package org.terasology.logic.console;
  * @author Immortius
  */
 public class Message {
-    private MessageType type = CoreMessageType.CONSOLE;
-    private String message;
+    /**
+     * A newline constant for the console
+     * JAVA8: consider moving this to the {@link Console} interface as soon as Java 8 is around
+     */
+    public static final String NEW_LINE = "\n";
+
+    private final MessageType type;
+    private final String message;
 
     public Message(String message) {
         this.message = message;
+        this.type = CoreMessageType.CONSOLE;
     }
 
     public Message(String message, MessageType type) {

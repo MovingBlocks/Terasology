@@ -25,24 +25,24 @@ import org.terasology.rendering.nui.Color;
 public final class ConsoleColors {
     
     /**
-     * For the word "Terasology"
+     * Error color
      */
-    public static final Color TERASOLOGY = new Color(0, 128, 0);
-    
+    public static final Color ERROR = new Color(224, 32, 32);
+
     /**
      * Command color
      */
     public static final Color COMMAND = new Color(32, 32, 224);
     
     /**
-     * Player name color
+     * Notification color
      */
-    public static final Color PLAYER = new Color(32, 32, 224);
-    
+    public static final Color NOTIFICATION = new Color(48, 48, 224);
+
     /**
-     * Area name color
+     * Default console color
      */
-    public static final Color AREA = new Color(32, 32, 224);
+    public static final Color DEFAULT = Color.WHITE;
 
 
     private ConsoleColors() {

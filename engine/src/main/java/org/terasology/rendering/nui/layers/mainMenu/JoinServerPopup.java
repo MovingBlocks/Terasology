@@ -67,4 +67,11 @@ public class JoinServerPopup extends CoreScreenLayer {
         });
     }
 
+    @Override
+    public void onOpened() {
+        super.onOpened();
+        
+        UIText address = find("address", UIText.class);
+        getManager().setFocus(address);
+    }
 }

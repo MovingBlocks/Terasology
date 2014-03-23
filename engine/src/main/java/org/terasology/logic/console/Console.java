@@ -101,4 +101,17 @@ public interface Console {
      * @return Returns the command list.
      */
     List<CommandInfo> getCommandList();
+
+    /**
+     * If <code>oldMsg</code> does not exist, the method does nothing.
+     * @param oldMsg the old message
+     * @param newMsg the new message
+     */
+    void replaceMessage(Message oldMsg, Message newMsg);
+
+    /**
+     * If the message does not exist, the method does nothing.
+     * @param message the message to remove
+     */
+    void removeMessage(Message message);
 }
