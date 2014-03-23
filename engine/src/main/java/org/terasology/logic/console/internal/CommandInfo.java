@@ -50,6 +50,7 @@ public class CommandInfo {
 
     private String name;
     private List<String> parameterNames = Lists.newArrayList();
+    private List<String> parameterTypes = Lists.newArrayList();
     private String shortDescription;
     private String helpText;
     private boolean clientEntityRequired;
@@ -68,19 +69,38 @@ public class CommandInfo {
             if (i == method.getParameterTypes().length - 1 && parameterType == EntityRef.class) {
                 clientEntityRequired = true;
             } else {
-                String paramName = method.getParameterTypes()[i].getSimpleName();
-                for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
-                    if (paramAnnot instanceof CommandParam) {
-                        paramName = ((CommandParam) paramAnnot).value();
-                        break;
-                    }
+                String paramType = parameterType.getSimpleName().toLowerCase();
+                String paramName = getParamName(i);
+                
+                if (paramName == null) {
+                    paramName = "p" + i;
+                    logger.warn("Parameter {} in method {} does not have a CommandParam annotation", i, method);
                 }
+
                 parameterNames.add(paramName);
+                parameterTypes.add(paramType);
             }
         }
         this.runOnServer = commandAnnotation.runOnServer();
         this.shortDescription = commandAnnotation.shortDescription();
         this.helpText = commandAnnotation.helpText();
+    }
+    
+    private String getParamName(int i) {
+        // JAVA8: if relevant classes are compiled with the "-parameters" flag, 
+        // the parameter name can be accessed through reflection like this:
+        // Parameter p = method.getParameters()[i]
+        // if (p.isNamePresent()) {
+        //     return p.getName();
+        // }
+        
+        for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
+            if (paramAnnot instanceof CommandParam) {
+                return ((CommandParam) paramAnnot).value();
+            }
+        }
+        
+        return null;
     }
 
     public String getName() {
@@ -113,10 +133,11 @@ public class CommandInfo {
 
     public String getUsageMessage() {
         StringBuilder builder = new StringBuilder(FontColor.getColored(name, ConsoleColors.COMMAND));
-        for (String param : parameterNames) {
+        for (int i = 0; i < parameterNames.size(); i++) {
             builder.append(" <");
-            builder.append(param);
-            builder.append(param);
+            builder.append(parameterTypes.get(i));
+            builder.append(" ");
+            builder.append(parameterNames.get(i));
             builder.append(">");
         }
 
