@@ -96,6 +96,7 @@ public class TerasologyEngine implements GameEngine {
     private boolean running;
     private boolean disposed;
     private GameState pendingState;
+    private boolean wantRestart;
 
     private Config config;
 
@@ -259,6 +260,16 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void shutdown() {
         running = false;
+    }
+    
+    @Override
+    public void restart() {
+        wantRestart = true;
+        shutdown();
+    }
+    
+    boolean wantRestart() {
+        return wantRestart;
     }
 
     @Override

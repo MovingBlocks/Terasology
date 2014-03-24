@@ -15,7 +15,11 @@
  */
 package org.terasology.engine;
 
-import com.google.common.collect.Lists;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+
+import javax.swing.JOptionPane;
 
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
@@ -30,11 +34,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import javax.swing.*;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
+import com.google.common.collect.Lists;
 
 /**
  * Main method for launching Terasology
@@ -77,14 +77,18 @@ public final class Terasology {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
 
-            TerasologyEngine engine = new TerasologyEngine(subsystemList);
-            engine.init();
-            if (isHeadless) {
-                engine.run(new StateHeadlessSetup());
-            } else {
-                engine.run(new StateMainMenu());
+            TerasologyEngine engine;
+            do {
+                engine = new TerasologyEngine(subsystemList);
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+                engine.dispose();
             }
-            engine.dispose();
+            while (engine.wantRestart());
         } catch (Throwable t) {
             String text = getNestedMessageText(t);
             JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
