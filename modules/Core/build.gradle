@@ -149,17 +149,36 @@ dependencies {
             }
         }
     } else {
-        println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for everything"
+        println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for dependencies"
 
-        // In Jenkins we can expect to have a sort of "project harness" dumped into a libs dir (engine, engine libs ..)
-        // compile fileTree(dir: 'libs', include: '*.jar', exclude: 'engine.tests-*.jar')
-        // testCompile fileTree(dir: 'libs', include: 'engine.tests-*.jar')
+        // Modules implicitly depend on the engine, need to catch that if Core or an explicit engine dependency isn't set
+        boolean implicitEngineDependency = true
 
         // To get Terasology module dependencies we simply declare them against Artifactory and wait - no runtime need
         moduleDepends.each {
             println "*** Attempting to fetch dependency module from Artifactory: " + project.name + ": " + it
             // The '+' is satisfied by any version
             compile(group: 'org.nanoware.modules', name: it, version: '+')
+
+            if (it == 'Core' || it == 'engine') {
+                implicitEngineDependency = false
+            }
+        }
+
+        if (implicitEngineDependency) {
+            println "Setting implicit engine dependency for $project.name - no explicit or transitive dependency set"
+            compile(group: 'org.nanoware.engine', name: 'engine', version: '+')
+        }
+
+        // TODO: parse and apply external lib dependencies if any are present
+
+        // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any sort of trouble
+        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+            def id = artifact.moduleVersion.id
+            // Print out module (and engine) dependencies and the exact versions they resolved at
+            if (id.group.startsWith('org.nanoware')) {
+                println "*** $project.name remotely resolved $id.group - $id.name at version $id.version"
+            }
         }
     }
 }
