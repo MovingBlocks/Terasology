@@ -24,8 +24,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Command;
+import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
@@ -45,15 +46,12 @@ public class ServerCommands extends BaseComponentSystem {
     public String shutdownServer(EntityRef sender) {
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
 
-        NetworkComponent network = clientInfo.getComponent(NetworkComponent.class);
         DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
         
-        // this is logged on the server
-        logger.info("Shutdown triggered by {} ({})", name.name, network.getNetworkId());
+        logger.info("Shutdown triggered by {}", name.name);
         
         CoreRegistry.get(GameEngine.class).shutdown();
         
-        // this is reported in the client console
         return "Server shutdown triggered";
     }
     
@@ -62,17 +60,40 @@ public class ServerCommands extends BaseComponentSystem {
     public String restartServer(EntityRef sender) {
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
 
-        NetworkComponent network = clientInfo.getComponent(NetworkComponent.class);
         DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
         
-        // this is logged on the server
-        logger.info("Restart triggered by {} ({})", name.name, network.getNetworkId());
+        logger.info("Restart triggered by {}", name.name);
         
         CoreRegistry.get(GameEngine.class).restart();
         
-        // this is reported in the client console
         return "Server restart triggered";
     }
+
     
+    @Command(shortDescription = "Kick user", runOnServer = true)
+    public String kick(String username, EntityRef sender) {
+        NetworkSystem network = CoreRegistry.get(NetworkSystem.class);
+
+        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
+            EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
+
+            DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
+            if (username.equals(name.name)) {
+                
+                Client client = network.getOwner(clientEntity);
+        
+                if (!client.isLocal()) {
+                    logger.info("Kicking user {}", name.name);
+
+                    network.forceDisconnect(client);
+                    return "User kick triggered for '" + username + "'";
+                }
+
+            }
+        }
+        
+        throw new IllegalArgumentException("No such user '" + username + "'");
+    }
+
 }
 

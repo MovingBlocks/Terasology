@@ -64,4 +64,6 @@ public interface NetworkSystem extends BlockRegistrationListener {
     int getOutgoingMessagesDelta();
 
     int getOutgoingBytesDelta();
+
+    void forceDisconnect(Client client);
 }
