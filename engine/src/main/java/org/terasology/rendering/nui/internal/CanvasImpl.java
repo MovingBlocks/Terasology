@@ -142,7 +142,7 @@ public class CanvasImpl implements CanvasControl {
     public void processMousePosition(Vector2i position) {
         if (clickedRegion != null) {
             Vector2i relPos = new Vector2i(position);
-            relPos.sub(clickedRegion.region.min());
+            relPos.sub(clickedRegion.offset);
             clickedRegion.listener.onMouseDrag(relPos);
         }
 
@@ -152,7 +152,7 @@ public class CanvasImpl implements CanvasControl {
             InteractionRegion next = iter.next();
             if (next.region.contains(position)) {
                 Vector2i relPos = new Vector2i(position);
-                relPos.sub(next.region.min());
+                relPos.sub(next.offset);
                 next.listener.onMouseOver(relPos, newMouseOverRegions.isEmpty());
                 newMouseOverRegions.add(next);
             }
@@ -198,7 +198,7 @@ public class CanvasImpl implements CanvasControl {
         for (InteractionRegion next : mouseOverRegions) {
             if (next.region.contains(pos)) {
                 Vector2i relPos = new Vector2i(pos);
-                relPos.sub(next.region.min());
+                relPos.sub(next.offset);
                 if (possibleDoubleClick && nuiManager.getFocus() == next.element) {
                     if (next.listener.onMouseDoubleClick(button, relPos)) {
                         clickedRegion = next;
@@ -640,13 +640,14 @@ public class CanvasImpl implements CanvasControl {
     }
 
     public void addInteractionRegion(InteractionListener listener, String tooltip, Rect2i region) {
+        Vector2i offset = state.drawRegion.min();
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
         if (!finalRegion.isEmpty()) {
             listener.setFocusManager(nuiManager);
             if (state.drawOnTop) {
-                drawOnTopOperations.add(new DrawInteractionRegionOperation(finalRegion, listener, state.element, tooltip));
+                drawOnTopOperations.add(new DrawInteractionRegionOperation(finalRegion, offset, listener, state.element, tooltip));
             } else {
-                interactionRegions.addLast(new InteractionRegion(finalRegion, listener, state.element, tooltip));
+                interactionRegions.addLast(new InteractionRegion(finalRegion, offset, listener, state.element, tooltip));
             }
         }
     }
@@ -771,12 +772,14 @@ public class CanvasImpl implements CanvasControl {
     private static class InteractionRegion {
         public InteractionListener listener;
         public Rect2i region;
+        public Vector2i offset;
         public UIWidget element;
         public String tooltipOverride;
 
-        public InteractionRegion(Rect2i region, InteractionListener listener, UIWidget element, String tooltipOverride) {
+        public InteractionRegion(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget element, String tooltipOverride) {
             this.listener = listener;
             this.region = region;
+            this.offset = offset;
             this.element = element;
             this.tooltipOverride = tooltipOverride;
         }
@@ -933,21 +936,23 @@ public class CanvasImpl implements CanvasControl {
 
     private final class DrawInteractionRegionOperation implements DrawOperation {
 
+        private final Vector2i offset;
         private final Rect2i region;
         private final InteractionListener listener;
         private final UIWidget currentElement;
         private final String tooltipOverride;
 
-        public DrawInteractionRegionOperation(Rect2i region, InteractionListener listener, UIWidget currentElement, String tooltipOverride) {
+        public DrawInteractionRegionOperation(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget currentElement, String tooltipOverride) {
             this.region = region;
             this.listener = listener;
+            this.offset = offset;
             this.currentElement = currentElement;
             this.tooltipOverride = tooltipOverride;
         }
 
         @Override
         public void draw() {
-            interactionRegions.addLast(new InteractionRegion(region, listener, currentElement, tooltipOverride));
+            interactionRegions.addLast(new InteractionRegion(region, offset, listener, currentElement, tooltipOverride));
         }
     }
 
