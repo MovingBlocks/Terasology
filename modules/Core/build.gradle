@@ -85,7 +85,6 @@ dependencies {
         // Unit tests for the engine have been split out into their own sub-project (eases some config)
         testCompile project(':engine-tests')
 
-        // If the module has dependencies on other modules we look in a few different spots to find them
         if (moduleDepends.size() > 0) {
             println "* $project.name has extra dependencies:"
             moduleDepends.each {
@@ -95,57 +94,44 @@ dependencies {
             println "* No extra dependencies"
         }
 
+        // If the module has dependencies on other modules we look for either a source version or a remote binary
         for (dependency in moduleDepends) {
-
             File wouldBeSrcPath = new File(rootDir, 'modules/' + dependency)
-
-            // TODO: module jars with version info (maybe supplied by user) won't match. Artifactory fetches get renamed
-            File wouldBeModuleJar = new File(rootDir, 'modules/' + dependency + '.jar')
-
             //println "Scanning for source module at: " + wouldBeSrcPath.getAbsolutePath()
-            //println "Or local module jar: " + wouldBeModuleJar.getAbsoluteFile()
 
-            // First see if we have an actual source module project in the Gradle project tree (user addModule'ed it)
+            // First see if we have an actual source module project in the Gradle project tree (user fetchModule'ed it)
             if (wouldBeSrcPath.exists()) {
-                //TODO: This is fragile, of course, and will hit problems with corrupt module directories (empty dir)
+                //TODO: This could hit problems with corrupt module directories?
 
-                println "*** Found " + wouldBeSrcPath.getAbsolutePath() + " locally"
+                println "*** Identified source: " + dependency
                 compile project(':modules:' + dependency)
-
-            } else if (false) { //wouldBeModuleJar.exists()) {
-                // TODO: With transitive dependencies this will fail to catch updates after the first time the jar is fetched
-                // TODO: Move to where only the game launching cares for module jars and dependency management always uses Gradle cache?
-
-                // Alternatively might find the dependency in the modules dir as a binary (manually placed or fetched)
-                println "Found " + wouldBeModuleJar.getAbsoluteFile() + ", it will be included via file dependency"
-
-                compile files(wouldBeModuleJar)
-
-                // Knowing that the jar is in /modules we know it'll be available at runtime
-                // If the user later adds a source version it'll override this binary naturally
-
             } else {
-                println "*** Unsatisfied local dependency for module " + project.name + ": " + dependency
+                println "*** Seeking as binary: " + dependency
                 // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
                 // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
                 compile(group: 'org.nanoware.modules', name: dependency, version: '+', changing: true)
+            }
+        }
 
-                // NOTE: Referencing resolvedArtifacts actually resolves the involved artifacts at this time (early)
-                configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
-                    def id = artifact.moduleVersion.id
-                    // Look for any modules (other than core) and copy the jar to /modules for runtime purposes
-                    if (id.group == 'org.nanoware.modules' && id.name != "Core") {
-                        println "$project.name remotely resolved $id.group - $id.name at version $id.version"
+        // This step resolves artifacts early, after which project config CANNOT be altered again!
+        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+            def id = artifact.moduleVersion.id
 
-                        // This copies the jar from the Gradle cache to the game's module dir for runtime usage
-                        //TODO: This needs to be able to support multiple module jar copies (transient dependencies)
-                        File runtimeModuleJar = new File(rootDir, 'modules/' + id.name + '.jar')
-                        // TODO: Version check the module.txt if the jar exists and don't recopy if already current?
-                        runtimeModuleJar.createNewFile()
-                        runtimeModuleJar << artifact.file.bytes
-                        // After this has run the next execution will match the local binary case instead
+            // Check for any needed module dependencies on other modules that we need at runtime
+            if (id.group == 'org.nanoware.modules' && id.name != "Core") {
+                File moduleSrcPath = new File(rootDir, 'modules/' + id.name)
+                File moduleJarPath = new File(rootDir, 'modules/' + id.name + id.version + '.jar')
 
-                        // TODO: Make the project clean task delete such transient module jars? They'll re-resolve
+                if (moduleSrcPath.exists()) {
+                    //println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
+                } else {
+                    println "$project.name resolved binary $id.group - $id.name at version $id.version"
+
+                    // This copies the jar from the Gradle cache to the game's module dir for runtime usage, if needed
+                    if (!moduleJarPath.exists()) {
+                        println "* Writing a runtime jar to /modules: " + moduleJarPath.name
+                        moduleJarPath.createNewFile()
+                        moduleJarPath << artifact.file.bytes
                     }
                 }
             }
@@ -171,7 +157,7 @@ dependencies {
         // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any sort of trouble
         configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
             def id = artifact.moduleVersion.id
-            // Print out module (and engine) dependencies and the exact versions they resolved at
+            // Print out module (and engine stuff) dependencies and the exact versions they resolved at
             if (id.group.startsWith('org.nanoware')) {
                 println "*** $project.name remotely resolved $id.group - $id.name - version $id.version"
             }
