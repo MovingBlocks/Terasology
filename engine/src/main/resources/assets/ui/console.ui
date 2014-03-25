@@ -12,7 +12,7 @@
                         "id" : "scrollArea",
                         "stickToBottom" : true,
                         "content" : {
-                            "type" : "UIText",
+                            "type" : "UILabel",
                             "id" : "messageHistory"
                         },
                         "layoutInfo" : {
