@@ -351,7 +351,7 @@ public class CanvasImpl implements CanvasControl {
         UIStyle newStyle = skin.getStyleFor(family, element.getClass(), UIWidget.BASE_PART, element.getMode());
         Rect2i regionArea;
         try (SubRegion ignored = subRegionForWidget(element, region, false)) {
-            regionArea = applyStyleToSize(region, newStyle, element.getMaxContentSize(this));
+            regionArea = applyStyleToSize(region, newStyle, calculateMaximumSize(element));
         }
 
         try (SubRegion ignored = subRegionForWidget(element, regionArea, false)) {

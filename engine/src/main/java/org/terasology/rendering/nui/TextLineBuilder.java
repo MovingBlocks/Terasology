@@ -49,7 +49,7 @@ public class TextLineBuilder {
     }
 
     public void addText(String text) {
-        List<String> paragraphs = Arrays.asList(text.split("\\r?\\n"));
+        List<String> paragraphs = Arrays.asList(text.split("\\r?\\n", -1));
         for (String paragraph : paragraphs) {
             String remainder = paragraph;
             while (remainder != null && !remainder.isEmpty()) {

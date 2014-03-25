@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -65,6 +64,9 @@ public class UIText extends CoreWidget {
     @LayoutConfig
     private boolean multiline;
 
+    @LayoutConfig
+    private boolean readOnly;
+
     private int cursorPosition;
     private int selectionStart;
 
@@ -74,8 +76,6 @@ public class UIText extends CoreWidget {
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
     private int offset;
-    
-    private boolean readOnly;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
         boolean dragging;
@@ -124,9 +124,9 @@ public class UIText extends CoreWidget {
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         correctCursor();
 
-        // TODO: Add a crop within margin option to UIWidget?
+
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
-             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, lastFont.getLineHeight()), false)) {
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, Integer.MAX_VALUE), false)) {
             canvas.drawText(text.get(), canvas.getRegion());
             if (isFocused()) {
                 if (hasSelection()) {
@@ -155,12 +155,12 @@ public class UIText extends CoreWidget {
         int lastLineWidth = font.getWidth(linesBefore.get(linesBefore.size() - 1));
 
         for (int i = 0; i < linesSelected.size(); i++) {
-            int startX = (i == 0) ? lastLineWidth : 0; 
+            int startX = (i == 0) ? lastLineWidth : 0;
             Vector2i selectionTopLeft = new Vector2i(startX, (i + linesBefore.size() - 1) * font.getLineHeight());
-            
+
             String selLine = linesSelected.get(i);
             int selectionWidth = font.getWidth(selLine);
-            
+
             Rect2i region = Rect2i.createFromMinAndSize(selectionTopLeft.x, selectionTopLeft.y, selectionWidth, font.getLineHeight());
 
             canvas.drawTexture(cursorTexture, region, textColor);
@@ -195,6 +195,16 @@ public class UIText extends CoreWidget {
             return font.getSize(lines);
         } else {
             return new Vector2i(font.getWidth(getText()), font.getLineHeight());
+        }
+    }
+
+    @Override
+    public Vector2i getMaxContentSize(Canvas canvas) {
+        Font font = canvas.getCurrentStyle().getFont();
+        if (isMultiline()) {
+            return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        } else {
+            return new Vector2i(Integer.MAX_VALUE, font.getLineHeight());
         }
     }
 
@@ -258,7 +268,7 @@ public class UIText extends CoreWidget {
                     }
                 }
             }
-            
+
             if (!readOnly) {
                 switch (event.getKey().getId()) {
                     case KeyId.BACKSPACE: {
