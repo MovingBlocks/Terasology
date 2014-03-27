@@ -15,21 +15,14 @@
  */
 
 varying vec3 normal;
-
-uniform mat3 normalMatrix;
-uniform mat4 worldViewMatrix;
-uniform mat4 projectionMatrix;
+varying vec4 vertexWorldPos;
 
 void main()
 {
-#if !defined (FEATURE_USE_MATRIX_STACK)
-    normal = normalMatrix * gl_Normal;
-	gl_Position = (projectionMatrix * worldViewMatrix) * gl_Vertex;
-#else
+	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
     normal = gl_NormalMatrix * gl_Normal;
-    gl_Position = ftransform();
-#endif
 
+	gl_Position = ftransform();
+    gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_FrontColor = gl_Color;
 }
-
