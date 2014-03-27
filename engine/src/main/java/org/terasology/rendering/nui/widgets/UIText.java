@@ -45,6 +45,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -124,9 +125,10 @@ public class UIText extends CoreWidget {
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         correctCursor();
 
+        int widthForDraw = (multiline) ?  canvas.size().x : lastFont.getWidth(getText());
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
-             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, Integer.MAX_VALUE), false)) {
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw, Integer.MAX_VALUE), false)) {
             canvas.drawText(text.get(), canvas.getRegion());
             if (isFocused()) {
                 if (hasSelection()) {
@@ -177,7 +179,6 @@ public class UIText extends CoreWidget {
             }
             List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
 
-            // TODO: Support multiline text boxes
             // TODO: Support different alignments
 
             int lastLineWidth = font.getWidth(lines.get(lines.size() - 1));
@@ -334,7 +335,7 @@ public class UIText extends CoreWidget {
     }
 
     private void updateOffset() {
-        if (lastFont != null) {
+        if (lastFont != null && !multiline) {
             String before = getText().substring(0, cursorPosition);
             int cursorDist = lastFont.getWidth(before);
             if (cursorDist < offset) {
@@ -403,22 +404,43 @@ public class UIText extends CoreWidget {
     private void moveCursor(Vector2i pos, boolean selecting) {
         if (lastFont != null) {
             pos.x += offset;
-            List<String> lines = TextLineBuilder.getLines(lastFont, getText(), Integer.MAX_VALUE);
-            int lineIndex = TeraMath.clamp(pos.y / lastFont.getLineHeight(), 0, lines.size() - 1);
+            String rawText = getText();
+            List<String> lines = TextLineBuilder.getLines(lastFont, rawText, Integer.MAX_VALUE);
+            int targetLineIndex = pos.y / lastFont.getLineHeight();
+            int passedLines = 0;
             int newCursorPos = 0;
-            int totalWidth = 0;
-            for (char c : lines.get(lineIndex).toCharArray()) {
-                int charWidth = lastFont.getWidth(c);
-                if (totalWidth + charWidth / 2 >= pos.x) {
-                    break;
+            for (int lineIndex = 0; lineIndex < lines.size() && passedLines <= targetLineIndex; lineIndex++) {
+                List<String> subLines;
+                if (multiline) {
+                    subLines = TextLineBuilder.getLines(lastFont, lines.get(lineIndex), lastWidth);
+                } else {
+                    subLines = Arrays.asList(lines.get(lineIndex));
                 }
-                newCursorPos++;
-                totalWidth += charWidth;
+                if (subLines.size() + passedLines > targetLineIndex) {
+                    for (String subLine : subLines) {
+                        if (passedLines == targetLineIndex) {
+                            int totalWidth = 0;
+                            for (char c : subLine.toCharArray()) {
+                                int charWidth = lastFont.getWidth(c);
+                                if (totalWidth + charWidth / 2 >= pos.x) {
+                                    break;
+                                }
+                                newCursorPos++;
+                                totalWidth += charWidth;
+                            }
+                            passedLines++;
+                            break;
+                        } else {
+                            newCursorPos += subLine.length();
+                            passedLines++;
+                        }
+                    }
+                } else {
+                    passedLines += subLines.size();
+                    newCursorPos += lines.get(lineIndex).length() + 1;
+                }
             }
-            for (int i = 0; i < lineIndex; ++i) {
-                newCursorPos += lines.get(i).length() + 1;
-            }
-            cursorPosition = newCursorPos;
+            cursorPosition = Math.min(newCursorPos, rawText.length());
             if (!isSelectionModifierActive() && !selecting) {
                 selectionStart = cursorPosition;
             }

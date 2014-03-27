@@ -12,7 +12,9 @@
                         "id" : "scrollArea",
                         "stickToBottom" : true,
                         "content" : {
-                            "type" : "UILabel",
+                            "type" : "UIText",
+                            "readOnly" : true,
+                            "multiline" : true,
                             "id" : "messageHistory"
                         },
                         "layoutInfo" : {
@@ -29,7 +31,8 @@
                         "type" : "UICommandEntry",
                         "id" : "commandLine",
                         "layoutInfo" : {
-                            "position-horizontal-center" : {},
+                            "position-left" : {},
+                            "position-right" : {},
                             "use-content-height" : true,
                             "position-bottom" : {}
                         }
