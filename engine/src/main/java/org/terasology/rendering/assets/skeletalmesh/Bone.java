@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -94,5 +95,14 @@ public class Bone {
 
     public Collection<Bone> getChildren() {
         return children;
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString()
+                  + ", name=" + getName()
+                  + ", index=" + getIndex()
+                  + ", pos=" + getObjectPosition()
+                  + ", rot=" + getObjectRotation();
     }
 }
