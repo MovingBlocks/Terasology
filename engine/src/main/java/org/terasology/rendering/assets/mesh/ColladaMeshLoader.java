@@ -18,10 +18,8 @@ package org.terasology.rendering.assets.mesh;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
 
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.engine.module.Module;
 import org.terasology.rendering.collada.ColladaLoader;
-
-import com.google.common.base.Charsets;
 
 /**
  * Importer for Collada data exchange model files.  Supports mesh data
@@ -48,22 +44,23 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
 
     @Override
     public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+        logger.info("Loading mesh for " + urls);
 
-        String contents = loadDataAsString(reader);
         try {
-            parseData(contents);
+            parseMeshData(stream);
         } catch (ColladaParseException e) {
-            logger.error("Unable to load mesh", e);
+            logger.error("Unable to load mesh for " + urls, e);
             return null;
         }
 
         MeshData data = new MeshData();
+        TFloatList colorsMesh = data.getColors();
         TFloatList verticesMesh = data.getVertices();
         TFloatList texCoord0Mesh = data.getTexCoord0();
         TFloatList normalsMesh = data.getNormals();
         TIntList indicesMesh = data.getIndices();
 
+        colorsMesh.addAll(this.colors);
         verticesMesh.addAll(this.vertices);
         texCoord0Mesh.addAll(this.texCoord0);
         normalsMesh.addAll(this.normals);
@@ -75,8 +72,26 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
         //if (data.getNormals() == null || data.getNormals().size() != data.getVertices().size()) {
         //    throw new IOException("The number of normals does not match the number of vertices.");
         //}
-        if (data.getTexCoord0() == null || data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
-            throw new IOException("The number of tex coords does not match the number of vertices.");
+
+        if (((null == data.getColors()) || (0 == data.getColors().size()))
+            && ((null == data.getTexCoord0()) || (0 == data.getTexCoord0().size()))) {
+            throw new IOException("There must be either texture coordinates or vertex colors provided.");
+        }
+
+        if ((null != data.getTexCoord0()) && (0 != data.getTexCoord0().size())) {
+            if (data.getTexCoord0().size() / 2 != data.getVertices().size() / 3) {
+                throw new IOException("The number of tex coords (" + data.getTexCoord0().size() / 2
+                                      + ") does not match the number of vertices (" + data.getVertices().size() / 3
+                                      + ").");
+            }
+        }
+
+        if ((null != data.getColors()) && (0 != data.getColors().size())) {
+            if (data.getColors().size() / 4 != data.getVertices().size() / 3) {
+                throw new IOException("The number of vertex colors (" + data.getColors().size() / 4
+                                      + ") does not match the number of vertices (" + data.getVertices().size() / 3
+                                      + ").");
+            }
         }
 
         return data;
