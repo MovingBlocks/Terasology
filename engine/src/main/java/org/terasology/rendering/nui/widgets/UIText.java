@@ -26,6 +26,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.FontColor;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -45,6 +46,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -124,9 +126,10 @@ public class UIText extends CoreWidget {
         canvas.addInteractionRegion(interactionListener, canvas.getRegion());
         correctCursor();
 
+        int widthForDraw = (multiline) ?  canvas.size().x : lastFont.getWidth(getText());
 
         try (SubRegion ignored = canvas.subRegion(canvas.getRegion(), true);
-             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, lastFont.getWidth(getText()) + 1, Integer.MAX_VALUE), false)) {
+             SubRegion ignored2 = canvas.subRegion(Rect2i.createFromMinAndSize(-offset, 0, widthForDraw + 1, Integer.MAX_VALUE), false)) {
             canvas.drawText(text.get(), canvas.getRegion());
             if (isFocused()) {
                 if (hasSelection()) {
@@ -140,31 +143,48 @@ public class UIText extends CoreWidget {
 
     private void drawSelection(Canvas canvas) {
         Font font = canvas.getCurrentStyle().getFont();
+        String currentText = getText();
 
         int start = Math.min(cursorPosition, selectionStart);
         int end = Math.max(cursorPosition, selectionStart);
 
-        String beforeCursor = text.get().substring(0, start);
-        String selectionText = text.get().substring(start, end);
-
         Color textColor = canvas.getCurrentStyle().getTextColor();
+        int canvasWidth = (multiline) ? canvas.size().x : Integer.MAX_VALUE;
 
         // TODO: Support different text alignments
-        List<String> linesBefore = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
-        List<String> linesSelected = TextLineBuilder.getLines(font, selectionText, canvas.size().x);
-        int lastLineWidth = font.getWidth(linesBefore.get(linesBefore.size() - 1));
+        List<String> rawLinesAfterCursor = TextLineBuilder.getLines(font, currentText, Integer.MAX_VALUE);
+        int currentChar = 0;
+        int lineOffset = 0;
+        for (int lineIndex = 0; lineIndex < rawLinesAfterCursor.size() && currentChar <= end; ++lineIndex) {
+            String line = rawLinesAfterCursor.get(lineIndex);
+            List<String> innerLines = TextLineBuilder.getLines(font, line, canvasWidth);
 
-        for (int i = 0; i < linesSelected.size(); i++) {
-            int startX = (i == 0) ? lastLineWidth : 0;
-            Vector2i selectionTopLeft = new Vector2i(startX, (i + linesBefore.size() - 1) * font.getLineHeight());
+            for (int innerLineIndex = 0; innerLineIndex < innerLines.size() && currentChar <= end; ++innerLineIndex) {
+                String innerLine = innerLines.get(innerLineIndex);
+                String selectionString;
+                int offsetX = 0;
+                if (currentChar + innerLine.length() < start) {
+                    selectionString = "";
+                } else if (currentChar < start) {
+                    offsetX = font.getWidth(innerLine.substring(0, start - currentChar));
+                    selectionString = innerLine.substring(start - currentChar, Math.min(end - currentChar, innerLine.length()));
+                } else if (currentChar + innerLine.length() >= end) {
+                    selectionString = innerLine.substring(0, end - currentChar);
+                } else {
+                    selectionString = innerLine;
+                }
+                if (!selectionString.isEmpty()) {
+                    int selectionWidth = font.getWidth(selectionString);
+                    Vector2i selectionTopLeft = new Vector2i(offsetX, (lineOffset) * font.getLineHeight());
+                    Rect2i region = Rect2i.createFromMinAndSize(selectionTopLeft.x, selectionTopLeft.y, selectionWidth, font.getLineHeight());
 
-            String selLine = linesSelected.get(i);
-            int selectionWidth = font.getWidth(selLine);
-
-            Rect2i region = Rect2i.createFromMinAndSize(selectionTopLeft.x, selectionTopLeft.y, selectionWidth, font.getLineHeight());
-
-            canvas.drawTexture(cursorTexture, region, textColor);
-            canvas.drawTextRaw(selLine, font, textColor.inverse(), region);
+                    canvas.drawTexture(cursorTexture, region, textColor);
+                    canvas.drawTextRaw(FontColor.stripColor(selectionString), font, textColor.inverse(), region);
+                }
+                currentChar += innerLine.length();
+                lineOffset++;
+            }
+            currentChar++;
         }
     }
 
@@ -177,7 +197,6 @@ public class UIText extends CoreWidget {
             }
             List<String> lines = TextLineBuilder.getLines(font, beforeCursor, canvas.size().x);
 
-            // TODO: Support multiline text boxes
             // TODO: Support different alignments
 
             int lastLineWidth = font.getWidth(lines.get(lines.size() - 1));
@@ -334,7 +353,7 @@ public class UIText extends CoreWidget {
     }
 
     private void updateOffset() {
-        if (lastFont != null) {
+        if (lastFont != null && !multiline) {
             String before = getText().substring(0, cursorPosition);
             int cursorDist = lastFont.getWidth(before);
             if (cursorDist < offset) {
@@ -368,7 +387,7 @@ public class UIText extends CoreWidget {
         if (hasSelection()) {
             String fullText = getText();
             String selection = fullText.substring(Math.min(selectionStart, cursorPosition), Math.max(selectionStart, cursorPosition));
-            setClipboardContents(selection);
+            setClipboardContents(FontColor.stripColor(selection));
         }
     }
 
@@ -403,22 +422,43 @@ public class UIText extends CoreWidget {
     private void moveCursor(Vector2i pos, boolean selecting) {
         if (lastFont != null) {
             pos.x += offset;
-            List<String> lines = TextLineBuilder.getLines(lastFont, getText(), Integer.MAX_VALUE);
-            int lineIndex = TeraMath.clamp(pos.y / lastFont.getLineHeight(), 0, lines.size() - 1);
+            String rawText = getText();
+            List<String> lines = TextLineBuilder.getLines(lastFont, rawText, Integer.MAX_VALUE);
+            int targetLineIndex = pos.y / lastFont.getLineHeight();
+            int passedLines = 0;
             int newCursorPos = 0;
-            int totalWidth = 0;
-            for (char c : lines.get(lineIndex).toCharArray()) {
-                int charWidth = lastFont.getWidth(c);
-                if (totalWidth + charWidth / 2 >= pos.x) {
-                    break;
+            for (int lineIndex = 0; lineIndex < lines.size() && passedLines <= targetLineIndex; lineIndex++) {
+                List<String> subLines;
+                if (multiline) {
+                    subLines = TextLineBuilder.getLines(lastFont, lines.get(lineIndex), lastWidth);
+                } else {
+                    subLines = Arrays.asList(lines.get(lineIndex));
                 }
-                newCursorPos++;
-                totalWidth += charWidth;
+                if (subLines.size() + passedLines > targetLineIndex) {
+                    for (String subLine : subLines) {
+                        if (passedLines == targetLineIndex) {
+                            int totalWidth = 0;
+                            for (char c : subLine.toCharArray()) {
+                                int charWidth = lastFont.getWidth(c);
+                                if (totalWidth + charWidth / 2 >= pos.x) {
+                                    break;
+                                }
+                                newCursorPos++;
+                                totalWidth += charWidth;
+                            }
+                            passedLines++;
+                            break;
+                        } else {
+                            newCursorPos += subLine.length();
+                            passedLines++;
+                        }
+                    }
+                } else {
+                    passedLines += subLines.size();
+                    newCursorPos += lines.get(lineIndex).length() + 1;
+                }
             }
-            for (int i = 0; i < lineIndex; ++i) {
-                newCursorPos += lines.get(i).length() + 1;
-            }
-            cursorPosition = newCursorPos;
+            cursorPosition = Math.min(newCursorPos, rawText.length());
             if (!isSelectionModifierActive() && !selecting) {
                 selectionStart = cursorPosition;
             }
