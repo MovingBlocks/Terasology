@@ -41,6 +41,7 @@ public class AddServerPopup extends CoreScreenLayer {
                 UIText name = find("name", UIText.class);
                 UIText address = find("address", UIText.class);
                 if (name != null && address != null) {
+                    // TODO: Validate name and address are present
                     ServerInfo result = new ServerInfo(name.getText(), address.getText());
                     config.getNetwork().add(result);
                 }

@@ -454,6 +454,24 @@ public interface Canvas {
      * @param listener
      * @param tooltip
      */
+    void addInteractionRegion(InteractionListener listener, UIWidget tooltip);
+
+    /**
+     * Adds an interaction region filling the desired region.
+     *
+     * @param listener
+     * @param tooltip
+     * @param region
+     */
+    void addInteractionRegion(InteractionListener listener, UIWidget tooltip, Rect2i region);
+
+    /**
+     * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the
+     * full area of the widget.
+     *
+     * @param listener
+     * @param tooltip
+     */
     void addInteractionRegion(InteractionListener listener, String tooltip);
 
     /**
