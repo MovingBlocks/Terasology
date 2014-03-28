@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.widgets.TooltipLine;
@@ -34,6 +36,7 @@ import org.terasology.rendering.nui.widgets.UIList;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,9 +60,9 @@ public class ItemIcon extends CoreWidget {
     public ItemIcon() {
         tooltip = new UIList<>();
         tooltip.setSelectable(false);
-        tooltip.setFamily("tooltip");
+        tooltip.setSkin(Assets.getSkin("Engine:itemTooltip"));
         tooltip.setItemRenderer(new TooltipLineRenderer());
-        tooltip.bindList(new DefaultBinding<List<TooltipLine>>());
+        tooltip.bindList(new DefaultBinding<List<TooltipLine>>(new ArrayList<TooltipLine>()));
     }
 
     @Override
@@ -74,7 +77,8 @@ public class ItemIcon extends CoreWidget {
         if (getQuantity() > 1) {
             canvas.drawText(Integer.toString(getQuantity()));
         }
-        if (getTooltip() != null) {
+        List<TooltipLine> tooltipLines = tooltip.getList();
+        if (tooltipLines != null && !tooltipLines.isEmpty()) {
             canvas.addInteractionRegion(listener);
         }
     }
@@ -143,5 +147,10 @@ public class ItemIcon extends CoreWidget {
 
     public void setTooltipLines(List<TooltipLine> lines) {
         tooltip.setList(lines);
+    }
+
+    @Override
+    public UIWidget getTooltip() {
+        return tooltip;
     }
 }
