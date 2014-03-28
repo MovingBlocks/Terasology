@@ -35,12 +35,13 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
-import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
-import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.TooltipLine;
 import org.terasology.world.block.items.BlockItemComponent;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -88,16 +89,23 @@ public class InventoryCell extends CoreWidget {
     };
 
     public InventoryCell() {
-        icon.bindTooltipString(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                DisplayNameComponent displayNameComponent = getTargetItem().getComponent(DisplayNameComponent.class);
-                if (displayNameComponent != null) {
-                    return displayNameComponent.name;
-                }
-                return "";
-            }
-        });
+        icon.bindTooltipLines(
+                new ReadOnlyBinding<List<TooltipLine>>() {
+                    @Override
+                    public List<TooltipLine> get() {
+                        GetItemTooltip itemTooltip;
+
+                        DisplayNameComponent displayNameComponent = getTargetItem().getComponent(DisplayNameComponent.class);
+                        if (displayNameComponent != null) {
+                            itemTooltip = new GetItemTooltip(displayNameComponent.name);
+                        } else {
+                            itemTooltip = new GetItemTooltip();
+                        }
+                        getTargetItem().send(itemTooltip);
+
+                        return itemTooltip.getTooltipLines();
+                    }
+                });
         icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
             @Override
             public TextureRegion get() {

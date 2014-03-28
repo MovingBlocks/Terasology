@@ -28,9 +28,13 @@ import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.widgets.TooltipLine;
+import org.terasology.rendering.nui.widgets.TooltipLineRenderer;
+import org.terasology.rendering.nui.widgets.UIList;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -47,6 +51,16 @@ public class ItemIcon extends CoreWidget {
     private Binding<Integer> quantity = new DefaultBinding<>(1);
 
     private InteractionListener listener = new BaseInteractionListener();
+
+    private UIList<TooltipLine> tooltip;
+
+    public ItemIcon() {
+        tooltip = new UIList<>();
+        tooltip.setSelectable(false);
+        tooltip.setFamily("tooltip");
+        tooltip.setItemRenderer(new TooltipLineRenderer());
+        tooltip.bindList(new DefaultBinding<List<TooltipLine>>());
+    }
 
     @Override
     public void onDraw(Canvas canvas) {
@@ -121,5 +135,13 @@ public class ItemIcon extends CoreWidget {
 
     public void setMeshTexture(Texture val) {
         meshTexture.set(val);
+    }
+
+    public void bindTooltipLines(Binding<List<TooltipLine>> lines) {
+        tooltip.bindList(lines);
+    }
+
+    public void setTooltipLines(List<TooltipLine> lines) {
+        tooltip.setList(lines);
     }
 }
