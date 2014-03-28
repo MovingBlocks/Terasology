@@ -60,7 +60,7 @@ public class ItemIcon extends CoreWidget {
         if (getQuantity() > 1) {
             canvas.drawText(Integer.toString(getQuantity()));
         }
-        if (!getTooltip().isEmpty()) {
+        if (getTooltip() != null) {
             canvas.addInteractionRegion(listener);
         }
     }

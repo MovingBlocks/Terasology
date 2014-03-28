@@ -78,6 +78,7 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.world.block.Block;
@@ -186,6 +187,10 @@ public class UILoader implements AssetLoader<UIData> {
 
         @Override
         public UIWidget deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+                return new UILabel(json.getAsString());
+            }
+
             JsonObject jsonObject = json.getAsJsonObject();
 
             String type = jsonObject.get("type").getAsString();

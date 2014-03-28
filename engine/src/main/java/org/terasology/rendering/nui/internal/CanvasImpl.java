@@ -43,6 +43,7 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITooltip;
 
 import javax.vecmath.Quat4f;
@@ -94,7 +95,6 @@ public class CanvasImpl implements CanvasControl {
     private Vector2i lastTooltipPosition = new Vector2i();
     private UITooltip tooltipWidget = new UITooltip();
 
-
     private InteractionRegion clickedRegion;
 
     // Double click handling
@@ -128,8 +128,10 @@ public class CanvasImpl implements CanvasControl {
         drawOnTopOperations.clear();
 
         if (topMouseOverRegion != null && time.getGameTime() >= tooltipTime && getSkin() != null) {
-            tooltipWidget.setText(topMouseOverRegion.getTooltip());
+            tooltipWidget.setAttachment(topMouseOverRegion.getTooltip());
             drawWidget(tooltipWidget);
+        } else {
+            tooltipWidget.setAttachment(null);
         }
 
         renderer.postRender();
@@ -626,7 +628,7 @@ public class CanvasImpl implements CanvasControl {
 
     @Override
     public void addInteractionRegion(InteractionListener listener) {
-        addInteractionRegion(listener, "", getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
+        addInteractionRegion(listener, (UIWidget) null, getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
     }
 
     @Override
@@ -635,11 +637,22 @@ public class CanvasImpl implements CanvasControl {
     }
 
     @Override
-    public void addInteractionRegion(InteractionListener listener, Rect2i region) {
-        addInteractionRegion(listener, "", region);
+    public void addInteractionRegion(InteractionListener listener, String tooltip, Rect2i region) {
+        UIWidget tooltipLabelWidget = (tooltip == null || tooltip.isEmpty()) ? null : new UILabel(tooltip);
+        addInteractionRegion(listener, tooltipLabelWidget, region);
     }
 
-    public void addInteractionRegion(InteractionListener listener, String tooltip, Rect2i region) {
+    @Override
+    public void addInteractionRegion(InteractionListener listener, Rect2i region) {
+        addInteractionRegion(listener, (UIWidget) null, region);
+    }
+
+    @Override
+    public void addInteractionRegion(InteractionListener listener, UIWidget tooltip) {
+        addInteractionRegion(listener, tooltip, getCurrentStyle().getMargin().grow(applyStyleToSize(getRegion())));
+    }
+
+    public void addInteractionRegion(InteractionListener listener, UIWidget tooltip, Rect2i region) {
         Vector2i offset = state.drawRegion.min();
         Rect2i finalRegion = state.cropRegion.intersect(relativeToAbsolute(region));
         if (!finalRegion.isEmpty()) {
@@ -774,9 +787,9 @@ public class CanvasImpl implements CanvasControl {
         public Rect2i region;
         public Vector2i offset;
         public UIWidget element;
-        public String tooltipOverride;
+        public UIWidget tooltipOverride;
 
-        public InteractionRegion(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget element, String tooltipOverride) {
+        public InteractionRegion(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget element, UIWidget tooltipOverride) {
             this.listener = listener;
             this.region = region;
             this.offset = offset;
@@ -784,8 +797,8 @@ public class CanvasImpl implements CanvasControl {
             this.tooltipOverride = tooltipOverride;
         }
 
-        public String getTooltip() {
-            if (tooltipOverride == null || tooltipOverride.isEmpty()) {
+        public UIWidget getTooltip() {
+            if (tooltipOverride == null) {
                 return element.getTooltip();
             }
             return tooltipOverride;
@@ -940,9 +953,9 @@ public class CanvasImpl implements CanvasControl {
         private final Rect2i region;
         private final InteractionListener listener;
         private final UIWidget currentElement;
-        private final String tooltipOverride;
+        private final UIWidget tooltipOverride;
 
-        public DrawInteractionRegionOperation(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget currentElement, String tooltipOverride) {
+        public DrawInteractionRegionOperation(Rect2i region, Vector2i offset, InteractionListener listener, UIWidget currentElement, UIWidget tooltipOverride) {
             this.region = region;
             this.listener = listener;
             this.offset = offset;
