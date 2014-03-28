@@ -16,33 +16,7 @@
 
 package org.terasology.logic.console.internal;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
-
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.network.NetworkMode;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.ConsoleMessageEvent;
-import org.terasology.logic.console.ConsoleSubscriber;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageType;
-import org.terasology.network.Client;
-import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.FontColor;
-import org.terasology.utilities.collection.CircularBuffer;
+import static org.reflections.ReflectionUtils.withModifier;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -52,7 +26,33 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static org.reflections.ReflectionUtils.withModifier;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleMessageEvent;
+import org.terasology.logic.console.ConsoleSubscriber;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.MessageType;
+import org.terasology.network.Client;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.FontColor;
+import org.terasology.utilities.collection.CircularBuffer;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 
 /**
  * The console handles commands and messages.
@@ -78,14 +78,14 @@ public class ConsoleImpl implements Console {
     private boolean commandsSorted;
 
     public ConsoleImpl() {
-        addMessage("Welcome to the wonderful world of " + FontColor.toChar(ConsoleColors.TERASOLOGY) + "Terasology" + FontColor.getReset() + "!\n" +
-                "\n" +
-                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details.\n" +
-                "Text parameters should be in quotes, no commas needed between multiple parameters.\n" +
-                "Commands are case-sensitive, block names and such are not.\n" +
-                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:\n" +
-                "'gh' + 'tab' = 'ghost'\n" +
-                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)\n");
+        addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
+                Message.NEW_LINE +
+                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
+                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE + 
+                "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
+                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
+                "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
+                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
     }
 
     /**
@@ -139,6 +139,10 @@ public class ConsoleImpl implements Console {
         addMessage(new Message(message, type));
     }
 
+    private void addErrorMessage(String message) {
+        addMessage(new Message(message, CoreMessageType.ERROR));
+    }
+    
     /**
      * Adds a message to the console
      *
@@ -151,6 +155,19 @@ public class ConsoleImpl implements Console {
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
+        }
+    }
+    
+    @Override
+    public void removeMessage(Message message) {
+        messageHistory.remove(message);
+    }
+    
+    @Override
+    public void replaceMessage(Message oldMsg, Message newMsg) {
+        int idx = messageHistory.indexOf(oldMsg);
+        if (idx >= 0) {
+            messageHistory.set(idx, newMsg);
         }
     }
 
@@ -229,12 +246,12 @@ public class ConsoleImpl implements Console {
         //check if the command is loaded
         if (cmd == null) {
             if (commandLookup.containsRow(commandName)) {
-                addMessage("Incorrect number of parameters. Try:");
+                addErrorMessage("Incorrect number of parameters. Try:");
                 for (CommandInfo ci : commandLookup.row(commandName).values()) {
                     addMessage(ci.getUsageMessage());
                 }
             } else {
-                addMessage("Unknown command '" + commandName + "'");
+                addErrorMessage("Unknown command '" + commandName + "'");
             }
 
             return false;
@@ -256,12 +273,14 @@ public class ConsoleImpl implements Console {
                 }
 
                 return true;
+            } catch (IllegalArgumentException e) {
+                addErrorMessage(e.getLocalizedMessage());
+                return false;
+                
             } catch (Exception e) {
-                // TODO: better error handling and error message
-                addMessage(cmd.getUsageMessage());
-                addMessage("Error executing command '" + commandName + "'.");
-                logger.warn("Failed to execute command", e);
-
+                addErrorMessage("Error executing command '" + commandName + "': " + e.getLocalizedMessage());
+                
+                logger.error("Failed to execute command", e);
                 return false;
             }
         }

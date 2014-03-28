@@ -15,25 +15,24 @@
  */
 package org.terasology.logic.console;
 
-import org.terasology.rendering.nui.Color;
-
+import org.terasology.network.OwnerEvent;
 
 /**
- * @author Immortius
+ * Use to send error messages to a client
+ *
+ * @author Martin Steiger
  */
-public enum CoreMessageType implements MessageType {
-    CONSOLE(ConsoleColors.DEFAULT),
-    CHAT(ConsoleColors.NOTIFICATION),
-    ERROR(ConsoleColors.ERROR);
+@OwnerEvent
+public class ErrorMessageEvent implements MessageEvent {
 
-    private Color color;
+    private final String message;
 
-    private CoreMessageType(Color color) {
-        this.color = color;
+    public ErrorMessageEvent(String message) {
+        this.message = message;
     }
 
     @Override
-    public Color getColor() {
-        return color;
+    public Message getFormattedMessage() {
+        return new Message(message, CoreMessageType.ERROR);
     }
 }

@@ -15,9 +15,18 @@
  */
 package org.terasology.utilities.collection;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import org.junit.Test;
+import org.terasology.protobuf.NetData.Color.Builder;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius
@@ -46,6 +55,113 @@ public class CircularBufferTest {
         assertEquals((Integer) 2, buffer.popFirst());
         assertEquals((Integer) 3, buffer.getFirst());
         assertEquals(3, buffer.size());
-        assertEquals((Integer) 5, buffer.getLast());
+        assertEquals((Integer) 5, buffer.popLast());
+        assertEquals((Integer) 4, buffer.popLast());
+        assertEquals((Integer) 3, buffer.getLast());
+        assertEquals((Integer) 3, buffer.popLast());
+        assertTrue(buffer.isEmpty());
     }
+    
+    @Test
+    public void testCollectionMethods() {
+        
+        Collection<Integer> buffer = CircularBuffer.create(4);
+
+        buffer.addAll(ImmutableList.of(1, 2, 3, 4, 5, 6));
+        buffer.add(4);
+        
+        assertTrue(buffer.contains(5));
+        assertTrue(buffer.containsAll(ImmutableList.of(5, 4)));
+    }
+    
+    @Test
+    public void testGetSet() {
+        
+        CircularBuffer<Integer> buffer = CircularBuffer.create(4);
+
+        buffer.addAll(ImmutableList.of(11, 12, 0, 1, 2, 3));
+
+        assertEquals((Integer) 0, buffer.get(0));
+        assertEquals((Integer) 3, buffer.get(3));
+        assertEquals((Integer) 2, buffer.set(2, 8));
+        assertEquals((Integer) 8, buffer.get(2));
+
+        assertEquals((Integer) 0, buffer.set(0, 5));
+        assertEquals((Integer) 5, buffer.get(0));
+
+        assertEquals((Integer) 3, buffer.set(3, 6));
+        assertEquals((Integer) 6, buffer.get(3));
+
+    }
+    
+    @Test
+    public void insert() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(4);
+        buffer.addAll(ImmutableList.of(1, 2, 5, 7));
+
+        // remove from the middle
+        assertEquals((Integer) 2, buffer.remove(1));
+        assertEquals((Integer) 5, buffer.get(1));
+
+        // remove from the left side
+        assertEquals((Integer) 1, buffer.remove(0));
+        
+        // remove from the right side
+        assertEquals((Integer) 7, buffer.remove(1));
+
+        // remove the only element
+        assertEquals((Integer) 5, buffer.remove(0));
+
+        assertTrue(buffer.isEmpty());
+    }
+
+    @Test
+    public void iterator1() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(2);
+        buffer.addAll(ImmutableList.of(1, 2));
+        Iterator<Integer> iterator = buffer.iterator();
+        iterator.next();
+        iterator.remove();
+    }
+
+    @Test
+    public void iterator2() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(2);
+        buffer.addAll(ImmutableList.of(1, 2));
+        Iterator<Integer> iterator = buffer.iterator();
+        iterator.next();
+        iterator.remove();
+        iterator.next();
+        iterator.remove();
+        assertTrue(buffer.isEmpty());
+    }
+
+    
+    @Test(expected = IllegalStateException.class)
+    public void iteratorRemoveTwice() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(2);
+        buffer.addAll(ImmutableList.of(1, 2));
+        Iterator<Integer> iterator = buffer.iterator();
+        iterator.next();
+        iterator.remove();
+        iterator.remove();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void iteratorRemoveWithoutNext() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(2);
+        buffer.addAll(ImmutableList.of(1, 2));
+        buffer.iterator().remove();
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void iteratorAfterEnd() {
+        CircularBuffer<Integer> buffer = CircularBuffer.create(1);
+        buffer.add(1);
+        Iterator<Integer> it = buffer.iterator();
+        it.next();
+        it.remove();
+        it.next();
+        it.remove();
+    }    
 }

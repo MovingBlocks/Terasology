@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.registry.CoreRegistry;
@@ -40,6 +42,25 @@ public class DeathScreen extends CoreScreenLayer {
             public void onActivated(UIWidget widget) {
                 CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
                 getManager().closeScreen(DeathScreen.this);
+            }
+        });
+        WidgetUtil.trySubscribe(this, "settings", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget widget) {
+                getManager().pushScreen("settingsMenuScreen");
+            }
+        });
+        WidgetUtil.trySubscribe(this, "mainMenu", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget widget) {
+                CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new RespawnRequestEvent());
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            }
+        });
+        WidgetUtil.trySubscribe(this, "exitGame", new ActivateEventListener() {
+            @Override
+            public void onActivated(UIWidget widget) {
+                CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
     }
