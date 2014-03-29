@@ -55,21 +55,6 @@ public class ServerCommands extends BaseComponentSystem {
         return "Server shutdown triggered";
     }
     
-    
-    @Command(shortDescription = "Shutdown the server", runOnServer = true)
-    public String restartServer(EntityRef sender) {
-        EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
-
-        DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-        
-        logger.info("Restart triggered by {}", name.name);
-        
-        CoreRegistry.get(GameEngine.class).restart();
-        
-        return "Server restart triggered";
-    }
-
-    
     @Command(shortDescription = "Kick user", runOnServer = true)
     public String kick(String username, EntityRef sender) {
         NetworkSystem network = CoreRegistry.get(NetworkSystem.class);

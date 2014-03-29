@@ -43,11 +43,6 @@ public interface GameEngine {
     void shutdown();
 
     /**
-     * Request the engine to restart
-     */
-    void restart();
-
-    /**
      * Cleans up the engine. Can only be
      */
     void dispose();
@@ -106,5 +101,6 @@ public interface GameEngine {
     void subscribeToStateChange(StateChangeSubscriber subscriber);
 
     void unsubscribeToStateChange(StateChangeSubscriber subscriber);
+
 
 }
