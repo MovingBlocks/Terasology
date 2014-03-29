@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public class ServerCommands extends BaseComponentSystem {
             return "User kick triggered for '" + name.name + "'";
         }
         
-        return "Request declined";
+        return "Request declined - cannot kick local user";
     }
 }
 
