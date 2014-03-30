@@ -79,6 +79,9 @@ public class UIText extends CoreWidget {
 
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
+    /**
+     * Horizontal scrolling offset in pixels
+     */
     private int offset;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -274,6 +277,9 @@ public class UIText extends CoreWidget {
                             if (!isSelectionModifierActive()) {
                                 selectionStart = cursorPosition;
                             }
+                            
+                            // reset horizontal scrolling offset
+                            offset = 0;
                         }
                     }
                     event.consume();
@@ -295,6 +301,9 @@ public class UIText extends CoreWidget {
                             if (!isSelectionModifierActive()) {
                                 selectionStart = newIdx;
                             }
+                            
+                            // reset horizontal scrolling offset
+                            offset = 0;
                         }
                     }
                     event.consume();
@@ -412,13 +421,24 @@ public class UIText extends CoreWidget {
                 }
             }
         }
+        
+        // always show cursor when a key was pressed
+        blinkCounter = 0;
+        
         correctCursor();
         updateOffset();
     }
 
     private void updateOffset() {
-        if (lastFont != null && !multiline) {
-            String before = getText().substring(0, cursorPosition);
+        if (lastFont != null) {
+            int start = 0;
+            if (multiline) {
+                // subtract 1 to avoid searching at the current location
+                // add 1 to go to the first char.
+                // negative indices and "not found" return -1
+                start = getText().lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+            }
+            String before = getText().substring(start, cursorPosition);
             int cursorDist = lastFont.getWidth(before);
             if (cursorDist < offset) {
                 offset = cursorDist;
