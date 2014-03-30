@@ -57,6 +57,8 @@ public class UIText extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 
     private static final float BLINK_RATE = 0.25f;
+    
+    private static final char NEW_LINE = '\n';
 
     private float blinkCounter;
 
@@ -260,9 +262,55 @@ public class UIText extends CoreWidget {
                     event.consume();
                     break;
                 }
+                case KeyId.UP: {
+                    if (multiline) {
+                        int prevNl1 = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1);
+                        int prevNl2 = fullText.lastIndexOf(NEW_LINE, prevNl1 - 1);
+
+                        if (prevNl1 >= 0) {
+                            int newIdx = Math.min(prevNl1, prevNl2 + cursorPosition - prevNl1);
+                            cursorPosition = newIdx;
+                            
+                            if (!isSelectionModifierActive()) {
+                                selectionStart = cursorPosition;
+                            }
+                        }
+                    }
+                    event.consume();
+                    break;
+                }
+                case KeyId.DOWN: {
+                    if (multiline) {
+                        int prevNl = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+                        int nextNl = fullText.indexOf(NEW_LINE, cursorPosition);
+                        int nextNl2 = fullText.indexOf(NEW_LINE, nextNl + 1);
+                        if (nextNl2 < 0) {
+                            nextNl2 = fullText.length();
+                        }
+                        if (nextNl >= 0) {
+                            // the offset could be larger than one line -> restrict to nextNl2
+                            int newIdx = Math.min(nextNl2, nextNl + cursorPosition - prevNl + 1);
+                            cursorPosition = newIdx;
+
+                            if (!isSelectionModifierActive()) {
+                                selectionStart = newIdx;
+                            }
+                        }
+                    }
+                    event.consume();
+                    break;
+                }
                 case KeyId.HOME: {
-                    cursorPosition = 0;
-                    offset = 0;
+                    if (multiline) {
+                        // subtract 1 to avoid searching at the current location
+                        // add 1 to go to the first char.
+                        // negative indices and "not found" return -1
+                        int nlIdx = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+                        cursorPosition = nlIdx;
+                    } else {
+                        cursorPosition = 0;
+                    }
+                    
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
@@ -270,7 +318,15 @@ public class UIText extends CoreWidget {
                     break;
                 }
                 case KeyId.END: {
-                    cursorPosition = fullText.length();
+                    if (multiline) {
+                        int nlIdx = fullText.indexOf(NEW_LINE, cursorPosition);
+                        if (nlIdx < 0) {
+                            nlIdx = fullText.length();
+                        }
+                        cursorPosition = nlIdx;
+                    } else {
+                        cursorPosition = fullText.length();
+                    }
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
@@ -315,8 +371,16 @@ public class UIText extends CoreWidget {
                         break;
                     }
                     case KeyId.ENTER: {
-                        for (ActivateEventListener listener : listeners) {
-                            listener.onActivated(this);
+                        if (!multiline) {
+                            for (ActivateEventListener listener : listeners) {
+                                listener.onActivated(this);
+                            }
+                        } else {
+                            String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
+                            String after = fullText.substring(Math.max(cursorPosition, selectionStart));
+                            setText(before + "\n" + after);
+                            cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
+                            selectionStart = cursorPosition;
                         }
                         event.consume();
                         break;
