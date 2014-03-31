@@ -30,6 +30,7 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.widgets.TooltipLine;
 import org.terasology.rendering.nui.widgets.TooltipLineRenderer;
 import org.terasology.rendering.nui.widgets.UIList;
@@ -60,8 +61,9 @@ public class ItemIcon extends CoreWidget {
     public ItemIcon() {
         tooltip = new UIList<>();
         tooltip.setSelectable(false);
-        tooltip.setSkin(Assets.getSkin("Engine:itemTooltip"));
-        tooltip.setItemRenderer(new TooltipLineRenderer());
+        final UISkin defaultSkin = Assets.getSkin("Engine:itemTooltip");
+        tooltip.setSkin(defaultSkin);
+        tooltip.setItemRenderer(new TooltipLineRenderer(defaultSkin));
         tooltip.bindList(new DefaultBinding<List<TooltipLine>>(new ArrayList<TooltipLine>()));
     }
 

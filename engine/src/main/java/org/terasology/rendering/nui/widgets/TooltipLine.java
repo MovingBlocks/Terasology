@@ -17,11 +17,25 @@ package org.terasology.rendering.nui.widgets;
 
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Color;
+import org.terasology.rendering.nui.skin.UISkin;
 
 public class TooltipLine {
     private Font font;
     private Color color;
     private String text;
+
+    private UISkin skin;
+    private String family;
+
+    public TooltipLine(String text, UISkin skin, String family) {
+        this.text = text;
+        this.skin = skin;
+        this.family = family;
+    }
+
+    public TooltipLine(String text, UISkin skin) {
+        this(text, skin, null);
+    }
 
     public TooltipLine(String text, Color color, Font font) {
         this.text = text;
@@ -34,7 +48,7 @@ public class TooltipLine {
     }
 
     public TooltipLine(String text) {
-        this(text, null);
+        this(text, (Color) null);
     }
 
     public Font getFont() {
@@ -47,5 +61,13 @@ public class TooltipLine {
 
     public String getText() {
         return text;
+    }
+
+    public String getFamily() {
+        return family;
+    }
+
+    public UISkin getSkin() {
+        return skin;
     }
 }
