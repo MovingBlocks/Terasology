@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -26,11 +27,18 @@ import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
 import org.terasology.rendering.nui.LayoutConfig;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.TooltipLine;
+import org.terasology.rendering.nui.widgets.TooltipLineRenderer;
+import org.terasology.rendering.nui.widgets.UIList;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -48,6 +56,17 @@ public class ItemIcon extends CoreWidget {
 
     private InteractionListener listener = new BaseInteractionListener();
 
+    private UIList<TooltipLine> tooltip;
+
+    public ItemIcon() {
+        tooltip = new UIList<>();
+        tooltip.setSelectable(false);
+        final UISkin defaultSkin = Assets.getSkin("Engine:itemTooltip");
+        tooltip.setSkin(defaultSkin);
+        tooltip.setItemRenderer(new TooltipLineRenderer(defaultSkin));
+        tooltip.bindList(new DefaultBinding<List<TooltipLine>>(new ArrayList<TooltipLine>()));
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (getIcon() != null) {
@@ -60,7 +79,8 @@ public class ItemIcon extends CoreWidget {
         if (getQuantity() > 1) {
             canvas.drawText(Integer.toString(getQuantity()));
         }
-        if (getTooltip() != null) {
+        List<TooltipLine> tooltipLines = tooltip.getList();
+        if (tooltipLines != null && !tooltipLines.isEmpty()) {
             canvas.addInteractionRegion(listener);
         }
     }
@@ -121,5 +141,18 @@ public class ItemIcon extends CoreWidget {
 
     public void setMeshTexture(Texture val) {
         meshTexture.set(val);
+    }
+
+    public void bindTooltipLines(Binding<List<TooltipLine>> lines) {
+        tooltip.bindList(lines);
+    }
+
+    public void setTooltipLines(List<TooltipLine> lines) {
+        tooltip.setList(lines);
+    }
+
+    @Override
+    public UIWidget getTooltip() {
+        return tooltip;
     }
 }

@@ -35,6 +35,7 @@ import java.util.Objects;
  */
 public class UIList<T> extends CoreWidget {
 
+    private Binding<Boolean> selectable = new DefaultBinding<>(true);
     private Binding<T> selection = new DefaultBinding<>();
     private Binding<List<T>> list = new DefaultBinding<List<T>>(Lists.<T>newArrayList());
 
@@ -112,16 +113,33 @@ public class UIList<T> extends CoreWidget {
         return list.get();
     }
 
+    public void bindSelectable(Binding<Boolean> binding) {
+        selectable = binding;
+    }
+
+    public boolean isSelectable() {
+        return selectable.get();
+    }
+
+    public void setSelectable(boolean value) {
+        selectable.set(value);
+    }
+
     public void bindSelection(Binding<T> binding) {
         selection = binding;
     }
 
     public T getSelection() {
+        if (!isSelectable()) {
+            return null;
+        }
         return selection.get();
     }
 
     public void setSelection(T val) {
-        selection.set(val);
+        if (isSelectable()) {
+            selection.set(val);
+        }
     }
 
     public void subscribe(ItemActivateEventListener<T> eventListener) {
@@ -133,13 +151,13 @@ public class UIList<T> extends CoreWidget {
     }
 
     public void select(int index) {
-        if (index >= 0 && index < list.get().size()) {
+        if (index >= 0 && index < list.get().size() && isSelectable()) {
             T item = list.get().get(index);
             setSelection(item);
         }
     }
 
-    public void activate(int index) {
+    private void activate(int index) {
         if (index < list.get().size()) {
             T item = list.get().get(index);
             for (ItemActivateEventListener<T> listener : eventListeners) {
@@ -165,7 +183,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
-            if (button == MouseInput.MOUSE_LEFT) {
+            if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
                 select(index);
                 return true;
             }
@@ -174,7 +192,7 @@ public class UIList<T> extends CoreWidget {
 
         @Override
         public boolean onMouseDoubleClick(MouseInput button, Vector2i pos) {
-            if (button == MouseInput.MOUSE_LEFT) {
+            if (button == MouseInput.MOUSE_LEFT && isSelectable()) {
                 activate(index);
                 return true;
             }
