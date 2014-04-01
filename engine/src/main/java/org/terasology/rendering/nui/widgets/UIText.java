@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.terasology.logic.console.Message.NEW_LINE;
+
 /**
  * @author Immortius
  */
@@ -58,8 +60,6 @@ public class UIText extends CoreWidget {
 
     private static final float BLINK_RATE = 0.25f;
     
-    private static final char NEW_LINE = '\n';
-
     private float blinkCounter;
 
     private TextureRegion cursorTexture;
@@ -385,11 +385,7 @@ public class UIText extends CoreWidget {
                                 listener.onActivated(this);
                             }
                         } else {
-                            String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
-                            String after = fullText.substring(Math.max(cursorPosition, selectionStart));
-                            setText(before + "\n" + after);
-                            cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
-                            selectionStart = cursorPosition;
+                            insertText(NEW_LINE);
                         }
                         event.consume();
                         break;
@@ -398,7 +394,7 @@ public class UIText extends CoreWidget {
                         if (Keyboard.isKeyDown(KeyId.LEFT_CTRL) || Keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
                             if (event.getKey() == Keyboard.Key.V) {
                                 removeSelection();
-                                paste();
+                                insertText(getClipboardContents());
                                 event.consume();
                                 break;
                             } else if (event.getKey() == Keyboard.Key.X) {
@@ -408,12 +404,9 @@ public class UIText extends CoreWidget {
                                 break;
                             }
                         }
-                        if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                            String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
-                            String after = fullText.substring(Math.max(cursorPosition, selectionStart));
-                            setText(before + event.getKeyCharacter() + after);
-                            cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
-                            selectionStart = cursorPosition;
+                        char keyCharacter = event.getKeyCharacter();
+                        if (keyCharacter != 0 && lastFont.hasCharacter(keyCharacter)) {
+                            insertText(String.valueOf(keyCharacter));
                             event.consume();
                         }
                         break;
@@ -427,6 +420,15 @@ public class UIText extends CoreWidget {
         
         correctCursor();
         updateOffset();
+    }
+
+    private void insertText(String insert) {
+        String fullText = getText();
+        String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
+        String after = fullText.substring(Math.max(cursorPosition, selectionStart));
+        setText(before + insert + after);
+        cursorPosition = Math.min(cursorPosition, selectionStart) + insert.length();
+        selectionStart = cursorPosition;
     }
 
     private void updateOffset() {
@@ -473,16 +475,6 @@ public class UIText extends CoreWidget {
             String selection = fullText.substring(Math.min(selectionStart, cursorPosition), Math.max(selectionStart, cursorPosition));
             setClipboardContents(FontColor.stripColor(selection));
         }
-    }
-
-    private void paste() {
-        String fullText = getText();
-        String before = fullText.substring(0, cursorPosition);
-        String after = fullText.substring(cursorPosition);
-        String pasted = getClipboardContents();
-        setText(before + pasted + after);
-        cursorPosition += pasted.length();
-        selectionStart = cursorPosition;
     }
 
     private String getClipboardContents() {
