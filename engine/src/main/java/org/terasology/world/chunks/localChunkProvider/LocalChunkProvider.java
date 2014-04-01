@@ -59,7 +59,7 @@ import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generation.World;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -89,7 +89,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
-    private WorldGenerator generator;
+    private World generator;
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
 
@@ -109,7 +109,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private LightMerger lightMerger = new LightMerger(this);
 
-    public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
+    public LocalChunkProvider(StorageManager storageManager, World generator) {
         blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
         this.generator = generator;
@@ -541,7 +541,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     Chunk chunk;
                     if (chunkStore == null) {
                         chunk = new ChunkImpl(getPosition());
-                        generator.createChunk(chunk);
+                        generator.rasterizeChunk(chunk);
                     } else {
                         chunk = chunkStore.getChunk();
                     }
@@ -561,7 +561,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public WorldGenerator getWorldGenerator() {
+    public World getWorldGenerator() {
         return generator;
     }
 

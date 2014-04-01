@@ -26,8 +26,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
@@ -38,8 +38,8 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.internal.RemoteWorldGenerator;
+import org.terasology.world.generation.World;
+import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -67,14 +67,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private ChunkGenerationPipeline pipeline;
 
-    private RemoteWorldGenerator remoteWorldGenerator;
+    private World remoteWorld;
     private LightMerger lightMerger = new LightMerger(this);
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
 
-        remoteWorldGenerator = new RemoteWorldGenerator();
+        remoteWorld = new WorldBuilder(0).build();
     }
 
     public void subscribe(ChunkReadyListener chunkReadyListener) {
@@ -247,9 +247,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public WorldGenerator getWorldGenerator() {
+    public World getWorldGenerator() {
         //TODO: send this information over the wire
-        return remoteWorldGenerator;
+        return remoteWorld;
     }
 
     @Override

@@ -68,7 +68,7 @@ public class SimplexNoise implements Noise2D, Noise3D {
      * Initialize permutations with a given seed
      * @param seed a seed value used for permutation shuffling 
      */
-    public SimplexNoise(int seed) {
+    public SimplexNoise(long seed) {
         FastRandom rand = new FastRandom(seed);
 
         short[] p = new short[256];

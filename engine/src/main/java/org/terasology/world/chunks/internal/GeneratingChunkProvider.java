@@ -36,7 +36,7 @@ public interface GeneratingChunkProvider extends ChunkProvider {
      */
     void onChunkIsReady(Chunk chunk);
 
-    WorldGenerator getWorldGenerator();
+    org.terasology.world.generation.World getWorldGenerator();
 
     Chunk getChunkUnready(Vector3i pos);
 }

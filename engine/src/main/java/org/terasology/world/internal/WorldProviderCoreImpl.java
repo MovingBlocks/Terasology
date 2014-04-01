@@ -292,16 +292,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public float getFog(float x, float y, float z) {
-        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.noise(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
+        return 0;
+        //return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.noise(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
     }
 
     @Override
     public float getTemperature(float x, float y, float z) {
-        return chunkProvider.getWorldGenerator().getTemperature(x, y, z);
+        return 0;
+
+        //return chunkProvider.getWorldGenerator().getTemperature(x, y, z);
     }
 
     @Override
     public float getHumidity(float x, float y, float z) {
-        return chunkProvider.getWorldGenerator().getHumidity(x, y, z);
+        return 0;
+        //return chunkProvider.getWorldGenerator().getHumidity(x, y, z);
     }
 }

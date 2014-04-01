@@ -39,8 +39,18 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
+import org.terasology.world.generation.World;
+import org.terasology.world.generation.WorldBuilder;
+import org.terasology.world.generation.perlin.BaseSurfaceProvider;
+import org.terasology.world.generation.perlin.HillsAndMountainsProvider;
+import org.terasology.world.generation.perlin.OceanProvider;
+import org.terasology.world.generation.perlin.RiverProvider;
+import org.terasology.world.generation.perlin.SimplexHumidityProvider;
+import org.terasology.world.generation.perlin.SimplexTemperatureProvider;
+import org.terasology.world.generation.rasterizers.GroundRasterizer;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -95,8 +105,18 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return false;
         }
 
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        World world = new WorldBuilder(0)
+                .addProvider(new SimplexTemperatureProvider())
+                .addProvider(new SimplexHumidityProvider())
+                .addProvider(new BaseSurfaceProvider())
+                .addProvider(new RiverProvider())
+                .addProvider(new OceanProvider())
+                .addProvider(new HillsAndMountainsProvider())
+                .addRasterizer(new GroundRasterizer(blockManager)).build();
+
         // Init. a new world
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, worldGenerator);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, world);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);

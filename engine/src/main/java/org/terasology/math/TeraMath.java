@@ -107,6 +107,21 @@ public final class TeraMath {
     }
 
     /**
+     * Clamps a given value to be an element of [0..1].
+     *
+     * @param value
+     * @return
+     */
+    public static float clamp(float value) {
+        if (value > 1.0f) {
+            return 1.0f;
+        } else if (value < 0.0f) {
+            return 0.0f;
+        }
+        return value;
+    }
+
+    /**
      * Clamps a given value to be an element of [min..max].
      *
      * @param value
