@@ -138,7 +138,7 @@ tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->
             println "Repo is $repo - localName is $localName"
 
             // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
-            def githubHome = 'MovingBlocks'
+            def githubHome = 'Nanoware'
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
             }

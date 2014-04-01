@@ -19,6 +19,7 @@ repositories {
 task sourceJar(type: Jar) {
     description = "Create a JAR with all sources"
     from sourceSets.main.allSource
+    from sourceSets.test.allSource
     classifier = 'sources'
 }
 

@@ -104,6 +104,8 @@ dependencies {
                 //TODO: This could hit problems with corrupt module directories?
 
                 println "*** Identified source: " + dependency
+                // Note: if artifactoryPublish is used in a multi-project workspace including modules the .pom gets hard version refs
+                // Normally they're expected to run in Jenkins standalone where they'll instead match the else and get version '+'
                 compile project(':modules:' + dependency)
             } else {
                 println "*** Seeking as binary: " + dependency
@@ -123,7 +125,7 @@ dependencies {
                 File moduleJarPath = new File(rootDir, 'modules/' + id.name + id.version + '.jar')
 
                 if (moduleSrcPath.exists()) {
-                    //println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
+                    println "*** Found module dependency $id.name in source form, not copying a runtime jar from Gradle"
                 } else {
                     println "$project.name resolved binary $id.group - $id.name at version $id.version"
 
@@ -137,12 +139,13 @@ dependencies {
             }
         }
     } else {
-        println "We're in a single-project workspace (probably Jenkins) so will look elsewhere for dependencies"
+        println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
 
         // If no Terasology dependencies are declared we need to set an implicit dependency on the latest engine version
         if (moduleDepends.size() == 0) {
             println "Setting implicit engine dependency for $project.name - no explicit or transitive dependency set"
             compile(group: 'org.nanoware.engine', name: 'engine', version: '+')
+            testCompile(group: 'org.nanoware.engine', name: 'engine-tests', version: '+')
         } else {
             // To get Terasology module dependencies we simply declare them against Artifactory
             moduleDepends.each {
@@ -154,8 +157,9 @@ dependencies {
 
         // TODO: parse and apply external lib dependencies if any are present
 
-        // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any sort of trouble
-        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
+        // TODO: Consider / keep an eye on whether resolving artifacts early at this point causes any trouble (is only for logging)
+        // This step resolves artifacts (both compile & testCompile) and prints out some interesting versions
+        configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
             def id = artifact.moduleVersion.id
             // Print out module (and engine stuff) dependencies and the exact versions they resolved at
             if (id.group.startsWith('org.nanoware')) {

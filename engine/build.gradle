@@ -123,18 +123,6 @@ jar {
     }
 }
 
-task distEngine (type: Sync) {
-    description = "Prepares the engine.jar for distribution"
-    into ("$distsDir/engine")
-    from jar
-}
-
-task distLibs (type: Sync) {
-    description = "Prepares the engine libs for distribution (useful for other builds)"
-    into ("$distsDir/libs")
-    from configurations.runtime
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2,6 +2,7 @@
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/common.gradle"
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
@@ -29,6 +30,13 @@ ext {
     displayVersion = versionBase
 }
 
+// Base the engine tests on the same version number as the engine
+version = project(':engine').version
+println "PC VERSION: $version"
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.nanoware.facades'
+
 dependencies {
     compile project(':engine')
 }
@@ -52,6 +60,23 @@ jar {
     }
 }
 
+// A configuration for publishing artifacts - TODO: For PC this isn't needed by anything until game distribution is a separate Jenkins job
+configurations {
+    published
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+    published javadocJar
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar, javadocJar
+}
+
 task runPC(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
 
@@ -72,6 +97,7 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
+// TODO: Check on "gradlew start" as something else clashes with that now? Also: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
 
@@ -112,7 +138,6 @@ task distApp (type: Sync) {
     dependsOn jar
 
     into ("$distsDir/app")
-    from ("$rootDir/Heightmap.txt") {}
     from ("$rootDir/README.markdown") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
@@ -174,6 +199,7 @@ task distModules (type: Sync) {
                 dependencies {
                     // TODO: When version handling and promotion is in then we can probably remove "changing"
                     compile group: 'org.nanoware.modules', name: dependency, version: '+', changing: true
+                    // TODO: Is "changing" set everywhere it is needed? Maybe that's why module dependencies fail to update in Jenkins?
                 }
             }
         }
