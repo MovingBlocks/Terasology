@@ -23,7 +23,6 @@ import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
 import org.terasology.rendering.nui.skin.UISkin;
-import org.terasology.rendering.nui.skin.UIStyle;
 
 import java.util.List;
 
@@ -36,35 +35,39 @@ public class TooltipLineRenderer extends AbstractItemRenderer<TooltipLine> {
 
     @Override
     public void draw(TooltipLine value, Canvas canvas) {
-        final UISkin skin = value.getSkin();
-        if (skin != null) {
-            canvas.setSkin(skin);
-            canvas.setFamily(value.getFamily());
-            canvas.drawText(value.getText());
-        } else {
-            canvas.setSkin(defaultSkin);
-
-            Font font = value.getFont();
-            if (font == null) {
-                font = canvas.getCurrentStyle().getFont();
-            }
-            Color color = value.getColor();
-            if (color == null) {
-                color = canvas.getCurrentStyle().getTextColor();
-            }
-            canvas.drawTextRaw(value.getText(), font, color, canvas.getRegion());
-        }
+        Font font = getFont(value);
+        Color color = getColor(value);
+        canvas.drawTextRaw(value.getText(), font, color, canvas.getRegion());
     }
 
     @Override
     public Vector2i getPreferredSize(TooltipLine value, Canvas canvas) {
-        UISkin skin = value.getSkin();
-        if (skin == null) {
-            skin = defaultSkin;
-        }
-        final UIStyle style = skin.getStyleFor(value.getFamily(), UIList.class, "item", UIWidget.DEFAULT_MODE);
-        Font font = style.getFont();
+        Font font = getFont(value);
         List<String> lines = TextLineBuilder.getLines(font, value.getText(), canvas.size().x);
         return font.getSize(lines);
+    }
+
+    private UISkin getSkin(TooltipLine value) {
+        final UISkin skin = value.getSkin();
+        if (skin != null) {
+            return skin;
+        }
+        return defaultSkin;
+    }
+
+    private Color getColor(TooltipLine value) {
+        final Color color = value.getColor();
+        if (color != null) {
+            return color;
+        }
+        return getSkin(value).getStyleFor(value.getFamily(), UIList.class, "item", UIWidget.DEFAULT_MODE).getTextColor();
+    }
+
+    private Font getFont(TooltipLine value) {
+        final Font font = value.getFont();
+        if (font != null) {
+            return font;
+        }
+        return getSkin(value).getStyleFor(value.getFamily(), UIList.class, "item", UIWidget.DEFAULT_MODE).getFont();
     }
 }

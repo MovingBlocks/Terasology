@@ -27,14 +27,16 @@ public class TooltipLine {
     private UISkin skin;
     private String family;
 
-    public TooltipLine(String text, UISkin skin, String family) {
+    public TooltipLine(String text, UISkin skin, String family, Color color, Font font) {
         this.text = text;
         this.skin = skin;
         this.family = family;
+        this.color = color;
+        this.font = font;
     }
 
     public TooltipLine(String text, UISkin skin) {
-        this(text, skin, null);
+        this(text, skin, null, null, null);
     }
 
     public TooltipLine(String text, Color color, Font font) {
