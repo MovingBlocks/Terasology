@@ -274,7 +274,10 @@ public class ConsoleImpl implements Console {
 
                 return true;
             } catch (IllegalArgumentException e) {
-                addErrorMessage(e.getLocalizedMessage());
+                String msgText = e.getLocalizedMessage();
+                if (msgText != null) {
+                    addErrorMessage(msgText);
+                }
                 return false;
                 
             } catch (Exception e) {

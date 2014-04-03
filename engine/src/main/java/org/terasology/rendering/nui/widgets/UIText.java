@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.terasology.logic.console.Message.NEW_LINE;
+
 /**
  * @author Immortius
  */
@@ -57,7 +59,7 @@ public class UIText extends CoreWidget {
     private static final Logger logger = LoggerFactory.getLogger(UIText.class);
 
     private static final float BLINK_RATE = 0.25f;
-
+    
     private float blinkCounter;
 
     private TextureRegion cursorTexture;
@@ -77,6 +79,9 @@ public class UIText extends CoreWidget {
 
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
+    /**
+     * Horizontal scrolling offset in pixels
+     */
     private int offset;
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -260,9 +265,61 @@ public class UIText extends CoreWidget {
                     event.consume();
                     break;
                 }
+                case KeyId.UP: {
+                    if (multiline) {
+                        int prevNl1 = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1);
+                        int prevNl2 = fullText.lastIndexOf(NEW_LINE, prevNl1 - 1);
+
+                        if (prevNl1 >= 0) {
+                            int newIdx = Math.min(prevNl1, prevNl2 + cursorPosition - prevNl1);
+                            cursorPosition = newIdx;
+                            
+                            if (!isSelectionModifierActive()) {
+                                selectionStart = cursorPosition;
+                            }
+                            
+                            // reset horizontal scrolling offset
+                            offset = 0;
+                        }
+                    }
+                    event.consume();
+                    break;
+                }
+                case KeyId.DOWN: {
+                    if (multiline) {
+                        int prevNl = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+                        int nextNl = fullText.indexOf(NEW_LINE, cursorPosition);
+                        int nextNl2 = fullText.indexOf(NEW_LINE, nextNl + 1);
+                        if (nextNl2 < 0) {
+                            nextNl2 = fullText.length();
+                        }
+                        if (nextNl >= 0) {
+                            // the offset could be larger than one line -> restrict to nextNl2
+                            int newIdx = Math.min(nextNl2, nextNl + cursorPosition - prevNl + 1);
+                            cursorPosition = newIdx;
+
+                            if (!isSelectionModifierActive()) {
+                                selectionStart = newIdx;
+                            }
+                            
+                            // reset horizontal scrolling offset
+                            offset = 0;
+                        }
+                    }
+                    event.consume();
+                    break;
+                }
                 case KeyId.HOME: {
-                    cursorPosition = 0;
-                    offset = 0;
+                    if (multiline) {
+                        // subtract 1 to avoid searching at the current location
+                        // add 1 to go to the first char.
+                        // negative indices and "not found" return -1
+                        int nlIdx = fullText.lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+                        cursorPosition = nlIdx;
+                    } else {
+                        cursorPosition = 0;
+                    }
+                    
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
@@ -270,7 +327,15 @@ public class UIText extends CoreWidget {
                     break;
                 }
                 case KeyId.END: {
-                    cursorPosition = fullText.length();
+                    if (multiline) {
+                        int nlIdx = fullText.indexOf(NEW_LINE, cursorPosition);
+                        if (nlIdx < 0) {
+                            nlIdx = fullText.length();
+                        }
+                        cursorPosition = nlIdx;
+                    } else {
+                        cursorPosition = fullText.length();
+                    }
                     if (!isSelectionModifierActive()) {
                         selectionStart = cursorPosition;
                     }
@@ -315,8 +380,12 @@ public class UIText extends CoreWidget {
                         break;
                     }
                     case KeyId.ENTER: {
-                        for (ActivateEventListener listener : listeners) {
-                            listener.onActivated(this);
+                        if (!multiline) {
+                            for (ActivateEventListener listener : listeners) {
+                                listener.onActivated(this);
+                            }
+                        } else {
+                            insertText(NEW_LINE);
                         }
                         event.consume();
                         break;
@@ -325,7 +394,7 @@ public class UIText extends CoreWidget {
                         if (Keyboard.isKeyDown(KeyId.LEFT_CTRL) || Keyboard.isKeyDown(KeyId.RIGHT_CTRL)) {
                             if (event.getKey() == Keyboard.Key.V) {
                                 removeSelection();
-                                paste();
+                                insertText(getClipboardContents());
                                 event.consume();
                                 break;
                             } else if (event.getKey() == Keyboard.Key.X) {
@@ -335,12 +404,9 @@ public class UIText extends CoreWidget {
                                 break;
                             }
                         }
-                        if (event.getKeyCharacter() != 0 && lastFont.hasCharacter(event.getKeyCharacter())) {
-                            String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
-                            String after = fullText.substring(Math.max(cursorPosition, selectionStart));
-                            setText(before + event.getKeyCharacter() + after);
-                            cursorPosition = Math.min(cursorPosition, selectionStart) + 1;
-                            selectionStart = cursorPosition;
+                        char keyCharacter = event.getKeyCharacter();
+                        if (keyCharacter != 0 && lastFont.hasCharacter(keyCharacter)) {
+                            insertText(String.valueOf(keyCharacter));
                             event.consume();
                         }
                         break;
@@ -348,13 +414,33 @@ public class UIText extends CoreWidget {
                 }
             }
         }
+        
+        // always show cursor when a key was pressed
+        blinkCounter = 0;
+        
         correctCursor();
         updateOffset();
     }
 
+    private void insertText(String insert) {
+        String fullText = getText();
+        String before = fullText.substring(0, Math.min(cursorPosition, selectionStart));
+        String after = fullText.substring(Math.max(cursorPosition, selectionStart));
+        setText(before + insert + after);
+        cursorPosition = Math.min(cursorPosition, selectionStart) + insert.length();
+        selectionStart = cursorPosition;
+    }
+
     private void updateOffset() {
-        if (lastFont != null && !multiline) {
-            String before = getText().substring(0, cursorPosition);
+        if (lastFont != null) {
+            int start = 0;
+            if (multiline) {
+                // subtract 1 to avoid searching at the current location
+                // add 1 to go to the first char.
+                // negative indices and "not found" return -1
+                start = getText().lastIndexOf(NEW_LINE, cursorPosition - 1) + 1;
+            }
+            String before = getText().substring(start, cursorPosition);
             int cursorDist = lastFont.getWidth(before);
             if (cursorDist < offset) {
                 offset = cursorDist;
@@ -389,16 +475,6 @@ public class UIText extends CoreWidget {
             String selection = fullText.substring(Math.min(selectionStart, cursorPosition), Math.max(selectionStart, cursorPosition));
             setClipboardContents(FontColor.stripColor(selection));
         }
-    }
-
-    private void paste() {
-        String fullText = getText();
-        String before = fullText.substring(0, cursorPosition);
-        String after = fullText.substring(cursorPosition);
-        String pasted = getClipboardContents();
-        setText(before + pasted + after);
-        cursorPosition += pasted.length();
-        selectionStart = cursorPosition;
     }
 
     private String getClipboardContents() {
