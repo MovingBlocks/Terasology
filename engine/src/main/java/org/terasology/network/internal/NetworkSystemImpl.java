@@ -24,8 +24,10 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
+
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -72,12 +74,13 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.NetData;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
@@ -242,8 +245,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public Client joinLocal(String name) {
-        Client localClient = new LocalClient(name, entityManager);
+    public Client joinLocal(String name, Color color) {
+        Client localClient = new LocalClient(name, color, entityManager);
         clientList.add(localClient);
         clientPlayerLookup.put(localClient.getEntity(), localClient);
         connectClient(localClient);
@@ -569,6 +572,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                         server.setComponentDirty(netComp.getNetworkId(), component);
                     }
                     break;
+                default:
+                    break;
             }
         }
         updatedOwnedEntities(entity, component, metadata);
@@ -681,6 +686,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             }
         }
         return EntityRef.NULL;
+    }
+    
+    @Override
+    public void forceDisconnect(Client client) {
+        if (client instanceof NetClient) {
+            NetClient nc = (NetClient) client;
+            removeClient(nc);
+        }
     }
 
     void registerChannel(Channel channel) {

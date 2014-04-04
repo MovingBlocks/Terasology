@@ -36,20 +36,25 @@ public class TextLineBuilder {
 
     private boolean lineHasWord;
 
-    public TextLineBuilder(Font font, int maxWidth) {
+    public TextLineBuilder(Font font, int maxWidth, int startOffset) {
         this.font = font;
         this.spaceWidth = font.getWidth(' ');
         this.maxWidth = maxWidth;
+        this.currentLineLength = startOffset;
     }
 
     public static List<String> getLines(Font font, String text, int maxWidth) {
-        TextLineBuilder textLineBuilder = new TextLineBuilder(font, maxWidth);
+        return getLines(font, text, maxWidth, 0);
+    }
+
+    public static List<String> getLines(Font font, String text, int maxWidth, int startOffset) {
+        TextLineBuilder textLineBuilder = new TextLineBuilder(font, maxWidth, startOffset);
         textLineBuilder.addText(text);
         return textLineBuilder.getLines();
     }
 
     public void addText(String text) {
-        List<String> paragraphs = Arrays.asList(text.split("\\r?\\n"));
+        List<String> paragraphs = Arrays.asList(text.split("\\r?\\n", -1));
         for (String paragraph : paragraphs) {
             String remainder = paragraph;
             while (remainder != null && !remainder.isEmpty()) {

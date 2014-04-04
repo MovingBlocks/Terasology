@@ -257,7 +257,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
                 TextureCacheKey key = new TextureCacheKey(texture.size(), absoluteRegion.size());
                 usedTextures.add(key);
                 mesh = cachedTextures.get(key);
-                if (mesh == null) {
+                if (mesh == null || mesh.isDisposed()) {
                     MeshBuilder builder = new MeshBuilder();
                     addTiles(builder, absoluteRegion, FULL_REGION, texture.size(), FULL_REGION);
                     mesh = builder.build();
@@ -308,6 +308,14 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         usedText.add(key);
         Map<Material, Mesh> fontMesh = cachedText.get(key);
         List<String> lines = TextLineBuilder.getLines(font, text, absoluteRegion.width());
+        if (fontMesh != null) {
+            for (Mesh mesh : fontMesh.values()) {
+                if (mesh.isDisposed()) {
+                    fontMesh = null;
+                    break;
+                }
+            }
+        }
         if (fontMesh == null) {
             FontMeshBuilder meshBuilder = new FontMeshBuilder(font);
             fontMesh = meshBuilder.createTextMesh(lines, absoluteRegion.width(), hAlign, color, shadowColor);
@@ -341,7 +349,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         TextureCacheKey key = new TextureCacheKey(textureSize, region.size(), border, tile);
         usedTextures.add(key);
         Mesh mesh = cachedTextures.get(key);
-        if (mesh == null) {
+        if (mesh == null || mesh.isDisposed()) {
             MeshBuilder builder = new MeshBuilder();
 
 

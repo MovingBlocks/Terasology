@@ -16,11 +16,11 @@
 
 package org.terasology.rendering.assets.texture;
 
-import java.awt.Color;
 import java.nio.ByteBuffer;
 
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
+import org.terasology.rendering.nui.Color;
 
 import com.google.common.primitives.UnsignedBytes;
 
@@ -44,10 +44,10 @@ public final class TextureDataFactory {
      */
     public static TextureData newInstance(Color color) {
 
-        byte red = UnsignedBytes.checkedCast(color.getRed());
-        byte green = UnsignedBytes.checkedCast(color.getGreen());
-        byte blue = UnsignedBytes.checkedCast(color.getBlue());
-        byte alpha = UnsignedBytes.checkedCast(color.getAlpha());
+        byte red = UnsignedBytes.checkedCast(color.r());
+        byte green = UnsignedBytes.checkedCast(color.g());
+        byte blue = UnsignedBytes.checkedCast(color.b());
+        byte alpha = UnsignedBytes.checkedCast(color.a());
 
         ByteBuffer data = ByteBuffer.allocateDirect(4 * TEXTURE_WIDTH * TEXTURE_HEIGHT);
         for (int width = 0; width < TEXTURE_WIDTH; width++) {

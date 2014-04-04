@@ -30,7 +30,7 @@ public final class ShutdownChunkTask implements ChunkTask {
     }
 
     @Override
-    public void enact() {
+    public void run() {
     }
 
     @Override

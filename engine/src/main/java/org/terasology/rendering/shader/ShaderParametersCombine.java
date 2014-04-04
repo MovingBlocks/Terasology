@@ -44,13 +44,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 1.0f)
     private float skyInscatteringThreshold = 0.8f;
 
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogGlobalDensity = 0.05f;
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogHeightFalloff = 0.1f;
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogDensityAtViewer = 0.1f;
-
     @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);

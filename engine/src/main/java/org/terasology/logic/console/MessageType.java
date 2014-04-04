@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.console;
 
+import org.terasology.rendering.nui.Color;
 
-import org.newdawn.slick.Color;
 
 /**
  * @author Immortius

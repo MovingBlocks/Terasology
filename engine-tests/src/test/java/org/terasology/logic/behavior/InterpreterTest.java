@@ -160,7 +160,7 @@ public class InterpreterTest {
                     }
 
                     @Override
-                    public void handle(Status result) {
+                    public void handle(Status handleResult) {
 
                     }
                 });

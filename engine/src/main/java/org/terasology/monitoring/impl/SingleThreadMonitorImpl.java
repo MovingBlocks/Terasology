@@ -15,6 +15,7 @@
  */
 package org.terasology.monitoring.impl;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -139,7 +140,7 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
     @Override
     public int compareTo(SingleThreadMonitor other) {
         if (other == null) {
-            return 0;
+            return -1;
         }
         final boolean alive1 = this.isAlive();
         final boolean alive2 = other.isAlive();
@@ -162,5 +163,23 @@ public class SingleThreadMonitorImpl implements SingleThreadMonitor {
             return relActive;
         }
         return relAlive;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof SingleThreadMonitor) {
+            SingleThreadMonitor other = (SingleThreadMonitor) obj;
+            return Objects.equal(isAlive(), other.isActive()) && Objects.equal(isActive(), other.isActive())
+                    && Objects.equal(name, other.getName()) && Objects.equal(getThreadId(), other.getThreadId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(isActive(), isActive(), name, getThreadId());
     }
 }

@@ -41,98 +41,62 @@
                     "horizontalSpacing": 8,
                     "family": "option-grid",
                     "contents": [
-                        {
-                            "type": "UILabel",
-                            "text": "Graphics Quality:"
-                        },
+                        "Graphics Quality:",
                         {
                             "type": "UIDropdown",
                             "id": "quality"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Environment Effects:"
-                        },
+                        "Environment Effects:",
                         {
                             "type": "UIDropdown",
                             "id": "environmentEffects"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Viewing Distance:"
-                        },
+                        "Viewing Distance:",
                         {
                             "type": "UIDropdown",
                             "id": "viewDistance"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Reflections:"
-                        },
+                        "Reflections:",
                         {
                             "type": "UIDropdown",
                             "id": "reflections"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "FOV:"
-                        },
+                        "FOV:",
                         {
                             "type": "UISlider",
                             "id": "fov"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Blur Intensity:"
-                        },
+                        "Blur Intensity:",
                         {
                             "type": "UIDropdown",
                             "id": "blur"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Bobbing:"
-                        },
+                        "Bobbing:",
                         {
                             "type": "UICheckbox",
                             "id": "bobbing"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Fullscreen:"
-                        },
+                        "Fullscreen:",
                         {
                             "type": "UICheckbox",
                             "id": "fullscreen"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Dynamic Shadows:"
-                        },
+                        "Dynamic Shadows:",
                         {
                             "type": "UIDropdown",
                             "id": "shadows"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Outline:"
-                        },
+                        "Outline:",
                         {
                             "type": "UICheckbox",
                             "id": "outline"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "VSync:"
-                        },
+                        "VSync:",
                         {
                             "type": "UICheckbox",
                             "id": "vsync"
                         },
-                        {
-                            "type": "UILabel",
-                            "text": "Camera:"
-                        },
+                        "Camera:",
                         {
                             "type": "UIDropdown",
                             "id": "camera"

@@ -15,20 +15,21 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
-import java.util.Map;
-
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import org.terasology.core.logic.generators.DefaultGenerators;
 import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
 import org.terasology.core.world.generator.chunkGenerators.FloraGenerator;
 import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
+import org.terasology.core.world.generator.chunkGenerators.OreGenerator;
 import org.terasology.core.world.generator.chunkGenerators.PerlinTerrainGenerator;
 import org.terasology.core.world.liquid.LiquidsGenerator;
 import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.Component;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.WorldConfigurator;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -45,20 +46,21 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
         register(new PerlinTerrainGenerator());
         register(new FloraGenerator());
         register(new LiquidsGenerator());
+        register(new OreGenerator());
         ForestGenerator forestGenerator = new ForestGenerator();
         DefaultGenerators.addDefaultForestGenerators(forestGenerator);
         register(forestGenerator);
     }
-    
+
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
 
         WorldConfigurator wc = new WorldConfigurator() {
 
             @Override
-            public Map<String, Object> getProperties() {
+            public Map<String, Component> getProperties() {
                 PerlinWorldConfigComponent configComp = new PerlinWorldConfigComponent();
-                Map<String, Object> map = Maps.newHashMap();
+                Map<String, Component> map = Maps.newHashMap();
                 map.put("General", configComp);
                 return map;
             }
@@ -66,5 +68,5 @@ public class PerlinWorldGenerator extends AbstractBaseWorldGenerator {
         };
 
         return Optional.of(wc);
-    }    
+    }
 }

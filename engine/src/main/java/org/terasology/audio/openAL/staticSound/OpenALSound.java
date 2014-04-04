@@ -18,10 +18,10 @@ package org.terasology.audio.openAL.staticSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.openAL.OpenALException;
+import org.terasology.audio.openAL.OpenALManager;
 
 import static org.lwjgl.openal.AL10.AL_BITS;
 import static org.lwjgl.openal.AL10.AL_CHANNELS;
@@ -33,15 +33,14 @@ import static org.lwjgl.openal.AL10.alGetBufferi;
 
 public final class OpenALSound extends AbstractAsset<StaticSoundData> implements StaticSound {
 
-
     protected float length;
-    private final AudioManager audioManager;
+    private final OpenALManager audioManager;
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
     private int bufferId;
 
 
-    public OpenALSound(AssetUri uri, StaticSoundData data, AudioManager audioManager) {
+    public OpenALSound(AssetUri uri, StaticSoundData data, OpenALManager audioManager) {
         super(uri);
         this.audioManager = audioManager;
         reload(data);
@@ -88,7 +87,7 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     @Override
     public void dispose() {
         if (bufferId != 0) {
-            // TODO: need to ensure the sound is not in use, or stop it?
+            audioManager.purgeSound(this);
             alDeleteBuffers(bufferId);
             bufferId = 0;
             OpenALException.checkState("Deleting buffer data");
@@ -102,8 +101,12 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
 
     @Override
     public void reload(StaticSoundData data) {
-        dispose();
-        bufferId = alGenBuffers();
+        if (bufferId == 0) {
+            bufferId = alGenBuffers();
+        } else {
+            audioManager.purgeSound(this);
+        }
+
         AL10.alBufferData(bufferId, data.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16, data.getData(), data.getSampleRate());
         OpenALException.checkState("Allocating sound buffer");
 

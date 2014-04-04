@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
+import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -64,6 +65,15 @@ public class ZoomableLayout extends CoreLayout {
             p.add(windowPosition);
 
             setWindowPosition(p);
+        }
+
+        @Override
+        public boolean onMouseWheel(int wheelTurns, Vector2i pos) {
+            if (Keyboard.isKeyDown(Keyboard.Key.LEFT_SHIFT.getId())) {
+                float scale = 1 + wheelTurns * 0.05f;
+                zoom(scale, scale, pos);
+            }
+            return false;
         }
     };
 
@@ -227,17 +237,16 @@ public class ZoomableLayout extends CoreLayout {
     }
 
     public void zoom(float zoomX, float zoomY, Vector2i mousePos) {
-        Vector2f mid = new Vector2f(windowSize);
-        mid.scale(0.5f);
-        mid.add(windowPosition);
-        Vector2f pos = screenToWorld(mousePos);
+        Vector2f mouseBefore = screenToWorld(mousePos);
 
         windowSize.x *= zoomX;
         windowSize.y *= zoomY;
         calculateSizes();
 
-        windowPosition.x += (pos.x - mid.x) * 0.1;
-        windowPosition.y += (pos.y - mid.y) * 0.1;
+        Vector2f mouseAfter = screenToWorld(mousePos);
+
+        windowPosition.x -= mouseAfter.x - mouseBefore.x;
+        windowPosition.y -= mouseAfter.y - mouseBefore.y;
     }
 
 

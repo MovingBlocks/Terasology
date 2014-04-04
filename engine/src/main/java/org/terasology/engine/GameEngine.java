@@ -80,11 +80,6 @@ public interface GameEngine {
      */
     void submitTask(String name, Runnable task);
 
-    /**
-     * @return Count of currently active tasks
-     */
-    int getActiveTaskCount();
-
     boolean isHibernationAllowed();
 
     void setHibernationAllowed(boolean allowed);

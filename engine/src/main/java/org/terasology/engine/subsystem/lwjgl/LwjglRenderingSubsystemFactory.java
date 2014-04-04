@@ -24,8 +24,14 @@ import org.terasology.world.chunks.ChunkProvider;
 
 public class LwjglRenderingSubsystemFactory implements RenderingSubsystemFactory {
 
+    private GLBufferPool bufferPool;
+
+    public LwjglRenderingSubsystemFactory(GLBufferPool bufferPool) {
+        this.bufferPool = bufferPool;
+    }
+
     @Override
     public WorldRenderer createWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
-        return new WorldRendererLwjgl(worldProvider, chunkProvider, localPlayerSystem);
+        return new WorldRendererLwjgl(worldProvider, chunkProvider, localPlayerSystem, bufferPool);
     }
 }

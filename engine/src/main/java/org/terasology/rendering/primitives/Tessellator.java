@@ -103,7 +103,7 @@ public class Tessellator {
         nextIndex += vertices.length;
     }
 
-    public void addMeshPartReversed(BlockMeshPart part) {
+    public void addMeshPartDoubleSided(BlockMeshPart part) {
         addMeshPart(part, true);
     }
 
@@ -111,7 +111,7 @@ public class Tessellator {
         addMeshPart(part, false);
     }
 
-    private void addMeshPart(BlockMeshPart part, boolean reversed) {
+    private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
             Vector3f vertex = part.getVertex(i);
             meshData.getVertices().add(vertex.x);
@@ -137,20 +137,20 @@ public class Tessellator {
             meshData.getTexCoord1().add(lighting.z);
         }
 
-        if (reversed) {
+        for (int i = 0; i < part.indicesSize(); ++i) {
+            meshData.getIndices().add(nextIndex + part.getIndex(i));
+        }
+        if (doubleSided) {
             for (int i = 0; i < part.indicesSize(); i += 3) {
-                int i1 = part.getIndex(i);
-                int i2 = part.getIndex(i + 1);
-                int i3 = part.getIndex(i + 2);
+                int i1 = nextIndex + part.getIndex(i);
+                int i2 = nextIndex + part.getIndex(i + 1);
+                int i3 = nextIndex + part.getIndex(i + 2);
                 meshData.getIndices().add(i1);
                 meshData.getIndices().add(i3);
                 meshData.getIndices().add(i2);
             }
-        } else {
-            for (int i = 0; i < part.indicesSize(); ++i) {
-                meshData.getIndices().add(nextIndex + part.getIndex(i));
-            }
         }
+
         nextIndex += part.size();
     }
 

@@ -22,10 +22,9 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.action.MoveItemAction;
-import org.terasology.logic.inventory.action.SwitchItemAction;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
@@ -39,7 +38,10 @@ import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.widgets.TooltipLine;
 import org.terasology.world.block.items.BlockItemComponent;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -55,6 +57,7 @@ public class InventoryCell extends CoreWidget {
     private ItemIcon icon = new ItemIcon();
 
     private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+    private InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
         @Override
@@ -86,16 +89,23 @@ public class InventoryCell extends CoreWidget {
     };
 
     public InventoryCell() {
-        icon.bindTooltip(new ReadOnlyBinding<String>() {
-            @Override
-            public String get() {
-                DisplayNameComponent displayNameComponent = getTargetItem().getComponent(DisplayNameComponent.class);
-                if (displayNameComponent != null) {
-                    return displayNameComponent.name;
-                }
-                return "";
-            }
-        });
+        icon.bindTooltipLines(
+                new ReadOnlyBinding<List<TooltipLine>>() {
+                    @Override
+                    public List<TooltipLine> get() {
+                        GetItemTooltip itemTooltip;
+
+                        DisplayNameComponent displayNameComponent = getTargetItem().getComponent(DisplayNameComponent.class);
+                        if (displayNameComponent != null) {
+                            itemTooltip = new GetItemTooltip(displayNameComponent.name);
+                        } else {
+                            itemTooltip = new GetItemTooltip();
+                        }
+                        getTargetItem().send(itemTooltip);
+
+                        return itemTooltip.getTooltipLines();
+                    }
+                });
         icon.bindIcon(new ReadOnlyBinding<TextureRegion>() {
             @Override
             public TextureRegion get() {
@@ -204,15 +214,15 @@ public class InventoryCell extends CoreWidget {
     }
 
     private void swapItem() {
-        getTransferEntity().send(new SwitchItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot()));
+        inventoryManager.switchItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot());
     }
 
     private void giveAmount(int amount) {
-        getTargetInventory().send(new MoveItemAction(localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount));
+        inventoryManager.moveItem(getTargetInventory(), localPlayer.getCharacterEntity(), getTargetSlot(), getTransferEntity(), 0, amount);
     }
 
     private void takeAmount(int amount) {
-        getTransferEntity().send(new MoveItemAction(localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount));
+        inventoryManager.moveItem(getTransferEntity(), localPlayer.getCharacterEntity(), 0, getTargetInventory(), getTargetSlot(), amount);
     }
 
     private EntityRef getTransferEntity() {

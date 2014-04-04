@@ -36,7 +36,13 @@ public class UICommandEntry extends UIText {
     @Override
     public void onKeyEvent(KeyEvent event) {
         if (event.isDown()) {
-            switch (event.getKey().getId()) {
+            int id = event.getKey().getId();
+            
+            if (id != Keyboard.KeyId.TAB && tabCompletionEngine != null) {
+                tabCompletionEngine.reset();
+            }
+            
+            switch (id) {
                 case Keyboard.KeyId.UP:
                     if (index > 0) {
                         index--;

@@ -83,11 +83,11 @@ public class CoreCommands extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
     @Command(shortDescription = "Reloads a skin")
-    public String reloadSkin(String skin) {
+    public String reloadSkin(@CommandParam("skin") String skin) {
         AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
         UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
         if (uiSkinData != null) {
@@ -99,7 +99,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Reloads a shader")
-    public String reloadShader(String shader) {
+    public String reloadShader(@CommandParam("shader") String shader) {
         AssetUri uri = new AssetUri(AssetType.SHADER, shader);
         ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
         if (shaderData != null) {
@@ -111,7 +111,7 @@ public class CoreCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Reloads a material")
-    public String reloadMaterial(String material) {
+    public String reloadMaterial(@CommandParam("material") String material) {
         AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
         MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
         if (materialData != null) {

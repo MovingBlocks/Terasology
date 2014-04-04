@@ -80,6 +80,12 @@ public class DebugControlSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
+    public void onToggleViewDistance(ToggleViewDistanceButton button, EntityRef entity) {
+        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
+        button.consume();
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
         boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
@@ -100,6 +106,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                 case Keyboard.KeyId.LEFT:
                     world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
+                    break;
+                default:
                     break;
             }
         }
@@ -131,6 +139,8 @@ public class DebugControlSystem extends BaseComponentSystem {
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
+                default:
+                    break;
             }
         }
 
@@ -143,19 +153,14 @@ public class DebugControlSystem extends BaseComponentSystem {
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
-            case Keyboard.KeyId.F:
-                toggleViewingDistance();
-                event.consume();
-                break;
             case Keyboard.KeyId.F4:
                 overlay.toggleMetricsMode();
                 event.consume();
+                break;
+            default:
                 break;
 
         }
     }
 
-    private void toggleViewingDistance() {
-        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
-    }
 }

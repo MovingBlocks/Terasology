@@ -35,9 +35,9 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

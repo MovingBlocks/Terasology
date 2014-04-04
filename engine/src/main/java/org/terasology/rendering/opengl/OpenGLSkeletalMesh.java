@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -61,8 +62,11 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     private int vboUVBuffer;
     private int vboIndexBuffer;
 
-    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
+    private GLBufferPool bufferPool;
+
+    public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
         super(uri);
+        this.bufferPool = bufferPool;
         reload(data);
     }
 
@@ -71,14 +75,14 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {
-            vboPosNormBuffer = GL15.glGenBuffers();
+            vboPosNormBuffer = bufferPool.get(getURI().toSimpleString());
         }
 
         IntBuffer indexBuffer = BufferUtils.createIntBuffer(newData.getIndices().size());
         indexBuffer.put(newData.getIndices().toArray());
         indexBuffer.flip();
         if (vboIndexBuffer == 0) {
-            vboIndexBuffer = GL15.glGenBuffers();
+            vboIndexBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboElementData(vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
@@ -90,7 +94,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         uvBuffer.flip();
 
         if (vboUVBuffer == 0) {
-            vboUVBuffer = GL15.glGenBuffers();
+            vboUVBuffer = bufferPool.get(getURI().toSimpleString());
         }
         VertexBufferObjectUtil.bufferVboData(vboUVBuffer, uvBuffer, GL15.GL_STATIC_DRAW);
     }
@@ -98,15 +102,15 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     @Override
     public void dispose() {
         if (vboIndexBuffer != 0) {
-            GL15.glDeleteBuffers(vboIndexBuffer);
+            bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;
         }
         if (vboPosNormBuffer != 0) {
-            GL15.glDeleteBuffers(vboPosNormBuffer);
+            bufferPool.dispose(vboPosNormBuffer);
             vboPosNormBuffer = 0;
         }
         if (vboUVBuffer != 0) {
-            GL15.glDeleteBuffers(vboUVBuffer);
+            bufferPool.dispose(vboUVBuffer);
             vboUVBuffer = 0;
         }
     }

@@ -64,6 +64,7 @@ import java.util.Map;
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
+
     @In
     private EntityManager entityManager;
     @In
@@ -135,7 +136,9 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         try {
             Files.createDirectories(savePath);
             Path file = savePath.resolve(uri.getAssetName() + ".behavior");
-            loader.save(new FileOutputStream(file.toFile()), tree.getData());
+            try (FileOutputStream fos = new FileOutputStream(file.toFile())) {
+                loader.save(fos, tree.getData());
+            }
         } catch (IOException e) {
             throw new RuntimeException("Cannot save asset " + uri + " to " + savePath, e);
         }

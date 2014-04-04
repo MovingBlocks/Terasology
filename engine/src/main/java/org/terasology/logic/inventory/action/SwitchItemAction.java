@@ -21,8 +21,10 @@ import org.terasology.entitySystem.event.AbstractConsumableEvent;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @deprecated Use InventoryManager method instead.
  */
 @API
+@Deprecated
 public class SwitchItemAction extends AbstractConsumableEvent {
     private EntityRef instigator;
     private EntityRef to;

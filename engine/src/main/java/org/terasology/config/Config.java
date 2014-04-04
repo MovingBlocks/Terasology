@@ -16,6 +16,7 @@
 
 package org.terasology.config;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,11 +29,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.entitySystem.Component;
 import org.terasology.input.Input;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
@@ -45,7 +49,9 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
@@ -63,9 +69,9 @@ public final class Config {
     private RenderingConfig rendering = new RenderingConfig();
     private ModuleConfig defaultModSelection = new ModuleConfig();
     private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
+    private Map<SimpleUri, Map<String, JsonElement>> moduleConfigs = Maps.newHashMap();
     private NetworkConfig network = new NetworkConfig();
     private SecurityConfig security = new SecurityConfig();
-
 
     /**
      * Create a new, empty config
@@ -179,6 +185,13 @@ public final class Config {
                 .setPrettyPrinting().create();
     }
 
+    private static Gson createGsonForModules() {
+        return new GsonBuilder()
+                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+                .registerTypeAdapterFactory(new UriTypeAdapterFactory())
+                .setPrettyPrinting().create();
+    }
+    
     private static void merge(JsonObject target, JsonObject from) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -195,6 +208,49 @@ public final class Config {
         }
     }
 
+    /**
+     * @param uri the uri to look uo
+     * @return a set that contains all keys for that uri, never <code>null</code>
+     */
+    public Set<String> getModuleConfigKeys(SimpleUri uri) {
+        Map<String, JsonElement> map = moduleConfigs.get(uri);
+        if (map == null) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(map.keySet());
+    }
+    
+    /**
+     * @param uri the uri to look up
+     * @param key the look-up key
+     * @param clazz the class to convert the data to
+     * @return a config component for the given uri and class or <code>null</code>
+     */
+    public <T extends Component> T getModuleConfig(SimpleUri uri, String key, Class<T> clazz) {
+        Map<String, JsonElement> map = moduleConfigs.get(uri);
+        if (map == null) {
+            return null;
+        } 
+        
+        JsonElement element = map.get(key);
+        Gson gson = createGsonForModules();
+        return gson.fromJson(element, clazz);
+    }
+
+    /**
+     * @param generatorUri the generator Uri 
+     * @param configs the new config params for the world generator
+     */
+    public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
+        Gson gson = createGsonForModules();
+        Map<String, JsonElement> map = Maps.newHashMap();
+        for (Map.Entry<String, Component> entry : configs.entrySet()) {
+            JsonElement json = gson.toJsonTree(entry.getValue());
+            map.put(entry.getKey(), json);
+        }
+        this.moduleConfigs.put(generatorUri, map);
+    }
+    
     private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
 
         @Override

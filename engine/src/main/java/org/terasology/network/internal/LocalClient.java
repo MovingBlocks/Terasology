@@ -24,6 +24,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -36,8 +38,8 @@ public class LocalClient extends AbstractClient {
 
     private Config config = CoreRegistry.get(Config.class);
 
-    public LocalClient(String name, EntityManager entityManager) {
-        createEntity(name, entityManager);
+    public LocalClient(String name, Color color, EntityManager entityManager) {
+        createEntity(name, color, entityManager);
     }
 
     @Override
@@ -52,6 +54,18 @@ public class LocalClient extends AbstractClient {
         return "Unknown";
     }
 
+    @Override
+    public Color getColor() {
+        ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
+            if (colorComp != null) {
+                return colorComp.color;
+            }
+        }
+        return Color.WHITE;
+    }
+    
     @Override
     public String getId() {
         return "local";

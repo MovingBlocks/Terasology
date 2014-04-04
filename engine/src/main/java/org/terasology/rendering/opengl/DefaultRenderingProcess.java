@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
@@ -800,35 +801,47 @@ public class DefaultRenderingProcess {
 
     public void renderPost(StereoRenderState stereoRenderState) {
         if (config.getRendering().isLightShafts()) {
+            PerformanceMonitor.startActivity("Rendering light shafts");
             generateLightShafts();
+            PerformanceMonitor.endActivity();
         }
 
+        PerformanceMonitor.startActivity("Pre-post processing");
         generatePrePost();
+        PerformanceMonitor.endActivity();
 
         if (config.getRendering().isEyeAdaptation()) {
+            PerformanceMonitor.startActivity("Rendering eye adaption");
             generateDownsampledScene();
+            PerformanceMonitor.endActivity();
         }
 
+        PerformanceMonitor.startActivity("Updating exposure");
         updateExposure();
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Tone mapping");
         generateToneMappedScene();
+        PerformanceMonitor.endActivity();
 
         if (config.getRendering().isBloom()) {
+            PerformanceMonitor.startActivity("Applying bloom");
             generateHighPass();
-        }
-
-        for (int i = 0; i < 3; i++) {
-            if (config.getRendering().isBloom()) {
+            for (int i = 0; i < 3; i++) {
                 generateBloom(i);
             }
+            PerformanceMonitor.endActivity();
         }
 
+        PerformanceMonitor.startActivity("Applying blur");
         for (int i = 0; i < 2; i++) {
             if (config.getRendering().getBlurIntensity() != 0) {
                 generateBlur(i);
             }
         }
+        PerformanceMonitor.endActivity();
 
+        PerformanceMonitor.startActivity("Rendering final scene");
         if (stereoRenderState == StereoRenderState.OCULUS_LEFT_EYE
                 || stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE
                 || (stereoRenderState == StereoRenderState.MONO && takeScreenshot)) {
@@ -844,6 +857,7 @@ public class DefaultRenderingProcess {
                 || stereoRenderState == StereoRenderState.OCULUS_RIGHT_EYE) {
             renderFinalScene();
         }
+        PerformanceMonitor.endActivity();
     }
 
     private void renderFinalSceneToRT(StereoRenderState stereoRenderState) {

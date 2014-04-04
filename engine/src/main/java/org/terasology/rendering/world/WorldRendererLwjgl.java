@@ -24,6 +24,7 @@ import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.Time;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -104,7 +105,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
-    private static final int MAX_CHUNKS = ViewDistance.ULTRA.getChunkDistance() * ViewDistance.ULTRA.getChunkDistance();
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance() * ViewDistance.MEGA.getChunkDistance();
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRendererLwjgl.class);
 
@@ -184,11 +185,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Initializes a new (local) world for the single player mode.
      */
-    public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
+    public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(worldProvider);
+        chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
         skysphere = new Skysphere(this);
         chunkUpdateManager = new ChunkUpdateManager(chunkTessellator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
@@ -265,16 +266,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 }
 
                 // add
-                List<Rect2i> addRects = Rect2i.difference(newView, oldView);
-                for (Rect2i r : addRects) {
-                    for (int x = r.minX(); x <= r.maxX(); ++x) {
-                        for (int y = r.minY(); y <= r.maxY(); ++y) {
-                            ChunkImpl c = chunkProvider.getChunk(x, 0, y);
-                            if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
-                                chunksInProximity.add(c);
-                            } else {
-                                chunksCurrentlyPending = true;
-                            }
+                for (int x = newView.minX(); x <= newView.maxX(); ++x) {
+                    for (int y = newView.minY(); y <= newView.maxY(); ++y) {
+                        ChunkImpl c = chunkProvider.getChunk(x, 0, y);
+                        if (c != null && c.getChunkState() == ChunkImpl.State.COMPLETE && worldProvider.getLocalView(c.getPos()) != null) {
+                            chunksInProximity.add(c);
+                        } else {
+                            chunksCurrentlyPending = true;
                         }
                     }
                 }

@@ -146,14 +146,14 @@ public class MigLayout extends CoreLayout<MigLayout.CCHint> implements Container
         final ComponentWrapper cw = getWrapper(element);
 
         final String cStr = ConstraintParser.prepare(hint != null ? hint.cc : "");
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+        CC constraint = AccessController.doPrivileged(new PrivilegedAction<CC>() {
             @Override
-            public Object run() {
-                ccMap.put(cw, ConstraintParser.parseComponentConstraint(cStr));
-                return null;
+            public CC run() {
+                return ConstraintParser.parseComponentConstraint(cStr);
             }
         });
 
+        ccMap.put(cw, constraint);
         wrappers.put(element, cw);
         children.add(cw);
         dirty = true;

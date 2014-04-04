@@ -559,7 +559,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         }
 
                         @Override
-                        public void enact() {
+                        public void run() {
                             ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                             ChunkImpl chunk = chunkStore.getChunk();
 
@@ -592,7 +592,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         }
 
                         @Override
-                        public void enact() {
+                        public void run() {
                             ChunkImpl chunk = new ChunkImpl(getPosition());
                             generator.createChunk(chunk);
                             if (nearCache.putIfAbsent(getPosition(), chunk) != null) {

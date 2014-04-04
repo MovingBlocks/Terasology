@@ -25,6 +25,7 @@ import org.terasology.logic.characters.events.JumpEvent;
 import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
@@ -110,7 +111,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
             }
 
-            if (result.getMode() != MovementMode.GHOSTING) {
+            if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
                 checkMode(characterMovementComponent, result, initial, entity, input.isFirstRun());
             }
         }
@@ -122,9 +123,15 @@ public class KinematicCharacterMover implements CharacterMover {
         return result;
     }
 
+    private float getMaxSpeed(EntityRef character, MovementMode movementMode, float baseMaxSpeed) {
+        GetMaxSpeedEvent speedEvent = new GetMaxSpeedEvent(baseMaxSpeed, movementMode);
+        character.send(speedEvent);
+        return Math.max(0, speedEvent.getResultValue());
+    }
+
     /*
-     * Figure out if our position has put us into a new set of blocks and fire the appropriate events.
-     */
+    * Figure out if our position has put us into a new set of blocks and fire the appropriate events.
+    */
     private void checkBlockEntry(EntityRef entity, Vector3i oldPosition, Vector3i newPosition, float characterHeight) {
         // TODO: This will only work for tall mobs/players and single block mobs
         // is this a different position than previously
@@ -163,8 +170,8 @@ public class KinematicCharacterMover implements CharacterMover {
      */
     private void checkMode(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                            final CharacterStateEvent oldState, EntityRef entity, boolean firstRun) {
-        //If we are ghosting, the mode cannot be changed.
-        if (state.getMode() == MovementMode.GHOSTING) {
+        //If we are ghosting or we can't move, the mode cannot be changed.
+        if (state.getMode() == MovementMode.GHOSTING || state.getMode() == MovementMode.NONE) {
             return;
         }
 
@@ -254,7 +261,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        float maxSpeed = movementComp.maxClimbSpeed;
+        float maxSpeed = getMaxSpeed(entity, MovementMode.CLIMBING, movementComp.maxClimbSpeed);
         if (input.isRunning()) {
             maxSpeed *= movementComp.runFactor;
         }
@@ -330,6 +337,16 @@ public class KinematicCharacterMover implements CharacterMover {
         return direction;
     }
 
+    private void followToParent(final CharacterStateEvent state, EntityRef entity) {
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        if (!locationComponent.getParent().equals(EntityRef.NULL)) {
+            Vector3f velocity = new Vector3f(locationComponent.getWorldPosition());
+            velocity.sub(state.getPosition());
+            state.getVelocity().set(velocity);
+            state.getPosition().set(locationComponent.getWorldPosition());
+        }
+    }
+
     private void ghost(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                        CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
@@ -337,7 +354,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        float maxSpeed = movementComp.maxGhostSpeed;
+        float maxSpeed = getMaxSpeed(entity, MovementMode.GHOSTING, movementComp.maxGhostSpeed);
         if (input.isRunning()) {
             maxSpeed *= movementComp.runFactor;
         }
@@ -560,7 +577,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        float maxSpeed = movementComp.maxWaterSpeed;
+        float maxSpeed = getMaxSpeed(entity, MovementMode.SWIMMING, movementComp.maxWaterSpeed);
         if (input.isRunning()) {
             maxSpeed *= movementComp.runFactor;
         }
@@ -577,8 +594,8 @@ public class KinematicCharacterMover implements CharacterMover {
 
         // Slow down due to friction
         float speed = state.getVelocity().length();
-        if (speed > movementComp.maxWaterSpeed) {
-            state.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * input.getDelta()) / speed);
+        if (speed > maxSpeed) {
+            state.getVelocity().scale((speed - 4 * (speed - maxSpeed) * input.getDelta()) / speed);
         }
         Vector3f moveDelta = new Vector3f(state.getVelocity());
         moveDelta.scale(input.getDelta());
@@ -617,6 +634,9 @@ public class KinematicCharacterMover implements CharacterMover {
             case CLIMBING:
                 climb(movementComp, state, input, entity);
                 break;
+            case NONE:
+                followToParent(state, entity);
+                break;
             default:
                 walk(movementComp, state, input, entity);
                 break;
@@ -645,7 +665,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (lengthSquared > 1) {
             desiredVelocity.normalize();
         }
-        float maxSpeed = movementComp.maxGroundSpeed;
+        float maxSpeed = getMaxSpeed(entity, MovementMode.WALKING, movementComp.maxGroundSpeed);
         if (input.isRunning()) {
             maxSpeed *= movementComp.runFactor;
         }

@@ -18,7 +18,9 @@ package org.terasology.rendering.nui;
 import com.google.common.collect.Lists;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UILabel;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +43,7 @@ public abstract class AbstractWidget implements UIWidget {
     private Binding<Boolean> visible = new DefaultBinding<>(true);
 
     @LayoutConfig
-    private Binding<String> tooltip = new DefaultBinding<>("");
+    private Binding<UIWidget> tooltip = new DefaultBinding<>();
 
     @LayoutConfig
     private float tooltipDelay = 0.5f;
@@ -174,18 +176,32 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public void bindTooltip(Binding<String> binding) {
+    public void bindTooltip(Binding<UIWidget> binding) {
         tooltip = binding;
     }
 
     @Override
-    public String getTooltip() {
+    public UIWidget getTooltip() {
         return tooltip.get();
     }
 
     @Override
-    public void setTooltip(String val) {
+    public void setTooltip(UIWidget val) {
         tooltip.set(val);
+    }
+
+    @Override
+    public void bindTooltipString(Binding<String> bind) {
+        bindTooltip(new TooltipLabelBinding(bind));
+    }
+
+    @Override
+    public void setTooltip(String value) {
+        if (value != null && !value.isEmpty()) {
+            setTooltip(new UILabel(value));
+        } else {
+            tooltip = new DefaultBinding<>(null);
+        }
     }
 
     @Override
@@ -195,5 +211,22 @@ public abstract class AbstractWidget implements UIWidget {
 
     public final void setTooltipDelay(float value) {
         this.tooltipDelay = value;
+    }
+
+    private static class TooltipLabelBinding extends ReadOnlyBinding<UIWidget> {
+
+        private UILabel tooltipLabel = new UILabel();
+
+        public TooltipLabelBinding(Binding<String> stringBind) {
+            tooltipLabel.bindText(stringBind);
+        }
+
+        @Override
+        public UIWidget get() {
+            if (tooltipLabel.getText().isEmpty()) {
+                return null;
+            }
+            return tooltipLabel;
+        }
     }
 }

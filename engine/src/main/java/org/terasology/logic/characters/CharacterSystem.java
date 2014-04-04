@@ -74,7 +74,7 @@ public class CharacterSystem extends BaseComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})

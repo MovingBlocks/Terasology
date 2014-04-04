@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu.loadingScreen;
 
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.widgets.UILabel;
+import org.terasology.rendering.nui.widgets.UILoadBar;
 
 /**
  * @author Immortius

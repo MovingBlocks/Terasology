@@ -244,7 +244,7 @@ public class HeadlessEnvironment extends Environment {
         }
 
         moduleManager.applyActiveModules();
-        assetManager.clear();
+        assetManager.refresh();
         assetManager.applyOverrides();        
     }
 

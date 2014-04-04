@@ -35,9 +35,9 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Quat4f;

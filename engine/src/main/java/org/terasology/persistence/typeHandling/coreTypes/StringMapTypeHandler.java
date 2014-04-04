@@ -21,7 +21,6 @@ import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.SerializationContext;
 import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 import org.terasology.persistence.typeHandling.TypeHandler;
-import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 
@@ -39,7 +38,6 @@ public class StringMapTypeHandler<T> extends SimpleTypeHandler<Map<String, T>> {
     @Override
     public PersistedData serialize(Map<String, T> value, SerializationContext context) {
         Map<String, PersistedData> map = Maps.newLinkedHashMap();
-        EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (Map.Entry<String, T> entry : value.entrySet()) {
             PersistedData item = contentsHandler.serialize(entry.getValue(), context);
             if (!item.isNull()) {

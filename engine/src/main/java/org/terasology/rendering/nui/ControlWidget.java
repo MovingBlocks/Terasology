@@ -22,7 +22,7 @@ package org.terasology.rendering.nui;
  */
 public interface ControlWidget extends UIWidget {
 
-    void initialise();
+    void onOpened();
 
     void onClosed();
 

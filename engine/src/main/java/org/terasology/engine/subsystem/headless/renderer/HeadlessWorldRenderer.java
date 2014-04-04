@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 
 public class HeadlessWorldRenderer implements WorldRenderer {
 
-    private static final int MAX_CHUNKS = ViewDistance.ULTRA.getChunkDistance() * ViewDistance.ULTRA.getChunkDistance();
+    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance() * ViewDistance.MEGA.getChunkDistance();
 
     private WorldProvider worldProvider;
     private ChunkProvider chunkProvider;

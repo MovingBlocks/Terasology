@@ -18,6 +18,10 @@
         <!-- Ignore this, as it is reported incorrectly from try-with-resources (will be fixed in future versions of findbugs -->
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"/>
     </Match>
+	<Match>
+        <!-- Really don't care about Serializable in Terasology -->
+        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+    </Match>
     <Match>
         <Package name="~org\.terasology\.protobuf.*" />
     </Match>

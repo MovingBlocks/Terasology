@@ -129,7 +129,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent health) {
         BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
         if (!beforeDamage.isConsumed()) {
-            int damageAmount = calculateTotal(beforeDamage.getBaseDamage(), beforeDamage.getMultipliers(), beforeDamage.getModifiers());
+            int damageAmount = TeraMath.floorToInt(beforeDamage.getResultValue());
             if (damageAmount > 0) {
                 doDamage(entity, damageAmount, damageType, instigator, directCause, health);
             } else {
@@ -207,9 +207,11 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
 
     // Debug commands
     @Command(shortDescription = "Reduce the player's health by an amount", runOnServer = true)
-    public void damage(@CommandParam("amount") int amount, EntityRef client) {
+    public String damage(@CommandParam("amount") int amount, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoDamageEvent(amount, EngineDamageTypes.DIRECT.get(), clientComp.character));
+        
+        return "Inflicted damage of " + amount;
     }
 
     @Command(shortDescription = "Restores your health to max", runOnServer = true)
@@ -226,22 +228,24 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     }
 
     @Command(shortDescription = "Set max health", runOnServer = true)
-    public void setMaxHealth(@CommandParam("max") int max, EntityRef client) {
+    public String setMaxHealth(@CommandParam("max") int max, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             doHeal(clientComp.character, health.maxHealth, clientComp.character, health);
         }
+        return "Max health set to " + max;
     }
 
     @Command(shortDescription = "Set regen rate", runOnServer = true)
-    public void setRegenRaterate(@CommandParam("rate") float rate, EntityRef client) {
+    public String setRegenRate(@CommandParam("rate") float rate, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             health.regenRate = rate;
             clientComp.character.saveComponent(health);
         }
+        return "Set regeneration rate to " + rate;
     }
 
     @Command(shortDescription = "Show your health")

@@ -16,8 +16,10 @@
 
 package org.terasology.engine;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -57,8 +59,13 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.utilities.concurrency.ShutdownTask;
+import org.terasology.utilities.concurrency.Task;
+import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
@@ -74,9 +81,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -95,7 +100,7 @@ public class TerasologyEngine implements GameEngine {
     private Config config;
 
     private EngineTime time;
-    private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+    private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", 16);
 
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
@@ -116,6 +121,8 @@ public class TerasologyEngine implements GameEngine {
         if (initialised) {
             return;
         }
+        
+        Stopwatch sw = Stopwatch.createStarted();
 
         try {
             logger.info("Initializing Terasology...");
@@ -164,6 +171,8 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Failed to initialise Terasology", t);
             throw new RuntimeException("Failed to initialise Terasology", t);
         }
+        
+        logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
     }
 
     private void initAssets() {
@@ -192,6 +201,12 @@ public class TerasologyEngine implements GameEngine {
             @Override
             public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
                 return new BehaviorTree(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.UI_ELEMENT, new AssetFactory<UIData, UIElement>() {
+            @Override
+            public UIElement buildAsset(AssetUri uri, UIData data) {
+                return new UIElement(uri, data);
             }
         });
 
@@ -290,26 +305,36 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void submitTask(final String name, final Runnable task) {
-        threadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                Thread.currentThread().setName("Engine-Task-Pool");
-                try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                    task.run();
-                } catch (RejectedExecutionException e) {
-                    ThreadMonitor.addError(e);
-                    logger.error("Thread submitted after shutdown requested: {}", name);
-                } catch (Throwable e) {
-                    ThreadMonitor.addError(e);
+        try {
+            commonThreadPool.put(new Task() {
+                @Override
+                public String getName() {
+                    return name;
                 }
-            }
-        });
-    }
 
-    @Override
-    public int getActiveTaskCount() {
-        return threadPool.getActiveCount();
+                @Override
+                public void run() {
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                    Thread.currentThread().setName("Engine-Task-Pool");
+                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
+                        task.run();
+                    } catch (RejectedExecutionException e) {
+                        ThreadMonitor.addError(e);
+                        logger.error("Thread submitted after shutdown requested: {}", name);
+                    } catch (Throwable e) {
+                        ThreadMonitor.addError(e);
+                    }
+                }
+
+                @Override
+                public boolean isTerminateSignal() {
+                    return false;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to submit task {}, running on main thread", name, e);
+            task.run();
+        }
     }
 
     private void initManagers() {
@@ -326,7 +351,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
-        CoreRegistry.putPermanently(Game.class, new Game(time));
+        CoreRegistry.putPermanently(Game.class, new Game(this, time));
 
         AssetType.registerAssetTypes(assetManager);
         ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
@@ -421,16 +446,15 @@ public class TerasologyEngine implements GameEngine {
             currentState = null;
         }
 
-        terminateThreads();
+        stopThreads();
     }
 
-    private void terminateThreads() {
-        threadPool.shutdown();
-        try {
-            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            logger.error("Error terminating thread pool.", e);
-        }
+    public void stopThreads() {
+        commonThreadPool.shutdown(new ShutdownTask(), false);
+    }
+
+    public void restartThreads() {
+        commonThreadPool.restart();
     }
 
     private void mainLoop() {

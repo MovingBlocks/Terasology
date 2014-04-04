@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
@@ -44,7 +45,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -581,6 +582,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      */
     @Override
     public <T extends Component> T addComponent(int entityId, T component) {
+        Preconditions.checkNotNull(component);
         Component oldComponent = store.put(entityId, component);
         if (oldComponent != null) {
             logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);

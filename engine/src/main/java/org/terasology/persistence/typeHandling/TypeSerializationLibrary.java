@@ -21,12 +21,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.metadata.DefaultClassMetadata;
-import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.MappedContainer;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
@@ -41,6 +35,12 @@ import org.terasology.persistence.typeHandling.coreTypes.NumberTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.SetTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringMapTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.StringTypeHandler;
+import org.terasology.reflection.MappedContainer;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.DefaultClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Modifier;
@@ -63,6 +63,8 @@ public class TypeSerializationLibrary {
     private Set<Class<?>> coreTypeHandlers = Sets.newHashSet();
     private ReflectFactory reflectFactory;
     private CopyStrategyLibrary copyStrategies;
+
+    private Map<ClassMetadata<?, ?>, Serializer> serializerMap = Maps.newHashMap();
 
     /**
      * @param factory        The factory providing reflect implementation.
@@ -100,6 +102,23 @@ public class TypeSerializationLibrary {
             typeHandlers.put(type, original.typeHandlers.get(type));
             coreTypeHandlers.add(type);
         }
+    }
+
+    /**
+     * Obtains a serializer for the given type
+     *
+     * @param type The ClassMetadata for the type of interest
+     * @return A serializer for serializing/deserializing the type
+     */
+    @SuppressWarnings("unchecked")
+    public Serializer getSerializerFor(ClassMetadata<?, ?> type) {
+        Serializer serializer = serializerMap.get(type);
+        if (serializer == null) {
+            Map<FieldMetadata<?, ?>, TypeHandler> fieldHandlerMap = getFieldHandlerMap(type);
+            serializer = new Serializer(type, fieldHandlerMap);
+            serializerMap.put(type, serializer);
+        }
+        return serializer;
     }
 
     /**

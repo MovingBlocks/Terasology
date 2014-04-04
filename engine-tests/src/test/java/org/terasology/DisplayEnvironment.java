@@ -28,6 +28,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -70,6 +71,8 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
  * @author Martin Steiger
  */
 public class DisplayEnvironment extends HeadlessEnvironment {
+
+    private GLBufferPool bufferPool = new GLBufferPool(true);
     
     @Override
     protected void setupDisplay() {
@@ -130,13 +133,13 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
             @Override
             public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data);
+                return new OpenGLMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
             @Override
             public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data);
+                return new OpenGLSkeletalMesh(uri, data, bufferPool);
             }
         });
         assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {

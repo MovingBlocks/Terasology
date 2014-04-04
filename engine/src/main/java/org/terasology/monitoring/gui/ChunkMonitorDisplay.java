@@ -22,7 +22,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -31,6 +30,7 @@ import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
 import org.terasology.monitoring.impl.ChunkMonitorEntry;
 import org.terasology.monitoring.impl.ChunkMonitorEvent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.swing.*;
@@ -89,8 +89,8 @@ public class ChunkMonitorDisplay extends JPanel {
     private Vector3i selectedChunk;
 
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
-    private final ExecutorService executor;
-    private final Runnable renderTask;
+    private final transient ExecutorService executor;
+    private final transient Runnable renderTask;
 
     public ChunkMonitorDisplay(int refreshInterval, int chunkSize) {
         Preconditions.checkArgument(refreshInterval >= 500, "Parameter 'refreshInterval' has to be greater or equal 500 (" + refreshInterval + ")");

@@ -76,7 +76,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     @Override
-    public void enact() {
+    public void run() {
         switch (type) {
             case REVIEW:
                 for (Vector3i pos : region) {

@@ -19,9 +19,8 @@ import org.terasology.entitySystem.Component;
 import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.ForceBlockActive;
-
-import javax.vecmath.Color4f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -45,6 +44,6 @@ public final class MeshComponent implements Component {
 
     // This should be elsewhere I think, probably in the material
     @Replicate
-    public Color4f color = new Color4f(0, 0, 0, 1);
+    public Color color = Color.WHITE;
 
 }

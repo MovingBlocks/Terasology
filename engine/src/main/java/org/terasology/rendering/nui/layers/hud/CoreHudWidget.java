@@ -33,6 +33,8 @@ public abstract class CoreHudWidget extends CoreWidget implements ControlWidget 
     @LayoutConfig
     private UIWidget contents;
 
+    private boolean initialised;
+
     public void setContents(UIWidget contents) {
         this.contents = contents;
     }
@@ -40,6 +42,16 @@ public abstract class CoreHudWidget extends CoreWidget implements ControlWidget 
     public UIWidget getContents() {
         return contents;
     }
+
+    @Override
+    public void onOpened() {
+        if (!initialised) {
+            initialise();
+            initialised = true;
+        }
+    }
+
+    protected abstract void initialise();
 
     @Override
     public void onClosed() {

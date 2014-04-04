@@ -27,7 +27,7 @@
     },
     "Mesh" : {
         "mesh" : "engine:testmonkey",
-        "material" : "engine:monkeyHead1",
+        "material" : "engine:monkeyHead9",
         "hideFromOwner" : true
     },
     "Drowns" : {
