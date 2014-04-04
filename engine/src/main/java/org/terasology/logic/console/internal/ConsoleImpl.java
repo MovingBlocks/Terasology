@@ -16,27 +16,15 @@
 
 package org.terasology.logic.console.internal;
 
-import static org.reflections.ReflectionUtils.withModifier;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.*;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleMessageEvent;
-import org.terasology.logic.console.ConsoleSubscriber;
-import org.terasology.logic.console.CoreMessageType;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageType;
+import org.terasology.logic.console.*;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -44,15 +32,11 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+
+import static org.reflections.ReflectionUtils.withModifier;
 
 /**
  * The console handles commands and messages.
@@ -81,7 +65,7 @@ public class ConsoleImpl implements Console {
         addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
                 Message.NEW_LINE +
                 "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
-                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE + 
+                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
                 "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
                 "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
                 "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
@@ -142,7 +126,7 @@ public class ConsoleImpl implements Console {
     private void addErrorMessage(String message) {
         addMessage(new Message(message, CoreMessageType.ERROR));
     }
-    
+
     /**
      * Adds a message to the console
      *
@@ -157,12 +141,12 @@ public class ConsoleImpl implements Console {
             subscriber.onNewConsoleMessage(message);
         }
     }
-    
+
     @Override
     public void removeMessage(Message message) {
         messageHistory.remove(message);
     }
-    
+
     @Override
     public void replaceMessage(Message oldMsg, Message newMsg) {
         int idx = messageHistory.indexOf(oldMsg);
@@ -274,12 +258,15 @@ public class ConsoleImpl implements Console {
 
                 return true;
             } catch (IllegalArgumentException e) {
-                addErrorMessage(e.getLocalizedMessage());
+                String msgText = e.getLocalizedMessage();
+                if (msgText != null && !msgText.isEmpty()) {
+                    addErrorMessage(e.getLocalizedMessage());
+                }
                 return false;
-                
+
             } catch (Exception e) {
                 addErrorMessage("Error executing command '" + commandName + "': " + e.getLocalizedMessage());
-                
+
                 logger.error("Failed to execute command", e);
                 return false;
             }
