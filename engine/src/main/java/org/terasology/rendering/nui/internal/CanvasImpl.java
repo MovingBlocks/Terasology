@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.Time;
 import org.terasology.input.MouseInput;
@@ -45,6 +46,7 @@ import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITooltip;
+import org.terasology.rendering.opengl.FrameBufferObject;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -247,6 +249,11 @@ public class CanvasImpl implements CanvasControl {
     @Override
     public SubRegion subRegion(Rect2i region, boolean crop) {
         return new SubRegionImpl(region, crop);
+    }
+
+    @Override
+    public SubRegion subRegionFBO(AssetUri uri, Vector2i size) {
+        return new SubRegionFBOImpl(uri, size);
     }
 
     @Override
@@ -779,6 +786,25 @@ public class CanvasImpl implements CanvasControl {
                 }
                 state = previousState;
             }
+        }
+    }
+
+    private class SubRegionFBOImpl implements SubRegion {
+        private FrameBufferObject fbo;
+        private CanvasState previousState;
+
+        private SubRegionFBOImpl(AssetUri uri, Vector2i size) {
+            previousState = state;
+
+            fbo = renderer.getFBO(uri, size);
+            state = new CanvasState(state, Rect2i.createFromMinAndSize(new Vector2i(), size));
+            fbo.bindFrame();
+        }
+
+        @Override
+        public void close() {
+            fbo.unbindFrame();
+            state = previousState;
         }
     }
 

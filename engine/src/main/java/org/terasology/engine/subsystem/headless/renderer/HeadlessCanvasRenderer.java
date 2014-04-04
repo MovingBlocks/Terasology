@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,9 +15,7 @@
  */
 package org.terasology.engine.subsystem.headless.renderer;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import org.terasology.asset.AssetUri;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -30,6 +28,10 @@ import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.nui.internal.CanvasRenderer;
+import org.terasology.rendering.opengl.FrameBufferObject;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 public class HeadlessCanvasRenderer implements CanvasRenderer {
 
@@ -66,6 +68,11 @@ public class HeadlessCanvasRenderer implements CanvasRenderer {
     @Override
     public void crop(Rect2i cropRegion) {
         // Do nothing
+    }
+
+    @Override
+    public FrameBufferObject getFBO(AssetUri uri, Vector2i region) {
+        return null;
     }
 
     @Override
