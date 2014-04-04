@@ -43,6 +43,7 @@ import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.VerticalAlign;
 import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -234,7 +235,7 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     public FrameBufferObject getFBO(AssetUri uri, Vector2i size) {
         FrameBufferObject frameBufferObject = fboMap.get(uri);
         if (frameBufferObject == null) {
-            frameBufferObject = new FrameBufferObject(uri, size);
+            frameBufferObject = new LwjglFrameBufferObject(uri, size);
             fboMap.put(uri, frameBufferObject);
         }
         return frameBufferObject;
