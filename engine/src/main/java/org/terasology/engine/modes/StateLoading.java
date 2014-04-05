@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -52,6 +53,8 @@ import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
+import org.terasology.logic.chat.Chat;
+import org.terasology.logic.chat.internal.ChatImpl;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
@@ -113,6 +116,8 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
+        
+        CoreRegistry.put(Chat.class, new ChatImpl());
 
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
