@@ -31,6 +31,8 @@ import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.events.ConnectedEvent;
+import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
@@ -51,7 +53,7 @@ public class ChatSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
-
+    
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleChat(ChatButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
@@ -60,6 +62,22 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
 
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onConnect(ConnectedEvent connected, EntityRef entity) {
+        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            client.send(ChatMessageEvent.newJoinEvent(clientInfo));
+        }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDisconnect(DisconnectedEvent connected, EntityRef entity) {
+        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            client.send(ChatMessageEvent.newLeaveEvent(clientInfo));
+        }
+    }
+        
     @ReceiveEvent(components = ClientComponent.class)
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
@@ -75,7 +93,7 @@ public class ChatSystem extends BaseComponentSystem {
     public void say(@CommandParam("message") String message, EntityRef speaker) {
         logger.debug("Received chat message from {} : '{}'", speaker, message);
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(new ChatMessageEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
+            client.send(ChatMessageEvent.newTextEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
         }
     }
 }
