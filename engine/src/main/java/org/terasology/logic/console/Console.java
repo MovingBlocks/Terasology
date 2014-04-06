@@ -78,12 +78,22 @@ public interface Console {
     void unsubscribe(ConsoleSubscriber subscriber);
 
     /**
-     * Execute a command.
+     * Execute a command and log to local command history.
      *
      * @param command The whole string of the command including the command name and the optional parameters.
      * @return Returns true if the command was executed successfully.
      */
     boolean execute(String command, EntityRef callingClient);
+
+    /**
+     * Execute a command
+     * 
+     * @param commandName the command name
+     * @param params a list of parameters (no quotes!)
+     * @param callingClient the resonsible client entity
+     * @return true if successful
+     */
+    boolean execute(String commandName, List<String> params, EntityRef callingClient);
 
     List<String> splitParameters(String paramStr);
 

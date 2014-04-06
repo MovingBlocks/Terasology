@@ -188,26 +188,16 @@ public class ConsoleImpl implements Console {
         this.messageSubscribers.remove(subscriber);
     }
 
-    /**
-     * Execute a command.
-     *
-     * @param command The whole string of the command including the command name and the optional parameters.
-     * @return Returns true if the command was executed successfully.
-     */
     @Override
     public boolean execute(String command, EntityRef callingClient) {
-        if (command.length() == 0) {
+
+        // trim and remove double spaces
+        String cleanedCommand = command.trim().replaceAll("\\s\\s+", " ");
+
+        if (cleanedCommand.isEmpty()) {
             return false;
         }
-
-        Client owner = networkSystem.getOwner(callingClient);
-        if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {
-            localCommandHistory.add(command);
-        }
-
-        //remove double spaces
-        String cleanedCommand = command.replaceAll("\\s\\s+", " ");
-
+        
         //get the command name
         int commandEndIndex = cleanedCommand.indexOf(" ");
         String commandName;
@@ -224,6 +214,21 @@ public class ConsoleImpl implements Console {
         //get the parameters
         List<String> params = splitParameters(parameterPart);
 
+        Client owner = networkSystem.getOwner(callingClient);
+        if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {
+            localCommandHistory.add(command);
+        }
+
+        return execute(commandName, params, callingClient);
+    }        
+
+    @Override
+    public boolean execute(String commandName, List<String> params, EntityRef callingClient) {
+        
+        if (commandName.isEmpty()) {
+            return false;
+        }
+        
         //get the command
         CommandInfo cmd = commandLookup.get(commandName, params.size());
 

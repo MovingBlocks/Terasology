@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.console.ui;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.terasology.input.MouseInput;
 import org.terasology.logic.chat.Chat;
 import org.terasology.logic.console.Console;
@@ -70,10 +73,17 @@ public class ChatScreen extends CoreScreenLayer {
         commandLine.subscribe(new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget widget) {
-                // TODO: move command execution to separate class
-                console.execute("say \"" + commandLine.getText() + "\"", localPlayer.getClientEntity());
-                commandLine.setText("");
-                scrollArea.moveToBottom();
+                String text = commandLine.getText();
+
+                if (!text.isEmpty()) {
+                    String command = "say";
+                    List<String> params = Collections.singletonList(text);
+    
+                    // TODO: move command execution to separate class
+                    console.execute(command, params, localPlayer.getClientEntity());
+                    commandLine.setText("");
+                    scrollArea.moveToBottom();
+                }
             }
         });
 
