@@ -24,6 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Message;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -61,7 +62,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
     
     @Command(shortDescription = "Kick user by name", runOnServer = true)
-    public String kickUser(String username, EntityRef sender) {
+    public String kickUser(@CommandParam("username") String username, EntityRef sender) {
 
         // TODO: verify permissions of sender
 
@@ -79,7 +80,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Kick user by ID", runOnServer = true)
-    public String kickUserByID(int userId, EntityRef sender) {
+    public String kickUserByID(@CommandParam("userId") int userId, EntityRef sender) {
 
         // TODO: verify permissions of sender
         
@@ -94,7 +95,7 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user with ID " + userId);
     }
     
-    @Command(shortDescription = "List users")
+    @Command(shortDescription = "List users", runOnServer = true)
     public String listUsers(EntityRef sender) {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -129,7 +130,7 @@ public class ServerCommands extends BaseComponentSystem {
             return "User kick triggered for '" + name.name + "'";
         }
         
-        return "Request declined - cannot kick local user";
+        return "Request declined";
     }
 }
 
