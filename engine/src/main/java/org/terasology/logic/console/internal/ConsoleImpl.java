@@ -16,7 +16,6 @@
 
 package org.terasology.logic.console.internal;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
@@ -46,7 +45,6 @@ import static org.reflections.ReflectionUtils.withModifier;
 public class ConsoleImpl implements Console {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
     private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
-    private static final Joiner PARAMETER_JOINER = Joiner.on(", ");
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
 
@@ -247,8 +245,7 @@ public class ConsoleImpl implements Console {
         }
 
         if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
-            String paramsStr = PARAMETER_JOINER.join(params);
-            callingClient.send(new CommandEvent(commandName, paramsStr));
+            callingClient.send(new CommandEvent(commandName, params));
             return true;
         } else {
             try {
@@ -278,8 +275,7 @@ public class ConsoleImpl implements Console {
         }
     }
 
-    @Override
-    public List<String> splitParameters(String paramStr) {
+    private List<String> splitParameters(String paramStr) {
         String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
         List<String> params = Lists.newArrayList();
         for (String s : rawParams) {

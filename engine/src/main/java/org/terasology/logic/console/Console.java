@@ -95,8 +95,6 @@ public interface Console {
      */
     boolean execute(String commandName, List<String> params, EntityRef callingClient);
 
-    List<String> splitParameters(String paramStr);
-
     /**
      * Get a group of commands by their name. These will vary by the number of parameters they accept
      *
