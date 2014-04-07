@@ -51,11 +51,11 @@ public class AttachSupportRequiredSystem extends BaseComponentSystem implements 
 
     @Override
     public boolean shouldBeRemovedDueToChange(Vector3i location, Side sideChanged) {
-        final SideBlockSupportRequiredComponent component = getComponent(location, Collections.<Vector3i, Block>emptyMap());
+        final AttachSupportRequiredComponent component = getComponent(location, Collections.<Vector3i, Block>emptyMap());
         if (component != null) {
             final Block block = getBlockWithOverrides(location, Collections.<Vector3i, Block>emptyMap());
             if (!hasRequiredSupportOnSideForBlock(location, sideChanged, block)) {
-                return false;
+                return true;
             }
         }
         return false;
@@ -74,7 +74,7 @@ public class AttachSupportRequiredSystem extends BaseComponentSystem implements 
 
     @Override
     public boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides) {
-        final SideBlockSupportRequiredComponent component = getComponent(location, blockOverrides);
+        final AttachSupportRequiredComponent component = getComponent(location, blockOverrides);
         if (component != null) {
             final Block block = getBlockWithOverrides(location, blockOverrides);
             for (Side side : Side.values()) {
@@ -82,8 +82,9 @@ public class AttachSupportRequiredSystem extends BaseComponentSystem implements 
                     return true;
                 }
             }
+            return false;
         }
-        return false;
+        return true;
     }
 
     private EntityRef getEntity(Vector3i location, Map<Vector3i, Block> blockOverrides) {
@@ -95,13 +96,12 @@ public class AttachSupportRequiredSystem extends BaseComponentSystem implements 
         if (blockEntity.exists()) {
             return blockEntity;
         } else {
-            final Block blockAtPosition = getBlockWithOverrides(location, blockOverrides);
-            return blockAtPosition.getEntity();
+            return worldProvider.getBlock(location).getEntity();
         }
     }
 
-    private SideBlockSupportRequiredComponent getComponent(Vector3i location, Map<Vector3i, Block> blockOverrides) {
-        return getEntity(location, blockOverrides).getComponent(SideBlockSupportRequiredComponent.class);
+    private AttachSupportRequiredComponent getComponent(Vector3i location, Map<Vector3i, Block> blockOverrides) {
+        return getEntity(location, blockOverrides).getComponent(AttachSupportRequiredComponent.class);
     }
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {

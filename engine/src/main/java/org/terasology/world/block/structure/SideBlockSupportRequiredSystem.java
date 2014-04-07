@@ -93,7 +93,7 @@ public class SideBlockSupportRequiredSystem extends BaseComponentSystem implemen
         if (component != null) {
             return isSufficientlySupported(location, null, blockOverrides, component);
         }
-        return false;
+        return true;
     }
 
     private EntityRef getEntity(Vector3i location, Map<Vector3i, Block> blockOverrides) {
@@ -105,8 +105,7 @@ public class SideBlockSupportRequiredSystem extends BaseComponentSystem implemen
         if (blockEntity.exists()) {
             return blockEntity;
         } else {
-            final Block blockAtPosition = getBlockWithOverrides(location, blockOverrides);
-            return blockAtPosition.getEntity();
+            return worldProvider.getBlock(location).getEntity();
         }
     }
 

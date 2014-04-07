@@ -28,6 +28,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 import org.terasology.world.BlockEntityRegistry;
@@ -35,7 +36,6 @@ import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
 
 import java.util.Collections;
@@ -79,7 +79,8 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
-        if (event.getNewType() == BlockManager.getAir()) {
+        PerformanceMonitor.startActivity("StructuralCheck");
+        try {
             boolean initialEvent = !midDestruction;
 
             if (initialEvent) {
@@ -107,6 +108,8 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
                     gatheringEntity.destroy();
                 }
             }
+        } finally {
+            PerformanceMonitor.endActivity();
         }
     }
 
@@ -131,36 +134,11 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
             for (BlockStructuralSupport support : supports) {
                 if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
+                    System.out.println("Removing block due to: " + support.getClass());
                     blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
                     break;
                 }
             }
         }
-    }
-
-    private boolean hasSupport(Vector3i blockPosition, SideBlockSupportRequiredComponent supportComponent, Map<Vector3i, Block> blockOverrides) {
-        if (supportComponent.bottomAllowed && hasBlockOnSide(blockPosition, Side.BOTTOM, blockOverrides)) {
-            return true;
-        }
-        if (supportComponent.topAllowed && hasBlockOnSide(blockPosition, Side.TOP, blockOverrides)) {
-            return true;
-        }
-        if (supportComponent.sideAllowed && (hasBlockOnSide(blockPosition, Side.LEFT, blockOverrides) || hasBlockOnSide(blockPosition, Side.RIGHT, blockOverrides)
-                || hasBlockOnSide(blockPosition, Side.FRONT, blockOverrides) || hasBlockOnSide(blockPosition, Side.BACK, blockOverrides))) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean hasBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
-        final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
-        if (!worldProvider.isBlockRelevant(sideBlockPosition)) {
-            return true;
-        }
-        final Block overrideBlock = blockOverrides.get(sideBlockPosition);
-        if (overrideBlock != null) {
-            return overrideBlock != BlockManager.getAir();
-        }
-        return worldProvider.getBlock(sideBlockPosition) != BlockManager.getAir();
     }
 }
