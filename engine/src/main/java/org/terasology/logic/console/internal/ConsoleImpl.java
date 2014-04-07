@@ -18,12 +18,24 @@ package org.terasology.logic.console.internal;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.*;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
+
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.*;
+import org.terasology.logic.console.Command;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleMessageEvent;
+import org.terasology.logic.console.ConsoleSubscriber;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.MessageType;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -33,7 +45,11 @@ import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import static org.reflections.ReflectionUtils.withModifier;
 
@@ -211,6 +227,14 @@ public class ConsoleImpl implements Console {
 
         //get the parameters
         List<String> params = splitParameters(parameterPart);
+
+        // remove quotation marks
+        for (int i = 0; i < params.size(); i++) {
+            String value = params.get(i);
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                params.set(i, value.substring(1, value.length() - 1));
+            }
+        }
 
         Client owner = networkSystem.getOwner(callingClient);
         if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {

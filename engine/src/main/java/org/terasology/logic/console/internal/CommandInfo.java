@@ -172,10 +172,6 @@ public class CommandInfo {
                 } else if (type == String.class) {
                     String value = params.get(i);
 
-                    // remove quotation marks
-                    if (value.startsWith("\"") && value.endsWith("\"")) {
-                        value = value.substring(1, value.length() - 1);
-                    }
                     processedParams[i] = value;
                 }
             } catch (NumberFormatException e) {
