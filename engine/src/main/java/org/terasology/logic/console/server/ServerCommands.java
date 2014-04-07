@@ -28,7 +28,9 @@ import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Message;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -86,8 +88,9 @@ public class ServerCommands extends BaseComponentSystem {
         
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+            NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
 
-            if (userId == clientInfo.getId()) {
+            if (userId == nc.getNetworkId()) {
                 return kick(clientEntity);
             }
         }
@@ -95,19 +98,19 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user with ID " + userId);
     }
     
-    @Command(shortDescription = "List users", runOnServer = true)
+    @Command(shortDescription = "List users")
     public String listUsers(EntityRef sender) {
 
         StringBuilder stringBuilder = new StringBuilder();
         
-        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
-            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+        for (EntityRef clientInfo : entityManager.getEntitiesWith(ClientInfoComponent.class)) {
 
             DisplayNameComponent dnc = clientInfo.getComponent(DisplayNameComponent.class);
             ColorComponent cc = clientInfo.getComponent(ColorComponent.class);
+            NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
             
             String playerText = FontColor.getColored(dnc.name, cc.color);
-            String line = String.format("%s - %s (%d)", playerText, dnc.description, clientInfo.getId());
+            String line = String.format("%s - %s (%d)", playerText, dnc.description, nc.getNetworkId());
             
             stringBuilder.append(line);
             stringBuilder.append(Message.NEW_LINE);
