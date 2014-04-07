@@ -87,9 +87,14 @@ public interface ChunkProvider {
     void removeRelevanceEntity(EntityRef entity);
 
     /**
+     * Finish adding any pending chunks
+     */
+    void completeUpdate();
+
+    /**
      * Updates the near cache based on the movement of the caching entities
      */
-    void update();
+    void beginUpdate();
 
     /**
      * @param pos

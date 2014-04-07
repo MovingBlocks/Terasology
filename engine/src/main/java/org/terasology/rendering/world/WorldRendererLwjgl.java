@@ -975,11 +975,16 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         updateTick(delta);
         PerformanceMonitor.endActivity();
 
-        worldProvider.processPropagation();
+        PerformanceMonitor.startActivity("Complete chunk update");
+        chunkProvider.completeUpdate();
+        PerformanceMonitor.endActivity();
 
-        // Free unused space
-        PerformanceMonitor.startActivity("Update Chunk Cache");
-        chunkProvider.update();
+        PerformanceMonitor.startActivity("Update Lighting");
+        worldProvider.processPropagation();
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Begin chunk update");
+        chunkProvider.beginUpdate();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");
@@ -1113,7 +1118,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         Vector3i newChunkPos = calcCamChunkOffset();
         Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
 
-        chunkProvider.update();
+        chunkProvider.completeUpdate();
+        chunkProvider.beginUpdate();
         for (Vector3i pos : Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2))) {
             RenderableChunk chunk = chunkProvider.getChunk(pos);
             if (chunk == null) {

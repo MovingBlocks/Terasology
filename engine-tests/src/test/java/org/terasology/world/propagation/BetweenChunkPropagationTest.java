@@ -251,7 +251,12 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void update() {
+        public void completeUpdate() {
+
+        }
+
+        @Override
+        public void beginUpdate() {
 
         }
 

@@ -68,7 +68,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     private ChunkGenerationPipeline pipeline;
 
     private World remoteWorld;
-    private LightMerger lightMerger = new LightMerger(this);
+
+    private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
@@ -106,7 +107,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void update() {
+    public void beginUpdate() {
         if (listener != null) {
             List<Chunk> newReadyChunks = Lists.newArrayList();
             readyChunks.drainTo(newReadyChunks);
@@ -135,16 +136,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
     }
 
-    private boolean makeChunkAvailable(Chunk chunk) {
+    private boolean makeChunkAvailable(final Chunk chunk) {
         for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
             if (chunkCache.get(pos) == null) {
                 return false;
             }
         }
-        chunk.markReady();
-        lightMerger.merge(chunk);
-        listener.onChunkReady(chunk.getPosition());
-        worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+
+        lightMerger.beginMerge(chunk, chunk);
         return true;
     }
 
@@ -235,6 +234,16 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public void removeRelevanceEntity(EntityRef entity) {
+    }
+
+    @Override
+    public void completeUpdate() {
+        Chunk chunk = lightMerger.completeMerge();
+        if (chunk != null) {
+            chunk.markReady();
+            listener.onChunkReady(chunk.getPosition());
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+        }
     }
 
     @Override

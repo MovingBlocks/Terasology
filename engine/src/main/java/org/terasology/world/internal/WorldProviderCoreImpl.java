@@ -18,11 +18,13 @@ package org.terasology.world.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
@@ -33,10 +35,7 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.chunks.*;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
@@ -57,6 +56,7 @@ import org.terasology.world.time.WorldTimeImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -168,7 +168,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            chunk.lock();
             Block oldBlockType = chunk.setBlock(blockPos, type);
+            chunk.unlock();
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
@@ -185,6 +187,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
+
         }
         return null;
     }
