@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.structure;
 
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -28,20 +29,27 @@ import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.entity.placement.PlaceBlocks;
-import org.terasology.world.block.family.AttachedToSurfaceFamily;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem
-public class BlockSupportRequiredSystem extends BaseComponentSystem {
+@Share(value = {BlockStructuralSupportRegistry.class})
+public class BlockStructuralSupportSystem extends BaseComponentSystem implements BlockStructuralSupportRegistry {
+    public static final int GATHERING_INVENTORY_SLOT_COUNT = 20;
     @In
     private WorldProvider worldProvider;
     @In
@@ -55,6 +63,19 @@ public class BlockSupportRequiredSystem extends BaseComponentSystem {
 
     private boolean midDestruction;
     private EntityRef gatheringEntity;
+
+    private Set<BlockStructuralSupport> supports = Sets.newTreeSet(
+            new Comparator<BlockStructuralSupport>() {
+                @Override
+                public int compare(BlockStructuralSupport o1, BlockStructuralSupport o2) {
+                    return o1.getPriority() - o2.getPriority();
+                }
+            });
+
+    @Override
+    public void registerBlockStructuralSupport(BlockStructuralSupport blockStructuralSupport) {
+        supports.add(blockStructuralSupport);
+    }
 
     @ReceiveEvent(components = {BlockComponent.class})
     public void checkForSupportRemoved(OnChangedBlock event, EntityRef entity) {
@@ -92,77 +113,32 @@ public class BlockSupportRequiredSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void preventInvalidPlacement(PlaceBlocks placeBlocks, EntityRef world) {
         final Map<Vector3i, Block> blocksMap = placeBlocks.getBlocks();
-        for (Map.Entry<Vector3i, Block> blockEntry : blocksMap.entrySet()) {
-            final Vector3i position = blockEntry.getKey();
-            final Block block = blockEntry.getValue();
-            if (block.isSupportRequired()) {
-                final Vector3i bottomPos = Side.BOTTOM.getAdjacentPos(position);
-                final Block setBottomBlock = blocksMap.get(bottomPos);
-                if (setBottomBlock != null && setBottomBlock == BlockManager.getAir()) {
+        for (BlockStructuralSupport support : supports) {
+            for (Map.Entry<Vector3i, Block> blockEntry : blocksMap.entrySet()) {
+                final Vector3i position = blockEntry.getKey();
+                if (!support.isSufficientlySupported(position, Collections.unmodifiableMap(blocksMap))) {
                     placeBlocks.consume();
-                    break;
-                } else if (setBottomBlock == null) {
-                    final Block bottomBlockInWorld = worldProvider.getBlock(bottomPos);
-                    if (bottomBlockInWorld == BlockManager.getAir()) {
-                        placeBlocks.consume();
-                        break;
-                    }
-                }
-            }
-            final BlockSupportRequiredComponent supportComponent = block.getEntity().getComponent(BlockSupportRequiredComponent.class);
-            if (supportComponent != null) {
-                if (!hasSupport(position, supportComponent, blocksMap)) {
-                    placeBlocks.consume();
-                    break;
+                    return;
                 }
             }
         }
-
     }
 
     private void validateSupportForBlockOnSide(Vector3i replacedBlockPosition, Side side) {
         final Vector3i blockPosition = side.getAdjacentPos(replacedBlockPosition);
-        boolean destroyBlock = false;
         if (worldProvider.isBlockRelevant(blockPosition)) {
-            Block blockAtPosition = worldProvider.getBlock(blockPosition);
-            if (side == Side.TOP && blockAtPosition.isSupportRequired()) {
-                destroyBlock = true;
-            } else if (blockAtPosition.getBlockFamily() instanceof AttachedToSurfaceFamily
-                    && ((AttachedToSurfaceFamily) blockAtPosition.getBlockFamily()).getSideAttachedTo(blockAtPosition) == side) {
-                destroyBlock = true;
-            } else {
-                EntityRef blockEntity = blockEntityRegistry.getExistingBlockEntityAt(blockPosition);
-                if (blockEntity.exists()) {
-                    BlockSupportRequiredComponent supportComponent = blockEntity.getComponent(BlockSupportRequiredComponent.class);
-                    if (supportComponent != null) {
-                        if (side.isHorizontal() && supportComponent.sideAllowed
-                                && !hasSupport(blockPosition, supportComponent, Collections.<Vector3i, Block>emptyMap())) {
-                            destroyBlock = true;
-                        } else if (!side.isHorizontal() && (supportComponent.topAllowed || supportComponent.bottomAllowed)
-                                && !hasSupport(blockPosition, supportComponent, Collections.<Vector3i, Block>emptyMap())) {
-                            destroyBlock = true;
-                        }
-                    }
-                } else {
-                    BlockSupportRequiredComponent supportComponent = blockAtPosition.getEntity().getComponent(BlockSupportRequiredComponent.class);
-                    if (supportComponent != null) {
-                        if (side.isHorizontal() && supportComponent.sideAllowed
-                                && !hasSupport(blockPosition, supportComponent, Collections.<Vector3i, Block>emptyMap())) {
-                            destroyBlock = true;
-                        } else if (!side.isHorizontal() && (supportComponent.topAllowed || supportComponent.bottomAllowed)
-                                && !hasSupport(blockPosition, supportComponent, Collections.<Vector3i, Block>emptyMap())) {
-                            destroyBlock = true;
-                        }
-                    }
+            final Side sideReverse = side.reverse();
+
+            for (BlockStructuralSupport support : supports) {
+                if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
+                    blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
+                    break;
                 }
-            }
-            if (destroyBlock) {
-                blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
             }
         }
     }
 
-    private boolean hasSupport(Vector3i blockPosition, BlockSupportRequiredComponent supportComponent, Map<Vector3i, Block> blockOverrides) {
+    private boolean hasSupport(Vector3i blockPosition, SideBlockSupportRequiredComponent supportComponent, Map<Vector3i, Block> blockOverrides) {
         if (supportComponent.bottomAllowed && hasBlockOnSide(blockPosition, Side.BOTTOM, blockOverrides)) {
             return true;
         }

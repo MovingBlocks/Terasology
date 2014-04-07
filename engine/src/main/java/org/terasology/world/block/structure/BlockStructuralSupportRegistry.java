@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.structure;
 
-import org.terasology.entitySystem.Component;
-
-/**
- * @author Marcin Sciesinski <marcins78@gmail.com>
- */
-public class BlockSupportRequiredComponent implements Component {
-    public boolean topAllowed;
-    public boolean sideAllowed;
-    public boolean bottomAllowed;
+public interface BlockStructuralSupportRegistry {
+    void registerBlockStructuralSupport(BlockStructuralSupport blockStructuralSupport);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.world.block.structure;
+
+import org.terasology.entitySystem.Component;
 
 /**
- * Torches catch on fire and stuff. On purpose!
+ * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-{
-"rotation" : "attachedToSurface",
-"sides" : {
-"shape" : "TorchWall"
-},
-"top" : {
-"shape" : "TorchGrounded"
-},
-
-"penetrable" : true,
-"attachmentAllowed" : false,
-"shadowCasting" : false,
-"luminance" : 15,
-"hardness" : 1,
-"inventory" : {
-"directPickup" : true
-},
-"entity": {
-"prefab": "Core:Torch"
-}
+public class SideBlockSupportRequiredComponent implements Component {
+    public boolean topAllowed;
+    public boolean sideAllowed;
+    public boolean bottomAllowed;
+    public long dropDelay;
 }
