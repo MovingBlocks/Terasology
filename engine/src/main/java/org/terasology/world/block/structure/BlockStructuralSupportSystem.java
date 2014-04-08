@@ -86,7 +86,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
             if (initialEvent) {
                 midDestruction = true;
                 gatheringEntity = entityManager.create();
-                gatheringEntity.addComponent(new InventoryComponent(20));
+                gatheringEntity.addComponent(new InventoryComponent(GATHERING_INVENTORY_SLOT_COUNT));
             }
             try {
                 for (Side side : Side.values()) {
@@ -95,7 +95,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
 
                 if (initialEvent) {
                     PickupBuilder pickupBuilder = new PickupBuilder(entityManager);
-                    for (int i = 0; i < 20; i++) {
+                    for (int i = 0; i < GATHERING_INVENTORY_SLOT_COUNT; i++) {
                         EntityRef item = inventoryManager.getItemInSlot(gatheringEntity, i);
                         if (item.exists()) {
                             pickupBuilder.createPickupFor(item, event.getBlockPosition().toVector3f(), 60, true);
