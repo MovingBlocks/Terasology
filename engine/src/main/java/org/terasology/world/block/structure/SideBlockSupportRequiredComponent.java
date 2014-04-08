@@ -18,6 +18,13 @@ package org.terasology.world.block.structure;
 import org.terasology.entitySystem.Component;
 
 /**
+ * Component for block entities that wish to describe their structural dependency on other blocks. One can describe
+ * what are its support sides. If a block describes multiple sides as "allowed", at least one of them is required to
+ * exist in order for the block to be "structurally sound".
+ *
+ * As an example - a chandelier would have topAllowed=true, most of building blocks for houses would be -
+ * bottomAllowed=true, sideAllowed=true, table (furniture) would be bottomAllowed=true.
+ *
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 public class SideBlockSupportRequiredComponent implements Component {

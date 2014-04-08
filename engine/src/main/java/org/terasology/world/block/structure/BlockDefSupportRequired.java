@@ -15,30 +15,16 @@
  */
 package org.terasology.world.block.structure;
 
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.registry.In;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 import java.util.Collections;
 import java.util.Map;
 
-@RegisterSystem
-public class BlockDefSupportRequiredSystem extends BaseComponentSystem implements BlockStructuralSupport {
-    @In
-    private BlockStructuralSupportRegistry registry;
-
-    @In
-    private WorldProvider worldProvider;
-
-    @Override
-    public void preBegin() {
-        registry.registerBlockStructuralSupport(this);
-    }
-
+public class BlockDefSupportRequired implements BlockStructuralSupport {
     @Override
     public int getPriority() {
         return 0;
@@ -49,7 +35,7 @@ public class BlockDefSupportRequiredSystem extends BaseComponentSystem implement
         final Block block = getBlockWithOverrides(location, blockOverrides);
         if (block.isSupportRequired()) {
             final Vector3i bottomLocation = Side.BOTTOM.getAdjacentPos(location);
-            return !worldProvider.isBlockRelevant(bottomLocation)
+            return !getWorldProvider().isBlockRelevant(bottomLocation)
                     || getBlockWithOverrides(bottomLocation, blockOverrides).isFullSide(Side.TOP);
         }
         return true;
@@ -65,6 +51,10 @@ public class BlockDefSupportRequiredSystem extends BaseComponentSystem implement
         if (blockFromOverride != null) {
             return blockFromOverride;
         }
-        return worldProvider.getBlock(location);
+        return getWorldProvider().getBlock(location);
+    }
+
+    private WorldProvider getWorldProvider() {
+        return CoreRegistry.get(WorldProvider.class);
     }
 }

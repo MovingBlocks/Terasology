@@ -17,6 +17,14 @@ package org.terasology.world.block.structure;
 
 import org.terasology.entitySystem.Component;
 
+/**
+ * Component for block entities that are attached to another block and depend on this block allowing to have been
+ * attached to. The side it can be attached to is variable (i.e. torch attaches to 4 sides or bottom).
+ *
+ * If the supporting block is removed or changed to one that does not support attachment, the block
+ * (attachment) will be destroyed. The check for which side this block entity is attached to is done via BlockMeshPart.
+ *
+ * @author Marcin Sciesinski <marcins78@gmail.com>
+ */
 public class AttachSupportRequiredComponent implements Component {
-
 }

@@ -73,6 +73,13 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
             });
 
     @Override
+    public void preBegin() {
+        registerBlockStructuralSupport(new AttachSupportRequired());
+        registerBlockStructuralSupport(new BlockDefSupportRequired());
+        registerBlockStructuralSupport(new SideBlockSupportRequired());
+    }
+
+    @Override
     public void registerBlockStructuralSupport(BlockStructuralSupport blockStructuralSupport) {
         supports.add(blockStructuralSupport);
     }
