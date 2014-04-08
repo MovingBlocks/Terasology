@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.internal;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
-import org.terasology.logic.console.ConsoleColors;
-import org.terasology.rendering.FontColor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -40,10 +37,6 @@ import java.util.List;
  */
 public class CommandInfo {
     private static final Logger logger = LoggerFactory.getLogger(CommandInfo.class);
-
-    private static final Joiner PARAM_JOINER = Joiner.on(", ");
-    private static final String PROVIDER_VAR = "provider";
-    private static final String CLIENT_VAR = "client";
 
     private Method method;
     private Object provider;
@@ -170,9 +163,7 @@ public class CommandInfo {
                 } else if (type == Integer.TYPE) {
                     processedParams[i] = Integer.parseInt(params.get(i));
                 } else if (type == String.class) {
-                    String value = params.get(i);
-
-                    processedParams[i] = value;
+                    processedParams[i] = params.get(i);
                 }
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Bad argument '" + params.get(i) + "'");
