@@ -18,6 +18,8 @@ package org.terasology.logic.chat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -30,6 +32,7 @@ import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
+import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
@@ -45,6 +48,9 @@ import org.terasology.rendering.nui.NUIManager;
 public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
+    private static final AssetUri CHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:chat");
+    private static final AssetUri MINICHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:minichatOverlay");
+    
     @In
     private Chat chat;
     
@@ -53,11 +59,19 @@ public class ChatSystem extends BaseComponentSystem {
 
     @In
     private NUIManager nuiManager;
-    
+
+    private MiniChatOverlay overlay;
+
+    @Override
+    public void initialise() {
+        overlay = nuiManager.addOverlay(MINICHAT_UI, MiniChatOverlay.class);
+    }
+
     @ReceiveEvent(components = ClientComponent.class)
     public void onToggleChat(ChatButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            nuiManager.toggleScreen("engine:chat");
+            nuiManager.pushScreen(CHAT_UI);
+            overlay.setVisible(false);
             event.consume();
         }
     }
@@ -85,6 +99,10 @@ public class ChatSystem extends BaseComponentSystem {
             Message message = event.getFormattedMessage();
             if (message.getType() == CoreMessageType.CHAT) {
                 chat.addMessage(message.getMessage());
+
+                if (!nuiManager.isOpen(CHAT_UI)) {
+                    overlay.setVisible(true);
+                }
             }
         }
     }
