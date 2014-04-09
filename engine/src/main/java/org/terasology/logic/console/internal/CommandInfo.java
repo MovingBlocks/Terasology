@@ -132,7 +132,7 @@ public class CommandInfo {
     }
 
     public String getUsageMessage() {
-        StringBuilder builder = new StringBuilder(FontColor.getColored(name, ConsoleColors.COMMAND));
+        StringBuilder builder = new StringBuilder(name);
         for (int i = 0; i < parameterNames.size(); i++) {
             builder.append(" <");
             builder.append(parameterTypes.get(i));

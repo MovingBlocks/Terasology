@@ -24,10 +24,13 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Command;
+import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Message;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -61,7 +64,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
     
     @Command(shortDescription = "Kick user by name", runOnServer = true)
-    public String kickUser(String username, EntityRef sender) {
+    public String kickUser(@CommandParam("username") String username, EntityRef sender) {
 
         // TODO: verify permissions of sender
 
@@ -79,14 +82,15 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Kick user by ID", runOnServer = true)
-    public String kickUserByID(int userId, EntityRef sender) {
+    public String kickUserByID(@CommandParam("userId") int userId, EntityRef sender) {
 
         // TODO: verify permissions of sender
         
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+            NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
 
-            if (userId == clientInfo.getId()) {
+            if (userId == nc.getNetworkId()) {
                 return kick(clientEntity);
             }
         }
@@ -99,14 +103,14 @@ public class ServerCommands extends BaseComponentSystem {
 
         StringBuilder stringBuilder = new StringBuilder();
         
-        for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
-            EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
+        for (EntityRef clientInfo : entityManager.getEntitiesWith(ClientInfoComponent.class)) {
 
             DisplayNameComponent dnc = clientInfo.getComponent(DisplayNameComponent.class);
             ColorComponent cc = clientInfo.getComponent(ColorComponent.class);
+            NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
             
             String playerText = FontColor.getColored(dnc.name, cc.color);
-            String line = String.format("%s - %s (%d)", playerText, dnc.description, clientInfo.getId());
+            String line = String.format("%s - %s (%d)", playerText, dnc.description, nc.getNetworkId());
             
             stringBuilder.append(line);
             stringBuilder.append(Message.NEW_LINE);
@@ -129,7 +133,7 @@ public class ServerCommands extends BaseComponentSystem {
             return "User kick triggered for '" + name.name + "'";
         }
         
-        return "Request declined - cannot kick local user";
+        return "Request declined";
     }
 }
 

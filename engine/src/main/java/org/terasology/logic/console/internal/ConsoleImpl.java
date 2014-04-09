@@ -260,7 +260,11 @@ public class ConsoleImpl implements Console {
             } catch (IllegalArgumentException e) {
                 String msgText = e.getLocalizedMessage();
                 if (msgText != null && !msgText.isEmpty()) {
-                    addErrorMessage(e.getLocalizedMessage());
+                    if (callingClient.exists()) {
+                        callingClient.send(new ConsoleMessageEvent(e.getLocalizedMessage()));
+                    } else {
+                        addErrorMessage(e.getLocalizedMessage());
+                    }
                 }
                 return false;
 
