@@ -36,7 +36,6 @@ import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersCombine;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersGelCube;
 import org.terasology.rendering.shader.ShaderParametersHdr;
 import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
 import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
@@ -92,8 +91,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
         prepareAndStoreShaderProgramInstance("block", new ShaderParametersBlock());
-        prepareAndStoreShaderProgramInstance("gelatinousCube", new ShaderParametersGelCube());
-        prepareAndStoreShaderProgramInstance("animateOpacity", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersShadowMap());
         prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
         prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
@@ -146,7 +143,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         Shader shader = Assets.getShader(uri);
         checkNotNull(shader, "Failed to resolve %s", uri);
         shader.recompile();
-        GLSLMaterial material = Assets.generateAsset(new AssetUri(AssetType.MATERIAL, uri), new MaterialData(shader), GLSLMaterial.class);
+        GLSLMaterial material = Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:prog." + title), new MaterialData(shader), GLSLMaterial.class);
         material.setShaderParameters(params);
 
         return material;

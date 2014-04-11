@@ -95,4 +95,13 @@ public class AssetSourceCollection implements AssetSource {
         return combinedList;
     }
 
+    @Override
+    public List<URL> getDelta(AssetUri uri) {
+        List<URL> combinedList = Lists.newArrayList();
+        for (AssetSource assetSource : assetSources) {
+            combinedList.addAll(assetSource.getDelta(uri));
+        }
+        return combinedList;
+    }
+
 }

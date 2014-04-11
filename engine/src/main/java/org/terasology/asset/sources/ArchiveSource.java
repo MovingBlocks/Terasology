@@ -35,12 +35,13 @@ public class ArchiveSource extends AbstractSource {
 
     private final Logger logger = LoggerFactory.getLogger(ArchiveSource.class);
 
-    public ArchiveSource(String sourceId, File archive, String assetsPath, String overridesPath) {
+    public ArchiveSource(String sourceId, File archive, String assetsPath, String overridesPath, String deltasPath) {
         super(sourceId);
 
         try {
             scanArchiveForAssets(archive, assetsPath);
             scanArchiveForOverrides(archive, overridesPath);
+            scanArchiveForDeltas(archive, deltasPath);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
@@ -86,6 +87,46 @@ public class ArchiveSource extends AbstractSource {
         }
     }
 
+    private void scanArchiveForDeltas(File file, String deltaPath) throws IOException {
+        ZipFile archive;
+
+        if (file.getName().endsWith(".jar")) {
+            archive = new JarFile(file, false);
+        } else {
+            archive = new ZipFile(file);
+        }
+
+        try {
+            Enumeration<? extends ZipEntry> lister = archive.entries();
+
+            while (lister.hasMoreElements()) {
+                ZipEntry entry = lister.nextElement();
+                String entryPath = entry.getName();
+                logger.debug("Found {}", entryPath);
+
+                if (entryPath.startsWith(deltaPath)) {
+                    String key = entryPath.substring(deltaPath.length() + 1);
+                    int moduleIndex = key.indexOf('/');
+                    String moduleName = key.substring(0, moduleIndex);
+                    key = key.substring(moduleIndex + 1);
+
+                    AssetUri uri = getUri(moduleName, key);
+                    if (uri == null || !uri.isValid()) {
+                        continue;
+                    }
+
+                    logger.debug("Discovered delta {} at {}", uri, entryPath);
+
+                    // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                    URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
+                    setDelta(uri, url);
+                }
+            }
+        } finally {
+            archive.close();
+        }
+    }
+
     protected void scanArchiveForAssets(File file, String assetsPath) throws IOException {
         ZipFile archive;
 
@@ -121,4 +162,5 @@ public class ArchiveSource extends AbstractSource {
             archive.close();
         }
     }
+
 }

@@ -70,7 +70,7 @@ public class PojoEntityManagerTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
         AssetManager assetManager = new AssetManager(moduleManager);
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override

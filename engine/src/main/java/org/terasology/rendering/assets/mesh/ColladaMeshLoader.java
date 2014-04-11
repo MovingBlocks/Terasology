@@ -43,7 +43,7 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
     private static final Logger logger = LoggerFactory.getLogger(ColladaMeshLoader.class);
 
     @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         logger.info("Loading mesh for " + urls);
 
         try {

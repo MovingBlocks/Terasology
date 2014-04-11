@@ -52,7 +52,7 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
     }
 
     @Override
-    public AtlasData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public AtlasData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         AtlasDefinition def = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), AtlasDefinition.class);
         Texture texture = Assets.getTexture(def.getTexture());
         if (texture != null) {

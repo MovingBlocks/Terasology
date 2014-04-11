@@ -355,7 +355,7 @@ public class TerasologyEngine implements GameEngine {
 
         AssetType.registerAssetTypes(assetManager);
         ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
-                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
+                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY);
         assetManager.addAssetSource(source);
 
         ApplyModulesUtil.applyModules();
@@ -363,7 +363,7 @@ public class TerasologyEngine implements GameEngine {
 
     private ModuleManager initModuleManager() {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager, config.getSystem().isReflectionsCacheEnabled()));
 
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");

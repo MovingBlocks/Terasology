@@ -61,7 +61,7 @@ public class FontLoader implements AssetLoader<FontData> {
             "chnl=" + INTEGER_PATTERN + "\\s*");
 
     @Override
-    public FontData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public FontData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             FontDataBuilder builder = new FontDataBuilder();
             parseHeader(reader.readLine());

@@ -67,7 +67,7 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
-        AssetManager assetManager = new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager()));
+        AssetManager assetManager = new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager(), false));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {

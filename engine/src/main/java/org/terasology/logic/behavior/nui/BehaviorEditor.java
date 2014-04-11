@@ -27,12 +27,7 @@ import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.BaseInteractionListener;
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.Color;
-import org.terasology.rendering.nui.InteractionListener;
-import org.terasology.rendering.nui.SubRegion;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
@@ -40,6 +35,8 @@ import javax.vecmath.Vector2f;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
 
 /**
  * @author synopia
@@ -234,7 +231,7 @@ public class BehaviorEditor extends ZoomableLayout {
 
         try {
             loader.save(os, data);
-            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null);
+            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null, Collections.<URL>emptyList());
             Port.OutputPort parent = node.getInputPort().getTargetPort();
             copy.createRenderable();
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());

@@ -110,7 +110,7 @@ public class UILoader implements AssetLoader<UIData> {
 
 
     @Override
-    public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UIData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);

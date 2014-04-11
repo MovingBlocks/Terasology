@@ -72,7 +72,7 @@ public class BlockSelectionRenderer {
         tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
-        defaultTextured = Assets.getMaterial("engine:defaultTextured");
+        defaultTextured = Assets.getMaterial("engine:prog.defaultTextured");
     }
 
     public void setEffectsTexture(Texture newEffectsTexture) {

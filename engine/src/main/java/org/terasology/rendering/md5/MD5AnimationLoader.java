@@ -59,7 +59,7 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
 
     @Override
-    public MeshAnimationData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MeshAnimationData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try {
             MD5 md5 = parse(stream);
             return createAnimation(md5);

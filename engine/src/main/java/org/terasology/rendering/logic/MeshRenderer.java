@@ -20,8 +20,11 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -296,6 +299,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 lastMesh.postRender();
             }
         }
+        Util.checkGLError();
     }
 
     @Override

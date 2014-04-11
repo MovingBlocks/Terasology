@@ -18,15 +18,7 @@ package org.terasology.engine.module;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import com.google.common.collect.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -40,34 +32,20 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
-import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.gson.VersionTypeAdapter;
 import org.terasology.version.TerasologyVersion;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -94,21 +72,23 @@ public class ModuleManagerImpl implements ModuleManager {
     private Reflections activeModuleReflections;
 
     private ClassLoader[] engineClassLoaders;
-    private Config config;
 
-    public ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager) {
-        this(moduleSecurityManager, ModuleManagerImpl.class.getClassLoader());
+    private boolean cacheReflections;
+
+    public ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager, boolean cacheReflections) {
+        this(moduleSecurityManager, cacheReflections, ModuleManagerImpl.class.getClassLoader());
     }
 
-    private ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager, ClassLoader... engineClassLoaders) {
+    private ModuleManagerImpl(ModuleSecurityManager moduleSecurityManager, boolean cacheReflections, ClassLoader... engineClassLoaders) {
         this.engineClassLoaders = Arrays.copyOf(engineClassLoaders, engineClassLoaders.length);
         this.moduleSecurityManager = moduleSecurityManager;
-
-        config = CoreRegistry.get(Config.class);
+        this.cacheReflections = cacheReflections;
 
         String filename = "engine-reflections";
 
-        engineReflections = loadReflectionsFromCacheFile(filename);
+        if (cacheReflections) {
+            engineReflections = tryLoadReflectionsFromCacheFile(filename);
+        }
 
         if (engineReflections == null) {
             ConfigurationBuilder builder = new ConfigurationBuilder()
@@ -120,7 +100,9 @@ public class ModuleManagerImpl implements ModuleManager {
             }
             engineReflections = new Reflections(builder);
 
-            saveReflectionsToCacheFile(engineReflections, filename);
+            if (cacheReflections) {
+                saveReflectionsToCacheFile(engineReflections, filename);
+            }
         }
 
         String modulePath = "/" + TerasologyConstants.ASSETS_SUBDIRECTORY + "/" + "module.txt";
@@ -132,26 +114,21 @@ public class ModuleManagerImpl implements ModuleManager {
         refresh();
     }
 
-    private Reflections loadReflectionsFromCacheFile(String filename) {
-        boolean useCache = config.getSystem().isReflectionsCacheEnabled();
+    private Reflections tryLoadReflectionsFromCacheFile(String filename) {
+        String version = TerasologyVersion.getInstance().getGitCommit();
+        Path root = PathManager.getInstance().getHomePath().resolve("cache");
+        Path path = root.resolve(filename + version + ".xml");
 
-        if (useCache) {
-
-            String version = TerasologyVersion.getInstance().getGitCommit();
-            Path root = PathManager.getInstance().getHomePath().resolve("cache");
-            Path path = root.resolve(filename + version + ".xml");
-
-            if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-                logger.info("Reading reflection content from file {}", filename);
-                Stopwatch sw = Stopwatch.createStarted();
-                try (InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
-                    engineReflections = new Reflections(new ConfigurationBuilder());
-                    engineReflections.collect(is);
-                    logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
-                    return engineReflections;
-                } catch (IOException e) {
-                    logger.warn("Failed to read from cache");
-                }
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+            logger.info("Reading reflection content from file {}", filename);
+            Stopwatch sw = Stopwatch.createStarted();
+            try (InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
+                engineReflections = new Reflections(new ConfigurationBuilder());
+                engineReflections.collect(is);
+                logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+                return engineReflections;
+            } catch (IOException e) {
+                logger.warn("Failed to read from cache");
             }
         }
 
@@ -159,23 +136,19 @@ public class ModuleManagerImpl implements ModuleManager {
     }
 
     private void saveReflectionsToCacheFile(Reflections reflections, String filename) {
-        boolean useCache = config.getSystem().isReflectionsCacheEnabled();
+        String version = TerasologyVersion.getInstance().getGitCommit();
+        Path root = PathManager.getInstance().getHomePath().resolve("cache");
+        Path path = root.resolve(filename + version + ".xml");
 
-        if (useCache) {
-            String version = TerasologyVersion.getInstance().getGitCommit();
-            Path root = PathManager.getInstance().getHomePath().resolve("cache");
-            Path path = root.resolve(filename + version + ".xml");
+        try {
+            Files.createDirectories(root);
 
-            try {
-                Files.createDirectories(root);
-
-                logger.info("Reading reflection content from file {}", path);
-                Stopwatch sw = Stopwatch.createStarted();
-                reflections.save(path.toString());
-                logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
-            } catch (IOException e) {
-                logger.warn("Could not create folder " + root, e);
-            }
+            logger.info("Reading reflection content from file {}", path);
+            Stopwatch sw = Stopwatch.createStarted();
+            reflections.save(path.toString());
+            logger.info("Reflections read in {}ms.", sw.elapsed(TimeUnit.MILLISECONDS));
+        } catch (IOException e) {
+            logger.warn("Could not create folder " + root, e);
         }
     }
 
@@ -248,7 +221,9 @@ public class ModuleManagerImpl implements ModuleManager {
         if (allReflections == null) {
             String filename = "all-reflections";
 
-            allReflections = loadReflectionsFromCacheFile(filename);
+            if (cacheReflections) {
+                allReflections = tryLoadReflectionsFromCacheFile(filename);
+            }
 
             if (allReflections == null) {
                 List<URL> urls = Lists.newArrayList();
@@ -273,7 +248,9 @@ public class ModuleManagerImpl implements ModuleManager {
                     }
                 }
 
-                saveReflectionsToCacheFile(allReflections, filename);
+                if (cacheReflections) {
+                    saveReflectionsToCacheFile(allReflections, filename);
+                }
             }
         }
         return allReflections;
@@ -355,7 +332,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 try {
                     ModuleInfo moduleInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry), Charsets.UTF_8), ModuleInfo.class);
                     AssetSource source = new ArchiveSource(moduleInfo.getId(), modulePath.toFile(),
-                            TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
+                            TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY);
                     processModuleInfo(moduleInfo, modulePath, source);
                 } catch (FileNotFoundException | JsonIOException e) {
                     logger.warn("Failed to load module manifest for module at {}", modulePath, e);
@@ -373,7 +350,8 @@ public class ModuleManagerImpl implements ModuleManager {
                 ModuleInfo moduleInfo = gson.fromJson(reader, ModuleInfo.class);
                 Path assetLocation = modulePath.resolve(TerasologyConstants.ASSETS_SUBDIRECTORY);
                 Path overridesLocation = modulePath.resolve(TerasologyConstants.OVERRIDES_SUBDIRECTORY);
-                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation);
+                Path deltasLocation = modulePath.resolve(TerasologyConstants.DELTAS_SUBDIRECTORY);
+                AssetSource source = new DirectorySource(moduleInfo.getId(), assetLocation, overridesLocation, deltasLocation);
                 processModuleInfo(moduleInfo, modulePath, source);
             } catch (FileNotFoundException | JsonIOException e) {
                 logger.warn("Failed to load module manifest for module at {}", modulePath, e);

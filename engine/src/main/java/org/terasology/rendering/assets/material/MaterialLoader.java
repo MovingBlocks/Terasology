@@ -54,7 +54,7 @@ public class MaterialLoader implements AssetLoader<MaterialData> {
     }
 
     @Override
-    public MaterialData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MaterialData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), MaterialMetadata.class);
 
         Shader shader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);

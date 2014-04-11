@@ -134,7 +134,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:block");
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -157,7 +157,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
     }
 
     private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:block");
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -194,7 +194,7 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
         Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
-        Material shader = Assets.getMaterial("engine:block");
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();

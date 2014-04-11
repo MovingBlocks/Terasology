@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class OggStreamingSoundLoader implements AssetLoader<StreamingSoundData> {
     @Override
-    public StreamingSoundData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public StreamingSoundData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         return new OggStreamingSoundData(urls.get(0));
     }
 }
