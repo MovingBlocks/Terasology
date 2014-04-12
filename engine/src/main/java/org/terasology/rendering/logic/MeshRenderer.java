@@ -20,11 +20,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -57,11 +54,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
@@ -299,7 +292,6 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 lastMesh.postRender();
             }
         }
-        Util.checkGLError();
     }
 
     @Override

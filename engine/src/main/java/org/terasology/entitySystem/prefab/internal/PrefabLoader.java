@@ -16,15 +16,15 @@
 package org.terasology.entitySystem.prefab.internal;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,19 +38,21 @@ import java.util.List;
  */
 public class PrefabLoader implements AssetLoader<PrefabData> {
 
-    private ModuleManager moduleManager;
-
-    public PrefabLoader() {
-        moduleManager = CoreRegistry.get(ModuleManager.class);
-    }
-
     @Override
     public PrefabData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
         EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
         if (prefabData != null) {
             EngineEntityManager entityManager = CoreRegistry.get(EngineEntityManager.class);
-            return new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary()).deserialize(prefabData);
+            List<EntityData.Prefab> deltaData = Lists.newArrayListWithCapacity(deltas.size());
+            for (URL deltaUrl : deltas) {
+                try (BufferedReader deltaReader = new BufferedReader(new InputStreamReader(deltaUrl.openStream(), Charsets.UTF_8))) {
+                    EntityData.Prefab delta = EntityDataJSONFormat.readPrefab(deltaReader);
+                    deltaData.add(delta);
+                }
+            }
+            PrefabSerializer serializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
+            return serializer.deserialize(prefabData, deltaData);
         }
         return null;
     }

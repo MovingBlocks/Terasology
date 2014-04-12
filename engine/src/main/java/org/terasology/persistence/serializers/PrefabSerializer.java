@@ -30,6 +30,8 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,26 +108,41 @@ public class PrefabSerializer {
     }
 
     /**
-     * Deserializes a prefab, with a known uri. This uri will override any uri within the serialized prefab
+     * Deserializes a prefab
      *
      * @param prefabData
      * @return The deserialized prefab
      */
     public PrefabData deserialize(EntityData.Prefab prefabData) {
+        return deserialize(prefabData, Collections.<EntityData.Prefab>emptyList());
+    }
+
+    /**
+     * Deserializes a prefab
+     *
+     * @param prefabData
+     * @param
+     * @return The deserialized prefab
+     */
+    public PrefabData deserialize(EntityData.Prefab prefabData, List<EntityData.Prefab> deltas) {
         Module context = ModuleContext.getContext();
         PrefabData result = new PrefabData();
-        result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
-        result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
-        if (prefabData.hasParentName()) {
-            Prefab parent = Assets.get(AssetType.PREFAB, prefabData.getParentName(), Prefab.class);
-            result.setParent(parent);
+        deserializeCommonData(prefabData, result);
+        for (EntityData.Prefab delta : deltas) {
+            applyCommonDataDelta(delta, result);
         }
 
-        if (result.getParent() != null) {
-            for (Component comp : result.getParent().iterateComponents()) {
-                result.addComponent(componentLibrary.copy(comp));
-            }
+        addInheritedComponents(result);
+
+        applyComponentChanges(context, prefabData, result);
+        for (EntityData.Prefab delta : deltas) {
+            applyComponentChanges(context, delta, result);
         }
+
+        return result;
+    }
+
+    private void applyComponentChanges(Module context, EntityData.Prefab prefabData, PrefabData result) {
         for (String removedComponent : prefabData.getRemovedComponentList()) {
             ComponentMetadata<?> metadata = componentLibrary.resolve(removedComponent, context);
             if (metadata != null) {
@@ -148,9 +165,35 @@ public class PrefabSerializer {
                 logger.error("Prefab contains unknown component '{}'", componentData.getType());
             }
         }
-
-        return result;
     }
 
+    private void addInheritedComponents(PrefabData result) {
+        if (result.getParent() != null) {
+            for (Component comp : result.getParent().iterateComponents()) {
+                result.addComponent(componentLibrary.copy(comp));
+            }
+        }
+    }
 
+    private void applyCommonDataDelta(EntityData.Prefab delta, PrefabData result) {
+        if (delta.hasPersisted()) {
+            result.setPersisted(delta.getPersisted());
+        }
+        if (delta.hasAlwaysRelevant()) {
+            result.setAlwaysRelevant(delta.getAlwaysRelevant());
+        }
+        if (delta.hasParentName()) {
+            Prefab parent = Assets.get(AssetType.PREFAB, delta.getParentName(), Prefab.class);
+            result.setParent(parent);
+        }
+    }
+
+    private void deserializeCommonData(EntityData.Prefab prefabData, PrefabData result) {
+        result.setPersisted((prefabData.hasPersisted()) ? prefabData.getPersisted() : true);
+        result.setAlwaysRelevant(prefabData.hasAlwaysRelevant() ? prefabData.getAlwaysRelevant() : false);
+        if (prefabData.hasParentName()) {
+            Prefab parent = Assets.get(AssetType.PREFAB, prefabData.getParentName(), Prefab.class);
+            result.setParent(parent);
+        }
+    }
 }

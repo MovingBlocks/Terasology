@@ -26,8 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * @deprecated Use the prefab delta system instead (create a json file under /deltas/moduleName/prefabs/prefabName.prefab with the desired changes)
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
+@Deprecated
 public class BeforeEntityCreated implements Event {
     private Prefab prefab;
     private Iterable<Component> components;
