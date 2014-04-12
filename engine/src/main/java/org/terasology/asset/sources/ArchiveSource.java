@@ -67,6 +67,9 @@ public class ArchiveSource extends AbstractSource {
                 if (entryPath.startsWith(overridesPath)) {
                     String key = entryPath.substring(overridesPath.length() + 1);
                     int moduleIndex = key.indexOf('/');
+                    if (moduleIndex == -1) {
+                        continue;
+                    }
                     String moduleName = key.substring(0, moduleIndex);
                     key = key.substring(moduleIndex + 1);
 
@@ -107,6 +110,9 @@ public class ArchiveSource extends AbstractSource {
                 if (entryPath.startsWith(deltaPath)) {
                     String key = entryPath.substring(deltaPath.length() + 1);
                     int moduleIndex = key.indexOf('/');
+                    if (moduleIndex == -1) {
+                        continue;
+                    }
                     String moduleName = key.substring(0, moduleIndex);
                     key = key.substring(moduleIndex + 1);
 

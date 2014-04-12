@@ -189,6 +189,8 @@ task createSkeleton() {
     mkdir('assets/sounds')
     mkdir('assets/textures')
     mkdir('assets/ui')
+	mkdir('overrides')
+	mkdir('deltas')
     mkdir('src/main/java')
     mkdir('src/test/java')
 }
@@ -197,6 +199,16 @@ task createSkeleton() {
 task syncAssets(type: Sync) {
     from 'assets'
     into 'build/classes/assets'
+}
+
+task syncOverrides(type: Sync) {
+    from 'overrides'
+    into 'build/classes/overrides'
+}
+
+task syncDeltas(type: Sync) {
+    from 'deltas'
+    into 'build/classes/deltas'
 }
 
 // Change the output dir of each module
@@ -212,6 +224,8 @@ sourceSets {
 jar {
     // Make sure the assets directory is included
     dependsOn syncAssets
+	dependsOn syncOverrides
+	dependsOn syncDeltas
 
     // Jarring needs to copy module.txt and all the assets into the output
     doFirst {
