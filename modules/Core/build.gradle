@@ -55,7 +55,7 @@ for (dependency in moduleConfig.dependencies) {
 version = moduleConfig.version
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = 'org.nanoware.modules'
+group = 'org.terasology.modules'
 
 // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
 if (env.BUILD_NUMBER != null) {
@@ -111,7 +111,7 @@ dependencies {
                 println "*** Seeking as binary: " + dependency
                 // The '+' is satisfied by any version. "changing" triggers better checking for updated snapshots
                 // TODO: When version handling and promotion is in then we can probably ignore snapshots in normal cases
-                compile(group: 'org.nanoware.modules', name: dependency, version: '+', changing: true)
+                compile(group: 'org.terasology.modules', name: dependency, version: '+', changing: true)
             }
         }
 
@@ -120,7 +120,7 @@ dependencies {
             def id = artifact.moduleVersion.id
 
             // Check for any needed module dependencies on other modules that we need at runtime
-            if (id.group == 'org.nanoware.modules' && id.name != "Core") {
+            if (id.group == 'org.terasology.modules' && id.name != "Core") {
                 File moduleSrcPath = new File(rootDir, 'modules/' + id.name)
                 File moduleJarPath = new File(rootDir, 'modules/' + id.name + id.version + '.jar')
 
@@ -144,14 +144,14 @@ dependencies {
         // If no Terasology dependencies are declared we need to set an implicit dependency on the latest engine version
         if (moduleDepends.size() == 0) {
             println "Setting implicit engine dependency for $project.name - no explicit or transitive dependency set"
-            compile(group: 'org.nanoware.engine', name: 'engine', version: '+')
-            testCompile(group: 'org.nanoware.engine', name: 'engine-tests', version: '+')
+            compile(group: 'org.terasology.engine', name: 'engine', version: '+')
+            testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+')
         } else {
             // To get Terasology module dependencies we simply declare them against Artifactory
             moduleDepends.each {
                 println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
                 // The '+' is satisfied by any version
-                compile(group: 'org.nanoware.modules', name: it, version: '+')
+                compile(group: 'org.terasology.modules', name: it, version: '+')
             }
         }
 
@@ -162,7 +162,7 @@ dependencies {
         configurations.testCompile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
             def id = artifact.moduleVersion.id
             // Print out module (and engine stuff) dependencies and the exact versions they resolved at
-            if (id.group.startsWith('org.nanoware')) {
+            if (id.group.startsWith('org.terasology')) {
                 println "*** $project.name remotely resolved $id.group - $id.name - version $id.version"
             }
         }

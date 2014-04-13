@@ -23,7 +23,7 @@ version = project(':engine').version
 println "ENGINE TESTS VERSION: $version"
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-group = 'org.nanoware.engine'
+group = 'org.terasology.engine'
 
 // Primary dependencies definition
 dependencies {
