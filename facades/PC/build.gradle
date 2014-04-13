@@ -148,8 +148,11 @@ task distApp (type: Sync) {
     from ("$rootDir/NOTICE") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
     }
-    from ("build/libs/PC.jar") {
-        rename 'PC.*', 'Terasology.jar'
+    from ("$buildDir/libs") {
+        include "*.jar"
+        rename {
+            'Terasology.jar'
+        }
     }
     from('launchScripts') {
         exclude('*.xml')
@@ -220,7 +223,7 @@ task distModules (type: Sync) {
 
 task distAppZip (type: Zip) {
     from "$distsDir/app"
-    baseName = "Terasology"
+    archiveName = "Terasology.zip"
 }
 
 task distForLauncher (type: Sync) {
