@@ -97,7 +97,7 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
-// TODO: Check on "gradlew start" as something else clashes with that now? Also: Make a task to reset server / game data
+// TODO: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
 
