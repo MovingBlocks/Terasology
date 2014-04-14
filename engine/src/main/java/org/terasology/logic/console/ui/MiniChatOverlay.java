@@ -17,7 +17,9 @@ package org.terasology.logic.console.ui;
 
 import java.util.List;
 
-import org.terasology.logic.chat.Chat;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -44,7 +46,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
         VISIBLE,
         FADE_OUT,
         HIDDEN
-    };
+    }
     
     private float time;
 
@@ -53,7 +55,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
     private State state = State.HIDDEN;
     
     @In
-    private Chat chat;
+    private Console console;
 
     @Override
     public void initialise() {
@@ -61,10 +63,14 @@ public class MiniChatOverlay extends CoreScreenLayer {
         message.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                List<String> msgs = chat.getMessages();
-                int lastIdx = msgs.size() - 1;
-
-                return (lastIdx >= 0) ? msgs.get(lastIdx) : "";
+                Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
+                String last = "";
+                
+                for (Message msg : msgs) {
+                    last = msg.getMessage();
+                }
+                
+                return last;
             }
         });
     }
@@ -98,7 +104,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
             time = 0;
             state = State.FADE_IN;
             break;
-        };
+        }
     }
     
     private void hideImmediately() {

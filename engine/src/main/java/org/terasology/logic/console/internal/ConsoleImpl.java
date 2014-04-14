@@ -18,6 +18,7 @@ package org.terasology.logic.console.internal;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -45,6 +46,7 @@ import org.terasology.utilities.collection.CircularBuffer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -177,6 +179,20 @@ public class ConsoleImpl implements Console {
         return messageHistory;
     }
 
+    @Override
+    public Iterable<Message> getMessages(MessageType... types) {
+        final List<MessageType> allowedTypes = Arrays.asList(types);
+        
+        // JAVA8: this can be simplified using Stream.filter()
+        return Collections2.filter(messageHistory, new Predicate<Message>() {
+
+            @Override
+            public boolean apply(Message input) {
+                return allowedTypes.contains(input.getType());
+            }
+        });
+    }
+    
     @Override
     public List<String> getPreviousCommands() {
         return ImmutableList.copyOf(localCommandHistory);

@@ -42,24 +42,6 @@ public class ChatMessageEvent implements MessageEvent {
         this.message = message;
         this.from = from;
     }
-    
-    public static ChatMessageEvent newJoinEvent(EntityRef client) {
-        String playerName = getColoredPlayerName(client);
-        
-        return new ChatMessageEvent("Player \"" + playerName + "\" has joined the game", client);
-    }
-    
-    public static ChatMessageEvent newLeaveEvent(EntityRef client) {
-        String playerName = getColoredPlayerName(client);
-        
-        return new ChatMessageEvent("Player \"" + playerName + "\" has left the game", client);
-    }
-    
-    public static ChatMessageEvent newTextEvent(String msgText, EntityRef from) {
-        String playerName = getColoredPlayerName(from);
-
-        return new ChatMessageEvent(String.format("%s: %s", playerName, msgText), from);
-    }
 
     public String getMessage() {
         return message;
@@ -67,8 +49,17 @@ public class ChatMessageEvent implements MessageEvent {
 
     @Override
     public Message getFormattedMessage() {
-        return new Message(message, CoreMessageType.CHAT);
+        DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
+        ColorComponent colorInfo = from.getComponent(ColorComponent.class);
+        String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";
+        
+        if (colorInfo != null) {
+            playerName = FontColor.getColored(playerName, colorInfo.color);
+        }
+        
+        return new Message(String.format("%s: %s", playerName, message), CoreMessageType.CHAT);
     }
+
 
     @Override
     public String toString() {
@@ -77,16 +68,5 @@ public class ChatMessageEvent implements MessageEvent {
 
     public EntityRef getFrom() {
         return from;
-    }
-
-    private static String getColoredPlayerName(EntityRef from) {
-        DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
-        ColorComponent colorInfo = from.getComponent(ColorComponent.class);
-        String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";
-        
-        if (colorInfo != null) {
-            playerName = FontColor.getColored(playerName, colorInfo.color);
-        }
-        return playerName;
     }
 }

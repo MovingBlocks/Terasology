@@ -60,6 +60,12 @@ public interface Console {
      * @return An iterator over all messages in the console
      */
     Iterable<Message> getMessages();
+    
+    /**
+     * @param types a set of allowed message types
+     * @return All messages in the console, filtered by message type (OR)
+     */
+    Iterable<Message> getMessages(MessageType... types);
 
     List<String> getPreviousCommands();
 

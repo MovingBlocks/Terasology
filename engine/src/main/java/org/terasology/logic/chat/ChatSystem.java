@@ -29,13 +29,12 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.events.ConnectedEvent;
-import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
@@ -49,10 +48,11 @@ public class ChatSystem extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChatSystem.class);
 
     private static final AssetUri CHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:chat");
+    private static final AssetUri CONSOLE_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:console");
     private static final AssetUri MINICHAT_UI = new AssetUri(AssetType.UI_ELEMENT, "engine:minichatOverlay");
     
     @In
-    private Chat chat;
+    private Console console;
     
     @In
     private EntityManager entityManager;
@@ -77,30 +77,14 @@ public class ChatSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onConnect(ConnectedEvent connected, EntityRef entity) {
-        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
-        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(ChatMessageEvent.newJoinEvent(clientInfo));
-        }
-    }
-
-    @ReceiveEvent(components = ClientComponent.class)
-    public void onDisconnect(DisconnectedEvent connected, EntityRef entity) {
-        EntityRef clientInfo = entity.getComponent(ClientComponent.class).clientInfo;
-        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(ChatMessageEvent.newLeaveEvent(clientInfo));
-        }
-    }
-        
-    @ReceiveEvent(components = ClientComponent.class)
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
             Message message = event.getFormattedMessage();
-            if (message.getType() == CoreMessageType.CHAT) {
-                chat.addMessage(message.getMessage());
+            if (message.getType() == CoreMessageType.CHAT || message.getType() == CoreMessageType.NOTIFICATION) {
 
-                if (!nuiManager.isOpen(CHAT_UI)) {
+                // show overlay only if chat and console are hidden
+                if (!nuiManager.isOpen(CHAT_UI) && !nuiManager.isOpen(CONSOLE_UI)) {
                     overlay.setVisible(true);
                 }
             }
@@ -111,7 +95,7 @@ public class ChatSystem extends BaseComponentSystem {
     public void say(@CommandParam("message") String message, EntityRef speaker) {
         logger.debug("Received chat message from {} : '{}'", speaker, message);
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(ChatMessageEvent.newTextEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
+            client.send(new ChatMessageEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
         }
     }
 }
