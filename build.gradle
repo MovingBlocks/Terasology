@@ -6,8 +6,9 @@
  */
 
 // Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
-apply from: 'utility.gradle'
-apply from: 'ide.gradle'
+apply from: 'config/gradle/utility.gradle'
+apply from: 'config/gradle/ide.gradle'
+apply from: 'config/gradle/artifactory.gradle'
 
 // Needed for extending the "clean" task to also delete custom stuff defined here like natives
 apply plugin: 'base'
@@ -17,6 +18,30 @@ apply plugin: 'idea'
 
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
 //apply plugin: 'eclipse'
+
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
+
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://dl.bintray.com/jfrog/jfrog-jars'
+        }
+    }
+
+    dependencies {
+        // Artifactory plugin
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+    }
+}
+
+// The root project doesn't publish anything
+artifactoryPublish.skip = true
 
 /*
  * To Update Gradle Wrapper:
@@ -173,12 +198,12 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract the natives! 'gradlew extractNatives' or a dependent task"
 }
 
-task runProtobufWindows(type:Exec) {
+task protobufCompileWindows(type:Exec) {
     description = "Run 'Protobuf Compiler' (Windows)"
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
 }
 
-// TODO: add linux protobuf compiler
+// TODO: add linux protobuf compiler and if we do maybe straighten out tasks for better abbreviations
 //task runProtobufLinux(type:Exec) {
 //    description = "Run 'Protobuf Compiler' (Linux)"
 //    commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java engine/src/main/protobuf/*'

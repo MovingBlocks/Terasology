@@ -16,6 +16,19 @@ repositories {
     }
 }
 
+task sourceJar(type: Jar) {
+    description = "Create a JAR with all sources"
+    from sourceSets.main.allSource
+    from sourceSets.test.allSource
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    description = "Create a JAR with the JavaDoc for the java sources"
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
 // Extra details provided for unit tests
 test {
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.

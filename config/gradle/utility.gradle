@@ -1,26 +1,23 @@
 // This extra build file is mainly for structural setup of the project using Git to import other repos from GitHub
 
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+    }
+}
+
 // Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
 
 ext {
     // TODO: Huh, why can't this be resolved from the main build.gradle anymore? It used to be accessible
     templatesDir = 'templates'
-}
-
-// The special build script section here ties dependencies to running the Gradle script itself
-buildscript {
-
-    // This needs to be in here as well for some reason - can't just inherit?
-    repositories {
-        mavenCentral()
-    }
-
-    // Dependencies at build script level
-    dependencies {
-        // Git plugin for Gradle
-        classpath 'org.ajoberstar:gradle-git:0.6.3'
-    }
 }
 
 // Dynamic task definition for cloning an existing module (with the module name embedded in the task name as <ID>)
@@ -180,7 +177,7 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
             println "Repo is $repo - localName is $localName"
 
             // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
-            def githubHome = 'Terasology'
+            def githubHome = 'MovingBlocks'
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
             }
@@ -250,7 +247,7 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
             }
 
             // Prep destination - this creates the "libs" dir if it doesn't exists and places a subprojects.gradle there
-            checkSubprojectDir(parentDir)
+            checkLibsDir(parentDir)
 
             def destination = file("$parentDir/$repo")
 
@@ -270,8 +267,8 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
 }
 
 // Check for a sub project type dir (/modules, /libs, etc), and create it along with a subprojects.gradle if no exist
-// NOTE: With the PC Facade and Core module back in main repo those two dirs exist and have the file. Maybe more later
-def checkSubprojectDir(String dir) {
+// NOTE: With the PC Facade and Core module back in main repo their subproject.gradles are already there and this just does libs
+def checkLibsDir(String dir) {
     def typeDir = new File(dir)
     if (!typeDir.exists()) {
         println "typeDir " + typeDir + " didn't exist yet, creating it and generating a subprojects.gradle file for it"
@@ -281,19 +278,18 @@ def checkSubprojectDir(String dir) {
 
         // TODO: Change this to be a template file instead? Although two other instances will be kept (facades, modules)
         // Fill in the new file, including its parent dir so each is unique
-        subProjectGradleFile.text = """
+        subProjectGradleFile.text = '''
 // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
 // The first time this type of sub is added this file is created, but the sub-sub isn't available until next run
-new File('${dir}').eachDir { possibleSubprojectDir ->
-    println "subprojects.gradle running for " + possibleSubprojectDir
-    def subprojectName = '${dir}:' + possibleSubprojectDir.name
-    println "subprojectName is " + subprojectName
+new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
+    def subprojectName = 'libs:' + possibleSubprojectDir.name
+    println "Processing lib project $subprojectName, including it as a sub-project"
     include subprojectName
     def subprojectPath = ':' + subprojectName
     def subproject = project(subprojectPath)
     subproject.projectDir = possibleSubprojectDir
 }
-"""
+'''
 
     }
 }

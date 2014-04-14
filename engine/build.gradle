@@ -1,7 +1,8 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
-// Grab all the common stuff like plugins to use, artifact repositories, code analysis config
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
 apply from: "$rootDir/config/gradle/common.gradle"
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -122,32 +123,6 @@ jar {
     }
 }
 
-task distEngine (type: Sync) {
-    description = "Prepares the engine.jar for distribution"
-    into ("$distsDir/engine")
-    from jar
-}
-
-task distLibs (type: Sync) {
-    description = "Prepares the engine libs for distribution (useful for other builds)"
-    into ("$distsDir/libs")
-    from configurations.runtime
-}
-
-task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, resources)"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'sources'
-    from sourceSets.main.output
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = "Create a JAR with the JavaDoc for the java sources"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,21 +132,26 @@ def moduleFile = file('src/main/resources/assets/module.txt')
 
 if (!moduleFile.exists()) {
     println "Y U NO EXIST MODULE.TXT!"
+    throw new GradleException("Failed to find module.txt for engine")
+}
+
+println "Scanning for version in module.txt for engine"
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
+
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+version = moduleConfig.version
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.engine'
+
+// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+if (env.BUILD_NUMBER != null) {
+    version += '-SNAPSHOT+' + env.BUILD_NUMBER
 } else {
-    println "Scanning for version in module.txt for engine"
-    def slurper = new JsonSlurper()
-    def moduleConfig = slurper.parseText(moduleFile.text)
-
-    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-    version = moduleConfig.version
-
-    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-    group = 'org.terasology.engine'
-
-    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-    if (env.BUILD_NUMBER != null) {
-        version += '-SNAPSHOT+' + env.BUILD_NUMBER
-    }
+    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
+    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
+    println "Fancy local version: $version"
 }
 
 // This version info file actually goes inside the built jar and can be used at runtime
@@ -196,6 +176,23 @@ task createVersionInfoFile {
 }
 
 jar.dependsOn createVersionInfoFile
+
+// A configuration for publishing artifacts
+configurations {
+    published
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+    published javadocJar
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar, javadocJar
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
