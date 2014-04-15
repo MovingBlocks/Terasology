@@ -1,0 +1,50 @@
+{
+    "type": "ChatScreen",
+    "skin": "chat",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "RelativeLayout",
+                "contents": [
+                    {
+                        "type": "ScrollableArea",
+                        "id": "scrollArea",
+                        "stickToBottom": true,
+                        "content": {
+                            "type": "UILabel",
+                            "id": "messageHistory",
+                            "family": "history"
+                        },
+                        "layoutInfo": {
+                            "position-horizontal-center": {},
+                            "position-top": {
+                            },
+                            "position-bottom": {
+                                "widget": "commandLine",
+                                "target": "TOP"
+                            }
+                        }
+                    },
+                    {
+                        "type": "UIText",
+                        "id": "commandLine",
+                        "layoutInfo": {
+                            "position-left": {},
+                            "position-right": {},
+                            "use-content-height": true,
+                            "position-bottom": {}
+                        }
+                    }
+                ],
+                "layoutInfo": {
+                    "height" : 300, 
+                    "width" : 500,
+                    "position-bottom": {
+                        "target": "BOTTOM"
+                    }
+                }
+            }
+        ]
+    }
+}

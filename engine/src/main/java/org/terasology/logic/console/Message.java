@@ -45,4 +45,9 @@ public class Message {
     public MessageType getType() {
         return type;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("[%s] '%s'", type, message); 
+    }
 }

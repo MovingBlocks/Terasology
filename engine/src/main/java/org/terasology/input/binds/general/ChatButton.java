@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console;
 
-import org.terasology.rendering.nui.Color;
+package org.terasology.input.binds.general;
 
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
 /**
- * @author Immortius
+ * Toggles the display of ChatScreen (through ChatSystem)
+ * @author Martin Steiger
  */
-public enum CoreMessageType implements MessageType {
-    CONSOLE(ConsoleColors.DEFAULT),
-    CHAT(ConsoleColors.CHAT),
-    ERROR(ConsoleColors.ERROR), 
-    NOTIFICATION(ConsoleColors.NOTIFICATION);
-
-    private Color color;
-
-    private CoreMessageType(Color color) {
-        this.color = color;
-    }
-
-    @Override
-    public Color getColor() {
-        return color;
-    }
+@RegisterBindButton(id = "chat", description = "Toggle Chat", category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.T)
+public class ChatButton extends BindButtonEvent {
 }

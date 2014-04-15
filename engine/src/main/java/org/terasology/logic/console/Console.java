@@ -60,6 +60,12 @@ public interface Console {
      * @return An iterator over all messages in the console
      */
     Iterable<Message> getMessages();
+    
+    /**
+     * @param types a set of allowed message types
+     * @return All messages in the console, filtered by message type (OR)
+     */
+    Iterable<Message> getMessages(MessageType... types);
 
     List<String> getPreviousCommands();
 
@@ -78,14 +84,22 @@ public interface Console {
     void unsubscribe(ConsoleSubscriber subscriber);
 
     /**
-     * Execute a command.
+     * Execute a command and log to local command history.
      *
      * @param command The whole string of the command including the command name and the optional parameters.
      * @return Returns true if the command was executed successfully.
      */
     boolean execute(String command, EntityRef callingClient);
 
-    List<String> splitParameters(String paramStr);
+    /**
+     * Execute a command
+     * 
+     * @param commandName the command name
+     * @param params a list of parameters (no quotes!)
+     * @param callingClient the resonsible client entity
+     * @return true if successful
+     */
+    boolean execute(String commandName, List<String> params, EntityRef callingClient);
 
     /**
      * Get a group of commands by their name. These will vary by the number of parameters they accept
