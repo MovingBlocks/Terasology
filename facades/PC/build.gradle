@@ -202,7 +202,6 @@ task distModules (type: Sync) {
                 dependencies {
                     // TODO: When version handling and promotion is in then we can probably remove "changing"
                     compile group: 'org.terasology.modules', name: dependency, version: '+', changing: true
-                    // TODO: Is "changing" set everywhere it is needed? Maybe that's why module dependencies fail to update in Jenkins?
                 }
             }
         }

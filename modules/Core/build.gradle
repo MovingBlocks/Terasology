@@ -144,14 +144,14 @@ dependencies {
         // If no Terasology dependencies are declared we need to set an implicit dependency on the latest engine version
         if (moduleDepends.size() == 0) {
             println "Setting implicit engine dependency for $project.name - no explicit or transitive dependency set"
-            compile(group: 'org.terasology.engine', name: 'engine', version: '+')
-            testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+')
+            compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
+            testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
         } else {
             // To get Terasology module dependencies we simply declare them against Artifactory
             moduleDepends.each {
                 println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
                 // The '+' is satisfied by any version
-                compile(group: 'org.terasology.modules', name: it, version: '+')
+                compile(group: 'org.terasology.modules', name: it, version: '+', changing: true)
             }
         }
 
