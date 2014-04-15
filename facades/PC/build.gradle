@@ -69,12 +69,11 @@ configurations {
 artifacts {
     published jar
     published sourceJar
-    published javadocJar
 }
 
 // Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
 artifactoryPublish {
-    dependsOn jar, sourceJar, javadocJar
+    dependsOn jar, sourceJar
 }
 
 task runPC(type:JavaExec) {
