@@ -100,7 +100,6 @@ task runPC(type:JavaExec) {
 task setupServerConfig() {
     
     def json = new JsonBuilder()
-    def config = rootProject.file(localServerDataPath + '/' + 'config.cfg')
     
     json.worldGeneration
     {
@@ -108,6 +107,12 @@ task setupServerConfig() {
        defaultGenerator "core:flat"
     }
     
+    def root = rootProject.file(localServerDataPath);
+    root.mkdir()
+    
+    def config = new File(root, 'config.cfg')
+    
+    logger.lifecycle("Creating config file $config")
     config.text = json.toPrettyString()
 }
 
