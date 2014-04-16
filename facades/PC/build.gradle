@@ -6,6 +6,7 @@ apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
+import groovy.json.JsonBuilder
 
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -96,6 +97,20 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
+task setupServerConfig() {
+    
+    def json = new JsonBuilder()
+    def config = rootProject.file(localServerDataPath + '/' + 'config.cfg')
+    
+    json.worldGeneration
+    {
+       defaultSeed "Colorado"
+       defaultGenerator "core:flat"
+    }
+    
+    config.text = json.toPrettyString()
+}
+
 // TODO: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
@@ -104,6 +119,7 @@ task startServer(type:JavaExec) {
     dependsOn rootProject.extractNatives
     dependsOn rootProject.moduleClasses
     dependsOn classes
+    dependsOn setupServerConfig
 
     // Run arguments
     main = mainClassName
