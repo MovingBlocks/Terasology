@@ -6,6 +6,7 @@ apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
+import groovy.json.JsonBuilder
 
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -63,6 +64,9 @@ jar {
 // A configuration for publishing artifacts - TODO: For PC this isn't needed by anything until game distribution is a separate Jenkins job
 configurations {
     published
+    modules {
+        transitive = false
+    }
 }
 
 // Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
@@ -96,6 +100,47 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
+task setupServerConfig() {
+    description 'Parses "seed" and "worldGen" parameters and writes them to config.cfg'
+    
+    def json = new JsonBuilder()
+
+    def root = rootProject.file(localServerDataPath);
+    root.mkdir()
+
+    def config = new File(root, 'config.cfg')
+    logger.lifecycle("Creating config file $config")
+
+    json.worldGeneration {
+        if (project.hasProperty('seed')) {
+            logger.lifecycle("  Seed value: $seed");
+            defaultSeed seed
+        }
+        if (project.hasProperty('worldGen')) {
+            logger.lifecycle("  World Generator: $worldGen");
+            defaultGenerator worldGen
+        }
+    }
+
+    config.text = json.toPrettyString()
+}
+
+task setupServerModules(type: Sync) {
+    description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
+
+    if (project.hasProperty('extraModules')) {
+        extraModules.split(',').each { String dependency ->
+            println "Extra module: " + dependency
+            dependencies {
+                modules group: 'org.terasology.modules', name: dependency, version: '+'
+            }
+        }
+    }
+
+    from(configurations.modules)
+    into(new File(rootProject.file(localServerDataPath), "modules"))
+}
+
 // TODO: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
@@ -104,6 +149,8 @@ task startServer(type:JavaExec) {
     dependsOn rootProject.extractNatives
     dependsOn rootProject.moduleClasses
     dependsOn classes
+    dependsOn setupServerConfig
+    dependsOn setupServerModules
 
     // Run arguments
     main = mainClassName

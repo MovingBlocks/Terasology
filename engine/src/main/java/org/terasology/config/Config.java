@@ -157,6 +157,7 @@ public final class Config {
      * @throws IOException
      */
     public static Config load(Path fromFile) throws IOException {
+        logger.info("Reading config file {}", fromFile);
         try (Reader reader = Files.newBufferedReader(fromFile, TerasologyConstants.CHARSET)) {
             Gson gson = createGson();
             JsonElement baseConfig = gson.toJsonTree(new Config());
