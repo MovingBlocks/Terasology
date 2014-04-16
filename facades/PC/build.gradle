@@ -98,21 +98,27 @@ task runPC(type:JavaExec) {
 }
 
 task setupServerConfig() {
+    description 'Parses "seed" and "worldGen" parameters and writes them to config.cfg'
     
     def json = new JsonBuilder()
-    
-    json.worldGeneration
-    {
-       defaultSeed "Colorado"
-       defaultGenerator "core:flat"
-    }
-    
+
     def root = rootProject.file(localServerDataPath);
     root.mkdir()
-    
+
     def config = new File(root, 'config.cfg')
-    
     logger.lifecycle("Creating config file $config")
+
+    json.worldGeneration {
+        if (project.hasProperty('seed')) {
+            logger.lifecycle("  Seed value: $seed");
+            defaultSeed seed
+        }
+        if (project.hasProperty('worldGen')) {
+            logger.lifecycle("  World Generator: $worldGen");
+            defaultGenerator worldGen
+        }
+    }
+
     config.text = json.toPrettyString()
 }
 
