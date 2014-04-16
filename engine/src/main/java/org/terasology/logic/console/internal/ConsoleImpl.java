@@ -37,8 +37,7 @@ import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
-import org.terasology.network.Client;
-import org.terasology.network.NetworkMode;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
@@ -252,8 +251,8 @@ public class ConsoleImpl implements Console {
             }
         }
 
-        Client owner = networkSystem.getOwner(callingClient);
-        if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {
+        ClientComponent cc = callingClient.getComponent(ClientComponent.class);
+        if (cc.local) {
             localCommandHistory.add(command);
         }
 
