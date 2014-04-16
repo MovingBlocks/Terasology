@@ -64,6 +64,9 @@ jar {
 // A configuration for publishing artifacts - TODO: For PC this isn't needed by anything until game distribution is a separate Jenkins job
 configurations {
     published
+    modules {
+        transitive = false
+    }
 }
 
 // Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
@@ -122,6 +125,22 @@ task setupServerConfig() {
     config.text = json.toPrettyString()
 }
 
+task setupServerModules(type: Sync) {
+    description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
+
+    if (project.hasProperty('extraModules')) {
+        extraModules.split(',').each { String dependency ->
+            println "Extra module: " + dependency
+            dependencies {
+                modules group: 'org.terasology.modules', name: dependency, version: '+'
+            }
+        }
+    }
+
+    from(configurations.modules)
+    into(new File(rootProject.file(localServerDataPath), "modules"))
+}
+
 // TODO: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
@@ -131,6 +150,7 @@ task startServer(type:JavaExec) {
     dependsOn rootProject.moduleClasses
     dependsOn classes
     dependsOn setupServerConfig
+    dependsOn setupServerModules
 
     // Run arguments
     main = mainClassName
