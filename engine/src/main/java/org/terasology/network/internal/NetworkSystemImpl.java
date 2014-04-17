@@ -687,6 +687,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         return EntityRef.NULL;
     }
+    
+    @Override
+    public void forceDisconnect(Client client) {
+        if (client instanceof NetClient) {
+            NetClient nc = (NetClient) client;
+            removeClient(nc);
+        }
+    }
 
     void registerChannel(Channel channel) {
         allChannels.add(channel);

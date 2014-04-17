@@ -43,7 +43,7 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
     private static final Logger logger = LoggerFactory.getLogger(ColladaMeshLoader.class);
 
     @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         logger.info("Loading mesh for " + urls);
 
         try {
@@ -60,8 +60,14 @@ public class ColladaMeshLoader extends ColladaLoader implements AssetLoader<Mesh
         TFloatList normalsMesh = data.getNormals();
         TIntList indicesMesh = data.getIndices();
 
+        // Scale vertices coordinates by unitsPerMeter
+        for (int i = 0; i < this.vertices.size(); i++) {
+            float originalVertexValue = this.vertices.get(i);
+            float adjustedVertexValue = (float) (originalVertexValue * unitsPerMeter);
+            verticesMesh.add(adjustedVertexValue);
+        }
+
         colorsMesh.addAll(this.colors);
-        verticesMesh.addAll(this.vertices);
         texCoord0Mesh.addAll(this.texCoord0);
         normalsMesh.addAll(this.normals);
         indicesMesh.addAll(this.indices);

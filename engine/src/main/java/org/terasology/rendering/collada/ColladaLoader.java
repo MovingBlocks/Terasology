@@ -75,6 +75,7 @@ public class ColladaLoader {
     protected TFloatList normals;
     protected TFloatList colors;
     protected TIntList indices;
+    protected double unitsPerMeter;
 
     protected SkeletalMeshDataBuilder skeletonBuilder;
 
@@ -451,7 +452,7 @@ public class ColladaLoader {
             md5Joint.orientation = jointMatrix[0];
         } else if (1 < matrixSet.size()) {
             throw new ColladaParseException("Found " + matrixSet.size() + " joint matrix sets for element " + jointNodeElement.id());
-        // } else {
+            // } else {
             // TODO: Might be translation, rotation pairs instead of a matrix
             // Or might be an unused joint node
             //            throw new ColladaParseException("Found " + matrixSet.size() + " joint matrix sets for element " + jointNodeElement.id());
@@ -517,6 +518,16 @@ public class ColladaLoader {
         }
         Element upAxisElement = upAxisSet.first();
         String upAxis = upAxisElement.text();
+
+        ElementSet unitSet = rootElement.find("asset", "unit");
+        if (1 != unitSet.size()) {
+            throw new ColladaParseException("Found multiple unit asset values");
+        }
+        Element unitElement = unitSet.first();
+        String unitsPerMeterString = unitElement.attr("meter");
+        if (null != unitsPerMeterString) {
+            unitsPerMeter = Double.parseDouble(unitsPerMeterString);
+        }
 
         boolean yUp = "Y_UP".equals(upAxis);
         boolean zUp = "Z_UP".equals(upAxis);

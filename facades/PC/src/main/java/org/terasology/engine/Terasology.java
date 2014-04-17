@@ -32,6 +32,8 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
 
+import java.awt.GraphicsEnvironment;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -76,7 +78,7 @@ public final class Terasology {
             } else {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
-
+            
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
             if (isHeadless) {
@@ -86,8 +88,26 @@ public final class Terasology {
             }
             engine.dispose();
         } catch (Throwable t) {
-            String text = getNestedMessageText(t);
-            JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+            
+            if (!GraphicsEnvironment.isHeadless()) {
+                String text = getNestedMessageText(t);
+                showModalDialog(text);
+            }
+        }
+    }
+
+    private static void showModalDialog(final String text) {
+        // Swing element methods must be called in the swing thread
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                
+                @Override
+                public void run() {
+                    JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        } catch (InvocationTargetException | InterruptedException e) {
+            e.printStackTrace(System.err);
         }
     }
 

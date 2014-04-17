@@ -12,6 +12,7 @@
             "elements": {
                 "UIText": {
                     "background": "",
+                    "text-shadowed": false,
                     "background-border": {
                         "top": 0,
                         "bottom": 0,

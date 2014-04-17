@@ -71,7 +71,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     @Override
-    public UISkinData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UISkinData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UISkinData.class);

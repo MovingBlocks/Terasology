@@ -40,6 +40,7 @@ public abstract class AbstractSource implements AssetSource {
     private SetMultimap<AssetUri, URL> assets = HashMultimap.create();
     private SetMultimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
     private SetMultimap<AssetUri, URL> overrides = HashMultimap.create();
+    private SetMultimap<AssetUri, URL> deltas = HashMultimap.create();
 
     public AbstractSource(String id) {
         sourceId = id;
@@ -71,6 +72,11 @@ public abstract class AbstractSource implements AssetSource {
     }
 
     @Override
+    public List<URL> getDelta(AssetUri uri) {
+        return Lists.newArrayList(deltas.get(uri));
+    }
+
+    @Override
     public Iterable<AssetUri> listOverrides() {
         return overrides.keySet();
     }
@@ -86,8 +92,13 @@ public abstract class AbstractSource implements AssetSource {
     }
 
     protected void addOverride(AssetUri uri, URL url) {
-        logger.debug("Adding override {} with urls {}", uri, url);
+        logger.debug("Adding override url {} -> {}", uri, url);
         overrides.put(uri, url);
+    }
+
+    protected void setDelta(AssetUri uri, URL url) {
+        logger.debug("Adding delta url {} -> {}", uri, url);
+        deltas.put(uri, url);
     }
 
     protected AssetUri getUri(Path relativePath) {

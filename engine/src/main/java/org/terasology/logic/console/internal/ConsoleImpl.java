@@ -16,15 +16,15 @@
 
 package org.terasology.logic.console.internal;
 
-import static org.reflections.ReflectionUtils.withModifier;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -37,22 +37,22 @@ import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
-import org.terasology.network.Client;
-import org.terasology.network.NetworkMode;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+
+import static org.reflections.ReflectionUtils.withModifier;
 
 /**
  * The console handles commands and messages.
@@ -62,7 +62,6 @@ import com.google.common.collect.Table;
 public class ConsoleImpl implements Console {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
     private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
-    private static final Joiner PARAMETER_JOINER = Joiner.on(", ");
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
 
@@ -81,7 +80,7 @@ public class ConsoleImpl implements Console {
         addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
                 Message.NEW_LINE +
                 "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
-                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE + 
+                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
                 "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
                 "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
                 "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
@@ -142,7 +141,7 @@ public class ConsoleImpl implements Console {
     private void addErrorMessage(String message) {
         addMessage(new Message(message, CoreMessageType.ERROR));
     }
-    
+
     /**
      * Adds a message to the console
      *
@@ -157,12 +156,12 @@ public class ConsoleImpl implements Console {
             subscriber.onNewConsoleMessage(message);
         }
     }
-    
+
     @Override
     public void removeMessage(Message message) {
         messageHistory.remove(message);
     }
-    
+
     @Override
     public void replaceMessage(Message oldMsg, Message newMsg) {
         int idx = messageHistory.indexOf(oldMsg);
@@ -179,6 +178,20 @@ public class ConsoleImpl implements Console {
         return messageHistory;
     }
 
+    @Override
+    public Iterable<Message> getMessages(MessageType... types) {
+        final List<MessageType> allowedTypes = Arrays.asList(types);
+        
+        // JAVA8: this can be simplified using Stream.filter()
+        return Collections2.filter(messageHistory, new Predicate<Message>() {
+
+            @Override
+            public boolean apply(Message input) {
+                return allowedTypes.contains(input.getType());
+            }
+        });
+    }
+    
     @Override
     public List<String> getPreviousCommands() {
         return ImmutableList.copyOf(localCommandHistory);
@@ -204,26 +217,16 @@ public class ConsoleImpl implements Console {
         this.messageSubscribers.remove(subscriber);
     }
 
-    /**
-     * Execute a command.
-     *
-     * @param command The whole string of the command including the command name and the optional parameters.
-     * @return Returns true if the command was executed successfully.
-     */
     @Override
     public boolean execute(String command, EntityRef callingClient) {
-        if (command.length() == 0) {
+
+        // trim and remove double spaces
+        String cleanedCommand = command.trim().replaceAll("\\s\\s+", " ");
+
+        if (cleanedCommand.isEmpty()) {
             return false;
         }
-
-        Client owner = networkSystem.getOwner(callingClient);
-        if (networkSystem.getMode() == NetworkMode.NONE || (owner != null && owner.isLocal())) {
-            localCommandHistory.add(command);
-        }
-
-        //remove double spaces
-        String cleanedCommand = command.replaceAll("\\s\\s+", " ");
-
+        
         //get the command name
         int commandEndIndex = cleanedCommand.indexOf(" ");
         String commandName;
@@ -240,6 +243,29 @@ public class ConsoleImpl implements Console {
         //get the parameters
         List<String> params = splitParameters(parameterPart);
 
+        // remove quotation marks
+        for (int i = 0; i < params.size(); i++) {
+            String value = params.get(i);
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                params.set(i, value.substring(1, value.length() - 1));
+            }
+        }
+
+        ClientComponent cc = callingClient.getComponent(ClientComponent.class);
+        if (cc.local) {
+            localCommandHistory.add(command);
+        }
+
+        return execute(commandName, params, callingClient);
+    }        
+
+    @Override
+    public boolean execute(String commandName, List<String> params, EntityRef callingClient) {
+        
+        if (commandName.isEmpty()) {
+            return false;
+        }
+        
         //get the command
         CommandInfo cmd = commandLookup.get(commandName, params.size());
 
@@ -258,8 +284,7 @@ public class ConsoleImpl implements Console {
         }
 
         if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
-            String paramsStr = PARAMETER_JOINER.join(params);
-            callingClient.send(new CommandEvent(commandName, paramsStr));
+            callingClient.send(new CommandEvent(commandName, params));
             return true;
         } else {
             try {
@@ -274,20 +299,26 @@ public class ConsoleImpl implements Console {
 
                 return true;
             } catch (IllegalArgumentException e) {
-                addErrorMessage(e.getLocalizedMessage());
+                String msgText = e.getLocalizedMessage();
+                if (msgText != null && !msgText.isEmpty()) {
+                    if (callingClient.exists()) {
+                        callingClient.send(new ConsoleMessageEvent(e.getLocalizedMessage()));
+                    } else {
+                        addErrorMessage(e.getLocalizedMessage());
+                    }
+                }
                 return false;
-                
+
             } catch (Exception e) {
                 addErrorMessage("Error executing command '" + commandName + "': " + e.getLocalizedMessage());
-                
+
                 logger.error("Failed to execute command", e);
                 return false;
             }
         }
     }
 
-    @Override
-    public List<String> splitParameters(String paramStr) {
+    private List<String> splitParameters(String paramStr) {
         String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
         List<String> params = Lists.newArrayList();
         for (String s : rawParams) {

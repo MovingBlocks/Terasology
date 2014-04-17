@@ -22,6 +22,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,6 +63,11 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> listOverrides() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<URL> getDelta(AssetUri uri) {
         return Collections.emptyList();
     }
 }

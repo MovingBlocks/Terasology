@@ -33,5 +33,8 @@
     "hardness" : 1,
     "inventory" : {
         "directPickup" : true
+    },
+    "entity": {
+        "prefab": "Core:Torch"
     }
 }

@@ -86,7 +86,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
@@ -98,7 +98,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm = new StorageManagerInternal(moduleManager, entityManager, false);
 
         CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(ModuleManager.class, new ModuleManagerImpl(new ModuleSecurityManager()));
+        CoreRegistry.put(ModuleManager.class, new ModuleManagerImpl(new ModuleSecurityManager(), false));
         CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager));
     }
 

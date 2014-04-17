@@ -392,7 +392,7 @@ public class DefaultRenderingProcess {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
             if (type == FBOType.HDR) {
-                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA,
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA,
                         ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (ByteBuffer) null);
             } else {
                 GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
@@ -864,9 +864,9 @@ public class DefaultRenderingProcess {
         Material material;
 
         if (config.getRendering().getDebug().isEnabled()) {
-            material = Assets.getMaterial("engine:debug");
+            material = Assets.getMaterial("engine:prog.debug");
         } else {
-            material = Assets.getMaterial("engine:post");
+            material = Assets.getMaterial("engine:prog.post");
         }
 
         material.enable();
@@ -919,15 +919,15 @@ public class DefaultRenderingProcess {
         Material material;
 
         if (config.getRendering().isOculusVrSupport()) {
-            material = Assets.getMaterial("engine:ocDistortion");
+            material = Assets.getMaterial("engine:prog.ocDistortion");
             material.enable();
 
             updateOcShaderParametersForVP(material, 0, 0, rtFullWidth / 2, rtFullHeight, StereoRenderState.OCULUS_LEFT_EYE);
         } else {
             if (config.getRendering().getDebug().isEnabled()) {
-                material = Assets.getMaterial("engine:debug");
+                material = Assets.getMaterial("engine:prog.debug");
             } else {
-                material = Assets.getMaterial("engine:post");
+                material = Assets.getMaterial("engine:prog.post");
             }
 
             material.enable();
@@ -943,7 +943,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateCombinedScene() {
-        Assets.getMaterial("engine:combine").enable();
+        Assets.getMaterial("engine:prog.combine").enable();
 
         bindFbo("sceneOpaquePingPong");
 
@@ -958,7 +958,7 @@ public class DefaultRenderingProcess {
     }
 
     private void applyLightBufferPass(String target) {
-        Material program = Assets.getMaterial("engine:lightBufferPass");
+        Material program = Assets.getMaterial("engine:prog.lightBufferPass");
         program.enable();
 
         DefaultRenderingProcess.FBO targetFbo = getFBO(target);
@@ -1008,7 +1008,7 @@ public class DefaultRenderingProcess {
         skyBand.bind();
         setRenderBufferMask(true, false, false);
 
-        Material material = Assets.getMaterial("engine:blur");
+        Material material = Assets.getMaterial("engine:prog.blur");
 
         material.enable();
         material.setFloat("radius", 8.0f, true);
@@ -1030,7 +1030,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateToneMappedScene() {
-        Assets.getMaterial("engine:hdr").enable();
+        Assets.getMaterial("engine:prog.hdr").enable();
 
         bindFbo("sceneToneMapped");
 
@@ -1042,7 +1042,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateLightShafts() {
-        Assets.getMaterial("engine:lightshaft").enable();
+        Assets.getMaterial("engine:prog.lightshaft").enable();
 
         FBO lightshaft = getFBO("lightShafts");
 
@@ -1062,7 +1062,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateSSAO() {
-        Material ssaoShader = Assets.getMaterial("engine:ssao");
+        Material ssaoShader = Assets.getMaterial("engine:prog.ssao");
         ssaoShader.enable();
 
         FBO ssao = getFBO("ssao");
@@ -1086,7 +1086,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateSobel() {
-        Assets.getMaterial("engine:sobel").enable();
+        Assets.getMaterial("engine:prog.sobel").enable();
 
         FBO sobel = getFBO("sobel");
 
@@ -1106,7 +1106,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateBlurredSSAO() {
-        Material shader = Assets.getMaterial("engine:ssaoBlur");
+        Material shader = Assets.getMaterial("engine:prog.ssaoBlur");
         shader.enable();
 
         FBO ssao = getFBO("ssaoBlurred");
@@ -1129,7 +1129,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generatePrePost() {
-        Assets.getMaterial("engine:prePost").enable();
+        Assets.getMaterial("engine:prog.prePost").enable();
 
         bindFbo("scenePrePost");
 
@@ -1141,7 +1141,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateHighPass() {
-        Material program = Assets.getMaterial("engine:highp");
+        Material program = Assets.getMaterial("engine:prog.highp");
         program.setFloat("highPassThreshold", bloomHighPassThreshold, true);
         program.enable();
 
@@ -1176,7 +1176,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateBlur(int id) {
-        Material material = Assets.getMaterial("engine:blur");
+        Material material = Assets.getMaterial("engine:prog.blur");
         material.enable();
 
         material.setFloat("radius", overallBlurRadiusFactor * config.getRendering().getBlurRadius(), true);
@@ -1209,7 +1209,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateBloom(int id) {
-        Material shader = Assets.getMaterial("engine:blur");
+        Material shader = Assets.getMaterial("engine:prog.blur");
 
         shader.enable();
         shader.setFloat("radius", bloomBlurRadius, true);
@@ -1242,7 +1242,7 @@ public class DefaultRenderingProcess {
     }
 
     private void generateDownsampledScene() {
-        Material shader = Assets.getMaterial("engine:down");
+        Material shader = Assets.getMaterial("engine:prog.down");
         shader.enable();
 
         for (int i = 4; i >= 0; i--) {

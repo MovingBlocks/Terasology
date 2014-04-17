@@ -57,7 +57,7 @@ public class WorldSerializerTest {
 
     @BeforeClass
     public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
     }
 
     @Before

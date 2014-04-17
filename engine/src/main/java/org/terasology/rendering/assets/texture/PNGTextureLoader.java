@@ -47,7 +47,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
     }
 
     @Override
-    public TextureData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public TextureData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         InputStream pngStream = null;
         if (urls.get(0).toString().endsWith(".png")) {
             pngStream = stream;

@@ -16,6 +16,7 @@
 package org.terasology.engine.subsystem.headless.mode;
 
 import org.terasology.config.Config;
+import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
@@ -49,9 +50,6 @@ public class StateHeadlessSetup extends StateSetup {
 
         GameManifest gameManifest = new GameManifest();
 
-        gameManifest.setTitle("headless");
-        gameManifest.setSeed("headless");
-
         Config config = CoreRegistry.get(Config.class);
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         for (String moduleName : config.getDefaultModSelection().listModules()) {
@@ -61,7 +59,11 @@ public class StateHeadlessSetup extends StateSetup {
             }
         }
 
-        SimpleUri worldGeneratorUri = config.getWorldGeneration().getDefaultGenerator();
+        WorldGenerationConfig worldGenConfig = config.getWorldGeneration();
+        SimpleUri worldGeneratorUri = worldGenConfig.getDefaultGenerator();
+
+        gameManifest.setTitle(worldGenConfig.getWorldTitle());
+        gameManifest.setSeed(worldGenConfig.getDefaultSeed());
 
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                 (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);

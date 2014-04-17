@@ -27,17 +27,22 @@ public final class ConsoleColors {
     /**
      * Error color
      */
-    public static final Color ERROR = new Color(224, 32, 32);
+    public static final Color ERROR = new Color(224, 128, 128);
 
     /**
      * Command color
      */
-    public static final Color COMMAND = new Color(32, 32, 224);
+    public static final Color COMMAND = new Color(196, 196, 224);
+    
+    /**
+     * Chat text color
+     */
+    public static final Color CHAT = new Color(208, 208, 224);
     
     /**
      * Notification color
      */
-    public static final Color NOTIFICATION = new Color(48, 48, 224);
+    public static final Color NOTIFICATION = new Color(208, 208, 224);
 
     /**
      * Default console color

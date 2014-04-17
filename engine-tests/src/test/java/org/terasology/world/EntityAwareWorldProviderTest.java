@@ -105,13 +105,13 @@ public class EntityAwareWorldProviderTest {
 
     @BeforeClass
     public static void commonSetup() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
     }
 
     @Before
     public void setup() {
         GameThread.setGameThread();
-        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager())));
+        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager(), false)));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
             @Override

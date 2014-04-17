@@ -115,7 +115,7 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
-
+        
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:

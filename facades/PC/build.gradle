@@ -2,9 +2,11 @@
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/common.gradle"
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.text.SimpleDateFormat;
+import groovy.json.JsonBuilder
 
 def dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
 dateTimeFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -29,6 +31,13 @@ ext {
     displayVersion = versionBase
 }
 
+// Base the engine tests on the same version number as the engine
+version = project(':engine').version
+println "PC VERSION: $version"
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.facades'
+
 dependencies {
     compile project(':engine')
 }
@@ -52,6 +61,25 @@ jar {
     }
 }
 
+// A configuration for publishing artifacts - TODO: For PC this isn't needed by anything until game distribution is a separate Jenkins job
+configurations {
+    published
+    modules {
+        transitive = false
+    }
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar
+}
+
 task runPC(type:JavaExec) {
     description = "Run 'Terasology' to play the game as a standard PC application"
 
@@ -72,6 +100,65 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
+task setupServerConfig() {
+    description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
+    
+    def json = new JsonBuilder()
+
+    def root = rootProject.file(localServerDataPath);
+    root.mkdir()
+
+    def config = new File(root, 'config.cfg')
+    logger.lifecycle("Creating config file $config")
+
+    json.worldGeneration {
+        if (project.hasProperty('seed')) {
+            logger.lifecycle("  Seed value: $seed");
+            defaultSeed seed
+        }
+        if (project.hasProperty('worldGen')) {
+            logger.lifecycle("  World Generator: $worldGen");
+            defaultGenerator worldGen
+        }
+    }
+
+    config.text = json.toPrettyString()
+}
+
+task setupServerModules(type: Sync) {
+    description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
+
+    // Make sure the server config task has already created a config.cfg
+    dependsOn setupServerConfig
+
+    def json2 = new JsonBuilder()
+    def root2 = rootProject.file(localServerDataPath);
+    def config2 = new File(root2, 'config.cfg')
+
+    def enabledModules = []
+
+    if (project.hasProperty('extraModules')) {
+        // Grab modules from Artifactory - cheats by declaring them as dependencies
+        extraModules.split(',').each { String module ->
+            println "Extra module: " + module
+            enabledModules += module
+            dependencies {
+                modules group: 'org.terasology.modules', name: module, version: '+'
+            }
+        }
+        // Add the requested modules to the config
+        json2.defaultModSelection {
+            logger.lifecycle("  Enabling modules: $enabledModules");
+            modules enabledModules
+        }
+        config2.text = json2.toPrettyString()
+    }
+
+    from(configurations.modules)
+    into(new File(rootProject.file(localServerDataPath), "modules"))
+}
+
+// TODO: Make a task to reset server / game data
 task startServer(type:JavaExec) {
     description "Starts a headless multiplayer server with data stored in [project-root]/$localServerDataPath"
 
@@ -79,6 +166,8 @@ task startServer(type:JavaExec) {
     dependsOn rootProject.extractNatives
     dependsOn rootProject.moduleClasses
     dependsOn classes
+    dependsOn setupServerConfig
+    dependsOn setupServerModules
 
     // Run arguments
     main = mainClassName
@@ -112,7 +201,6 @@ task distApp (type: Sync) {
     dependsOn jar
 
     into ("$distsDir/app")
-    from ("$rootDir/Heightmap.txt") {}
     from ("$rootDir/README.markdown") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')
@@ -123,8 +211,11 @@ task distApp (type: Sync) {
     from ("$rootDir/NOTICE") {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
     }
-    from ("build/libs/PC.jar") {
-        rename 'PC.*', 'Terasology.jar'
+    from ("$buildDir/libs") {
+        include "*.jar"
+        rename {
+            'Terasology.jar'
+        }
     }
     from('launchScripts') {
         exclude('*.xml')
@@ -194,7 +285,7 @@ task distModules (type: Sync) {
 
 task distAppZip (type: Zip) {
     from "$distsDir/app"
-    baseName = "Terasology"
+    archiveName = "Terasology.zip"
 }
 
 task distForLauncher (type: Sync) {

@@ -70,7 +70,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     }
 
     @Override
-    public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         BehaviorTreeData data = new BehaviorTreeData();
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
@@ -41,6 +42,8 @@ import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.opengl.FrameBufferObject;
+import org.terasology.rendering.opengl.LwjglFrameBufferObject;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -96,6 +99,8 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
 
     private Rect2i requestedCropRegion;
     private Rect2i currentTextureCropRegion;
+
+    private Map<AssetUri, FrameBufferObject> fboMap = Maps.newHashMap();
 
     @Override
     public void preRender() {
@@ -224,6 +229,16 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
     @Override
     public void crop(Rect2i cropRegion) {
         requestedCropRegion = cropRegion;
+    }
+
+    @Override
+    public FrameBufferObject getFBO(AssetUri uri, Vector2i size) {
+        FrameBufferObject frameBufferObject = fboMap.get(uri);
+        if (frameBufferObject == null) {
+            frameBufferObject = new LwjglFrameBufferObject(uri, size);
+            fboMap.put(uri, frameBufferObject);
+        }
+        return frameBufferObject;
     }
 
     public void drawTexture(TextureRegion texture, Color color, ScaleMode mode, Rect2i absoluteRegion,

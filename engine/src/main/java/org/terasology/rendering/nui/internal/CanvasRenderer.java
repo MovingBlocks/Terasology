@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.internal;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
@@ -26,6 +27,7 @@ import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.HorizontalAlign;
 import org.terasology.rendering.nui.ScaleMode;
 import org.terasology.rendering.nui.VerticalAlign;
+import org.terasology.rendering.opengl.FrameBufferObject;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -42,6 +44,8 @@ public interface CanvasRenderer {
     Vector2i getTargetSize();
 
     void crop(Rect2i cropRegion);
+
+    FrameBufferObject getFBO(AssetUri uri, Vector2i size);
 
     void drawMesh(Mesh mesh, Material material, Rect2i drawRegion, Rect2i cropRegion, Quat4f rotation, Vector3f offset, float scale, float alpha);
 

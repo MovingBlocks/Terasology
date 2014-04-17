@@ -188,7 +188,7 @@ public class CoreCommands extends BaseComponentSystem {
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
     @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public void spawnPrefab(@CommandParam("prefabId") String prefabName, EntityRef entity) {
+    public String spawnPrefab(@CommandParam("prefabId") String prefabName, EntityRef entity) {
         Camera camera = worldRenderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -206,6 +206,11 @@ public class CoreCommands extends BaseComponentSystem {
         Prefab prefab = Assets.getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
             entityManager.create(prefab, spawnPos, rotation);
+            return "Done";
+        } else if (prefab == null) {
+            return "Unknown prefab";
+        } else {
+            return "Prefab cannot be spawned (no location component)";
         }
     }
 

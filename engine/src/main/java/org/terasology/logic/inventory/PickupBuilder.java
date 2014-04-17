@@ -56,7 +56,7 @@ public final class PickupBuilder {
                     pickupItem = removedItem;
                 }
             } else {
-                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false);
+                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
                 if (removedItem != null) {
                     pickupItem = removedItem;
                 }

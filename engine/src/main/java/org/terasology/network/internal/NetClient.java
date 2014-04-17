@@ -198,6 +198,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     @Override
     public void disconnect() {
         super.disconnect();
+        
+        if (channel.isOpen()) {
+            channel.close().awaitUninterruptibly();
+        }
+        
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.unregisterListener(this);

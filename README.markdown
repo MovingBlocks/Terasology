@@ -25,7 +25,7 @@ You can use the Windows executable or one of the default launch scripts to start
 Controls
 --------
 
-Note that these instructions are meant for the stable release. The latest develop build may differ and for more detailed instructions accurate to that release see our [GitHub Wiki](https://github.com/MovingBlocks/Terasology/wiki)
+Note: Keys between the latest stable and latest develop build may differ.
 
 * [W,A,S,D] - Movement
 * [E] - Activate (Chest, TNT, etc)
@@ -77,7 +77,7 @@ More or completely alternative line-ups with certain modules / world types selec
 Console Commands
 --------
 
-Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes)
+Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
 
 * help - Show in-game help (more thorough)
 * ghost - fly / no-clip mode (old double-jump for "god" mode)
@@ -145,9 +145,10 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
+* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
-* ~~[Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working (edit: not so much anymore, alas!) :D~~
+* [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
 * [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis)
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [MultiBlock](https://github.com/Terasology/MultiBlock) - supports the concept of multiple blocks being part of the same structure
@@ -160,6 +161,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * ~~[Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone~~
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
+* [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
 * ~~[Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons~~
