@@ -30,7 +30,7 @@ public class LwjglAudio extends BaseLwjglSubsystem {
     private AudioManager audioManager;
 
     @Override
-    public void preInitialise() {
+    public synchronized void preInitialise() {
         super.preInitialise();
     }
 
@@ -61,7 +61,11 @@ public class LwjglAudio extends BaseLwjglSubsystem {
         if (config.getAudio().isDisableSound()) {
             audioManager = new NullAudioManager();
         } else {
-            audioManager = new OpenALManager(config.getAudio());
+            try {
+                audioManager = new OpenALManager(config.getAudio());
+            } catch (Exception e) {
+                audioManager = new NullAudioManager();
+            }
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
