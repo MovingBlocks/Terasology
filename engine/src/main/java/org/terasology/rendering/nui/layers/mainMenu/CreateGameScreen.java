@@ -174,7 +174,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                             (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
                     gameManifest.addWorld(worldInfo);
 
-                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
+                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE, false));
                 }
             }
         });

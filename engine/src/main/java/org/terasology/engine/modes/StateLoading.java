@@ -68,13 +68,12 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private GameManifest gameManifest;
-    private String serverAddress;
-    private int serverPort;
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
-
+    private boolean headless;
+    
     private NUIManager nuiManager;
 
     private LoadingScreen loadingScreen;
@@ -88,12 +87,13 @@ public class StateLoading implements GameState {
      * @param gameManifest
      * @param netMode
      */
-    public StateLoading(GameManifest gameManifest, NetworkMode netMode) {
+    public StateLoading(GameManifest gameManifest, NetworkMode netMode, boolean headless) {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
 
         this.gameManifest = gameManifest;
         this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = netMode;
+        this.headless = headless;
     }
 
     /**
@@ -181,8 +181,10 @@ public class StateLoading implements GameState {
             loadProcesses.add(new StartServer());
         }
         loadProcesses.add(new PostBeginSystems());
-        loadProcesses.add(new SetupLocalPlayer());
-        loadProcesses.add(new AwaitCharacterSpawn());
+        if (!headless) {
+            loadProcesses.add(new SetupLocalPlayer());
+            loadProcesses.add(new AwaitCharacterSpawn());
+        }
         loadProcesses.add(new PrepareWorld());
     }
 

@@ -68,7 +68,7 @@ public class StateHeadlessSetup extends StateSetup {
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                 (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
-        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.SERVER));
+        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.SERVER, true));
     }
 
     @Override
