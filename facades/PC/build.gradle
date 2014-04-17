@@ -101,7 +101,7 @@ task runPC(type:JavaExec) {
 }
 
 task setupServerConfig() {
-    description 'Parses "seed" and "worldGen" parameters and writes them to config.cfg'
+    description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
     
     def json = new JsonBuilder()
 
@@ -128,13 +128,30 @@ task setupServerConfig() {
 task setupServerModules(type: Sync) {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
+    // Make sure the server config task has already created a config.cfg
+    dependsOn setupServerConfig
+
+    def json2 = new JsonBuilder()
+    def root2 = rootProject.file(localServerDataPath);
+    def config2 = new File(root2, 'config.cfg')
+
+    def enabledModules = []
+
     if (project.hasProperty('extraModules')) {
-        extraModules.split(',').each { String dependency ->
-            println "Extra module: " + dependency
+        // Grab modules from Artifactory - cheats by declaring them as dependencies
+        extraModules.split(',').each { String module ->
+            println "Extra module: " + module
+            enabledModules += module
             dependencies {
-                modules group: 'org.terasology.modules', name: dependency, version: '+'
+                modules group: 'org.terasology.modules', name: module, version: '+'
             }
         }
+        // Add the requested modules to the config
+        json2.defaultModSelection {
+            logger.lifecycle("  Enabling modules: $enabledModules");
+            modules enabledModules
+        }
+        config2.text = json2.toPrettyString()
     }
 
     from(configurations.modules)

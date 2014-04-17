@@ -23,7 +23,7 @@ import org.terasology.engine.SimpleUri;
  */
 public class WorldGenerationConfig {
     private String worldTitle = "New World";
-    private String defaultSeed = "Terasology";
+    private String defaultSeed = "nowater4";
 
     private SimpleUri defaultGenerator = new SimpleUri("core:perlin");
 
