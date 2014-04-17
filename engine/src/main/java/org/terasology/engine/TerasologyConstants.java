@@ -32,6 +32,7 @@ public final class TerasologyConstants {
     public static final String ENGINE_MODULE = "engine";
     public static final String ASSETS_SUBDIRECTORY = "assets";
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
+    public static final String DELTAS_SUBDIRECTORY = "deltas";
 
     private TerasologyConstants() {
     }

@@ -271,10 +271,22 @@ public class AssetManager {
             }
 
             Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
+            List<URL> deltas;
+            if (uri.getAssetType().isDeltaSupported()) {
+                deltas = Lists.newArrayList();
+                for (Module deltaModule : moduleManager.getActiveModulesOrderedByDependency()) {
+                    AssetSource source = assetSources.get(deltaModule.getId());
+                    if (source != null) {
+                        deltas.addAll(source.getDelta(uri));
+                    }
+                }
+            } else {
+                deltas = Collections.emptyList();
+            }
             try (InputStream stream = AccessController.doPrivileged(new PrivilegedOpenStream(url))) {
                 urls.remove(url);
                 urls.add(0, url);
-                return loader.load(module, stream, urls);
+                return loader.load(module, stream, urls, deltas);
             } catch (PrivilegedActionException e) {
                 logger.error("Error reading asset {}", uri, e.getCause());
                 return null;

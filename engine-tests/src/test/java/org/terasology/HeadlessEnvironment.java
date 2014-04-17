@@ -149,11 +149,11 @@ public class HeadlessEnvironment extends Environment {
 
         CodeSource tsCodeSource = TerasologyEngine.class.getProtectionDomain().getCodeSource();
         assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, tsCodeSource,
-                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
+                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY));
         
         CodeSource thisCodeSource = HeadlessEnvironment.class.getProtectionDomain().getCodeSource();
         assetManager.addAssetSource(new ClasspathSource("unittest", thisCodeSource, TerasologyConstants.ASSETS_SUBDIRECTORY,
-                TerasologyConstants.OVERRIDES_SUBDIRECTORY));
+                TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY));
 
 
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
@@ -196,7 +196,7 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupModuleManager() {
-        ModuleManagerImpl moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        ModuleManagerImpl moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
 

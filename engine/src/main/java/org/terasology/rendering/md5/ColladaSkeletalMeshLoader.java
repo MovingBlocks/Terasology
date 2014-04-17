@@ -41,7 +41,7 @@ public class ColladaSkeletalMeshLoader extends ColladaLoader implements AssetLoa
     private static final Logger logger = LoggerFactory.getLogger(ColladaSkeletalMeshLoader.class);
 
     @Override
-    public SkeletalMeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public SkeletalMeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         logger.info("Loading skeletal mesh for " + urls);
 
         try {

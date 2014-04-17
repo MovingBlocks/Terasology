@@ -20,7 +20,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
-
 import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
@@ -52,13 +51,13 @@ import java.util.Map;
  * @author Lucas Jenss <public@x3ro.de>
  */
 public enum AssetType {
-    PREFAB("prefab", "prefabs", "prefab", new PrefabLoader()),
-    SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
-    MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
-    SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader()),
-    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}),
-    TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader()),
-    SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
+    PREFAB("prefab", "prefabs", "prefab", new PrefabLoader(), true),
+    SOUND("sound", "sounds", "ogg", new OggSoundLoader(), false),
+    MUSIC("music", "music", "ogg", new OggStreamingSoundLoader(), false),
+    SHAPE("shape", "shapes", "shape", new JsonBlockShapeLoader(), false),
+    MESH("mesh", "mesh", new String[]{"obj", "dae"}, new AssetLoader[]{new ObjMeshLoader(), new ColladaMeshLoader()}, false),
+    TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader(), false),
+    SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader(), false) {
         @Override
         public AssetUri getUri(String sourceId, String item) {
             if (item.endsWith("_frag")) {
@@ -71,25 +70,21 @@ public enum AssetType {
             return new AssetUri(this, sourceId, item);
         }
     },
-    MATERIAL("material", "materials", "mat", new MaterialLoader()),
-    BLOCK_DEFINITION("blockdef", "blocks", "block", null),
-    BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
-    SKELETON_MESH("skeletalmesh", "skeletalMesh", new String[]{"md5mesh", "dae"}, new AssetLoader[]{new MD5SkeletonLoader(), new ColladaSkeletalMeshLoader()}),
-    ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),
-    FONT("font", "fonts", "fnt", new FontLoader()),
-    SUBTEXTURE("subtexture", new String[] {}, "", null),
-    ATLAS("atlas", "atlas", "atlas", new AtlasLoader()),
-    UI_SKIN("skin", "skins", "skin", new UISkinLoader()),
-    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader()),
-    UI_ELEMENT("ui", "ui", "ui", new UILoader());
+    MATERIAL("material", "materials", "mat", new MaterialLoader(), false),
+    BLOCK_DEFINITION("blockdef", "blocks", "block", null, false),
+    BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader(), false),
+    SKELETON_MESH("skeletalmesh", "skeletalMesh", new String[]{"md5mesh", "dae"}, new AssetLoader[]{new MD5SkeletonLoader(), new ColladaSkeletalMeshLoader()}, false),
+    ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader(), false),
+    FONT("font", "fonts", "fnt", new FontLoader(), false),
+    SUBTEXTURE("subtexture", new String[]{}, "", null, false),
+    ATLAS("atlas", "atlas", "atlas", new AtlasLoader(), false),
+    UI_SKIN("skin", "skins", "skin", new UISkinLoader(), false),
+    BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader(), false),
+    UI_ELEMENT("ui", "ui", "ui", new UILoader(), false);
 
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;
-
-    /* ============
-     * Class fields
-     * ============ */
 
     private String typeId;
 
@@ -102,6 +97,11 @@ public enum AssetType {
      * The file extension for assets of this type.
      */
     private List<String> fileExtensions;
+
+    /**
+     * Does this asset type support deltas.
+     */
+    private boolean deltaSupported;
 
     /**
      * An instance of the asset loaders for the current asset type.
@@ -121,47 +121,39 @@ public enum AssetType {
         }
     }
 
-
-    /* ==========
-     * Public API
-     * ========== */
-
-    private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader) {
-        this.typeId = typeId;
-        this.subDirs = ImmutableList.of(subDir);
-        this.fileExtensions = ImmutableList.of(fileExtension);
-        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
+    private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader, boolean supportsDelta) {
+        this(typeId,
+                new String[]{subDir},
+                new String[]{fileExtension},
+                assetLoader,
+                supportsDelta);
     }
 
-    private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader assetLoader) {
-        this.typeId = typeId;
-        this.subDirs = ImmutableList.copyOf(subDirs);
-        this.fileExtensions = ImmutableList.copyOf(fileExtensions);
-        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
+    private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader assetLoader, boolean supportsDelta) {
+        this(typeId, subDirs, fileExtensions, (assetLoader == null) ? new AssetLoader[0] : new AssetLoader[]{assetLoader}, supportsDelta);
     }
 
-    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader assetLoader) {
-        this.typeId = typeId;
-        this.subDirs = ImmutableList.of(subDir);
-        this.fileExtensions = ImmutableList.copyOf(fileExtensions);
-        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader assetLoader, boolean supportsDelta) {
+        this(typeId, new String[]{subDir}, fileExtensions, assetLoader, supportsDelta);
     }
 
-    private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader) {
-        this.typeId = typeId;
-        this.subDirs = ImmutableList.copyOf(subDirs);
-        this.fileExtensions = ImmutableList.of(fileExtension);
-        this.assetLoaderList = (null != assetLoader) ? ImmutableList.of(assetLoader) : null;
+    private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader, boolean supportsDelta) {
+        this(typeId, subDirs, new String[]{fileExtension}, assetLoader, supportsDelta);
     }
 
     /**
      * We're going to assume that there's exactly one file extension per asset loader specified in the case of multiple asset loaders
      */
-    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader[] assetLoaders) {
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader[] assetLoaders, boolean supportsDelta) {
+        this(typeId, new String[]{subDir}, fileExtensions, assetLoaders, supportsDelta);
+    }
+
+    private AssetType(String typeId, String[] subDir, String[] fileExtensions, AssetLoader[] assetLoaders, boolean supportsDelta) {
         this.typeId = typeId;
-        this.subDirs = ImmutableList.of(subDir);
+        this.subDirs = ImmutableList.copyOf(subDir);
         this.fileExtensions = ImmutableList.copyOf(fileExtensions);
         this.assetLoaderList = ImmutableList.copyOf(assetLoaders);
+        this.deltaSupported = supportsDelta;
     }
 
     public String getTypeId() {
@@ -199,10 +191,9 @@ public enum AssetType {
         return new AssetUri(this, sourceId, item);
     }
 
-
-    /* ==========
-     * Static API
-     * ========== */
+    public boolean isDeltaSupported() {
+        return deltaSupported;
+    }
 
     public static AssetType getTypeForId(String id) {
         return typeIdLookup.get(id);

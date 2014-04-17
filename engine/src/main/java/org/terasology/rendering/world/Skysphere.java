@@ -65,7 +65,7 @@ public class Skysphere {
             glCullFace(GL_FRONT);
         }
 
-        Material shader = Assets.getMaterial("engine:sky");
+        Material shader = Assets.getMaterial("engine:prog.sky");
         shader.enable();
 
         // Draw the skysphere

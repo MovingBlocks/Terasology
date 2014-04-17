@@ -48,7 +48,7 @@ public class GLSLShaderLoader implements AssetLoader<ShaderData> {
     }
 
     @Override
-    public ShaderData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public ShaderData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();

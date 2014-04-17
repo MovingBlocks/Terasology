@@ -17,6 +17,7 @@
 package org.terasology.asset;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -44,5 +45,7 @@ public interface AssetSource {
     List<URL> getOverride(AssetUri uri);
 
     Iterable<AssetUri> listOverrides();
+
+    Collection<URL> getDelta(AssetUri uri);
 
 }

@@ -72,7 +72,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     }
 
     @Override
-    public BlockShapeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public BlockShapeData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         return gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), BlockShapeData.class);
     }
 

@@ -230,7 +230,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     private void render(Iterable<EntityRef> particleEntities) {
-        Assets.getMaterial("engine:particle").enable();
+        Assets.getMaterial("engine:prog.particle").enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -342,7 +342,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         mat.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
         mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
@@ -353,7 +353,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, Block block, float temperature, float humidity, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);

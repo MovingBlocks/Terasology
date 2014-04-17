@@ -681,7 +681,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
-        Material program = Assets.getMaterial("engine:simple");
+        Material program = Assets.getMaterial("engine:prog.simple");
         program.enable();
         program.setCamera(camera);
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
@@ -698,7 +698,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
          * LIGHT GEOMETRY PASS
          */
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
-        program = Assets.getMaterial("engine:lightGeometryPass");
+        program = Assets.getMaterial("engine:prog.lightGeometryPass");
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -820,7 +820,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         camera.lookThroughNormalized();
         skysphere.render(camera);
 
-        Material chunkShader = Assets.getMaterial("engine:chunk");
+        Material chunkShader = Assets.getMaterial("engine:prog.chunk");
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         if (config.getRendering().isReflectiveWater()) {
@@ -868,7 +868,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                             chunk.getPos().z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                shader = Assets.getMaterial("engine:chunk");
+                shader = Assets.getMaterial("engine:prog.chunk");
                 shader.enable();
 
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
@@ -888,7 +888,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 }
 
             } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-                shader = Assets.getMaterial("engine:shadowMap");
+                shader = Assets.getMaterial("engine:prog.shadowMap");
                 shader.enable();
             } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
                 CoreRegistry.get(ShaderManager.class).disableShader();

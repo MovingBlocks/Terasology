@@ -53,7 +53,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
 
     @BeforeClass
     public static void initialise() {
-        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
 

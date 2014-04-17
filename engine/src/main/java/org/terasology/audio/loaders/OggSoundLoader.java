@@ -35,7 +35,7 @@ import java.util.List;
 public class OggSoundLoader implements AssetLoader<StaticSoundData> {
 
     @Override
-    public StaticSoundData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public StaticSoundData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try (OggReader reader = new OggReader(stream)) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ByteStreams.copy(reader, bos);

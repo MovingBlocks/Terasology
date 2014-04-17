@@ -57,7 +57,7 @@ public class FactoryTest {
         OutputStream os = new ByteArrayOutputStream(10000);
         loader.save(os, data);
         String jsonExpected = os.toString();
-        data = loader.load(null, new ByteArrayInputStream(jsonExpected.getBytes()), null);
+        data = loader.load(null, new ByteArrayInputStream(jsonExpected.getBytes()), null, null);
         os = new ByteArrayOutputStream(10000);
         loader = new BehaviorTreeLoader();
         loader.save(os, data);
@@ -82,7 +82,7 @@ public class FactoryTest {
 
     @Before
     public void setup() {
-        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
         moduleManager.applyActiveModules();
         ReflectionReflectFactory reflectFactory = new ReflectionReflectFactory();
         CoreRegistry.put(ReflectFactory.class, reflectFactory);

@@ -1,5 +1,5 @@
 {
-    "shader" : "engine:block",
+    "shader" : "engine:prog.block",
     "params" : {
         "colorOffset" : [1.0, 1.0, 1.0],
         "textured" : false
