@@ -175,8 +175,8 @@ public class BlockManagerImpl extends BlockManager {
                     logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
                     block.setId(UNKNOWN_ID);
                 }
-                registerFamily(family);
             }
+            registerFamily(family);
         } else {
             logger.error("Block family not available: {}", familyUri);
         }
