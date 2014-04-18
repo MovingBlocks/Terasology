@@ -41,12 +41,6 @@ public final class LWJGLHelper {
         initLibraryPaths();
 
         try {
-            initOpenAL();
-        } catch (UnsatisfiedLinkError e) {
-            logger.warn("Could not load OpenAL native libraries - sound disabled", e);
-        }
-            
-        try {
             initOculus();
         } catch (UnsatisfiedLinkError e) {
             logger.warn("Could not load optional TeraOVR native libraries - Oculus support disabled");
@@ -66,26 +60,6 @@ public final class LWJGLHelper {
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported operating system: " + LWJGLUtil.getPlatformName());
-        }
-    }
-
-    private static void initOpenAL() {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_LINUX:
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("openal64");
-                } else {
-                    System.loadLibrary("openal");
-                }
-                break;
-                
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                if (System.getProperty("os.arch").contains("64")) {
-                    System.loadLibrary("OpenAL64");
-                } else {
-                    System.loadLibrary("OpenAL32");
-                }
-                break;
         }
     }
 

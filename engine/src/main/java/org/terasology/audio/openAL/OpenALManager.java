@@ -17,7 +17,9 @@ package org.terasology.audio.openAL;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Maps;
+
 import org.lwjgl.BufferUtils;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
@@ -44,6 +46,7 @@ import org.terasology.math.Direction;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
@@ -77,7 +80,7 @@ public class OpenALManager implements AudioManager {
         }
     };
 
-    public OpenALManager(AudioConfig config) throws Exception {
+    public OpenALManager(AudioConfig config) throws OpenALException, LWJGLException {
         logger.info("Initializing OpenAL audio manager");
         config.subscribe(configListener);
 
