@@ -111,14 +111,22 @@ task setupServerConfig() {
     def config = new File(root, 'config.cfg')
     logger.lifecycle("Creating config file $config")
 
-    json.worldGeneration {
-        if (project.hasProperty('seed')) {
-            logger.lifecycle("  Seed value: $seed");
-            defaultSeed seed
+    json {
+        worldGeneration {
+            if (project.hasProperty('seed')) {
+                logger.lifecycle("  Seed value: $seed");
+                defaultSeed seed
+            }
+            if (project.hasProperty('worldGen')) {
+                logger.lifecycle("  World Generator: $worldGen");
+                defaultGenerator worldGen
+            }
         }
-        if (project.hasProperty('worldGen')) {
-            logger.lifecycle("  World Generator: $worldGen");
-            defaultGenerator worldGen
+        defaultModSelection {
+            if (project.hasProperty('extraModules')) {
+                logger.lifecycle("  Enabling modules: $extraModules");
+                modules extraModules.tokenize(" ,")
+            }
         }
     }
 
@@ -128,30 +136,14 @@ task setupServerConfig() {
 task setupServerModules(type: Sync) {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
-    // Make sure the server config task has already created a config.cfg
-    dependsOn setupServerConfig
-
-    def json2 = new JsonBuilder()
-    def root2 = rootProject.file(localServerDataPath);
-    def config2 = new File(root2, 'config.cfg')
-
-    def enabledModules = []
-
     if (project.hasProperty('extraModules')) {
         // Grab modules from Artifactory - cheats by declaring them as dependencies
         extraModules.split(',').each { String module ->
             println "Extra module: " + module
-            enabledModules += module
             dependencies {
                 modules group: 'org.terasology.modules', name: module, version: '+'
             }
         }
-        // Add the requested modules to the config
-        json2.defaultModSelection {
-            logger.lifecycle("  Enabling modules: $enabledModules");
-            modules enabledModules
-        }
-        config2.text = json2.toPrettyString()
     }
 
     from(configurations.modules)
