@@ -64,10 +64,8 @@ public final class LWJGLHelper {
     }
 
     private static void initOculus() {
-        switch (LWJGLUtil.getPlatform()) {
-            case LWJGLUtil.PLATFORM_WINDOWS:
-                OculusVrHelper.loadNatives();
-                break;
+        if (LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_WINDOWS) {
+            OculusVrHelper.loadNatives();
         }
     }
 }
