@@ -45,39 +45,39 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(Sound sound) {
+    public void playSound(Sound<?> sound) {
     }
 
     @Override
-    public void playSound(Sound sound, float volume) {
+    public void playSound(Sound<?> sound, float volume) {
     }
 
     @Override
-    public void playSound(Sound sound, float volume, int priority) {
+    public void playSound(Sound<?> sound, float volume, int priority) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position) {
+    public void playSound(Sound<?> sound, Vector3f position) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position, float volume) {
+    public void playSound(Sound<?> sound, Vector3f position, float volume) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position, float volume, int priority) {
+    public void playSound(Sound<?> sound, Vector3f position, float volume, int priority) {
     }
 
     @Override
-    public void playMusic(Sound sound) {
+    public void playMusic(Sound<?> sound) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(Sound<?> sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
     }
 
     @Override
-    public void playMusic(Sound sound, AudioEndListener endListener) {
+    public void playMusic(Sound<?> sound, AudioEndListener endListener) {
     }
 
     @Override

@@ -24,24 +24,24 @@ import org.terasology.network.NetworkEvent;
  * @author Immortius
  */
 public abstract class AbstractPlaySoundEvent extends NetworkEvent {
-    private Sound sound;
+    private Sound<?> sound;
     private float volume;
 
     protected AbstractPlaySoundEvent() {
     }
 
-    public AbstractPlaySoundEvent(Sound sound, float volume) {
+    public AbstractPlaySoundEvent(Sound<?> sound, float volume) {
         this.sound = sound;
         this.volume = volume;
     }
 
-    public AbstractPlaySoundEvent(EntityRef instigator, Sound sound, float volume) {
+    public AbstractPlaySoundEvent(EntityRef instigator, Sound<?> sound, float volume) {
         super(instigator);
         this.sound = sound;
         this.volume = volume;
     }
 
-    public Sound getSound() {
+    public Sound<?> getSound() {
         return sound;
     }
 

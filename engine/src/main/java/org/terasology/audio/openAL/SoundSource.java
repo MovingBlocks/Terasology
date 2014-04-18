@@ -19,28 +19,28 @@ import org.terasology.audio.Sound;
 
 import javax.vecmath.Vector3f;
 
-public interface SoundSource<T extends Sound> {
+public interface SoundSource<T extends Sound<?>> {
 
     /**
      * Start sound playback
      *
      * @return
      */
-    SoundSource play();
+    SoundSource<T> play();
 
     /**
      * Stop sound playback
      *
      * @return
      */
-    SoundSource stop();
+    SoundSource<T> stop();
 
     /**
      * Pause sound playback
      *
      * @return
      */
-    SoundSource pause();
+    SoundSource<T> pause();
 
     /**
      * Returns true if sound is currently playing, or intended to be played
@@ -61,7 +61,7 @@ public interface SoundSource<T extends Sound> {
      * @param absolute
      * @return
      */
-    SoundSource setAbsolute(boolean absolute);
+    SoundSource<T> setAbsolute(boolean absolute);
 
     /**
      * Returns true if sound source is absolute relative to listener
@@ -76,7 +76,7 @@ public interface SoundSource<T extends Sound> {
      * @param pos
      * @return
      */
-    SoundSource setPosition(Vector3f pos);
+    SoundSource<T> setPosition(Vector3f pos);
 
     /**
      * Returns sound position in space
@@ -92,7 +92,7 @@ public interface SoundSource<T extends Sound> {
      * @param velocity
      * @return
      */
-    SoundSource setVelocity(Vector3f velocity);
+    SoundSource<T> setVelocity(Vector3f velocity);
 
     /**
      * Returns sound source velocity
@@ -107,7 +107,7 @@ public interface SoundSource<T extends Sound> {
      * @param direction
      * @return
      */
-    SoundSource setDirection(Vector3f direction);
+    SoundSource<T> setDirection(Vector3f direction);
 
     /**
      * Returns sound source direction in cartesian coordinates
@@ -129,7 +129,7 @@ public interface SoundSource<T extends Sound> {
      * @param pitch
      * @return
      */
-    SoundSource setPitch(float pitch);
+    SoundSource<T> setPitch(float pitch);
 
     /**
      * Returns sound source gain
@@ -149,7 +149,7 @@ public interface SoundSource<T extends Sound> {
      * @param gain
      * @return
      */
-    SoundSource setGain(float gain);
+    SoundSource<T> setGain(float gain);
 
     /**
      * Returns true if sound source is looped (sound will be repeated)
@@ -165,7 +165,7 @@ public interface SoundSource<T extends Sound> {
      * @param looping
      * @return
      */
-    SoundSource setLooping(boolean looping);
+    SoundSource<T> setLooping(boolean looping);
 
     /**
      * Set source of sound (samples)
@@ -173,7 +173,7 @@ public interface SoundSource<T extends Sound> {
      * @param sound
      * @return
      */
-    SoundSource setAudio(T sound);
+    SoundSource<T> setAudio(T sound);
 
     /**
      * Returns sound of source :)
@@ -188,9 +188,9 @@ public interface SoundSource<T extends Sound> {
      * @param targetGain
      * @return
      */
-    SoundSource fade(float targetGain);
+    SoundSource<T> fade(float targetGain);
 
-    SoundSource reset();
+    SoundSource<T> reset();
 
     void purge();
 }

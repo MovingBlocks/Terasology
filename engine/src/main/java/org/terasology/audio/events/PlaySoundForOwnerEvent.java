@@ -28,7 +28,7 @@ public class PlaySoundForOwnerEvent extends AbstractPlaySoundEvent {
     protected PlaySoundForOwnerEvent() {
     }
 
-    public PlaySoundForOwnerEvent(Sound sound, float volume) {
+    public PlaySoundForOwnerEvent(Sound<?> sound, float volume) {
         super(sound, volume);
     }
 

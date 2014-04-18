@@ -37,12 +37,12 @@ import static org.lwjgl.openal.AL10.alSourcei;
 
 public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingSound> {
 
-    public OpenALStreamingSoundSource(SoundPool owningPool) {
+    public OpenALStreamingSoundSource(SoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> owningPool) {
         super(owningPool);
     }
 
     @Override
-    public SoundSource stop() {
+    public SoundSource<OpenALStreamingSound> stop() {
         if (audio != null) {
             audio.reset();
         }
@@ -56,7 +56,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
     @Override
     // TODO: Implement looping support for streaming sounds
-    public SoundSource setLooping(boolean looping) {
+    public OpenALStreamingSoundSource setLooping(boolean looping) {
         if (looping) {
             throw new UnsupportedOperationException("Looping is unsupported on streaming sounds!");
         }
@@ -92,9 +92,9 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
     }
 
     @Override
-    public SoundSource setAudio(OpenALStreamingSound sound) {
-        boolean playing = this.isPlaying();
-        if (playing) {
+    public OpenALStreamingSoundSource setAudio(OpenALStreamingSound sound) {
+        boolean isPlaying = this.isPlaying();
+        if (isPlaying) {
             alSourceStop(this.sourceId);
             alSourceRewind(this.sourceId);
         }
@@ -113,7 +113,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
         alSourceQueueBuffers(this.getSourceId(), (IntBuffer) BufferUtils.createIntBuffer(buffers.length).put(buffers).flip());
 
-        if (playing) {
+        if (isPlaying) {
             this.play();
         }
 
@@ -122,8 +122,8 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
     @Override
     public void purge() {
-        boolean playing = this.isPlaying();
-        if (playing) {
+        boolean isPlaying = this.isPlaying();
+        if (isPlaying) {
             alSourceStop(this.sourceId);
             alSourceRewind(this.sourceId);
         }

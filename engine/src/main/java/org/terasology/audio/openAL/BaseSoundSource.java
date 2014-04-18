@@ -37,7 +37,7 @@ import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 
-public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T> {
+public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource<T> {
 
     protected T audio;
     protected int sourceId;
@@ -54,9 +54,9 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
 
     protected boolean playing;
 
-    private SoundPool owningPool;
+    private SoundPool<T, ? extends SoundSource<T>> owningPool;
 
-    public BaseSoundSource(SoundPool pool) {
+    public BaseSoundSource(SoundPool<T, ? extends SoundSource<T>> pool) {
         this.owningPool = pool;
         sourceId = alGenSources();
         OpenALException.checkState("Creating sound source");
@@ -65,7 +65,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource play() {
+    public SoundSource<T> play() {
         if (!isPlaying()) {
             AL10.alSourcePlay(getSourceId());
             playing = true;
@@ -75,7 +75,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource stop() {
+    public SoundSource<T> stop() {
         alSourceStop(getSourceId());
         OpenALException.checkState("Stop playback");
 
@@ -89,7 +89,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource pause() {
+    public SoundSource<T> pause() {
         if (isPlaying()) {
             AL10.alSourcePause(getSourceId());
 
@@ -119,7 +119,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource reset() {
+    public SoundSource<T> reset() {
         setPitch(1.0f);
         setLooping(false);
         setGain(1.0f);
@@ -145,7 +145,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
 
 
     @Override
-    public SoundSource setAbsolute(boolean absolute) {
+    public SoundSource<T> setAbsolute(boolean absolute) {
         absolutePosition = absolute;
         AL10.alSourcei(getSourceId(), AL_SOURCE_RELATIVE, (absolute) ? AL_FALSE : AL_TRUE);
 
@@ -163,7 +163,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setVelocity(Vector3f value) {
+    public SoundSource<T> setVelocity(Vector3f value) {
         if (value == null || this.velocity.equals(value)) {
             return this;
         }
@@ -183,7 +183,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setPosition(Vector3f value) {
+    public SoundSource<T> setPosition(Vector3f value) {
         if (value == null || this.position.equals(value)) {
             return this;
         }
@@ -197,7 +197,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setDirection(Vector3f value) {
+    public SoundSource<T> setDirection(Vector3f value) {
         if (value == null || this.direction.equals(value)) {
             return this;
         }
@@ -222,7 +222,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setPitch(float pitch) {
+    public SoundSource<T> setPitch(float pitch) {
         AL10.alSourcef(getSourceId(), AL10.AL_PITCH, pitch);
 
         OpenALException.checkState("Setting sound pitch");
@@ -243,7 +243,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setGain(float gain) {
+    public SoundSource<T> setGain(float gain) {
         srcGain = gain;
         alSourcef(getSourceId(), AL_GAIN, gain * owningPool.getVolume());
 
@@ -258,7 +258,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource fade(float value) {
+    public SoundSource<T> fade(float value) {
         this.targetGain = value;
         fade = true;
 

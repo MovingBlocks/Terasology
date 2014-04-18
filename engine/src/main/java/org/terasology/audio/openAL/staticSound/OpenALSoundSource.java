@@ -21,7 +21,6 @@ import org.lwjgl.openal.AL11;
 import org.terasology.audio.openAL.BaseSoundSource;
 import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.openAL.SoundPool;
-import org.terasology.audio.openAL.SoundSource;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_LOOPING;
@@ -34,7 +33,7 @@ import static org.lwjgl.openal.AL10.alSourcei;
  */
 public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
-    public OpenALSoundSource(SoundPool pool) {
+    public OpenALSoundSource(SoundPool<OpenALSound, OpenALSoundSource> pool) {
         super(pool);
     }
 
@@ -59,9 +58,9 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
      *
      * @param position
      */
-    public SoundSource setPlaybackPositionInSeconds(float position) {
-        boolean playing = isPlaying();
-        if (playing) {
+    public OpenALSoundSource setPlaybackPositionInSeconds(float position) {
+        boolean isPlaying = isPlaying();
+        if (isPlaying) {
             AL10.alSourceStop(getSourceId());
         }
 
@@ -70,7 +69,7 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
         OpenALException.checkState("Setting sound playback absolute position");
 
-        if (playing) {
+        if (isPlaying) {
             play();
         }
 
@@ -83,9 +82,9 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
      * @param position
      */
     // TODO: This is broken for compressed streams - is this something that we need to worry about?
-    public SoundSource setPlaybackPosition(float position) {
-        boolean playing = isPlaying();
-        if (playing) {
+    public OpenALSoundSource setPlaybackPosition(float position) {
+        boolean isPlaying = isPlaying();
+        if (isPlaying) {
             AL10.alSourceStop(getSourceId());
         }
 
@@ -94,7 +93,7 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
         OpenALException.checkState("Setting sound playback relaive position");
 
-        if (playing) {
+        if (isPlaying) {
             play();
         }
 
@@ -107,7 +106,7 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
     }
 
     @Override
-    public SoundSource setLooping(boolean looping) {
+    public OpenALSoundSource setLooping(boolean looping) {
         alSourcei(getSourceId(), AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
 
         OpenALException.checkState("Setting sound looping");
@@ -116,9 +115,9 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
     }
 
     @Override
-    public SoundSource setAudio(OpenALSound sound) {
-        boolean playing = isPlaying();
-        if (playing) {
+    public OpenALSoundSource setAudio(OpenALSound sound) {
+        boolean isPlaying = isPlaying();
+        if (isPlaying) {
             stop();
         }
 
@@ -129,7 +128,7 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
         OpenALException.checkState("Assigning buffer to source");
 
-        if (playing) {
+        if (isPlaying) {
             play();
         }
 
@@ -138,8 +137,8 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
     @Override
     public void purge() {
-        boolean playing = isPlaying();
-        if (playing) {
+        boolean isPlaying = isPlaying();
+        if (isPlaying) {
             stop();
         }
 
