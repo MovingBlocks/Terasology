@@ -106,7 +106,7 @@ public enum AssetType {
     /**
      * An instance of the asset loaders for the current asset type.
      */
-    private List<AssetLoader> assetLoaderList;
+    private List<AssetLoader<?>> assetLoaderList;
 
     static {
         typeIdLookup = Maps.newHashMap();
@@ -121,7 +121,7 @@ public enum AssetType {
         }
     }
 
-    private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader, boolean supportsDelta) {
+    private AssetType(String typeId, String subDir, String fileExtension, AssetLoader<?> assetLoader, boolean supportsDelta) {
         this(typeId,
                 new String[]{subDir},
                 new String[]{fileExtension},
@@ -129,26 +129,26 @@ public enum AssetType {
                 supportsDelta);
     }
 
-    private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader assetLoader, boolean supportsDelta) {
+    private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader<?> assetLoader, boolean supportsDelta) {
         this(typeId, subDirs, fileExtensions, (assetLoader == null) ? new AssetLoader[0] : new AssetLoader[]{assetLoader}, supportsDelta);
     }
 
-    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader assetLoader, boolean supportsDelta) {
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader<?> assetLoader, boolean supportsDelta) {
         this(typeId, new String[]{subDir}, fileExtensions, assetLoader, supportsDelta);
     }
 
-    private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader, boolean supportsDelta) {
+    private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader<?> assetLoader, boolean supportsDelta) {
         this(typeId, subDirs, new String[]{fileExtension}, assetLoader, supportsDelta);
     }
 
     /**
      * We're going to assume that there's exactly one file extension per asset loader specified in the case of multiple asset loaders
      */
-    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader[] assetLoaders, boolean supportsDelta) {
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader<?>[] assetLoaders, boolean supportsDelta) {
         this(typeId, new String[]{subDir}, fileExtensions, assetLoaders, supportsDelta);
     }
 
-    private AssetType(String typeId, String[] subDir, String[] fileExtensions, AssetLoader[] assetLoaders, boolean supportsDelta) {
+    private AssetType(String typeId, String[] subDir, String[] fileExtensions, AssetLoader<?>[] assetLoaders, boolean supportsDelta) {
         this.typeId = typeId;
         this.subDirs = ImmutableList.copyOf(subDir);
         this.fileExtensions = ImmutableList.copyOf(fileExtensions);
@@ -168,7 +168,7 @@ public enum AssetType {
         return fileExtensions;
     }
 
-    public Collection<AssetLoader> getAssetLoaders() {
+    public Collection<AssetLoader<?>> getAssetLoaders() {
         return assetLoaderList;
     }
 
@@ -209,21 +209,17 @@ public enum AssetType {
      */
     public static void registerAssetTypes(AssetManager assetManager) {
         for (AssetType type : AssetType.values()) {
-            Collection<AssetLoader> loaders = type.getAssetLoaders();
+            Collection<AssetLoader<?>> loaders = type.getAssetLoaders();
             if ((loaders == null) || (loaders.isEmpty())) {
                 continue; // No loader has been assigned to this AssetType
             }
 
             for (String extension : type.getFileExtension()) {
-                AssetLoader loader = type.getAssetLoader(extension);
-                if (loaders == null) {
-                    continue; // No loader has been assigned to this AssetType's file extension
+                AssetLoader<?> loader = type.getAssetLoader(extension);
+                if (loader != null) {
+                    // A loader has been assigned to this AssetType's file extension
+                    assetManager.register(type, extension, loader);
                 }
-                assetManager.register(
-                        type,
-                        extension,
-                        loader
-                );
             }
         }
     }

@@ -46,7 +46,7 @@ public class UIButton extends CoreWidget {
     private Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
-    private Binding<Sound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click"));
+    private Binding<Sound<?>> clickSound = new DefaultBinding<Sound<?>>(Assets.getSound("engine:click"));
 
     @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
@@ -153,15 +153,15 @@ public class UIButton extends CoreWidget {
         return image.get();
     }
 
-    public void bindClickSound(Binding<Sound> binding) {
+    public void bindClickSound(Binding<Sound<?>> binding) {
         clickSound = binding;
     }
 
-    public Sound getClickSound() {
+    public Sound<?> getClickSound() {
         return clickSound.get();
     }
 
-    public void setClickSound(Sound val) {
+    public void setClickSound(Sound<?> val) {
         clickSound.set(val);
     }
 

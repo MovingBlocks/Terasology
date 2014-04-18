@@ -77,10 +77,12 @@ public final class AssetUri extends AbstractBaseUri {
         return type;
     }
 
+    @Override
     public String getModuleName() {
         return moduleName;
     }
 
+    @Override
     public String getNormalisedModuleName() {
         return normalisedModuleName;
     }
@@ -93,6 +95,7 @@ public final class AssetUri extends AbstractBaseUri {
         return normalisedAssetName;
     }
 
+    @Override
     public boolean isValid() {
         return type != null && !moduleName.isEmpty() && !assetName.isEmpty();
     }
