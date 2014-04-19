@@ -33,6 +33,8 @@ import static org.lwjgl.openal.AL10.alSourcei;
  */
 public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
 
+    private OpenALSound audio;
+    
     public OpenALSoundSource(SoundPool<OpenALSound, OpenALSoundSource> pool) {
         super(pool);
     }
@@ -84,7 +86,7 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
     // TODO: This is broken for compressed streams - is this something that we need to worry about?
     public OpenALSoundSource setPlaybackPosition(float position) {
         boolean isPlaying = isPlaying();
-        if (isPlaying) {
+        if (isPlaying()) {
             AL10.alSourceStop(getSourceId());
         }
 
@@ -98,6 +100,11 @@ public class OpenALSoundSource extends BaseSoundSource<OpenALSound> {
         }
 
         return this;
+    }
+
+    @Override
+    public OpenALSound getAudio() {
+        return audio;
     }
 
     @Override

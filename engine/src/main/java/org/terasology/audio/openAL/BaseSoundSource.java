@@ -39,20 +39,19 @@ import static org.lwjgl.openal.AL10.alSourcef;
 
 public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource<T> {
 
-    protected T audio;
-    protected int sourceId;
+    private int sourceId;
 
-    protected float srcGain = 1.0f;
-    protected float targetGain = 1.0f;
-    protected boolean fade;
+    private float srcGain = 1.0f;
+    private float targetGain = 1.0f;
+    private boolean fade;
 
-    protected Vector3f position = new Vector3f();
-    protected Vector3f velocity = new Vector3f();
-    protected Vector3f direction = new Vector3f();
+    private Vector3f position = new Vector3f();
+    private Vector3f velocity = new Vector3f();
+    private Vector3f direction = new Vector3f();
 
-    protected boolean absolutePosition;
+    private boolean absolutePosition;
 
-    protected boolean playing;
+    private boolean playing;
 
     private SoundPool<T, ? extends SoundSource<T>> owningPool;
 
@@ -103,7 +102,7 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     @Override
     public boolean isPlaying() {
-        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || playing;
+        return playing || alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
     }
 
     @Override
@@ -253,11 +252,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     @Override
-    public T getAudio() {
-        return audio;
-    }
-
-    @Override
     public SoundSource<T> fade(float value) {
         this.targetGain = value;
         fade = true;
@@ -265,7 +259,7 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
         return this;
     }
 
-    public int getSourceId() {
+    protected int getSourceId() {
         return sourceId;
     }
 

@@ -37,6 +37,8 @@ import static org.lwjgl.openal.AL10.alSourcei;
 
 public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingSound> {
 
+    private OpenALStreamingSound audio;
+    
     public OpenALStreamingSoundSource(SoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> owningPool) {
         super(owningPool);
     }
@@ -52,6 +54,11 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
     @Override
     public boolean isLooping() {
         return false;
+    }
+    
+    @Override
+    public OpenALStreamingSound getAudio() {
+        return audio;
     }
 
     @Override
@@ -76,7 +83,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
                 alSourceQueueBuffers(this.getSourceId(), buffer);
                 OpenALException.checkState("Buffer refill");
             } else {
-                playing = false; // we aren't playing anymore, because stream seems to end
+                stop(); // we aren't playing anymore, because stream seems to end
             }
         }
 
@@ -86,7 +93,7 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
     @Override
     protected void updateState() {
         // Start playing if playback for stopped by end of buffers
-        if (playing && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
+        if (isPlaying() && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
             alSourcePlay(this.getSourceId());
         }
     }
@@ -95,8 +102,8 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
     public OpenALStreamingSoundSource setAudio(OpenALStreamingSound sound) {
         boolean isPlaying = this.isPlaying();
         if (isPlaying) {
-            alSourceStop(this.sourceId);
-            alSourceRewind(this.sourceId);
+            alSourceStop(getSourceId());
+            alSourceRewind(getSourceId());
         }
 
         alSourcei(this.getSourceId(), AL_BUFFER, 0);
@@ -122,10 +129,9 @@ public class OpenALStreamingSoundSource extends BaseSoundSource<OpenALStreamingS
 
     @Override
     public void purge() {
-        boolean isPlaying = this.isPlaying();
-        if (isPlaying) {
-            alSourceStop(this.sourceId);
-            alSourceRewind(this.sourceId);
+        if (isPlaying()) {
+            alSourceStop(getSourceId());
+            alSourceRewind(getSourceId());
         }
 
         alSourcei(this.getSourceId(), AL_BUFFER, 0);
