@@ -67,7 +67,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         NetworkSystem server = new NetworkSystemImpl(time);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
-        server.host(7777);
+        server.host(NetworkMode.DEDICATED_SERVER, 7777);
 
         Thread.sleep(500);
 
@@ -92,7 +92,7 @@ public class TestNetwork extends TerasologyTestingEnvironment {
         NetworkSystem server = new NetworkSystemImpl(time);
         netSystems.add(server);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
-        server.host(7777);
+        server.host(NetworkMode.DEDICATED_SERVER, 7777);
 
         assertFalse(122 == entity.getComponent(NetworkComponent.class).getNetworkId());
         server.shutdown();

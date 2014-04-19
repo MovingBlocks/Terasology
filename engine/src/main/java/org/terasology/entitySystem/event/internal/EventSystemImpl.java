@@ -313,7 +313,7 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private void sendEventToOwner(EntityRef entity, Event event) {
-        if (networkSystem.getMode() == NetworkMode.SERVER) {
+        if (networkSystem.getMode().isServer()) {
             NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
             if (netComp != null) {
                 Client client = networkSystem.getOwner(entity);
@@ -325,7 +325,7 @@ public class EventSystemImpl implements EventSystem {
     }
 
     private void broadcastEvent(EntityRef entity, Event event, EventMetadata metadata) {
-        if (networkSystem.getMode() == NetworkMode.SERVER) {
+        if (networkSystem.getMode().isServer()) {
             NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (netComp != null || blockComp != null) {

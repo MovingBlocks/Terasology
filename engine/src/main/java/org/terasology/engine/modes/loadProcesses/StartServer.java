@@ -17,16 +17,30 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author Immortius
  */
 public class StartServer extends SingleStepLoadProcess {
+
+    private NetworkMode netMode;
+
+    /**
+     * @param netMode
+     */
+    public StartServer(NetworkMode netMode) {
+        Preconditions.checkArgument(netMode.isServer(), "netMode must be a server mode");
+        this.netMode = netMode;
+    }
+
     @Override
     public String getMessage() {
         return "Starting Server";
@@ -35,7 +49,7 @@ public class StartServer extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         try {
-            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
+            CoreRegistry.get(NetworkSystem.class).host(netMode, TerasologyConstants.DEFAULT_PORT);
         } catch (HostingFailedException e) {
             CoreRegistry.get(NUIManager.class).pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Failed to Host",
                     e.getMessage() + " - Reverting to single player");

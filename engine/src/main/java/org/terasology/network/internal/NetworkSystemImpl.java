@@ -17,6 +17,7 @@
 package org.terasology.network.internal;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -144,10 +145,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void host(int port) throws HostingFailedException {
+    public void host(NetworkMode newMode, int port) throws HostingFailedException {
+        Preconditions.checkArgument(newMode.isServer(), "netMode must be a server mode");
         if (mode == NetworkMode.NONE) {
             try {
-                mode = NetworkMode.SERVER;
+                mode = newMode;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
                 }
@@ -368,7 +370,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             return;
         }
 
-        if (mode == NetworkMode.SERVER) {
+        if (mode.isServer()) {
             NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
             netComponent.setNetworkId(nextNetId++);
             entity.saveComponent(netComponent);
@@ -466,7 +468,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             if (netComponent != null) {
                 logger.debug("Unregistering network entity: {} with netId {}", entity, netComponent.getNetworkId());
                 netIdToEntityId.remove(netComponent.getNetworkId());
-                if (mode == NetworkMode.SERVER) {
+                if (mode.isServer()) {
                     for (NetClient client : netClientList) {
                         client.setNetRemoved(netComponent.getNetworkId());
                     }
@@ -514,17 +516,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null) {
-            if (netComp.getNetworkId() != NULL_NET_ID) {
-                switch (mode) {
-                    case SERVER:
-                        if (metadata.isReplicated()) {
-                            for (NetClient client : netClientList) {
-                                logger.info("Component {} added to {}", component, entity);
-                                client.setComponentAdded(netComp.getNetworkId(), component);
-                            }
-                        }
-                        break;
+        if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
+            if (mode.isServer()) {
+                if (metadata.isReplicated()) {
+                    for (NetClient client : netClientList) {
+                        logger.info("Component {} added to {}", component, entity);
+                        client.setComponentAdded(netComp.getNetworkId(), component);
+                    }
                 }
             }
         }
@@ -536,15 +534,13 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
-            switch (mode) {
-                case SERVER:
-                    if (metadata.isReplicated()) {
-                        for (NetClient client : netClientList) {
-                            logger.info("Component {} removed from {}", component, entity);
-                            client.setComponentRemoved(netComp.getNetworkId(), component);
-                        }
+            if (mode.isServer()) {
+                if (metadata.isReplicated()) {
+                    for (NetClient client : netClientList) {
+                        logger.info("Component {} removed from {}", component, entity);
+                        client.setComponentRemoved(netComp.getNetworkId(), component);
                     }
-                    break;
+                }
             }
         }
         if (mode.isAuthority() && metadata.isReferenceOwner()) {
@@ -560,7 +556,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
         if (netComp != null && netComp.getNetworkId() != NULL_NET_ID) {
             switch (mode) {
-                case SERVER:
+                case LISTEN_SERVER:
+                case DEDICATED_SERVER:
                     if (metadata.isReplicated()) {
                         for (NetClient client : netClientList) {
                             client.setComponentDirty(netComp.getNetworkId(), component);
@@ -596,7 +593,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public int getIncomingMessagesDelta() {
         switch (mode) {
-            case SERVER:
+            case LISTEN_SERVER:
+            case DEDICATED_SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
                     total += client.getMetrics().getReceivedMessagesSinceLastCall();
@@ -617,7 +615,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public int getIncomingBytesDelta() {
         switch (mode) {
-            case SERVER:
+            case LISTEN_SERVER:
+            case DEDICATED_SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
                     total += client.getMetrics().getReceivedBytesSinceLastCall();
@@ -635,7 +634,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public int getOutgoingMessagesDelta() {
         switch (mode) {
-            case SERVER:
+            case LISTEN_SERVER:
+            case DEDICATED_SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
                     total += client.getMetrics().getSentMessagesSinceLastCall();
@@ -653,7 +653,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     @Override
     public int getOutgoingBytesDelta() {
         switch (mode) {
-            case SERVER:
+            case LISTEN_SERVER:
+            case DEDICATED_SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
                     total += client.getMetrics().getSentBytesSinceLastCall();
@@ -876,13 +877,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
 
     }
 
+    /**
+     * Used for testing only
+     */
     void mockHost() {
-        mode = NetworkMode.SERVER;
+        mode = NetworkMode.DEDICATED_SERVER;
     }
 
     @Override
     public void onBlockFamilyRegistered(BlockFamily family) {
-        if (mode == NetworkMode.SERVER) {
+        if (mode.isServer()) {
             for (NetClient client : netClientList) {
                 client.blockFamilyRegistered(family);
             }
