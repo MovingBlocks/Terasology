@@ -51,8 +51,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     private boolean absolutePosition;
 
-    private boolean playing;
-
     private SoundPool<T, ? extends SoundSource<T>> owningPool;
 
     public BaseSoundSource(SoundPool<T, ? extends SoundSource<T>> pool) {
@@ -67,7 +65,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     public SoundSource<T> play() {
         if (!isPlaying()) {
             AL10.alSourcePlay(getSourceId());
-            playing = true;
         }
 
         return this;
@@ -81,9 +78,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
         alSourceRewind(getSourceId());
         OpenALException.checkState("Rewind");
 
-
-        playing = false;
-
         return this;
     }
 
@@ -93,8 +87,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
             AL10.alSourcePause(getSourceId());
 
             OpenALException.checkState("Pause playback");
-
-            playing = false;
         }
 
         return this;
@@ -102,7 +94,7 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
 
     @Override
     public boolean isPlaying() {
-        return playing || alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
+        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
     }
 
     @Override
@@ -112,9 +104,6 @@ public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource
     }
 
     protected void updateState() {
-        if (playing && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
-            playing = false; // sound stop playing
-        }
     }
 
     @Override
