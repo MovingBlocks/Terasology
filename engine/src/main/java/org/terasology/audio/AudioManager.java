@@ -36,23 +36,27 @@ public interface AudioManager {
 
     void setMute(boolean mute);
 
-    void playSound(Sound<?> sound);
+    void playSound(StaticSound sound);
 
-    void playSound(Sound<?> sound, float volume);
+    void playSound(StaticSound sound, float volume);
 
-    void playSound(Sound<?> sound, float volume, int priority);
+    void playSound(StaticSound sound, float volume, int priority);
 
-    void playSound(Sound<?> sound, Vector3f position);
+    void playSound(StaticSound sound, Vector3f position);
 
-    void playSound(Sound<?> sound, Vector3f position, float volume);
+    void playSound(StaticSound sound, Vector3f position, float volume);
 
-    void playSound(Sound<?> sound, Vector3f position, float volume, int priority);
+    void playSound(StaticSound sound, Vector3f position, float volume, int priority);
 
-    void playSound(Sound<?> sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
+    void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
 
-    void playMusic(Sound<?> sound);
+    void playMusic(StreamingSound music);
 
-    void playMusic(Sound<?> sound, AudioEndListener endListener);
+    void playMusic(StreamingSound music, float volume);
+
+    void playMusic(StreamingSound music, AudioEndListener endListener);
+
+    void playMusic(StreamingSound music, float volume, AudioEndListener endListener);
 
     /**
      * Update AudioManager sound sources

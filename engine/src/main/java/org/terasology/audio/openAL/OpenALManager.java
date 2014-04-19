@@ -157,41 +157,41 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playSound(Sound<?> sound) {
+    public void playSound(StaticSound sound) {
         playSound(sound, null, 1.0f, PRIORITY_NORMAL);
     }
 
     @Override
-    public void playSound(Sound<?> sound, float volume) {
+    public void playSound(StaticSound sound, float volume) {
         playSound(sound, null, volume, PRIORITY_NORMAL);
     }
 
     @Override
-    public void playSound(Sound<?> sound, float volume, int priority) {
+    public void playSound(StaticSound sound, float volume, int priority) {
         playSound(sound, null, volume, priority);
     }
 
     @Override
-    public void playSound(Sound<?> sound, Vector3f position) {
+    public void playSound(StaticSound sound, Vector3f position) {
         playSound(sound, position, 1.0f, PRIORITY_NORMAL);
     }
 
     @Override
-    public void playSound(Sound<?> sound, Vector3f position, float volume) {
+    public void playSound(StaticSound sound, Vector3f position, float volume) {
         playSound(sound, position, volume, PRIORITY_NORMAL);
     }
 
     @Override
-    public void playSound(Sound<?> sound, Vector3f position, float volume, int priority) {
+    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
         playSound(sound, position, volume, priority, null);
     }
 
     @Override
-    public void playSound(Sound<?> sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
         if (position != null && !checkDistance(position)) {
             return;
         }
-        SoundPool<Sound<?>, ?> pool = (SoundPool<Sound<?>, ?>) pools.get("sfx");
+        SoundPool<StaticSound, ?> pool = (SoundPool<StaticSound, ?>) pools.get("sfx");
                 
         SoundSource<?> source = pool.getSource(sound, priority);
         if (source != null) {
@@ -209,13 +209,23 @@ public class OpenALManager implements AudioManager {
     }
 
     @Override
-    public void playMusic(Sound<?> music) {
-        playMusic(music, null);
+    public void playMusic(StreamingSound music) {
+        playMusic(music, 1.0f, null);
+    }
+    
+    @Override
+    public void playMusic(StreamingSound music, AudioEndListener endListener) {
+        playMusic(music, 1.0f, endListener);
     }
 
     @Override
-    public void playMusic(Sound<?> music, AudioEndListener endListener) {
-        SoundPool<Sound<?>, ?> pool = (SoundPool<Sound<?>, ?>) pools.get("music");
+    public void playMusic(StreamingSound music, float volume) {
+        playMusic(music, volume, null);
+    }
+
+    @Override
+    public void playMusic(StreamingSound music, float volume, AudioEndListener endListener) {
+        SoundPool<StreamingSound, ?> pool = (SoundPool<StreamingSound, ?>) pools.get("music");
 
         pool.stopAll();
 
@@ -225,7 +235,7 @@ public class OpenALManager implements AudioManager {
 
         SoundSource<?> source = pool.getSource(music);
         if (source != null) {
-            source.setGain(1.0f).play();
+            source.setGain(volume).play();
 
             if (endListener != null) {
                 endListeners.put(source, endListener);

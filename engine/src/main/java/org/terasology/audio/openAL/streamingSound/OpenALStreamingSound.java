@@ -95,12 +95,12 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
 
     @Override
     public void play() {
-        audioManager.playSound(this);
+        audioManager.playMusic(this);
     }
 
     @Override
     public void play(float volume) {
-        audioManager.playSound(this, volume);
+        audioManager.playMusic(this, volume);
     }
 
     public int getBufferId() {

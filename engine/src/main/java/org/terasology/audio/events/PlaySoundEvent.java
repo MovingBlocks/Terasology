@@ -16,7 +16,7 @@
 
 package org.terasology.audio.events;
 
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.BroadcastEvent;
 
@@ -28,7 +28,7 @@ public class PlaySoundEvent extends AbstractPlaySoundEvent {
     protected PlaySoundEvent() {
     }
 
-    public PlaySoundEvent(Sound<?> sound, float volume) {
+    public PlaySoundEvent(StaticSound sound, float volume) {
         super(sound, volume);
     }
 
@@ -37,7 +37,7 @@ public class PlaySoundEvent extends AbstractPlaySoundEvent {
      * @param sound
      * @param volume
      */
-    public PlaySoundEvent(EntityRef exceptOwner, Sound<?> sound, float volume) {
+    public PlaySoundEvent(EntityRef exceptOwner, StaticSound sound, float volume) {
         super(exceptOwner, sound, volume);
     }
 

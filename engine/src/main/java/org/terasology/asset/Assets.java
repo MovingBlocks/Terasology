@@ -16,7 +16,8 @@
 
 package org.terasology.asset;
 
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.registry.CoreRegistry;
@@ -186,8 +187,8 @@ public final class Assets {
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound<?> getSound(String simpleUri) {
-        return get(AssetType.SOUND, simpleUri, Sound.class);
+    public static StaticSound getSound(String simpleUri) {
+        return get(AssetType.SOUND, simpleUri, StaticSound.class);
     }
 
     /**
@@ -195,16 +196,16 @@ public final class Assets {
      * @param assetName
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound<?> getSound(String module, String assetName) {
-        return get(new AssetUri(AssetType.SOUND, module, assetName), Sound.class);
+    public static StaticSound getSound(String module, String assetName) {
+        return get(new AssetUri(AssetType.SOUND, module, assetName), StaticSound.class);
     }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound<?> getMusic(String simpleUri) {
-        return get(AssetType.MUSIC, simpleUri, Sound.class);
+    public static StreamingSound getMusic(String simpleUri) {
+        return get(AssetType.MUSIC, simpleUri, StreamingSound.class);
     }
 
     /**
@@ -212,8 +213,8 @@ public final class Assets {
      * @param assetName
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound<?> getMusic(String module, String assetName) {
-        return get(new AssetUri(AssetType.MUSIC, module, assetName), Sound.class);
+    public static StreamingSound getMusic(String module, String assetName) {
+        return get(new AssetUri(AssetType.MUSIC, module, assetName), StreamingSound.class);
     }
 
     /**

@@ -16,7 +16,7 @@
 
 package org.terasology.audio.events;
 
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkEvent;
 
@@ -24,24 +24,24 @@ import org.terasology.network.NetworkEvent;
  * @author Immortius
  */
 public abstract class AbstractPlaySoundEvent extends NetworkEvent {
-    private Sound<?> sound;
+    private StaticSound sound;
     private float volume;
 
     protected AbstractPlaySoundEvent() {
     }
 
-    public AbstractPlaySoundEvent(Sound<?> sound, float volume) {
+    public AbstractPlaySoundEvent(StaticSound sound, float volume) {
         this.sound = sound;
         this.volume = volume;
     }
 
-    public AbstractPlaySoundEvent(EntityRef instigator, Sound<?> sound, float volume) {
+    public AbstractPlaySoundEvent(EntityRef instigator, StaticSound sound, float volume) {
         super(instigator);
         this.sound = sound;
         this.volume = volume;
     }
 
-    public Sound<?> getSound() {
+    public StaticSound getSound() {
         return sound;
     }
 
