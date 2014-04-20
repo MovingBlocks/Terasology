@@ -17,7 +17,6 @@
 package org.terasology.network.internal;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -145,11 +144,10 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public void host(NetworkMode newMode, int port) throws HostingFailedException {
-        Preconditions.checkArgument(newMode.isServer(), "netMode must be a server mode");
+    public void host(int port, boolean dedicatedServer) throws HostingFailedException {
         if (mode == NetworkMode.NONE) {
             try {
-                mode = newMode;
+                mode = dedicatedServer ? NetworkMode.DEDICATED_SERVER : NetworkMode.LISTEN_SERVER;
                 for (EntityRef entity : entityManager.getEntitiesWith(NetworkComponent.class)) {
                     registerNetworkEntity(entity);
                 }

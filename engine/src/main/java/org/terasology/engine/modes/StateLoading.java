@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -176,7 +177,15 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CreateWorldEntity());
         loadProcesses.add(new InitialiseWorldGenerator(gameManifest));
         if (netMode.isServer()) {
-            loadProcesses.add(new StartServer(netMode));
+            boolean dedicated;
+            if (netMode == NetworkMode.DEDICATED_SERVER) {
+                dedicated = true;
+            } else if (netMode == NetworkMode.LISTEN_SERVER) {
+                dedicated = false;
+            } else {
+                throw new IllegalStateException("Invalid server mode: " + netMode);
+            }
+            loadProcesses.add(new StartServer(dedicated));
         }
         loadProcesses.add(new PostBeginSystems());
         if (netMode.hasLocalClient()) {
