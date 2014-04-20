@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public final class PathManager {
         // We might be running from an IDE which can cause the installPath to be null. Try current working directory.
         if (installPath == null) {
             installPath = Paths.get("").toAbsolutePath();
-            System.out.println("installPath was null, running from IDE. Setting it to: " + installPath);
+            System.out.println("installPath was null, running from IDE or headless server? Setting to: " + installPath);
             installPath = findNativesHome(installPath, 5);
             if (installPath == null) {
                 System.out.println("Failed to find the natives dir - unable to launch!");

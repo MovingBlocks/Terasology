@@ -30,7 +30,8 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [W,A,S,D] - Movement
 * [E] - Activate (Chest, TNT, etc)
 * [Q] - Throw held (block) item (hold down to charge for a longer throw!)
-* [Space] - Jump
+* [Space] - Jump / Ascend
+* [Ctrl] - Crouch / Descend
 * [Shift] - Hold to run
 * [Left click] - Activate left click action (default = remove block)
 * [Right click] - Activate right click action (default = place block)
