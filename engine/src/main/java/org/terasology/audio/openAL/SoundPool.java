@@ -19,7 +19,7 @@ import org.terasology.audio.Sound;
 
 import java.util.Set;
 
-public interface SoundPool<SOUND extends Sound<?>, SOUNDSOURCE extends SoundSource<SOUND>> {
+public interface SoundPool<SOUND extends Sound<?>, SOURCE extends SoundSource<SOUND>> {
 
     /**
      * Returns sound source tuned for specified sound with specified priority
@@ -28,7 +28,7 @@ public interface SoundPool<SOUND extends Sound<?>, SOUNDSOURCE extends SoundSour
      * @param priority
      * @return
      */
-    SOUNDSOURCE getSource(SOUND sound, int priority);
+    SOURCE getSource(SOUND sound, int priority);
 
     /**
      * Returns sound source tuned for specified sound with normal priority
@@ -36,7 +36,7 @@ public interface SoundPool<SOUND extends Sound<?>, SOUNDSOURCE extends SoundSour
      * @param sound
      * @return
      */
-    SOUNDSOURCE getSource(SOUND sound);
+    SOURCE getSource(SOUND sound);
 
     /**
      * Returns all available sound sources
@@ -44,21 +44,21 @@ public interface SoundPool<SOUND extends Sound<?>, SOUNDSOURCE extends SoundSour
      *
      * @return
      */
-    Set<SOUNDSOURCE> getSources();
+    Set<SOURCE> getSources();
 
     /**
      * Returns all inactive (available) sources
      *
      * @return
      */
-    Set<SOUNDSOURCE> getInactiveSources();
+    Set<SOURCE> getInactiveSources();
 
     /**
      * Returns all active or locked sources
      *
      * @return
      */
-    Set<SOUNDSOURCE> getActiveSources();
+    Set<SOURCE> getActiveSources();
 
     /**
      * Returns sound sources amount in this pool
@@ -73,7 +73,7 @@ public interface SoundPool<SOUND extends Sound<?>, SOUNDSOURCE extends SoundSour
      * @param source
      * @return
      */
-    boolean isInPool(SOUNDSOURCE source);
+    boolean isInPool(SOURCE source);
 
     /**
      * Stop playback of all sources of this pool
