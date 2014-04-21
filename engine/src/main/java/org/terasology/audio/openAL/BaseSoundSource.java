@@ -37,26 +37,23 @@ import static org.lwjgl.openal.AL10.alSourceRewind;
 import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 
-public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T> {
+public abstract class BaseSoundSource<T extends Sound<?>> implements SoundSource<T> {
 
-    protected T audio;
-    protected int sourceId;
+    private int sourceId;
 
-    protected float srcGain = 1.0f;
-    protected float targetGain = 1.0f;
-    protected boolean fade;
+    private float srcGain = 1.0f;
+    private float targetGain = 1.0f;
+    private boolean fade;
 
-    protected Vector3f position = new Vector3f();
-    protected Vector3f velocity = new Vector3f();
-    protected Vector3f direction = new Vector3f();
+    private Vector3f position = new Vector3f();
+    private Vector3f velocity = new Vector3f();
+    private Vector3f direction = new Vector3f();
 
-    protected boolean absolutePosition;
+    private boolean absolutePosition;
 
-    protected boolean playing;
+    private SoundPool<T, ? extends SoundSource<T>> owningPool;
 
-    private SoundPool owningPool;
-
-    public BaseSoundSource(SoundPool pool) {
+    public BaseSoundSource(SoundPool<T, ? extends SoundSource<T>> pool) {
         this.owningPool = pool;
         sourceId = alGenSources();
         OpenALException.checkState("Creating sound source");
@@ -65,37 +62,31 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource play() {
+    public SoundSource<T> play() {
         if (!isPlaying()) {
             AL10.alSourcePlay(getSourceId());
-            playing = true;
         }
 
         return this;
     }
 
     @Override
-    public SoundSource stop() {
+    public SoundSource<T> stop() {
         alSourceStop(getSourceId());
         OpenALException.checkState("Stop playback");
 
         alSourceRewind(getSourceId());
         OpenALException.checkState("Rewind");
 
-
-        playing = false;
-
         return this;
     }
 
     @Override
-    public SoundSource pause() {
+    public SoundSource<T> pause() {
         if (isPlaying()) {
             AL10.alSourcePause(getSourceId());
 
             OpenALException.checkState("Pause playback");
-
-            playing = false;
         }
 
         return this;
@@ -103,7 +94,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
 
     @Override
     public boolean isPlaying() {
-        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || playing;
+        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
     }
 
     @Override
@@ -113,13 +104,10 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     protected void updateState() {
-        if (playing && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
-            playing = false; // sound stop playing
-        }
     }
 
     @Override
-    public SoundSource reset() {
+    public SoundSource<T> reset() {
         setPitch(1.0f);
         setLooping(false);
         setGain(1.0f);
@@ -145,7 +133,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
 
 
     @Override
-    public SoundSource setAbsolute(boolean absolute) {
+    public SoundSource<T> setAbsolute(boolean absolute) {
         absolutePosition = absolute;
         AL10.alSourcei(getSourceId(), AL_SOURCE_RELATIVE, (absolute) ? AL_FALSE : AL_TRUE);
 
@@ -163,7 +151,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setVelocity(Vector3f value) {
+    public SoundSource<T> setVelocity(Vector3f value) {
         if (value == null || this.velocity.equals(value)) {
             return this;
         }
@@ -183,7 +171,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setPosition(Vector3f value) {
+    public SoundSource<T> setPosition(Vector3f value) {
         if (value == null || this.position.equals(value)) {
             return this;
         }
@@ -197,7 +185,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setDirection(Vector3f value) {
+    public SoundSource<T> setDirection(Vector3f value) {
         if (value == null || this.direction.equals(value)) {
             return this;
         }
@@ -222,7 +210,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setPitch(float pitch) {
+    public SoundSource<T> setPitch(float pitch) {
         AL10.alSourcef(getSourceId(), AL10.AL_PITCH, pitch);
 
         OpenALException.checkState("Setting sound pitch");
@@ -243,7 +231,7 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public SoundSource setGain(float gain) {
+    public SoundSource<T> setGain(float gain) {
         srcGain = gain;
         alSourcef(getSourceId(), AL_GAIN, gain * owningPool.getVolume());
 
@@ -253,19 +241,14 @@ public abstract class BaseSoundSource<T extends Sound> implements SoundSource<T>
     }
 
     @Override
-    public T getAudio() {
-        return audio;
-    }
-
-    @Override
-    public SoundSource fade(float value) {
+    public SoundSource<T> fade(float value) {
         this.targetGain = value;
         fade = true;
 
         return this;
     }
 
-    public int getSourceId() {
+    protected int getSourceId() {
         return sourceId;
     }
 

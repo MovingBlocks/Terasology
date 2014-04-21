@@ -17,9 +17,10 @@ package org.terasology.logic.behavior.tree;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 
@@ -41,7 +42,7 @@ public class PlayMusicNode extends Node {
         return new PlayMusicTask(this);
     }
 
-    public static class PlayMusicTask extends Task implements AudioEndListener {
+    private static class PlayMusicTask extends Task implements AudioEndListener {
         @In
         private AudioManager audioManager;
         @In
@@ -49,7 +50,7 @@ public class PlayMusicNode extends Node {
         private boolean playing;
         private boolean finished;
 
-        public PlayMusicTask(Node node) {
+        public PlayMusicTask(PlayMusicNode node) {
             super(node);
         }
 
@@ -57,7 +58,7 @@ public class PlayMusicNode extends Node {
         public void onInitialize() {
             AssetUri uri = getNode().music;
             if (uri != null) {
-                Sound asset = assetManager.loadAsset(uri, Sound.class);
+                StreamingSound asset = assetManager.loadAsset(uri, StreamingSound.class);
                 if (asset != null) {
                     audioManager.playMusic(asset, this);
                     playing = true;

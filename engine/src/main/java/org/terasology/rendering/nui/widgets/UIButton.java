@@ -16,8 +16,9 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.asset.Assets;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -46,7 +47,7 @@ public class UIButton extends CoreWidget {
     private Binding<String> text = new DefaultBinding<>("");
 
     @LayoutConfig
-    private Binding<Sound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click"));
+    private Binding<StaticSound> clickSound = new DefaultBinding<StaticSound>(Assets.getSound("engine:click"));
 
     @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
@@ -153,15 +154,15 @@ public class UIButton extends CoreWidget {
         return image.get();
     }
 
-    public void bindClickSound(Binding<Sound> binding) {
+    public void bindClickSound(Binding<StaticSound> binding) {
         clickSound = binding;
     }
 
-    public Sound getClickSound() {
+    public StaticSound getClickSound() {
         return clickSound.get();
     }
 
-    public void setClickSound(Sound val) {
+    public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
 

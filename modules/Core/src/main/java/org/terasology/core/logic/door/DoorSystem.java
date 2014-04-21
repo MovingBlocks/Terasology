@@ -20,12 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.ActivateEvent;
@@ -43,6 +42,7 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
 
 import javax.vecmath.Vector3f;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -185,7 +185,7 @@ public class DoorSystem extends BaseComponentSystem {
         worldProvider.setBlock(regionComp.region.min(), bottomBlock);
         Block topBlock = door.topBlockFamily.getBlockForPlacement(worldProvider, blockEntityRegistry, regionComp.region.max(), newSide, Side.TOP);
         worldProvider.setBlock(regionComp.region.max(), topBlock);
-        Sound sound = (door.isOpen) ? door.closeSound : door.openSound;
+        StaticSound sound = (door.isOpen) ? door.closeSound : door.openSound;
         if (sound != null) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             audioManager.playSound(sound, loc.getWorldPosition(), 10, 1);

@@ -16,7 +16,7 @@
 package org.terasology.logic.actions;
 
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -43,7 +43,7 @@ public class PlaySoundAction extends BaseComponentSystem {
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
-        Sound sound = random.nextItem(playSound.sounds);
+        StaticSound sound = random.nextItem(playSound.sounds);
         if (sound != null) {
             Vector3f pos = null;
             switch (playSound.relativeTo) {

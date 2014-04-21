@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.inputSettings;
 
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.Keyboard;
@@ -45,7 +45,7 @@ public class UIInputBind extends CoreWidget {
     private boolean capturingInput;
 
     private Binding<Input> input = new DefaultBinding<>();
-    private Binding<Sound> clickSound = new DefaultBinding<>();
+    private Binding<StaticSound> clickSound = new DefaultBinding<>();
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
     private InteractionListener interactionListener = new BaseInteractionListener() {
@@ -161,15 +161,15 @@ public class UIInputBind extends CoreWidget {
         input.set(val);
     }
 
-    public void bindClickSound(Binding<Sound> binding) {
+    public void bindClickSound(Binding<StaticSound> binding) {
         clickSound = binding;
     }
 
-    public Sound getClickSound() {
+    public StaticSound getClickSound() {
         return clickSound.get();
     }
 
-    public void setClickSound(Sound val) {
+    public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
 

@@ -88,18 +88,19 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
         return stream.getSamplingRate();
     }
 
+    @Override
     public int getBufferSize() {
         return alGetBufferi(lastUpdatedBuffer, AL_SIZE);
     }
 
     @Override
     public void play() {
-        audioManager.playSound(this);
+        audioManager.playMusic(this);
     }
 
     @Override
     public void play(float volume) {
-        audioManager.playSound(this, volume);
+        audioManager.playMusic(this, volume);
     }
 
     public int getBufferId() {

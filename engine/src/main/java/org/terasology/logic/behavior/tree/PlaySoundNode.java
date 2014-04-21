@@ -19,7 +19,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
@@ -62,7 +62,7 @@ public class PlaySoundNode extends Node {
         public void onInitialize() {
             AssetUri uri = getNode().sound;
             if (uri != null) {
-                Sound snd = assetManager.loadAsset(uri, Sound.class);
+                StaticSound snd = assetManager.loadAsset(uri, StaticSound.class);
                 if (snd != null) {
                     if (actor().hasLocation()) {
                         Vector3f worldPosition = actor().location().getWorldPosition();
