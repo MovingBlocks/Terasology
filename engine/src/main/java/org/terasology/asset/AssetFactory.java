@@ -19,7 +19,7 @@ package org.terasology.asset;
 /**
  *
  */
-public interface AssetFactory<DATA_TYPE extends AssetData, ASSET_TYPE extends Asset<DATA_TYPE>> {
+public interface AssetFactory<DATA extends AssetData, ASSET extends Asset<DATA>> {
 
-    ASSET_TYPE buildAsset(AssetUri uri, DATA_TYPE data);
+    ASSET buildAsset(AssetUri uri, DATA data);
 }
