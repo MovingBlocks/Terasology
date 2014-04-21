@@ -226,9 +226,9 @@ public class AssetManager {
     }
 
     public <D extends AssetData> void reload(Asset<D> asset) {
-        D data = loadAssetData(asset.getURI(), false);
+        AssetData data = loadAssetData(asset.getURI(), false);
         if (data != null) {
-            asset.reload(data);
+            asset.reload((D) data);
         }
     }
 
@@ -240,7 +240,7 @@ public class AssetManager {
         return null;
     }
 
-    private <D extends AssetData> D loadAssetData(AssetUri uri, boolean logErrors) {
+    private AssetData loadAssetData(AssetUri uri, boolean logErrors) {
         if (!uri.isValid()) {
             return null;
         }
@@ -286,7 +286,7 @@ public class AssetManager {
             try (InputStream stream = AccessController.doPrivileged(new PrivilegedOpenStream(url))) {
                 urls.remove(url);
                 urls.add(0, url);
-                return (D) loader.load(module, stream, urls, deltas);
+                return loader.load(module, stream, urls, deltas);
             } catch (PrivilegedActionException e) {
                 logger.error("Error reading asset {}", uri, e.getCause());
                 return null;
@@ -325,10 +325,12 @@ public class AssetManager {
         }
 
         try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getActiveModule(uri.getNormalisedModuleName()))) {
-            D data = loadAssetData(uri, logErrors);
+            AssetData data = loadAssetData(uri, logErrors);
 
             if (data != null) {
-                asset = factory.buildAsset(uri, data);
+                // TODO: verify that data class matches factory data class type
+                // for example: if (factory.getDataTypeClass().isInstance(data)) ..
+                asset = factory.buildAsset(uri, (D) data);
                 if (asset != null) {
                     logger.debug("Loaded {}", uri);
                     assetCache.put(uri, asset);
@@ -418,8 +420,8 @@ public class AssetManager {
                 Asset<D> asset = (Asset<D>) assetCache.get(override);
                 if (asset != null) {
                     if (TerasologyConstants.ENGINE_MODULE.equals(override.getNormalisedModuleName())) {
-                        D data = loadAssetData(override, true);
-                        asset.reload(data);
+                        AssetData data = loadAssetData(override, true);
+                        asset.reload((D) data);
                     } else {
                         asset.dispose();
                         assetCache.remove(override);
