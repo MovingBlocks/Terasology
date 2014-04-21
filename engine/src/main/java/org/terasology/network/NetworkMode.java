@@ -25,22 +25,31 @@ public enum NetworkMode {
     /**
      * The game is running in single-player mode.
      */
-    NONE(true),
+    NONE(true, false, true),
 
     /**
-     * The game is hosting a server.
+     * The game is hosting a server without local player
      */
-    SERVER(true),
-
+    LISTEN_SERVER(true, true, false),
+    
+    /**
+     * The game is hosting a server with local player
+     */
+    DEDICATED_SERVER(true, true, true),
+    
     /**
      * The game is a remote client connected to a server
      */
-    CLIENT(false);
+    CLIENT(false, false, true);
 
     private boolean authority;
+    private boolean isServer;
+    private boolean hasLocalClient;
 
-    private NetworkMode(boolean authority) {
+    private NetworkMode(boolean authority, boolean isServer, boolean hasLocalClient) {
         this.authority = authority;
+        this.isServer = isServer;
+        this.hasLocalClient = hasLocalClient;
     }
 
     /**
@@ -49,4 +58,19 @@ public enum NetworkMode {
     public boolean isAuthority() {
         return authority;
     }
+    
+    /**
+     * @return true if the game is hosting a server
+     */
+    public boolean isServer() {
+        return isServer;
+    }
+    
+    /**
+     * @return true if the instance has a local client
+     */
+    public boolean hasLocalClient() {
+        return hasLocalClient;
+    }
+    
 }

@@ -27,6 +27,16 @@ import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
  * @author Immortius
  */
 public class StartServer extends SingleStepLoadProcess {
+
+    private boolean dedicated;
+
+    /**
+     * @param dedicated true, if server should be dedicated (i.e. with local client)
+     */
+    public StartServer(boolean dedicated) {
+        this.dedicated = dedicated;
+    }
+
     @Override
     public String getMessage() {
         return "Starting Server";
@@ -35,7 +45,7 @@ public class StartServer extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         try {
-            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
+            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT, dedicated);
         } catch (HostingFailedException e) {
             CoreRegistry.get(NUIManager.class).pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Failed to Host",
                     e.getMessage() + " - Reverting to single player");

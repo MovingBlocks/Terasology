@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
@@ -68,13 +69,11 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private GameManifest gameManifest;
-    private String serverAddress;
-    private int serverPort;
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
-
+    
     private NUIManager nuiManager;
 
     private LoadingScreen loadingScreen;
@@ -177,12 +176,22 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseBlockTypeEntities());
         loadProcesses.add(new CreateWorldEntity());
         loadProcesses.add(new InitialiseWorldGenerator(gameManifest));
-        if (netMode == NetworkMode.SERVER) {
-            loadProcesses.add(new StartServer());
+        if (netMode.isServer()) {
+            boolean dedicated;
+            if (netMode == NetworkMode.DEDICATED_SERVER) {
+                dedicated = true;
+            } else if (netMode == NetworkMode.LISTEN_SERVER) {
+                dedicated = false;
+            } else {
+                throw new IllegalStateException("Invalid server mode: " + netMode);
+            }
+            loadProcesses.add(new StartServer(dedicated));
         }
         loadProcesses.add(new PostBeginSystems());
-        loadProcesses.add(new SetupLocalPlayer());
-        loadProcesses.add(new AwaitCharacterSpawn());
+        if (netMode.hasLocalClient()) {
+            loadProcesses.add(new SetupLocalPlayer());
+            loadProcesses.add(new AwaitCharacterSpawn());
+        }
         loadProcesses.add(new PrepareWorld());
     }
 

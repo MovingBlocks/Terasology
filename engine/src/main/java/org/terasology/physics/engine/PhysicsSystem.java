@@ -154,7 +154,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             entity.saveComponent(comp);
         }
 
-        if (networkSystem.getMode() == NetworkMode.SERVER && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+        if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
             lastNetsync = time.getGameTimeInMs();
         }
