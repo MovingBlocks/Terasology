@@ -15,25 +15,26 @@
  */
 package org.terasology.world.generation.perlin;
 
-import org.terasology.utilities.procedural.BrownianNoise2D;
-import org.terasology.utilities.procedural.SimplexNoise;
+import org.terasology.math.TeraMath;
+import org.terasology.utilities.procedural.BrownianNoise3D;
+import org.terasology.utilities.procedural.Noise3D;
+import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.generation.providers.SurfaceHeightProvider;
 
 /**
  * @author Immortius
  */
-public class BaseSurfaceProvider implements SurfaceHeightProvider {
+public class PerlinSurfaceProvider implements SurfaceHeightProvider {
 
-    private BrownianNoise2D noise;
+    private Noise3D surfaceNoise;
 
     @Override
     public float getHeightAt(float x, float z) {
-        //return (float) noise.noise(x, z);
-        return 32f + 32f * ((float) noise.noise(0.004 * x, 0.004 * z) + 1.0f) / 2.0f;
+        return 32f + 32f * (float) TeraMath.clamp((surfaceNoise.noise(0.004f * x, 0, 0.004f * z) + 1.0) / 2.0);
     }
 
     @Override
     public void setSeed(long seed) {
-        noise = new BrownianNoise2D(new SimplexNoise(seed), 8);
+        surfaceNoise = new BrownianNoise3D(new PerlinNoise(seed), 8);
     }
 }

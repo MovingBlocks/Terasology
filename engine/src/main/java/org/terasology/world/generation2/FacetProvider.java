@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.providers;
-
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.WorldDataProvider;
+package org.terasology.world.generation2;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
+public interface FacetProvider {
 
-    boolean[] isSolid(Region3i region);
+    void setSeed(long seed);
+
+    void process(GeneratingRegion region);
 }

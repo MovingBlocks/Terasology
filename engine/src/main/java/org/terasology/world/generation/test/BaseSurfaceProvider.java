@@ -13,28 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.perlin;
+package org.terasology.world.generation.test;
 
-import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.BrownianNoise2D;
 import org.terasology.utilities.procedural.SimplexNoise;
-import org.terasology.world.generation.providers.SeaLevelTemperatureProvider;
+import org.terasology.world.generation.providers.SurfaceHeightProvider;
 
 /**
  * @author Immortius
  */
-public class SimplexTemperatureProvider implements SeaLevelTemperatureProvider {
+public class BaseSurfaceProvider implements SurfaceHeightProvider {
 
-    private BrownianNoise2D temperatureNoise;
+    private BrownianNoise2D noise;
 
     @Override
-    public float getTemperature(float x, float z) {
-        float result = (float) temperatureNoise.noise(x * 0.00005, 0.00005 * z);
-        return TeraMath.clamp((result + 1.0f) / 2.0f);
+    public float getHeightAt(float x, float z) {
+        //return (float) noise.noise(x, z);
+        return 32f + 32f * (noise.noise(0.004f * x, 0.004f * z) + 1.0f) / 2.0f;
     }
 
     @Override
     public void setSeed(long seed) {
-        temperatureNoise = new BrownianNoise2D(new SimplexNoise(seed + 5), 8);
+        noise = new BrownianNoise2D(new SimplexNoise(seed), 8);
     }
 }

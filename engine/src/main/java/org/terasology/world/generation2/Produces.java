@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.providers;
+package org.terasology.world.generation2;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.WorldDataProvider;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
-
-    boolean[] isSolid(Region3i region);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Produces {
+    Class<? extends WorldFacet>[] value();
 }

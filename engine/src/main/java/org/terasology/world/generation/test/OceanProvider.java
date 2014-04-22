@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.perlin;
+package org.terasology.world.generation.test;
 
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.BrownianNoise2D;
@@ -24,21 +24,21 @@ import org.terasology.world.generation.providers.SurfaceHeightProvider;
 /**
  * @author Immortius
  */
-public class RiverProvider implements SurfaceHeightProvider {
+public class OceanProvider implements SurfaceHeightProvider {
 
     @Requires
     private SurfaceHeightProvider baseProvider;
 
-    private BrownianNoise2D riverNoise;
+    private BrownianNoise2D noise;
 
     @Override
     public float getHeightAt(float x, float z) {
-        float river = (float) TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(riverNoise.noise(0.0008 * x, 0.0008 * z))) - 0.1) * 7.0);
-        return baseProvider.getHeightAt(x, z) * TeraMath.clamp(river + 0.25f);
+        float oceanNoise = (float) TeraMath.clamp(noise.noise(0.0009f * x, 0.0009f * z) * 8.0);
+        return baseProvider.getHeightAt(x, z) * TeraMath.clamp(oceanNoise + 0.25f);
     }
 
     @Override
     public void setSeed(long seed) {
-        riverNoise = new BrownianNoise2D(new SimplexNoise(seed + 2), 8);
+        noise = new BrownianNoise2D(new SimplexNoise(seed + 1), 8);
     }
 }

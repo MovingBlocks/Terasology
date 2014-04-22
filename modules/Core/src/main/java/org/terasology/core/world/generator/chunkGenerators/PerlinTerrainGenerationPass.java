@@ -16,16 +16,16 @@
 
 package org.terasology.core.world.generator.chunkGenerators;
 
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
@@ -41,7 +41,6 @@ import java.util.Map;
 public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
-    private static final int HEIGHT_FACTOR = 256;
 
     private Noise3D pGen1;
     private Noise3D pGen2;
@@ -52,7 +51,6 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     private WorldBiomeProvider biomeProvider;
 
     private Block air;
-    private Block mantle;
     private Block water;
     private Block ice;
     private Block stone;
@@ -64,7 +62,6 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
     public PerlinTerrainGenerationPass() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         air = BlockManager.getAir();
-        mantle = blockManager.getBlock("core:MantleStone");
         water = blockManager.getBlock("core:water");
         ice = blockManager.getBlock("core:Ice");
         stone = blockManager.getBlock("core:Stone");
@@ -276,38 +273,38 @@ public class PerlinTerrainGenerationPass implements ChunkGenerationPass {
         return -y + (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath.clamp(ocean + 0.25)) + densityMountains * 1024.0 + densityHills * 128.0);
     }
 
-    private double calcBaseTerrain(double x, double z) {
-        return TeraMath.clamp((pGen1.noise(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+    private double calcBaseTerrain(float x, float z) {
+        return TeraMath.clamp((pGen1.noise(0.004f * x, 0, 0.004f * z) + 1.0) / 2.0);
     }
 
-    private double calcOceanTerrain(double x, double z) {
-        return TeraMath.clamp(pGen2.noise(0.0009 * x, 0, 0.0009 * z) * 8.0);
+    private double calcOceanTerrain(float x, float z) {
+        return TeraMath.clamp(pGen2.noise(0.0009f * x, 0, 0.0009f * z) * 8.0);
     }
 
-    private double calcRiverTerrain(double x, double z) {
-        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3.noise(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
+    private double calcRiverTerrain(float x, float z) {
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3.noise(0.0008f * x, 0, 0.0008f * z))) - 0.1) * 7.0);
     }
 
-    private double calcMountainDensity(double x, double y, double z) {
-        double x1 = x * 0.002;
-        double y1 = y * 0.001;
-        double z1 = z * 0.002;
+    private float calcMountainDensity(float x, float y, float z) {
+        float x1 = x * 0.002f;
+        float y1 = y * 0.001f;
+        float z1 = z * 0.002f;
 
-        double result = pGen4.noise(x1, y1, z1);
+        float result = pGen4.noise(x1, y1, z1);
         return result > 0.0 ? result : 0;
     }
 
-    private double calcHillDensity(double x, double y, double z) {
-        double x1 = x * 0.008;
-        double y1 = y * 0.006;
-        double z1 = z * 0.008;
+    private float calcHillDensity(float x, float y, float z) {
+        float x1 = x * 0.008f;
+        float y1 = y * 0.006f;
+        float z1 = z * 0.008f;
 
-        double result = pGen5.noise(x1, y1, z1) - 0.1;
+        float result = pGen5.noise(x1, y1, z1) - 0.1f;
         return result > 0.0 ? result : 0;
     }
 
-    private double calcCaveDensity(double x, double y, double z) {
-        return pGen8.noise(x * 0.02, y * 0.02, z * 0.02);
+    private float calcCaveDensity(float x, float y, float z) {
+        return pGen8.noise(x * 0.02f, y * 0.02f, z * 0.02f);
     }
 
     @Override

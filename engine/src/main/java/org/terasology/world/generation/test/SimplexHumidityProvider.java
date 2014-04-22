@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.perlin;
+package org.terasology.world.generation.test;
 
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.BrownianNoise2D;
@@ -29,7 +29,7 @@ public class SimplexHumidityProvider implements HumidityProvider {
 
     @Override
     public float getHumidity(float x, float z) {
-        float result = (float) humidityNoise.noise(x * 0.00005, 0.00005 * z);
+        float result = humidityNoise.noise(x * 0.00005f, 0.00005f * z);
         return TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 

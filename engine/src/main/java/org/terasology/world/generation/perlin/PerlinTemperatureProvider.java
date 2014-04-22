@@ -16,29 +16,25 @@
 package org.terasology.world.generation.perlin;
 
 import org.terasology.math.TeraMath;
-import org.terasology.utilities.procedural.BrownianNoise2D;
-import org.terasology.utilities.procedural.SimplexNoise;
-import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.providers.SurfaceHeightProvider;
+import org.terasology.utilities.procedural.BrownianNoise3D;
+import org.terasology.utilities.procedural.Noise3D;
+import org.terasology.utilities.procedural.PerlinNoise;
+import org.terasology.world.generation.providers.SeaLevelTemperatureProvider;
 
 /**
  * @author Immortius
  */
-public class OceanProvider implements SurfaceHeightProvider {
-
-    @Requires
-    private SurfaceHeightProvider baseProvider;
-
-    private BrownianNoise2D noise;
+public class PerlinTemperatureProvider implements SeaLevelTemperatureProvider {
+    private Noise3D temperatureNoise;
 
     @Override
-    public float getHeightAt(float x, float z) {
-        float oceanNoise = (float) TeraMath.clamp(noise.noise(0.0009 * x, 0.0009 * z) * 8.0);
-        return baseProvider.getHeightAt(x, z) * TeraMath.clamp(oceanNoise + 0.25f);
+    public float getTemperature(float x, float z) {
+        double result = temperatureNoise.noise(x * 0.0005f, 0, 0.0005f * z);
+        return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 
     @Override
     public void setSeed(long seed) {
-        noise = new BrownianNoise2D(new SimplexNoise(seed + 1), 8);
+        temperatureNoise = new BrownianNoise3D(new PerlinNoise(seed + 5));
     }
 }

@@ -42,15 +42,11 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.generation.World;
-import org.terasology.world.generation.WorldBuilder;
-import org.terasology.world.generation.perlin.BaseSurfaceProvider;
-import org.terasology.world.generation.perlin.HillsAndMountainsProvider;
-import org.terasology.world.generation.perlin.OceanProvider;
-import org.terasology.world.generation.perlin.RiverProvider;
-import org.terasology.world.generation.perlin.SimplexHumidityProvider;
-import org.terasology.world.generation.perlin.SimplexTemperatureProvider;
-import org.terasology.world.generation.rasterizers.GroundRasterizer;
+import org.terasology.world.generation.BatchSurfaceHeigherProviderImpl;
+import org.terasology.world.generation2.World;
+import org.terasology.world.generation2.WorldBuilder;
+import org.terasology.world.generation2.perlin.BasePerlinSurfaceProvider;
+import org.terasology.world.generation2.rasterizer.GroundRasterizer;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -107,12 +103,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         World world = new WorldBuilder(0)
-                .addProvider(new SimplexTemperatureProvider())
-                .addProvider(new SimplexHumidityProvider())
-                .addProvider(new BaseSurfaceProvider())
-                .addProvider(new RiverProvider())
-                .addProvider(new OceanProvider())
-                .addProvider(new HillsAndMountainsProvider())
+                .addProvider(new BasePerlinSurfaceProvider())
                 .addRasterizer(new GroundRasterizer(blockManager)).build();
 
         // Init. a new world

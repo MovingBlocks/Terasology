@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.providers;
+package org.terasology.world.generation2;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.WorldDataProvider;
+import org.terasology.world.chunks.CoreChunk;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
-
-    boolean[] isSolid(Region3i region);
+public interface WorldRasterizer {
+    void generateChunk(CoreChunk chunk, Region chunkRegion);
 }

@@ -38,13 +38,13 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
     @Override
     public float getHumidityAt(int x, int z) {
-        double result = humidityNoise.noise(x * 0.0005, 0, 0.0005 * z);
+        double result = humidityNoise.noise(x * 0.0005f, 0, 0.0005f * z);
         return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 
     @Override
     public float getTemperatureAt(int x, int z) {
-        double result = temperatureNoise.noise(x * 0.0005, 0, 0.0005 * z);
+        double result = temperatureNoise.noise(x * 0.0005f, 0, 0.0005f * z);
         return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
     }
 

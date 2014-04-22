@@ -32,7 +32,7 @@ public class PerlinNoise implements Noise3D {
      *
      * @param seed The seed value
      */
-    public PerlinNoise(int seed) {
+    public PerlinNoise(long seed) {
         FastRandom rand = new FastRandom(seed);
 
         noisePermutations = new int[512];
@@ -57,7 +57,6 @@ public class PerlinNoise implements Noise3D {
             noisePermutations[i] = noiseTable[i];
             noisePermutations[i + 256] = noiseTable[i];
         }
-
     }
 
     /**
@@ -69,18 +68,18 @@ public class PerlinNoise implements Noise3D {
      * @return The noise value
      */
     @Override
-    public double noise(double posX, double posY, double posZ) {
+    public float noise(float posX, float posY, float posZ) {
         int xInt = (int) TeraMath.fastFloor(posX) & 255;
         int yInt = (int) TeraMath.fastFloor(posY) & 255;
         int zInt = (int) TeraMath.fastFloor(posZ) & 255;
 
-        double x = posX - TeraMath.fastFloor(posX);
-        double y = posY - TeraMath.fastFloor(posY);
-        double z = posZ - TeraMath.fastFloor(posZ);
+        float x = posX - TeraMath.fastFloor(posX);
+        float y = posY - TeraMath.fastFloor(posY);
+        float z = posZ - TeraMath.fastFloor(posZ);
 
-        double u = fade(x);
-        double v = fade(y);
-        double w = fade(z);
+        float u = TeraMath.fadePerlin(x);
+        float v = TeraMath.fadePerlin(y);
+        float w = TeraMath.fadePerlin(z);
         int a = noisePermutations[xInt] + yInt;
         int aa = noisePermutations[a] + zInt;
         int ab = noisePermutations[(a + 1)] + zInt;
@@ -88,28 +87,23 @@ public class PerlinNoise implements Noise3D {
         int ba = noisePermutations[b] + zInt;
         int bb = noisePermutations[(b + 1)] + zInt;
 
-        return lerp(w, lerp(v, lerp(u, grad(noisePermutations[aa], x, y, z),
-                grad(noisePermutations[ba], x - 1, y, z)),
-                lerp(u, grad(noisePermutations[ab], x, y - 1, z),
-                        grad(noisePermutations[bb], x - 1, y - 1, z))),
-                lerp(v, lerp(u, grad(noisePermutations[(aa + 1)], x, y, z - 1),
-                        grad(noisePermutations[(ba + 1)], x - 1, y, z - 1)),
-                        lerp(u, grad(noisePermutations[(ab + 1)], x, y - 1, z - 1),
-                                grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1))));
+        return TeraMath.lerp(w, TeraMath.lerp(v, TeraMath.lerp(u, grad(noisePermutations[aa], x, y, z),
+                                grad(noisePermutations[ba], x - 1, y, z)),
+                        TeraMath.lerp(u, grad(noisePermutations[ab], x, y - 1, z),
+                                grad(noisePermutations[bb], x - 1, y - 1, z))
+                ),
+                TeraMath.lerp(v, TeraMath.lerp(u, grad(noisePermutations[(aa + 1)], x, y, z - 1),
+                                grad(noisePermutations[(ba + 1)], x - 1, y, z - 1)),
+                        TeraMath.lerp(u, grad(noisePermutations[(ab + 1)], x, y - 1, z - 1),
+                                grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1))
+                )
+        );
     }
 
-    private static double fade(double t) {
-        return t * t * t * (t * (t * 6 - 15) + 10);
-    }
-
-    private static double lerp(double t, double a, double b) {
-        return a + t * (b - a);
-    }
-
-    private static double grad(int hash, double x, double y, double z) {
+    private static float grad(int hash, float x, float y, float z) {
         int h = hash & 15;
-        double u = h < 8 ? x : y;
-        double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+        float u = h < 8 ? x : y;
+        float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 

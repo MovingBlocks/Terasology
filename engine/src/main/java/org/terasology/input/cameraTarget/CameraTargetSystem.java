@@ -127,7 +127,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
             if (eyeFocusDistance == Float.MAX_VALUE) {
                 eyeFocusDistance = playerToTargetRay.length();
             } else {
-                eyeFocusDistance = TeraMath.lerpf(eyeFocusDistance, playerToTargetRay.length(), delta * 20.0f);
+                eyeFocusDistance = TeraMath.lerp(eyeFocusDistance, playerToTargetRay.length(), delta * 20.0f);
             }
         } else {
             eyeFocusDistance = Float.MAX_VALUE;

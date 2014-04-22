@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.providers;
-
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.WorldDataProvider;
+package org.terasology.utilities.procedural;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
+public class Noise3DTo2DAdapter implements Noise2D {
 
-    boolean[] isSolid(Region3i region);
+    private Noise3D noise;
+    private float yVal;
+
+    public Noise3DTo2DAdapter(Noise3D noise) {
+        this.noise = noise;
+    }
+
+    public Noise3DTo2DAdapter(Noise3D noise, float fixedYVal) {
+        this(noise);
+        yVal = fixedYVal;
+    }
+
+    @Override
+    public float noise(float x, float y) {
+        return noise.noise(x, yVal, y);
+    }
 }

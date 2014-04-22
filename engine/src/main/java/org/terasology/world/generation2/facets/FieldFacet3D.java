@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.providers;
+package org.terasology.world.generation2.facets;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.WorldDataProvider;
+import org.terasology.math.Vector3i;
+import org.terasology.world.generation2.WorldFacet;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
+public interface FieldFacet3D extends WorldFacet {
 
-    boolean[] isSolid(Region3i region);
+    float get(int x, int y, int z);
+
+    float get(Vector3i pos);
+
+    void set(int x, int y, int z, float value);
+
+    void set(Vector3i pos, float value);
 }

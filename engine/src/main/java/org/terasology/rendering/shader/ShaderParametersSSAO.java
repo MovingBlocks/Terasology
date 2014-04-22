@@ -73,7 +73,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
                 vec.normalize();
                 vec.scale(random.nextFloat(0.0f, 1.0f));
                 float scale = i / (float) SSAO_KERNEL_ELEMENTS;
-                scale = TeraMath.lerpf(0.25f, 1.0f, scale * scale);
+                scale = TeraMath.lerp(0.25f, 1.0f, scale * scale);
 
                 vec.scale(scale);
 

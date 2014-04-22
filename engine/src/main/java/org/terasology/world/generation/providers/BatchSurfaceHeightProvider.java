@@ -15,13 +15,13 @@
  */
 package org.terasology.world.generation.providers;
 
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.world.generation.WorldDataProvider;
 
 /**
  * @author Immortius
  */
-public interface SolidityProvider extends WorldDataProvider {
-
-    boolean[] isSolid(Region3i region);
+public interface BatchSurfaceHeightProvider extends WorldDataProvider {
+    float[] getSurfaceHeights(Rect2i area);
 }
