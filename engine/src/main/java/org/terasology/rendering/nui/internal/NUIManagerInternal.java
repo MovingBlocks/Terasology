@@ -45,7 +45,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -58,7 +57,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, FocusManager {
+public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
@@ -196,8 +195,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public UIScreenLayer pushScreen(UIElement element) {
         if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
-            result.setId(element.getURI().toNormalisedSimpleString());
-            pushScreen(result, element.getURI());
+            if (!result.equals(screens.peek())) {
+                result.setId(element.getURI().toNormalisedSimpleString());
+                pushScreen(result, element.getURI());
+            }
             return result;
         }
         return null;
@@ -230,7 +231,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return null;
     }
 
-    public void pushScreen(CoreScreenLayer screen, AssetUri uri) {
+    private void pushScreen(CoreScreenLayer screen, AssetUri uri) {
         screen.setManager(this);
         prepare(screen);
         screens.push(screen);
@@ -312,6 +313,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         forceReleaseMouse = false;
     }
 
+    @Override
     public void render() {
         canvas.preRender();
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
@@ -330,6 +332,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         canvas.postRender();
     }
 
+    @Override
     public void update(float delta) {
         canvas.processMousePosition(Mouse.getPosition());
 
