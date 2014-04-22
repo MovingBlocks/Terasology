@@ -39,7 +39,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * The class implements the main game menu.
@@ -105,7 +105,7 @@ public class StateMainMenu implements GameState {
         //guiManager.openWindow("main");
         CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error", messageOnLoad);
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
     }
 

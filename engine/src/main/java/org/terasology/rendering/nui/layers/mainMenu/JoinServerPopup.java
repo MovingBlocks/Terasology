@@ -53,8 +53,8 @@ public class JoinServerPopup extends CoreScreenLayer {
                 if (status.getStatus() != JoinStatus.Status.FAILED) {
                     engine.changeState(new StateLoading(status));
                 } else {
-                    getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
-                            .setError("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
+                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                            .setMessage("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
                 }
             }
         });

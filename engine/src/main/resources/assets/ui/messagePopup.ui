@@ -1,5 +1,5 @@
 {
-    "type" : "errorMessagePopup",
+    "type" : "messagePopup",
     "skin" : "messageBox",
     "contents" : {
         "type" : "relativeLayout",
@@ -19,7 +19,7 @@
                         "contents" : [
                             {
                                 "type" : "UILabel",
-                                "text" : "Error",
+                                "text" : "Title",
                                 "id" : "title",
                                 "family" : "title"
                             },

@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -24,8 +26,10 @@ import org.terasology.rendering.nui.widgets.UILabel;
 /**
  * @author Immortius
  */
-public class ErrorMessagePopup extends CoreScreenLayer {
+public class MessagePopup extends CoreScreenLayer {
 
+    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:messagePopup");
+    
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "ok", new ActivateEventListener() {
@@ -36,7 +40,7 @@ public class ErrorMessagePopup extends CoreScreenLayer {
         });
     }
 
-    public void setError(String title, String message) {
+    public void setMessage(String title, String message) {
         UILabel titleLabel = find("title", UILabel.class);
         if (titleLabel != null) {
             titleLabel.setText(title);

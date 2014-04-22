@@ -127,8 +127,8 @@ public class JoinGameScreen extends CoreScreenLayer {
         if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
             engine.changeState(new StateLoading(joinStatus));
         } else {
-            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
-                    .setError("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                    .setMessage("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
         }
     }
 }
