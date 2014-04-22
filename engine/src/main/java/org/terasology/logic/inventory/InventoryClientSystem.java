@@ -61,7 +61,7 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
         moveItem(entity, event.getInstigator(), event.getSlotFrom(), event.getTo(), event.getSlotTo(), event.getCount());
     }
 
-    @ReceiveEvent(components = {InventoryComponent.class})
+    @ReceiveEvent
     public void inventoryChangeAcknowledge(InventoryChangeAcknowledgedRequest event, EntityRef entity) {
         pendingMoves.remove(event.getChangeId());
         recalculatePredictedState();
