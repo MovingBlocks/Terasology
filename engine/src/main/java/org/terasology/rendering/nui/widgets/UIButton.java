@@ -39,6 +39,7 @@ import java.util.List;
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
+    public static final String DISABLED_MODE = "disabled";
 
     @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
@@ -53,6 +54,8 @@ public class UIButton extends CoreWidget {
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
 
     private boolean down;
+
+    private boolean enabled = true;
 
     private List<ActivateEventListener> listeners = Lists.newArrayList();
 
@@ -98,13 +101,24 @@ public class UIButton extends CoreWidget {
         this.text = text;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         if (image.get() != null) {
             canvas.drawTexture(image.get());
         }
         canvas.drawText(text.get());
-        canvas.addInteractionRegion(interactionListener);
+
+        if (enabled) {
+            canvas.addInteractionRegion(interactionListener);
+        }
     }
 
     @Override
@@ -116,7 +130,9 @@ public class UIButton extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (down) {
+        if (!enabled) {
+            return DISABLED_MODE;
+        } else if (down) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
