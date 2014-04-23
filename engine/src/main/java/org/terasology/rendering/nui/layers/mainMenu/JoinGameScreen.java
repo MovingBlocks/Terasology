@@ -16,11 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
@@ -30,8 +26,10 @@ import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.ParallelOperation;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.ParallelOperation.Status;
 import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
@@ -45,8 +43,6 @@ import org.terasology.rendering.nui.widgets.UIList;
  */
 public class JoinGameScreen extends CoreScreenLayer {
 
-    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
-    
     @In
     private Config config;
 
@@ -58,8 +54,8 @@ public class JoinGameScreen extends CoreScreenLayer {
 
     private UIList<ServerInfo> serverList;
     
-    private FutureTask<JoinStatus> joinServerTask;
-
+    private ParallelOperation<JoinStatus> joinServer = new ParallelOperation<>();
+    
     @Override
     public void initialise() {
         serverList = find("serverList", UIList.class);
@@ -135,50 +131,39 @@ public class JoinGameScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
+
+       Status status = joinServer.getStatus();
         
-        if (joinServerTask != null && joinServerTask.isDone()) {
+        if (status.isFinished()) {
             getManager().popScreen();
-            
-            if (!joinServerTask.isCancelled()) {
-                try {
-                    JoinStatus joinStatus = joinServerTask.get();
-                    if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
-                        engine.changeState(new StateLoading(joinStatus));
-                    } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                                .setMessage("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.warn("Could not join server", e);
+
+            if (status == ParallelOperation.Status.SUCCESSFUL) {
+                JoinStatus result = joinServer.getResult();
+                if (result.getStatus() != JoinStatus.Status.FAILED) {
+                    engine.changeState(new StateLoading(result));               
+                } else {
+                    MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
                 }
             }
-            joinServerTask = null;
+            
+            joinServer = new ParallelOperation<>();
         }
     }
     
     private void join(final String address) {
-        
-        joinServerTask = new FutureTask<JoinStatus>(new Callable<JoinStatus>() {
+        Callable<JoinStatus> action = new Callable<JoinStatus>() {
 
             @Override
             public JoinStatus call() throws InterruptedException {
                 JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
                 return joinStatus;
             }
-        });
-        
-        final MessagePopup popup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
-        popup.setMessage("Join Game", "Connecting ... please wait");
-        popup.setCloseButtonText("Cancel");
-        popup.setCloseAction(new ActivateEventListener() {
-            
-            @Override
-            public void onActivated(UIWidget widget) {
-                joinServerTask.cancel(true);
-            }
-        });
+        };
 
-        Thread t = new Thread(joinServerTask, "Join Server");
-        t.start();
+        String message = "Connecting to '" + address + "' - please wait ...";
+
+        joinServer = new ParallelOperation<JoinStatus>(action);
+        joinServer.showPopup(getManager(), "Join Game", message);
     }
 }

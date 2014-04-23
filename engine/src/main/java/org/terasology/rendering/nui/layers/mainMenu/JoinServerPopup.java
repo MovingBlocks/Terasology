@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.concurrent.Callable;
+
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
@@ -23,8 +25,10 @@ import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.ParallelOperation;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
+import org.terasology.rendering.nui.ParallelOperation.Status;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
@@ -41,26 +45,16 @@ public class JoinServerPopup extends CoreScreenLayer {
 
     @In
     private GameEngine engine;
+    
+    private ParallelOperation<JoinStatus> joinServer = new ParallelOperation<>();
 
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "join", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
-                getManager().popScreen();
                 UIText address = find("address", UIText.class);
-                try {
-                    JoinStatus status = networkSystem.join(address.getText(), TerasologyConstants.DEFAULT_PORT);
-                    if (status.getStatus() != JoinStatus.Status.FAILED) {
-                        engine.changeState(new StateLoading(status));
-                    } else {
-                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                                .setMessage("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
-                    }
-                } catch (InterruptedException e) {
-                    // TODO: use similar mechanism as in JoinGameScren.join() to prevent the game from hanging while connecting
-                    Thread.currentThread().interrupt();
-                }
+                join(address.getText());
             }
         });
 
@@ -70,6 +64,45 @@ public class JoinServerPopup extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
+    }
+    
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        Status status = joinServer.getStatus();
+
+        if (status.isFinished()) {
+            getManager().popScreen();
+
+            if (status == ParallelOperation.Status.SUCCESSFUL) {
+                JoinStatus result = joinServer.getResult();
+                if (result.getStatus() != JoinStatus.Status.FAILED) {
+                    engine.changeState(new StateLoading(result));
+                } else {
+                    MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+                }
+            }
+
+            joinServer = new ParallelOperation<>();
+        }
+    }
+    
+    private void join(final String address) {
+        Callable<JoinStatus> action = new Callable<JoinStatus>() {
+
+            @Override
+            public JoinStatus call() throws InterruptedException {
+                JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
+                return joinStatus;
+            }
+        };
+
+        String message = "Connecting to '" + address + "' - please wait ...";
+
+        joinServer = new ParallelOperation<JoinStatus>(action);
+        joinServer.showPopup(getManager(), "Join Game", message);
     }
 
     @Override
