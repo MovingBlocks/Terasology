@@ -112,7 +112,7 @@ public interface EntityManager {
      * @param other
      * @return A new entity with a copy of each of the other entity's components
      */
-    // TODO: Remove? A little dangerous due to ownership
+    @Deprecated
     EntityRef copy(EntityRef other);
 
     /**
