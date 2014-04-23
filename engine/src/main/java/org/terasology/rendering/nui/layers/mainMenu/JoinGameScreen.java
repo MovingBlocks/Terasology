@@ -161,7 +161,7 @@ public class JoinGameScreen extends CoreScreenLayer {
         joinServerTask = new FutureTask<JoinStatus>(new Callable<JoinStatus>() {
 
             @Override
-            public JoinStatus call() {
+            public JoinStatus call() throws InterruptedException {
                 JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
                 return joinStatus;
             }

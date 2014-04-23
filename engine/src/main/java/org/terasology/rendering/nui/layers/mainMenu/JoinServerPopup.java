@@ -49,12 +49,17 @@ public class JoinServerPopup extends CoreScreenLayer {
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
                 UIText address = find("address", UIText.class);
-                JoinStatus status = networkSystem.join(address.getText(), TerasologyConstants.DEFAULT_PORT);
-                if (status.getStatus() != JoinStatus.Status.FAILED) {
-                    engine.changeState(new StateLoading(status));
-                } else {
-                    getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                            .setMessage("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
+                try {
+                    JoinStatus status = networkSystem.join(address.getText(), TerasologyConstants.DEFAULT_PORT);
+                    if (status.getStatus() != JoinStatus.Status.FAILED) {
+                        engine.changeState(new StateLoading(status));
+                    } else {
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                .setMessage("Failed to Join", "Could not connect to server - " + status.getErrorMessage());
+                    }
+                } catch (InterruptedException e) {
+                    // TODO: use similar mechanism as in JoinGameScren.join() to prevent the game from hanging while connecting
+                    Thread.currentThread().interrupt();
                 }
             }
         });
