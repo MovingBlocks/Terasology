@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
@@ -39,6 +45,8 @@ import org.terasology.rendering.nui.widgets.UIList;
  */
 public class JoinGameScreen extends CoreScreenLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(JoinGameScreen.class);
+    
     @In
     private Config config;
 
@@ -49,6 +57,8 @@ public class JoinGameScreen extends CoreScreenLayer {
     private GameEngine engine;
 
     private UIList<ServerInfo> serverList;
+    
+    private FutureTask<JoinStatus> joinServerTask;
 
     @Override
     public void initialise() {
@@ -122,13 +132,53 @@ public class JoinGameScreen extends CoreScreenLayer {
         return false;
     }
 
-    private void join(String address) {
-        JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
-        if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
-            engine.changeState(new StateLoading(joinStatus));
-        } else {
-            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
-                    .setMessage("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        
+        if (joinServerTask != null && joinServerTask.isDone()) {
+            getManager().popScreen();
+            
+            if (!joinServerTask.isCancelled()) {
+                try {
+                    JoinStatus joinStatus = joinServerTask.get();
+                    if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
+                        engine.changeState(new StateLoading(joinStatus));
+                    } else {
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class)
+                                .setMessage("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.warn("Could not join server", e);
+                }
+            }
+            joinServerTask = null;
         }
+    }
+    
+    private void join(final String address) {
+        
+        joinServerTask = new FutureTask<JoinStatus>(new Callable<JoinStatus>() {
+
+            @Override
+            public JoinStatus call() {
+                JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
+                return joinStatus;
+            }
+        });
+        
+        final MessagePopup popup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+        popup.setMessage("Join Game", "Connecting ... please wait");
+        popup.setCloseButtonText("Cancel");
+        popup.setCloseAction(new ActivateEventListener() {
+            
+            @Override
+            public void onActivated(UIWidget widget) {
+                joinServerTask.cancel(true);
+            }
+        });
+
+        Thread t = new Thread(joinServerTask, "Join Server");
+        t.start();
     }
 }
