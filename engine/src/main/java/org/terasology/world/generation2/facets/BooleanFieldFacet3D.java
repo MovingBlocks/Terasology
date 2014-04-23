@@ -15,14 +15,27 @@
  */
 package org.terasology.world.generation2.facets;
 
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
+import org.terasology.world.generation2.WorldFacet;
 
 /**
  * @author Immortius
  */
-public interface Float2DIterator extends TFloatIterator {
-    Vector2i currentPosition();
+public interface BooleanFieldFacet3D extends WorldFacet {
 
-    void setLast(float newValue);
+    boolean get(int x, int y, int z);
+
+    boolean get(Vector3i pos);
+
+    boolean[] getInternal();
+
+    Boolean3DIterator get();
+
+    void set(int x, int y, int z, boolean value);
+
+    void set(Vector3i pos, boolean value);
+
+    void set(boolean[] newData);
+
+    void set(int index, boolean value);
 }

@@ -15,14 +15,14 @@
  */
 package org.terasology.world.generation2.facets;
 
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public interface Float2DIterator extends TFloatIterator {
-    Vector2i currentPosition();
+public class SolidityFacet extends BaseBooleanFieldFacet3D {
 
-    void setLast(float newValue);
+    public SolidityFacet(Vector3i size) {
+        super(size);
+    }
 }

@@ -16,13 +16,16 @@
 package org.terasology.world.generation2.facets;
 
 import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Vector2i;
+import gnu.trove.iterator.TIterator;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public interface Float2DIterator extends TFloatIterator {
-    Vector2i currentPosition();
+public interface Boolean3DIterator extends TIterator {
+    Vector3i currentPosition();
 
-    void setLast(float newValue);
+    boolean next();
+
+    void setLast(boolean newValue);
 }

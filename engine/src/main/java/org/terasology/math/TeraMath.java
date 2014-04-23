@@ -782,4 +782,8 @@ public final class TeraMath {
             target[dimX - 1 + dimX * (dimY - 1)] = Math.min(source[dimX - 2 + dimX * (dimY - 1)], source[dimX - 1 + dimX * (dimY - 2)]);
         }
     }
+
+    public static float sqrt(float value) {
+        return (float) Math.sqrt(value);
+    }
 }

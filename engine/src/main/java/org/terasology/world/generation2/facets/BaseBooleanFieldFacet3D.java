@@ -16,65 +16,69 @@
 package org.terasology.world.generation2.facets;
 
 import com.google.common.base.Preconditions;
-import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public abstract class BaseFieldFacet2D implements FieldFacet2D {
+public class BaseBooleanFieldFacet3D implements BooleanFieldFacet3D {
 
-    private Vector2i size = new Vector2i();
-    private float[] data;
+    private Vector3i size = new Vector3i();
+    private boolean[] data;
 
-    public BaseFieldFacet2D(Vector2i size) {
+    public BaseBooleanFieldFacet3D(Vector3i size) {
         this.size.set(size);
-        this.data = new float[size.getX() * size.getY()];
+        data = new boolean[size.x * size.y * size.z];
     }
 
     @Override
-    public float get(int x, int y) {
-        return data[x + size.getX() * y];
+    public boolean get(int x, int y, int z) {
+        return data[x + size.getX() * (y + size.getY() * z)];
     }
 
     @Override
-    public float get(Vector2i pos) {
-        return data[pos.x + size.getX() * pos.y];
+    public boolean get(Vector3i pos) {
+        return get(pos.x, pos.y, pos.z);
     }
 
     @Override
-    public float[] getInternal() {
+    public boolean[] getInternal() {
         return data;
     }
 
     @Override
-    public Float2DIterator get() {
-        return new Float2DIterator() {
-            private Vector2i position = new Vector2i(-1, 0);
-            private int index;
+    public Boolean3DIterator get() {
+        return new Boolean3DIterator() {
+            private Vector3i position = new Vector3i(-1, 0, 0);
+            private int nextIndex = 0;
 
             @Override
-            public Vector2i currentPosition() {
+            public Vector3i currentPosition() {
                 return position;
             }
 
             @Override
-            public void setLast(float newValue) {
-                data[index - 1] = newValue;
+            public void setLast(boolean newValue) {
+                data[nextIndex - 1] = newValue;
             }
 
             @Override
-            public float next() {
+            public boolean next() {
                 position.x++;
                 if (position.x == size.x) {
                     position.x = 0;
                     position.y++;
+                    if (position.y == size.y) {
+                        position.y = 0;
+                        position.z++;
+                    }
                 }
-                return data[index++];
+                return data[nextIndex++];
             }
 
             @Override
             public boolean hasNext() {
-                return index < data.length;
+                return nextIndex < data.length;
             }
 
             @Override
@@ -85,18 +89,23 @@ public abstract class BaseFieldFacet2D implements FieldFacet2D {
     }
 
     @Override
-    public void set(int x, int y, float value) {
-        data[x + size.getX() * y] = value;
+    public void set(int x, int y, int z, boolean value) {
+        data[x + size.getX() * (y + size.getY() * z)] = value;
     }
 
     @Override
-    public void set(Vector2i pos, float value) {
-        data[pos.x + size.getX() * pos.y] = value;
+    public void set(Vector3i pos, boolean value) {
+        set(pos.x, pos.y, pos.z, value);
     }
 
     @Override
-    public void set(float[] newData) {
+    public void set(boolean[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
+    }
+
+    @Override
+    public void set(int index, boolean value) {
+        data[index] = value;
     }
 }

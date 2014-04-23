@@ -42,11 +42,16 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.generation.BatchSurfaceHeigherProviderImpl;
 import org.terasology.world.generation2.World;
 import org.terasology.world.generation2.WorldBuilder;
-import org.terasology.world.generation2.perlin.BasePerlinSurfaceProvider;
+import org.terasology.world.generation2.perlin.PerlinBaseSurfaceProvider;
+import org.terasology.world.generation2.perlin.PerlinHillsAndMountainsProvider;
+import org.terasology.world.generation2.perlin.PerlinHumidityProvider;
+import org.terasology.world.generation2.perlin.PerlinOceanProvider;
+import org.terasology.world.generation2.perlin.PerlinRiverProvider;
+import org.terasology.world.generation2.perlin.PerlinTemperatureProvider;
 import org.terasology.world.generation2.rasterizer.GroundRasterizer;
+import org.terasology.world.generation2.rasterizer.SolidRasterizer;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -103,8 +108,13 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         World world = new WorldBuilder(0)
-                .addProvider(new BasePerlinSurfaceProvider())
-                .addRasterizer(new GroundRasterizer(blockManager)).build();
+                .addProvider(new PerlinHumidityProvider())
+                .addProvider(new PerlinTemperatureProvider())
+                .addProvider(new PerlinBaseSurfaceProvider())
+                .addProvider(new PerlinRiverProvider())
+                .addProvider(new PerlinOceanProvider())
+                .addProvider(new PerlinHillsAndMountainsProvider())
+                .addRasterizer(new SolidRasterizer(blockManager)).build();
 
         // Init. a new world
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, world);

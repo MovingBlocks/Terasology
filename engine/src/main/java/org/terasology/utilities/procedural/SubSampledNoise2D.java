@@ -52,7 +52,7 @@ public class SubSampledNoise2D implements Noise2D {
         float q01 = source.noise(x0 * zoom.x, y1 * zoom.y);
         float q11 = source.noise(x1 * zoom.x, y1 * zoom.y);
 
-        return bilinearInterpolate(q00, q10, q01, q11, xMod / sampleRate, yMod / sampleRate);
+        return TeraMath.biLerp(q00, q10, q01, q11, xMod / sampleRate, yMod / sampleRate);
     }
 
     public float[] noise(Rect2i region) {
@@ -88,7 +88,7 @@ public class SubSampledNoise2D implements Noise2D {
                 for (int innerY = 0; innerY < sampleRate; ++innerY) {
                     for (int innerX = 0; innerX < sampleRate; ++innerX) {
                         fullData[x * sampleRate + innerX + fullRegion.size().x * (y * sampleRate + innerY)] =
-                                bilinearInterpolate(q11, q21, q12, q22, (float) innerX / sampleRate, (float) innerY / sampleRate);
+                                TeraMath.biLerp(q11, q21, q12, q22, (float) innerX / sampleRate, (float) innerY / sampleRate);
                     }
                 }
             }
@@ -96,20 +96,15 @@ public class SubSampledNoise2D implements Noise2D {
         return fullData;
     }
 
-    private float bilinearInterpolate(float q11, float q21, float q12, float q22, float tx, float ty) {
-        float lerpX1 = TeraMath.lerp(q11, q21, tx);
-        float lerpX2 = TeraMath.lerp(q12, q22, tx);
-        return TeraMath.lerp(lerpX1, lerpX2, ty);
-    }
-
     private float[] getKeyValues(Rect2i fullRegion) {
         int xDim = fullRegion.size().x / sampleRate + 1;
-        float[] fullData = new float[xDim * (fullRegion.size().y / sampleRate + 1)];
-        for (int y = 0; y <= fullRegion.size().y / sampleRate; y++) {
-            for (int x = 0; x <= fullRegion.size().x / sampleRate; x++) {
+        int yDim = fullRegion.size().y / sampleRate + 1;
+        float[] fullData = new float[xDim * yDim];
+        for (int y = 0; y < yDim; y++) {
+            for (int x = 0; x < xDim; x++) {
                 int actualX = x * sampleRate + fullRegion.minX();
                 int actualY = y * sampleRate + fullRegion.minY();
-                fullData[x + y * xDim] = (float) source.noise(zoom.x * actualX, zoom.y * actualY);
+                fullData[x + y * xDim] = source.noise(zoom.x * actualX, zoom.y * actualY);
             }
         }
         return fullData;

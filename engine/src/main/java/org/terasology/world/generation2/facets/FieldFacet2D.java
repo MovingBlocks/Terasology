@@ -28,6 +28,8 @@ public interface FieldFacet2D extends WorldFacet {
 
     float get(Vector2i pos);
 
+    float[] getInternal();
+
     Float2DIterator get();
 
     void set(int x, int y, float value);

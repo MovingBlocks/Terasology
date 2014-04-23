@@ -17,12 +17,13 @@ package org.terasology.world.generation2.facets;
 
 import gnu.trove.iterator.TFloatIterator;
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public interface Float2DIterator extends TFloatIterator {
-    Vector2i currentPosition();
+public interface Float3DIterator extends TFloatIterator {
+    Vector3i currentPosition();
 
     void setLast(float newValue);
 }

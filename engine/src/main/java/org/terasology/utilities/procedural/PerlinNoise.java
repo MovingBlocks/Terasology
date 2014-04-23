@@ -57,6 +57,7 @@ public class PerlinNoise implements Noise3D {
             noisePermutations[i] = noiseTable[i];
             noisePermutations[i + 256] = noiseTable[i];
         }
+
     }
 
     /**
@@ -87,16 +88,13 @@ public class PerlinNoise implements Noise3D {
         int ba = noisePermutations[b] + zInt;
         int bb = noisePermutations[(b + 1)] + zInt;
 
-        return TeraMath.lerp(w, TeraMath.lerp(v, TeraMath.lerp(u, grad(noisePermutations[aa], x, y, z),
-                                grad(noisePermutations[ba], x - 1, y, z)),
-                        TeraMath.lerp(u, grad(noisePermutations[ab], x, y - 1, z),
-                                grad(noisePermutations[bb], x - 1, y - 1, z))
-                ),
-                TeraMath.lerp(v, TeraMath.lerp(u, grad(noisePermutations[(aa + 1)], x, y, z - 1),
-                                grad(noisePermutations[(ba + 1)], x - 1, y, z - 1)),
-                        TeraMath.lerp(u, grad(noisePermutations[(ab + 1)], x, y - 1, z - 1),
-                                grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1))
-                )
+        return TeraMath.lerp(TeraMath.lerp(TeraMath.lerp(grad(noisePermutations[aa], x, y, z), grad(noisePermutations[ba], x - 1, y, z), u
+                        ), TeraMath.lerp(grad(noisePermutations[ab], x, y - 1, z), grad(noisePermutations[bb], x - 1, y - 1, z), u
+                        ), v
+                ), TeraMath.lerp(TeraMath.lerp(grad(noisePermutations[(aa + 1)], x, y, z - 1), grad(noisePermutations[(ba + 1)], x - 1, y, z - 1), u
+                        ), TeraMath.lerp(grad(noisePermutations[(ab + 1)], x, y - 1, z - 1), grad(noisePermutations[(bb + 1)], x - 1, y - 1, z - 1), u
+                        ), v
+                ), w
         );
     }
 

@@ -15,20 +15,17 @@
  */
 package org.terasology.world.generation2.perlin;
 
-import com.google.common.math.IntMath;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise2D;
-import org.terasology.utilities.procedural.Noise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
 import org.terasology.world.generation2.FacetProvider;
 import org.terasology.world.generation2.GeneratingRegion;
 import org.terasology.world.generation2.Produces;
+import org.terasology.world.generation2.Requires;
 import org.terasology.world.generation2.facets.SurfaceHeightFacet;
 
 import javax.vecmath.Vector2f;
@@ -36,28 +33,27 @@ import javax.vecmath.Vector2f;
 /**
  * @author Immortius
  */
+@Requires(SurfaceHeightFacet.class)
 @Produces(SurfaceHeightFacet.class)
-public class BasePerlinSurfaceProvider implements FacetProvider {
+public class PerlinRiverProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise2D surfaceNoise;
+    private SubSampledNoise2D riverNoise;
 
     @Override
     public void setSeed(long seed) {
-        surfaceNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed), 6)), new Vector2f(0.004f, 0.004f), SAMPLE_RATE);
+        riverNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 2), 8)), new Vector2f(0.0008f, 0.0008f), SAMPLE_RATE);
     }
 
     @Override
     public void process(GeneratingRegion region) {
         Region3i processRegion = region.getRegion();
-        float[] noise = surfaceNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
+        float[] noise = riverNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
 
+        SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
+        float[] surfaceHeights = facet.getInternal();
         for (int i = 0; i < noise.length; ++i) {
-            noise[i] = 32f + 32f * TeraMath.clamp((noise[i] + 1f) / 2f);
+            surfaceHeights[i] *= TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i])) - 0.1f) + 0.25f);
         }
-
-        SurfaceHeightFacet facet = new SurfaceHeightFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
-        facet.set(noise);
-        region.setRegionFacet(SurfaceHeightFacet.class, facet);
     }
 }

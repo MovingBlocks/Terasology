@@ -27,7 +27,13 @@ public interface FieldFacet3D extends WorldFacet {
 
     float get(Vector3i pos);
 
+    Float3DIterator get();
+
+    float[] getInternal();
+
     void set(int x, int y, int z, float value);
 
     void set(Vector3i pos, float value);
+
+    void set(float[] newData);
 }
