@@ -141,18 +141,17 @@ dependencies {
     } else {
         println "We're in a single-project non-Core module workspace (Jenkins) so will look elsewhere for dependencies"
 
-        // If no Terasology dependencies are declared we need to set an implicit dependency on the latest engine version
-        if (moduleDepends.size() == 0) {
-            println "Setting implicit engine dependency for $project.name - no explicit or transitive dependency set"
-            compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
-            testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
-        } else {
-            // To get Terasology module dependencies we simply declare them against Artifactory
-            moduleDepends.each {
-                println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
-                // The '+' is satisfied by any version
-                compile(group: 'org.terasology.modules', name: it, version: '+', changing: true)
-            }
+        // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
+        // Tricky scenario: Building a module with a transitive dependency on engine-tests - that seems to be ignored
+        compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
+        testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+
+        // To get Terasology module dependencies we simply declare them against Artifactory
+        moduleDepends.each {
+            println "*** Attempting to fetch dependency module from Artifactory for " + project.name + ": " + it
+            // The '+' is satisfied by any version
+            compile(group: 'org.terasology.modules', name: it, version: '+', changing: true)
+
         }
 
         // TODO: parse and apply external lib dependencies if any are present
