@@ -75,7 +75,7 @@ public class InventoryAuthoritySystemTest {
         ItemComponent itemCompCopy = new ItemComponent();
         setupItemRef(itemCopy, itemCompCopy, 2, 10);
 
-        Mockito.when(entityManager.copy(item)).thenReturn(itemCopy);
+        Mockito.when(item.copy()).thenReturn(itemCopy);
 
         RemoveItemAction action = new RemoveItemAction(instigator, item, false, 1);
         inventoryAuthoritySystem.removeItem(action, inventory);
@@ -91,7 +91,7 @@ public class InventoryAuthoritySystemTest {
         Mockito.verify(itemCopy).saveComponent(itemCompCopy);
         Mockito.verify(inventory, new AtLeast(0)).getComponent(InventoryComponent.class);
         Mockito.verify(inventory).send(Matchers.any(InventorySlotStackSizeChangedEvent.class));
-        Mockito.verify(entityManager).copy(item);
+        Mockito.verify(item).copy();
 
         Mockito.verifyNoMoreInteractions(instigator, inventory, entityManager, item, itemCopy);
 
