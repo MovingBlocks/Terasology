@@ -9,18 +9,24 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,6 +37,8 @@ import javax.swing.JTextArea;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.jpaste.exceptions.PasteException;
 import org.jpaste.pastebin.PasteExpireDate;
@@ -127,7 +135,8 @@ public class CrashReporter {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         buttonPanel.setLayout(new GridLayout(1, 3, 20, 0));
-        JButton pastebinUpload = new JButton("Upload log file to PasteBin");
+        final JButton pastebinUpload = new JButton("Upload log file to PasteBin");
+        pastebinUpload.setIcon(loadIcon("icons/pastebin.png"));
         pastebinUpload.addActionListener(new ActionListener() {
             
             @Override
@@ -136,13 +145,37 @@ public class CrashReporter {
                 String title = "Terasology Error Report";
                 PastebinPaste paste = Pastebin.newPaste(PASTEBIN_DEVELOPER_KEY, logArea.getText(), title);
                 paste.setPasteFormat("apache"); // Apache Log File Format - this is the closest I could find
-//                paste.setPasteExpireDate(PasteExpireDate.ONE_MONTH);
-                paste.setPasteExpireDate(PasteExpireDate.TEN_MINUTES);
+                paste.setPasteExpireDate(PasteExpireDate.ONE_MONTH);
                 uploadPaste(paste);
             }
         });
+        // disable upload if log area text field is empty
+        logArea.getDocument().addDocumentListener(new DocumentListener() {
+            
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+            
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+            
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+
+            private void update() {
+                pastebinUpload.setEnabled(!logArea.getText().isEmpty());
+            }
+        });
+        pastebinUpload.setEnabled(!logArea.getText().isEmpty());
+        
         buttonPanel.add(pastebinUpload);
         JButton githubIssueButton = new JButton("File an issue on GitHub");
+        githubIssueButton.setIcon(loadIcon("icons/github.png"));
         githubIssueButton.addActionListener(new ActionListener() {
             
             @Override
@@ -152,6 +185,7 @@ public class CrashReporter {
         });
         buttonPanel.add(githubIssueButton);
         JButton enterIrc = new JButton("Enter IRC channel");
+        enterIrc.setIcon(loadIcon("icons/irc.png"));
         enterIrc.addActionListener(new ActionListener() {
             
             @Override
@@ -163,9 +197,24 @@ public class CrashReporter {
 
         mainPanel.add(buttonPanel);
         
-        Object[] opts = new Object[] { "Close" };
+        Object[] opts = new Object[] { new JButton("Close", loadIcon("icons/close.png")) };
         Object opt = opts[0];
         JOptionPane.showOptionDialog(null, mainPanel, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, opts, opt);
+    }
+
+    private static Icon loadIcon(String fname) {
+        try {
+            String fullPath = "/" + fname;
+            URL rsc = CrashReporter.class.getResource(fullPath);
+            if (rsc == null) {
+                throw new FileNotFoundException(fullPath);
+            }
+            BufferedImage image = ImageIO.read(rsc);
+            return new ImageIcon(image);
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+            return null;
+        }
     }
 
     protected static void uploadPaste(final PastebinPaste paste) {
@@ -188,7 +237,7 @@ public class CrashReporter {
                         };
                     });
                 } catch (PasteException e) {
-                    message = "Uploading failed: <br/> " + e.getLocalizedMessage();
+                    message = "Upload failed: <br/> " + e.getLocalizedMessage();
                 }
                 
                 final String finalMessage = "<html>" + message + "</html>";
