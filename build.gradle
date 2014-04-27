@@ -149,6 +149,12 @@ subprojects {
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
+    } else if (project.getParent().name == "meta" ) {
+        println "Iterating over a meta-module: " + project.name
+        apply plugin: 'eclipse'
+        apply plugin: 'idea'
+    } else {
+        println "Iterating over something else: " + project.name
     }
 }
 
