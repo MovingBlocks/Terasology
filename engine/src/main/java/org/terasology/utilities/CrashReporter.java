@@ -335,7 +335,8 @@ public final class CrashReporter {
                 builder.append(line);
                 builder.append(System.lineSeparator());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
+            // we catch all here, because we want to continue execution in all cases 
             e.printStackTrace(System.err);
         }
         
