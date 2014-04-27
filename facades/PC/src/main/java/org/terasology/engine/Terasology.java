@@ -32,6 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
+import org.terasology.utilities.CrashReporter;
 
 import com.google.common.collect.Lists;
 

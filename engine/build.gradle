@@ -99,6 +99,9 @@ dependencies {
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.1'
     compile group: 'com.miglayout', name: 'miglayout-core', version: '4.2'
 
+	// CrashReporter
+	compile group: 'brianbb', name: 'jpastebin', version: '1.0.0'
+	
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
