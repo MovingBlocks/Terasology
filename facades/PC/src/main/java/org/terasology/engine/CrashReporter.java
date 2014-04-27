@@ -28,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -56,6 +57,7 @@ import com.google.common.base.Joiner;
 
 /**
  * Displays a detailed error message and provides some options to communicate with devs.
+ * Errors are reported to {@link System#err}
  * @author Martin Steiger
  */
 public class CrashReporter {
@@ -103,7 +105,7 @@ public class CrashReporter {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         
-        // Replace newline chars. with html newline elements
+        // Replace newline chars. with html newline elements (not needed in most cases)
         String text = exception.toString().replaceAll("\\r?\\n", "<br/>");
         JLabel message = new JLabel("<html><h3>A fatal error occurred</h3><br/>" + text + "</html>");
         mainPanel.add(message);
@@ -111,25 +113,25 @@ public class CrashReporter {
         
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        final JTabbedPane mainSettings = new JTabbedPane();
+        // Tab pane
+        final JTabbedPane tabPane = new JTabbedPane();
+        tabPane.setPreferredSize(new Dimension(600, 250));
+        tabPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // StackTrace tab 
         JTextArea stackTraceArea = new JTextArea();
         stackTraceArea.setText(Joiner.on(System.lineSeparator()).join(exception.getStackTrace()));
         stackTraceArea.setEditable(false);
         stackTraceArea.setCaretPosition(0);
-        mainSettings.addTab("StackTrace", new JScrollPane(stackTraceArea));
+        tabPane.addTab("StackTrace", new JScrollPane(stackTraceArea));
 
+        // Logfile tab
         final JTextArea logArea = new JTextArea();
         logArea.setText(logFileContent);
+        tabPane.addTab("Logfile", new JScrollPane(logArea));
 
-        mainSettings.addTab("Logfile", new JScrollPane(logArea));
-        mainSettings.setPreferredSize(new Dimension(550, 250));
-        mainSettings.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        mainPanel.add(mainSettings);
-        
+        mainPanel.add(tabPane);
         mainPanel.add(new JLabel("NOTE: you can edit the content of the log file before uploading"));
-
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         JPanel buttonPanel = new JPanel();
@@ -171,7 +173,7 @@ public class CrashReporter {
                 pastebinUpload.setEnabled(!logArea.getText().isEmpty());
             }
         });
-        pastebinUpload.setEnabled(!logArea.getText().isEmpty());
+        pastebinUpload.setEnabled(!logArea.getText().isEmpty());        // initial update of the button
         
         buttonPanel.add(pastebinUpload);
         JButton githubIssueButton = new JButton("File an issue on GitHub");
@@ -196,10 +198,33 @@ public class CrashReporter {
         buttonPanel.add(enterIrc);
 
         mainPanel.add(buttonPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         
-        Object[] opts = new Object[] { new JButton("Close", loadIcon("icons/close.png")) };
-        Object opt = opts[0];
-        JOptionPane.showOptionDialog(null, mainPanel, "Fatal Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, opts, opt);
+        // Custom close button
+        JButton closeButton = new JButton("Close", loadIcon("icons/close.png"));
+        
+        showDialog(mainPanel, closeButton, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    private static void showDialog(Component mainPanel, JButton closeButton, String title, int messageType) {
+        Object[] opts = new Object[] { closeButton };
+        
+        // The error-message pane
+        final JOptionPane pane = new JOptionPane(mainPanel, messageType, JOptionPane.DEFAULT_OPTION, null, opts, opts[0]);
+        closeButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // calling setValue() closes the dialog
+                pane.setValue("CLOSE"); // the actual value doesn't matter
+            }
+        });
+
+        // wrap it all in a dialog
+        JDialog dialog = pane.createDialog(null, title);
+//        dialog.setResizable(true);      // disabled by default
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 
     private static Icon loadIcon(String fname) {
@@ -221,41 +246,48 @@ public class CrashReporter {
         final JLabel label = new JLabel("Uploading file - please wait ...");
         label.setPreferredSize(new Dimension(250, 50));
 
+        final JButton closeButton = new JButton("Close", loadIcon("icons/close.png"));
+        closeButton.setEnabled(false);
+
         Runnable runnable = new Runnable() {
-            
+
             @Override
             public void run() {
-                String message;
                 try {
                     final PastebinLink link = paste.paste();
-                    final String url = link.getLink().toString();
-                    message = String.format("Paste uploaded to <a href=\"%s\">%s</a>", url, url);
-                    label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    label.addMouseListener(new MouseAdapter() {
-                        public void mouseClicked(java.awt.event.MouseEvent e) {
-                            openInBrowser(url);
-                        };
-                    });
-                } catch (PasteException e) {
-                    message = "Upload failed: <br/> " + e.getLocalizedMessage();
-                }
-                
-                final String finalMessage = "<html>" + message + "</html>";
-                SwingUtilities.invokeLater(new Runnable() {
                     
-                    @Override
-                    public void run() {
-                        label.setText(finalMessage);
-                    }
-                });
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            closeButton.setEnabled(true);
+                            final String url = link.getLink().toString();
+                            label.setText(String.format("<html>Paste uploaded to <a href=\"%s\">%s</a></html>", url, url));
+                            label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                            label.addMouseListener(new MouseAdapter() {
+                                public void mouseClicked(java.awt.event.MouseEvent e) {
+                                    openInBrowser(url);
+                                };
+                            });
+                        }
+                    });
+                } catch (final PasteException e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            closeButton.setEnabled(true);
+                            label.setText("<html>Upload failed: <br/> " + e.getLocalizedMessage() + "</html>");
+                        }
+                    });
+                }
             }
         };
         
         Thread thread = new Thread(runnable, "Upload paste");
         thread.start();
 
-        // TODO: use a resizing JDialog and disable "Close" button while uploading
-        JOptionPane.showMessageDialog(null, label, "Pastebin Upload", JOptionPane.INFORMATION_MESSAGE);
+        showDialog(label, closeButton, "Pastebin Upload", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private static void openInBrowser(String url) {
