@@ -15,11 +15,14 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Region3i;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface Region {
+
+    <T extends WorldFacet> T getFacet(Class<T> dataType);
+
+    Region3i getRegion();
 }

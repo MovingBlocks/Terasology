@@ -13,13 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Vector3i;
+import org.terasology.world.generation.WorldFacet;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface BooleanFieldFacet3D extends WorldFacet {
+
+    boolean get(int x, int y, int z);
+
+    boolean get(Vector3i pos);
+
+    boolean[] getInternal();
+
+    Boolean3DIterator get();
+
+    void set(int x, int y, int z, boolean value);
+
+    void set(Vector3i pos, boolean value);
+
+    void set(boolean[] newData);
+
+    void set(int index, boolean value);
 }

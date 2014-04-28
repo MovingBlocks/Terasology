@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Vector3i;
+import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public class DensityFacet extends BaseFieldFacet3D {
+
+    public DensityFacet(Vector3i size) {
+        super(size);
+    }
 }

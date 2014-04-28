@@ -15,9 +15,8 @@
  */
 package org.terasology.world.generation;
 
+import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
-
-import java.util.Collection;
 
 /**
  * @author Immortius
@@ -26,7 +25,7 @@ public interface World {
 
     long getSeed();
 
-    <T extends WorldDataProvider> T getWorldDataProvider(Class<T> providerClass);
+    Region getWorldData(Region3i region);
 
     void rasterizeChunk(CoreChunk chunk);
 }

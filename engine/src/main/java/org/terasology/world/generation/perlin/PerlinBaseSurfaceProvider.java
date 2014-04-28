@@ -17,7 +17,6 @@ package org.terasology.world.generation.perlin;
 
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
@@ -26,35 +25,35 @@ import org.terasology.utilities.procedural.SubSampledNoise2D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
-import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
+import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-@Produces(SeaLevelTemperatureFacet.class)
-public class PerlinTemperatureProvider implements FacetProvider {
+@Produces(SurfaceHeightFacet.class)
+public class PerlinBaseSurfaceProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise2D temperatureNoise;
+    private SubSampledNoise2D surfaceNoise;
 
     @Override
     public void setSeed(long seed) {
-        temperatureNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 5), 8)), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
+        surfaceNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed), 8)), new Vector2f(0.004f, 0.004f), SAMPLE_RATE);
     }
 
     @Override
     public void process(GeneratingRegion region) {
         Region3i processRegion = region.getRegion();
-        float[] noise = this.temperatureNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
+        float[] noise = surfaceNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
 
         for (int i = 0; i < noise.length; ++i) {
-            noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
+            noise[i] = 32f + 32f * ((noise[i] + 1f) / 2f);
         }
 
-        SeaLevelTemperatureFacet facet = new SeaLevelTemperatureFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
+        SurfaceHeightFacet facet = new SurfaceHeightFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
         facet.set(noise);
-        region.setRegionFacet(SeaLevelTemperatureFacet.class, facet);
+        region.setRegionFacet(SurfaceHeightFacet.class, facet);
     }
 }

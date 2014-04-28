@@ -15,21 +15,15 @@
  */
 package org.terasology.world.generation;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.InjectionHelper;
-import org.terasology.utilities.ReflectionUtil;
-import org.terasology.world.generation.internal.WorldImpl;
 
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,72 +34,18 @@ public class WorldBuilder {
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
 
     private long seed;
-    private List<WorldDataProvider> providersList = Lists.newArrayList();
-    private Map<Class<? extends WorldDataProvider>, WorldDataProvider> providersMap = Maps.newHashMap();
+    private List<FacetProvider> providersList = Lists.newArrayList();
+    private Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private List<WorldRasterizer> rasterizers = Lists.newArrayList();
 
     public WorldBuilder(long seed) {
         this.seed = seed;
     }
 
-    public WorldBuilder addProvider(WorldDataProvider provider) {
+    public WorldBuilder addProvider(FacetProvider provider) {
         provider.setSeed(seed);
         providersList.add(provider);
-        for (Class implementedInterface : ReflectionUtil.getInheritanceTree(provider.getClass(), WorldDataProvider.class)) {
-            if (WorldDataProvider.class != implementedInterface) {
-                WorldDataProvider previous = providersMap.put(implementedInterface, provider);
-                if (previous != null) {
-                    injectChainedDependency(provider, previous, implementedInterface);
-                }
-            }
-        }
-
         return this;
-    }
-
-    private void injectChainedDependency(final WorldDataProvider provider, final WorldDataProvider previous, final Class<? extends WorldDataProvider> implementedInterface) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                for (Field field : ReflectionUtils.getAllFields(provider.getClass(), ReflectionUtils.withAnnotation(Requires.class))) {
-                    if (field.getType().equals(implementedInterface)) {
-                        try {
-                            field.setAccessible(true);
-                            field.set(provider, previous);
-                        } catch (IllegalAccessException e) {
-                            logger.error("Failed to inject value {} into field {}", previous, field, e);
-                        }
-                    }
-                }
-                return null;
-            }
-        });
-    }
-
-    private void injectUnchainedDependencies(final WorldDataProvider provider, final Map<Class<? extends WorldDataProvider>, WorldDataProvider> sourceProviders) {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                Set<Class<? extends WorldDataProvider>> implemented = Sets.newHashSet(ReflectionUtil.getInheritanceTree(provider.getClass(), WorldDataProvider.class));
-
-                for (Field field : ReflectionUtils.getAllFields(provider.getClass(), ReflectionUtils.withAnnotation(Requires.class))) {
-                    if (!implemented.contains(field.getType())) {
-                        WorldDataProvider source = sourceProviders.get(field.getType());
-                        if (source != null) {
-                            try {
-                                field.setAccessible(true);
-                                field.set(provider, source);
-                            } catch (IllegalAccessException e) {
-                                logger.error("Failed to inject value {} into field {}", source, field, e);
-                            }
-                        } else {
-                            logger.error("Missing required provider {} for {}", field.getType(), provider.getClass());
-                        }
-                    }
-                }
-                return null;
-            }
-        });
     }
 
     public WorldBuilder addRasterizer(WorldRasterizer rasterizer) {
@@ -114,15 +54,53 @@ public class WorldBuilder {
     }
 
     public World build() {
-        for (WorldDataProvider provider : providersList) {
-            injectUnchainedDependencies(provider, providersMap);
+        ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = determineProviderChains();
+        return new WorldImpl(seed, determineProviderChains(), rasterizers);
+    }
+
+    private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {
+        ListMultimap<Class<? extends WorldFacet>, FacetProvider> result = ArrayListMultimap.create();
+        Set<Class<? extends WorldFacet>> facets = Sets.newHashSet();
+        for (FacetProvider provider : providersList) {
+            Produces produces = provider.getClass().getAnnotation(Produces.class);
+            if (produces != null) {
+                facets.addAll(Arrays.asList(produces.value()));
+            } else {
+                logger.warn("FacetProvider {} does not produce any data", provider.getClass());
+            }
+        }
+        for (Class<? extends WorldFacet> facet : facets) {
+            determineProviderChainFor(facet, result);
         }
 
-        for (WorldRasterizer rasterizer : rasterizers) {
-            InjectionHelper.inject(rasterizer, Requires.class, providersMap);
-        }
+        return result;
+    }
 
-        return new WorldImpl(seed, providersMap, rasterizers);
+    private void determineProviderChainFor(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> result) {
+        if (result.containsKey(facet)) {
+            return;
+        }
+        if (!facetCalculationInProgress.add(facet)) {
+            throw new RuntimeException("Circular dependency detected when calculating facet provider ordering for " + facet);
+        }
+        Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
+        for (FacetProvider provider : providersList) {
+            Produces produces = provider.getClass().getAnnotation(Produces.class);
+            if (produces != null && Arrays.asList(produces.value()).contains(facet)) {
+                Requires requirements = provider.getClass().getAnnotation(Requires.class);
+                if (requirements != null) {
+                    for (Class<? extends WorldFacet> requirement : requirements.value()) {
+                        if (requirement != facet) {
+                            determineProviderChainFor(requirement, result);
+                            orderedProviders.addAll(result.get(requirement));
+                        }
+                    }
+                }
+                orderedProviders.add(provider);
+            }
+        }
+        result.putAll(facet, orderedProviders);
+        facetCalculationInProgress.remove(facet);
     }
 
 }

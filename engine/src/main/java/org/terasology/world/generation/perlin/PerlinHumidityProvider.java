@@ -15,27 +15,46 @@
  */
 package org.terasology.world.generation.perlin;
 
+import org.terasology.math.Rect2i;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector2i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3D;
+import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
-import org.terasology.world.generation.providers.HumidityProvider;
+import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.FacetProvider;
+import org.terasology.world.generation.GeneratingRegion;
+import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.facets.HumidityFacet;
+
+import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-public class PerlinHumidityProvider implements HumidityProvider {
+@Produces(HumidityFacet.class)
+public class PerlinHumidityProvider implements FacetProvider {
+    private static final int SAMPLE_RATE = 4;
 
-    private Noise3D humidityNoise;
-
-    @Override
-    public float getHumidity(float x, float z) {
-        double result = humidityNoise.noise(x * 0.0005f, 0, 0.0005f * z);
-        return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
-    }
+    private SubSampledNoise2D humidityNoise;
 
     @Override
     public void setSeed(long seed) {
-        humidityNoise = new BrownianNoise3D(new PerlinNoise(seed + 6));
+        humidityNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 6), 8)), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
+    }
+
+    @Override
+    public void process(GeneratingRegion region) {
+        Region3i processRegion = region.getRegion();
+        float[] noise = humidityNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
+
+        for (int i = 0; i < noise.length; ++i) {
+            noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
+        }
+
+        HumidityFacet facet = new HumidityFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
+        facet.set(noise);
+        region.setRegionFacet(HumidityFacet.class, facet);
     }
 }

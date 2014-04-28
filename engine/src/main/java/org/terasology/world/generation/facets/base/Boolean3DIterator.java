@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.world.chunks.CoreChunk;
+import gnu.trove.iterator.TIterator;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface Boolean3DIterator extends TIterator {
+    Vector3i currentPosition();
+
+    boolean next();
+
+    void setLast(boolean newValue);
 }

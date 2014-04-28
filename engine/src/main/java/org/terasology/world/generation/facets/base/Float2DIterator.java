@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.world.chunks.CoreChunk;
+import gnu.trove.iterator.TFloatIterator;
+import org.terasology.math.Vector2i;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface Float2DIterator extends TFloatIterator {
+    Vector2i currentPosition();
+
+    void setLast(float newValue);
 }

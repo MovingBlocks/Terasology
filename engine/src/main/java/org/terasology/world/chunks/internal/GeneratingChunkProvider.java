@@ -19,7 +19,7 @@ package org.terasology.world.chunks.internal;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.generation2.World;
+import org.terasology.world.generation.World;
 
 /**
  * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including

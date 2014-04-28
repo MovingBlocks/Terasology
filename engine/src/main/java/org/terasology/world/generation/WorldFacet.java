@@ -15,11 +15,8 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.world.chunks.CoreChunk;
-
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface WorldFacet {
 }

@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Vector2i;
+import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public class SurfaceHeightFacet extends BaseFieldFacet2D {
+    public SurfaceHeightFacet(Vector2i size) {
+        super(size);
+    }
 }

@@ -15,11 +15,16 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.world.chunks.CoreChunk;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface Produces {
+    Class<? extends WorldFacet>[] value();
 }

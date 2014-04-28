@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Vector2i;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.generation.facets.base.BaseEnumFacet2D;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public class BiomeFacet extends BaseEnumFacet2D<WorldBiomeProvider.Biome> {
+    public BiomeFacet(Vector2i size) {
+        super(size, WorldBiomeProvider.Biome.class);
+    }
 }

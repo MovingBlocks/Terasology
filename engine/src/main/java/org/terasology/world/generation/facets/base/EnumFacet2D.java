@@ -13,13 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.math.Vector2i;
+import org.terasology.world.generation.WorldFacet;
 
 /**
  * @author Immortius
  */
-public interface WorldRasterizer {
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface EnumFacet2D<T extends Enum> extends WorldFacet {
+    T get(int x, int y);
+
+    T get(Vector2i pos);
+
+    T[] getInternal();
+
+    void set(int x, int y, T value);
+
+    void set(Vector2i pos, T value);
+
+    void set(int index, T value);
+
+    void set(T[] data);
 }
