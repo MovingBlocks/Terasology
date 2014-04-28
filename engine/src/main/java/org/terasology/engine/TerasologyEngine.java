@@ -19,14 +19,12 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.config.Config;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
@@ -121,7 +119,7 @@ public class TerasologyEngine implements GameEngine {
         if (initialised) {
             return;
         }
-        
+
         Stopwatch sw = Stopwatch.createStarted();
 
         try {
@@ -171,7 +169,7 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Failed to initialise Terasology", t);
             throw new RuntimeException("Failed to initialise Terasology", t);
         }
-        
+
         logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
     }
 
@@ -354,10 +352,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(Game.class, new Game(this, time));
 
         AssetType.registerAssetTypes(assetManager);
-        ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
-                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY);
-        assetManager.addAssetSource(source);
-
+        assetManager.addAssetSource(moduleManager.getActiveModule(TerasologyConstants.ENGINE_MODULE).getModuleSource());
         ApplyModulesUtil.applyModules();
     }
 

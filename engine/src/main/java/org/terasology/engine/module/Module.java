@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import org.reflections.Reflections;
+import org.terasology.asset.AssetSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,8 @@ import java.io.InputStream;
  * @author Immortius
  */
 public interface Module {
+
+    AssetSource getModuleSource();
 
     String getId();
 
