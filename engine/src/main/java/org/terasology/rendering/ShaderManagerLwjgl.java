@@ -68,7 +68,31 @@ public class ShaderManagerLwjgl implements ShaderManager {
         logger.info("Loading Terasology shader manager...");
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
         logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        logger.info("EXTENSIONS: {}", GL11.glGetString(GL11.GL_EXTENSIONS));
+
+        String extStr = GL11.glGetString(GL11.GL_EXTENSIONS);
+
+        // log shader extensions in smaller packages, 
+        // because the full string can be extremely long 
+        int extsPerLine = 8;
+
+        // starting with OpenGL 3.0, extensions can also listed using
+        // GL_NUM_EXTENSIONS and glGetStringi(GL_EXTENSIONS, idx)
+        String[] exts = extStr.split(" ");
+        if (exts.length > 0) {
+            StringBuilder bldr = new StringBuilder(exts[0]); 
+            for (int i = 1; i < exts.length; i++) {
+                if (i % extsPerLine == 0) {
+                    logger.info("EXTENSIONS: {}", bldr.toString());
+                    bldr.setLength(0);
+                } else {
+                    bldr.append(" ");
+                }
+                bldr.append(exts[i]); 
+            }
+            if (bldr.length() > 0) {
+                logger.info("EXTENSIONS: {}", bldr.toString());
+            }
+        }
     }
 
     @Override
