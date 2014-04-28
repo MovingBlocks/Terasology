@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.utilities;
+package org.terasology.engine;
 
 import java.awt.Component;
 import java.awt.Cursor;
