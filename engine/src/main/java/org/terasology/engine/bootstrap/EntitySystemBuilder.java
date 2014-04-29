@@ -17,8 +17,10 @@
 package org.terasology.engine.bootstrap;
 
 import com.google.common.collect.ListMultimap;
+
 import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
@@ -79,6 +81,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
 import java.util.Map;
 
 /**
@@ -135,7 +138,8 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(AssetType.UI_ELEMENT, UIElement.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
-        serializationLibrary.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
+        serializationLibrary.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        serializationLibrary.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));

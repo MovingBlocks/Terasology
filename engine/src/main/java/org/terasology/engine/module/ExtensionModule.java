@@ -21,9 +21,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
-import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -57,12 +55,9 @@ public class ExtensionModule implements Module {
         this.version = version;
     }
 
-    void enable() {
-        CoreRegistry.get(AssetManager.class).addAssetSource(moduleSource);
-    }
-
-    void disable() {
-        CoreRegistry.get(AssetManager.class).removeAssetSource(moduleSource);
+    @Override
+    public AssetSource getModuleSource() {
+        return moduleSource;
     }
 
     URL getModuleClasspathUrl() {

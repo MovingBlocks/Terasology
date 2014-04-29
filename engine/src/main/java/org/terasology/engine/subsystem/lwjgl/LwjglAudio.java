@@ -15,6 +15,10 @@
  */
 package org.terasology.engine.subsystem.lwjgl;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.openal.OpenALException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.AudioManager;
@@ -27,10 +31,12 @@ import org.terasology.registry.CoreRegistry;
 
 public class LwjglAudio extends BaseLwjglSubsystem {
 
+    private static final Logger logger = LoggerFactory.getLogger(LwjglAudio.class);
+    
     private AudioManager audioManager;
 
     @Override
-    public void preInitialise() {
+    public synchronized void preInitialise() {
         super.preInitialise();
     }
 
@@ -61,7 +67,12 @@ public class LwjglAudio extends BaseLwjglSubsystem {
         if (config.getAudio().isDisableSound()) {
             audioManager = new NullAudioManager();
         } else {
-            audioManager = new OpenALManager(config.getAudio());
+            try {
+                audioManager = new OpenALManager(config.getAudio());
+            } catch (LWJGLException | OpenALException e) {
+                logger.warn("Could not load OpenAL manager - sound is disabled", e);
+                audioManager = new NullAudioManager();
+            }
         }
         CoreRegistry.putPermanently(AudioManager.class, audioManager);
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);

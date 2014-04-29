@@ -66,7 +66,7 @@ public class NetworkEntitySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = NetworkComponent.class, priority = EventPriority.PRIORITY_CRITICAL, netFilter = RegisterMode.AUTHORITY)
     public void onAddNetworkComponent(OnActivatedComponent event, EntityRef entity) {
-        if (networkSystem.getMode() == NetworkMode.SERVER) {
+        if (networkSystem.getMode().isServer()) {
             networkSystem.registerNetworkEntity(entity);
         }
     }

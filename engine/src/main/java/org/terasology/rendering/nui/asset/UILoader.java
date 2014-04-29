@@ -26,11 +26,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.stream.JsonReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.engine.module.Module;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.Border;
@@ -88,6 +90,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -123,7 +126,8 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Quat4f.class, new Quat4fTypeHandler());
         library.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         library.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
-        library.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
+        library.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        library.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         library.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         library.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         library.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));

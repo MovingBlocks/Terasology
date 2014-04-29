@@ -168,6 +168,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         if (character.exists()) {
             event.getPlayerStore().setCharacter(character);
         }
+        worldRenderer.getChunkProvider().removeRelevanceEntity(entity);
     }
 
     @ReceiveEvent(components = {ClientComponent.class})

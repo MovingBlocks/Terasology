@@ -16,9 +16,8 @@
 package org.terasology.audio.openAL.streamingSound;
 
 import org.terasology.audio.openAL.BaseSoundPool;
-import org.terasology.audio.openAL.SoundSource;
 
-public class OpenALStreamingSoundPool extends BaseSoundPool {
+public class OpenALStreamingSoundPool extends BaseSoundPool<OpenALStreamingSound, OpenALStreamingSoundSource> {
 
     public OpenALStreamingSoundPool(int capacity) {
         super(capacity);
@@ -28,7 +27,7 @@ public class OpenALStreamingSoundPool extends BaseSoundPool {
     }
 
     @Override
-    protected SoundSource createSoundSource() {
+    protected OpenALStreamingSoundSource createSoundSource() {
         return new OpenALStreamingSoundSource(this);
     }
 

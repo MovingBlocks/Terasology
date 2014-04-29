@@ -4,7 +4,14 @@
         "UIScreenLayer" : {
             "background-scale-mode" : "scale_fill",
             "background" : "menuBackground"
-        }
+        },
+        "UIButton" : {
+            "modes" : {
+                "disabled" : {
+                    "text-color" : "AAAAAAFF"
+                }
+            }
+       }
     },
     "families" : {
         "menu-options" : {

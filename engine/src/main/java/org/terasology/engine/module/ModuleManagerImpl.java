@@ -29,11 +29,13 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.gson.VersionTypeAdapter;
 import org.terasology.version.TerasologyVersion;
@@ -166,6 +168,11 @@ public class ModuleManagerImpl implements ModuleManager {
 
     @Override
     public void disableAllModules() {
+        for (Module module : activeModules.values()) {
+            if (module instanceof ExtensionModule) {
+                CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
+            }
+        }
         activeModules.clear();
         activeModules.put(engineModule.getId(), engineModule);
     }
@@ -175,10 +182,10 @@ public class ModuleManagerImpl implements ModuleManager {
         Module oldModule = activeModules.put(module.getId(), module);
         if (!module.equals(oldModule)) {
             if (oldModule != null && oldModule instanceof ExtensionModule) {
-                ((ExtensionModule) oldModule).disable();
+                CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
             }
             if (module instanceof ExtensionModule) {
-                ((ExtensionModule) module).enable();
+                CoreRegistry.get(AssetManager.class).addAssetSource(module.getModuleSource());
             }
         }
     }
@@ -193,10 +200,10 @@ public class ModuleManagerImpl implements ModuleManager {
         Module oldModule = activeModules.put(module.getId(), module);
         if (!module.equals(oldModule)) {
             if (oldModule != null && oldModule instanceof ExtensionModule) {
-                ((ExtensionModule) oldModule).disable();
+                CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
             }
             if (module instanceof ExtensionModule) {
-                ((ExtensionModule) module).enable();
+                CoreRegistry.get(AssetManager.class).addAssetSource(module.getModuleSource());
             }
         }
     }
@@ -205,7 +212,7 @@ public class ModuleManagerImpl implements ModuleManager {
     public void disableModule(Module module) {
         Module removedModule = activeModules.remove(module.getId());
         if (removedModule != null && removedModule instanceof ExtensionModule) {
-            ((ExtensionModule) module).disable();
+            CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
         }
     }
 

@@ -32,6 +32,7 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     /**
      * @return This asset's identifying URI.
      */
+    @Override
     public final AssetUri getURI() {
         return uri;
     }
@@ -42,7 +43,7 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
             return true;
         }
         if (obj instanceof  AbstractAsset) {
-            return Objects.equals(uri, ((AbstractAsset) obj).uri);
+            return Objects.equals(uri, ((AbstractAsset<?>) obj).uri);
         }
         return false;
     }

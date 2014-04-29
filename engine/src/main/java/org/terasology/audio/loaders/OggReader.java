@@ -140,6 +140,7 @@ public class OggReader extends FilterInputStream {
      *
      * @return the next byte of data, or -1 if the end of the stream is reached.
      */
+    @Override
     public int read() throws IOException {
         int retVal = read(readDummy, 0, 1);
         return (retVal == -1 ? -1 : readDummy[0]);
@@ -154,6 +155,7 @@ public class OggReader extends FilterInputStream {
      * @return the total number of bytes read into the buffer, or -1 if there is
      *         no more data because the end of the stream has been reached.
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (eos) {
             return -1;
@@ -226,6 +228,7 @@ public class OggReader extends FilterInputStream {
      *
      * @return 1 before EOF and 0 after EOF is reached.
      */
+    @Override
     public int available() throws IOException {
         return (eos ? 0 : 1);
     }
@@ -233,7 +236,8 @@ public class OggReader extends FilterInputStream {
     /**
      * OggInputStream does not support mark and reset. This function does nothing.
      */
-    public void reset() throws IOException {
+    @Override
+    public synchronized void reset() throws IOException {
     }
 
     /**
@@ -241,6 +245,7 @@ public class OggReader extends FilterInputStream {
      *
      * @return false.
      */
+    @Override
     public boolean markSupported() {
         return false;
     }
@@ -253,6 +258,7 @@ public class OggReader extends FilterInputStream {
      * @param n the number of bytes to be skipped.
      * @return the actual number of bytes skipped.
      */
+    @Override
     public long skip(long n) throws IOException {
         int bytesRead = 0;
         while (bytesRead < n) {
@@ -485,7 +491,7 @@ public class OggReader extends FilterInputStream {
                     logger.warn("syncState.pageout(page) result == -1");
                     return -1;
                 } else {
-                    int result3 = streamState.pagein(page);
+                    streamState.pagein(page);
                 }
             } else if (result1 == -1) {
                 logger.warn("streamState.packetout(packet) result == -1");
@@ -520,6 +526,7 @@ public class OggReader extends FilterInputStream {
     /**
      * Gets information on the ogg.
      */
+    @Override
     public String toString() {
         String s = "";
         s = s + "version         " + info.version + "\n";

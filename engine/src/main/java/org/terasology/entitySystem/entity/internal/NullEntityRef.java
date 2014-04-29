@@ -39,6 +39,11 @@ public final class NullEntityRef extends EntityRef {
     }
 
     @Override
+    public EntityRef copy() {
+        return this;
+    }
+
+    @Override
     public boolean exists() {
         return false;
     }

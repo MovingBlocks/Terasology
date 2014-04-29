@@ -16,7 +16,8 @@
 
 package org.terasology.asset;
 
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.registry.CoreRegistry;
@@ -71,18 +72,18 @@ public final class Assets {
      * @param uri
      * @return The requested asset, or null if it doesn't exist.
      */
-    public static Asset get(AssetUri uri) {
+    public static Asset<?> get(AssetUri uri) {
         return CoreRegistry.get(AssetManager.class).loadAsset(uri);
     }
 
-    public static Asset get(AssetType type, String uri) {
+    public static Asset<?> get(AssetType type, String uri) {
         if (uri != null && !uri.isEmpty()) {
             return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
         }
         return null;
     }
 
-    public static <T extends Asset> T get(AssetType type, String uri, Class<T> assetClass) {
+    public static <T extends Asset<?>> T get(AssetType type, String uri, Class<T> assetClass) {
         if (uri != null && !uri.isEmpty()) {
             return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
         }
@@ -93,7 +94,7 @@ public final class Assets {
      * @param name
      * @return The resolved asset, or
      */
-    public static Asset resolve(AssetType type, String name) {
+    public static Asset<?> resolve(AssetType type, String name) {
         return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, name);
     }
 
@@ -115,8 +116,8 @@ public final class Assets {
      * @param <T>
      * @return The requested asset, or null if it doesn't exist or isn't of the expected class.
      */
-    public static <T extends Asset> T get(AssetUri uri, Class<T> assetClass) {
-        Asset result = get(uri);
+    public static <T extends Asset<?>> T get(AssetUri uri, Class<T> assetClass) {
+        Asset<?> result = get(uri);
         if (result != null && assetClass.isAssignableFrom(result.getClass())) {
             return assetClass.cast(result);
         }
@@ -186,8 +187,8 @@ public final class Assets {
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound getSound(String simpleUri) {
-        return get(AssetType.SOUND, simpleUri, Sound.class);
+    public static StaticSound getSound(String simpleUri) {
+        return get(AssetType.SOUND, simpleUri, StaticSound.class);
     }
 
     /**
@@ -195,16 +196,16 @@ public final class Assets {
      * @param assetName
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound getSound(String module, String assetName) {
-        return get(new AssetUri(AssetType.SOUND, module, assetName), Sound.class);
+    public static StaticSound getSound(String module, String assetName) {
+        return get(new AssetUri(AssetType.SOUND, module, assetName), StaticSound.class);
     }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound getMusic(String simpleUri) {
-        return get(AssetType.MUSIC, simpleUri, Sound.class);
+    public static StreamingSound getMusic(String simpleUri) {
+        return get(AssetType.MUSIC, simpleUri, StreamingSound.class);
     }
 
     /**
@@ -212,8 +213,8 @@ public final class Assets {
      * @param assetName
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound getMusic(String module, String assetName) {
-        return get(new AssetUri(AssetType.MUSIC, module, assetName), Sound.class);
+    public static StreamingSound getMusic(String module, String assetName) {
+        return get(new AssetUri(AssetType.MUSIC, module, assetName), StreamingSound.class);
     }
 
     /**
@@ -316,7 +317,7 @@ public final class Assets {
         return null;
     }
 
-    public static void dispose(Asset asset) {
+    public static void dispose(Asset<?> asset) {
         CoreRegistry.get(AssetManager.class).dispose(asset);
     }
 

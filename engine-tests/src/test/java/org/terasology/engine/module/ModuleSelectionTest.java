@@ -22,6 +22,7 @@ import com.google.common.collect.Table;
 import org.junit.Before;
 import org.junit.Test;
 import org.reflections.Reflections;
+import org.terasology.asset.AssetSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,6 +122,11 @@ public class ModuleSelectionTest {
             dependency.setMaxVersion(Version.create(maxVersion));
             dependencies.add(dependency);
             return this;
+        }
+
+        @Override
+        public AssetSource getModuleSource() {
+            return null;
         }
 
         @Override

@@ -100,6 +100,16 @@ ext {
                     'vcs' : 'Git'
             ])
         }
+
+        // Set meta-modules to use Git
+        rootProject.project(':meta').childProjects.each { child ->
+
+            println "Preparing IntelliJ Git setup for meta-module $child.value.name"
+            vcsMappings.appendNode('mapping', [
+                    'directory' : "\$PROJECT_DIR\$" + child.value.path.replace(':', '/'),
+                    'vcs' : 'Git'
+            ])
+        }
     }
 
     // Activate 'Gradle' plugin - TODO: Doesn't actually work with the Gradle wrapper in a non-default location :-(
