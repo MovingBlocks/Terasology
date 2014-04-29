@@ -17,7 +17,6 @@ package org.terasology.logic.behavior.tree;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;

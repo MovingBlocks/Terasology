@@ -47,7 +47,7 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @RegisterSystem
-@Share(value = {BlockStructuralSupportRegistry.class})
+@Share(BlockStructuralSupportRegistry.class)
 public class BlockStructuralSupportSystem extends BaseComponentSystem implements BlockStructuralSupportRegistry {
     public static final int GATHERING_INVENTORY_SLOT_COUNT = 20;
     @In
@@ -142,7 +142,8 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
             for (BlockStructuralSupport support : supports) {
                 if (support.shouldBeRemovedDueToChange(blockPosition, sideReverse)) {
                     System.out.println("Removing block due to: " + support.getClass());
-                    blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
+                    blockEntityRegistry.getBlockEntityAt(blockPosition).send(new DestroyEvent(gatheringEntity,
+                            EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
                     break;
                 }
             }

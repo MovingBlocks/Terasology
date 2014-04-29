@@ -18,7 +18,15 @@ package org.terasology.engine.module;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -40,14 +48,26 @@ import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.gson.VersionTypeAdapter;
 import org.terasology.version.TerasologyVersion;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -182,7 +202,7 @@ public class ModuleManagerImpl implements ModuleManager {
         Module oldModule = activeModules.put(module.getId(), module);
         if (!module.equals(oldModule)) {
             if (oldModule != null && oldModule instanceof ExtensionModule) {
-                CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
+                CoreRegistry.get(AssetManager.class).removeAssetSource(oldModule.getModuleSource());
             }
             if (module instanceof ExtensionModule) {
                 CoreRegistry.get(AssetManager.class).addAssetSource(module.getModuleSource());
@@ -197,15 +217,7 @@ public class ModuleManagerImpl implements ModuleManager {
                 enableModuleAndDependencies(dependency);
             }
         }
-        Module oldModule = activeModules.put(module.getId(), module);
-        if (!module.equals(oldModule)) {
-            if (oldModule != null && oldModule instanceof ExtensionModule) {
-                CoreRegistry.get(AssetManager.class).removeAssetSource(module.getModuleSource());
-            }
-            if (module instanceof ExtensionModule) {
-                CoreRegistry.get(AssetManager.class).addAssetSource(module.getModuleSource());
-            }
-        }
+        enableModule(module);
     }
 
     @Override
