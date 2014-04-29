@@ -15,11 +15,7 @@
  */
 package org.terasology.engine;
 
-import java.awt.GraphicsEnvironment;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-
+import com.google.common.collect.Lists;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -33,7 +29,10 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import com.google.common.collect.Lists;
+import java.awt.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
 
 /**
  * Main method for launching Terasology
@@ -42,7 +41,7 @@ import com.google.common.collect.Lists;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
-    
+
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
@@ -68,14 +67,14 @@ public final class Terasology {
             } else {
                 PathManager.getInstance().useDefaultHomePath();
             }
-            
+
             Collection<EngineSubsystem> subsystemList;
             if (isHeadless) {
                 subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
             } else {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
-            
+
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
             if (isHeadless) {
@@ -85,7 +84,7 @@ public final class Terasology {
             }
             engine.dispose();
         } catch (Throwable t) {
-            
+
             if (!GraphicsEnvironment.isHeadless()) {
                 CrashReporter.report(t);
             }

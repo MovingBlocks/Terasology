@@ -789,7 +789,7 @@ public class CanvasImpl implements CanvasControl {
         }
     }
 
-    private class SubRegionFBOImpl implements SubRegion {
+    private final class SubRegionFBOImpl implements SubRegion {
         private FrameBufferObject fbo;
         private CanvasState previousState;
 

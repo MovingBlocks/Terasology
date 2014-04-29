@@ -16,11 +16,19 @@
 
 package org.terasology.engine;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import com.google.common.base.Joiner;
+import org.jpaste.exceptions.PasteException;
+import org.jpaste.pastebin.PasteExpireDate;
+import org.jpaste.pastebin.Pastebin;
+import org.jpaste.pastebin.PastebinLink;
+import org.jpaste.pastebin.PastebinPaste;
+import org.terasology.engine.paths.PathManager;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -33,46 +41,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
-import org.jpaste.exceptions.PasteException;
-import org.jpaste.pastebin.PasteExpireDate;
-import org.jpaste.pastebin.Pastebin;
-import org.jpaste.pastebin.PastebinLink;
-import org.jpaste.pastebin.PastebinPaste;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.FileAppender;
-
-import com.google.common.base.Joiner;
+import java.nio.file.Path;
 
 /**
  * Displays a detailed error message and provides some options to communicate with devs.
  * Errors are reported to {@link System#err}
+ *
  * @author Martin Steiger
  */
 public final class CrashReporter {
@@ -89,7 +63,7 @@ public final class CrashReporter {
     private CrashReporter() {
         // don't create any instances
     }
-    
+
     public static void report(final Throwable t) {
 
         // Swing element methods must be called in the swing thread
@@ -97,7 +71,7 @@ public final class CrashReporter {
             final String logFileContent = getLogFileContent();
 
             SwingUtilities.invokeAndWait(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     LookAndFeel oldLaF = UIManager.getLookAndFeel();
@@ -120,16 +94,16 @@ public final class CrashReporter {
     }
 
     private static void showModalDialog(Throwable exception, final String logFileContent) {
-     
+
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        
+
         // Replace newline chars. with html newline elements (not needed in most cases)
         String text = exception.toString().replaceAll("\\r?\\n", "<br/>");
         JLabel message = new JLabel("<html><h3>A fatal error occurred</h3><br/>" + text + "</html>");
         mainPanel.add(message);
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Tab pane
@@ -159,7 +133,7 @@ public final class CrashReporter {
         final JButton pastebinUpload = new JButton("Upload log file to PasteBin");
         pastebinUpload.setIcon(loadIcon("icons/pastebin.png"));
         pastebinUpload.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent event) {
 
@@ -172,17 +146,17 @@ public final class CrashReporter {
         });
         // disable upload if log area text field is empty
         logArea.getDocument().addDocumentListener(new DocumentListener() {
-            
+
             @Override
             public void removeUpdate(DocumentEvent e) {
                 update();
             }
-            
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 update();
             }
-            
+
             @Override
             public void changedUpdate(DocumentEvent e) {
                 update();
@@ -193,12 +167,12 @@ public final class CrashReporter {
             }
         });
         pastebinUpload.setEnabled(!logArea.getText().isEmpty());        // initial update of the button
-        
+
         buttonPanel.add(pastebinUpload);
         JButton githubIssueButton = new JButton("File an issue on GitHub");
         githubIssueButton.setIcon(loadIcon("icons/github.png"));
         githubIssueButton.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 openInBrowser(REPORT_ISSUE_LINK);
@@ -208,7 +182,7 @@ public final class CrashReporter {
         JButton enterIrc = new JButton("Enter IRC channel");
         enterIrc.setIcon(loadIcon("icons/irc.png"));
         enterIrc.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 openInBrowser(JOIN_IRC_LINK);
@@ -218,20 +192,20 @@ public final class CrashReporter {
 
         mainPanel.add(buttonPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
+
         // Custom close button
         JButton closeButton = new JButton("Close", loadIcon("icons/close.png"));
-        
+
         showDialog(mainPanel, closeButton, "Fatal Error", JOptionPane.ERROR_MESSAGE);
     }
-    
+
     private static void showDialog(Component mainPanel, JButton closeButton, String title, int messageType) {
-        Object[] opts = new Object[] { closeButton };
-        
+        Object[] opts = new Object[]{closeButton};
+
         // The error-message pane
         final JOptionPane pane = new JOptionPane(mainPanel, messageType, JOptionPane.DEFAULT_OPTION, null, opts, opts[0]);
         closeButton.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // calling setValue() closes the dialog
@@ -274,7 +248,7 @@ public final class CrashReporter {
             public void run() {
                 try {
                     final PastebinLink link = paste.paste();
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -286,7 +260,9 @@ public final class CrashReporter {
                             label.addMouseListener(new MouseAdapter() {
                                 public void mouseClicked(java.awt.event.MouseEvent e) {
                                     openInBrowser(url);
-                                };
+                                }
+
+                                ;
                             });
                         }
                     });
@@ -302,7 +278,7 @@ public final class CrashReporter {
                 }
             }
         };
-        
+
         Thread thread = new Thread(runnable, "Upload paste");
         thread.start();
 
@@ -325,52 +301,23 @@ public final class CrashReporter {
 
     private static String getLogFileContent() {
         StringBuilder builder = new StringBuilder();
-        
-        List<String> lines;
-        try {
-            String logFile = getLogFilename();
 
-            lines = Files.readAllLines(Paths.get(logFile), Charset.defaultCharset());
-            for (String line : lines) {
-                builder.append(line);
-                builder.append(System.lineSeparator());
+        try {
+            Path logDirectory = PathManager.getInstance().getLogPath();
+            if (logDirectory != null) {
+                Path logPath = PathManager.getInstance().getLogPath().resolve("Terasology.log");
+                if (Files.exists(logPath)) {
+                    for (String line : Files.readAllLines(logPath, Charset.defaultCharset())) {
+                        builder.append(line);
+                        builder.append(System.lineSeparator());
+                    }
+                }
             }
         } catch (Exception e) {
             // we catch all here, because we want to continue execution in all cases 
             e.printStackTrace(System.err);
         }
-        
+
         return builder.toString();
-    }
-
-    private static String getLogFilename() {
-        String logFile = null;
-        
-        org.slf4j.Logger logger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-
-        // We try to get log filename directly from the Logback system
-        // PathManager only knows the path, and determining the file name is not 
-        // straightforward for RollingFileAppenders
-        
-        if (logger instanceof Logger) {
-            Logger logbackLogger = (Logger) logger;
-            Iterator<Appender<ILoggingEvent>> it = logbackLogger.iteratorForAppenders();
-            while (it.hasNext()) {
-                Appender<ILoggingEvent> app = it.next();
-                
-                if (app instanceof FileAppender) {
-                    FileAppender<ILoggingEvent> fileApp = (FileAppender<ILoggingEvent>) app;
-                    if (logFile == null) {
-                        logFile = fileApp.getFile();
-                    } else {
-                        System.err.println("Multiple log files found!");
-                    }
-                }
-            }
-        } else {
-            System.err.println("Logger ist not a Logback logger, but " + logger.getClass().getName());
-        }
-        
-        return logFile;
     }
 }
