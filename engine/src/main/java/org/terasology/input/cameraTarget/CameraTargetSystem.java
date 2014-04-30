@@ -83,10 +83,9 @@ public class CameraTargetSystem extends BaseComponentSystem {
     public void update(float delta) {
         // Repair lost target
         // TODO: Improvements to temporary chunk handling will remove the need for this
-        if (!target.exists() && targetBlockPos != null && blockRegistry != null) {
-            target = blockRegistry.getEntityAt(targetBlockPos);
-        }
         boolean lostTarget = false;
+
+        getTarget(); // refreshes value stored in variable target, if possible.
         if (!target.exists()) {
             targetBlockPos = null;
             lostTarget = true;
@@ -119,6 +118,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
         targetBlockPos = newBlockPos;
     }
 
+    // TODO: Q: what are these eyeFocusDistance calculation for?
     private void updateEyeDistance(HitResult hitInfo, float delta) {
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();

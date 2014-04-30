@@ -18,6 +18,7 @@ package org.terasology.entitySystem.systems;
 /**
  * @author Immortius
  */
+// TODO: Q: why have an empty abstract class when an interface exists?
 public abstract class BaseComponentSystem implements ComponentSystem {
 
     @Override
