@@ -16,6 +16,8 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
+
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -29,7 +31,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -86,7 +88,13 @@ public final class Terasology {
         } catch (Throwable t) {
 
             if (!GraphicsEnvironment.isHeadless()) {
-                CrashReporter.report(t);
+                Path logDirectory = PathManager.getInstance().getLogPath();
+                if (logDirectory == null) {
+                    logDirectory = Paths.get(".");
+                }
+                Path logPath = logDirectory.resolve("Terasology.log");
+
+                CrashReporter.report(t, logPath);
             }
         }
         System.exit(0);

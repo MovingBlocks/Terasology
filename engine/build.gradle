@@ -103,7 +103,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
 	// TODO: These could be moved into facade
-	compile group: 'brianbb', name: 'jpastebin', version: '1.0.0'
+	compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+'
 	runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 	runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.5'
     // And here is Groovy to read the config file
