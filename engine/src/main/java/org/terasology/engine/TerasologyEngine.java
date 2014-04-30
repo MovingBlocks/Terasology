@@ -19,6 +19,7 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -115,7 +116,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         if (initialised) {
             return;
         }
@@ -167,10 +168,11 @@ public class TerasologyEngine implements GameEngine {
             initialised = true;
         } catch (Throwable t) {
             logger.error("Failed to initialise Terasology", t);
-            throw new RuntimeException("Failed to initialise Terasology", t);
+            throw t;
         }
 
-        logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
+        double secs = 0.001 * sw.elapsed(TimeUnit.MILLISECONDS);
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", secs));
     }
 
     private void initAssets() {
@@ -235,7 +237,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void run(GameState initialState) {
+    public void run(GameState initialState) throws Exception {
         try {
             CoreRegistry.putPermanently(GameEngine.class, this);
             if (!initialised) {
@@ -250,7 +252,7 @@ public class TerasologyEngine implements GameEngine {
             cleanup();
         } catch (Throwable t) {
             logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+            throw t;
         }
     }
 
@@ -260,7 +262,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void dispose() {
+    public void dispose() throws Exception {
         try {
             if (!running) {
                 disposed = true;
@@ -273,7 +275,7 @@ public class TerasologyEngine implements GameEngine {
             }
         } catch (Throwable t) {
             logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+            throw t;
         }
     }
 

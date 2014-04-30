@@ -78,22 +78,33 @@ public final class Terasology {
             }
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
-            engine.init();
-            if (isHeadless) {
-                engine.run(new StateHeadlessSetup());
-            } else {
-                engine.run(new StateMainMenu());
+            try {
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+            } finally {
+                try {
+                    engine.dispose();
+                } catch (Exception e) {
+                    // Just log this one to System.err because we don't want it 
+                    // to replace the one that came first (thrown above).
+                    e.printStackTrace();
+                }
             }
-            engine.dispose();
         } catch (Throwable t) {
 
             if (!GraphicsEnvironment.isHeadless()) {
-                Path logDirectory = PathManager.getInstance().getLogPath();
-                if (logDirectory == null) {
-                    logDirectory = Paths.get(".");
+                Path logDirectory = Paths.get("."); 
+                try {
+                    logDirectory = PathManager.getInstance().getLogPath();
+                } catch (Exception e) {
+                    // eat silently
                 }
+                
                 Path logPath = logDirectory.resolve("Terasology.log");
-
                 CrashReporter.report(t, logPath);
             }
         }
