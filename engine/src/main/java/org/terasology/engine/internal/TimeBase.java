@@ -158,6 +158,7 @@ public abstract class TimeBase implements EngineTime {
         @Override
         public Float next() {
             currentCycle++;
+            // TODO: Q: why use addAndGet() if the return value is not needed?
             gameTime.addAndGet(deltaPerCycle);
             return deltaPerCycle / 1000f;
         }

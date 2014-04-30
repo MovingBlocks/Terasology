@@ -290,6 +290,7 @@ public class DefaultRenderingProcess {
             return;
         }
 
+        // createFBO(title, width, height, type, depthBuffer, normalBuffer, lightBuffer, stencilBuffer)
         createFBO("sceneOpaque", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
         createFBO("sceneOpaquePingPong", rtFullWidth, rtFullHeight, FBOType.HDR, true, true, true, true);
 

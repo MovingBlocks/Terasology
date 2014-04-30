@@ -43,6 +43,7 @@ import org.terasology.rendering.nui.internal.NUIManagerInternal;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @version 0.3
  */
+// TODO: Q: is this class still relevant? I can't find a place in the project where it's used.
 public class StateSetup implements GameState {
     private EngineEntityManager entityManager;
     private EventSystem eventSystem;
@@ -54,11 +55,13 @@ public class StateSetup implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
 
-        //lets get the entity event system running
+        // let's get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
-                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        eventSystem = CoreRegistry.get(EventSystem.class);
+                                                        CoreRegistry.get(NetworkSystem.class),
+                                                        CoreRegistry.get(ReflectFactory.class),
+                                                        CoreRegistry.get(CopyStrategyLibrary.class));
 
+        eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
 
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
@@ -71,7 +74,6 @@ public class StateSetup implements GameState {
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         localPlayer.setClientEntity(localPlayerEntity);
 

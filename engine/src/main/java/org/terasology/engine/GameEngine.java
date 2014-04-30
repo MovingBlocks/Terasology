@@ -43,7 +43,7 @@ public interface GameEngine {
     void shutdown();
 
     /**
-     * Cleans up the engine. Can only be
+     * Cleans up the engine. Can only be (TODO: can only be what?)
      */
     void dispose();
 
