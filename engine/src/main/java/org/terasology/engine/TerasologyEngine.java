@@ -116,7 +116,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         if (initialised) {
             return;
         }
@@ -166,9 +166,9 @@ public class TerasologyEngine implements GameEngine {
                 new AdvancedMonitor().setVisible(true);
             }
             initialised = true;
-        } catch (Throwable t) {
-            logger.error("Failed to initialise Terasology", t);
-            throw t;
+        } catch (RuntimeException e) {
+            logger.error("Failed to initialise Terasology", e);
+            throw e;
         }
 
         double secs = 0.001 * sw.elapsed(TimeUnit.MILLISECONDS);
@@ -237,7 +237,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void run(GameState initialState) throws Exception {
+    public void run(GameState initialState) {
         try {
             CoreRegistry.putPermanently(GameEngine.class, this);
             if (!initialised) {
@@ -250,9 +250,9 @@ public class TerasologyEngine implements GameEngine {
             mainLoop();
 
             cleanup();
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw t;
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -262,7 +262,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void dispose() throws Exception {
+    public void dispose() {
         try {
             if (!running) {
                 disposed = true;
@@ -273,9 +273,9 @@ public class TerasologyEngine implements GameEngine {
                     subsystem.dispose();
                 }
             }
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw t;
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 

@@ -29,13 +29,13 @@ public interface GameEngine {
     /**
      * Initialises the engine
      */
-    void init() throws Exception;
+    void init();
 
     /**
      * Runs the engine, which will block the thread.
      * Invalid for a disposed engine
      */
-    void run(GameState initialState) throws Exception;
+    void run(GameState initialState);
 
     /**
      * Request the engine to stop running
@@ -45,7 +45,7 @@ public interface GameEngine {
     /**
      * Cleans up the engine. Can only be
      */
-    void dispose() throws Exception;
+    void dispose();
 
     /**
      * @return Whether the engine is running

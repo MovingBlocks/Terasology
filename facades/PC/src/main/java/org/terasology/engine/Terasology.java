@@ -94,18 +94,21 @@ public final class Terasology {
                     e.printStackTrace();
                 }
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
 
             if (!GraphicsEnvironment.isHeadless()) {
-                Path logDirectory = Paths.get("."); 
+                Path logPath = Paths.get("."); 
                 try {
-                    logDirectory = PathManager.getInstance().getLogPath();
-                } catch (Exception e) {
+                    Path gameLogPath = PathManager.getInstance().getLogPath();
+                    if (gameLogPath != null) {
+                        logPath = gameLogPath;
+                    }
+                } catch (Exception eat) {
                     // eat silently
                 }
                 
-                Path logPath = logDirectory.resolve("Terasology.log");
-                CrashReporter.report(t, logPath);
+                Path logFile = logPath.resolve("Terasology.log");
+                CrashReporter.report(e, logFile);
             }
         }
         System.exit(0);
