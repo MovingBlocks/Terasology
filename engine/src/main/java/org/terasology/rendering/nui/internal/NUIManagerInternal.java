@@ -195,7 +195,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public UIScreenLayer pushScreen(UIElement element) {
         if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
-            if (!result.equals(screens.peek())) {
+            if (!screens.contains(result)) {
                 result.setId(element.getURI().toNormalisedSimpleString());
                 pushScreen(result, element.getURI());
             }

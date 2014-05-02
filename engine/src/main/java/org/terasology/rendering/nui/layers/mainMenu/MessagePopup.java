@@ -22,7 +22,6 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
@@ -39,12 +38,9 @@ public class MessagePopup extends CoreScreenLayer {
         }
     };
 
-    public ActivateEventListener prevCloseAction;
-
     @Override
     public void initialise() {
         WidgetUtil.trySubscribe(this, "ok", defaultCloseAction);
-        prevCloseAction = defaultCloseAction;
     }
 
     public void setMessage(String title, String message) {
@@ -59,25 +55,6 @@ public class MessagePopup extends CoreScreenLayer {
         }
     }
 
-    public void setCloseButtonText(String text) {
-        UIButton button = find("ok", UIButton.class);
-        if (button != null) {
-            button.setText(text);
-        }
-    }
-
-    /**
-     * @param closeAction the event listener will be run instead of the default one (close the popup)
-     */
-    public void setCloseAction(ActivateEventListener closeAction) {
-        UIButton button = find("ok", UIButton.class);
-        if (button != null) {
-            button.unsubscribe(prevCloseAction);
-            button.subscribe(closeAction);
-            prevCloseAction = closeAction;
-        }
-    }
-    
     @Override
     public void onClosed() {
         super.onClosed();
