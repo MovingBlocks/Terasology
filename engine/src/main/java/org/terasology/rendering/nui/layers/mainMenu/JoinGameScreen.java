@@ -15,14 +15,16 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import java.util.concurrent.Callable;
+
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.registry.In;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
@@ -33,6 +35,8 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
+
+import com.google.common.base.Function;
 
 /**
  * @author Immortius
@@ -49,7 +53,7 @@ public class JoinGameScreen extends CoreScreenLayer {
     private GameEngine engine;
 
     private UIList<ServerInfo> serverList;
-
+    
     @Override
     public void initialise() {
         serverList = find("serverList", UIList.class);
@@ -122,13 +126,32 @@ public class JoinGameScreen extends CoreScreenLayer {
         return false;
     }
 
-    private void join(String address) {
-        JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
-        if (joinStatus.getStatus() != JoinStatus.Status.FAILED) {
-            engine.changeState(new StateLoading(joinStatus));
-        } else {
-            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class)
-                    .setError("Failed to Join", "Could not connect to server - " + joinStatus.getErrorMessage());
-        }
+    private void join(final String address) {
+        Callable<JoinStatus> operation = new Callable<JoinStatus>() {
+
+            @Override
+            public JoinStatus call() throws InterruptedException {
+                JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
+                return joinStatus;
+            }
+        };
+        
+        final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Join Game", "Connecting to '" + address + "' - please wait ...");
+        popup.onSuccess(new Function<JoinStatus, Void>() {
+            
+            @Override
+            public Void apply(JoinStatus result) {
+                if (result.getStatus() != JoinStatus.Status.FAILED) {
+                    engine.changeState(new StateLoading(result));               
+                } else {
+                    MessagePopup screen = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+                }
+                return null;
+            }
+        });
+        popup.startOperation(operation);
+
     }
 }

@@ -175,7 +175,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     @Override
-    public JoinStatus join(String address, int port) {
+    public JoinStatus join(String address, int port) throws InterruptedException {
         if (mode == NetworkMode.NONE) {
             factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(), Executors.newCachedThreadPool());
             ClientBootstrap bootstrap = new ClientBootstrap(factory);
@@ -183,7 +183,14 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             bootstrap.setOption("tcpNoDelay", true);
             bootstrap.setOption("keepAlive", true);
             ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(address, port));
-            connectCheck.awaitUninterruptibly();
+            try {
+                connectCheck.await();
+            } catch (InterruptedException e) {
+                connectCheck.cancel();
+                connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
+                factory.releaseExternalResources();
+                throw e;
+            }
             if (!connectCheck.isSuccess()) {
                 logger.warn("Failed to connect to server", connectCheck.getCause());
                 connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
