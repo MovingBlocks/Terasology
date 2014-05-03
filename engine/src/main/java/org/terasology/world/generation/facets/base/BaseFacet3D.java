@@ -33,7 +33,7 @@ public class BaseFacet3D implements WorldFacet3D {
         worldRegion = Region3i.createFromMinMax(new Vector3i(targetRegion.minX() - border.x, targetRegion.minY() - border.y, targetRegion.minZ() - border.z),
                 new Vector3i(targetRegion.maxX() + border.x, targetRegion.maxY() + border.y, targetRegion.maxZ() + border.z));
         relativeRegion = Region3i.createFromMinMax(new Vector3i(-border.x, -border.y, -border.z),
-                new Vector3i(targetRegion.sizeX() + border.x, targetRegion.sizeY() + border.y, targetRegion.sizeZ() + border.z));
+                new Vector3i(targetRegion.sizeX() + border.x - 1, targetRegion.sizeY() + border.y - 1, targetRegion.sizeZ() + border.z - 1));
     }
 
     @Override

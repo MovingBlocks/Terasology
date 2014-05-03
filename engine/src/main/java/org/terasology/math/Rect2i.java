@@ -263,7 +263,7 @@ public final class Rect2i implements Iterable<Vector2i> {
 
             @Override
             public boolean hasNext() {
-                return pos.getY() < maxY() && pos.getX() < maxX();
+                return pos.getY() < maxY() || pos.getX() < maxX();
             }
 
             @Override

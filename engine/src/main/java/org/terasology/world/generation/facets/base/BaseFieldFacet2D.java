@@ -82,7 +82,7 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
 
     @Override
     public void set(float[] newData) {
-        Preconditions.checkArgument(newData.length == data.length);
+        Preconditions.checkArgument(newData.length == data.length, "New data must have same length as existing");
         System.arraycopy(newData, 0, data, 0, newData.length);
     }
 }

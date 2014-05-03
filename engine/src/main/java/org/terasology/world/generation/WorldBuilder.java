@@ -70,8 +70,10 @@ public class WorldBuilder {
                 facets.addAll(Arrays.asList(produces.value()));
             }
             Updates updates = provider.getClass().getAnnotation(Updates.class);
-            for (Facet facet : updates.value()) {
-                facets.add(facet.value());
+            if (updates != null) {
+                for (Facet facet : updates.value()) {
+                    facets.add(facet.value());
+                }
             }
         }
         for (Class<? extends WorldFacet> facet : facets) {

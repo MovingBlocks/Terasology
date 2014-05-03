@@ -31,7 +31,7 @@ public class BaseFacet2D implements WorldFacet2D {
     public BaseFacet2D(Region3i targetRegion, Vector3i border) {
         worldRegion = Rect2i.createFromMinAndMax(targetRegion.minX() - border.x, targetRegion.minZ() - border.z,
                 targetRegion.maxX() + border.x, targetRegion.maxZ() + border.z);
-        relativeRegion = Rect2i.createFromMinAndMax(-border.x, -border.z, targetRegion.sizeX() + border.x, targetRegion.sizeZ() + border.z);
+        relativeRegion = Rect2i.createFromMinAndMax(-border.x, -border.z, targetRegion.sizeX() + border.x - 1, targetRegion.sizeZ() + border.z - 1);
     }
 
     @Override
