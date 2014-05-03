@@ -21,7 +21,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.entity.internal.BaseEntityRef;
 import org.terasology.network.NetworkComponent;
-import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
 import java.util.Objects;

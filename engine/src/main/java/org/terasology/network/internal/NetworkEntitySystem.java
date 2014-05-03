@@ -29,7 +29,6 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.WorldRenderer;
