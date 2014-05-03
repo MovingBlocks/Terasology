@@ -15,16 +15,16 @@
  */
 package org.terasology.world.generation.facets;
 
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.base.BaseBooleanFieldFacet3D;
-import org.terasology.world.generation.facets.base.BooleanFieldFacet3D;
 
 /**
  * @author Immortius
  */
 public class PlantFacet extends BaseBooleanFieldFacet3D {
-    public PlantFacet(Vector3i size) {
-        super(size);
+
+    public PlantFacet(Region3i targetRegion, Vector3i border) {
+        super(targetRegion, border);
     }
 }

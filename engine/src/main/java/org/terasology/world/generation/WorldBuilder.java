@@ -18,12 +18,15 @@ package org.terasology.world.generation;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.Vector3i;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,6 +38,7 @@ public class WorldBuilder {
 
     private long seed;
     private List<FacetProvider> providersList = Lists.newArrayList();
+    private Map<Class<? extends WorldFacet>, Vector3i> borders = Maps.newHashMap();
     private Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private List<WorldRasterizer> rasterizers = Lists.newArrayList();
 
@@ -54,7 +58,6 @@ public class WorldBuilder {
     }
 
     public World build() {
-        ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains = determineProviderChains();
         return new WorldImpl(seed, determineProviderChains(), rasterizers);
     }
 
@@ -65,8 +68,10 @@ public class WorldBuilder {
             Produces produces = provider.getClass().getAnnotation(Produces.class);
             if (produces != null) {
                 facets.addAll(Arrays.asList(produces.value()));
-            } else {
-                logger.warn("FacetProvider {} does not produce any data", provider.getClass());
+            }
+            Updates updates = provider.getClass().getAnnotation(Updates.class);
+            for (Facet facet : updates.value()) {
+                facets.add(facet.value());
             }
         }
         for (Class<? extends WorldFacet> facet : facets) {
@@ -85,22 +90,35 @@ public class WorldBuilder {
         }
         Set<FacetProvider> orderedProviders = Sets.newLinkedHashSet();
         for (FacetProvider provider : providersList) {
-            Produces produces = provider.getClass().getAnnotation(Produces.class);
-            if (produces != null && Arrays.asList(produces.value()).contains(facet)) {
+            if (producesFacet(provider, facet)) {
                 Requires requirements = provider.getClass().getAnnotation(Requires.class);
                 if (requirements != null) {
-                    for (Class<? extends WorldFacet> requirement : requirements.value()) {
-                        if (requirement != facet) {
-                            determineProviderChainFor(requirement, result);
-                            orderedProviders.addAll(result.get(requirement));
-                        }
+                    for (Facet requirement : requirements.value()) {
+                        determineProviderChainFor(requirement.value(), result);
+                        orderedProviders.addAll(result.get(requirement.value()));
                     }
                 }
                 orderedProviders.add(provider);
             }
+            result.putAll(facet, orderedProviders);
+            facetCalculationInProgress.remove(facet);
         }
-        result.putAll(facet, orderedProviders);
-        facetCalculationInProgress.remove(facet);
     }
 
+    private boolean producesFacet(FacetProvider provider, Class<? extends WorldFacet> facet) {
+        Produces produces = provider.getClass().getAnnotation(Produces.class);
+        if (produces != null && Arrays.asList(produces.value()).contains(facet)) {
+            return true;
+        }
+
+        Updates updates = provider.getClass().getAnnotation(Updates.class);
+        if (updates != null) {
+            for (Facet updatedFacet : updates.value()) {
+                if (updatedFacet.value() == facet) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

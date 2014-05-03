@@ -19,6 +19,7 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -46,14 +47,13 @@ public class PerlinTemperatureProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Region3i processRegion = region.getRegion();
-        float[] noise = this.temperatureNoise.noise(Rect2i.createFromMinAndSize(processRegion.minX(), processRegion.minZ(), processRegion.sizeX(), processRegion.sizeZ()));
+        SeaLevelTemperatureFacet facet = new SeaLevelTemperatureFacet(region.getRegion(), region.getBorderForFacet(SeaLevelTemperatureFacet.class));
+        float[] noise = this.temperatureNoise.noise(facet.getWorldRegion());
 
         for (int i = 0; i < noise.length; ++i) {
             noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
         }
 
-        SeaLevelTemperatureFacet facet = new SeaLevelTemperatureFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
         facet.set(noise);
         region.setRegionFacet(SeaLevelTemperatureFacet.class, facet);
     }

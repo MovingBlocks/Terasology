@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.facets;
+package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import org.terasology.math.Rect2i;
 
 /**
  * @author Immortius
  */
-public class BiomeFacet extends BaseObjectFacet2D<WorldBiomeProvider.Biome> {
-    public BiomeFacet(Region3i targetRegion, Vector3i border) {
-        super(targetRegion, border, WorldBiomeProvider.Biome.class);
-    }
+public interface WorldFacet2D extends WorldFacet {
+
+    /**
+     * @return The region of the world covered by this facet
+     */
+    Rect2i getWorldRegion();
+
+    /**
+     * @return The region covered by this facet, relative to the target region
+     */
+    Rect2i getRelativeRegion();
 }

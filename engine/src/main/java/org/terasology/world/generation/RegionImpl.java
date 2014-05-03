@@ -18,6 +18,7 @@ package org.terasology.world.generation;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
 import org.terasology.utilities.collection.TypeMap;
 
 import java.util.Set;
@@ -68,5 +69,10 @@ public class RegionImpl implements Region, GeneratingRegion {
     @Override
     public <T extends WorldFacet> void setRegionFacet(Class<T> type, T facet) {
         generatingFacets.put(type, facet);
+    }
+
+    @Override
+    public Vector3i getBorderForFacet(Class<? extends WorldFacet> type) {
+        return new Vector3i(4, 4, 4);
     }
 }

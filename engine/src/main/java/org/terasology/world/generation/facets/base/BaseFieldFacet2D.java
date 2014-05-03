@@ -16,29 +16,43 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
+import gnu.trove.iterator.TFloatIterator;
+import org.terasology.math.Rect2i;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public abstract class BaseFieldFacet2D implements FieldFacet2D {
+public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet2D {
 
-    private Vector2i size = new Vector2i();
     private float[] data;
 
-    public BaseFieldFacet2D(Vector2i size) {
-        this.size.set(size);
-        this.data = new float[size.getX() * size.getY()];
+    public BaseFieldFacet2D(Region3i targetRegion, Vector3i border) {
+        super(targetRegion, border);
+        Vector2i size = getRelativeRegion().size();
+        this.data = new float[size.x * size.y];
     }
 
     @Override
     public float get(int x, int y) {
-        return data[x + size.getX() * y];
+        return data[getRelativeIndex(x, y)];
     }
 
     @Override
     public float get(Vector2i pos) {
-        return data[pos.x + size.getX() * pos.y];
+        return get(pos.x, pos.y);
+    }
+
+    @Override
+    public float getWorld(int x, int y) {
+        return data[getWorldIndex(x, y)];
+    }
+
+    @Override
+    public float getWorld(Vector2i pos) {
+        return getWorld(pos.x, pos.y);
     }
 
     @Override
@@ -47,51 +61,23 @@ public abstract class BaseFieldFacet2D implements FieldFacet2D {
     }
 
     @Override
-    public Float2DIterator get() {
-        return new Float2DIterator() {
-            private Vector2i position = new Vector2i(-1, 0);
-            private int index;
-
-            @Override
-            public Vector2i currentPosition() {
-                return position;
-            }
-
-            @Override
-            public void setLast(float newValue) {
-                data[index - 1] = newValue;
-            }
-
-            @Override
-            public float next() {
-                position.x++;
-                if (position.x == size.x) {
-                    position.x = 0;
-                    position.y++;
-                }
-                return data[index++];
-            }
-
-            @Override
-            public boolean hasNext() {
-                return index < data.length;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    @Override
     public void set(int x, int y, float value) {
-        data[x + size.getX() * y] = value;
+        data[getRelativeIndex(x, y)] = value;
     }
 
     @Override
     public void set(Vector2i pos, float value) {
-        data[pos.x + size.getX() * pos.y] = value;
+        set(pos.x, pos.y, value);
+    }
+
+    @Override
+    public void setWorld(int x, int y, float value) {
+        data[getWorldIndex(x, y)] = value;
+    }
+
+    @Override
+    public void setWorld(Vector2i pos, float value) {
+        setWorld(pos.x, pos.y, value);
     }
 
     @Override

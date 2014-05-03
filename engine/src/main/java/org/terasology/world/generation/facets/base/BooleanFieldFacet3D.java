@@ -17,25 +17,30 @@ package org.terasology.world.generation.facets.base;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.generation.WorldFacet;
+import org.terasology.world.generation.WorldFacet3D;
 
 /**
  * @author Immortius
  */
-public interface BooleanFieldFacet3D extends WorldFacet {
+public interface BooleanFieldFacet3D extends WorldFacet3D {
 
     boolean get(int x, int y, int z);
 
     boolean get(Vector3i pos);
 
-    boolean[] getInternal();
+    boolean getWorld(int x, int y, int z);
 
-    Boolean3DIterator get();
+    boolean getWorld(Vector3i pos);
+
+    boolean[] getInternal();
 
     void set(int x, int y, int z, boolean value);
 
     void set(Vector3i pos, boolean value);
 
-    void set(boolean[] newData);
+    void setWorld(int x, int y, int z, boolean value);
 
-    void set(int index, boolean value);
+    void setWorld(Vector3i pos, boolean value);
+
+    void set(boolean[] newData);
 }

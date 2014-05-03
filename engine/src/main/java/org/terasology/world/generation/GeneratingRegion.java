@@ -16,6 +16,7 @@
 package org.terasology.world.generation;
 
 import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
@@ -27,4 +28,6 @@ public interface GeneratingRegion {
     <T extends WorldFacet> T getRegionFacet(Class<T> type);
 
     <T extends WorldFacet> void setRegionFacet(Class<T> type, T facet);
+
+    Vector3i getBorderForFacet(Class<? extends WorldFacet> type);
 }

@@ -17,23 +17,30 @@ package org.terasology.world.generation.facets.base;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.generation.WorldFacet;
+import org.terasology.world.generation.WorldFacet3D;
 
 /**
  * @author Immortius
  */
-public interface FieldFacet3D extends WorldFacet {
+public interface FieldFacet3D extends WorldFacet3D {
 
     float get(int x, int y, int z);
 
     float get(Vector3i pos);
 
-    Float3DIterator get();
+    float getWorld(int x, int y, int z);
+
+    float getWorld(Vector3i pos);
 
     float[] getInternal();
 
     void set(int x, int y, int z, float value);
 
     void set(Vector3i pos, float value);
+
+    void setWorld(int x, int y, int z, float value);
+
+    void setWorld(Vector3i pos, float value);
 
     void set(float[] newData);
 }

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.facets;
+package org.terasology.world.generation;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Immortius
  */
-public class BiomeFacet extends BaseObjectFacet2D<WorldBiomeProvider.Biome> {
-    public BiomeFacet(Region3i targetRegion, Vector3i border) {
-        super(targetRegion, border, WorldBiomeProvider.Biome.class);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FacetBorder {
+    int x() default 0;
+    int y() default 0;
+    int z() default 0;
 }

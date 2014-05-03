@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.facets.base;
+package org.terasology.world.generation;
 
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Vector2i;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
+ * This is the sub-annotation for describing facets in Requires and Updates annotations
  * @author Immortius
  */
-public interface Float2DIterator extends TFloatIterator {
-    Vector2i currentPosition();
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Facet {
+    /**
+     * @return The class of the facet
+     */
+    Class<? extends WorldFacet> value();
 
-    void setLast(float newValue);
+    /**
+     * @return The desired minimum border around the main facet data
+     */
+    FacetBorder border() default @FacetBorder;
 }

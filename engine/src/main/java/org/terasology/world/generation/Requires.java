@@ -28,5 +28,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Requires {
-    Class<? extends WorldFacet>[] value();
+    Facet[] value();
 }

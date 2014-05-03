@@ -16,7 +16,9 @@
 package org.terasology.world.generation.perlin;
 
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
@@ -29,7 +31,7 @@ import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
  * @author Immortius
  */
 @Produces(BiomeFacet.class)
-@Requires({SeaLevelTemperatureFacet.class, HumidityFacet.class})
+@Requires({@Facet(SeaLevelTemperatureFacet.class), @Facet(HumidityFacet.class)})
 public class PerlinBiomeProvider implements FacetProvider {
 
     @Override
@@ -40,24 +42,22 @@ public class PerlinBiomeProvider implements FacetProvider {
     public void process(GeneratingRegion region) {
         SeaLevelTemperatureFacet temperature = region.getRegionFacet(SeaLevelTemperatureFacet.class);
         HumidityFacet humidityFacet = region.getRegionFacet(HumidityFacet.class);
-        float[] tempInternal = temperature.getInternal();
-        float[] humidityInternal = humidityFacet.getInternal();
 
-        BiomeFacet biomeFacet = new BiomeFacet(new Vector2i(region.getRegion().sizeX(), region.getRegion().sizeZ()));
-        WorldBiomeProvider.Biome[] biomeInternal = biomeFacet.getInternal();
-        for (int i = 0; i < biomeInternal.length; ++i) {
-            float temp = tempInternal[i];
-            float hum = temp * humidityInternal[i];
+        Vector3i border = region.getBorderForFacet(BiomeFacet.class);
+        BiomeFacet biomeFacet = new BiomeFacet(region.getRegion(), border);
+        for (Vector2i pos : biomeFacet.getRelativeRegion()) {
+            float temp = temperature.get(pos);
+            float hum = temp * humidityFacet.get(pos);
             if (temp >= 0.5f && hum < 0.3f) {
-                biomeInternal[i] = WorldBiomeProvider.Biome.DESERT;
+                biomeFacet.set(pos, WorldBiomeProvider.Biome.DESERT);
             } else if (hum >= 0.3f && hum <= 0.6f && temp >= 0.5f) {
-                biomeInternal[i] = WorldBiomeProvider.Biome.PLAINS;
+                biomeFacet.set(pos, WorldBiomeProvider.Biome.PLAINS);
             } else if (temp <= 0.3f && hum > 0.5f) {
-                biomeInternal[i] = WorldBiomeProvider.Biome.SNOW;
+                biomeFacet.set(pos, WorldBiomeProvider.Biome.SNOW);
             } else if (hum >= 0.2f && hum <= 0.6f && temp < 0.5f) {
-                biomeInternal[i] = WorldBiomeProvider.Biome.MOUNTAINS;
+                biomeFacet.set(pos, WorldBiomeProvider.Biome.MOUNTAINS);
             } else {
-                biomeInternal[i] = WorldBiomeProvider.Biome.FOREST;
+                biomeFacet.set(pos, WorldBiomeProvider.Biome.FOREST);
             }
         }
         region.setRegionFacet(BiomeFacet.class, biomeFacet);

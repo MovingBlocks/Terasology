@@ -15,26 +15,34 @@
  */
 package org.terasology.world.generation.facets.base;
 
+import gnu.trove.iterator.TFloatIterator;
+import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.world.generation.WorldFacet;
+import org.terasology.world.generation.WorldFacet2D;
 
 /**
  * @author Immortius
  */
-public interface FieldFacet2D extends WorldFacet {
+public interface FieldFacet2D extends WorldFacet2D {
 
     float get(int x, int y);
 
     float get(Vector2i pos);
 
-    float[] getInternal();
+    float getWorld(int x, int y);
 
-    Float2DIterator get();
+    float getWorld(Vector2i pos);
+
+    float[] getInternal();
 
     void set(int x, int y, float value);
 
     void set(Vector2i pos, float value);
 
-    void set(float[] data);
+    void setWorld(int x, int y, float value);
 
+    void setWorld(Vector2i pos, float value);
+
+    void set(float[] data);
 }

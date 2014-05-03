@@ -16,24 +16,25 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public class BaseBooleanFieldFacet3D implements BooleanFieldFacet3D {
+public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements BooleanFieldFacet3D {
 
-    private Vector3i size = new Vector3i();
     private boolean[] data;
 
-    public BaseBooleanFieldFacet3D(Vector3i size) {
-        this.size.set(size);
+    public BaseBooleanFieldFacet3D(Region3i targetRegion, Vector3i border) {
+        super(targetRegion, border);
+        Vector3i size = getRelativeRegion().size();
         data = new boolean[size.x * size.y * size.z];
     }
 
     @Override
     public boolean get(int x, int y, int z) {
-        return data[x + size.getX() * (y + size.getY() * z)];
+        return data[getRelativeIndex(x, y, z)];
     }
 
     @Override
@@ -42,55 +43,23 @@ public class BaseBooleanFieldFacet3D implements BooleanFieldFacet3D {
     }
 
     @Override
+    public boolean getWorld(int x, int y, int z) {
+        return data[getWorldIndex(x, y, z)];
+    }
+
+    @Override
+    public boolean getWorld(Vector3i pos) {
+        return getWorld(pos.x, pos.y, pos.z);
+    }
+
+    @Override
     public boolean[] getInternal() {
         return data;
     }
 
     @Override
-    public Boolean3DIterator get() {
-        return new Boolean3DIterator() {
-            private Vector3i position = new Vector3i(-1, 0, 0);
-            private int nextIndex = 0;
-
-            @Override
-            public Vector3i currentPosition() {
-                return position;
-            }
-
-            @Override
-            public void setLast(boolean newValue) {
-                data[nextIndex - 1] = newValue;
-            }
-
-            @Override
-            public boolean next() {
-                position.x++;
-                if (position.x == size.x) {
-                    position.x = 0;
-                    position.y++;
-                    if (position.y == size.y) {
-                        position.y = 0;
-                        position.z++;
-                    }
-                }
-                return data[nextIndex++];
-            }
-
-            @Override
-            public boolean hasNext() {
-                return nextIndex < data.length;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-    }
-
-    @Override
     public void set(int x, int y, int z, boolean value) {
-        data[x + size.getX() * (y + size.getY() * z)] = value;
+        data[getRelativeIndex(x, y, z)] = value;
     }
 
     @Override
@@ -99,13 +68,19 @@ public class BaseBooleanFieldFacet3D implements BooleanFieldFacet3D {
     }
 
     @Override
+    public void setWorld(int x, int y, int z, boolean value) {
+        data[getWorldIndex(x, y, z)] = value;
+    }
+
+    @Override
+    public void setWorld(Vector3i pos, boolean value) {
+
+    }
+
+    @Override
     public void set(boolean[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
     }
 
-    @Override
-    public void set(int index, boolean value) {
-        data[index] = value;
-    }
 }

@@ -15,19 +15,21 @@
  */
 package org.terasology.world.generation.perlin;
 
+import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
+import org.terasology.math.Vector2i;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-import org.terasology.world.generation.facets.base.Float2DIterator;
 
 /**
  * @author Immortius
  */
-@Requires(SurfaceHeightFacet.class)
+@Requires(@Facet(SurfaceHeightFacet.class))
 @Produces(DensityFacet.class)
 public class PerlinSurfaceToDensityProvider implements FacetProvider {
 
@@ -39,15 +41,15 @@ public class PerlinSurfaceToDensityProvider implements FacetProvider {
     @Override
     public void process(GeneratingRegion region) {
         SurfaceHeightFacet surfaceHeight = region.getRegionFacet(SurfaceHeightFacet.class);
-        DensityFacet facet = new DensityFacet(region.getRegion().size());
-        float[] result = facet.getInternal();
-        Float2DIterator iterator = surfaceHeight.get();
+        DensityFacet facet = new DensityFacet(region.getRegion(), region.getBorderForFacet(DensityFacet.class));
+
         Region3i area = region.getRegion();
-        while (iterator.hasNext()) {
-            float height = iterator.next();
-            for (int y = 0; y < region.getRegion().sizeY(); ++y) {
-                int index = iterator.currentPosition().x + area.sizeX() * (y + area.sizeY() * iterator.currentPosition().getY());
-                result[index] = height - area.minY() - y;
+        Rect2i rect = Rect2i.createFromMinAndMax(facet.getRelativeRegion().minX(), facet.getRelativeRegion().minZ(),
+                facet.getRelativeRegion().maxX(), facet.getRelativeRegion().maxZ());
+        for (Vector2i pos : rect) {
+            float height = surfaceHeight.get(pos);
+            for (int y = facet.getRelativeRegion().minY(); y <= facet.getRelativeRegion().maxY(); ++y) {
+                facet.set(pos.x, y, pos.y, height - area.minY() - y);
             }
         }
         region.setRegionFacet(DensityFacet.class, facet);

@@ -16,31 +16,43 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 
 import java.lang.reflect.Array;
 
 /**
  * @author Immortius
  */
-public class BaseEnumFacet2D<T extends Enum> implements EnumFacet2D<T> {
+public abstract class BaseObjectFacet2D<T> extends BaseFacet2D implements ObjectFacet2D<T> {
 
-    private Vector2i size = new Vector2i();
     private T[] data;
 
-    public BaseEnumFacet2D(Vector2i size, Class<T> enumType) {
-        this.size.set(size);
-        this.data = (T[]) Array.newInstance(enumType, size.getX() * size.getY());
+    public BaseObjectFacet2D(Region3i targetRegion, Vector3i border, Class<T> objectType) {
+        super(targetRegion, border);
+        Vector2i size = getRelativeRegion().size();
+        this.data = (T[]) Array.newInstance(objectType, size.x * size.y);
     }
 
     @Override
     public T get(int x, int y) {
-        return data[x + size.getX() * y];
+        return data[getRelativeIndex(x, y)];
     }
 
     @Override
     public T get(Vector2i pos) {
         return get(pos.x, pos.y);
+    }
+
+    @Override
+    public T getWorld(int x, int y) {
+        return data[getWorldIndex(x, y)];
+    }
+
+    @Override
+    public T getWorld(Vector2i pos) {
+        return getWorld(pos.x, pos.y);
     }
 
     @Override
@@ -50,7 +62,7 @@ public class BaseEnumFacet2D<T extends Enum> implements EnumFacet2D<T> {
 
     @Override
     public void set(int x, int y, T value) {
-        data[x + size.getX() * y] = value;
+        data[getRelativeIndex(x, y)] = value;
     }
 
     @Override
@@ -59,8 +71,13 @@ public class BaseEnumFacet2D<T extends Enum> implements EnumFacet2D<T> {
     }
 
     @Override
-    public void set(int index, T value) {
-        data[index] = value;
+    public void setWorld(int x, int y, T value) {
+        data[getWorldIndex(x, y)] = value;
+    }
+
+    @Override
+    public void setWorld(Vector2i pos, T value) {
+        setWorld(pos.x, pos.y, value);
     }
 
     @Override

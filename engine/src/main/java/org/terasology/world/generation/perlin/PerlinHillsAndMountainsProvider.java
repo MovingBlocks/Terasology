@@ -15,27 +15,29 @@
  */
 package org.terasology.world.generation.perlin;
 
-import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector2i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
-import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
+import org.terasology.world.generation.Updates;
 import org.terasology.world.generation.facets.HumidityFacet;
 import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import javax.vecmath.Vector2f;
+import java.util.Iterator;
 
 /**
  * @author Immortius
  */
-@Requires({SurfaceHeightFacet.class, SeaLevelTemperatureFacet.class, HumidityFacet.class})
-@Produces(SurfaceHeightFacet.class)
+@Requires({@Facet(SeaLevelTemperatureFacet.class), @Facet(HumidityFacet.class)})
+@Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinHillsAndMountainsProvider implements FacetProvider {
 
     private SubSampledNoise2D mountainNoise;
@@ -49,17 +51,20 @@ public class PerlinHillsAndMountainsProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Rect2i region2d = Rect2i.createFromMinAndMax(region.getRegion().minX(), region.getRegion().minZ(), region.getRegion().maxX(), region.getRegion().maxZ());
+        SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
 
-        float[] mountainData = mountainNoise.noise(region2d);
-        float[] hillData = hillNoise.noise(region2d);
-        float[] temperatureData = region.getRegionFacet(SeaLevelTemperatureFacet.class).getInternal();
-        float[] humidityData = region.getRegionFacet(HumidityFacet.class).getInternal();
+        float[] mountainData = mountainNoise.noise(facet.getWorldRegion());
+        float[] hillData = hillNoise.noise(facet.getWorldRegion());
+        SeaLevelTemperatureFacet temperatureData = region.getRegionFacet(SeaLevelTemperatureFacet.class);
+        HumidityFacet humidityData = region.getRegionFacet(HumidityFacet.class);
 
-        float[] heightData = region.getRegionFacet(SurfaceHeightFacet.class).getInternal();
-        for (int i = 0; i < mountainData.length; ++i) {
-            float tempHumid = temperatureData[i] * humidityData[i];
-            Vector2f distanceToMountainBiome = new Vector2f(temperatureData[i] - 0.25f, tempHumid - 0.35f);
+        float[] heightData = facet.getInternal();
+        Iterator<Vector2i> positionIterator = facet.getRelativeRegion().iterator();
+        for (int i = 0; i < heightData.length; ++i) {
+            Vector2i pos = positionIterator.next();
+            float temp = temperatureData.get(pos);
+            float tempHumid = temp * humidityData.get(pos);
+            Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, tempHumid - 0.35f);
             float mIntens = TeraMath.clamp(1.0f - distanceToMountainBiome.length() * 3.0f);
             float densityMountains = Math.max(mountainData[i], 0) * mIntens;
             float densityHills = Math.max(hillData[i] - 0.1f, 0) * (1.0f - mIntens);

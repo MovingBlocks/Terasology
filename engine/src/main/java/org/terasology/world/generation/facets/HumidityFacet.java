@@ -15,14 +15,17 @@
  */
 package org.terasology.world.generation.facets;
 
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
+import org.terasology.math.Vector3i;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
  * @author Immortius
  */
 public class HumidityFacet extends BaseFieldFacet2D {
-    public HumidityFacet(Vector2i size) {
-        super(size);
+
+    public HumidityFacet(Region3i targetRegion, Vector3i border) {
+        super(targetRegion, border);
     }
 }
