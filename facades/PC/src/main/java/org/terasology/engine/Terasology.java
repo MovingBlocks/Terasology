@@ -32,6 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -94,7 +95,7 @@ public final class Terasology {
                     e.printStackTrace();
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException | IOException e) {
 
             if (!GraphicsEnvironment.isHeadless()) {
                 Path logPath = Paths.get("."); 
