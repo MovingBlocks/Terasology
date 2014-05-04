@@ -84,6 +84,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
+// TODO: Review - This could be a static class but its existence is also questionable.
 public class EntitySystemBuilder {
 
     public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
@@ -111,11 +112,14 @@ public class EntitySystemBuilder {
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         // Event System
-        entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
-        CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+        EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
+        entityManager.setEventSystem(eventSystem);
+        CoreRegistry.put(EventSystem.class, eventSystem);
 
+        // TODO: Review - NodeClassLibrary related to the UI for behaviours. Should not be here and probably not even in the CoreRegistry
         CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
+        // Behaviour Trees Node Library
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(moduleManager);
@@ -126,7 +130,6 @@ public class EntitySystemBuilder {
     }
 
     private TypeSerializationLibrary buildTypeLibrary(PojoEntityManager entityManager, ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        Vector3iTypeHandler vector3iHandler = new Vector3iTypeHandler();
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
         serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
         serializationLibrary.add(Block.class, new BlockTypeHandler());
@@ -144,7 +147,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
-        serializationLibrary.add(Vector3i.class, vector3iHandler);
+        serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler());
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
