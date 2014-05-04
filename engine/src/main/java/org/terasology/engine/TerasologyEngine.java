@@ -19,6 +19,7 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -165,12 +166,13 @@ public class TerasologyEngine implements GameEngine {
                 new AdvancedMonitor().setVisible(true);
             }
             initialised = true;
-        } catch (Throwable t) {
-            logger.error("Failed to initialise Terasology", t);
-            throw new RuntimeException("Failed to initialise Terasology", t);
+        } catch (RuntimeException e) {
+            logger.error("Failed to initialise Terasology", e);
+            throw e;
         }
 
-        logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
+        double secs = 0.001 * sw.elapsed(TimeUnit.MILLISECONDS);
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", secs));
     }
 
     private void initAssets() {
@@ -248,9 +250,9 @@ public class TerasologyEngine implements GameEngine {
             mainLoop();
 
             cleanup();
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -271,9 +273,9 @@ public class TerasologyEngine implements GameEngine {
                     subsystem.dispose();
                 }
             }
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 

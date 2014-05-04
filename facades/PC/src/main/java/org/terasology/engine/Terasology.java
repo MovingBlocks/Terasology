@@ -16,6 +16,8 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
+
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -29,7 +31,8 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -76,17 +79,37 @@ public final class Terasology {
             }
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
-            engine.init();
-            if (isHeadless) {
-                engine.run(new StateHeadlessSetup());
-            } else {
-                engine.run(new StateMainMenu());
+            try {
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+            } finally {
+                try {
+                    engine.dispose();
+                } catch (Exception e) {
+                    // Just log this one to System.err because we don't want it 
+                    // to replace the one that came first (thrown above).
+                    e.printStackTrace();
+                }
             }
-            engine.dispose();
-        } catch (Throwable t) {
+        } catch (RuntimeException | IOException e) {
 
             if (!GraphicsEnvironment.isHeadless()) {
-                CrashReporter.report(t);
+                Path logPath = Paths.get("."); 
+                try {
+                    Path gameLogPath = PathManager.getInstance().getLogPath();
+                    if (gameLogPath != null) {
+                        logPath = gameLogPath;
+                    }
+                } catch (Exception eat) {
+                    // eat silently
+                }
+                
+                Path logFile = logPath.resolve("Terasology.log");
+                CrashReporter.report(e, logFile);
             }
         }
         System.exit(0);
