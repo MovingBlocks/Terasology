@@ -72,9 +72,7 @@ public class StateMainMenu implements GameState {
 
         // let's get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
-                                                        CoreRegistry.get(NetworkSystem.class),
-                                                        CoreRegistry.get(ReflectFactory.class),
-                                                        CoreRegistry.get(CopyStrategyLibrary.class));
+               CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
 
         eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
