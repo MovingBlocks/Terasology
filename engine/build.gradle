@@ -74,6 +74,11 @@ configurations {
     devCompile.extendsFrom compile
 }
 
+// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
@@ -103,7 +108,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
 	// TODO: These could be moved into facade
-	compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+'
+	compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+', changing: true
 	runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
 	runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.5'
     // And here is Groovy to read the config file
