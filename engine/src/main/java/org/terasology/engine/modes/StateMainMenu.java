@@ -70,31 +70,42 @@ public class StateMainMenu implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
 
-        //lets get the entity event system running
+        // let's get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
-                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+                                                        CoreRegistry.get(NetworkSystem.class),
+                                                        CoreRegistry.get(ReflectFactory.class),
+                                                        CoreRegistry.get(CopyStrategyLibrary.class));
+
         eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
 
         nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
+        eventSystem.registerEventHandler(nuiManager);
 
+        // TODO: Q: The CSM is registered permanently on engine initialization.
+        // TODO: Q: Why do it here again? The following line should be enough?
+        // componentSystemManager = CoreRegistry.get(ComponentSystemManager.class)
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
 
+        // TODO: Q: why set up the CameraTargetSystem and LocalPlayer in the MainMenu?
+        // TODO: Q: don't they become relevant only ingame?
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
+
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
-        eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         inputSystem = CoreRegistry.get(InputSystem.class);
 
+        // TODO: Q: the following line re-instantiate and re-register the CameraTargetSystem
+        // TODO: Q: mentioned a few lines above. Is this meant to be?
         new RegisterInputSystem().step();
 
+        // TODO: Q: similarly, the LocalPlayer was instantiated and registered in the line above.
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         localPlayer.setClientEntity(localPlayerEntity);
 
