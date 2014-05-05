@@ -164,12 +164,12 @@ public class CameraTargetSystem extends BaseComponentSystem {
     }
 
     /**
-     Returns the distance between the camera and the target object.
-     One usage of this is to generate out-of-focus effects: the
-     target object remains sharp while further away objects (and
-     potentially also nearer ones) are rendered out-of-focus (blurred).
-
-     @return Returns the distance between the camera and the target object.
+     * Returns the distance between the camera and the target object.
+     * One usage of this is to generate out-of-focus effects: the
+     * target object remains sharp while further away objects (and
+     * potentially also nearer ones) are rendered out-of-focus (blurred).
+     *
+     * @return Returns the distance between the camera and the target object.
      */
     public float getFocalDistance() {
         return focalDistance;
