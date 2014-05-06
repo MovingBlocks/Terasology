@@ -90,7 +90,7 @@ public class JoinServerPopup extends CoreScreenLayer {
                 return null;
             }
         });
-        popup.startOperation(operation);
+        popup.startOperation(operation, true);
     }
 
     @Override

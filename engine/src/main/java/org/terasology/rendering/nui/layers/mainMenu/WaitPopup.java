@@ -28,6 +28,7 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
 import com.google.common.base.Function;
@@ -50,22 +51,25 @@ public class WaitPopup<T> extends CoreScreenLayer {
 
     private Function<T, Void> resultEvent;
 
+    private UILabel titleLabel;
+    private UILabel messageLabel;
+    private UIButton cancelButton;
 
     @Override
     protected void initialise() {
-        // too early - we need to wait for setOperation()
+        titleLabel = find("title", UILabel.class);
+        Preconditions.checkNotNull(titleLabel, "UILabel 'title' not found");
+
+        messageLabel = find("message", UILabel.class);
+        Preconditions.checkNotNull(messageLabel, "UILabel 'message' not found");
+
+        cancelButton = find("cancel", UIButton.class);
+        Preconditions.checkNotNull(cancelButton, "UIButton 'cancel' not found");
     }
     
     public void setMessage(String title, String message) {
-        UILabel titleLabel = find("title", UILabel.class);
-        if (titleLabel != null) {
-            titleLabel.setText(title);
-        }
-
-        UILabel messageLabel = find("message", UILabel.class);
-        if (messageLabel != null) {
-            messageLabel.setText(message);
-        }
+        titleLabel.setText(title);
+        messageLabel.setText(message);
     }
 
     @Override
@@ -108,13 +112,16 @@ public class WaitPopup<T> extends CoreScreenLayer {
     }
 
     /**
-     * @param operation the operation to run
+     * @param operation the operation to run - the executing thread will be interrupted when the operation is cancelled
+     * @param canBeCancelled true if the operation is aborted when the {@link Thread#isInterrupted()} flag is set 
      * @throws NullPointerException if operation is null
      * @throws IllegalArgumentException if startOperation() was called before
      */
-    public void startOperation(Callable<T> operation) {
+    public void startOperation(Callable<T> operation, boolean canBeCancelled) {
         Preconditions.checkState(parallelTask == null, "startOperation() cannot be called twice");
-        
+
+        cancelButton.setVisible(canBeCancelled);
+            
         parallelTask = new FutureTask<>(operation);
 
         thread = new Thread(parallelTask, "Parallel Operation");
@@ -136,4 +143,7 @@ public class WaitPopup<T> extends CoreScreenLayer {
         Assets.dispose(Assets.get(WaitPopup.ASSET_URI));
     }
 
+    public boolean canBeCancelled() {
+        return cancelButton.isVisible();
+    }
 }

@@ -151,7 +151,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                 return null;
             }
         });
-        popup.startOperation(operation);
+        popup.startOperation(operation, true);
 
     }
 }
