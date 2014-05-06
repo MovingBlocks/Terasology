@@ -142,9 +142,9 @@ public class StateIngame implements GameState {
     public void update(float delta) {
         eventSystem.process();
 
-        for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
-            PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
-            updater.update(delta);
+        for (UpdateSubscriberSystem system : componentSystemManager.iterateUpdateSubscribers()) {
+            PerformanceMonitor.startActivity(system.getClass().getSimpleName());
+            system.update(delta);
             PerformanceMonitor.endActivity();
         }
 

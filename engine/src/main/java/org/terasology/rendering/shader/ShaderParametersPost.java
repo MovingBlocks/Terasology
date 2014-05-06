@@ -67,7 +67,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
-                program.setFloat("blurFocusDistance", cameraTargetSystem.getEyeFocusDistance(), true);
+                program.setFloat("blurFocusDistance", cameraTargetSystem.getFocalDistance(), true);
             }
 
             program.setFloat("blurStart", blurStart, true);
