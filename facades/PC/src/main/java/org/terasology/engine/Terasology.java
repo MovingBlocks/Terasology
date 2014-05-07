@@ -32,6 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
 import javax.swing.*;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -42,56 +43,62 @@ import java.util.Collection;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
+
 public final class Terasology {
 
-    // -------------- ARGUMENTS ----------------
-    // Terasology saves data such as game saves and logs into subfolders of a "home directory".
-    // Terasology provides a default, platform-specific home directory, but the user can use
-    // launch arguments to use the current directory (?) or specify one explicitly.
-    private static final String LOCAL_ARG = "-homedir"; // use the -current- directory (?) as Terasology's home directory.
-    private static final String HOME_ARG = "-homedir="; // use the -specified- directory as Terasology's home directory.
+    private static final String PrintUsage_ARG            = "-help";
+    private static final String UseCurrentDirAsHome_ARG   = "-homedir";
+    private static final String UseSpecifiedDirAsHome_ARG = "-homedir=";
+    private static final String StartHeadlessEngine_ARG   = "-headless";
 
-    // Using this argument launches Terasology without graphics, i.e. to act as a server.
-    private static final String HEADLESS_ARG = "-headless";
+    private static boolean isHeadless = false;
+    private static Collection<EngineSubsystem> subsystemList;
 
     private Terasology() {
     }
 
-    public static void main(String[] args) {
+    private static void printUsageAndExit() {
 
-        boolean isHeadless = false;
-        Path homePath = null;
+            String usage =
+                "Usage:\n" +
+                "\n" +
+                "    terasology [" + PrintUsage_ARG + "] [" + UseCurrentDirAsHome_ARG + "|" + UseSpecifiedDirAsHome_ARG + "<path>] [" + StartHeadlessEngine_ARG + "]\n" +
+                "\n" +
+                "By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".\n" +
+                "Optionally, the user can override the default by using one of the following launch arguments:\n" +
+                "\n" +
+                "    " + UseCurrentDirAsHome_ARG + "           Use the current directory as the home directory.\n" +
+                "    " + UseSpecifiedDirAsHome_ARG + "<path> Use the specified directory as the home directory.\n" +
+                "\n" +
+                "It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.\n" +
+                "For this purpose use the " + StartHeadlessEngine_ARG + " launch argument.\n" +
+                "\n" +
+                "Examples:\n" +
+                "\n" +
+                "    Use the current directory as the home directory:\n" +
+                "    terasology " + UseCurrentDirAsHome_ARG + "\n" +
+                "\n" +
+                "    Use \"myPath\" as the home directory:\n" +
+                "    terasology " + UseSpecifiedDirAsHome_ARG + "myPath" + "\n" +
+                "\n" +
+                "    Start terasology in headless mode (no graphics):\n" +
+                "    terasology " + StartHeadlessEngine_ARG + "\n" +
+                "\n" +
+                "    Don't start Terasology, just print this help:\n" +
+                "    terasology " + PrintUsage_ARG + "\n" +
+                "\n";
+
+            System.out.println(usage);
+            System.exit(0);
+    }
+
+    public static void main(String[] args) {
 
         try {
 
-            for (String arg : args) {
-                if (arg.startsWith(HOME_ARG)) {
-                    // the user explicitly specified a home directory
-                    homePath = Paths.get(arg.substring(HOME_ARG.length()));
-                } else if (arg.equals(LOCAL_ARG)) {
-                    // the user wishes to use the current directory as the home directory
-                    homePath = Paths.get("");
-                } else if (arg.equals(HEADLESS_ARG)) {
-                    // the user is starting Terasology as headless
-                    isHeadless = true;
-                }
-            }
+            handleLaunchArguments(args);
+            fillSubsystemList();
 
-            if (homePath != null) {
-                PathManager.getInstance().useOverrideHomePath(homePath);
-            } else {
-                PathManager.getInstance().useDefaultHomePath();
-            }
-
-            Collection<EngineSubsystem> subsystemList;
-            if (isHeadless) {
-                subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
-            } else {
-                subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
-            }
-
-            // ------------------------------------------------------------------------------------------------
-            // IMPORTANT SECTION: this is where the engine is initialized, started and eventually disposed of.
             // ------------------------------------------------------------------------------------------------
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
@@ -101,6 +108,7 @@ public final class Terasology {
             } else {
                 engine.run(new StateMainMenu());
             }
+
             engine.dispose();
             // ------------------------------------------------------------------------------------------------
 
@@ -111,11 +119,45 @@ public final class Terasology {
         System.exit(0);
     }
 
+    private static void handleLaunchArguments(String[] args) throws IOException {
+
+        Path homePath = null;
+
+        for (String arg : args) {
+            if(arg.equals(PrintUsage_ARG)) {
+                printUsageAndExit();
+            } else if (arg.startsWith(UseSpecifiedDirAsHome_ARG)) {
+                homePath = Paths.get(arg.substring(UseSpecifiedDirAsHome_ARG.length()));
+            } else if (arg.equals(UseCurrentDirAsHome_ARG)) {
+                homePath = Paths.get("");
+            } else if (arg.equals(StartHeadlessEngine_ARG)) {
+                isHeadless = true;
+            }
+        }
+
+        if (homePath != null) {
+            PathManager.getInstance().useOverrideHomePath(homePath);
+        } else {
+            PathManager.getInstance().useDefaultHomePath();
+        }
+    }
+
+    private static void fillSubsystemList() {
+        if (isHeadless) {
+            subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
+        } else {
+            subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
+        }
+    }
+
     /**
-     The content of a throwable can be highly nested.
-     This method formats it into a single string that
-     can be displayed by the dialog opened by the
-     JOptionPane class.
+     * The content of a throwable can be highly nested.
+     * This method formats it into a single string that
+     * can be displayed by the dialog opened through the
+     * JOptionPane class.
+     *
+     * @param t A Throwable object.
+     * @return A string, to be displayed by the message dialog.
      */
     private static String getNestedMessageText(Throwable t) {
         String nl = System.getProperty("line.separator");
