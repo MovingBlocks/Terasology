@@ -16,6 +16,8 @@
 package org.terasology.engine.module;
 
 import org.reflections.Reflections;
+import org.terasology.asset.AssetSource;
+import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.engine.TerasologyConstants;
 
 import java.io.IOException;
@@ -30,11 +32,19 @@ public class EngineModule implements Module {
     private ModuleInfo info;
     private String id = TerasologyConstants.ENGINE_MODULE;
     private Version version;
+    private AssetSource source;
 
     public EngineModule(Reflections reflections, ModuleInfo moduleInfo) {
         this.reflections = reflections;
         this.info = moduleInfo;
         this.version = Version.create(moduleInfo.getVersion());
+        this.source = new ClasspathSource(id, getClass().getProtectionDomain().getCodeSource(),
+                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY);
+    }
+
+    @Override
+    public AssetSource getModuleSource() {
+        return source;
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -128,6 +129,7 @@ public class StateIngame implements GameState {
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
+        CoreRegistry.get(ModuleManager.class).disableAllModules();
         CoreRegistry.get(AssetManager.class).refresh();
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
@@ -140,9 +142,9 @@ public class StateIngame implements GameState {
     public void update(float delta) {
         eventSystem.process();
 
-        for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
-            PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
-            updater.update(delta);
+        for (UpdateSubscriberSystem system : componentSystemManager.iterateUpdateSubscribers()) {
+            PerformanceMonitor.startActivity(system.getClass().getSimpleName());
+            system.update(delta);
             PerformanceMonitor.endActivity();
         }
 

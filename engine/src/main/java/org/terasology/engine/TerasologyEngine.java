@@ -26,7 +26,6 @@ import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.config.Config;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
@@ -121,7 +120,7 @@ public class TerasologyEngine implements GameEngine {
         if (initialised) {
             return;
         }
-        
+
         Stopwatch sw = Stopwatch.createStarted();
 
         try {
@@ -167,12 +166,13 @@ public class TerasologyEngine implements GameEngine {
                 new AdvancedMonitor().setVisible(true);
             }
             initialised = true;
-        } catch (Throwable t) {
-            logger.error("Failed to initialise Terasology", t);
-            throw new RuntimeException("Failed to initialise Terasology", t);
+        } catch (RuntimeException e) {
+            logger.error("Failed to initialise Terasology", e);
+            throw e;
         }
-        
-        logger.info("Initialization completed in {}sec.", 0.01 * (sw.elapsed(TimeUnit.MILLISECONDS) / 10)); // round to 2 digits
+
+        double secs = 0.001 * sw.elapsed(TimeUnit.MILLISECONDS);
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", secs));
     }
 
     private void initAssets() {
@@ -250,9 +250,9 @@ public class TerasologyEngine implements GameEngine {
             mainLoop();
 
             cleanup();
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -273,9 +273,9 @@ public class TerasologyEngine implements GameEngine {
                     subsystem.dispose();
                 }
             }
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -354,16 +354,14 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(Game.class, new Game(this, time));
 
         AssetType.registerAssetTypes(assetManager);
-        ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
-                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY);
-        assetManager.addAssetSource(source);
-
+        assetManager.addAssetSource(moduleManager.getActiveModule(TerasologyConstants.ENGINE_MODULE).getModuleSource());
         ApplyModulesUtil.applyModules();
     }
 
     private ModuleManager initModuleManager() {
         ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager, config.getSystem().isReflectionsCacheEnabled()));
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class,
+                new ModuleManagerImpl(moduleSecurityManager, config.getSystem().isReflectionsCacheEnabled()));
 
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");

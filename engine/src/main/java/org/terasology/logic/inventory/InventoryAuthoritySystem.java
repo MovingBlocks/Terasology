@@ -131,7 +131,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
                 InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
             } else {
                 if (removed == null) {
-                    removed = entityManager.copy(itemAt);
+                    removed = itemAt.copy();
                 }
                 InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
             }

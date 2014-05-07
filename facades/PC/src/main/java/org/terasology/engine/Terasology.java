@@ -17,6 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.collect.Lists;
 
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -30,10 +31,8 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import javax.swing.*;
-
 import java.awt.GraphicsEnvironment;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -45,7 +44,7 @@ import java.util.Collection;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
-    
+
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
@@ -78,56 +77,42 @@ public final class Terasology {
             } else {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
-            
+
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
-            engine.init();
-            if (isHeadless) {
-                engine.run(new StateHeadlessSetup());
-            } else {
-                engine.run(new StateMainMenu());
+            try {
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+            } finally {
+                try {
+                    engine.dispose();
+                } catch (Exception e) {
+                    // Just log this one to System.err because we don't want it 
+                    // to replace the one that came first (thrown above).
+                    e.printStackTrace();
+                }
             }
-            engine.dispose();
-        } catch (Throwable t) {
-            
+        } catch (RuntimeException | IOException e) {
+
             if (!GraphicsEnvironment.isHeadless()) {
-                String text = getNestedMessageText(t);
-                showModalDialog(text);
+                Path logPath = Paths.get("."); 
+                try {
+                    Path gameLogPath = PathManager.getInstance().getLogPath();
+                    if (gameLogPath != null) {
+                        logPath = gameLogPath;
+                    }
+                } catch (Exception eat) {
+                    // eat silently
+                }
+                
+                Path logFile = logPath.resolve("Terasology.log");
+                CrashReporter.report(e, logFile);
             }
         }
         System.exit(0);
     }
 
-    private static void showModalDialog(final String text) {
-        // Swing element methods must be called in the swing thread
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                
-                @Override
-                public void run() {
-                    JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        } catch (InvocationTargetException | InterruptedException e) {
-            e.printStackTrace(System.err);
-        }
-    }
-
-    private static String getNestedMessageText(Throwable t) {
-        String nl = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-
-        Throwable cause = t;
-        while (cause != null && cause != cause.getCause()) {
-            if (cause.getMessage() != null) {
-                sb.append(cause.getClass().getSimpleName());
-                sb.append(": ");
-                sb.append(cause.getLocalizedMessage());
-                sb.append(nl);
-            }
-
-            cause = cause.getCause();
-        }
-
-        return sb.toString();
-    }
 }

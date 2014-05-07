@@ -64,8 +64,10 @@ extensions
 /modules/*
 !/modules/Core
 !/modules/subprojects.gradle
-
-libs
+/meta/*
+!/meta/subprojects.gradle
+/libs/*
+!/libs/subprojects.gradle
 
 # Ignore weird stuff that might be obsolete
 .DS_Store

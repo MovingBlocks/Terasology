@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.console.ui;
 
-import java.util.List;
-
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -28,32 +26,33 @@ import org.terasology.rendering.nui.widgets.UILabel;
 
 /**
  * The miniaturized chat console widget
+ *
  * @author Martin Steiger
  */
 public class MiniChatOverlay extends CoreScreenLayer {
-    
+
     /**
      * Extra display time per message char
      */
     private static final float TIME_VISIBLE_PER_CHAR = 0.08f;
 
     private static final float TIME_VISIBLE_BASE = 1.0f;
-    
+
     private static final float TIME_FADE = 0.3f;
-    
+
     private enum State {
         FADE_IN,
         VISIBLE,
         FADE_OUT,
         HIDDEN
     }
-    
+
     private float time;
 
     private UILabel message;
-   
+
     private State state = State.HIDDEN;
-    
+
     @In
     private Console console;
 
@@ -65,11 +64,11 @@ public class MiniChatOverlay extends CoreScreenLayer {
             public String get() {
                 Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
                 String last = "";
-                
+
                 for (Message msg : msgs) {
                     last = msg.getMessage();
                 }
-                
+
                 return last;
             }
         });
@@ -78,95 +77,95 @@ public class MiniChatOverlay extends CoreScreenLayer {
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        
+
         if (isVisible()) {        // depends on the "visible" binding
             refresh();
         } else {
             hideImmediately();
         }
     }
-    
+
     private void refresh() {
         switch (state) {
-        case VISIBLE:
-            time = 0;
-            break;
-            
-        case FADE_IN:
-            break;
-            
-        case FADE_OUT:
-            state = State.FADE_IN;
-            time = TIME_FADE - time;
-            break;
-            
-        case HIDDEN:
-            time = 0;
-            state = State.FADE_IN;
-            break;
+            case VISIBLE:
+                time = 0;
+                break;
+
+            case FADE_IN:
+                break;
+
+            case FADE_OUT:
+                state = State.FADE_IN;
+                time = TIME_FADE - time;
+                break;
+
+            case HIDDEN:
+                time = 0;
+                state = State.FADE_IN;
+                break;
         }
     }
-    
+
     private void hideImmediately() {
         state = State.HIDDEN;
         time = 0;
     }
-    
+
     @Override
     public void onDraw(Canvas canvas) {
         switch (state) {
-        case FADE_IN:
-            canvas.setAlpha(time / TIME_FADE);
-            break;
-            
-        case FADE_OUT:
-            canvas.setAlpha(1.0f - time / TIME_FADE);
-            break;
-            
-        case HIDDEN:
-            return;            // don't draw anything
-        
-        case VISIBLE:
-            break;
+            case FADE_IN:
+                canvas.setAlpha(time / TIME_FADE);
+                break;
+
+            case FADE_OUT:
+                canvas.setAlpha(1.0f - time / TIME_FADE);
+                break;
+
+            case HIDDEN:
+                return;            // don't draw anything
+
+            case VISIBLE:
+                break;
         }
-        
+
         super.onDraw(canvas);
     }
-    
+
     @Override
     public void update(float delta) {
         super.update(delta);
-        
+
         time += delta;
-        
+
         switch (state) {
-        case FADE_IN:
-            if (time > TIME_FADE) {
-                time = 0;
-                state = State.VISIBLE;
-            }
-            break;
-            
-        case FADE_OUT:
-            if (time > TIME_FADE) {
-                time = 0;
-                state = State.HIDDEN;
-            }
-            break;
-            
-        case HIDDEN:
-            break;
-        
-        case VISIBLE:
-            int textLen = message.getText().length();
-            float maxTime = TIME_VISIBLE_BASE + textLen * TIME_VISIBLE_PER_CHAR;
-            
-            // longer text messages are shown for longer periods of time
-            if (time > maxTime) {
-                time = 0;
-                state = State.FADE_OUT;
-            }
-            break;
+            case FADE_IN:
+                if (time > TIME_FADE) {
+                    time = 0;
+                    state = State.VISIBLE;
+                }
+                break;
+
+            case FADE_OUT:
+                if (time > TIME_FADE) {
+                    time = 0;
+                    state = State.HIDDEN;
+                }
+                break;
+
+            case HIDDEN:
+                break;
+
+            case VISIBLE:
+                int textLen = message.getText().length();
+                float maxTime = TIME_VISIBLE_BASE + textLen * TIME_VISIBLE_PER_CHAR;
+
+                // longer text messages are shown for longer periods of time
+                if (time > maxTime) {
+                    time = 0;
+                    state = State.FADE_OUT;
+                }
+                break;
         }
     }
 

@@ -35,7 +35,7 @@ public interface NetworkSystem extends BlockRegistrationListener {
 
     void host(int port, boolean dedicatedServer) throws HostingFailedException;
 
-    JoinStatus join(String address, int port);
+    JoinStatus join(String address, int port) throws InterruptedException;
 
     void shutdown();
 

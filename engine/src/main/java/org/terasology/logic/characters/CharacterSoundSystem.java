@@ -16,7 +16,6 @@
 package org.terasology.logic.characters;
 
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.Time;

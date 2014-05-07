@@ -121,6 +121,91 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
     }
 }
 
+// Dynamic task definition for cloning an existing meta-module (with the meta-module name embedded in the task name as <ID>)
+// Sample command: gradlew fetchMetaStructuralResources
+tasks.addRule("Pattern: fetchMeta<ID>") { String taskName ->
+    if (taskName.startsWith("fetchMeta")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitClone) {
+            // TODO: This task description does not get listed under the "Rules" section on "gradlew tasks" :-(
+            description = 'Fetches source for a given meta-module to the local project, cloned from GitHub'
+
+            // Repo name is the dynamic part of the task name
+            def repo = (taskName - 'fetchMeta')
+            def parentDir = 'meta'
+
+            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'MetaTerasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            // Since meta-modules only accompany normal modules they need a unique name
+            def destination = file("$parentDir/$repo" + "Meta")
+
+            // Don't clone this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "fetchMeta requested for $repo from Github under $githubHome - exists already? " + !enabled
+
+            // Do the actual clone if we don't have the directory already
+            if (enabled) {
+                uri = "https://github.com/$githubHome/" + repo + ".git"
+                println "Fetching $repo from $uri"
+                destinationPath = destination
+                bare = false
+            }
+        }
+    }
+}
+
+// Dynamic task definition for creating a new meta-module (from scratch, rather than cloning from GitHub)
+// Sample command: gradlew createMetaStructuralResources
+tasks.addRule("Pattern: createMeta<ID>") { String taskName ->
+    if (taskName.startsWith("createMeta")) {
+
+        // Here's the actual task definition for each dynamically created task of name taskName
+        task (taskName, type: GitInit) {
+            description = 'Creates template source for a given meta-module to the local project and preps a local Git repo'
+
+            // Repo name is the dynamic part of the task name + "Meta" appended in the case of meta-modules
+            def repo = (taskName - 'createMeta')
+            def parentDir = 'meta'
+
+            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            def githubHome = 'MetaTerasology'
+            if (project.hasProperty('githubAccount')) {
+                githubHome = githubAccount
+            }
+
+            // Since meta-modules only accompany normal modules they need a unique name
+            def destination = file("$parentDir/$repo" + "Meta")
+
+            // Don't create this repo if we already have a directory by that name (also determines Gradle UP-TO-DATE)
+            enabled = !destination.exists()
+            println "createMeta requested for $repo linked to $githubHome on GitHub - exists already? " + !enabled
+
+            // Do the actual creation if we don't have the directory already
+            if (enabled) {
+
+                println "Creating $repo locally"
+                destination.mkdir()
+                destinationPath = destination
+
+                // TODO: Add in the local mapping to a remote ref definition. Needs support in the Gradle-Git plugin
+                //uri = "https://github.com/$githubAccount/" + repo + ".git"
+                bare = false
+
+                // Copy in some template stuff for the new meta-module
+                doLast {
+                    new File(destination, 'README.markdown') << new File(templatesDir, 'metaREADME.markdown').text.replaceAll('MODULENAME', repo)
+                    new File(destination, '.gitignore') << new File(templatesDir, '.gitignore').text
+                }
+            }
+        }
+    }
+}
+
 // Dynamic task definition for cloning an existing facade (with the facade name embedded in the task name as <ID>)
 // Sample command: gradlew fetchFacadeAndroid
 tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->

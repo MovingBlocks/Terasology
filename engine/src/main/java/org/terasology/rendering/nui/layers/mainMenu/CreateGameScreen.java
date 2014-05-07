@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -154,9 +155,9 @@ public class CreateGameScreen extends CoreScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 if (worldGenerator.getSelection() == null) {
-                    ErrorMessagePopup errorMessagePopup = getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class);
+                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     if (errorMessagePopup != null) {
-                        errorMessagePopup.setError("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
+                        errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
                     }
                 } else {
                     GameManifest gameManifest = new GameManifest();

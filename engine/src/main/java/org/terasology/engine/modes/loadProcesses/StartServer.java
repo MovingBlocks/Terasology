@@ -21,7 +21,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * @author Immortius
@@ -47,7 +47,7 @@ public class StartServer extends SingleStepLoadProcess {
         try {
             CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT, dedicated);
         } catch (HostingFailedException e) {
-            CoreRegistry.get(NUIManager.class).pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Failed to Host",
+            CoreRegistry.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
                     e.getMessage() + " - Reverting to single player");
         }
         return true;
