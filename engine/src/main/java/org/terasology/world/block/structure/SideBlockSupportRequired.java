@@ -18,6 +18,8 @@ package org.terasology.world.block.structure;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DestroyEvent;
@@ -32,7 +34,8 @@ import org.terasology.world.block.BlockComponent;
 import java.util.Collections;
 import java.util.Map;
 
-public class SideBlockSupportRequired implements BlockStructuralSupport {
+@RegisterSystem
+public class SideBlockSupportRequired extends BaseComponentSystem implements BlockStructuralSupport {
     private static final String SUPPORT_CHECK_ACTION_ID = "Engine:SideBlockSupportCheck";
 
     @Override
