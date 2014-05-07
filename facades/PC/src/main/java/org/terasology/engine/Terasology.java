@@ -43,27 +43,40 @@ import java.util.Collection;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
-    
-    private static final String HOME_ARG = "-homedir=";
-    private static final String LOCAL_ARG = "-homedir";
+
+    // -------------- ARGUMENTS ----------------
+    // Terasology saves data such as game saves and logs into subfolders of a "home directory".
+    // Terasology provides a default, platform-specific home directory, but the user can use
+    // launch arguments to use the current directory (?) or specify one explicitly.
+    private static final String LOCAL_ARG = "-homedir"; // use the -current- directory (?) as Terasology's home directory.
+    private static final String HOME_ARG = "-homedir="; // use the -specified- directory as Terasology's home directory.
+
+    // Using this argument launches Terasology without graphics, i.e. to act as a server.
     private static final String HEADLESS_ARG = "-headless";
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
+
+        boolean isHeadless = false;
+        Path homePath = null;
+
         try {
-            boolean isHeadless = false;
-            Path homePath = null;
+
             for (String arg : args) {
                 if (arg.startsWith(HOME_ARG)) {
+                    // the user explicitly specified a home directory
                     homePath = Paths.get(arg.substring(HOME_ARG.length()));
                 } else if (arg.equals(LOCAL_ARG)) {
+                    // the user wishes to use the current directory as the home directory
                     homePath = Paths.get("");
                 } else if (arg.equals(HEADLESS_ARG)) {
+                    // the user is starting Terasology as headless
                     isHeadless = true;
                 }
             }
+
             if (homePath != null) {
                 PathManager.getInstance().useOverrideHomePath(homePath);
             } else {
@@ -77,14 +90,20 @@ public final class Terasology {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
 
+            // ------------------------------------------------------------------------------------------------
+            // IMPORTANT SECTION: this is where the engine is initialized, started and eventually disposed of.
+            // ------------------------------------------------------------------------------------------------
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
             engine.init();
+
             if (isHeadless) {
                 engine.run(new StateHeadlessSetup());
             } else {
                 engine.run(new StateMainMenu());
             }
             engine.dispose();
+            // ------------------------------------------------------------------------------------------------
+
         } catch (Throwable t) {
             String text = getNestedMessageText(t);
             JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
@@ -92,6 +111,12 @@ public final class Terasology {
         System.exit(0);
     }
 
+    /**
+     The content of a throwable can be highly nested.
+     This method formats it into a single string that
+     can be displayed by the dialog opened by the
+     JOptionPane class.
+     */
     private static String getNestedMessageText(Throwable t) {
         String nl = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
