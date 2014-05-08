@@ -131,7 +131,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
                 InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
             } else {
                 if (removed == null) {
-                    removed = entityManager.copy(itemAt);
+                    removed = itemAt.copy();
                 }
                 InventoryUtils.adjustStackSize(entity, shrinkSlotNo, shrinkCountResult);
             }
@@ -247,13 +247,13 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
 
     @ReceiveEvent
     public void moveItemRequest(MoveItemRequest request, EntityRef entity) {
-        try {
-            if (!(request instanceof MoveItemAmountRequest)) {
+        if (!(request instanceof MoveItemAmountRequest)) {
+            try {
                 InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
                         request.getToInventory(), request.getToSlot());
+            } finally {
+                entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
             }
-        } finally {
-            entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
         }
     }
 

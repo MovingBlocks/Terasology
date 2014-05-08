@@ -18,12 +18,15 @@ package org.terasology.world.block.structure;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.delay.DelayManager;
 import org.terasology.logic.delay.DelayedActionTriggeredEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -32,8 +35,25 @@ import org.terasology.world.block.BlockComponent;
 import java.util.Collections;
 import java.util.Map;
 
-public class SideBlockSupportRequired implements BlockStructuralSupport {
+@RegisterSystem(value = RegisterMode.AUTHORITY)
+public class SideBlockSupportRequired extends BaseComponentSystem implements BlockStructuralSupport {
     private static final String SUPPORT_CHECK_ACTION_ID = "Engine:SideBlockSupportCheck";
+
+    @In
+    private DelayManager delayManager;
+    @In
+    private PrefabManager prefabManager;
+    @In
+    private BlockEntityRegistry blockEntityRegistry;
+    @In
+    private WorldProvider worldProvider;
+    @In
+    private BlockStructuralSupportRegistry blockStructuralSupportRegistry;
+
+    @Override
+    public void preBegin() {
+        blockStructuralSupportRegistry.registerBlockStructuralSupport(this);
+    }
 
     @Override
     public int getPriority() {
@@ -49,8 +69,7 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
                 if (component.dropDelay <= 0) {
                     return true;
                 } else {
-                    DelayManager delayManager = CoreRegistry.get(DelayManager.class);
-                    final EntityRef blockEntity = getBlockEntityRegistry().getEntityAt(location);
+                    final EntityRef blockEntity = blockEntityRegistry.getBlockEntityAt(location);
                     if (!delayManager.hasDelayedAction(blockEntity, SUPPORT_CHECK_ACTION_ID)) {
                         delayManager.addDelayedAction(blockEntity, SUPPORT_CHECK_ACTION_ID, component.dropDelay);
                     }
@@ -64,7 +83,6 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
     public void checkForSupport(DelayedActionTriggeredEvent event, EntityRef entity, BlockComponent block, SideBlockSupportRequiredComponent supportRequired) {
         if (event.getActionId().equals(SUPPORT_CHECK_ACTION_ID)) {
             if (!isSufficientlySupported(block.getPosition(), null, Collections.<Vector3i, Block>emptyMap(), supportRequired)) {
-                PrefabManager prefabManager = CoreRegistry.get(PrefabManager.class);
                 entity.send(new DestroyEvent(entity, EntityRef.NULL, prefabManager.getPrefab("engine:supportRemovedDamage")));
             }
         }
@@ -84,11 +102,11 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         if (overwrittenBlock != null) {
             return overwrittenBlock.getEntity();
         }
-        EntityRef blockEntity = getBlockEntityRegistry().getExistingBlockEntityAt(location);
+        EntityRef blockEntity = blockEntityRegistry.getExistingBlockEntityAt(location);
         if (blockEntity.exists()) {
             return blockEntity;
         } else {
-            return getWorldProvider().getBlock(location).getEntity();
+            return worldProvider.getBlock(location).getEntity();
         }
     }
 
@@ -127,7 +145,7 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
 
     private boolean hasSupportFromBlockOnSide(Vector3i blockPosition, Side side, Map<Vector3i, Block> blockOverrides) {
         final Vector3i sideBlockPosition = side.getAdjacentPos(blockPosition);
-        if (!getWorldProvider().isBlockRelevant(sideBlockPosition)) {
+        if (!worldProvider.isBlockRelevant(sideBlockPosition)) {
             return true;
         }
         return getBlockWithOverrides(sideBlockPosition, blockOverrides).canAttachTo(side.reverse());
@@ -138,14 +156,6 @@ public class SideBlockSupportRequired implements BlockStructuralSupport {
         if (blockFromOverride != null) {
             return blockFromOverride;
         }
-        return getWorldProvider().getBlock(location);
-    }
-
-    private BlockEntityRegistry getBlockEntityRegistry() {
-        return CoreRegistry.get(BlockEntityRegistry.class);
-    }
-
-    private WorldProvider getWorldProvider() {
-        return CoreRegistry.get(WorldProvider.class);
+        return worldProvider.getBlock(location);
     }
 }

@@ -265,7 +265,7 @@ public final class InventoryUtils {
         EntityRef itemTo = getItemAt(to, slotTo);
 
         if (!itemTo.exists()) {
-            EntityRef fromCopy = CoreRegistry.get(EntityManager.class).copy(itemFrom);
+            EntityRef fromCopy = itemFrom.copy();
 
             ItemComponent copyItem = fromCopy.getComponent(ItemComponent.class);
             copyItem.stackCount = (byte) amount;
