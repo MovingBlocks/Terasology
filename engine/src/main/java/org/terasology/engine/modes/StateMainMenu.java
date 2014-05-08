@@ -81,18 +81,43 @@ public class StateMainMenu implements GameState {
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
         eventSystem.registerEventHandler(nuiManager);
 
+        // TODO: REVIEW - As per conversation in https://github.com/MovingBlocks/Terasology/pull/1094:
+        // TODO:          The ComponentSysteManager (CSM) is registered and becomes first available
+        // TODO:          on engine initialization. However, it is re-instantiated and
+        // TODO:          re-registered here, every time the application enters this game state.
+        // TODO:          This is perhaps done to ensure a fresh new instance of the CSM that
+        // TODO:          doesn't mantain references to previous game instances.
+        // TODO:          If this is the case the code should make this strategy explicit.
+        // TODO:          Furthermore, it needs to be evaluated if it is indeed necessary for the CSM
+        // TODO:          to be instantiated and registered on engine initialization or if it should
+        // TODO:          be done only in the context of game states and their lifecycles.
+        componentSystemManager = new ComponentSystemManager();
+        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+
+        // TODO: As per conversation in https://github.com/MovingBlocks/Terasology/pull/1094:
+        // TODO: REVIEW - The input system has a dependency on the CameraTargetSystem.
+        // TODO:          This coupling should be reduced, i.e. to avoid using it where there are no cameras.
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
 
-        componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         inputSystem = CoreRegistry.get(InputSystem.class);
 
+        // TODO: As per conversation in https://github.com/MovingBlocks/Terasology/pull/1094:
+        // TODO: The RegisterInputSystem class duplicate instantiation and registration of the
+        // TODO: CameraTargetSystem done above and the LocalPlayer's done below. Immortius says:
+        // TODO: REMOVE this and handle refreshing of core game state at the engine level
         new RegisterInputSystem().step();
 
+        // It is somewhat curious that the CameraTargetSystem and the LocalPlayer classes
+        // are involved in the Main Menu, when no game is taking place and there are no
+        // 3D elements requiring a camera yet. Apart from some existing dependencies
+        // that will perhaps be eliminated, it turns out that immortius does have features
+        // in mind that might involve 3D elements in the Main Menu. These features will
+        // eventually require the classes mentioned.
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         localPlayer.setClientEntity(localPlayerEntity);
