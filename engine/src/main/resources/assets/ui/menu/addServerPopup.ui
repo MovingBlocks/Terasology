@@ -1,5 +1,6 @@
 {
     "type" : "addServerPopup",
+    "skin" : "popup",
     "contents" : {
         "type" : "relativeLayout",
             "contents" : [
@@ -59,6 +60,27 @@
                                     }
                                 ]
                             },
+                            {
+                                "type" : "RowLayout",
+                                "contents" : [
+                                    {
+                                        "type" : "UILabel",
+                                        "text" : "Port: ",
+                                        "family" : "option-grid",
+                                        "layoutInfo" : {
+                                            "relativeWidth" : 0.3
+                                        }
+                                    },
+                                    {
+                                        "type" : "UIText",
+                                        "id" : "port"
+                                    }
+                                ]
+                            },                            
+                            {
+                               "type" : "UILabel",
+                                "text" : "You can press ENTER to copy the name to the address field"
+                            },                            
                             {
                                 "type" : "UISpace",
                                 "size" : [1, 16]

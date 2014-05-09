@@ -29,6 +29,7 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
@@ -72,16 +73,28 @@ public class JoinGameScreen extends CoreScreenLayer {
                 }
             });
 
+            final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
+
             UILabel name = find("name", UILabel.class);
-            name.bindText(BindHelper.bindBoundBeanProperty("name", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
+            name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
 
             UILabel address = find("address", UILabel.class);
-            address.bindText(BindHelper.bindBoundBeanProperty("address", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
+            address.bindText(BindHelper.bindBoundBeanProperty("address", infoBinding, ServerInfo.class, String.class));
+
+            UILabel port = find("port", UILabel.class);
+            port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
 
             WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    getManager().pushScreen("engine:addServerPopup");
+                    AddServerPopup popup = getManager().pushScreen("engine:addServerPopup", AddServerPopup.class);
+                }
+            });
+            WidgetUtil.trySubscribe(this, "edit", new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    AddServerPopup popup = getManager().pushScreen("engine:addServerPopup", AddServerPopup.class);
+                    popup.setServerInfo(infoBinding.get());
                 }
             });
             WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {

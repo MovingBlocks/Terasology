@@ -82,6 +82,43 @@
                             "family" : "description",
                             "contents" : [
                                 {
+                                    "type" : "UIButton",
+                                    "id" : "add",
+                                    "text" : "Add",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "TOP"
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "edit",
+                                    "text" : "Edit",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "add",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "id" : "remove",
+                                    "text" : "Remove",
+                                    "layoutInfo" : {
+                                        "use-content-height" : true,
+                                        "position-top" : {
+                                            "target" : "BOTTOM",
+                                            "widget" : "edit",
+                                            "offset" : 8
+                                        }
+                                    }
+                                },
+                                {
                                     "type" : "ColumnLayout",
                                     "id" : "simpleItems",
                                     "columns" : 2,
@@ -105,38 +142,23 @@
                                             "type" : "UILabel",
                                             "id" : "address",
                                             "text" : "Server Address Goes Here"
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "text" : "Port: "
+                                        },
+                                        {
+                                            "type" : "UILabel",
+                                            "id" : "port",
+                                            "text" : "Server Port Goes Here"
                                         }
                                     ],
                                     "layoutInfo" : {
                                         "use-content-height" : true,
                                         "position-horizontal-center" : {},
                                         "position-top" : {
-                                            "target" : "TOP"
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "add",
-                                    "text" : "Add",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-top" : {
                                             "target" : "BOTTOM",
-                                            "widget" : "simpleItems",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "remove",
-                                    "text" : "Remove",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "add",
+                                            "widget" : "remove",
                                             "offset" : 8
                                         }
                                     }
@@ -147,9 +169,9 @@
                                     "text" : "Join",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
-                                        "position-top" : {
-                                            "target" : "BOTTOM",
-                                            "widget" : "remove",
+                                        "position-bottom" : {
+                                            "target" : "TOP",
+                                            "widget" : "joinDirect",
                                             "offset" : 8
                                         }
                                     }
