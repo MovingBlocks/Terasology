@@ -37,6 +37,9 @@
         "error" : {
             "text-color" : "FF4444FF"
         },
+        "highlight" : {
+            "text-color" : "FFFF00FF"
+        },
         "heading-input" : {
             "font" : "title",
             "text-align-horizontal" : "left"

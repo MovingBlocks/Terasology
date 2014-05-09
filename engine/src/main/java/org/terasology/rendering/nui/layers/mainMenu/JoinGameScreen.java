@@ -29,15 +29,19 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 
 /**
  * @author Immortius
@@ -75,25 +79,25 @@ public class JoinGameScreen extends CoreScreenLayer {
 
             final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
 
-            UILabel name = find("name", UILabel.class);
+            UILabel name = findChecked("name", UILabel.class);
             name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
 
-            UILabel address = find("address", UILabel.class);
+            UILabel address = findChecked("address", UILabel.class);
             address.bindText(BindHelper.bindBoundBeanProperty("address", infoBinding, ServerInfo.class, String.class));
 
-            UILabel port = find("port", UILabel.class);
+            UILabel port = findChecked("port", UILabel.class);
             port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
 
             WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    AddServerPopup popup = getManager().pushScreen("engine:addServerPopup", AddServerPopup.class);
+                    getManager().pushScreen(AddServerPopup.ASSET_URI);
                 }
             });
             WidgetUtil.trySubscribe(this, "edit", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    AddServerPopup popup = getManager().pushScreen("engine:addServerPopup", AddServerPopup.class);
+                    AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
                     popup.setServerInfo(infoBinding.get());
                 }
             });
@@ -115,6 +119,22 @@ public class JoinGameScreen extends CoreScreenLayer {
                     }
                 }
             });
+            
+            Binding<Boolean> hasSelection = new ReadOnlyBinding<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    return infoBinding.get() != null;
+                }
+            };
+            
+            UIButton editButton = findChecked("edit", UIButton.class);
+            UIButton removeButton = findChecked("remove", UIButton.class);
+            UIButton joinButton = findChecked("join", UIButton.class);
+
+            editButton.bindEnabled(hasSelection);
+            removeButton.bindEnabled(hasSelection);
+            joinButton.bindEnabled(hasSelection);
         }
         WidgetUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
             @Override

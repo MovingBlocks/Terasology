@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.TerasologyConstants;
@@ -22,6 +24,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
@@ -34,6 +37,8 @@ import com.google.common.primitives.Ints;
  */
 public class AddServerPopup extends CoreScreenLayer {
 
+    public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:addServerPopup");
+    
     @In
     private Config config;
     private UIText nameText;
@@ -81,7 +86,7 @@ public class AddServerPopup extends CoreScreenLayer {
             }
         });
         
-        okButton.bindEnabled(new Binding<Boolean>() {
+        okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
 
             @Override
             public Boolean get() {
@@ -89,11 +94,6 @@ public class AddServerPopup extends CoreScreenLayer {
                     && !addressText.getText().isEmpty()
                     && Ints.tryParse(portText.getText()) != null;
             }
-
-            @Override
-            public void set(Boolean value) {
-            }
-            
         });
 
         cancelButton.subscribe(new ActivateEventListener() {

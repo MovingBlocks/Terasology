@@ -167,6 +167,7 @@
                                     "type" : "UIButton",
                                     "id" : "join",
                                     "text" : "Join",
+                                    "family" : "highlight",
                                     "layoutInfo" : {
                                         "use-content-height" : true,
                                         "position-bottom" : {

@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
@@ -116,6 +117,15 @@ public abstract class AbstractWidget implements UIWidget {
         return null;
     }
 
+    @Override
+    public final <T extends UIWidget> T findChecked(String targetId, Class<T> type) {
+        T result = find(targetId, type);
+        if (result == null) {
+            throw new NullPointerException(String.format("%s '%s' not found!", type.getSimpleName(), targetId));
+        }
+        return result;
+    }
+    
     @Override
     public final <T extends UIWidget> Collection<T> findAll(Class<T> type) {
         List<T> results = Lists.newArrayList();
