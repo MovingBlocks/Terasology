@@ -65,15 +65,6 @@ public interface UIWidget extends Iterable<UIWidget> {
      */
     <T extends UIWidget> T find(String id, Class<T> type);
 
-    /**
-     * Similar to {@link UIWidget#find(String, Class)}, but throws a {@link NullPointerException} if not found
-     * @param id the id
-     * @param type the class type
-     * @return the widget
-     * @throws NullPointerException if no widget was found
-     */
-    <T extends UIWidget> T findChecked(String id, Class<T> type);
-
     <T extends UIWidget> Collection<T> findAll(Class<T> type);
 
     void onDraw(Canvas canvas);

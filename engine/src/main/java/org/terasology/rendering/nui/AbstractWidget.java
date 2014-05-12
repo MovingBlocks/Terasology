@@ -118,15 +118,6 @@ public abstract class AbstractWidget implements UIWidget {
     }
 
     @Override
-    public final <T extends UIWidget> T findChecked(String targetId, Class<T> type) {
-        T result = find(targetId, type);
-        if (result == null) {
-            throw new NullPointerException(String.format("%s '%s' not found!", type.getSimpleName(), targetId));
-        }
-        return result;
-    }
-    
-    @Override
     public final <T extends UIWidget> Collection<T> findAll(Class<T> type) {
         List<T> results = Lists.newArrayList();
         findAll(type, this, results);

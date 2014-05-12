@@ -23,13 +23,11 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 
 /**
@@ -55,12 +53,6 @@ public class AddServerPopup extends CoreScreenLayer {
         portText = find("port", UIText.class);
         okButton = find("ok", UIButton.class);
         cancelButton = find("cancel", UIButton.class);
-
-        Preconditions.checkNotNull(nameText, "UIText 'name' not found");
-        Preconditions.checkNotNull(addressText, "UIText 'address' not found");
-        Preconditions.checkNotNull(portText, "UIText 'port' not found");
-        Preconditions.checkNotNull(okButton, "UIButton 'ok' not found");
-        Preconditions.checkNotNull(cancelButton, "UIButton 'cancel' not found");
 
         okButton.subscribe(new ActivateEventListener() {
             @Override
