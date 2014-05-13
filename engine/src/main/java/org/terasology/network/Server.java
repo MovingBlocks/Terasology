@@ -28,7 +28,7 @@ public interface Server extends ChunkReadyListener {
 
     EntityRef getClientEntity();
 
-    NetData.ServerInfoMessage getInfo();
+    ServerInfoMessage getInfo();
 
     void send(Event event, EntityRef target);
 
