@@ -126,10 +126,13 @@ public class TerasologyEngine implements GameEngine {
         try {
             logger.info("Initializing Terasology...");
             logger.info(TerasologyVersion.getInstance().toString());
-            logger.info("Platform: {}", System.getProperty("os.name"));
             logger.info("Home path: {}", PathManager.getInstance().getHomePath());
             logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
-            logger.info("Java version: {}", System.getProperty("java.version"));
+            logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
+            logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm.version"));
+            logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
+            logger.info("Max. Memory: {} MB", Runtime.getRuntime().maxMemory() / (1024 * 1024));
+            logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
 
             initConfig();
 
