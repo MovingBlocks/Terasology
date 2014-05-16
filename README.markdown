@@ -123,6 +123,9 @@ If you want to pull down the source code for a module you can easily do so via G
 
 This fetches the module source for the "Sample" module and the second command fetches any dependencies and updates the IntelliJ project structure so you can see it as a module. Likewise for Eclipse or any other setup you should run any one `gradlew` command to make sure the new module's dependencies have been fetched as well. See [Codebase Structure](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) in the wiki for more.
 
+[![Build Status](http://jenkins.movingblocks.net/job/Terasology/badge/icon)](http://jenkins.movingblocks.net/job/Terasology/)
+[![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
+
 Modules
 --------
 
