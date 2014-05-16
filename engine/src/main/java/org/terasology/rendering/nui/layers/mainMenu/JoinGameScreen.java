@@ -118,7 +118,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     }
                 }
             });
-            
+
             Binding<Boolean> hasSelection = new ReadOnlyBinding<Boolean>() {
 
                 @Override
@@ -126,7 +126,7 @@ public class JoinGameScreen extends CoreScreenLayer {
                     return infoBinding.get() != null;
                 }
             };
-            
+
             UIButton editButton = find("edit", UIButton.class);
             UIButton removeButton = find("remove", UIButton.class);
             UIButton joinButton = find("join", UIButton.class);
@@ -135,14 +135,6 @@ public class JoinGameScreen extends CoreScreenLayer {
             removeButton.bindEnabled(hasSelection);
             joinButton.bindEnabled(hasSelection);
         }
-        WidgetUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                config.save();
-                getManager().pushScreen("engine:joinServerPopup");
-            }
-        });
-
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -167,11 +159,11 @@ public class JoinGameScreen extends CoreScreenLayer {
                 return joinStatus;
             }
         };
-        
+
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
         popup.onSuccess(new Function<JoinStatus, Void>() {
-            
+
             @Override
             public Void apply(JoinStatus result) {
                 if (result.getStatus() != JoinStatus.Status.FAILED) {

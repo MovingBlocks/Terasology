@@ -171,19 +171,6 @@
                                     "layoutInfo" : {
                                         "use-content-height" : true,
                                         "position-bottom" : {
-                                            "target" : "TOP",
-                                            "widget" : "joinDirect",
-                                            "offset" : 8
-                                        }
-                                    }
-                                },
-                                {
-                                    "type" : "UIButton",
-                                    "id" : "joinDirect",
-                                    "text" : "Join Direct",
-                                    "layoutInfo" : {
-                                        "use-content-height" : true,
-                                        "position-bottom" : {
                                             "target" : "BOTTOM"
                                         }
                                     }
