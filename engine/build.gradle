@@ -4,6 +4,18 @@
 apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
+// Get the gradle versioneye plugin from Maven central
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.standardout:gradle-versioneye-plugin:0.1.1'
+    }
+}
+
+apply plugin: 'versioneye'
+
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
 
