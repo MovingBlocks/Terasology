@@ -39,14 +39,14 @@ import com.google.common.collect.Maps;
 class ServerInfoMessageImpl implements ServerInfoMessage {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerInfoMessageImpl.class);
-    
+
     private final NetData.ServerInfoMessage info;
 
     ServerInfoMessageImpl(NetData.ServerInfoMessage pbInfo) {
         this.info = pbInfo;
         this.info.getBlockIdList();
     }
-    
+
     @Override
     public String getGameName() {
         return info.getGameName();
@@ -55,13 +55,14 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     @Override
     public List<WorldInfo> getWorldInfoList() {
         List<WorldInfo> result = Lists.newArrayList();
-        
+
         for (NetData.WorldInfo pbWorldInfo : info.getWorldInfoList()) {
             WorldInfo worldInfo = new WorldInfo();
             worldInfo.setTime(pbWorldInfo.getTime());
             worldInfo.setTitle(pbWorldInfo.getTitle());
+            result.add(worldInfo);
         }
-        
+
         return result;
     }
 
@@ -78,7 +79,7 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     @Override
     public List<ModuleInfo> getModuleList() {
         List<ModuleInfo> result = Lists.newArrayList();
-        
+
         for (NetData.ModuleInfo moduleInfo : info.getModuleList()) {
             if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion() || Version.create(moduleInfo.getModuleVersion()) == null) {
                 logger.error("Received incomplete module info");
@@ -90,18 +91,18 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
                 result.add(mi);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public Map<Integer, String> getBlockIds() {
         Map<Integer, String> result = Maps.newHashMap();
-        
+
         for (int i = 0; i < info.getBlockIdCount(); ++i) {
             result.put(info.getBlockId(i), info.getBlockName(i));
         }
-        
+
         return result;
     }
 }
