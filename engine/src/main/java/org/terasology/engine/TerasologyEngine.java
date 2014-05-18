@@ -339,6 +339,9 @@ public class TerasologyEngine implements GameEngine {
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
+        // WARNING: the next line was at the beginning of the method and might be needed there!
+        ModuleManager moduleManager = initModuleManager();
+
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
@@ -348,8 +351,6 @@ public class TerasologyEngine implements GameEngine {
         // WARNING the next line was at the beginning of the try block in run()
         CoreRegistry.putPermanently(GameEngine.class, this);
 
-        // WARNING: the next line was at the beginning of the method and might be needed there!
-        ModuleManager moduleManager = initModuleManager();
         // WARNING: the next line was before the CoreRegistry statements and might be needed there!
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
         AssetType.registerAssetTypes(assetManager);
