@@ -60,7 +60,5 @@
               0,0,0,0,0,0,0,0,0,0
             ]
     },
-    "Drowns" : {
-        "breathes" : ["Oxygen"]
-    }
+    "Drowns" : {}
 }
