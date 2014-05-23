@@ -18,6 +18,7 @@ package org.terasology.world.generation.facets.base;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 import org.terasology.world.generation.WorldFacet3D;
 
@@ -29,11 +30,9 @@ public class BaseFacet3D implements WorldFacet3D {
     private Region3i worldRegion;
     private Region3i relativeRegion;
 
-    public BaseFacet3D(Region3i targetRegion, Vector3i border) {
-        worldRegion = Region3i.createFromMinMax(new Vector3i(targetRegion.minX() - border.x, targetRegion.minY() - border.y, targetRegion.minZ() - border.z),
-                new Vector3i(targetRegion.maxX() + border.x, targetRegion.maxY() + border.y, targetRegion.maxZ() + border.z));
-        relativeRegion = Region3i.createFromMinMax(new Vector3i(-border.x, -border.y, -border.z),
-                new Vector3i(targetRegion.sizeX() + border.x - 1, targetRegion.sizeY() + border.y - 1, targetRegion.sizeZ() + border.z - 1));
+    public BaseFacet3D(Region3i targetRegion, Border3D border) {
+        worldRegion = border.expandTo3D(targetRegion);
+        relativeRegion = border.expandTo3D(targetRegion.size());
     }
 
     @Override
@@ -50,13 +49,13 @@ public class BaseFacet3D implements WorldFacet3D {
         if (!relativeRegion.encompasses(x, y, z)) {
             throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
         }
-        return x - relativeRegion.minX() + relativeRegion.sizeX() * (y - relativeRegion.minY() + relativeRegion.sizeY() * (z - relativeRegion.minY()));
+        return x - relativeRegion.minX() + relativeRegion.sizeX() * (y - relativeRegion.minY() + relativeRegion.sizeY() * (z - relativeRegion.minZ()));
     }
 
     protected final int getWorldIndex(int x, int y, int z) {
         if (!worldRegion.encompasses(x, y, z)) {
             throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
         }
-        return x - worldRegion.minX() + worldRegion.sizeX() * (y - worldRegion.minY() + worldRegion.sizeY() * (z - worldRegion.minY()));
+        return x - worldRegion.minX() + worldRegion.sizeX() * (y - worldRegion.minY() + worldRegion.sizeY() * (z - worldRegion.minZ()));
     }
 }

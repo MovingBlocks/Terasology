@@ -16,13 +16,11 @@
 package org.terasology.world.generation.perlin;
 
 import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
@@ -46,7 +44,7 @@ public class PerlinBaseSurfaceProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Vector3i border = region.getBorderForFacet(SurfaceHeightFacet.class);
+        Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
         Rect2i processRegion = facet.getWorldRegion();
         float[] noise = surfaceNoise.noise(processRegion);

@@ -17,6 +17,7 @@ package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
 
 /**
@@ -24,7 +25,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
  */
 public class DensityFacet extends BaseFieldFacet3D {
 
-    public DensityFacet(Region3i targetRegion, Vector3i border) {
+    public DensityFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }

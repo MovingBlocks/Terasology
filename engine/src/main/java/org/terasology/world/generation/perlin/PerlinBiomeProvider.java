@@ -18,6 +18,7 @@ package org.terasology.world.generation.perlin;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -43,7 +44,7 @@ public class PerlinBiomeProvider implements FacetProvider {
         SeaLevelTemperatureFacet temperature = region.getRegionFacet(SeaLevelTemperatureFacet.class);
         HumidityFacet humidityFacet = region.getRegionFacet(HumidityFacet.class);
 
-        Vector3i border = region.getBorderForFacet(BiomeFacet.class);
+        Border3D border = region.getBorderForFacet(BiomeFacet.class);
         BiomeFacet biomeFacet = new BiomeFacet(region.getRegion(), border);
         for (Vector2i pos : biomeFacet.getRelativeRegion()) {
             float temp = temperature.get(pos);

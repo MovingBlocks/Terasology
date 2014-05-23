@@ -24,6 +24,7 @@ import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
@@ -47,7 +48,7 @@ public class PerlinHumidityProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Vector3i border = region.getBorderForFacet(HumidityFacet.class);
+        Border3D border = region.getBorderForFacet(HumidityFacet.class);
         HumidityFacet facet = new HumidityFacet(region.getRegion(), border);
 
         float[] noise = humidityNoise.noise(facet.getWorldRegion());

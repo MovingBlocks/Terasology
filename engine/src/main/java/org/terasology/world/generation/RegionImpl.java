@@ -72,7 +72,7 @@ public class RegionImpl implements Region, GeneratingRegion {
     }
 
     @Override
-    public Vector3i getBorderForFacet(Class<? extends WorldFacet> type) {
-        return new Vector3i(4, 4, 4);
+    public Border3D getBorderForFacet(Class<? extends WorldFacet> type) {
+        return new Border3D(0, 1, 0);
     }
 }

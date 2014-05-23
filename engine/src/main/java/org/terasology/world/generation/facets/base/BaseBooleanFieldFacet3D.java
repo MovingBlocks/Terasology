@@ -18,6 +18,7 @@ package org.terasology.world.generation.facets.base;
 import com.google.common.base.Preconditions;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 
 /**
  * @author Immortius
@@ -26,7 +27,7 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
 
     private boolean[] data;
 
-    public BaseBooleanFieldFacet3D(Region3i targetRegion, Vector3i border) {
+    public BaseBooleanFieldFacet3D(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
         Vector3i size = getRelativeRegion().size();
         data = new boolean[size.x * size.y * size.z];

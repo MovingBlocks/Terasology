@@ -18,6 +18,7 @@ package org.terasology.world.generation.facets;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
@@ -25,7 +26,7 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
  */
 public class HumidityFacet extends BaseFieldFacet2D {
 
-    public HumidityFacet(Region3i targetRegion, Vector3i border) {
+    public HumidityFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }

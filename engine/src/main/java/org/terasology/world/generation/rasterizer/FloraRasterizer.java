@@ -15,8 +15,33 @@
  */
 package org.terasology.world.generation.rasterizer;
 
+import org.terasology.math.Vector3i;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.WorldRasterizer;
+import org.terasology.world.generation.facets.PlantFacet;
+
 /**
  * @author Immortius
  */
-public class FloraRasterizer {
+public class FloraRasterizer implements WorldRasterizer {
+
+    private Block tallGrass;
+
+    public FloraRasterizer(BlockManager blockManager) {
+        tallGrass = blockManager.getBlock("core:TallGrass1");
+    }
+
+    @Override
+    public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+        PlantFacet facet = chunkRegion.getFacet(PlantFacet.class);
+        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+            if (pos.y + chunk.getChunkWorldOffsetY() > 32 && facet.get(pos)) {
+                chunk.setBlock(pos, tallGrass);
+            }
+        }
+    }
 }

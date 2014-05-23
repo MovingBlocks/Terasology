@@ -19,13 +19,14 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
 
 /**
  * @author Immortius
  */
 public class BiomeFacet extends BaseObjectFacet2D<WorldBiomeProvider.Biome> {
-    public BiomeFacet(Region3i targetRegion, Vector3i border) {
+    public BiomeFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border, WorldBiomeProvider.Biome.class);
     }
 }

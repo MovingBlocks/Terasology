@@ -18,6 +18,7 @@ package org.terasology.world.generation.facets.base;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
@@ -28,10 +29,9 @@ public class BaseFacet2D implements WorldFacet2D {
     private Rect2i worldRegion;
     private Rect2i relativeRegion;
 
-    public BaseFacet2D(Region3i targetRegion, Vector3i border) {
-        worldRegion = Rect2i.createFromMinAndMax(targetRegion.minX() - border.x, targetRegion.minZ() - border.z,
-                targetRegion.maxX() + border.x, targetRegion.maxZ() + border.z);
-        relativeRegion = Rect2i.createFromMinAndMax(-border.x, -border.z, targetRegion.sizeX() + border.x - 1, targetRegion.sizeZ() + border.z - 1);
+    public BaseFacet2D(Region3i targetRegion, Border3D border) {
+        worldRegion = border.expandTo2D(targetRegion);
+        relativeRegion = border.expandTo2D(targetRegion.size());
     }
 
     @Override

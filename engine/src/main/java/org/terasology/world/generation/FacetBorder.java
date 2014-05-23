@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FacetBorder {
-    int x() default 0;
-    int y() default 0;
-    int z() default 0;
+    int top() default 0;
+    int bottom() default 0;
+    int sides() default 0;
 }

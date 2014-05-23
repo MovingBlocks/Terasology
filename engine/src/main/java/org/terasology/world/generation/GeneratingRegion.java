@@ -29,5 +29,5 @@ public interface GeneratingRegion {
 
     <T extends WorldFacet> void setRegionFacet(Class<T> type, T facet);
 
-    Vector3i getBorderForFacet(Class<? extends WorldFacet> type);
+    Border3D getBorderForFacet(Class<? extends WorldFacet> type);
 }

@@ -20,6 +20,7 @@ import org.terasology.math.Border;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.generation.Border3D;
 
 /**
  * @author Immortius
@@ -28,7 +29,7 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
 
     private float[] data;
 
-    public BaseFieldFacet3D(Region3i targetRegion, Vector3i border) {
+    public BaseFieldFacet3D(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
         Vector3i size = getRelativeRegion().size();
         this.data = new float[size.x * size.y * size.z];
