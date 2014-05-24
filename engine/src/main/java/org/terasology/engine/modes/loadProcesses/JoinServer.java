@@ -74,7 +74,7 @@ public class JoinServer implements LoadProcess {
                 Short id = Short.valueOf(entry.getKey().shortValue());
                 Short oldId = blockMap.put(name, id);
                 if (oldId != null && oldId != id) {
-                    logger.warn("Overwriting ID {} for {} with ID {}", oldId, name, id);
+                    logger.warn("Overwriting Id {} for {} with Id {}", oldId, name, id);
                 }
             }
             gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());

@@ -17,7 +17,6 @@ package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
-import com.sun.xml.internal.ws.api.pipe.Engine;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
