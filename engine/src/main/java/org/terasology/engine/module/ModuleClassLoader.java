@@ -30,6 +30,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
@@ -58,8 +59,14 @@ public class ModuleClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> clazz = super.loadClass(name, resolve);
-        if (clazz.getClassLoader() != this) {
+        final Class<?> clazz = super.loadClass(name, resolve);
+        ClassLoader loadingClassLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
+            public ClassLoader run() {
+                return clazz.getClassLoader();
+            }
+        });
+        if (loadingClassLoader != this) {
             if (securityManager.checkAccess(clazz)) {
                 return clazz;
             } else {
