@@ -30,8 +30,6 @@
         "material" : "engine:monkeyHead9",
         "hideFromOwner" : true
     },
-    "Drowns" : {
-    },
     "BoxShape" : {
         "extents" : [1.5, 1.6, 1.5]
     },
@@ -61,5 +59,6 @@
               0,0,0,0,0,0,0,0,0,0,
               0,0,0,0,0,0,0,0,0,0
             ]
-    }
+    },
+    "Breather" : {}
 }
