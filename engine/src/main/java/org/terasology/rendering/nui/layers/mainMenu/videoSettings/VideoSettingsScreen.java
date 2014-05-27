@@ -16,10 +16,16 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.collect.Lists;
+import com.sun.jna.platform.unix.X11;
+import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.input.BindableButton;
+import org.terasology.logic.console.Console;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
@@ -27,10 +33,9 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.widgets.ActivateEventListener;
-import org.terasology.rendering.nui.widgets.UIDropdown;
-import org.terasology.rendering.nui.widgets.UISlider;
+import org.terasology.rendering.nui.widgets.*;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
@@ -44,20 +49,33 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @In
     private GameEngine engine;
 
+
+    UICheckbox checkbox;
     @In
     private Config config;
 
-    public VideoSettingsScreen() {
+    int windowHeight;
+    int windowWidth;
 
+    public VideoSettingsScreen() {
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
-        UIDropdown<VideoQuality> videoQuality = find("quality", UIDropdown.class);
+
+        final UITooltip tooltip = new UITooltip();
+
+       boolean testBoolean = true;
+        windowHeight = config.getRendering().getWindowHeight();
+        windowWidth = config.getRendering().getWindowWidth();
+
+
+
+        UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
-            videoQuality.setOptions(Lists.newArrayList(VideoQuality.NICE, VideoQuality.EPIC, VideoQuality.INSANE, VideoQuality.UBER));
-            videoQuality.bindSelection(new VideoQualityBinding(config.getRendering()));
+            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL,Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
+            videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);
@@ -106,7 +124,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             dynamicShadows.bindSelection(new DynamicShadowsBinding(config.getRendering()));
         }
 
-        UISlider fovSlider = find("fov", UISlider.class);
+        final UISlider fovSlider = find("fov", UISlider.class);
         if (fovSlider != null) {
             fovSlider.setIncrement(5.0f);
             fovSlider.setPrecision(0);
@@ -120,17 +138,39 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
-
-        WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "cloudShadow", BindHelper.bindBeanProperty("cloudShadows", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "parallax", BindHelper.bindBeanProperty("parallaxMapping", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "filmGrain", BindHelper.bindBeanProperty("filmGrain", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "motionBlur", BindHelper.bindBeanProperty("motionBlur", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
-        WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "outLine", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "eyeAdaptation", BindHelper.bindBeanProperty("eyeAdaptation", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.trySubscribe(this, "fovReset", new ActivateEventListener() {
+
+            @Override
+            public void onActivated(UIWidget widget) {
+                CameraSettingBinding cam;
+                fovSlider.setValue(100.0f);
+
+            }
+        });
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
             }
         });
+
+        videoQuality.bindTooltip(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                tooltip.setText("Graphic Presets, autommaticly sets settings for you.");
+                return tooltip.getText();
+            }
+        });
+
     }
 
     @Override
