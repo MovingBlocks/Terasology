@@ -132,16 +132,6 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
         Display.destroy();
     }
 
-    ///TODO: Maybe add better code, for locking the screen borders. -- Should this be removed?
-    public void lockDisplay(boolean locked) {
-        if (locked == true) {
-            Display.setResizable(false);
-        }
-        else {
-            Display.setResizable(true);
-        }
-    }
-
     private void initDisplay(Config config, LwjglDisplayDevice lwjglDisplay) {
         try {
             lwjglDisplay.setFullscreen(config.getRendering().isFullscreen(), false);
