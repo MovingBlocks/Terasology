@@ -149,7 +149,7 @@ public class InventoryCell extends CoreWidget {
     public void onDraw(Canvas canvas) {
         getTargetItem().send(new BeforeInventoryCellRendered(canvas));
 
-        canvas.addInteractionRegion(interactionListener, canvas.getRegion());
+        canvas.addInteractionRegion(interactionListener, icon.getTooltip(), canvas.getRegion());
         canvas.drawWidget(icon);
 
         getTargetItem().send(new InventoryCellRendered(canvas));
