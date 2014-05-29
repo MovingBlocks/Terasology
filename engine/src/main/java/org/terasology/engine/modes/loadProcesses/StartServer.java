@@ -16,6 +16,7 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import org.terasology.config.Config;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -45,7 +46,9 @@ public class StartServer extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         try {
-            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT, dedicated);
+            Config config = CoreRegistry.get(Config.class);
+            int port = config.getNetwork().getServerPort();
+            CoreRegistry.get(NetworkSystem.class).host(port, dedicated);
         } catch (HostingFailedException e) {
             CoreRegistry.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
                     e.getMessage() + " - Reverting to single player");

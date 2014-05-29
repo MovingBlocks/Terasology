@@ -63,6 +63,7 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.Server;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -94,6 +95,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Implementation of the Network System using Netty and TCP/IP
@@ -855,7 +857,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     }
 
     private void applySerializationTables() {
-        NetData.ServerInfoMessage serverInfo = server.getInfo();
+        NetData.ServerInfoMessage serverInfo = server.getRawInfo();
         entitySerializer.setIdMapping(applySerializationInfo(serverInfo.getComponentList(), entitySystemLibrary.getComponentLibrary()));
         eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
     }

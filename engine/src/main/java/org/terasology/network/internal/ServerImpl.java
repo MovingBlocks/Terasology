@@ -23,9 +23,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
@@ -126,7 +129,11 @@ public class ServerImpl implements Server {
     }
 
     @Override
-    public NetData.ServerInfoMessage getInfo() {
+    public ServerInfoMessage getInfo() {
+        return new ServerInfoMessageImpl(serverInfo);
+    }
+    
+    public NetData.ServerInfoMessage getRawInfo() {
         return serverInfo;
     }
 

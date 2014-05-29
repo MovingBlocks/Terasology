@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 import org.terasology.config.Config;
 import org.terasology.config.ServerInfo;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
@@ -29,10 +28,14 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.databinding.IntToStringBinding;
 import org.terasology.rendering.nui.databinding.ListSelectionBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.ItemActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIList;
 
@@ -68,20 +71,32 @@ public class JoinGameScreen extends CoreScreenLayer {
             serverList.subscribe(new ItemActivateEventListener<ServerInfo>() {
                 @Override
                 public void onItemActivated(UIWidget widget, ServerInfo item) {
-                    join(item.getAddress());
+                    join(item.getAddress(), item.getPort());
                 }
             });
 
+            final ListSelectionBinding<ServerInfo> infoBinding = new ListSelectionBinding<ServerInfo>(serverList);
+
             UILabel name = find("name", UILabel.class);
-            name.bindText(BindHelper.bindBoundBeanProperty("name", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
+            name.bindText(BindHelper.bindBoundBeanProperty("name", infoBinding, ServerInfo.class, String.class));
 
             UILabel address = find("address", UILabel.class);
-            address.bindText(BindHelper.bindBoundBeanProperty("address", new ListSelectionBinding<ServerInfo>(serverList), ServerInfo.class, String.class));
+            address.bindText(BindHelper.bindBoundBeanProperty("address", infoBinding, ServerInfo.class, String.class));
+
+            UILabel port = find("port", UILabel.class);
+            port.bindText(new IntToStringBinding(BindHelper.bindBoundBeanProperty("port", infoBinding, ServerInfo.class, int.class)));
 
             WidgetUtil.trySubscribe(this, "add", new ActivateEventListener() {
                 @Override
                 public void onActivated(UIWidget button) {
-                    getManager().pushScreen("engine:addServerPopup");
+                    getManager().pushScreen(AddServerPopup.ASSET_URI);
+                }
+            });
+            WidgetUtil.trySubscribe(this, "edit", new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    AddServerPopup popup = getManager().pushScreen(AddServerPopup.ASSET_URI, AddServerPopup.class);
+                    popup.setServerInfo(infoBinding.get());
                 }
             });
             WidgetUtil.trySubscribe(this, "remove", new ActivateEventListener() {
@@ -97,20 +112,29 @@ public class JoinGameScreen extends CoreScreenLayer {
                 @Override
                 public void onActivated(UIWidget button) {
                     config.save();
-                    if (serverList.getSelection() != null) {
-                        join(serverList.getSelection().getAddress());
+                    ServerInfo item = serverList.getSelection();
+                    if (item != null) {
+                        join(item.getAddress(), item.getPort());
                     }
                 }
             });
-        }
-        WidgetUtil.trySubscribe(this, "joinDirect", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                config.save();
-                getManager().pushScreen("engine:joinServerPopup");
-            }
-        });
 
+            Binding<Boolean> hasSelection = new ReadOnlyBinding<Boolean>() {
+
+                @Override
+                public Boolean get() {
+                    return infoBinding.get() != null;
+                }
+            };
+
+            UIButton editButton = find("edit", UIButton.class);
+            UIButton removeButton = find("remove", UIButton.class);
+            UIButton joinButton = find("join", UIButton.class);
+
+            editButton.bindEnabled(hasSelection);
+            removeButton.bindEnabled(hasSelection);
+            joinButton.bindEnabled(hasSelection);
+        }
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -126,20 +150,20 @@ public class JoinGameScreen extends CoreScreenLayer {
         return false;
     }
 
-    private void join(final String address) {
+    private void join(final String address, final int port) {
         Callable<JoinStatus> operation = new Callable<JoinStatus>() {
 
             @Override
             public JoinStatus call() throws InterruptedException {
-                JoinStatus joinStatus = networkSystem.join(address, TerasologyConstants.DEFAULT_PORT);
+                JoinStatus joinStatus = networkSystem.join(address, port);
                 return joinStatus;
             }
         };
-        
+
         final WaitPopup<JoinStatus> popup = getManager().pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage("Join Game", "Connecting to '" + address + "' - please wait ...");
+        popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
         popup.onSuccess(new Function<JoinStatus, Void>() {
-            
+
             @Override
             public Void apply(JoinStatus result) {
                 if (result.getStatus() != JoinStatus.Status.FAILED) {

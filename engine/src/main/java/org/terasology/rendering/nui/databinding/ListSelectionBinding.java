@@ -24,7 +24,7 @@ public class ListSelectionBinding<T> implements Binding<T> {
 
     UIList<T> list;
 
-    public ListSelectionBinding(UIList list) {
+    public ListSelectionBinding(UIList<T> list) {
         this.list = list;
     }
 
