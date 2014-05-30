@@ -30,6 +30,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 
@@ -299,6 +300,10 @@ public final class Assets {
 
     public static UIElement getUIElement(String uri) {
         return get(AssetType.UI_ELEMENT, uri, UIElement.class);
+    }
+
+    public static UIWidget getUIWidget(String uri) {
+        return getUIElement(uri).getRootWidget();
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {
