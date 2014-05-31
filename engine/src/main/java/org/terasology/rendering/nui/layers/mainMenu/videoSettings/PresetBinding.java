@@ -51,7 +51,7 @@ public class PresetBinding implements Binding<Preset> {
         else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
             return Preset.MINIMAL;
         }
-    return Preset.CUSTOM;
+        return Preset.CUSTOM;
     }
 
     @Override
