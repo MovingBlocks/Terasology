@@ -37,7 +37,6 @@ public class MainMenuScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         find("version", UILabel.class).setText(TerasologyVersion.getInstance().getHumanVersion());
-
         WidgetUtil.trySubscribe(this, "singleplayer", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

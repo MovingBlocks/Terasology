@@ -33,7 +33,7 @@
                     },
                     {
                         "type" : "UIButton",
-                        "text" : "Exit Terasology",
+                        "text" : "Exit Teraslogy",
                         "id" : "exitGame"
                     }
                 ],

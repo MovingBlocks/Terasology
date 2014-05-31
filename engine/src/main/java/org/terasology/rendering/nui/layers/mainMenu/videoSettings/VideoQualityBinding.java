@@ -21,42 +21,37 @@ import org.terasology.rendering.nui.databinding.Binding;
 /**
  * @author Immortius
  */
-public class PresetBinding implements Binding<Preset> {
+public class VideoQualityBinding implements Binding<VideoQuality> {
     private RenderingConfig config;
 
-    public PresetBinding(RenderingConfig config) {
+    public VideoQualityBinding(RenderingConfig config) {
         this.config = config;
     }
 
     @Override
-    public Preset get() {
+    public VideoQuality get() {
         if (config.isFlickeringLight() && config.isVignette() && config.isEyeAdaptation() && config.isFilmGrain()) {
             if (config.isSsao()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts() && config.isCloudShadows()) {
-                    return Preset.UBER;
+                    return VideoQuality.UBER;
                 }
-            }
-            else if (config.isCloudShadows()) {
+            } else if (config.isCloudShadows()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts()) {
-                    return Preset.INSANE;
+                    return VideoQuality.INSANE;
                 }
             } else if (config.isBloom()) {
                 if (!config.isMotionBlur() && !config.isLightShafts()) {
-                    return Preset.EPIC;
+                    return VideoQuality.EPIC;
                 }
             } else if (!config.isMotionBlur() && !config.isLightShafts()) {
-                return Preset.NICE;
+                return VideoQuality.NICE;
             }
         }
-        else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
-            return Preset.MINIMAL;
-        }
-    return Preset.CUSTOM;
+        return VideoQuality.CUSTOM;
     }
 
     @Override
-    public void set(Preset value) {
+    public void set(VideoQuality value) {
         value.apply(config);
     }
 }
-

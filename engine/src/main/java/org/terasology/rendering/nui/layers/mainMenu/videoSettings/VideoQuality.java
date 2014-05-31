@@ -20,22 +20,7 @@ import org.terasology.config.RenderingConfig;
 /**
  * @author Immortius
  */
-public enum Preset {
-    MINIMAL("Minimal") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
-            renderConfig.setFlickeringLight(false);
-            renderConfig.setVignette(false);
-            renderConfig.setEyeAdaptation(false);
-            renderConfig.setFilmGrain(false);
-
-            renderConfig.setBloom(false);
-            renderConfig.setMotionBlur(false);
-            renderConfig.setSsao(false);
-            renderConfig.setLightShafts(false);
-            renderConfig.setCloudShadows(false);
-        }
-    },
+public enum VideoQuality {
     NICE("Nice") {
         @Override
         public void apply(RenderingConfig renderConfig) {
@@ -66,7 +51,7 @@ public enum Preset {
             renderConfig.setCloudShadows(false);
         }
     },
-    INSANE("Insane!") {
+    INSANE("Insane") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -81,7 +66,7 @@ public enum Preset {
             renderConfig.setSsao(false);
         }
     },
-    UBER("Uber!") {
+    UBER("Uber") {
         @Override
         public void apply(RenderingConfig renderConfig) {
             renderConfig.setFlickeringLight(true);
@@ -93,24 +78,6 @@ public enum Preset {
             renderConfig.setSsao(true);
             renderConfig.setLightShafts(true);
             renderConfig.setCloudShadows(true);
-            renderConfig.setAnimateGrass(true);
-
-        }
-    },
-    UBERNOFILMGRAIN("Uber (No Filmgrain)") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
-            renderConfig.setFlickeringLight(true);
-            renderConfig.setVignette(true);
-            renderConfig.setEyeAdaptation(true);
-            renderConfig.setFilmGrain(false);
-            renderConfig.setBloom(true);
-            renderConfig.setMotionBlur(true);
-            renderConfig.setSsao(true);
-            renderConfig.setLightShafts(true);
-            renderConfig.setCloudShadows(true);
-            renderConfig.setAnimateGrass(true);
-
         }
     },
     CUSTOM("Custom") {
@@ -121,7 +88,7 @@ public enum Preset {
 
     private String displayName;
 
-    private Preset(String displayName) {
+    private VideoQuality(String displayName) {
         this.displayName = displayName;
     }
 
@@ -130,12 +97,5 @@ public enum Preset {
     @Override
     public String toString() {
         return displayName;
-    }
-
-
-    //Run if an other setting is changed
-    public void setCustom(RenderingConfig renderConfig)
-    {
-        Preset.CUSTOM.apply(renderConfig);
     }
 }

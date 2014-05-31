@@ -35,7 +35,6 @@ public class RenderingConfig {
     private int windowPosY = -1;
     private int windowWidth = 1152;
     private int windowHeight = 720;
-    private boolean isFixedWindow;
     private boolean fullscreen;
     private ViewDistance viewDistance = ViewDistance.MODERATE;
     private boolean flickeringLight = true;
@@ -84,8 +83,6 @@ public class RenderingConfig {
     public void setPixelFormat(PixelFormat pixelFormat) {
         this.pixelFormat = pixelFormat;
     }
-
-    public boolean getisfixedWindow() { return isFixedWindow; }
 
     public int getWindowPosX() {
         return windowPosX;
