@@ -110,7 +110,7 @@ public class EntityAwareWorldProviderTest {
 
     @Before
     public void setup() {
-        GameThread.setGameThread();
+        GameThread.setToCurrentThread();
         AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager(), false)));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 

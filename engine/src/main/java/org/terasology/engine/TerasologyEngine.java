@@ -87,46 +87,27 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Immortius
  *
- * This GameEngine implementation is the kernel of Terasology.
+ * This GameEngine implementation is the heart of Terasology.
  *
- * It is normally started by a facade which provides it with a runtime context and a
- * launch profile (i.e. headless vs with-graphics). It first takes care of making
- * a number of application-wide initializations (see init() method). It then provides
- * a main game loop (see mainLoop() method) characterized by a number of mutually
- * exclusive GameStates.
+ * It first takes care of making a number of application-wide initializations (see init()
+ * method). It then provides a main game loop (see run() method) characterized by a number
+ * of mutually exclusive {@link GameState}s. The current GameState is updated each
+ * frame, and a change of state (see changeState() method) can be requested at any time - the
+ * switch will occur cleanly between frames. Interested parties can be notified of GameState
+ * changes by using the subscribeToStateChange() method.
  *
- * Each GameState encapsulates a different set of systems and managers being initialized
- * on state change and updated every iteration of the main loop. Existing GameState
- * implementation can be found in engine/modes and do not necessarily represent a state
- * of play. I.e. interacting with the Main Menu is handled through a GameState.
+ * At this stage the engine also provides a number of utility methods (see submitTask() and
+ * hasMouseFocus() to name a few) but they might be moved elsewhere.
  *
- * The engine also provides methods to deal with its shutdown (see cleanup() and
- * dispose()) alongside some utility methods to submit background tasks and to subscribe
- * to GameState changes.
- *
- * Special mention must be made in regard to EngineSubsystems. They are not individually
- * specified here in the engine and are provided instead by the facade via the constructor.
- * They take care of things such as Input and Rendering and are not to be confused with
- * the systems and managers initialized by the engine or in the GameStates. They can be
- * found in engine/subsystem.
- *
- * As an overview of this class, and to jump to subsections, here is an index:
- *
- * Declarations - introducing all class-level variables
- * Constructors - only a simple one at this stage and might stay that way.
- * Initialization - the init() method on its own, given its importance
- * Initialization Support Methods - methods used by init()
- * LifeCycle and GameState methods - i.e. run(), shutdown() and changeState()
- * -THE- MAIN LOOP - Where most of the application's time and resources are spent
- * Miscellaneous Methods - i.e. submitTask(), subscribeToStateChange()
- * Getter/Setter/Checker Methods - for the variables encountered in Declarations
- *
+ * Special mention must be made in regard to EngineSubsystems. An {@link EngineSubsystem}
+ * is a pluggable low-level component of the engine, that is processed every frame - like
+ * rendering or audio. A list of EngineSubsystems is provided in input to the engine's
+ * constructor. Different sets of Subsystems can significantly change the behaviour of
+ * the engine, i.e. providing a "no-frills" server in one case or a full-graphics client
+ * in another.
  */
 public class TerasologyEngine implements GameEngine {
 
-    // ----------------------------------------------------------------------------------
-    // DECLARATIONS
-    // ----------------------------------------------------------------------------------
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
     private Config config;
@@ -136,10 +117,8 @@ public class TerasologyEngine implements GameEngine {
     private GameState pendingState;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    // TODO: Convert to an EngineState enum? Initialized, Running, Paused (= initialized, not running), Disposed
-    private boolean initialised;
-    private boolean running;
-    private boolean disposed;
+    private enum EngineState {UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED};
+    private EngineState engineState = EngineState.UNINITIALIZED;
 
     // TODO: Convert magic number 16 to a readable constant - why 16?
     private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", 16);
@@ -149,9 +128,6 @@ public class TerasologyEngine implements GameEngine {
 
     private Deque<EngineSubsystem> subsystems;
 
-    // ----------------------------------------------------------------------------------
-    // CONSTRUCTORS - even though at this stage there's only one and might stay that way.
-    // ----------------------------------------------------------------------------------
     /**
      -THE- Engine constructor. Terasology is started by a set of
      platform-specific scripts/executables called "the facade".
@@ -180,7 +156,7 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void init() {
 
-        if (initialised) {
+        if (isInitialized()) {
             return;
         }
 
@@ -188,41 +164,33 @@ public class TerasologyEngine implements GameEngine {
 
         try {
 
-            // logging info such as platform, version, paths, java version...
-            logGenericInfo();
+            logger.info("Initializing Terasology...");
+            logEnvironmentInfo();
 
-            // load configuration from file or create a configuration from scratch.
             initConfig();
 
-            // subsystems have a chance to do something BEFORE managers and Time are initialized.
-            subsystemsPreInitialization();
+            preInitSubsystems();
 
             // time must be set here as it is needed by some of the managers.
             verifyRequiredSystemIsRegistered(Time.class);
             time = (EngineTime) CoreRegistry.get(Time.class);
 
-            // the thread currently running is set as -THE- game thread.
-            // no other thread should be confused with it.
-            GameThread.setGameThread();
+            GameThread.setToCurrentThread();
 
-            // initializes a number of managers and systems
             initManagers();
 
-            // subsystems have a chance to do something AFTER managers and Time are initialized
-            subsystemsPostInitialization();
+            postInitSubsystems();
 
-            // some systems absolutely need to be up and running by now
             verifyRequiredSystemIsRegistered(DisplayDevice.class);
             verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
             verifyRequiredSystemIsRegistered(InputSystem.class);
 
-            // Instantiates a number of asset factories, each for a specific asset type.
             initAssets();
 
-            // Do we want to monitor Threads, Chunks and Performance?
-            initAdvancedMonitorIfEnabled();
+            // TODO: Review - The advanced monitor shouldn't be hooked-in this way (see issue #692)
+            initAdvancedMonitor();
 
-            initialised = true;
+            engineState = EngineState.INITIALIZED;
 
         } catch (RuntimeException e) {
             logger.error("Failed to initialise Terasology", e);
@@ -233,15 +201,10 @@ public class TerasologyEngine implements GameEngine {
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
     }
 
-    // ----------------------------------------------------------------------------------
-    // Initialization Support Methods, i.e. initConfig(), initManagers(), initAssets()...
-    // ----------------------------------------------------------------------------------
-
     /**
      * Logs software, environment and hardware information.
      */
-    private void logGenericInfo() {
-        logger.info("Initializing Terasology...");
+    private void logEnvironmentInfo() {
         logger.info(TerasologyVersion.getInstance().toString());
         logger.info("Home path: {}", PathManager.getInstance().getHomePath());
         logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
@@ -255,7 +218,7 @@ public class TerasologyEngine implements GameEngine {
     /**
      * Gives a chance to subsystems to do something BEFORE managers and Time are initialized.
      */
-    private void subsystemsPreInitialization() {
+    private void preInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             subsystem.preInitialise();
         }
@@ -264,7 +227,7 @@ public class TerasologyEngine implements GameEngine {
     /**
      * Gives a chance to subsystems to do something AFTER managers and Time are initialized.
      */
-    private void subsystemsPostInitialization() {
+    private void postInitSubsystems() {
         for (EngineSubsystem subsystem : getSubsystems()) {
             subsystem.postInitialise(config);
         }
@@ -283,9 +246,10 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * The Advanced Monitor is a display allowing monitoring of Threads, Chunks and Performance.
+     * The Advanced Monitor is a display opening in a separate window
+     * allowing for monitoring of Threads, Chunks and Performance.
      */
-    private void initAdvancedMonitorIfEnabled() {
+    private void initAdvancedMonitor() {
         if (config.getSystem().isMonitoringEnabled()) {
             new AdvancedMonitor().setVisible(true);
         }
@@ -340,6 +304,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
         // WARNING: the next line was at the beginning of the method and might be needed there!
+        // ModuleManager initialization needed here by WorldGeneratorManger (and perhaps others too)
         ModuleManager moduleManager = initModuleManager();
 
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
@@ -487,7 +452,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     // ----------------------------------------------------------------------------------
-    // Life-Cycle and GameState methods
+    // Life-Cycle Methods
     // ----------------------------------------------------------------------------------
     /**
      * Runs the engine, including its main loop. Initializes the engine if necessary,
@@ -507,12 +472,12 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void run(GameState initialState) {
         try {
-            if (!initialised) {
+            if (!isInitialized()) {
                 init();
             }
 
             changeState(initialState);
-            running = true;
+            engineState = EngineState.RUNNING;
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
             mainLoop(); // -THE- MAIN LOOP. Most of the application time and resources are spent here.
@@ -525,21 +490,15 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Causes the main loop to be interrupted. Notice that despite the "finality"
-     * of the method name, cleanup() and dispose() will follow, in this order,
-     * only once the main loop has been stopped. This occurs shortly, but not
-     * immediately after this method is called. See mainLoop() method for details.
+     * Causes the main loop to stop at the end of the current frame, cleanly ending
+     * the current gamestate, all running task threads and disposing subsystems.
      */
     @Override
     public void shutdown() {
-        running = false;
+        engineState = EngineState.INITIALIZED;
     }
 
 
-    /**
-     * After the main loop has been interrupted, shuts down subsystems,
-     * dispose of the current game state (if any) and stops all threads.
-     */
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
@@ -561,13 +520,13 @@ public class TerasologyEngine implements GameEngine {
 
     /**
      * If the engine is not running, disposes of its subsystems.
+     * Do nothing otherwise.
      */
     @Override
     public void dispose() {
         try {
-            if (!running) {
-                disposed = true;
-                initialised = false;
+            if (!isRunning()) {
+                engineState = EngineState.DISPOSED;
                 Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
                 while (iter.hasNext()) {
                     EngineSubsystem subsystem = iter.next();
@@ -581,60 +540,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
-     (each is a GameState). The change can be immediate, if there is no current game
-     state set, or scheduled, when a current state exists and the new state is stored as
-     pending. That been said, scheduled changes occurs in the main loop through the call
-     processStateChanges(). As such, from a user perspective in normal circumstances,
-     scheduled changes are likely to be perceived as immediate.
-     */
-    @Override
-    public void changeState(GameState newState) {
-        if (currentState != null) {
-            pendingState = newState; // scheduled change
-        } else {
-            switchState(newState); // immediate change
-        }
-    }
-
-    /**
-     Called in the main loop, this method triggers a GameState change
-     if one has been scheduled by setting a pending state in changeState().
-     */
-    private void processPendingStateIfNecessary() {
-        if (pendingState != null) {
-            switchState(pendingState);
-            pendingState = null;
-        }
-    }
-
-    /**
-     This method is where the actual GameState change occurs, by disposing of the
-     current state (if any) and then initializing the new state. Interested parties
-     are notified of the change and any unused input from mouse/keyboard is cleared.
-     The new state is then updated every frame by the main loop.
-     */
-    private void switchState(GameState newState) {
-        if (currentState != null) {
-            currentState.dispose();
-        }
-        currentState = newState;
-        newState.init(this);
-        for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
-            subscriber.onStateChange();
-        }
-        // drain input queues
-        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
-        inputSystem.getMouseDevice().getInputQueue();
-        inputSystem.getKeyboard().getInputQueue();
-    }
-
-    // ------------------------------------------------------------------------------------
-    // -THE- MAIN LOOP. This is where most of the application time and resources are spent.
-    // ------------------------------------------------------------------------------------
-
-    /**
-     * The main loop runs until the running flag is set to false by the shutdown() method
+     * The main loop runs until the EngineState is set back to INITIALIZED by shutdown()
      * or until the OS requests the application's window to be closed. Engine cleanup
      * and disposal occur afterwards.
      */
@@ -649,7 +555,7 @@ public class TerasologyEngine implements GameEngine {
 
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (running && !display.isCloseRequested()) {
+        while (isRunning() && !display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
             // TODO: Q: why process rendering and updating at all
@@ -674,7 +580,7 @@ public class TerasologyEngine implements GameEngine {
                 continue;
             }
 
-            processPendingStateIfNecessary();
+            processPendingState();
 
             // TODO: Q: what sets currentState to null? cleanup() does but is called after the
             // TODO:    main loop is interrupted. switchState() cannot, as calling init() on
@@ -691,7 +597,8 @@ public class TerasologyEngine implements GameEngine {
             // WARNING: the following line was before the networkSystem.update() block.
             Iterator<Float> updateCycles = time.tick();
 
-            // TODO: review this whole following section to make sure everything is necessary and in the right order
+            // TODO: review this whole following section to make sure everything is necessary
+            // TODO: and in the right order
             totalDelta = 0;
             while (updateCycles.hasNext()) {
                 updateDelta = updateCycles.next();  // gameTime gets updated here!
@@ -724,13 +631,74 @@ public class TerasologyEngine implements GameEngine {
         PerformanceMonitor.endActivity();
 
         // This becomes important only if display.isCloseRequested() is true.
-        // In all other circumstances "running" is already false by the time
-        // the flow gets here.
-        running = false;
+        // In all other circumstances the EngineState is already set to
+        // INITIALIZED by the time the flow gets here.
+        engineState = EngineState.INITIALIZED;
     }
 
-    // ------------------------------------------------------------------------------------
-    // Misc. Methods: i.e. submitTask(), thread-related, state-change subscriptions...
+    // ----------------------------------------------------------------------------------
+    // GameState Methods
+    // ----------------------------------------------------------------------------------
+
+    /**
+     Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
+     (each is a GameState). The change can be immediate, if there is no current game
+     state set, or scheduled, when a current state exists and the new state is stored as
+     pending. That been said, scheduled changes occurs in the main loop through the call
+     processStateChanges(). As such, from a user perspective in normal circumstances,
+     scheduled changes are likely to be perceived as immediate.
+     */
+    @Override
+    public void changeState(GameState newState) {
+        if (currentState != null) {
+            pendingState = newState; // scheduled change
+        } else {
+            switchState(newState); // immediate change
+        }
+    }
+
+    @Override
+    public void subscribeToStateChange(StateChangeSubscriber subscriber) {
+        stateChangeSubscribers.add(subscriber);
+    }
+
+    @Override
+    public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
+        stateChangeSubscribers.remove(subscriber);
+    }
+
+    /**
+     Called in the main loop, this method triggers a GameState change
+     if one has been scheduled by setting a pending state in changeState().
+     */
+    private void processPendingState() {
+        if (pendingState != null) {
+            switchState(pendingState);
+            pendingState = null;
+        }
+    }
+
+    /**
+     This method is where the actual GameState change occurs, by disposing of the
+     current state (if any) and then initializing the new state. Interested parties
+     are notified of the change and any unused input from mouse/keyboard is cleared.
+     The new state is then updated every frame by the main loop.
+     */
+    private void switchState(GameState newState) {
+        if (currentState != null) {
+            currentState.dispose();
+        }
+        currentState = newState;
+        newState.init(this);
+        for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
+            subscriber.onStateChange();
+        }
+        // drain input queues
+        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        inputSystem.getMouseDevice().getInputQueue();
+        inputSystem.getKeyboard().getInputQueue();
+    }
+
     // ------------------------------------------------------------------------------------
 
     @Override
@@ -775,31 +743,22 @@ public class TerasologyEngine implements GameEngine {
         commonThreadPool.restart();
     }
 
-    @Override
-    public void subscribeToStateChange(StateChangeSubscriber subscriber) {
-        stateChangeSubscribers.add(subscriber);
-    }
-
-    @Override
-    public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
-        stateChangeSubscribers.remove(subscriber);
-    }
-
-    // ------------------------------------------------------------------------------------
-    // Getter/Setter/Checker Methods
-    // ------------------------------------------------------------------------------------
     public Iterable<EngineSubsystem> getSubsystems() {
         return subsystems;
     }
 
+    public boolean isInitialized() {
+        return engineState == EngineState.INITIALIZED;
+    }
+
     @Override
     public boolean isRunning() {
-        return running;
+        return engineState == EngineState.RUNNING;
     }
 
     @Override
     public boolean isDisposed() {
-        return disposed;
+        return engineState == EngineState.DISPOSED;
     }
 
     @Override
