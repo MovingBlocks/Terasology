@@ -283,28 +283,28 @@
                     "offset": 16,
                     "widget": "subtitle"
                 },
-                    "position-bottom": {
+                "position-bottom": {
                     "target": "TOP",
                     "offset": 32,
                     "widget": "close"
                 }
             }
         },
-            "layoutInfo" : {
+        "layoutInfo" : {
             "width" : 300,
             "position-horizontal-center" : {},
             "position-top" : {
                 "target" : "BOTTOM",
                 "widget" : "subtitle"
             },
-                "position-bottom" : {
+            "position-bottom" : {
                 "target" : "TOP",
                 "widget" : "actionButtons",
                 "offset" : 16
             }
         }
     },
-                "layoutInfo":
+            "layoutInfo":
                 {
                     "width": 740,
                     "height": 364,
@@ -323,7 +323,7 @@
                         "widget": "close"
                     }
                 }
-                },
+                }
             {
                 "type": "UIButton",
                 "text": "Back",
