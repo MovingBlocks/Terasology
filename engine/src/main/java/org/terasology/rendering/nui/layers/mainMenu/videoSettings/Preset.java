@@ -97,22 +97,6 @@ public enum Preset {
 
         }
     },
-    UBERNOFILMGRAIN("Uber (No Filmgrain)") {
-        @Override
-        public void apply(RenderingConfig renderConfig) {
-            renderConfig.setFlickeringLight(true);
-            renderConfig.setVignette(true);
-            renderConfig.setEyeAdaptation(true);
-            renderConfig.setFilmGrain(false);
-            renderConfig.setBloom(true);
-            renderConfig.setMotionBlur(true);
-            renderConfig.setSsao(true);
-            renderConfig.setLightShafts(true);
-            renderConfig.setCloudShadows(true);
-            renderConfig.setAnimateGrass(true);
-
-        }
-    },
     CUSTOM("Custom") {
         @Override
         public void apply(RenderingConfig renderConfig) {
