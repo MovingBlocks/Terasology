@@ -48,7 +48,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     private GameEngine engine;
 
 
-    UICheckbox checkbox;
     @In
     private Config config;
 
@@ -63,11 +62,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     public void initialise() {
 
         final UITooltip tooltip = new UITooltip();
-
-       boolean testBoolean = true;
-        windowHeight = config.getRendering().getWindowHeight();
-        windowWidth = config.getRendering().getWindowWidth();
-
 
 
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
