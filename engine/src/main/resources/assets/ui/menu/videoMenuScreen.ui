@@ -323,7 +323,7 @@
                         "widget": "close"
                     }
                 }
-                }
+                },
             {
                 "type": "UIButton",
                 "text": "Back",
