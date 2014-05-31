@@ -51,17 +51,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    int windowHeight;
-    int windowWidth;
-
     public VideoSettingsScreen() {
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
-
-        final UITooltip tooltip = new UITooltip();
 
 
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
