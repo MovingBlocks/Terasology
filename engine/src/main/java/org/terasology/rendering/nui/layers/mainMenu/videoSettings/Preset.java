@@ -131,11 +131,4 @@ public enum Preset {
     public String toString() {
         return displayName;
     }
-
-
-    //Run if an other setting is changed
-    public void setCustom(RenderingConfig renderConfig)
-    {
-        Preset.CUSTOM.apply(renderConfig);
-    }
 }
