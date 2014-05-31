@@ -121,7 +121,7 @@
                         },
                         {
                             "type": "UICheckbox",
-                            "id": "outLine"
+                            "id": "outline"
                         },
                         {
                             "type": "UILabel",
