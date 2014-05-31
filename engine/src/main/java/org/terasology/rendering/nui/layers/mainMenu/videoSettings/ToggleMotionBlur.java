@@ -18,5 +18,6 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 /**
  * Created by Member1221 on 23-03-2014.
  */
-public class ToggleMotionBlur {
+public class ToggleMotionBlur 
+{
 }
