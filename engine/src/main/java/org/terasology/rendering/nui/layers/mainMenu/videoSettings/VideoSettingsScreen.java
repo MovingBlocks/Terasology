@@ -16,7 +16,6 @@
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.BindsConfig;
