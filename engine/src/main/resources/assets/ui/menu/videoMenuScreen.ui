@@ -164,12 +164,12 @@
                                 "id": "fov"
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UILabel",
+                                "text": "View Distance: "
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UIDropdown",
+                                "id": "viewDistance"
                             },
                             {
                                 "type": "UISpace",
@@ -271,7 +271,7 @@
                             {
                                 "type": "UIButton",
                                 "text": "Advanced Settings",
-                                "id": "advancedSettings"
+                                "id": "advancedVideo"
                             }
                         ],
                         "layoutInfo": {
