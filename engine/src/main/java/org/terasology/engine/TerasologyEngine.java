@@ -86,7 +86,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Immortius
  */
-public class TerasologyEngine implements GameEngine {
+public class TerasologyEngine implements GameEngine, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
@@ -280,6 +280,11 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Uncaught exception", e);
             throw e;
         }
+    }
+
+    @Override
+    public void close() {
+        dispose();
     }
 
     @Override
