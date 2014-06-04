@@ -15,6 +15,7 @@
  */
 package org.terasology.engine;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import org.terasology.crashreporter.CrashReporter;
@@ -37,26 +38,36 @@ import java.nio.file.Paths;
 import java.util.Collection;
 
 /**
- * Class providing the main() method for launching Terasology
+ * Class providing the main() method for launching Terasology.
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author Kireev   Anton   <adeon.k87@gmail.com>
+ * Through the following launch arguments default locations to store logs and
+ * game saves can be overridden, by using the current directory or a specified
+ * one as the home directory. Furthermore, Terasology can be launched headless,
+ * to save resources while acting as a server or to run in an environment with
+ * no graphics, audio or input support.
  *
- * This class can be used to start Terasology via command line and to customize
- * its launch characteristics. Default locations to store logs and game saves
- * can be overriden by using the current directory or a specified one as the
- * home directory. Furthermore, Terasology can be launched headless, to save
- * resources while acting as a server.
+ * Available launch arguments:
  *
- * To print out the command-line help and see usage examples:
+ * <table>
+ *  <tbody>
+ *      <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
+ *      <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
+ *      <tr><td>-headless</td><td>Start headless.</td></tr>
+ *  </tbody>
+ * </table>
+ *
+ * When used via command line an usage help and some examples can be obtained via:
  *
  *      terasology -help    or    terasology /?
  *
  * In case of crashes Terasology logs available information in <logpath>/Terasology.log
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
 
-    private static final String[] PRINT_USAGE_FLAGS = {"--help", "-help", "/help", "-h", "/h",  "/?"};
+    private static final String[] PRINT_USAGE_FLAGS = {"--help", "-help", "/help", "-h", "/h", "/?"};
     private static final String USE_CURRENT_DIR_AS_HOME = "-homedir";
     private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
     private static final String START_HEADLESS = "-headless";
@@ -98,52 +109,37 @@ public final class Terasology {
 
     private static void printUsageAndExit() {
 
-        String usage =
+        String printUsageFlags = Joiner.on("|").join(PRINT_USAGE_FLAGS);
 
-            "Usage:\n" +
-            "\n" +
-            "    terasology [" + joinUsageFlags("|") + "] [" + USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>] [" + START_HEADLESS + "]\n" +
-            "\n" +
-            "By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".\n" +
-            "Optionally, the user can override the default by using one of the following launch arguments:\n" +
-            "\n" +
-            "    " + USE_CURRENT_DIR_AS_HOME + "           Use the current directory as the home directory.\n" +
-            "    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.\n" +
-            "\n" +
-            "It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.\n" +
-            "For this purpose use the " + USE_SPECIFIED_DIR_AS_HOME + " launch argument.\n" +
-            "\n" +
-            "Examples:\n" +
-            "\n" +
-            "    Use the current directory as the home directory:\n" +
-            "    terasology " + USE_CURRENT_DIR_AS_HOME + "\n" +
-            "\n" +
-            "    Use \"myPath\" as the home directory:\n" +
-            "    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath" + "\n" +
-            "\n" +
-            "    Start terasology in headless mode (no graphics):\n" +
-            "    terasology " + START_HEADLESS + "\n" +
-            "\n" +
-            "    Don't start Terasology, just print this help:\n" +
-            "    terasology " + PRINT_USAGE_FLAGS[1] + "\n" +
-            "\n";
+        System.out.println("Usage:");
+        System.out.println();
+        System.out.println("    terasology [" + printUsageFlags + "] [" + USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>] [" + START_HEADLESS + "]");
+        System.out.println();
+        System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
+        System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
+        System.out.println();
+        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "           Use the current directory as the home directory.");
+        System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.");
+        System.out.println();
+        System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.");
+        System.out.println("For this purpose use the " + USE_SPECIFIED_DIR_AS_HOME + " launch argument.");
+        System.out.println();
+        System.out.println("Examples:");
+        System.out.println();
+        System.out.println("    Use the current directory as the home directory:");
+        System.out.println("    terasology " + USE_CURRENT_DIR_AS_HOME);
+        System.out.println();
+        System.out.println("    Use \"myPath\" as the home directory:");
+        System.out.println("    terasology " + USE_SPECIFIED_DIR_AS_HOME + "myPath");
+        System.out.println();
+        System.out.println("    Start terasology in headless mode (no graphics):");
+        System.out.println("    terasology " + START_HEADLESS);
+        System.out.println();
+        System.out.println("    Don't start Terasology, just print this help:");
+        System.out.println("    terasology " + PRINT_USAGE_FLAGS[1]);
+        System.out.println();
 
-        System.out.println(usage);
         System.exit(0);
-    }
-
-    /**
-     * Joins the items in PRINT_USAGE_FLAGS into a single string
-     * using the separator provided. Example:
-     *
-     *      {"-help", "-h", "/?"}  becomes  "-help|-h|/?"
-     */
-    private static String joinUsageFlags(String separator) {
-        String joinedFlags = PRINT_USAGE_FLAGS[0];
-        for (int index = 1; index < PRINT_USAGE_FLAGS.length; index++) {
-            joinedFlags += separator + PRINT_USAGE_FLAGS[index];
-        }
-        return joinedFlags;
     }
 
     private static void handleLaunchArguments(String[] args) {
