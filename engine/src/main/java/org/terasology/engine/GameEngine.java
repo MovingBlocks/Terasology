@@ -24,7 +24,7 @@ import org.terasology.engine.modes.GameState;
  *
  * @author Immortius
  */
-public interface GameEngine {
+public interface GameEngine extends AutoCloseable {
 
     /**
      * Initialises the engine
@@ -45,7 +45,7 @@ public interface GameEngine {
     /**
      * Cleans up the engine. Can only be called after shutdown.
      */
-    void dispose();
+    void close();
 
     /**
      * @return Whether the engine is running

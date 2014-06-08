@@ -265,7 +265,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void dispose() {
+    public void close() {
         try {
             if (!running) {
                 disposed = true;
