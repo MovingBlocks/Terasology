@@ -71,20 +71,19 @@ public final class TeraEd extends JWindow {
         Collection<EngineSubsystem> subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput(),
                 lwjglCustomViewPort);
 
-        engine = new TerasologyEngine(subsystemList);
         mainWindow = new MainWindow(this);
         lwjglCustomViewPort.setCustomViewport(mainWindow.getViewport());
 
-        try {
+        try (TerasologyEngine engine = new TerasologyEngine(subsystemList)) {
             PathManager.getInstance().useDefaultHomePath();
 
+            this.engine = engine;
             engine.setHibernationAllowed(false);
             engine.subscribeToStateChange(mainWindow);
-            engine.init();
-
             engine.run(new StateMainMenu());
-            engine.dispose();
+
         } catch (Throwable t) {
+            this.engine = null;
             logger.error("Uncaught Exception", t);
         }
     }
