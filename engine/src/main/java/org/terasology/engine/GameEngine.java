@@ -19,17 +19,13 @@ package org.terasology.engine;
 import org.terasology.engine.modes.GameState;
 
 /**
- * The game engine is the core of Terasology. It maintains a stack of game states, that drive the behaviour of
- * Terasology in different modes (Main Menu, ingame, dedicated server, etc)
+ * The game engine is the core of Terasology. It maintains a stack of game states,
+ * that drive the behaviour of Terasology in different modes (Main Menu, ingame,
+ * dedicated server, etc)
  *
  * @author Immortius
  */
-public interface GameEngine {
-
-    /**
-     * Initialises the engine
-     */
-    void init();
+public interface GameEngine extends AutoCloseable {
 
     /**
      * Runs the engine, which will block the thread.
@@ -45,20 +41,30 @@ public interface GameEngine {
     /**
      * Cleans up the engine. Can only be called after shutdown.
      */
-    void dispose();
+    void close();
 
     /**
-     * @return Whether the engine is running
+     * @return Whether the engine has yet to be initialized.
+     */
+    boolean isUninitialized();
+
+    /**
+     * @return Whether the engine has been initialized.
+     */
+    boolean isInitialized();
+
+    /**
+     * @return Whether the engine is running.
      */
     boolean isRunning();
 
     /**
-     * @return Whether the engine has been disposed
+     * @return Whether the engine has been disposed.
      */
     boolean isDisposed();
 
     /**
-     * @return The current state of the engine
+     * @return The current game state of the engine
      */
     GameState getState();
 
@@ -69,8 +75,8 @@ public interface GameEngine {
      */
     void changeState(GameState newState);
 
-    // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
-    // shuts down
+    // TODO: Move task system elsewhere? Need to support saving
+    // TODO: queued/unfinished tasks too, when the world shuts down
 
     /**
      * Submits a task to be run concurrent with the main thread
@@ -101,6 +107,5 @@ public interface GameEngine {
     void subscribeToStateChange(StateChangeSubscriber subscriber);
 
     void unsubscribeToStateChange(StateChangeSubscriber subscriber);
-
 
 }

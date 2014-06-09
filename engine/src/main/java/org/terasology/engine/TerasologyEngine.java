@@ -117,7 +117,7 @@ public class TerasologyEngine implements GameEngine {
     private GameState pendingState;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    private enum EngineState {UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED};
+    private enum EngineState { UNINITIALIZED, INITIALIZED, RUNNING, DISPOSED}
     private EngineState engineState = EngineState.UNINITIALIZED;
 
     // TODO: Convert magic number 16 to a readable constant - why 16?
@@ -129,38 +129,26 @@ public class TerasologyEngine implements GameEngine {
     private Deque<EngineSubsystem> subsystems;
 
     /**
-     -THE- Engine constructor. Terasology is started by a set of
-     platform-specific scripts/executables called "the facade".
-     For example, on PCs the file Terasology.java contains the
-     main() method that constructs, initializes, runs and eventually
-     dispose of this engine.
-
-     @param subsystems  Typical subsystems lists contain graphics, timer,
-                        audio and input subsystems. On PC they are currently
-                        available in two flavours depending if the application
-                        is run with or without graphics (aka headless, i.e.
-                        to run a server).
+     * Terasology is started by a set of platform-specific scripts/executables
+     * called "the facade". For example, on PCs the file Terasology.java contains
+     * the main() method that constructs, initializes, runs and eventually
+     * disposes this engine.
+     *
+     * This constructor initializes the engine by initializing its systems,
+     * subsystems and managers. It also verifies that some required systems
+     * are up and running after they have been initialized.
+     *
+     * @param subsystems  Typical subsystems lists contain graphics, timer,
+     *                   audio and input subsystems. On PC they are currently
+     *                   available in two flavours depending if the application
+     *                   is run with or without graphics (aka headless, i.e.
+     *                   to run a server).
      */
     public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
-        this.subsystems = Queues.newArrayDeque(subsystems);
-    }
-
-    // ----------------------------------------------------------------------------------
-    // INITIALIZATION
-    // ----------------------------------------------------------------------------------
-
-    /**
-     * Initializes the engine by initializing its systems, subsystems and managers.
-     * Also verifies that some required systems are up and running.
-     */
-    @Override
-    public void init() {
-
-        if (isInitialized()) {
-            return;
-        }
 
         Stopwatch totalInitTime = Stopwatch.createStarted();
+
+        this.subsystems = Queues.newArrayDeque(subsystems);
 
         try {
 
@@ -199,6 +187,7 @@ public class TerasologyEngine implements GameEngine {
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+
     }
 
     /**
@@ -256,7 +245,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Used by the init() method, this method loads config data from file
+     * Used by the constructor, this method loads config data from file
      * when available or creates a new config object from scratch.
      * Also registers the core module as part of the default module selection
      * and generates some security-related data.
@@ -289,7 +278,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Used by the init() method, this method generally creates instances
+     * Used by the constructor, this method generally creates instances
      * for a number of managers and systems and registers them with the
      * CoreRegistry.
      */
@@ -455,10 +444,9 @@ public class TerasologyEngine implements GameEngine {
     // Life-Cycle Methods
     // ----------------------------------------------------------------------------------
     /**
-     * Runs the engine, including its main loop. Initializes the engine if necessary,
-     * i.e. if the facade didn't do it. This method is called only once per application
-     * startup, which is the reason the GameState provided is the -initial- state
-     * rather than a generic game state.
+     * Runs the engine, including its main loop. This method is called only once per
+     * application startup, which is the reason the GameState provided is the -initial-
+     * state rather than a generic game state.
      *
      * @param initialState In at least one context (the PC facade) the GameState
      *                     implementation provided as input may vary, depending if
@@ -467,15 +455,11 @@ public class TerasologyEngine implements GameEngine {
      */
     // TODO: Q: perhaps this could be called startup() rather than run, to better
     // TODO:    match it to shutdown(). On the other hand, shutdown() seems quite
-    // TODO:    final, when cleanup() and dispose() will in fact follow. Perhaps
+    // TODO:    final, when cleanup() and close() will in fact follow. Perhaps
     // TODO:    then it is shutdown() that could be renamed to stop() or halt().
     @Override
     public void run(GameState initialState) {
         try {
-            if (!isInitialized()) {
-                init();
-            }
-
             changeState(initialState);
             engineState = EngineState.RUNNING;
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -491,7 +475,7 @@ public class TerasologyEngine implements GameEngine {
 
     /**
      * Causes the main loop to stop at the end of the current frame, cleanly ending
-     * the current gamestate, all running task threads and disposing subsystems.
+     * the current GameState, all running task threads and disposing subsystems.
      */
     @Override
     public void shutdown() {
@@ -523,7 +507,7 @@ public class TerasologyEngine implements GameEngine {
      * Do nothing otherwise.
      */
     @Override
-    public void dispose() {
+    public void close() {
         try {
             if (!isRunning()) {
                 engineState = EngineState.DISPOSED;
@@ -747,6 +731,12 @@ public class TerasologyEngine implements GameEngine {
         return subsystems;
     }
 
+    @Override
+    public boolean isUninitialized() {
+        return engineState == EngineState.UNINITIALIZED;
+    }
+
+    @Override
     public boolean isInitialized() {
         return engineState == EngineState.INITIALIZED;
     }
