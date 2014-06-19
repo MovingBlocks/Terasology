@@ -163,7 +163,6 @@ public class KinematicCharacterMover implements CharacterMover {
      * Checks whether a character should change movement mode (from being underwater or in a ladder). A higher and lower point of the
      * character is tested for being in water, only if both points are in water does the character count as swimming.
      * <p/>
-     * Sends the OnEnterLiquidEvent and OnLeaveLiquidEvent events.
      *
      * @param movementComp The movement component of the character.
      * @param state        The current state of the character.
@@ -175,57 +174,57 @@ public class KinematicCharacterMover implements CharacterMover {
             return;
         }
 
+        //Calculate positions relative to Player
         Vector3f worldPos = state.getPosition();
-        Vector3f top = new Vector3f(worldPos);
-        Vector3f bottom = new Vector3f(worldPos);
-        top.y += 0.25f * movementComp.height;
-        bottom.y -= 0.25f * movementComp.height;
+        Vector3f playerTop = new Vector3f(worldPos);    playerTop.y += 0.25f * movementComp.height;
+        Vector3f playerBottom = new Vector3f(worldPos); playerBottom.y -= 0.25f * movementComp.height;
+        Vector3f playerAbove = new Vector3f(worldPos);  playerAbove.y += 0.75f * movementComp.height;
+        Vector3f playerBelow = new Vector3f(worldPos);  playerBelow.y -= 0.75f * movementComp.height;
 
-        final boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
-        final boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        //Find out what MovementMode is right
+        MovementMode newMovementMode = MovementMode.WALKING;
 
-        final boolean newSwimming = topUnderwater && bottomUnderwater;
-        boolean newClimbing = false;
+        // - Swimming?
+        if (worldProvider.getBlock(playerTop).isLiquid() && worldProvider.getBlock(playerBottom).isLiquid()) {
+            newMovementMode = MovementMode.SWIMMING;
+        }
 
-        //TODO: refactor this knot of if-else statements into something easy to read. Some sub-methods and switch statements would be nice.
-        if (!newSwimming) {
+        // - Viscous? (E.g. in Leafs or Quicksand)
+        if (worldProvider.getBlock(playerTop).getViscosity() > 0 || worldProvider.getBlock(playerBottom).getViscosity() > 0
+                || worldProvider.getBlock(playerAbove).getViscosity() > 0 || worldProvider.getBlock(playerBelow).getViscosity() > 0) {
+            newMovementMode = MovementMode.VISCOUS;
+        }
+
+        // - Climbing?
+        if (newMovementMode != MovementMode.SWIMMING) { // Can't climb underwater!
+            //Calculate climbing positions (player sides)
             Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                     worldPos), new Vector3f(worldPos)};
-            float factor = 0.18f;
-            sides[0].x += factor * movementComp.radius;
-            sides[1].x -= factor * movementComp.radius;
-            sides[2].z += factor * movementComp.radius;
-            sides[3].z -= factor * movementComp.radius;
+            sides[0].x += 0.18f * movementComp.radius;
+            sides[1].x -= 0.18f * movementComp.radius;
+            sides[2].z += 0.18f * movementComp.radius;
+            sides[3].z -= 0.18f * movementComp.radius;
             sides[4].y -= movementComp.height;
+
+            //If any of our sides are near a climbable block, climb!
             for (Vector3f side : sides) {
                 if (worldProvider.getBlock(side).isClimbable()) {
-                    //If any of our sides are near a climbable block, climb!
-                    newClimbing = true;
+                    newMovementMode = MovementMode.CLIMBING;
+                    if (!(state.getMode() == MovementMode.CLIMBING)) {
+                        state.getVelocity().y = 0; //"Stick" to Block on first contact
+                    }
                     break;
                 }
             }
         }
 
-        if (newSwimming) {
-            //Note that you cannot climb under water!
-            if (state.getMode() != MovementMode.SWIMMING) {
-                state.setMode(MovementMode.SWIMMING);
-            }
-        } else if (state.getMode() == MovementMode.SWIMMING) {
-            if (newClimbing) {
-                state.setMode(MovementMode.CLIMBING);
-                state.getVelocity().y = 0;
-            } else {
-                if (state.getVelocity().y > 0) {
-                    state.getVelocity().y += 8;
-                }
-                state.setMode(MovementMode.WALKING);
-            }
-        } else if (newClimbing != (state.getMode() == MovementMode.CLIMBING)) {
-            //We need to toggle the climbing mode
-            state.getVelocity().y = 0;
-            state.setMode((newClimbing) ? MovementMode.CLIMBING : MovementMode.WALKING);
+        //Little jump when leaving the water
+        if(state.getMode() == MovementMode.SWIMMING && newMovementMode != MovementMode.SWIMMING
+                && newMovementMode == MovementMode.WALKING) {
+            state.getVelocity().y += 8;
         }
+
+        state.setMode(newMovementMode);
     }
 
     /**
@@ -619,6 +618,77 @@ public class KinematicCharacterMover implements CharacterMover {
         }
     }
 
+    private void viscousMove(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
+                      CharacterMoveInputEvent input, EntityRef entity) {
+        Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
+        float lengthSquared = desiredVelocity.lengthSquared();
+        if (lengthSquared > 1) {
+            desiredVelocity.normalize();
+        }
+
+        Vector3f worldPos = state.getPosition();
+        Vector3f playerTop = new Vector3f(worldPos);    playerTop.y += 0.25f * movementComp.height;
+        Vector3f playerBottom = new Vector3f(worldPos); playerBottom.y -= 0.25f * movementComp.height;
+        Vector3f playerAbove = new Vector3f(worldPos);  playerAbove.y += 0.75f * movementComp.height;
+        Vector3f playerBelow = new Vector3f(worldPos);  playerBelow.y -= 0.75f * movementComp.height;
+        float viscosities[] = {worldProvider.getBlock(playerTop).getViscosity()
+                              ,worldProvider.getBlock(playerBottom).getViscosity()
+                              ,worldProvider.getBlock(playerAbove).getViscosity()
+                              ,worldProvider.getBlock(playerBelow).getViscosity()};
+
+        float viscosity = 0;
+        int numOfViscousBlocks = 0;
+        for (float v : viscosities) {
+            if (v > 0) {
+                numOfViscousBlocks++;
+                viscosity += v;
+            }
+        }
+        viscosity = viscosity / numOfViscousBlocks;
+
+        float maxSpeed = getMaxSpeed(entity, MovementMode.VISCOUS, viscosity * movementComp.maxGroundSpeed);
+        if (input.isRunning()) {
+            maxSpeed *= movementComp.runFactor;
+        }
+        desiredVelocity.scale(maxSpeed);
+        desiredVelocity.y -= Math.pow(viscosity, 5) * GRAVITY;
+
+        // Modify velocity towards desired, up to the maximum rate determined by friction
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(state.getVelocity());
+        velocityDiff.scale(Math.min(input.getDelta() / viscosity, 1.0f));
+        state.getVelocity().x += velocityDiff.x;
+        state.getVelocity().y += velocityDiff.y;
+        state.getVelocity().z += velocityDiff.z;
+
+        // Slow down due to friction
+        float speed = state.getVelocity().length();
+        if (speed > maxSpeed) {
+            state.getVelocity().scale((speed - 4 * (speed - maxSpeed) * input.getDelta()) / speed);
+        }
+        Vector3f moveDelta = new Vector3f(state.getVelocity());
+        moveDelta.scale(input.getDelta());
+        CharacterCollider collider = physics.getCharacterCollider(entity);
+
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, collider);
+        Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
+        distanceMoved.sub(state.getPosition());
+        state.getPosition().set(moveResult.getFinalPosition());
+        if (input.isFirstRun() && distanceMoved.length() > 0) {
+            entity.send(new MovedEvent(distanceMoved, state.getPosition()));
+            state.setFootstepDelta(
+                    state.getFootstepDelta() + distanceMoved.length() / movementComp.distanceBetweenSwimStrokes);
+            if (state.getFootstepDelta() > 1) {
+                state.setFootstepDelta(state.getFootstepDelta() - 1);
+                //TODO: implement ViscousMoveEvent to play fitting sounds
+                //if (input.isFirstRun()) {
+                //    entity.send(new SwimStrokeEvent(worldProvider.getBlock(state.getPosition())));
+                //}
+            }
+        }
+    }
+
+
     private void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                                 CharacterMoveInputEvent input, EntityRef entity) {
         switch (state.getMode()) {
@@ -633,6 +703,9 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             case CLIMBING:
                 climb(movementComp, state, input, entity);
+                break;
+            case VISCOUS:
+                viscousMove(movementComp, state, input, entity);
                 break;
             case NONE:
                 followToParent(state, entity);

@@ -160,6 +160,7 @@ public final class Block {
     // Physics
     private float mass = 10;
     private boolean debrisOnDestroy = true;
+    private float viscosity;
 
     // Entity integration
     private String prefab = "";
@@ -508,6 +509,14 @@ public final class Block {
 
     public void setMass(float mass) {
         this.mass = mass;
+    }
+
+    public float getViscosity() {
+        return viscosity;
+    }
+
+    public void setViscosity(float viscosity) {
+        this.viscosity = viscosity;
     }
 
     public ColorSource getColorSource(BlockPart part) {
