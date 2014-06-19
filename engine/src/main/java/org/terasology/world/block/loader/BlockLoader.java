@@ -434,6 +434,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
         block.setMass(def.mass);
         block.setDebrisOnDestroy(def.debrisOnDestroy);
+        block.setViscosity(def.viscosity);
 
         if (def.entity != null) {
             block.setPrefab(def.entity.prefab);

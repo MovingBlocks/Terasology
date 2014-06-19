@@ -23,5 +23,8 @@
     "hardness" : 1,
     "colorSource" : "foliage_lut",
     "debrisOnDestroy" : false,
-    "waving" : true
+    "waving" : true,
+    "penetrable" : true,
+    "doubleSided" : true,
+    "viscosity" : 0.5
 }

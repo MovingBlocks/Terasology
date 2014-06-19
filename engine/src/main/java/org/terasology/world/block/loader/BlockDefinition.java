@@ -68,6 +68,7 @@ public class BlockDefinition {
 
     public float mass = 10f;
     public boolean debrisOnDestroy = true;
+    public float viscosity = 0f;
 
     public Entity entity;
     public Inventory inventory;

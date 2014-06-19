@@ -24,5 +24,6 @@ public enum MovementMode {
     CLIMBING,
     SWIMMING,
     GHOSTING,
+    VISCOUS,
     NONE
 }
