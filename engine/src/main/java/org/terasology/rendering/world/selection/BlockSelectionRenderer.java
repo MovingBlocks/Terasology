@@ -33,7 +33,7 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.material.Material;

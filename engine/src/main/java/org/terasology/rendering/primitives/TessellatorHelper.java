@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;

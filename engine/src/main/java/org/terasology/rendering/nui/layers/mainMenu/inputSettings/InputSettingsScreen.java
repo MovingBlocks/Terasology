@@ -21,13 +21,14 @@ import com.google.common.collect.Sets;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -87,13 +88,14 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
-        for (Module module : moduleManager.getModules()) {
+        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (module.isCodeModule()) {
-                for (Class<?> holdingType : module.getReflections().getTypesAnnotatedWith(InputCategory.class)) {
+                for (Class<?> holdingType : module.getReflectionsFragment().getTypesAnnotatedWith(InputCategory.class)) {
                     InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
                     inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
                 }
-                for (Class<?> bindEvent : module.getReflections().getTypesAnnotatedWith(RegisterBindButton.class)) {
+                for (Class<?> bindEvent : module.getReflectionsFragment().getTypesAnnotatedWith(RegisterBindButton.class)) {
                     if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
                         RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
                         inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);

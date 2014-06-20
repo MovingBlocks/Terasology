@@ -270,7 +270,8 @@ public class InventoryAuthoritySystemTest {
                         event.consume();
                         return null;
                     }
-                });
+                }
+        );
 
         RemoveItemAction action = new RemoveItemAction(instigator, item, true, 2);
         inventoryAuthoritySystem.removeItem(action, inventory);
@@ -394,7 +395,8 @@ public class InventoryAuthoritySystemTest {
                         event.consume();
                         return null;
                     }
-                });
+                }
+        );
 
         GiveItemAction action = new GiveItemAction(instigator, item);
         inventoryAuthoritySystem.giveItem(action, inventory);

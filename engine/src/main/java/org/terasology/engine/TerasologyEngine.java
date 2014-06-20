@@ -19,7 +19,6 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -29,10 +28,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
-import org.terasology.engine.module.EngineModulePolicy;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -72,10 +68,7 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ReflectPermission;
 import java.nio.file.Files;
-import java.security.Policy;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
@@ -226,8 +219,8 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
         }
-        if (!config.getDefaultModSelection().hasModule("core")) {
-            config.getDefaultModSelection().addModule("core");
+        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_MODULE)) {
+            config.getDefaultModSelection().addModule(TerasologyConstants.CORE_MODULE);
         }
         if (config.getSecurity().getServerPrivateCertificate() == null) {
             CertificateGenerator generator = new CertificateGenerator();
@@ -342,95 +335,24 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
         GameThread.setGameThread();
-        ModuleManager moduleManager = initModuleManager();
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
 
         ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
 
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
-        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
+        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        assetManager.setEnvironment(moduleManager.getEnvironment());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
         CoreRegistry.putPermanently(Game.class, new Game(this, time));
+        assetManager.setEnvironment(moduleManager.getEnvironment());
 
         AssetType.registerAssetTypes(assetManager);
-        assetManager.addAssetSource(moduleManager.getActiveModule(TerasologyConstants.ENGINE_MODULE).getModuleSource());
         ApplyModulesUtil.applyModules();
-    }
-
-    private ModuleManager initModuleManager() {
-        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class,
-                new ModuleManagerImpl(moduleSecurityManager, config.getSystem().isReflectionsCacheEnabled()));
-
-        moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAPIPackage("java.lang.ref");
-        moduleSecurityManager.addAPIPackage("java.math");
-        moduleSecurityManager.addAPIPackage("java.util");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
-        moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIPackage("java.awt");
-        moduleSecurityManager.addAPIPackage("java.awt.geom");
-        moduleSecurityManager.addAPIPackage("java.awt.image");
-        moduleSecurityManager.addAPIPackage("java.text");
-        moduleSecurityManager.addAPIPackage("com.google.common.annotations");
-        moduleSecurityManager.addAPIPackage("com.google.common.cache");
-        moduleSecurityManager.addAPIPackage("com.google.common.collect");
-        moduleSecurityManager.addAPIPackage("com.google.common.base");
-        moduleSecurityManager.addAPIPackage("com.google.common.math");
-        moduleSecurityManager.addAPIPackage("com.google.common.primitives");
-        moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
-        moduleSecurityManager.addAPIPackage("gnu.trove");
-        moduleSecurityManager.addAPIPackage("gnu.trove.decorator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.function");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.linked");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.custom_hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.queue");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
-        moduleSecurityManager.addAPIPackage("javax.vecmath");
-        moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
-        moduleSecurityManager.addAPIPackage("com.bulletphysics.linearmath");
-        moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
-        moduleSecurityManager.addAPIClass(IOException.class);
-        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
-        moduleSecurityManager.addAPIClass(LoggerFactory.class);
-        moduleSecurityManager.addAPIClass(Logger.class);
-        for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
-            if (apiClass.isSynthetic()) {
-                // This is a package-info
-                moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
-            } else {
-                moduleSecurityManager.addAPIClass(apiClass);
-            }
-        }
-
-        moduleSecurityManager.addFullPrivilegePackage("ch.qos.logback.classic");
-        moduleSecurityManager.addAllowedPermission("com.google.gson", ReflectPermission.class);
-        moduleSecurityManager.addAllowedPermission("com.google.gson.internal", ReflectPermission.class);
-
-        moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
-        moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
-
-        Policy.setPolicy(new EngineModulePolicy());
-        System.setSecurityManager(moduleSecurityManager);
-        return moduleManager;
     }
 
     private void cleanup() {

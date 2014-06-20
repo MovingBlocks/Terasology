@@ -17,7 +17,7 @@ package org.terasology.registry;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 import java.util.Iterator;
 import java.util.Map;

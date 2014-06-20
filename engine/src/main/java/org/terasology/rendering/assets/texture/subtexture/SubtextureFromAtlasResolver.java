@@ -20,6 +20,7 @@ import org.terasology.asset.AssetResolver;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.atlas.Atlas;
 
 /**
@@ -28,8 +29,8 @@ import org.terasology.rendering.assets.atlas.Atlas;
 public class SubtextureFromAtlasResolver implements AssetResolver<Subtexture, SubtextureData> {
 
     @Override
-    public AssetUri resolve(String partialUri) {
-        String[] parts = partialUri.split("\\.", 2);
+    public AssetUri resolve(Name partialUri) {
+        String[] parts = partialUri.toString().split("\\.", 2);
         if (parts.length == 2) {
             AssetUri uri = Assets.resolveAssetUri(AssetType.ATLAS, parts[0]);
             if (uri != null) {
@@ -41,7 +42,7 @@ public class SubtextureFromAtlasResolver implements AssetResolver<Subtexture, Su
 
     @Override
     public Subtexture resolve(AssetUri uri, AssetFactory<SubtextureData, Subtexture> factory) {
-        String[] parts = uri.getAssetName().split("\\.", 2);
+        String[] parts = uri.getAssetName().toString().split("\\.", 2);
         if (parts.length == 2) {
             Atlas atlas = Assets.get(new AssetUri(AssetType.ATLAS, uri.getModuleName(), parts[0]), Atlas.class);
             if (atlas == null) {

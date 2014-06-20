@@ -33,6 +33,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -280,7 +281,7 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
-        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        Block block = createRawBlock(blockDef, blockDefUri.getAssetName());
         block.setPrimaryAppearance(createAppearance(shape, tileUris, Rotation.none()));
         setBlockFullSides(block, shape, Rotation.none());
         block.setCollision(shape.getCollisionOffset(Rotation.none()), shape.getCollisionShape(Rotation.none()));
@@ -311,7 +312,7 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
-        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        Block block = createRawBlock(blockDef, blockDefUri.getAssetName());
         block.setDirection(rotation.rotate(Side.FRONT));
         block.setPrimaryAppearance(createAppearance(shape, tileUris, rotation));
         setBlockFullSides(block, shape, rotation);
@@ -405,7 +406,7 @@ public class BlockLoader implements BlockBuilderHelper {
         }
     }
 
-    private Block createRawBlock(BlockDefinition def, String defaultName) {
+    private Block createRawBlock(BlockDefinition def, Name defaultName) {
         Block block = new Block();
         block.setLiquid(def.liquid);
         block.setWater(def.water);
@@ -429,7 +430,7 @@ public class BlockLoader implements BlockBuilderHelper {
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {
-            block.setDisplayName(properCase(defaultName));
+            block.setDisplayName(properCase(defaultName.toString()));
         }
 
         block.setMass(def.mass);

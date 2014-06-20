@@ -19,14 +19,9 @@ import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -39,6 +34,10 @@ import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -58,8 +57,8 @@ public class ComponentSerializerTest {
     private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
 
     @BeforeClass
-    public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
+    public static void setupClass() throws Exception {
+        moduleManager = ModuleManagerFactory.create();
     }
 
     @Before
@@ -70,7 +69,7 @@ public class ComponentSerializerTest {
 
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        EngineEntityManager entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);

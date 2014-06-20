@@ -16,4 +16,4 @@
 
 @API package org.terasology.entitySystem.systems;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

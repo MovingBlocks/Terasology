@@ -15,16 +15,17 @@
  */
 package org.terasology.utilities;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.MersenneRandom;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Tests {@link MersenneRandom}.
+ *
  * @author Martin Steiger
  */
 public class MersenneRandomTest {
@@ -117,7 +118,7 @@ public class MersenneRandomTest {
             1310412747L, 2102066999L, 1504727249L, 3574298750L, 1191230036L, 3330575266L, 3180292097L, 3539347721L, 681369118L, 3305125752L, 3648233597L, 950049240L,
             4173257693L, 1760124957L, 512151405L, 681175196L, 580563018L, 1169662867L, 4015033554L, 2687781101L, 699691603L, 2673494188L, 1137221356L, 123599888L, 472658308L,
             1053598179L, 1012713758L, 3481064843L, 3759461013L, 3981457956L, 3830587662L, 1877191791L, 3650996736L, 988064871L, 3515461600L, 4089077232L, 2225147448L,
-            1249609188L, 2643151863L, 3896204135L, 2416995901L, 1397735321L, 3460025646L, };
+            1249609188L, 2643151863L, 3896204135L, 2416995901L, 1397735321L, 3460025646L,};
 
     /**
      * Compare results with
@@ -125,7 +126,7 @@ public class MersenneRandomTest {
      */
     @Test
     public void correctnessTest() {
-        MersenneRandom r = new MersenneRandom(new int[] {0x123, 0x234, 0x345, 0x456});
+        MersenneRandom r = new MersenneRandom(new int[]{0x123, 0x234, 0x345, 0x456});
         logger.debug("Compare MersenneTwisterFast with new (2002/1/26) seeding mechanism with original result data..");
 
         for (int j = 0; j < 1000; j++) {
@@ -137,7 +138,7 @@ public class MersenneRandomTest {
 
             assertEquals(FIRST_1000_VALS[j], l);
         }
-        
+
         logger.debug("Success");
     }
 
@@ -148,17 +149,17 @@ public class MersenneRandomTest {
     public void speedTest() {
 
         final long seed = 4357;
-        
+
         final int warmUpCount = 10000;
         final int count = 10000000;
 
         int sum;
         long start;
-        
+
         logger.info("Time to test grabbing {} ints", count);
 
         // -------------------------------------------------------
-        
+
         java.util.Random rr = new java.util.Random(seed);
 
         // warmup
@@ -173,7 +174,7 @@ public class MersenneRandomTest {
         }
 
         logger.info("java.util.Random: {}ms.", (System.nanoTime() - start) / 1000000);
-        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
+        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum);
 
         // -------------------------------------------------------
 
@@ -191,7 +192,7 @@ public class MersenneRandomTest {
         }
 
         logger.info("FastRandom: {}ms.", (System.nanoTime() - start) / 1000000);
-        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
+        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum);
 
         // -------------------------------------------------------
 
@@ -202,7 +203,7 @@ public class MersenneRandomTest {
         for (int j = 0; j < warmUpCount; j++) {
             sum += r.nextInt();
         }
-        
+
         sum = 0;
         start = System.nanoTime();
         for (int j = 0; j < count; j++) {
@@ -210,6 +211,6 @@ public class MersenneRandomTest {
         }
 
         logger.info("MersenneRandom: {}ms.", (System.nanoTime() - start) / 1000000);
-        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum); 
+        logger.trace("Use the result so that JVM doesn't skip the computation - here it is: {}", sum);
     }
 }

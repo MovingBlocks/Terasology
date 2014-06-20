@@ -24,10 +24,8 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
-
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -45,7 +43,6 @@ import org.terasology.config.NetworkConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -56,6 +53,7 @@ import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
+import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.JoinStatus;
@@ -63,7 +61,6 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.Server;
-import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -95,7 +92,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Implementation of the Network System using Netty and TCP/IP
@@ -695,7 +691,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
         return EntityRef.NULL;
     }
-    
+
     @Override
     public void forceDisconnect(Client client) {
         if (client instanceof NetClient) {
@@ -775,9 +771,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             worldInfoBuilder.setTitle(world.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }
-        for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-            if (!module.getModuleInfo().isServerSideOnly()) {
-                serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(module.getId()).setModuleVersion(module.getVersion().toString()).build());
+        for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+            if (!module.getMetadata().isServerSideOnly()) {
+                serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder()
+                        .setModuleId(module.getId().toString())
+                        .setModuleVersion(module.getVersion().toString()).build());
             }
         }
         for (Map.Entry<String, Short> blockMapping : blockManager.getBlockIdMap().entrySet()) {

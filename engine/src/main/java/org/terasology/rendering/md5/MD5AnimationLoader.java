@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
 import org.terasology.math.AABB;
+import org.terasology.module.Module;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 

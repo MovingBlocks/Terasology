@@ -34,6 +34,8 @@ import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -45,6 +47,8 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
+
+import java.util.Collections;
 
 /**
  * Play mode.
@@ -129,8 +133,8 @@ public class StateIngame implements GameState {
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
-        CoreRegistry.get(ModuleManager.class).disableAllModules();
-        CoreRegistry.get(AssetManager.class).refresh();
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);

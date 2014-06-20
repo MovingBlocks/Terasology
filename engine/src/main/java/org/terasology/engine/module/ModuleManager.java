@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,68 +15,161 @@
  */
 package org.terasology.engine.module;
 
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.paths.PathManager;
+import org.terasology.module.ClasspathModule;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleMetadata;
+import org.terasology.module.ModuleMetadataReader;
+import org.terasology.module.ModulePathScanner;
+import org.terasology.module.ModuleRegistry;
+import org.terasology.module.TableModuleRegistry;
+import org.terasology.module.sandbox.API;
+import org.terasology.module.sandbox.BytecodeInjector;
+import org.terasology.module.sandbox.ModuleSecurityManager;
+import org.terasology.module.sandbox.ModuleSecurityPolicy;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ReflectPermission;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.Policy;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 /**
  * @author Immortius
  */
-public interface ModuleManager {
-    Reflections getActiveModuleReflections();
+public class ModuleManager {
 
-    void disableAllModules();
+    private ModuleSecurityManager moduleSecurityManager;
 
-    void enableModule(Module module);
+    private ModuleRegistry registry;
+    private ModuleEnvironment environment;
+    private Module engineModule;
 
-    void enableModuleAndDependencies(Module module);
+    public ModuleManager() {
+        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/assets/module.txt"))) {
+            ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
+            engineModule = ClasspathModule.create(metadata, getClass(), Module.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read engine metadata", e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Failed to convert engine library location to path", e);
+        }
 
-    void disableModule(Module module);
+        registry = new TableModuleRegistry();
+        registry.add(engineModule);
+        new ModulePathScanner().scan(registry, PathManager.getInstance().getModulePaths());
 
-    /**
-     * Provides the ability to reflect over the engine and all modules, not just active modules.  This should be used sparingly,
-     * and classes retrieved from it should not be instantiated and used - this uses a different classloader than the
-     * rest of the system.
-     *
-     * @return Reflections over the engine and all available modules
-     */
-    Reflections loadInactiveReflections();
+        setupSandbox();
+        loadEnvironment(Sets.newHashSet(engineModule), true);
+    }
 
-    /**
-     * Rescans for modules.  This should not be done while a game is running, as it drops the module classloader.
-     */
-    void refresh();
+    private void setupSandbox() {
+        moduleSecurityManager = new ModuleSecurityManager();
+        moduleSecurityManager.addAPIPackage("java.lang");
+        moduleSecurityManager.addAPIPackage("java.lang.ref");
+        moduleSecurityManager.addAPIPackage("java.math");
+        moduleSecurityManager.addAPIPackage("java.util");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
+        moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
+        moduleSecurityManager.addAPIPackage("java.util.regex");
+        moduleSecurityManager.addAPIPackage("java.awt");
+        moduleSecurityManager.addAPIPackage("java.awt.geom");
+        moduleSecurityManager.addAPIPackage("java.awt.image");
+        moduleSecurityManager.addAPIPackage("com.google.common.annotations");
+        moduleSecurityManager.addAPIPackage("com.google.common.cache");
+        moduleSecurityManager.addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.addAPIPackage("com.google.common.base");
+        moduleSecurityManager.addAPIPackage("com.google.common.math");
+        moduleSecurityManager.addAPIPackage("com.google.common.primitives");
+        moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
+        moduleSecurityManager.addAPIPackage("gnu.trove");
+        moduleSecurityManager.addAPIPackage("gnu.trove.decorator");
+        moduleSecurityManager.addAPIPackage("gnu.trove.function");
+        moduleSecurityManager.addAPIPackage("gnu.trove.iterator");
+        moduleSecurityManager.addAPIPackage("gnu.trove.iterator.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.list.linked");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.map.custom_hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.procedure");
+        moduleSecurityManager.addAPIPackage("gnu.trove.procedure.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.queue");
+        moduleSecurityManager.addAPIPackage("gnu.trove.set");
+        moduleSecurityManager.addAPIPackage("gnu.trove.set.hash");
+        moduleSecurityManager.addAPIPackage("gnu.trove.stack");
+        moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
+        moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
+        moduleSecurityManager.addAPIPackage("javax.vecmath");
+        moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
+        moduleSecurityManager.addAPIPackage("com.bulletphysics.linearmath");
+        moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
+        moduleSecurityManager.addAPIClass(IOException.class);
+        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
+        moduleSecurityManager.addAPIClass(LoggerFactory.class);
+        moduleSecurityManager.addAPIClass(Logger.class);
 
-    void applyActiveModules();
+        for (Class<?> apiClass : engineModule.getReflectionsFragment().getTypesAnnotatedWith(API.class)) {
+            if (apiClass.isSynthetic()) {
+                // This is a package-info
+                moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
+            } else {
+                moduleSecurityManager.addAPIClass(apiClass);
+            }
+        }
 
-    List<Module> getModules();
+        moduleSecurityManager.grantFullPermission("ch.qos.logback.classic");
+        moduleSecurityManager.grantPermission("com.google.gson", ReflectPermission.class);
+        moduleSecurityManager.grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-    List<String> getModuleIds();
+        moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
+        moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
 
-    List<Module> getCodeModules();
+        Policy.setPolicy(new ModuleSecurityPolicy());
+        System.setSecurityManager(moduleSecurityManager);
+    }
 
-    Module getActiveModule(String id);
+    public ModuleRegistry getRegistry() {
+        return registry;
+    }
 
-    Iterable<Module> getActiveModules();
+    public ModuleEnvironment getEnvironment() {
+        return environment;
+    }
 
-    Module getLatestModuleVersion(String id);
-
-    Module getLatestModuleVersion(String id, Version minVersion, Version maxVersion);
-
-    Iterable<Module> getActiveCodeModules();
-
-    List<Module> getActiveModulesOrderedByDependency();
-
-    <T> ListMultimap<String, Class<? extends T>> findAllSubclassesOf(Class<? extends T> type);
-
-    boolean isEnabled(Module module);
-
-    Iterable<Module> getAllDependencies(Module module);
-
-    Set<String> getDependencyNamesOf(Module context);
-
-    Module getModule(String moduleId, Version version);
-
+    public ModuleEnvironment loadEnvironment(Set<Module> modules, boolean asPrimary) {
+        Set<Module> finalModules = Sets.newLinkedHashSet(modules);
+        for (Module module : registry) {
+            if (module.isOnClasspath()) {
+                finalModules.add(module);
+            }
+        }
+        ModuleEnvironment newEnvironment = new ModuleEnvironment(finalModules, moduleSecurityManager, Collections.<BytecodeInjector>emptyList());
+        if (asPrimary) {
+            if (environment != null) {
+                environment.close();
+            }
+            environment = newEnvironment;
+        }
+        return newEnvironment;
+    }
 }

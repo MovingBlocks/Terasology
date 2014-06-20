@@ -22,8 +22,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -44,6 +42,9 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -90,11 +91,11 @@ import java.util.Map;
 // TODO: Review - This could be a static class but its existence is also questionable.
 public class EntitySystemBuilder {
 
-    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
-        return build(moduleManager, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
+    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
+        return build(environment, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
     }
 
-    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         // Entity Manager
         PojoEntityManager entityManager = CoreRegistry.put(EntityManager.class, new PojoEntityManager());
         CoreRegistry.put(EngineEntityManager.class, entityManager);
@@ -125,10 +126,10 @@ public class EntitySystemBuilder {
         // Behaviour Trees Node Library
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan(moduleManager);
+        nodesClassLibrary.scan(environment);
 
-        registerComponents(library.getComponentLibrary(), moduleManager);
-        registerEvents(entityManager.getEventSystem(), moduleManager);
+        registerComponents(library.getComponentLibrary(), environment);
+        registerEvents(entityManager.getEventSystem(), environment);
         return entityManager;
     }
 
@@ -160,22 +161,19 @@ public class EntitySystemBuilder {
         return serializationLibrary;
     }
 
-    private void registerComponents(ComponentLibrary library, ModuleManager moduleManager) {
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            for (Class<? extends Component> componentType : module.getReflections().getSubTypesOf(Component.class)) {
-                if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
-                    String componentName = MetadataUtil.getComponentClassName(componentType);
-                    library.register(new SimpleUri(module.getId(), componentName), componentType);
-                }
+    private void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+        for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                String componentName = MetadataUtil.getComponentClassName(componentType);
+                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
             }
         }
     }
 
-    private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        ListMultimap<String, Class<? extends Event>> allSubclassesOf = moduleManager.findAllSubclassesOf(Event.class);
-        for (Map.Entry<String, Class<? extends Event>> entry : allSubclassesOf.entries()) {
-            if (entry.getValue().getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+    private void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
+        for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
+            if (type.getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
             }
         }
     }

@@ -22,8 +22,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ModuleInfo;
-import org.terasology.engine.module.Version;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
+import org.terasology.naming.Version;
 import org.terasology.network.ServerInfoMessage;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.internal.WorldInfo;
@@ -77,18 +78,16 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
-    public List<ModuleInfo> getModuleList() {
-        List<ModuleInfo> result = Lists.newArrayList();
+    public List<NameVersion> getModuleList() {
+        List<NameVersion> result = Lists.newArrayList();
 
         for (NetData.ModuleInfo moduleInfo : info.getModuleList()) {
-            if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion() || Version.create(moduleInfo.getModuleVersion()) == null) {
+            if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion()) {
                 logger.error("Received incomplete module info");
             } else {
-                ModuleInfo mi = new ModuleInfo();
-                mi.setId(moduleInfo.getModuleId());
-                mi.setVersion(moduleInfo.getModuleVersion());
-                // other info is not communicated
-                result.add(mi);
+                Name id = new Name(moduleInfo.getModuleId());
+                Version version = new Version(moduleInfo.getModuleVersion());
+                result.add(new NameVersion(id, version));
             }
         }
 

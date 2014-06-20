@@ -94,6 +94,7 @@ configurations.all {
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
+	compile group: 'org.terasology', name: 'gestalt-module', version: '0.1.1-SNAPSHOT'
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
     compile group: 'com.google.guava', name: 'guava', version: '15.0'

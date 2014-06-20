@@ -18,11 +18,11 @@ package org.terasology.engine.bootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.util.Set;
@@ -38,12 +38,10 @@ public final class ApplyModulesUtil {
 
     public static void applyModules() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        moduleManager.applyActiveModules();
 
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
         copyStrategyLibrary.clear();
-        Set<Class<? extends CopyStrategy>> copyStrategies = moduleManager.getActiveModuleReflections().getSubTypesOf(CopyStrategy.class);
-        for (Class<? extends CopyStrategy> copyStrategy : copyStrategies) {
+        for (Class<? extends CopyStrategy> copyStrategy : moduleManager.getEnvironment().getSubtypesOf(CopyStrategy.class)) {
             if (copyStrategy.getAnnotation(RegisterCopyStrategy.class) == null) {
                 continue;
             }
@@ -60,7 +58,6 @@ public final class ApplyModulesUtil {
         }
 
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.applyOverrides();
-        assetManager.refresh();
+        assetManager.setEnvironment(moduleManager.getEnvironment());
     }
 }

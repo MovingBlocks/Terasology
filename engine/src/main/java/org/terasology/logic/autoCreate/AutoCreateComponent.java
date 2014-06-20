@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.autoCreate;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.Component;
 
 /**

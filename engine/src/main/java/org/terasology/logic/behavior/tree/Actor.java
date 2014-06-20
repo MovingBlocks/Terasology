@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.tree;
 
 import com.google.common.collect.Maps;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.metadata.ComponentMetadata;

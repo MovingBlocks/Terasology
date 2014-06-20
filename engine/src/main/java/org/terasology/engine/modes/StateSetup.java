@@ -55,7 +55,7 @@ public class StateSetup implements GameState {
     public void init(GameEngine gameEngine) {
 
         // let's get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), CoreRegistry.get(NetworkSystem.class),
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), CoreRegistry.get(NetworkSystem.class),
                                                         CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
 
         eventSystem = CoreRegistry.get(EventSystem.class);

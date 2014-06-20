@@ -16,18 +16,15 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.family.BlockFamilyFactory;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.RegisterBlockFamilyFactory;
-
-import java.util.Set;
 
 /**
  * @author Immortius
@@ -45,20 +42,15 @@ public class RegisterBlockFamilyFactories extends SingleStepLoadProcess {
         DefaultBlockFamilyFactoryRegistry registry = new DefaultBlockFamilyFactoryRegistry();
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
-        for (Module module : moduleManager.getActiveModules()) {
-            if (module.isCodeModule()) {
-                loadFamilies(registry, module.getReflections());
-            }
-        }
+        loadFamilies(registry, moduleManager.getEnvironment());
 
         CoreRegistry.put(BlockFamilyFactoryRegistry.class, registry);
 
         return true;
     }
 
-    private void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, Reflections reflections) {
-        Set<Class<?>> blockFamilyFactories = reflections.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class);
-        for (Class<?> blockFamilyFactory : blockFamilyFactories) {
+    private void loadFamilies(DefaultBlockFamilyFactoryRegistry registry, ModuleEnvironment environment) {
+        for (Class<?> blockFamilyFactory : environment.getTypesAnnotatedWith(RegisterBlockFamilyFactory.class)) {
             if (!BlockFamilyFactory.class.isAssignableFrom(blockFamilyFactory)) {
                 logger.error("Cannot load {}, must be a subclass of BlockFamilyFactory", blockFamilyFactory.getSimpleName());
                 continue;

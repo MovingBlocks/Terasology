@@ -19,7 +19,8 @@ package org.terasology.network;
 import java.util.List;
 import java.util.Map;
 
-import org.terasology.engine.module.ModuleInfo;
+import org.terasology.module.ModuleMetadata;
+import org.terasology.naming.NameVersion;
 import org.terasology.world.internal.WorldInfo;
 
 /**
@@ -41,7 +42,6 @@ public interface ServerInfoMessage {
     List<String> getRegisterBlockFamilyList();
 
     /**
-     * @param i
      * @return
      */
     Map<Integer, String> getBlockIds();
@@ -54,6 +54,6 @@ public interface ServerInfoMessage {
     /**
      * @return
      */
-    List<ModuleInfo> getModuleList();
+    List<NameVersion> getModuleList();
 
 }

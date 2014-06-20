@@ -20,7 +20,7 @@ import com.google.common.io.ByteStreams;
 import org.lwjgl.BufferUtils;
 import org.terasology.asset.AssetLoader;
 import org.terasology.audio.StaticSoundData;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

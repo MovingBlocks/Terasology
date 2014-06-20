@@ -16,14 +16,19 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import com.google.common.collect.Lists;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleIdentifier;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.ResolutionResult;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
 import org.terasology.registry.CoreRegistry;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -44,19 +49,19 @@ public class RegisterMods extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        moduleManager.disableAllModules();
-
-        for (ModuleIdentifier moduleId : gameManifest.getModules()) {
-            Module module = moduleManager.getModule(moduleId.getId(), moduleId.getVersion());
-            if (module != null) {
-                moduleManager.enableModule(module);
-            } else {
-                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module: " + moduleId));
-                return true;
-            }
+        List<Name> moduleIds = Lists.newArrayListWithCapacity(gameManifest.getModules().size());
+        for (NameVersion moduleInfo : gameManifest.getModules()) {
+            moduleIds.add(moduleInfo.getName());
         }
 
-        ApplyModulesUtil.applyModules();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+        ResolutionResult result = resolver.resolve(moduleIds);
+        if (result.isSuccess()) {
+            moduleManager.loadEnvironment(result.getModules(), true);
+            ApplyModulesUtil.applyModules();
+        } else {
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Missing required module or dependency"));
+        }
         return true;
     }
 

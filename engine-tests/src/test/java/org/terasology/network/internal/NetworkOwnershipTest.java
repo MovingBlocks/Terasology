@@ -20,19 +20,18 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkComponent;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.BlockEntityRegistry;
 
 import static org.junit.Assert.assertTrue;
@@ -52,8 +51,8 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
     private EntityRef clientEntity;
 
     @BeforeClass
-    public static void initialise() {
-        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
+    public static void initialise() throws Exception {
+        ModuleManager moduleManager = ModuleManagerFactory.create();
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
 
@@ -63,7 +62,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         EngineTime mockTime = mock(EngineTime.class);
         networkSystem = new NetworkSystemImpl(mockTime);
 
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem, new ReflectionReflectFactory());
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
         entityManager.clear();
         client = mock(NetClient.class);

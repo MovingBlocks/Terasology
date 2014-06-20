@@ -17,10 +17,10 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import com.google.common.collect.Lists;
 import org.terasology.core.config.WorldGenerationConfig;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
+import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;

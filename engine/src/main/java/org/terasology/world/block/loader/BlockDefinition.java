@@ -18,7 +18,7 @@ package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 

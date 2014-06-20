@@ -20,23 +20,25 @@ import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetResolver;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.TerasologyConstants;
+import org.terasology.naming.Name;
 import org.terasology.rendering.nui.Color;
 
 /**
  * Resolves references to engine:color.RRGGBBAA texture assets,
  * where RR is the red hex value in lowercase,
  * and GG, BB, and AA are green, blue, and alpha, respectively.
- * 
+ * <p/>
  * The color is parsed from the name of the asset, then TextureDataFactory is used to create
  * a TextureData object which is used to build the Texture.
- * 
+ *
  * @author mkienenb
  */
 public class ColorTextureAssetResolver implements AssetResolver<Texture, TextureData> {
 
     @Override
-    public AssetUri resolve(String partialUri) {
-        String[] parts = partialUri.split("\\.", 2);
+    public AssetUri resolve(Name partialUri) {
+        String[] parts = partialUri.toString().split("\\.", 2);
         if (parts.length != 2) {
             return null;
         }
@@ -45,7 +47,7 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
             return null;
         }
 
-        return new AssetUri(AssetType.TEXTURE, "engine", partialUri);
+        return new AssetUri(AssetType.TEXTURE, TerasologyConstants.ENGINE_MODULE, partialUri);
     }
 
     @Override
@@ -54,7 +56,7 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
             return null;
         }
 
-        String[] parts = uri.getAssetName().split("\\.", 2);
+        String[] parts = uri.getAssetName().toString().split("\\.", 2);
         if (parts.length != 2) {
             return null;
         }

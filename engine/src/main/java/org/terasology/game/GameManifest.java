@@ -21,11 +21,13 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.ModuleIdentifier;
-import org.terasology.engine.module.Version;
+import org.terasology.naming.Name;
+import org.terasology.naming.NameVersion;
+import org.terasology.naming.Version;
+import org.terasology.naming.gson.NameTypeAdapter;
+import org.terasology.naming.gson.VersionTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.UriTypeAdapterFactory;
-import org.terasology.utilities.gson.VersionTypeAdapter;
 import org.terasology.world.internal.WorldInfo;
 
 import java.io.BufferedReader;
@@ -48,7 +50,7 @@ public class GameManifest {
     private List<String> registeredBlockFamilies = Lists.newArrayList();
     private Map<String, Short> blockIdMap = Maps.newHashMap();
     private Map<String, WorldInfo> worlds = Maps.newHashMap();
-    private List<ModuleIdentifier> modules = Lists.newArrayList();
+    private List<NameVersion> modules = Lists.newArrayList();
 
     public GameManifest() {
     }
@@ -132,15 +134,16 @@ public class GameManifest {
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
                 .registerTypeAdapter(Version.class, new VersionTypeAdapter())
+                .registerTypeAdapter(Name.class, new NameTypeAdapter())
                 .setPrettyPrinting()
                 .create();
     }
 
-    public List<ModuleIdentifier> getModules() {
+    public List<NameVersion> getModules() {
         return ImmutableList.copyOf(modules);
     }
 
-    public void addModule(String id, Version version) {
-        modules.add(new ModuleIdentifier(id, version));
+    public void addModule(Name id, Version version) {
+        modules.add(new NameVersion(id, version));
     }
 }

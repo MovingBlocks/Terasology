@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.DependencyInfo;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;
@@ -39,8 +39,6 @@ import java.util.Set;
 public class RegisterSystems extends SingleStepLoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterSystems.class);
     private NetworkMode netMode;
-    private Set<String> registeredModules = Sets.newHashSet();
-    private ModuleManager moduleManager;
     private ComponentSystemManager componentSystemManager;
 
     public RegisterSystems(NetworkMode netMode) {
@@ -55,35 +53,17 @@ public class RegisterSystems extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        moduleManager = CoreRegistry.get(ModuleManager.class);
-
-        for (Module module : moduleManager.getActiveModules()) {
-            if (!registeredModules.contains(module.getId())) {
-                loadModule(module);
-            }
-        }
+        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
         TerasologyEngine terasologyEngine = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
         for (EngineSubsystem subsystem : terasologyEngine.getSubsystems()) {
             subsystem.registerSystems(componentSystemManager);
         }
+        componentSystemManager.loadSystems(moduleManager.getEnvironment(), netMode);
 
         return true;
     }
 
-    private void loadModule(Module module) {
-        logger.debug("Loading {}", module);
-        for (DependencyInfo dependency : module.getModuleInfo().getDependencies()) {
-            if (!registeredModules.contains(UriUtil.normalise(dependency.getId()))) {
-                logger.debug("Requesting {} due to dependency", dependency);
-                loadModule(moduleManager.getLatestModuleVersion(dependency.getId()));
-            }
-        }
-        if (module.isCodeModule()) {
-            componentSystemManager.loadSystems(module.getId(), module.getReflections(), netMode);
-        }
-        registeredModules.add(module.getId().toLowerCase(Locale.ENGLISH));
-    }
 
     @Override
     public int getExpectedCost() {

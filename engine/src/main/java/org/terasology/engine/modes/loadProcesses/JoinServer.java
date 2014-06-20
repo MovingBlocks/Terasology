@@ -18,17 +18,17 @@ package org.terasology.engine.modes.loadProcesses;
 
 import com.google.common.collect.Maps;
 
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
+import org.terasology.naming.NameVersion;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleInfo;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.Version;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
@@ -38,6 +38,7 @@ import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -71,7 +72,7 @@ public class JoinServer implements LoadProcess {
             Map<String, Short> blockMap = Maps.newHashMap();
             for (Entry<Integer, String> entry : serverInfo.getBlockIds().entrySet()) {
                 String name = entry.getValue();
-                Short id = Short.valueOf(entry.getKey().shortValue());
+                short id = entry.getKey().shortValue();
                 Short oldId = blockMap.put(name, id);
                 if (oldId != null && oldId != id) {
                     logger.warn("Overwriting Id {} for {} with Id {}", oldId, name, id);
@@ -82,18 +83,19 @@ public class JoinServer implements LoadProcess {
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-            moduleManager.disableAllModules();
 
-            for (ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
-                Module module = moduleManager.getModule(moduleInfo.getId(), Version.create(moduleInfo.getVersion()));
+            Set<Module> moduleSet = Sets.newLinkedHashSet();
+            for (NameVersion moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
+                Module module = moduleManager.getRegistry().getModule(moduleInfo.getName(), moduleInfo.getVersion());
                 if (module == null) {
-                    StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo.getId() + ":" + moduleInfo.getVersion());
+                    StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo);
                     CoreRegistry.get(GameEngine.class).changeState(mainMenu);
                     return false;
                 } else {
-                    logger.debug("Activating module: {}:{}", moduleInfo.getId(), moduleInfo.getVersion());
+
+                    logger.debug("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
                     gameManifest.addModule(module.getId(), module.getVersion());
-                    moduleManager.enableModule(module);
+                    moduleSet.add(module);
                 }
             }
 

@@ -20,7 +20,7 @@ import com.google.common.math.IntMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

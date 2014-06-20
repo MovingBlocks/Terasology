@@ -16,7 +16,7 @@
 package org.terasology.logic.behavior.tree;
 
 import com.google.common.collect.Lists;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 import java.util.List;
 

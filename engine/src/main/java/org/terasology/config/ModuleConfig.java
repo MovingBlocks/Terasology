@@ -17,6 +17,7 @@
 package org.terasology.config;
 
 import com.google.common.collect.Lists;
+import org.terasology.naming.Name;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * @author Immortius
  */
 public class ModuleConfig {
-    private List<String> modules = Lists.newArrayList();
+    private List<Name> modules = Lists.newArrayList();
 
     public ModuleConfig() {
     }
@@ -34,17 +35,17 @@ public class ModuleConfig {
         this.modules.addAll(other.modules);
     }
 
-    public void addModule(String id) {
+    public void addModule(Name id) {
         if (!modules.contains(id)) {
             modules.add(id);
         }
     }
 
-    public Iterable<String> listModules() {
+    public Iterable<Name> listModules() {
         return modules;
     }
 
-    public boolean removeModule(String id) {
+    public boolean removeModule(Name id) {
         return modules.remove(id);
     }
 
@@ -52,7 +53,7 @@ public class ModuleConfig {
         return modules.size();
     }
 
-    public boolean hasModule(String modName) {
+    public boolean hasModule(Name modName) {
         return modules.contains(modName);
     }
 

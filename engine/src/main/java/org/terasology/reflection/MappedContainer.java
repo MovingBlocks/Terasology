@@ -16,7 +16,7 @@
 
 package org.terasology.reflection;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

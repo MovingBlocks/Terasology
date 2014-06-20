@@ -32,6 +32,7 @@ import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.ShaderManagerLwjgl;
@@ -68,12 +69,13 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 
 /**
  * Setup environment with display support
+ *
  * @author Martin Steiger
  */
 public class DisplayEnvironment extends HeadlessEnvironment {
 
     private GLBufferPool bufferPool = new GLBufferPool(true);
-    
+
     @Override
     protected void setupDisplay() {
         LWJGLHelper.initNativeLibs();
@@ -88,15 +90,9 @@ public class DisplayEnvironment extends HeadlessEnvironment {
 
     @Override
     protected void setupAssetManager() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-
-        AssetManager assetManager = new AssetManager(moduleManager);
+        AssetManager assetManager = new AssetManager(CoreRegistry.get(ModuleManager.class).getEnvironment());
         CoreRegistry.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
-        assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, TerasologyEngine.class.getProtectionDomain().getCodeSource(),
-                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY));
-        assetManager.addAssetSource(new ClasspathSource("unittest", DisplayEnvironment.class.getProtectionDomain().getCodeSource(),
-                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY));
 
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
@@ -168,11 +164,11 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         BlockManagerImpl blockManager = new BlockManagerImpl(new WorldAtlasImpl(4096), blockFamilyFactoryRegistry);
         CoreRegistry.put(BlockManager.class, blockManager);
     }
-    
+
     @Override
     public void close() throws Exception {
         Display.destroy();
-        
+
         super.close();
     }
 }

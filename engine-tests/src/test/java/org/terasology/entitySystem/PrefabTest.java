@@ -23,13 +23,8 @@ import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
@@ -42,6 +37,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,7 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,15 +62,14 @@ public class PrefabTest {
 
     @Before
     public void setup() throws Exception {
-        ModuleManager moduleManager = new ModuleManagerImpl(new ModuleSecurityManager(), false);
-        moduleManager.applyActiveModules();
-        AssetManager assetManager = new AssetManager(moduleManager);
+        ModuleManager moduleManager = ModuleManagerFactory.create();
+
+        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
         URL url = getClass().getClassLoader().getResource("testResources");
         url = new URL(url.toString().substring(0, url.toString().length() - "testResources".length() - 1));
-        assetManager.addAssetSource(new ClasspathSource("unittest", url, TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY, TerasologyConstants.DELTAS_SUBDIRECTORY));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {
@@ -81,7 +78,7 @@ public class PrefabTest {
         });
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        EntityManager em = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        EntityManager em = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         prefabManager = new PojoPrefabManager();
     }
 

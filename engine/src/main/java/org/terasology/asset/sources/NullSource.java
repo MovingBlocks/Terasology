@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.net.URL;
 import java.util.Collection;
@@ -30,14 +31,14 @@ import java.util.List;
  * @author Immortius
  */
 public class NullSource implements AssetSource {
-    private String id;
+    private Name id;
 
-    public NullSource(String id) {
+    public NullSource(Name id) {
         this.id = id;
     }
 
     @Override
-    public String getSourceId() {
+    public Name getSourceId() {
         return id;
     }
 
@@ -58,7 +59,7 @@ public class NullSource implements AssetSource {
 
     @Override
     public List<URL> getOverride(AssetUri uri) {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

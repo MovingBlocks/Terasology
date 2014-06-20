@@ -109,7 +109,7 @@ public final class Terasology {
                 }
                 
                 Path logFile = logPath.resolve("Terasology.log");
-                CrashReporter.report(e, logFile);
+                //CrashReporter.report(e, logFile);
             }
         }
         System.exit(0);

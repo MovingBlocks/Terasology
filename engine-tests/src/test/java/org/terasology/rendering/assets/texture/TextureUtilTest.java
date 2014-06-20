@@ -15,12 +15,14 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.TerasologyConstants;
+import org.terasology.naming.Name;
 import org.terasology.rendering.nui.Color;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author mkienenb@gmail.com
@@ -31,8 +33,8 @@ public class TextureUtilTest {
     public void testColorTransformedToTextureUri() throws Exception {
         AssetUri assetUri = TextureUtil.getTextureUriForColor(Color.RED);
         assertEquals(AssetType.TEXTURE, assetUri.getAssetType());
-        assertEquals("engine", assetUri.getModuleName());
-        assertEquals("color.ff0000ff", assetUri.getAssetName());
+        assertEquals(TerasologyConstants.ENGINE_MODULE, assetUri.getModuleName());
+        assertEquals(new Name("color.ff0000ff"), assetUri.getAssetName());
 
         int red = 0x12;
         int green = 0x3;
@@ -40,8 +42,8 @@ public class TextureUtilTest {
         int alpha = 0xe;
         assetUri = TextureUtil.getTextureUriForColor(new Color(red, green, blue, alpha));
         assertEquals(AssetType.TEXTURE, assetUri.getAssetType());
-        assertEquals("engine", assetUri.getModuleName());
-        assertEquals("color.1203c40e", assetUri.getAssetName());
+        assertEquals(TerasologyConstants.ENGINE_MODULE, assetUri.getModuleName());
+        assertEquals(new Name("color.1203c40e"), assetUri.getAssetName());
     }
 
     @Test
@@ -63,7 +65,7 @@ public class TextureUtilTest {
     public void testColorTransformedToAssetUriTransformedToColor() throws Exception {
         Color expectedColor = Color.RED;
         AssetUri assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        Color actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().substring("color.".length()));
+        Color actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toString().substring("color.".length()));
         assertEquals(expectedColor, actualColor);
 
         int red = 0x12;
@@ -72,7 +74,7 @@ public class TextureUtilTest {
         int alpha = 0xe;
         expectedColor = new Color(red, green, blue, alpha);
         assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().substring("color.".length()));
+        actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toString().substring("color.".length()));
         assertEquals(expectedColor, actualColor);
     }
 }
