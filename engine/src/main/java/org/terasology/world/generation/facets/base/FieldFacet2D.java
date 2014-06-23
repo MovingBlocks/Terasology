@@ -15,10 +15,7 @@
  */
 package org.terasology.world.generation.facets.base;
 
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**

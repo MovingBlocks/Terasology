@@ -38,8 +38,16 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.*;
-import org.terasology.world.chunks.*;
+import org.terasology.world.block.BeforeDeactivateBlocks;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.OnActivatedBlocks;
+import org.terasology.world.block.OnAddedBlocks;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkBlockIterator;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -51,13 +59,18 @@ import org.terasology.world.chunks.internal.ReadyChunkInfo;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generation.World;
+import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -75,7 +88,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
-    private World generator;
+    private WorldGenerator generator;
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
 
@@ -95,7 +108,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
 
-    public LocalChunkProvider(StorageManager storageManager, World generator) {
+    public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
         this.generator = generator;
@@ -534,7 +547,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     Chunk chunk;
                     if (chunkStore == null) {
                         chunk = new ChunkImpl(getPosition());
-                        generator.rasterizeChunk(chunk);
+                        generator.createChunk(chunk);
                     } else {
                         chunk = chunkStore.getChunk();
                     }
@@ -554,7 +567,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public World getWorldGenerator() {
+    public WorldGenerator getWorldGenerator() {
         return generator;
     }
 

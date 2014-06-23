@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.perlin;
+package org.terasology.core.world.generator.perlinFacetProviders;
 
+import org.terasology.core.world.generator.facets.DensityFacet;
+import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.WorldBiomeProvider;
@@ -25,14 +27,12 @@ import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.BiomeFacet;
-import org.terasology.world.generation.facets.DensityFacet;
-import org.terasology.world.generation.facets.PlantFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * @author Immortius
  */
-@Produces(BiomeFacet.class)
+@Produces(PlantFacet.class)
 @Requires({@Facet(SurfaceHeightFacet.class), @Facet(BiomeFacet.class), @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))})
 public class PerlinFloraProvider implements FacetProvider {
 

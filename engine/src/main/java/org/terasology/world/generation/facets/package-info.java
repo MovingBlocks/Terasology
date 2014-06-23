@@ -13,19 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseBooleanFieldFacet3D;
+@API package org.terasology.world.generation.facets;
 
-/**
- * @author Immortius
- */
-public class SolidityFacet extends BaseBooleanFieldFacet3D {
-
-    public SolidityFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border);
-    }
-}
+import org.terasology.engine.API;

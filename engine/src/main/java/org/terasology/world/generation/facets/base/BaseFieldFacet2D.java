@@ -16,11 +16,8 @@
 package org.terasology.world.generation.facets.base;
 
 import com.google.common.base.Preconditions;
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.world.generation.Border3D;
 
 /**

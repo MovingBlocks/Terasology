@@ -13,18 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.facets;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
+@API package org.terasology.world.generation;
 
-/**
- * @author Immortius
- */
-public class HumidityFacet extends BaseFieldFacet2D {
-
-    public HumidityFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border);
-    }
-}
+import org.terasology.engine.API;

@@ -16,8 +16,6 @@
 package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseObjectFacet2D;

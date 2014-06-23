@@ -17,10 +17,6 @@
 package org.terasology.core.world.generator.chunkGenerators;
 
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -33,6 +29,10 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Map;
 
 /**
  * Generates a terrain based on a provided heightmap
@@ -65,11 +65,12 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
 
     @Override
     public void setWorldSeed(String seed) {
-        if (seed == null)
+        if (seed == null) {
             return;
-        
+        }
+
         logger.info("Reading height map..");
-        
+
         Texture texture = Assets.getTexture("core:platec_heightmap");
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
@@ -83,7 +84,7 @@ public class BasicHMTerrainGenerationPass implements ChunkGenerationPass {
             int val = intBuf.get();
             heightmap[pos % width][pos / width] = val / (256 * 256 * 256 * 12.8f);
         }
-        
+
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
 
     }

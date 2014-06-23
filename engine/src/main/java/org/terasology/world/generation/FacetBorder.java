@@ -15,10 +15,8 @@
  */
 package org.terasology.world.generation;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
  * @author Immortius
@@ -26,6 +24,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FacetBorder {
     int top() default 0;
+
     int bottom() default 0;
+
     int sides() default 0;
 }

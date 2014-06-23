@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.rasterizer;
+package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
@@ -47,7 +47,7 @@ public class GroundRasterizer implements WorldRasterizer {
                 for (y = 0; y < chunk.getChunkSizeY() && y + chunkOffset.getY() < surfaceHeight; ++y) {
                     chunk.setBlock(x, y, z, stone);
                 }
-                for (; y < chunk.getChunkSizeY() && y + chunkOffset.getY() < 32; ++y) {
+                for (; y < chunk.getChunkSizeY() && y + chunkOffset.getY() <= 32; ++y) {
                     chunk.setBlock(x, y, z, water);
                 }
             }

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.rasterizer;
+package org.terasology.core.world.generator.rasterizers;
 
+import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -22,7 +23,6 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.facets.PlantFacet;
 
 /**
  * @author Immortius

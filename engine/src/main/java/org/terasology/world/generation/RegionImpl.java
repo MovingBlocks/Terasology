@@ -18,7 +18,6 @@ package org.terasology.world.generation;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
 import org.terasology.utilities.collection.TypeMap;
 
 import java.util.Set;

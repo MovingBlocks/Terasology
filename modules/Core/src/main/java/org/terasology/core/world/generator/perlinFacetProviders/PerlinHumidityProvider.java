@@ -13,48 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation.perlin;
+package org.terasology.core.world.generator.perlinFacetProviders;
 
-import org.terasology.math.Rect2i;
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
-import org.terasology.math.Vector3i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
-import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
+import org.terasology.world.generation.facets.HumidityFacet;
 
 import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-@Produces(SeaLevelTemperatureFacet.class)
-public class PerlinTemperatureProvider implements FacetProvider {
+@Produces(HumidityFacet.class)
+public class PerlinHumidityProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
-    private SubSampledNoise2D temperatureNoise;
+    private SubSampledNoise2D humidityNoise;
 
     @Override
     public void setSeed(long seed) {
-        temperatureNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 5), 8)), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
+        humidityNoise = new SubSampledNoise2D(new Noise3DTo2DAdapter(new BrownianNoise3D(new PerlinNoise(seed + 6), 8)), new Vector2f(0.0005f, 0.0005f), SAMPLE_RATE);
     }
 
     @Override
     public void process(GeneratingRegion region) {
-        SeaLevelTemperatureFacet facet = new SeaLevelTemperatureFacet(region.getRegion(), region.getBorderForFacet(SeaLevelTemperatureFacet.class));
-        float[] noise = this.temperatureNoise.noise(facet.getWorldRegion());
+        Border3D border = region.getBorderForFacet(HumidityFacet.class);
+        HumidityFacet facet = new HumidityFacet(region.getRegion(), border);
 
+        float[] noise = humidityNoise.noise(facet.getWorldRegion());
         for (int i = 0; i < noise.length; ++i) {
             noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
         }
-
         facet.set(noise);
-        region.setRegionFacet(SeaLevelTemperatureFacet.class, facet);
+        region.setRegionFacet(HumidityFacet.class, facet);
     }
 }

@@ -39,22 +39,8 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
-import org.terasology.world.generation.World;
-import org.terasology.world.generation.WorldBuilder;
-import org.terasology.world.generation.perlin.PerlinBaseSurfaceProvider;
-import org.terasology.world.generation.perlin.PerlinBiomeProvider;
-import org.terasology.world.generation.perlin.PerlinFloraProvider;
-import org.terasology.world.generation.perlin.PerlinHillsAndMountainsProvider;
-import org.terasology.world.generation.perlin.PerlinHumidityProvider;
-import org.terasology.world.generation.perlin.PerlinOceanProvider;
-import org.terasology.world.generation.perlin.PerlinRiverProvider;
-import org.terasology.world.generation.perlin.PerlinSurfaceToDensityProvider;
-import org.terasology.world.generation.perlin.PerlinTemperatureProvider;
-import org.terasology.world.generation.rasterizer.FloraRasterizer;
-import org.terasology.world.generation.rasterizer.SolidRasterizer;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
@@ -109,23 +95,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
             return false;
         }
 
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-        World world = new WorldBuilder(0)
-                .addProvider(new PerlinHumidityProvider())
-                .addProvider(new PerlinTemperatureProvider())
-                .addProvider(new PerlinBaseSurfaceProvider())
-                .addProvider(new PerlinRiverProvider())
-                .addProvider(new PerlinOceanProvider())
-                .addProvider(new PerlinHillsAndMountainsProvider())
-                .addProvider(new PerlinBiomeProvider())
-                .addProvider(new PerlinSurfaceToDensityProvider())
-                .addProvider(new PerlinFloraProvider())
-                .addRasterizer(new SolidRasterizer(blockManager))
-                .addRasterizer(new FloraRasterizer(blockManager))
-                .build();
-
         // Init. a new world
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, world);
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);
