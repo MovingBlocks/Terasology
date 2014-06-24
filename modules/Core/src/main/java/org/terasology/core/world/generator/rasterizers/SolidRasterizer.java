@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
-import org.terasology.core.world.generator.facets.DensityFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
@@ -27,6 +26,7 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.BiomeFacet;
+import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**

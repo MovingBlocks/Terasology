@@ -29,7 +29,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import javax.vecmath.Vector2f;
 
 /**
- * @author Immortius
+ * Scales the surface height closer to 0 for regions that are oceans
  */
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinOceanProvider implements FacetProvider {

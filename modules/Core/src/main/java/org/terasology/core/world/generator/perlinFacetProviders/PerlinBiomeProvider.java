@@ -28,7 +28,7 @@ import org.terasology.world.generation.facets.HumidityFacet;
 import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
 
 /**
- * @author Immortius
+ * Determines the biome based on temperature and humidity
  */
 @Produces(BiomeFacet.class)
 @Requires({@Facet(SeaLevelTemperatureFacet.class), @Facet(HumidityFacet.class)})

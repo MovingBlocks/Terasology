@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world.generator.perlinFacetProviders;
 
-import org.terasology.core.world.generator.facets.DensityFacet;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
@@ -24,10 +23,11 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
+import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
- * @author Immortius
+ * Sets density based on its distance from the surface
  */
 @Requires(@Facet(SurfaceHeightFacet.class))
 @Produces(DensityFacet.class)
