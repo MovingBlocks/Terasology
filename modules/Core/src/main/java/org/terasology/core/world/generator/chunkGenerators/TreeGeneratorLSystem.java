@@ -19,8 +19,8 @@ import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.CoreChunk;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
@@ -63,7 +63,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     }
 
     @Override
-    public void generate(ChunkView view, Random rand, int posX, int posY, int posZ) {
+    public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
         Matrix4f rotation = new Matrix4f();
@@ -74,7 +74,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
     }
 
-    private void recurse(ChunkView view, Random rand, int posX, int posY, int posZ, float angleOffset,
+    private void recurse(CoreChunk view, Random rand, int posX, int posY, int posZ, float angleOffset,
                          CharSequenceIterator axiomIterator, Vector3f position, Matrix4f rotation, int depth) {
         Matrix4f tempRotation = new Matrix4f();
         while (axiomIterator.hasNext()) {
@@ -83,10 +83,11 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    view.setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    view.setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
-                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
+
+                    safetlySetBlock(view, posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    safetlySetBlock(view, posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    safetlySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
+                    safetlySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
                     if (depth > 1) {
@@ -99,10 +100,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                         continue;
                                     }
 
-                                    view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
-                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
+                                    safetlySetBlock(view, posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    safetlySetBlock(view, posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    safetlySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
+                                    safetlySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
                                 }
                             }
                         }

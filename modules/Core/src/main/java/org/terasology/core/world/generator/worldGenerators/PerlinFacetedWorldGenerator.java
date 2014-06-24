@@ -23,10 +23,13 @@ import org.terasology.core.world.generator.perlinFacetProviders.PerlinHillsAndMo
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinHumidityProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinOceanProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinRiverProvider;
+import org.terasology.core.world.generator.perlinFacetProviders.PerlinSeaLevelProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinSurfaceToDensityProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinTemperatureProvider;
+import org.terasology.core.world.generator.perlinFacetProviders.PerlinTreeProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
+import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
@@ -81,6 +84,7 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         world = new WorldBuilder(worldSeed.hashCode())
+                .addProvider(new PerlinSeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinTemperatureProvider())
                 .addProvider(new PerlinBaseSurfaceProvider())
@@ -90,7 +94,9 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
                 .addProvider(new PerlinBiomeProvider())
                 .addProvider(new PerlinSurfaceToDensityProvider())
                 .addProvider(new PerlinFloraProvider())
+                .addProvider(new PerlinTreeProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
+                .addRasterizer(new TreeRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer(blockManager))
                 .addRasterizer(new FloraRasterizer(blockManager))
                 .build();

@@ -16,6 +16,7 @@
 package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.core.world.generator.facets.PlantFacet;
+import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -38,8 +39,9 @@ public class FloraRasterizer implements WorldRasterizer {
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         PlantFacet facet = chunkRegion.getFacet(PlantFacet.class);
+        SeaLevelFacet seaLevel = chunkRegion.getFacet(SeaLevelFacet.class);
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-            if (pos.y + chunk.getChunkWorldOffsetY() > 32 && facet.get(pos)) {
+            if (pos.y + chunk.getChunkWorldOffsetY() > seaLevel.getSeaLevel() && facet.get(pos)) {
                 chunk.setBlock(pos, tallGrass);
             }
         }

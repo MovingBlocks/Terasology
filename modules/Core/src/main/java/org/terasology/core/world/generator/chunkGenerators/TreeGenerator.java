@@ -24,6 +24,7 @@ import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.CoreChunk;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -55,7 +56,7 @@ public abstract class TreeGenerator {
      * @param posY Position on the y-axis
      * @param posZ Position on the z-axis
      */
-    public abstract void generate(ChunkView view, Random rand, int posX, int posY, int posZ);
+    public abstract void generate(CoreChunk view, Random rand, int posX, int posY, int posZ);
 
     public double getGenerationProbability() {
         return generationProbability;
@@ -92,5 +93,12 @@ public abstract class TreeGenerator {
         }
 
         return true;
+    }
+
+
+    protected void safetlySetBlock(CoreChunk chunk, int x, int y, int z, Block block) {
+        if (x >= 0 && x < chunk.getChunkSizeX() && y >= 0 && y < chunk.getChunkSizeY() && z >= 0 && z < chunk.getChunkSizeZ()) {
+            chunk.setBlock(x, y, z, block);
+        }
     }
 }
