@@ -20,7 +20,7 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet3D;
 
 /**
- * @author Immortius
+ * Stores a random seed for a tree to be planted
  */
 public class TreeFacet extends BaseFieldFacet3D {
 

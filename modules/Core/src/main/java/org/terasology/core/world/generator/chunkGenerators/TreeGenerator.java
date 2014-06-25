@@ -96,7 +96,7 @@ public abstract class TreeGenerator {
     }
 
 
-    protected void safetlySetBlock(CoreChunk chunk, int x, int y, int z, Block block) {
+    protected void safelySetBlock(CoreChunk chunk, int x, int y, int z, Block block) {
         if (x >= 0 && x < chunk.getChunkSizeX() && y >= 0 && y < chunk.getChunkSizeY() && z >= 0 && z < chunk.getChunkSizeZ()) {
             chunk.setBlock(x, y, z, block);
         }

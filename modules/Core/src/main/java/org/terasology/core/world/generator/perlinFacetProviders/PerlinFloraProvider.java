@@ -57,7 +57,6 @@ public class PerlinFloraProvider implements FacetProvider {
                 int height = TeraMath.floorToInt(surface.get(x, z));
                 if (height >= minY && height < maxY) {
                     WorldBiomeProvider.Biome biome = biomeFacet.get(x, z);
-                    boolean plains = biome == WorldBiomeProvider.Biome.PLAINS;
                     height = height - minY + facet.getRelativeRegion().minY();
 
                     if ((biome == WorldBiomeProvider.Biome.FOREST || biome == WorldBiomeProvider.Biome.PLAINS) && density.get(x, height, z) > 0

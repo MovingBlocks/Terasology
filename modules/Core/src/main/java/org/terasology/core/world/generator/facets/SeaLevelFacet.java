@@ -20,7 +20,7 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFacet2D;
 
 /**
- * @author Immortius
+ * Stores where sea level is
  */
 public class SeaLevelFacet extends BaseFacet2D {
 

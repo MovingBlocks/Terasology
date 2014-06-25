@@ -15,15 +15,18 @@
  */
 package org.terasology.core.world.generator.perlinFacetProviders;
 
+import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.math.Rect2i;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
 import org.terasology.world.generation.Border3D;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import javax.vecmath.Vector2f;
@@ -32,6 +35,7 @@ import javax.vecmath.Vector2f;
  * @author Immortius
  */
 @Produces(SurfaceHeightFacet.class)
+@Requires(@Facet(SeaLevelFacet.class))
 public class PerlinBaseSurfaceProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
@@ -46,11 +50,13 @@ public class PerlinBaseSurfaceProvider implements FacetProvider {
     public void process(GeneratingRegion region) {
         Border3D border = region.getBorderForFacet(SurfaceHeightFacet.class);
         SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), border);
+        SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);
+        float seaLevel = seaLevelFacet.getSeaLevel();
         Rect2i processRegion = facet.getWorldRegion();
         float[] noise = surfaceNoise.noise(processRegion);
 
         for (int i = 0; i < noise.length; ++i) {
-            noise[i] = 32f + 32f * ((noise[i] + 1f) / 2f);
+            noise[i] = seaLevel + seaLevel * ((noise[i] + 1f) / 2f);
         }
 
         facet.set(noise);

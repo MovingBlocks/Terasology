@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
-import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.Vector3i;
@@ -37,7 +36,7 @@ import org.terasology.world.generation.facets.BiomeFacet;
 import java.util.Map;
 
 /**
- * @author Immortius
+ * Creates trees based on the original
  */
 public class TreeRasterizer implements WorldRasterizer {
 
@@ -101,13 +100,11 @@ public class TreeRasterizer implements WorldRasterizer {
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
         TreeFacet facet = chunkRegion.getFacet(TreeFacet.class);
-        SeaLevelFacet seaLevel = chunkRegion.getFacet(SeaLevelFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
 
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             float facetValue = facet.get(pos);
             WorldBiomeProvider.Biome biome = biomeFacet.get(pos.getX(), pos.getZ());
-
             TreeGenerator generator = treeGeneratorLookup.get(biome);
 
             if (facetValue > 0 && generator.getGenerationProbability() < (facetValue / 256f)) {

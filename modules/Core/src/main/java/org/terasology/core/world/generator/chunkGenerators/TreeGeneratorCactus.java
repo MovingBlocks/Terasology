@@ -31,7 +31,7 @@ public class TreeGeneratorCactus extends TreeGenerator {
     @Override
     public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
         for (int y = posY; y < posY + 3; y++) {
-            safetlySetBlock(view, posX, y, posZ, cactus);
+            safelySetBlock(view, posX, y, posZ, cactus);
         }
     }
 

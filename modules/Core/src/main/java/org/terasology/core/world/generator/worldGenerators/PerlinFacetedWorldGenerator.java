@@ -96,9 +96,9 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
                 .addProvider(new PerlinFloraProvider())
                 .addProvider(new PerlinTreeProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
+                .addRasterizer(new FloraRasterizer(blockManager))
                 .addRasterizer(new TreeRasterizer(blockManager))
                 .addRasterizer(new SolidRasterizer(blockManager))
-                .addRasterizer(new FloraRasterizer(blockManager))
                 .build();
     }
 

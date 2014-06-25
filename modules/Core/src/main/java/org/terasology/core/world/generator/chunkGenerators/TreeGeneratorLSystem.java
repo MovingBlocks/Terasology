@@ -84,10 +84,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'F':
                     // Tree trunk
 
-                    safetlySetBlock(view, posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    safetlySetBlock(view, posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
-                    safetlySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
-                    safetlySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
+                    safelySetBlock(view, posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    safelySetBlock(view, posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType);
+                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType);
+                    safelySetBlock(view, posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType);
 
                     // Generate leaves
                     if (depth > 1) {
@@ -100,10 +100,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                         continue;
                                     }
 
-                                    safetlySetBlock(view, posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    safetlySetBlock(view, posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
-                                    safetlySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
-                                    safetlySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
+                                    safelySetBlock(view, posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    safelySetBlock(view, posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType);
+                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType);
+                                    safelySetBlock(view, posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType);
                                 }
                             }
                         }

@@ -20,7 +20,7 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseBooleanFieldFacet3D;
 
 /**
- * @author Immortius
+ * Stores where plants can be placed
  */
 public class PlantFacet extends BaseBooleanFieldFacet3D {
 
