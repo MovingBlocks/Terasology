@@ -53,11 +53,9 @@
 
         @In
         private GameEngine engine;
-
-
         @In
         private Config config;
-
+        
     public VideoSettingsScreen() {
     }
 
