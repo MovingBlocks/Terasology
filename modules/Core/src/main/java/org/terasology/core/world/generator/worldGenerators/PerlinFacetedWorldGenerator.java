@@ -16,6 +16,7 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
+import org.terasology.core.world.generator.perlinFacetProviders.EnsureSpawnableChunkZeroProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinBaseSurfaceProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinBiomeProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinFloraProvider;
@@ -95,6 +96,7 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
                 .addProvider(new PerlinSurfaceToDensityProvider())
                 .addProvider(new PerlinFloraProvider())
                 .addProvider(new PerlinTreeProvider())
+                .addProvider(new EnsureSpawnableChunkZeroProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new FloraRasterizer(blockManager))
                 .addRasterizer(new TreeRasterizer(blockManager))
@@ -110,5 +112,10 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 }

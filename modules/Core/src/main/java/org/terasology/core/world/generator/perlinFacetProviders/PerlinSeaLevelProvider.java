@@ -15,11 +15,11 @@
  */
 package org.terasology.core.world.generator.perlinFacetProviders;
 
-import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.facets.SeaLevelFacet;
 
 /**
  * @author Immortius

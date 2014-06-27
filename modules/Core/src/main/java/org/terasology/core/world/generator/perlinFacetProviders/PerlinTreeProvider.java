@@ -15,9 +15,10 @@
  */
 package org.terasology.core.world.generator.perlinFacetProviders;
 
-import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.math.Vector2i;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
@@ -26,21 +27,26 @@ import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.DensityFacet;
+import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
  */
 @Produces(TreeFacet.class)
-@Requires({@Facet(SeaLevelFacet.class), @Facet(SurfaceHeightFacet.class), @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))})
+@Requires({@Facet(SeaLevelFacet.class),
+        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 10, sides = 10)),
+        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 10, sides = 10))})
 public class PerlinTreeProvider implements FacetProvider {
 
-    private static float amountOfTrees = 0.07f;
-    private NoiseTable noiseTable;
+    private static float amountOfTrees = 0.12f;
+    private NoiseTable treeNoise;
+    private NoiseTable treeSeedNoise;
 
     @Override
     public void setSeed(long seed) {
-        noiseTable = new NoiseTable(seed);
+        treeNoise = new NoiseTable(seed);
+        treeSeedNoise = new NoiseTable(seed + 1);
     }
 
     @Override
@@ -50,30 +56,29 @@ public class PerlinTreeProvider implements FacetProvider {
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        int minY = facet.getWorldRegion().minY();
-        int maxY = facet.getWorldRegion().maxY();
-        for (int z = facet.getRelativeRegion().minZ(); z <= facet.getRelativeRegion().maxZ(); ++z) {
-            for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
-                int height = TeraMath.floorToInt(surface.get(x, z));
-                // if the surface is in range, and if we are above sea level
-                if (height >= minY && height < maxY && height >= seaLevel.getSeaLevel()) {
-                    height = height - minY + facet.getRelativeRegion().minY();
+        Rect2i worldRegion2D = Rect2i.createFromMinAndMax(facet.getWorldRegion().minX(), facet.getWorldRegion().minZ(), facet.getWorldRegion().maxX(), facet.getWorldRegion().maxZ());
+        for (Vector2i pos : worldRegion2D) {
+            int x = pos.getX();
+            int z = pos.getY();
+            int height = TeraMath.floorToInt(surface.getWorld(x, z));
+            // if the surface is in range, and if we are above sea level
+            if (facet.getWorldRegion().encompasses(x, height, z) && facet.getWorldRegion().encompasses(x, height + 1, z) && height >= seaLevel.getSeaLevel()) {
 
-                    // if the block on the surface is dense enough
-                    if (density.get(x, height, z) > 0
-                            && density.get(x, height + 1, z) <= 0
-                            // and if there is a level surface in adjacent directions
-                            && (x > facet.getRelativeRegion().minX() && TeraMath.floorToInt(surface.get(x - 1, z)) == height)
-                            && (x < facet.getRelativeRegion().maxX() && TeraMath.floorToInt(surface.get(x + 1, z)) == height)
-                            && (z > facet.getRelativeRegion().minZ() && TeraMath.floorToInt(surface.get(x, z - 1)) == height)
-                            && (z < facet.getRelativeRegion().maxZ() && TeraMath.floorToInt(surface.get(x, z + 1)) == height)
-                            // and if it selects a % of them
-                            && noiseTable.noise(x, z) / 256f < amountOfTrees) {
-                        facet.set(x, height + 1, z, noiseTable.noise(x, z));
-                    }
+                // if the block on the surface is dense enough
+                if (density.getWorld(x, height, z) > 0
+                        && density.getWorld(x, height + 1, z) <= 0
+                        // and if there is a level surface in adjacent directions
+                        && (x > facet.getWorldRegion().minX() && TeraMath.floorToInt(surface.getWorld(x - 1, z)) == height)
+                        && (x < facet.getWorldRegion().maxX() && TeraMath.floorToInt(surface.getWorld(x + 1, z)) == height)
+                        && (z > facet.getWorldRegion().minZ() && TeraMath.floorToInt(surface.getWorld(x, z - 1)) == height)
+                        && (z < facet.getWorldRegion().maxZ() && TeraMath.floorToInt(surface.getWorld(x, z + 1)) == height)
+                        // and if it selects a % of them
+                        && treeNoise.noise(x, z) / 256f < amountOfTrees) {
+                    facet.setWorld(x, height + 1, z, treeSeedNoise.noise(x, z));
                 }
             }
         }
+
         region.setRegionFacet(TreeFacet.class, facet);
     }
 }

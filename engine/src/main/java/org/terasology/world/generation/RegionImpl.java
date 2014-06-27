@@ -72,6 +72,6 @@ public class RegionImpl implements Region, GeneratingRegion {
 
     @Override
     public Border3D getBorderForFacet(Class<? extends WorldFacet> type) {
-        return new Border3D(0, 1, 0);
+        return new Border3D(0, 15, 10);
     }
 }

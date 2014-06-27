@@ -16,7 +16,6 @@
 package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.core.world.generator.facets.PlantFacet;
-import org.terasology.core.world.generator.facets.SeaLevelFacet;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -24,6 +23,7 @@ import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
+import org.terasology.world.generation.facets.SeaLevelFacet;
 
 /**
  * @author Immortius

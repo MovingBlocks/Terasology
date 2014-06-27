@@ -18,6 +18,7 @@ package org.terasology.world.generator;
 import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
 
 /**
  * @author Immortius
@@ -38,4 +39,6 @@ public interface WorldGenerator {
     void initialize();
 
     Optional<WorldConfigurator> getConfigurator();
+
+    World getWorld();
 }

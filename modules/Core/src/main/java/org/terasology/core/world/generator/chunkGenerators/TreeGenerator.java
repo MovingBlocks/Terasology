@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.Random;
-import org.terasology.world.ChunkView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -75,7 +74,7 @@ public abstract class TreeGenerator {
      * @param y    Position on the y-axis
      * @param z    Position on the z-axis
      */
-    public boolean canGenerateAt(ChunkView view, int x, int y, int z) {
+    public boolean canGenerateAt(CoreChunk view, int x, int y, int z) {
         Block posBlock = view.getBlock(x, y - 1, z);
         if (posBlock == null) {
             logger.error("WorldView.getBlock({}, {}, {}) return null, skipping forest generation (watchdog for issue #534)", x, y, z);
@@ -97,7 +96,7 @@ public abstract class TreeGenerator {
 
 
     protected void safelySetBlock(CoreChunk chunk, int x, int y, int z, Block block) {
-        if (x >= 0 && x < chunk.getChunkSizeX() && y >= 0 && y < chunk.getChunkSizeY() && z >= 0 && z < chunk.getChunkSizeZ()) {
+        if (ChunkConstants.CHUNK_REGION.encompasses(x, y, z)) {
             chunk.setBlock(x, y, z, block);
         }
     }

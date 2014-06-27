@@ -15,8 +15,9 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
@@ -27,7 +28,6 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class TreeRasterizer implements WorldRasterizer {
 
     private Block tallGrass;
-    private Map<WorldBiomeProvider.Biome, TreeGenerator> treeGeneratorLookup = Maps.newHashMap();
+    private Multimap<WorldBiomeProvider.Biome, TreeGenerator> treeGeneratorLookup = ArrayListMultimap.create();
 
     public TreeRasterizer(BlockManager blockManager) {
 
@@ -102,13 +102,16 @@ public class TreeRasterizer implements WorldRasterizer {
         TreeFacet facet = chunkRegion.getFacet(TreeFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
 
-        for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+        for (Vector3i pos : facet.getRelativeRegion()) {
             float facetValue = facet.get(pos);
             WorldBiomeProvider.Biome biome = biomeFacet.get(pos.getX(), pos.getZ());
-            TreeGenerator generator = treeGeneratorLookup.get(biome);
-
-            if (facetValue > 0 && generator.getGenerationProbability() < (facetValue / 256f)) {
-                generator.generate(chunk, new FastRandom((long) facetValue), pos.getX(), pos.getY(), pos.getZ());
+            if (facetValue > 0) {
+                for (TreeGenerator generator : treeGeneratorLookup.get(biome)) {
+                    if (generator.getGenerationProbability() > (facetValue / 256f)) {
+                        generator.generate(chunk, new FastRandom((long) facetValue), pos.getX(), pos.getY(), pos.getZ());
+                        break;
+                    }
+                }
             }
         }
     }

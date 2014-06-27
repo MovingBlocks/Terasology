@@ -24,6 +24,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
 import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
@@ -142,5 +143,10 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
     }
 }
