@@ -16,7 +16,6 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
-
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
@@ -31,7 +30,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,11 +47,13 @@ public final class Terasology {
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
+    private static final String NO_CRASH_REPORT_ARG = "-noCrashReport";
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
+        boolean crashReportEnabled = true;
         try {
             boolean isHeadless = false;
             Path homePath = null;
@@ -63,6 +64,8 @@ public final class Terasology {
                     homePath = Paths.get("");
                 } else if (arg.equals(HEADLESS_ARG)) {
                     isHeadless = true;
+                } else if (arg.equals(NO_CRASH_REPORT_ARG)) {
+                    crashReportEnabled = false;
                 }
             }
             if (homePath != null) {
@@ -98,7 +101,7 @@ public final class Terasology {
         } catch (RuntimeException | IOException e) {
 
             if (!GraphicsEnvironment.isHeadless()) {
-                Path logPath = Paths.get("."); 
+                Path logPath = Paths.get(".");
                 try {
                     Path gameLogPath = PathManager.getInstance().getLogPath();
                     if (gameLogPath != null) {
@@ -107,9 +110,12 @@ public final class Terasology {
                 } catch (Exception eat) {
                     // eat silently
                 }
-                
-                Path logFile = logPath.resolve("Terasology.log");
-                //CrashReporter.report(e, logFile);
+
+                if (crashReportEnabled) {
+                    Path logFile = logPath.resolve("Terasology.log");
+
+                    CrashReporter.report(e, logFile);
+                }
             }
         }
         System.exit(0);

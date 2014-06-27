@@ -43,8 +43,10 @@ import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.input.events.ButtonEvent;
-import org.terasology.module.Module;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ResolutionResult;
+import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 
@@ -126,10 +128,15 @@ public final class BindsConfig {
     public static BindsConfig createDefault() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         BindsConfig config = new BindsConfig();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
-                config.addDefaultsFor(module.getId(), module.getReflectionsFragment().getTypesAnnotatedWith(RegisterBindButton.class));
+            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
+                ResolutionResult result = resolver.resolve(moduleId);
+                if (result.isSuccess()) {
+                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                        config.addDefaultsFor(moduleId, environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId)));
+                    }
+                }
             }
         }
         return config;
@@ -140,10 +147,15 @@ public final class BindsConfig {
      */
     public void updateForChangedMods() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
-            if (module.isCodeModule()) {
-                updateInputsFor(module.getId(), module.getReflectionsFragment().getTypesAnnotatedWith(RegisterBindButton.class));
+            if (moduleManager.getRegistry().getLatestModuleVersion(moduleId).isCodeModule()) {
+                ResolutionResult result = resolver.resolve(moduleId);
+                if (result.isSuccess()) {
+                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                        updateInputsFor(moduleId, environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId)));
+                    }
+                }
             }
         }
     }

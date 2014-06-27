@@ -15,24 +15,21 @@
  */
 package org.terasology.engine.module;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleLoader;
 import org.terasology.module.ModuleMetadata;
 import org.terasology.module.ModuleMetadataReader;
 import org.terasology.module.ModulePathScanner;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.TableModuleRegistry;
-import org.terasology.module.sandbox.API;
+import org.terasology.module.sandbox.APIScanner;
 import org.terasology.module.sandbox.BytecodeInjector;
 import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.module.sandbox.ModuleSecurityPolicy;
@@ -43,12 +40,8 @@ import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ReflectPermission;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Policy;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,15 +49,20 @@ import java.util.Set;
  */
 public class ModuleManager {
 
+    public static final String SERVER_SIDE_ONLY_EXT = "serverSideOnly";
+
     private ModuleSecurityManager moduleSecurityManager;
 
     private ModuleRegistry registry;
     private ModuleEnvironment environment;
-    private Module engineModule;
+    private ModuleMetadataReader metadataReader;
 
     public ModuleManager() {
+        metadataReader = new ModuleMetadataReader();
+        metadataReader.registerExtension(SERVER_SIDE_ONLY_EXT, Boolean.TYPE);
+        Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/assets/module.txt"))) {
-            ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
+            ModuleMetadata metadata = metadataReader.read(reader);
             engineModule = ClasspathModule.create(metadata, getClass(), Module.class);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read engine metadata", e);
@@ -74,7 +72,9 @@ public class ModuleManager {
 
         registry = new TableModuleRegistry();
         registry.add(engineModule);
-        new ModulePathScanner().scan(registry, PathManager.getInstance().getModulePaths());
+        ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
+        scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+        scanner.scan(registry, PathManager.getInstance().getModulePaths());
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);
@@ -128,12 +128,10 @@ public class ModuleManager {
         moduleSecurityManager.addAPIClass(LoggerFactory.class);
         moduleSecurityManager.addAPIClass(Logger.class);
 
-        for (Class<?> apiClass : engineModule.getReflectionsFragment().getTypesAnnotatedWith(API.class)) {
-            if (apiClass.isSynthetic()) {
-                // This is a package-info
-                moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
-            } else {
-                moduleSecurityManager.addAPIClass(apiClass);
+        APIScanner apiScanner = new APIScanner(moduleSecurityManager);
+        for (Module module : registry) {
+            if (module.isOnClasspath()) {
+                apiScanner.scan(module);
             }
         }
 
@@ -171,5 +169,9 @@ public class ModuleManager {
             environment = newEnvironment;
         }
         return newEnvironment;
+    }
+
+    public ModuleMetadataReader getModuleMetadataReader() {
+        return metadataReader;
     }
 }

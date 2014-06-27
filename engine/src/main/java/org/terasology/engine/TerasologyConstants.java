@@ -20,6 +20,8 @@ import com.google.common.base.Charsets;
 import org.terasology.naming.Name;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Immortius
@@ -35,6 +37,7 @@ public final class TerasologyConstants {
     public static final String ASSETS_SUBDIRECTORY = "assets";
     public static final String OVERRIDES_SUBDIRECTORY = "overrides";
     public static final String DELTAS_SUBDIRECTORY = "deltas";
+    public static final Path MODULE_INFO_FILENAME = Paths.get("module.txt");
 
     private TerasologyConstants() {
     }

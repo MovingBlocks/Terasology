@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.EngineTime;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -150,7 +151,8 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                     }
 
                     Files.copy(tempModuleLocation, finalPath);
-                    ModuleLoader loader = new ModuleLoader();
+                    ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
+                    loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
 
                     moduleManager.getRegistry().add(loader.load(finalPath));
                     receivingModule = null;

@@ -27,7 +27,11 @@ import org.terasology.input.InputCategory;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindButton;
 import org.terasology.math.Vector2i;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ResolutionResult;
+import org.terasology.module.predicates.FromModule;
 import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -88,19 +92,26 @@ public class InputSettingsScreen extends CoreScreenLayer {
 
         Map<String, InputCategory> inputCategories = Maps.newHashMap();
         Map<SimpleUri, RegisterBindButton> inputsById = Maps.newHashMap();
+        DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (module.isCodeModule()) {
-                for (Class<?> holdingType : module.getReflectionsFragment().getTypesAnnotatedWith(InputCategory.class)) {
-                    InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
-                    inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
-                }
-                for (Class<?> bindEvent : module.getReflectionsFragment().getTypesAnnotatedWith(RegisterBindButton.class)) {
-                    if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
-                        RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
-                        inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
+                ResolutionResult result = resolver.resolve(moduleId);
+                if (result.isSuccess()) {
+                    try (ModuleEnvironment environment = moduleManager.loadEnvironment(result.getModules(), false)) {
+                        for (Class<?> holdingType : environment.getTypesAnnotatedWith(InputCategory.class, new FromModule(environment, moduleId))) {
+                            InputCategory inputCategory = holdingType.getAnnotation(InputCategory.class);
+                            inputCategories.put(module.getId() + ":" + inputCategory.id(), inputCategory);
+                        }
+                        for (Class<?> bindEvent : environment.getTypesAnnotatedWith(RegisterBindButton.class, new FromModule(environment, moduleId))) {
+                            if (BindButtonEvent.class.isAssignableFrom(bindEvent)) {
+                                RegisterBindButton bindRegister = bindEvent.getAnnotation(RegisterBindButton.class);
+                                inputsById.put(new SimpleUri(module.getId(), bindRegister.id()), bindRegister);
+                            }
+                        }
                     }
                 }
+
             }
         }
 
