@@ -18,6 +18,10 @@ apply plugin: 'versioneye'
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.text.SimpleDateFormat;
 
@@ -94,7 +98,7 @@ configurations.all {
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
-	compile group: 'org.terasology', name: 'gestalt-module', version: '1.0.1-SNAPSHOT'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '1.0.1-SNAPSHOT'
     compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
     compile group: 'com.google.guava', name: 'guava', version: '15.0'
@@ -120,10 +124,10 @@ dependencies {
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
-	// TODO: These could be moved into facade
-	compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+', changing: true
-	runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
-	runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.7'
+    // TODO: These could be moved into facade
+    compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+', changing: true
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.7'
     // And here is Groovy to read the config file
     runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
 
@@ -139,6 +143,19 @@ jar {
     manifest {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
         attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
+    }
+}
+
+task cacheReflections {
+    inputs.files project.classes.outputs.files
+    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    dependsOn classes
+    doFirst {
+        Reflections reflections = new ConfigurationBuilder()
+                    .addUrls((configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL()))
+                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                    .build()
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
 }
 
@@ -195,6 +212,7 @@ task createVersionInfoFile {
 }
 
 jar.dependsOn createVersionInfoFile
+jar.dependsOn cacheReflections
 
 // A configuration for publishing artifacts
 configurations {

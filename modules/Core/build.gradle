@@ -9,6 +9,10 @@ import java.text.SimpleDateFormat;
 
 // Git plugin details at https://github.com/ajoberstar/gradle-git
 import org.ajoberstar.gradle.git.tasks.*
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 
 // Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
 buildscript {
@@ -168,6 +172,15 @@ dependencies {
     }
 }
 
+// Change the output dir of each module
+sourceSets {
+    main {
+        java {
+            output.classesDir 'build/classes'
+        }
+    }
+}
+
 // Generate the module directory structure if missing
 task createSkeleton() {
     mkdir('assets')
@@ -188,10 +201,23 @@ task createSkeleton() {
     mkdir('assets/sounds')
     mkdir('assets/textures')
     mkdir('assets/ui')
-	mkdir('overrides')
-	mkdir('deltas')
+    mkdir('overrides')
+    mkdir('deltas')
     mkdir('src/main/java')
     mkdir('src/test/java')
+}
+
+task cacheReflections {
+    inputs.files project.classes.outputs.files
+    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    dependsOn classes
+    doFirst {
+        Reflections reflections = new ConfigurationBuilder()
+                .addUrls(sourceSets.main.output.classesDir.toURI().toURL())
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                .build()
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    }
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
@@ -210,21 +236,13 @@ task syncDeltas(type: Sync) {
     into 'build/classes/deltas'
 }
 
-// Change the output dir of each module
-sourceSets {
-    main {
-        java {
-            output.classesDir 'build/classes'
-        }
-    }
-}
-
 // Instructions for packaging a jar file - is a manifest even needed for modules?
 jar {
     // Make sure the assets directory is included
+    dependsOn cacheReflections
     dependsOn syncAssets
-	dependsOn syncOverrides
-	dependsOn syncDeltas
+    dependsOn syncOverrides
+    dependsOn syncDeltas
 
     // Jarring needs to copy module.txt and all the assets into the output
     doFirst {
