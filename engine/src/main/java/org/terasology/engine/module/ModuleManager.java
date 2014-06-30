@@ -122,6 +122,7 @@ public class ModuleManager {
         moduleSecurityManager.addAPIPackage("javax.vecmath");
         moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
         moduleSecurityManager.addAPIPackage("com.bulletphysics.linearmath");
+        moduleSecurityManager.addAPIPackage("sun.reflect");
         moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
         moduleSecurityManager.addAPIClass(IOException.class);
         moduleSecurityManager.addAPIClass(InvocationTargetException.class);
