@@ -17,10 +17,8 @@
 package org.terasology.core.world.generator.chunkGenerators;
 
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -28,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.utilities.procedural.HeightmapFileReader;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -68,11 +65,12 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        if (seed == null)
+        if (seed == null) {
             return;
-        
+        }
+
         logger.info("Reading height map..");
-        
+
         Texture texture = Assets.getTexture("core:platec_heightmap");
         ByteBuffer[] bb = texture.getData().getBuffers();
         IntBuffer intBuf = bb[0].asIntBuffer();
@@ -86,7 +84,7 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
             int val = intBuf.get();
             heightmap[pos % width][pos / width] = val / (256 * 256 * 256 * 12.8f);
         }
-        
+
         heightmap = shiftArray(rotateArray(heightmap), -50, -100);
         //try also other combinations with shift and rotate
         //heightmap = rotateArray(heightmap);
@@ -117,6 +115,7 @@ public class BasicHMTerrainGenerator implements FirstPassGenerator {
      *
      * @param chunk
      */
+    @Override
     public void generateChunk(Chunk chunk) {
 
         int hmX = (((chunk.getChunkWorldPosX() / chunk.getChunkSizeX()) % 512) + 512) % 512;
