@@ -20,17 +20,17 @@ import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
-import java.util.Locale;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
 public class Atlas extends AbstractAsset<AtlasData> {
-    private Map<String, Subtexture> subtextures = Maps.newHashMap();
+    private Map<Name, Subtexture> subtextures = Maps.newHashMap();
 
     public Atlas(AssetUri uri, AtlasData data) {
         super(uri);
@@ -40,11 +40,11 @@ public class Atlas extends AbstractAsset<AtlasData> {
     @Override
     public void reload(AtlasData data) {
         subtextures.clear();
-        for (Map.Entry<String, SubtextureData> entry : data.getSubtextures().entrySet()) {
+        for (Map.Entry<Name, SubtextureData> entry : data.getSubtextures().entrySet()) {
             String subtextureName = getURI().getAssetName() + "." + entry.getKey();
             Subtexture subtexture = Assets.generateAsset(new AssetUri(AssetType.SUBTEXTURE, getURI().getModuleName(), subtextureName), entry.getValue(), Subtexture.class);
             if (subtexture != null) {
-                subtextures.put(entry.getKey().toLowerCase(Locale.ENGLISH), subtexture);
+                subtextures.put(entry.getKey(), subtexture);
             }
         }
     }
@@ -60,6 +60,6 @@ public class Atlas extends AbstractAsset<AtlasData> {
     }
 
     public Subtexture getSubtexture(String name) {
-        return subtextures.get(name.toLowerCase(Locale.ENGLISH));
+        return subtextures.get(new Name(name));
     }
 }

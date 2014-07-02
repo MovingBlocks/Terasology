@@ -15,10 +15,10 @@
  */
 package org.terasology.engine;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.subsystem.DisplayDevice;
@@ -28,13 +28,15 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Simple manager for component systems.
@@ -65,20 +67,26 @@ public class ComponentSystemManager {
     public ComponentSystemManager() {
     }
 
-    public void loadSystems(String moduleName, Reflections reflections, NetworkMode netMode) {
+    public void loadSystems(ModuleEnvironment environment, NetworkMode netMode) {
         DisplayDevice displayDevice = CoreRegistry.get(DisplayDevice.class);
         boolean isHeadless = displayDevice.isHeadless();
 
-        Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterSystem.class);
-        for (Class<?> system : systems) {
-            if (!ComponentSystem.class.isAssignableFrom(system)) {
-                logger.error("Cannot load {}, must be a subclass of ComponentSystem", system.getSimpleName());
+        ListMultimap<Name, Class<?>> systemsByModule = ArrayListMultimap.create();
+        for (Class<?> type : environment.getTypesAnnotatedWith(RegisterSystem.class)) {
+            if (!ComponentSystem.class.isAssignableFrom(type)) {
+                logger.error("Cannot load {}, must be a subclass of ComponentSystem", type.getSimpleName());
                 continue;
             }
-
-            RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
+            Name moduleId = environment.getModuleProviding(type);
+            RegisterSystem registerInfo = type.getAnnotation(RegisterSystem.class);
             if (registerInfo.value().isValidFor(netMode, isHeadless)) {
-                String id = moduleName + ":" + system.getSimpleName();
+                systemsByModule.put(moduleId, type);
+            }
+        }
+
+        for (Module module : environment.getModulesOrderedByDependencies()) {
+            for (Class<?> system : systemsByModule.get(module.getId())) {
+                String id = module.getId() + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();
@@ -90,10 +98,9 @@ public class ComponentSystemManager {
                 }
             }
         }
-
     }
 
-    public <T extends ComponentSystem> void register(ComponentSystem object) {
+    public void register(ComponentSystem object) {
         store.add(object);
         if (object instanceof UpdateSubscriberSystem) {
             updateSubscribers.add((UpdateSubscriberSystem) object);
@@ -108,7 +115,7 @@ public class ComponentSystemManager {
         }
     }
 
-    public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
+    public void register(ComponentSystem object, String name) {
         namedLookup.put(name, object);
         register(object);
     }

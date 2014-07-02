@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;

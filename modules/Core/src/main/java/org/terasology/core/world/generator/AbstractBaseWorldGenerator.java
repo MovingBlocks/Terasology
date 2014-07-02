@@ -17,7 +17,6 @@ package org.terasology.core.world.generator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.core.world.internal.WorldBiomeProviderImpl;
@@ -156,7 +155,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     public Iterable<String> getLayers() {
         return Arrays.asList("Biome", "Humidity", "Temperature");
     }
-    
+
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();

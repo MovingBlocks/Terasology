@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 /**
  * Base class for nodes in a behavior tree. Each node must implement the create() method to create tasks, that are

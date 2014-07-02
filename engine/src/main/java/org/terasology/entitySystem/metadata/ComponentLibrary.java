@@ -18,15 +18,14 @@ package org.terasology.entitySystem.metadata;
 import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.engine.SimpleUri;
+import org.terasology.entitySystem.Component;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.Component;
 
 /**
  * The library for metadata about components (and their fields).
@@ -36,7 +35,6 @@ import org.terasology.entitySystem.Component;
 public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentLibrary.class);
-    private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
 
     public ComponentLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         super(factory, copyStrategies);
@@ -77,7 +75,7 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
     }
 
     @Override
-    public ComponentMetadata<?> resolve(String name, String context) {
+    public ComponentMetadata<?> resolve(String name, Name context) {
         return (ComponentMetadata<?>) super.resolve(name, context);
     }
 

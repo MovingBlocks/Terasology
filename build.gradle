@@ -37,6 +37,7 @@ buildscript {
 
         // Git plugin for Gradle
         classpath 'org.ajoberstar:gradle-git:0.6.3'
+        classpath 'org.reflections:reflections:0.9.9-RC1'
     }
 }
 
@@ -244,7 +245,7 @@ idea {
     project {
         // Set JDK
         jdkName = '1.7'
-		wildcards -= '!?*.groovy'
+        wildcards -= '!?*.groovy'
 
         ipr {
             withXml { xmlProvider ->

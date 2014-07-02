@@ -16,12 +16,12 @@
 package org.terasology.entitySystem.metadata;
 
 import org.junit.Test;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.stubs.OwnerComponent;
 import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.Assert.assertTrue;
 

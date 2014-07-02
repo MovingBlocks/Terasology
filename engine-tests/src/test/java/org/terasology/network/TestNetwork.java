@@ -22,15 +22,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.network.internal.NetworkSystemImpl;
+import org.terasology.registry.CoreRegistry;
 
 import java.util.List;
 

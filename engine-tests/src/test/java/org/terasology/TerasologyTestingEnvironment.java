@@ -16,10 +16,6 @@
 
 package org.terasology;
 
-import static org.mockito.Mockito.mock;
-
-import java.nio.file.FileSystem;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -47,6 +43,10 @@ import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
+
+import java.nio.file.FileSystem;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * A base class for unit test classes to inherit to run in a Terasology environment - with LWJGL set up and so forth
@@ -107,8 +107,8 @@ public abstract class TerasologyTestingEnvironment {
         CoreRegistry.put(Time.class, mockTime);
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
-        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), networkSystem, new ReflectionReflectFactory());
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager, engineEntityManager));
+        engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager.getEnvironment(), engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

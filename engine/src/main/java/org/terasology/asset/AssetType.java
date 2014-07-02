@@ -24,6 +24,7 @@ import org.terasology.audio.loaders.OggSoundLoader;
 import org.terasology.audio.loaders.OggStreamingSoundLoader;
 import org.terasology.entitySystem.prefab.internal.PrefabLoader;
 import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.atlas.AtlasLoader;
 import org.terasology.rendering.assets.font.FontLoader;
 import org.terasology.rendering.assets.material.MaterialLoader;
@@ -59,7 +60,7 @@ public enum AssetType {
     TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "texinfo"}, new PNGTextureLoader(), false),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader(), false) {
         @Override
-        public AssetUri getUri(String sourceId, String item) {
+        public AssetUri getUri(Name sourceId, String item) {
             if (item.endsWith("_frag")) {
                 String itemPart = item.substring(0, item.length() - "_frag".length());
                 return new AssetUri(this, sourceId, itemPart);
@@ -187,7 +188,7 @@ public enum AssetType {
         return assetLoaderList.get(index);
     }
 
-    public AssetUri getUri(String sourceId, String item) {
+    public AssetUri getUri(Name sourceId, String item) {
         return new AssetUri(this, sourceId, item);
     }
 

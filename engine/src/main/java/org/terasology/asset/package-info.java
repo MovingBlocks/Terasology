@@ -26,4 +26,4 @@
 // TODO: More javadoc
 @API package org.terasology.asset;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

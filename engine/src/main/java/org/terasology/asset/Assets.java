@@ -20,6 +20,7 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
@@ -64,7 +65,7 @@ public final class Assets {
     /**
      * @return An iterable over the list of available modules
      */
-    public static Iterable<String> listModules() {
+    public static Iterable<Name> listModules() {
         return CoreRegistry.get(AssetManager.class).listModuleNames();
     }
 
@@ -138,6 +139,15 @@ public final class Assets {
      * @return The requested texture, or null if it doesn't exist
      */
     public static Texture getTexture(String module, String assetName) {
+        return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
+    }
+
+    /**
+     * @param module
+     * @param assetName
+     * @return The requested texture, or null if it doesn't exist
+     */
+    public static Texture getTexture(Name module, String assetName) {
         return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
     }
 

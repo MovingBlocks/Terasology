@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.inventory.action;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 

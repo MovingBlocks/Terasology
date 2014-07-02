@@ -16,8 +16,8 @@
 
 package org.terasology.entitySystem.stubs;
 
-import org.terasology.reflection.MappedContainer;
 import org.terasology.entitySystem.Component;
+import org.terasology.reflection.MappedContainer;
 
 /**
  * @author Immortius

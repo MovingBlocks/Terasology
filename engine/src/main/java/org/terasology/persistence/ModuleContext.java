@@ -15,9 +15,10 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius
@@ -37,8 +38,8 @@ public final class ModuleContext {
         return new ContextSpan(module);
     }
 
-    public static ContextSpan setContext(String module) {
-        return new ContextSpan(CoreRegistry.get(ModuleManager.class).getActiveModule(module));
+    public static ContextSpan setContext(Name module) {
+        return new ContextSpan(CoreRegistry.get(ModuleManager.class).getEnvironment().get(module));
     }
 
     public static final class ContextSpan implements AutoCloseable {

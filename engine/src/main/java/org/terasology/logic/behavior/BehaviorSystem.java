@@ -130,7 +130,7 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
             savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("assets").resolve("behaviors");
         } else {
             Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("overrides");
-            savePath = overridesPath.resolve(uri.getModuleName()).resolve("behaviors");
+            savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");
         }
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
         try {

@@ -37,6 +37,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
@@ -76,8 +77,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     public void refreshWidgetsLibrary() {
         widgetsLibrary = new WidgetLibrary(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        for (Map.Entry<String, Class<? extends UIWidget>> entry : CoreRegistry.get(ModuleManager.class).findAllSubclassesOf(UIWidget.class).entries()) {
-            widgetsLibrary.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
+            widgetsLibrary.register(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
         }
     }
 
@@ -196,7 +198,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
             if (!screens.contains(result)) {
-                result.setId(element.getURI().toNormalisedSimpleString());
+                result.setId(element.getURI().toString());
                 pushScreen(result, element.getURI());
             }
             return result;

@@ -21,11 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.module.Module;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldProvider;
@@ -77,14 +77,12 @@ public class Game {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
             ModuleConfig moduleConfig = new ModuleConfig();
-            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-                moduleConfig.addModule(module.getId());
-            }
-
             GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
-            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
+            for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+                moduleConfig.addModule(module.getId());
                 gameManifest.addModule(module.getId(), module.getVersion());
             }
+
             List<String> registeredBlockFamilies = Lists.newArrayList();
             for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
                 registeredBlockFamilies.add(family.getURI().toString());

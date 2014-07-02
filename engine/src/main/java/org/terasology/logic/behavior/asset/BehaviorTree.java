@@ -64,7 +64,7 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
 
     @Override
     public String toString() {
-        return getURI().getAssetName();
+        return getURI().getAssetName().toString();
     }
 
     @Override

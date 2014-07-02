@@ -15,4 +15,4 @@
  */
 @API package org.terasology.logic.delay;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

@@ -23,22 +23,28 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.AssetSourceCollection;
-import org.terasology.engine.API;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.asset.sources.DirectorySource;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.UriUtil;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -53,19 +59,55 @@ public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
 
-    private ModuleManager moduleManager;
-    private Map<String, AssetSource> assetSources = Maps.newHashMap();
+    private ModuleEnvironment environment;
+    private Map<Name, AssetSource> assetSources = Maps.newHashMap();
     private Map<AssetType, Map<String, AssetLoader<?>>> assetLoaders = Maps.newEnumMap(AssetType.class);
     private Map<AssetUri, Asset<?>> assetCache = Maps.newHashMap();
     private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
     private Map<AssetType, AssetFactory<?, ?>> factories = Maps.newHashMap();
-    private Map<AssetType, Table<String, String, AssetUri>> uriLookup = Maps.newHashMap();
+    private Map<AssetType, Table<Name, Name, AssetUri>> uriLookup = Maps.newHashMap();
     private ListMultimap<AssetType, AssetResolver<?, ?>> resolvers = ArrayListMultimap.create();
 
-    public AssetManager(ModuleManager moduleManager) {
-        this.moduleManager = moduleManager;
+    public AssetManager(ModuleEnvironment environment) {
         for (AssetType type : AssetType.values()) {
-            uriLookup.put(type, HashBasedTable.<String, String, AssetUri>create());
+            uriLookup.put(type, HashBasedTable.<Name, Name, AssetUri>create());
+        }
+        setEnvironment(environment);
+    }
+
+    public ModuleEnvironment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(ModuleEnvironment environment) {
+        this.environment = environment;
+        assetSources.clear();
+        for (Module module : environment) {
+            Collection<Path> location = module.getLocations();
+            if (!location.isEmpty()) {
+                List<AssetSource> sources = Lists.newArrayList();
+                for (Path path : location) {
+                    sources.add(createAssetSource(module.getId(), path));
+                }
+                AssetSource source = new AssetSourceCollection(module.getId(), sources);
+                assetSources.put(source.getSourceId(), source);
+
+                for (AssetUri asset : source.list()) {
+                    uriLookup.get(asset.getAssetType()).put(asset.getAssetName(), asset.getModuleName(), asset);
+                }
+            }
+        }
+        applyOverrides();
+        refresh();
+    }
+
+    private AssetSource createAssetSource(Name id, Path path) {
+        if (Files.isRegularFile(path)) {
+           return new ArchiveSource(id, path.toFile(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY,
+                   TerasologyConstants.DELTAS_SUBDIRECTORY);
+        } else {
+            return new DirectorySource(id, path.resolve(TerasologyConstants.ASSETS_SUBDIRECTORY),
+                    path.resolve(TerasologyConstants.OVERRIDES_SUBDIRECTORY), path.resolve(TerasologyConstants.DELTAS_SUBDIRECTORY));
         }
     }
 
@@ -83,7 +125,11 @@ public class AssetManager {
             return Lists.newArrayList(uri);
         }
 
-        List<AssetUri> results = Lists.newArrayList(uriLookup.get(type).row(UriUtil.normalise(name)).values());
+        return resolveAll(type, new Name(name));
+    }
+
+    public List<AssetUri> resolveAll(AssetType type, Name name) {
+        List<AssetUri> results = Lists.newArrayList(uriLookup.get(type).row(name).values());
         for (AssetResolver<?, ?> resolver : resolvers.get(type)) {
             AssetUri additionalUri = resolver.resolve(name);
             if (additionalUri != null) {
@@ -104,14 +150,14 @@ public class AssetManager {
             default:
                 Module context = ModuleContext.getContext();
                 if (context != null) {
-                    Set<String> dependencies = moduleManager.getDependencyNamesOf(context);
+                    Set<Name> dependencies = environment.getDependencyNamesOf(context.getId());
                     Iterator<AssetUri> iterator = possibilities.iterator();
                     while (iterator.hasNext()) {
                         AssetUri possibleUri = iterator.next();
-                        if (context.getId().equals(possibleUri.getNormalisedModuleName())) {
+                        if (context.getId().equals(possibleUri.getModuleName())) {
                             return possibleUri;
                         }
-                        if (!dependencies.contains(possibleUri.getNormalisedModuleName())) {
+                        if (!dependencies.contains(possibleUri.getModuleName())) {
                             iterator.remove();
                         }
                     }
@@ -270,11 +316,11 @@ public class AssetManager {
                 continue;
             }
 
-            Module module = moduleManager.getActiveModule(uri.getNormalisedModuleName());
+            Module module = environment.get(uri.getModuleName());
             List<URL> deltas;
             if (uri.getAssetType().isDeltaSupported()) {
                 deltas = Lists.newArrayList();
-                for (Module deltaModule : moduleManager.getActiveModulesOrderedByDependency()) {
+                for (Module deltaModule : environment.getModulesOrderedByDependencies()) {
                     AssetSource source = assetSources.get(deltaModule.getId());
                     if (source != null) {
                         deltas.addAll(source.getDelta(uri));
@@ -324,7 +370,7 @@ public class AssetManager {
             }
         }
 
-        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(moduleManager.getActiveModule(uri.getNormalisedModuleName()))) {
+        try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(environment.get(uri.getModuleName()))) {
             AssetData data = loadAssetData(uri, logErrors);
 
             if (data != null) {
@@ -347,7 +393,7 @@ public class AssetManager {
         List<Asset<?>> dispose = Lists.newArrayList();
 
         for (Asset<?> asset : assetCache.values()) {
-            if (asset.getURI().getNormalisedModuleName().equals(TerasologyConstants.ENGINE_MODULE) && !(asset instanceof Prefab) && !(asset instanceof BehaviorTree)) {
+            if (asset.getURI().getModuleName().equals(TerasologyConstants.ENGINE_MODULE) && !(asset instanceof Prefab) && !(asset instanceof BehaviorTree)) {
                 keepAndReload.add(asset);
             } else {
                 dispose.add(asset);
@@ -397,29 +443,14 @@ public class AssetManager {
         return generateAsset(new AssetUri(type, "temp", UUID.randomUUID().toString()), data);
     }
 
-    public void addAssetSource(AssetSource newSource) {
-        String idKey = newSource.getSourceId().toLowerCase(Locale.ENGLISH);
-        AssetSource originalSource = assetSources.get(idKey);
-        if (null == originalSource) {
-            assetSources.put(idKey, newSource);
-        } else {
-            AssetSourceCollection combinedSource = new AssetSourceCollection(idKey, originalSource, newSource);
-            assetSources.put(idKey, combinedSource);
-        }
-        // only need to add entries from new source
-        for (AssetUri asset : newSource.list()) {
-            uriLookup.get(asset.getAssetType()).put(asset.getNormalisedAssetName(), asset.getNormalisedModuleName(), asset);
-        }
-    }
-
     public <D extends AssetData> void removeAssetSource(AssetSource source) {
-        assetSources.remove(source.getSourceId().toLowerCase(Locale.ENGLISH));
+        assetSources.remove(source.getSourceId());
         for (AssetUri override : source.listOverrides()) {
             if (overrides.get(override).equals(source)) {
                 overrides.remove(override);
                 Asset<D> asset = (Asset<D>) assetCache.get(override);
                 if (asset != null) {
-                    if (TerasologyConstants.ENGINE_MODULE.equals(override.getNormalisedModuleName())) {
+                    if (TerasologyConstants.ENGINE_MODULE.equals(override.getModuleName())) {
                         AssetData data = loadAssetData(override, true);
                         asset.reload((D) data);
                     } else {
@@ -429,8 +460,8 @@ public class AssetManager {
                 }
             }
         }
-        for (Table<String, String, AssetUri> table : uriLookup.values()) {
-            Map<String, AssetUri> columnMap = table.column(UriUtil.normalise(source.getSourceId()));
+        for (Table<Name, Name, AssetUri> table : uriLookup.values()) {
+            Map<Name, AssetUri> columnMap = table.column(source.getSourceId());
             for (AssetUri value : columnMap.values()) {
                 Asset<?> asset = assetCache.remove(value);
                 if (asset != null) {
@@ -480,7 +511,7 @@ public class AssetManager {
         return results;
     }
 
-    public Iterable<String> listModuleNames() {
+    public Iterable<Name> listModuleNames() {
         return assetSources.keySet();
     }
 
@@ -489,7 +520,7 @@ public class AssetManager {
         if (overrideSource != null) {
             return overrideSource.getOverride(uri);
         } else {
-            AssetSource source = assetSources.get(uri.getNormalisedModuleName());
+            AssetSource source = assetSources.get(uri.getModuleName());
             if (source != null) {
                 return source.get(uri);
             }

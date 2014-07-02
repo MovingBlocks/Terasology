@@ -36,5 +36,5 @@
                 "engine:toolbarSlot9"
         }) package org.terasology.input.binds.inventory;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.input.InputCategory;

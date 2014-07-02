@@ -20,13 +20,13 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+import org.terasology.engine.SimpleUri;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.UriUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +45,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     private ReflectFactory reflectFactory;
 
     private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> classLookup = Maps.newHashMap();
-    private Table<String, String, ClassMetadata<? extends T, ?>> uriLookup = HashBasedTable.create();
+    private Table<Name, Name, ClassMetadata<? extends T, ?>> uriLookup = HashBasedTable.create();
 
     public AbstractClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = factory;
@@ -66,7 +66,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
         if (metadata != null) {
             classLookup.put(clazz, metadata);
-            uriLookup.put(uri.getNormalisedObjectName(), uri.getNormalisedModuleName(), metadata);
+            uriLookup.put(uri.getObjectName(), uri.getModuleName(), metadata);
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     public ClassMetadata<? extends T, ?> getMetadata(SimpleUri uri) {
-        return uriLookup.get(uri.getNormalisedObjectName(), uri.getNormalisedModuleName());
+        return uriLookup.get(uri.getObjectName(), uri.getModuleName());
     }
 
     @Override
@@ -109,12 +109,17 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     @Override
     public List<ClassMetadata<? extends T, ?>> getMetadata(String name) {
-        return Lists.newArrayList(uriLookup.row(UriUtil.normalise(name)).values());
+        return getMetadata(new Name(name));
     }
 
     @Override
-    public ClassMetadata<? extends T, ?> resolve(String name, String context) {
-        Module moduleContext = moduleManager.getActiveModule(context);
+    public List<ClassMetadata<? extends T, ?>> getMetadata(Name name) {
+        return Lists.newArrayList(uriLookup.row(name).values());
+    }
+
+    @Override
+    public ClassMetadata<? extends T, ?> resolve(String name, Name context) {
+        Module moduleContext = moduleManager.getEnvironment().get(context);
         if (moduleContext != null) {
             return resolve(name, moduleContext);
         }
@@ -148,14 +153,14 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
                 return possibilities.get(0);
             default:
                 if (context != null) {
-                    Set<String> dependencies = moduleManager.getDependencyNamesOf(context);
+                    Set<Name> dependencies = moduleManager.getEnvironment().getDependencyNamesOf(context.getId());
                     Iterator<ClassMetadata<? extends T, ?>> iterator = possibilities.iterator();
                     while (iterator.hasNext()) {
                         ClassMetadata<? extends T, ?> metadata = iterator.next();
-                        if (context.getId().equals(metadata.getUri().getNormalisedModuleName())) {
+                        if (context.getId().equals(metadata.getUri().getModuleName())) {
                             return metadata;
                         }
-                        if (!dependencies.contains(metadata.getUri().getNormalisedModuleName())) {
+                        if (!dependencies.contains(metadata.getUri().getModuleName())) {
                             iterator.remove();
                         }
                     }

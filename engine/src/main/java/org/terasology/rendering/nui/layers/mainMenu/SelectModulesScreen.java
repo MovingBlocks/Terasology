@@ -16,20 +16,22 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleInfo;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleSelection;
 import org.terasology.math.Vector2i;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleMetadata;
+import org.terasology.module.ResolutionResult;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
-import org.terasology.rendering.nui.databinding.BindHelper;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.AbstractItemRenderer;
@@ -42,6 +44,7 @@ import org.terasology.rendering.nui.widgets.UIList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -54,98 +57,82 @@ public class SelectModulesScreen extends CoreScreenLayer {
     @In
     private Config config;
 
-    private ModuleSelection selection;
+    private Map<Name, ModuleSelectionInfo> modulesLookup;
+    private List<ModuleSelectionInfo> sortedModules;
+    private DependencyResolver resolver;
 
     @Override
     public void initialise() {
+        resolver = new DependencyResolver(moduleManager.getRegistry());
+        modulesLookup = Maps.newHashMap();
+        sortedModules = Lists.newArrayList();
 
-        //get all the default modes and load them up in selection
-        //  checking if it's valid along the way
-        selection = new ModuleSelection(moduleManager);
-        for (String moduleId : config.getDefaultModSelection().listModules()) {
-            ModuleSelection newSelection = selection.add(moduleId);
-            if (newSelection.isValid()) {
-                selection = newSelection;
-            }
-        }
-
-        //get all the modules id's, except engine
-        List<String> moduleIds = Lists.newArrayList(moduleManager.getModuleIds());
-        moduleIds.remove("engine");
-
-        //create our own copy of the modules
-        List<Module> modules = Lists.newArrayListWithCapacity(moduleIds.size());
-        for (String id : moduleIds) {
-            modules.add(moduleManager.getLatestModuleVersion(id));
-        }
-
-        //sort by name
-        Collections.sort(modules, new Comparator<Module>() {
+        Collections.sort(sortedModules, new Comparator<ModuleSelectionInfo>() {
             @Override
-            public int compare(Module o1, Module o2) {
-                return o1.getModuleInfo().getDisplayName().compareTo(o2.getModuleInfo().getDisplayName());
+            public int compare(ModuleSelectionInfo o1, ModuleSelectionInfo o2) {
+                return o1.getMetadata().getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
             }
         });
 
+        populateModuleInformation();
+        for (ModuleSelectionInfo info : sortedModules) {
+            info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
+        }
 
-        final UIList<Module> moduleList = find("moduleList", UIList.class);
+        ResolutionResult currentSelectionResults = resolver.resolve(config.getDefaultModSelection().listModules());
+        if (currentSelectionResults.isSuccess()) {
+            setSelectedVersions(currentSelectionResults);
+        }
+
+        updateValidToSelect();
+
+        final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
-            moduleList.setList(modules);
-            moduleList.setItemRenderer(new AbstractItemRenderer<Module>() {
+            moduleList.setList(sortedModules);
+            moduleList.setItemRenderer(new AbstractItemRenderer<ModuleSelectionInfo>() {
 
-                public String getString(Module value) {
-                    return value.getModuleInfo().getDisplayName();
+                public String getString(ModuleSelectionInfo value) {
+                    return value.getMetadata().getDisplayName().toString();
                 }
 
                 @Override
-                public void draw(Module value, Canvas canvas) {
-                    if (selection.contains(value.getId())) {
+                public void draw(ModuleSelectionInfo value, Canvas canvas) {
+                    if (value.isSelected() && value.isExplicitSelection()) {
                         canvas.setMode("enabled");
-                    } else {
+                    } else if (value.isSelected()) {
+                        canvas.setMode("dependency");
+                    } else if (value.isValidToSelect()) {
                         canvas.setMode("disabled");
+                    } else {
+                        canvas.setMode("invalid");
                     }
                     canvas.drawText(getString(value), canvas.getRegion());
                 }
 
                 @Override
-                public Vector2i getPreferredSize(Module value, Canvas canvas) {
+                public Vector2i getPreferredSize(ModuleSelectionInfo value, Canvas canvas) {
                     String text = getString(value);
                     return new Vector2i(canvas.getCurrentStyle().getFont().getWidth(text), canvas.getCurrentStyle().getFont().getLineHeight());
                 }
             });
 
             //ItemActivateEventListener is triggered by double clicking
-            moduleList.subscribe(new ItemActivateEventListener<Module>() {
+            moduleList.subscribe(new ItemActivateEventListener<ModuleSelectionInfo>() {
                 @Override
-                public void onItemActivated(UIWidget widget, Module item) {
-                    String id = item.getId();
-
-                    // The Core module is mandatory - ignore toggle requests
-                    if (id.equals("core")) {
-                        return;
-                    }
-
-                    // Toggle
-                    if (selection.contains(id)) {
-                        ModuleSelection newSelection = selection.remove(id);
-                        if (newSelection.isValid()) {
-                            selection = newSelection;
-                        }
-                    } else {
-                        ModuleSelection newSelection = selection.add(id);
-                        if (newSelection.isValid()) {
-                            selection = newSelection;
-                        }
+                public void onItemActivated(UIWidget widget, ModuleSelectionInfo item) {
+                    if (item.isSelected() && moduleList.getSelection().isExplicitSelection()) {
+                        deselect(item);
+                    } else if (item.isValidToSelect()) {
+                        select(item);
                     }
                 }
             });
 
-
-            Binding<ModuleInfo> moduleInfoBinding = new ReadOnlyBinding<ModuleInfo>() {
+            final Binding<ModuleMetadata> moduleInfoBinding = new ReadOnlyBinding<ModuleMetadata>() {
                 @Override
-                public ModuleInfo get() {
+                public ModuleMetadata get() {
                     if (moduleList.getSelection() != null) {
-                        return moduleList.getSelection().getModuleInfo();
+                        return moduleList.getSelection().getMetadata();
                     }
                     return null;
                 }
@@ -153,17 +140,41 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
             UILabel name = find("name", UILabel.class);
             if (name != null) {
-                name.bindText(BindHelper.bindBoundBeanProperty("displayName", moduleInfoBinding, ModuleInfo.class, String.class));
+                name.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        if (moduleInfoBinding.get() != null) {
+                            return moduleInfoBinding.get().getDisplayName().toString();
+                        }
+                        return "";
+                    }
+                });
             }
 
             UILabel version = find("version", UILabel.class);
             if (version != null) {
-                version.bindText(BindHelper.bindBoundBeanProperty("version", moduleInfoBinding, ModuleInfo.class, String.class));
+                version.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        if (moduleInfoBinding.get() != null) {
+                            return moduleInfoBinding.get().getVersion().toString();
+                        }
+                        return "";
+                    }
+                });
             }
 
             UILabel description = find("description", UILabel.class);
             if (description != null) {
-                description.bindText(BindHelper.bindBoundBeanProperty("description", moduleInfoBinding, ModuleInfo.class, String.class));
+                description.bindText(new ReadOnlyBinding<String>() {
+                    @Override
+                    public String get() {
+                        if (moduleInfoBinding.get() != null) {
+                            return moduleInfoBinding.get().getDescription().toString();
+                        }
+                        return "";
+                    }
+                });
             }
 
             UILabel error = find("errorMessage", UILabel.class);
@@ -172,9 +183,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     @Override
                     public String get() {
                         if (moduleList.getSelection() != null) {
-                            ModuleSelection newModuleSelection = selection.add(moduleList.getSelection().getId());
-                            if (!newModuleSelection.isValid()) {
-                                return newModuleSelection.getValidationMessages().get(0);
+                            if (!moduleList.getSelection().isValidToSelect()) {
+                                return "Incompatible with existing selection, or dependencies cannot be resolved";
                             }
                         }
                         return "";
@@ -188,24 +198,12 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     @Override
                     public void onActivated(UIWidget button) {
                         if (moduleList.getSelection() != null) {
-                            String id = moduleList.getSelection().getId();
-
-                            // The Core module is mandatory - ignore toggle requests
-                            if (id.equals("core")) {
-                                return;
-                            }
 
                             // Toggle
-                            if (selection.contains(id)) {
-                                ModuleSelection newSelection = selection.remove(id);
-                                if (newSelection.isValid()) {
-                                    selection = newSelection;
-                                }
-                            } else {
-                                ModuleSelection newSelection = selection.add(id);
-                                if (newSelection.isValid()) {
-                                    selection = newSelection;
-                                }
+                            if (moduleList.getSelection().isSelected() && moduleList.getSelection().isExplicitSelection()) {
+                                deselect(moduleList.getSelection());
+                            } else if (moduleList.getSelection().isValidToSelect()) {
+                                select(moduleList.getSelection());
                             }
                         }
                     }
@@ -214,15 +212,14 @@ public class SelectModulesScreen extends CoreScreenLayer {
                     @Override
                     public Boolean get() {
                         return moduleList.getSelection() != null
-                                && (selection.contains(moduleList.getSelection().getId()) || selection.add(moduleList.getSelection().getId()).isValid());
+                                && (moduleList.getSelection().isSelected() || moduleList.getSelection().isValidToSelect());
                     }
                 });
                 toggle.bindText(new ReadOnlyBinding<String>() {
                     @Override
                     public String get() {
                         if (moduleList.getSelection() != null) {
-                            String id = moduleList.getSelection().getId();
-                            if (selection.contains(id)) {
+                            if (moduleList.getSelection().isExplicitSelection()) {
                                 return "Deactivate";
                             } else {
                                 return "Activate";
@@ -238,10 +235,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 enableAll.subscribe(new ActivateEventListener() {
                     @Override
                     public void onActivated(UIWidget button) {
-                        for (Module m : moduleList.getList()) {
-                            ModuleSelection newSelection = selection.add(m);
-                            if (newSelection.isValid()) {
-                                selection = newSelection;
+                        for (ModuleSelectionInfo info : sortedModules) {
+                            if (!info.isExplicitSelection() && info.isValidToSelect()) {
+                                select(info);
                             }
                         }
                     }
@@ -253,16 +249,10 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 disableAll.subscribe(new ActivateEventListener() {
                     @Override
                     public void onActivated(UIWidget button) {
-                        for (Module m : moduleList.getList()) {
-                            // The Core module is mandatory - ignore trying to disable it
-                            if (m.getId().equals("core")) {
-                                continue;
+                        for (ModuleSelectionInfo info : sortedModules) {
+                            if (info.isSelected() && info.isExplicitSelection()) {
+                                deselect(info);
                             }
-
-                            //skipping the valid checks - the only one that should be left is the core module
-                            //TODO: Add a remove method that takes the module
-                            ModuleSelection newSelection = selection.remove(m.getId());
-                            selection = newSelection;
                         }
                     }
                 });
@@ -278,12 +268,47 @@ public class SelectModulesScreen extends CoreScreenLayer {
         });
     }
 
+    private void updateValidToSelect() {
+        List<Name> selectedModules = Lists.newArrayList();
+        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+            if (info.isSelected()) {
+                selectedModules.add(info.getMetadata().getId());
+            }
+        }
+        Name[] selectedModulesArray = selectedModules.toArray(new Name[selectedModules.size()]);
+        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+            if (!info.isSelected()) {
+                info.setValidToSelect(resolver.resolve(info.getMetadata().getId(), selectedModulesArray).isSuccess());
+            }
+        }
+    }
+
+    private void setSelectedVersions(ResolutionResult currentSelectionResults) {
+        for (Module module : currentSelectionResults.getModules()) {
+            SelectModulesScreen.ModuleSelectionInfo info = modulesLookup.get(module.getId());
+            info.setSelectedVersion(module);
+        }
+    }
+
+    private void populateModuleInformation() {
+        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            if (!latestVersion.isOnClasspath()) {
+                SelectModulesScreen.ModuleSelectionInfo info = new SelectModulesScreen.ModuleSelectionInfo(latestVersion);
+                modulesLookup.put(info.getMetadata().getId(), info);
+                sortedModules.add(info);
+            }
+        }
+    }
+
     @Override
     public void onClosed() {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.clear();
-        for (Module module : selection.getSelection()) {
-            moduleConfig.addModule(module.getId());
+        for (ModuleSelectionInfo info : sortedModules) {
+            if (info.isSelected() && info.isExplicitSelection()) {
+                moduleConfig.addModule(info.getMetadata().getId());
+            }
         }
         if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
             config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
@@ -296,4 +321,84 @@ public class SelectModulesScreen extends CoreScreenLayer {
         return false;
     }
 
+    private void select(ModuleSelectionInfo target) {
+        if (target.isValidToSelect() && !target.isExplicitSelection()) {
+            boolean previouslySelected = target.isSelected();
+            target.setExplicitSelection(true);
+            if (!previouslySelected) {
+                List<Name> selectedModules = getExplicitlySelectedModules();
+                for (ModuleSelectionInfo info : sortedModules) {
+                    info.setSelectedVersion(null);
+                }
+                setSelectedVersions(resolver.resolve(selectedModules));
+                updateValidToSelect();
+            }
+        }
+    }
+
+    private List<Name> getExplicitlySelectedModules() {
+        List<Name> selectedModules = Lists.newArrayList();
+        for (SelectModulesScreen.ModuleSelectionInfo info : sortedModules) {
+            if (info.isExplicitSelection()) {
+                selectedModules.add(info.getMetadata().getId());
+            }
+        }
+        return selectedModules;
+    }
+
+    private void deselect(ModuleSelectionInfo target) {
+        if (target.isExplicitSelection()) {
+            target.setExplicitSelection(false);
+            List<Name> selectedModules = getExplicitlySelectedModules();
+            for (ModuleSelectionInfo info : sortedModules) {
+                info.setSelectedVersion(null);
+            }
+            setSelectedVersions(resolver.resolve(selectedModules));
+            updateValidToSelect();
+        }
+    }
+
+
+    private static class ModuleSelectionInfo {
+        private Module latestVersion;
+        private Module selectedVersion;
+        private boolean explicitSelection;
+        private boolean validToSelect = true;
+
+        public ModuleSelectionInfo(Module module) {
+            this.latestVersion = module;
+        }
+
+        public ModuleMetadata getMetadata() {
+            if (selectedVersion != null) {
+                return selectedVersion.getMetadata();
+            } else {
+                return latestVersion.getMetadata();
+            }
+        }
+
+        public boolean isSelected() {
+            return selectedVersion != null;
+        }
+
+        public void setSelectedVersion(Module selectedVersion) {
+            this.selectedVersion = selectedVersion;
+        }
+
+        public boolean isExplicitSelection() {
+            return explicitSelection;
+        }
+
+        public void setExplicitSelection(boolean explicitSelection) {
+            this.explicitSelection = explicitSelection;
+        }
+
+        public boolean isValidToSelect() {
+            return validToSelect;
+        }
+
+        public void setValidToSelect(boolean validToSelect) {
+            this.validToSelect = validToSelect;
+        }
+    }
 }

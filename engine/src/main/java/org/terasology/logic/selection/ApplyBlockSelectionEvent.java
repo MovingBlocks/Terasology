@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.selection;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.math.Region3i;

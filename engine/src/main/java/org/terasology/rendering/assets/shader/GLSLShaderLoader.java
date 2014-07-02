@@ -25,7 +25,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.io.InputStream;
