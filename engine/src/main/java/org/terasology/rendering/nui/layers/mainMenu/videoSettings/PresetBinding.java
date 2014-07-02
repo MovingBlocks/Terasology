@@ -35,8 +35,7 @@ public class PresetBinding implements Binding<Preset> {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts() && config.isCloudShadows()) {
                     return Preset.UBER;
                 }
-            }
-            else if (config.isCloudShadows()) {
+            } else if (config.isCloudShadows()) {
                 if (config.isBloom() && config.isMotionBlur() && config.isLightShafts()) {
                     return Preset.INSANE;
                 }
@@ -47,8 +46,7 @@ public class PresetBinding implements Binding<Preset> {
             } else if (!config.isMotionBlur() && !config.isLightShafts()) {
                 return Preset.NICE;
             }
-        }
-        else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
+        } else if (!config.isBloom() && !config.isMotionBlur() && !config.isFlickeringLight() && !config.isVignette() && !config.isEyeAdaptation() && !config.isFilmGrain()) {
             return Preset.MINIMAL;
         }
         return Preset.CUSTOM;
