@@ -16,14 +16,14 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
-import org.terasology.core.world.generator.generalFacetProviders.BiomeProvider;
-import org.terasology.core.world.generator.generalFacetProviders.FloraProvider;
-import org.terasology.core.world.generator.generalFacetProviders.SeaLevelProvider;
-import org.terasology.core.world.generator.generalFacetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.generalFacetProviders.TreeProvider;
-import org.terasology.core.world.generator.heightMapFacetProviders.HeightMapSurfaceHeightProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinHumidityProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinTemperatureProvider;
+import org.terasology.core.world.generator.facetProviders.BiomeProvider;
+import org.terasology.core.world.generator.facetProviders.FloraProvider;
+import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinTemperatureProvider;
+import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
+import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
+import org.terasology.core.world.generator.facetProviders.TreeProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;

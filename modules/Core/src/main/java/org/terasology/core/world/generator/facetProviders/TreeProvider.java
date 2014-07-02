@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.generalFacetProviders;
+package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.Rect2i;
@@ -69,8 +69,8 @@ public class TreeProvider implements FacetProvider {
             if (facet.getWorldRegion().encompasses(x, height, z) && facet.getWorldRegion().encompasses(x, height + 1, z) && height >= seaLevel.getSeaLevel()) {
 
                 // if the block on the surface is dense enough
-                if (density.getWorld(x, height, z) > 0
-                        && density.getWorld(x, height + 1, z) <= 0
+                if (density.getWorld(x, height, z) >= 0
+                        && density.getWorld(x, height + 1, z) < 0
                         // and if there is a level surface in adjacent directions
                         && (x > facet.getWorldRegion().minX() && TeraMath.floorToInt(surface.getWorld(x - 1, z)) == height)
                         && (x < facet.getWorldRegion().maxX() && TeraMath.floorToInt(surface.getWorld(x + 1, z)) == height)

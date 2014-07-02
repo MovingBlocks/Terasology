@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.heightMapFacetProviders;
+package org.terasology.core.world.generator.facetProviders;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;

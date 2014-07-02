@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.generalFacetProviders;
+package org.terasology.core.world.generator.facetProviders;
 
-import org.terasology.world.generation.Border3D;
+import org.terasology.math.Vector2i;
+import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
-/**
- * @author Immortius
- */
-@Produces(SeaLevelFacet.class)
-public class SeaLevelProvider implements FacetProvider {
+@Produces(SurfaceHeightFacet.class)
+@Requires(@Facet(SeaLevelFacet.class))
+public class FlatSurfaceHeightProvider implements FacetProvider {
+    private int height;
 
-    private int seaLevel;
-
-    public SeaLevelProvider() {
-        seaLevel = 32;
-    }
-
-    public SeaLevelProvider(int seaLevel) {
-        this.seaLevel = seaLevel;
+    public FlatSurfaceHeightProvider(int height) {
+        this.height = height;
     }
 
     @Override
@@ -43,9 +39,12 @@ public class SeaLevelProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Border3D border = region.getBorderForFacet(SeaLevelFacet.class);
-        SeaLevelFacet facet = new SeaLevelFacet(region.getRegion(), border);
-        facet.setSeaLevel(seaLevel);
-        region.setRegionFacet(SeaLevelFacet.class, facet);
+        SurfaceHeightFacet facet = new SurfaceHeightFacet(region.getRegion(), region.getBorderForFacet(SurfaceHeightFacet.class));
+
+        for (Vector2i pos : facet.getRelativeRegion()) {
+            facet.set(pos, height);
+        }
+
+        region.setRegionFacet(SurfaceHeightFacet.class, facet);
     }
 }
