@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.perlinFacetProviders;
+package org.terasology.core.world.generator.generalFacetProviders;
 
 import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
@@ -25,8 +25,17 @@ import org.terasology.world.generation.facets.SeaLevelFacet;
  * @author Immortius
  */
 @Produces(SeaLevelFacet.class)
-public class PerlinSeaLevelProvider implements FacetProvider {
+public class SeaLevelProvider implements FacetProvider {
 
+    private int seaLevel;
+
+    public SeaLevelProvider() {
+        seaLevel = 32;
+    }
+
+    public SeaLevelProvider(int seaLevel) {
+        this.seaLevel = seaLevel;
+    }
 
     @Override
     public void setSeed(long seed) {
@@ -36,7 +45,7 @@ public class PerlinSeaLevelProvider implements FacetProvider {
     public void process(GeneratingRegion region) {
         Border3D border = region.getBorderForFacet(SeaLevelFacet.class);
         SeaLevelFacet facet = new SeaLevelFacet(region.getRegion(), border);
-        facet.setSeaLevel(32);
+        facet.setSeaLevel(seaLevel);
         region.setRegionFacet(SeaLevelFacet.class, facet);
     }
 }

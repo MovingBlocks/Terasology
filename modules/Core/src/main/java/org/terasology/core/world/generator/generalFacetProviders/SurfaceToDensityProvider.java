@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.perlinFacetProviders;
+package org.terasology.core.world.generator.generalFacetProviders;
 
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
@@ -31,7 +31,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Requires(@Facet(SurfaceHeightFacet.class))
 @Produces(DensityFacet.class)
-public class PerlinSurfaceToDensityProvider implements FacetProvider {
+public class SurfaceToDensityProvider implements FacetProvider {
 
     @Override
     public void setSeed(long seed) {

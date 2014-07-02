@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.perlinFacetProviders;
+package org.terasology.core.world.generator.generalFacetProviders;
 
 import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.math.TeraMath;
@@ -34,7 +34,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Produces(PlantFacet.class)
 @Requires({@Facet(SurfaceHeightFacet.class), @Facet(BiomeFacet.class), @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))})
-public class PerlinFloraProvider implements FacetProvider {
+public class FloraProvider implements FacetProvider {
 
     private NoiseTable noiseTable;
 

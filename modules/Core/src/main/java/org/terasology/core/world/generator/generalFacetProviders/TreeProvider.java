@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.perlinFacetProviders;
+package org.terasology.core.world.generator.generalFacetProviders;
 
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.Rect2i;
@@ -37,7 +37,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 @Requires({@Facet(SeaLevelFacet.class),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 10, sides = 10)),
         @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 10, sides = 10))})
-public class PerlinTreeProvider implements FacetProvider {
+public class TreeProvider implements FacetProvider {
 
     private static float amountOfTrees = 0.12f;
     private NoiseTable treeNoise;
@@ -56,7 +56,11 @@ public class PerlinTreeProvider implements FacetProvider {
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
 
-        Rect2i worldRegion2D = Rect2i.createFromMinAndMax(facet.getWorldRegion().minX(), facet.getWorldRegion().minZ(), facet.getWorldRegion().maxX(), facet.getWorldRegion().maxZ());
+        Rect2i worldRegion2D = Rect2i.createFromMinAndMax(facet.getWorldRegion().minX(),
+                facet.getWorldRegion().minZ(),
+                facet.getWorldRegion().maxX(),
+                facet.getWorldRegion().maxZ());
+
         for (Vector2i pos : worldRegion2D) {
             int x = pos.getX();
             int z = pos.getY();

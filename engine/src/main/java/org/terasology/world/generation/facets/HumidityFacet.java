@@ -20,7 +20,7 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
- * @author Immortius
+ * Values in between 0-1
  */
 public class HumidityFacet extends BaseFieldFacet2D {
 

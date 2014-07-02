@@ -153,7 +153,7 @@ public final class Rect2i implements Iterable<Vector2i> {
     }
 
     public boolean contains(int x, int y) {
-        return !isEmpty() && (x >= posX) && (y >= posY) && (x <= posX + w) && (y <= posY + h);
+        return !isEmpty() && (x >= posX) && (y >= posY) && (x < posX + w) && (y < posY + h);
     }
 
     public boolean encompasses(Rect2i other) {
@@ -253,6 +253,7 @@ public final class Rect2i implements Iterable<Vector2i> {
 
     /**
      * Provides an iterator over the positions in the Rect2i. They are iterated from min to max, x before y (so all values at minY, then minY + 1, etc)
+     *
      * @return An iterator over all positions in the Rect2i.
      */
     @Override

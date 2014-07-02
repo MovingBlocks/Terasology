@@ -16,18 +16,18 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
-import org.terasology.core.world.generator.perlinFacetProviders.EnsureSpawnableChunkZeroProvider;
+import org.terasology.core.world.generator.generalFacetProviders.BiomeProvider;
+import org.terasology.core.world.generator.generalFacetProviders.EnsureSpawnableChunkZeroProvider;
+import org.terasology.core.world.generator.generalFacetProviders.FloraProvider;
+import org.terasology.core.world.generator.generalFacetProviders.SeaLevelProvider;
+import org.terasology.core.world.generator.generalFacetProviders.SurfaceToDensityProvider;
+import org.terasology.core.world.generator.generalFacetProviders.TreeProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinBaseSurfaceProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinBiomeProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinFloraProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinHillsAndMountainsProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinHumidityProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinOceanProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinRiverProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinSeaLevelProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinSurfaceToDensityProvider;
 import org.terasology.core.world.generator.perlinFacetProviders.PerlinTemperatureProvider;
-import org.terasology.core.world.generator.perlinFacetProviders.PerlinTreeProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
@@ -85,17 +85,17 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
     public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         world = new WorldBuilder(worldSeed.hashCode())
-                .addProvider(new PerlinSeaLevelProvider())
+                .addProvider(new SeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinTemperatureProvider())
                 .addProvider(new PerlinBaseSurfaceProvider())
                 .addProvider(new PerlinRiverProvider())
                 .addProvider(new PerlinOceanProvider())
                 .addProvider(new PerlinHillsAndMountainsProvider())
-                .addProvider(new PerlinBiomeProvider())
-                .addProvider(new PerlinSurfaceToDensityProvider())
-                .addProvider(new PerlinFloraProvider())
-                .addProvider(new PerlinTreeProvider())
+                .addProvider(new BiomeProvider())
+                .addProvider(new SurfaceToDensityProvider())
+                .addProvider(new FloraProvider())
+                .addProvider(new TreeProvider())
                 .addProvider(new EnsureSpawnableChunkZeroProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
                 .addRasterizer(new FloraRasterizer(blockManager))
