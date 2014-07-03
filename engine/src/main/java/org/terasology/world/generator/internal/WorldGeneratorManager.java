@@ -25,8 +25,6 @@ import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ResolutionResult;
-import org.terasology.module.sandbox.BytecodeInjector;
-import org.terasology.module.sandbox.ModuleSecurityManager;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generator.RegisterWorldGenerator;
@@ -58,7 +56,7 @@ public class WorldGeneratorManager {
                 DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
                 ResolutionResult resolutionResult = resolver.resolve(module.getId());
                 if (resolutionResult.isSuccess()) {
-                    try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)){
+                    try (ModuleEnvironment tempEnvironment = moduleManager.loadEnvironment(resolutionResult.getModules(), false)) {
                         for (Class<?> generatorClass : tempEnvironment.getTypesAnnotatedWith(RegisterWorldGenerator.class)) {
                             if (tempEnvironment.getModuleProviding(generatorClass).equals(module.getId())) {
                                 RegisterWorldGenerator annotation = generatorClass.getAnnotation(RegisterWorldGenerator.class);

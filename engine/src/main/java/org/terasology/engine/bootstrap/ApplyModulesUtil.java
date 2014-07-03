@@ -25,8 +25,6 @@ import org.terasology.reflection.copy.RegisterCopyStrategy;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.ReflectionUtil;
 
-import java.util.Set;
-
 /**
  * @author Immortius
  */
