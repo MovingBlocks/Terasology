@@ -22,7 +22,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.Vector3i;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +37,6 @@ public class WorldBuilder {
 
     private long seed;
     private List<FacetProvider> providersList = Lists.newArrayList();
-    private Map<Class<? extends WorldFacet>, Vector3i> borders = Maps.newHashMap();
     private Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
     private List<WorldRasterizer> rasterizers = Lists.newArrayList();
 
@@ -58,7 +56,33 @@ public class WorldBuilder {
     }
 
     public World build() {
-        return new WorldImpl(seed, determineProviderChains(), rasterizers);
+        ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
+        return new WorldImpl(seed, providerChains, rasterizers, determineBorders(providerChains));
+    }
+
+    private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {
+        Map<Class<? extends WorldFacet>, Border3D> borders = Maps.newHashMap();
+
+        Border3D largestBorder = new Border3D(0, 0, 0);
+
+        // loop through the providers and find all the max sized borders for each facet
+        for (FacetProvider provider : providersList) {
+            Requires requirements = provider.getClass().getAnnotation(Requires.class);
+            if (requirements != null) {
+                for (Facet requirement : requirements.value()) {
+                    largestBorder = new Border3D(
+                            Math.max(requirement.border().top(), largestBorder.getTop()),
+                            Math.max(requirement.border().bottom(), largestBorder.getBottom()),
+                            Math.max(requirement.border().sides(), largestBorder.getSides()));
+                }
+            }
+        }
+
+        for (Class<? extends WorldFacet> type : providerChains.keySet()) {
+            borders.put(type, largestBorder);
+        }
+
+        return borders;
     }
 
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {

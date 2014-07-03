@@ -35,8 +35,9 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Produces(TreeFacet.class)
 @Requires({@Facet(SeaLevelFacet.class),
-        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 10, sides = 10)),
-        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 10, sides = 10))})
+        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
+        @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
+        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
 public class TreeProvider implements FacetProvider {
 
     private static float amountOfTrees = 0.12f;
