@@ -22,6 +22,7 @@ import org.terasology.math.Rect2i;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class Rect2iTest {
@@ -60,6 +61,21 @@ public class Rect2iTest {
     @Test
     public void overlap() {
         assertTrue(Rect2i.createFromMinAndSize(5, 5, 472, 17).overlaps(Rect2i.createFromMinAndSize(5, 5, 1, 16)));
+    }
+
+    @Test
+    public void testContains() {
+        Rect2i a = Rect2i.createFromMinAndMax(0, 0, 0, 0);
+        assertTrue(a.contains(0, 0));
+
+        assertFalse(a.contains(1, 0));
+        assertFalse(a.contains(0, 1));
+        assertFalse(a.contains(1, 1));
+        assertFalse(a.contains(-1, 0));
+        assertFalse(a.contains(0, -1));
+        assertFalse(a.contains(-1, 1));
+        assertFalse(a.contains(1, -1));
+        assertFalse(a.contains(-1, -1));
     }
 
 }
