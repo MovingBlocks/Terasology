@@ -16,15 +16,15 @@
 
 package org.terasology.network;
 
-import java.util.List;
-import java.util.Map;
-
-import org.terasology.module.ModuleMetadata;
 import org.terasology.naming.NameVersion;
 import org.terasology.world.internal.WorldInfo;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * TODO Type description
+ *
  * @author Martin Steiger
  */
 public interface ServerInfoMessage {

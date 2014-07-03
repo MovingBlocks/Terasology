@@ -16,22 +16,15 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.UriUtil;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.network.NetworkMode;
-
-import java.util.Locale;
-import java.util.Set;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius

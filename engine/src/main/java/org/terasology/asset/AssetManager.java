@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.AssetSourceCollection;
-import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.asset.sources.DirectorySource;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -103,8 +102,8 @@ public class AssetManager {
 
     private AssetSource createAssetSource(Name id, Path path) {
         if (Files.isRegularFile(path)) {
-           return new ArchiveSource(id, path.toFile(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY,
-                   TerasologyConstants.DELTAS_SUBDIRECTORY);
+            return new ArchiveSource(id, path.toFile(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY,
+                    TerasologyConstants.DELTAS_SUBDIRECTORY);
         } else {
             return new DirectorySource(id, path.resolve(TerasologyConstants.ASSETS_SUBDIRECTORY),
                     path.resolve(TerasologyConstants.OVERRIDES_SUBDIRECTORY), path.resolve(TerasologyConstants.DELTAS_SUBDIRECTORY));

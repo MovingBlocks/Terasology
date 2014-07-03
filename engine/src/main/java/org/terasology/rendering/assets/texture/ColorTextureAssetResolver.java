@@ -52,7 +52,7 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
 
     @Override
     public Texture resolve(AssetUri uri, AssetFactory<TextureData, Texture> factory) {
-        if (!"engine".equals(uri.getModuleName())) {
+        if (!TerasologyConstants.ENGINE_MODULE.equals(uri.getModuleName())) {
             return null;
         }
 

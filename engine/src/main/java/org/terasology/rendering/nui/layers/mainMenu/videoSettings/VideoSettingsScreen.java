@@ -18,12 +18,8 @@ package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
-import org.terasology.input.BindableButton;
-import org.terasology.logic.console.Console;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.ShaderManager;
@@ -31,9 +27,10 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
-import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
-import org.terasology.rendering.nui.widgets.*;
+import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.world.ViewDistance;
 
 import java.util.Arrays;
@@ -61,7 +58,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
 
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
-            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL,Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
+            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
             videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
