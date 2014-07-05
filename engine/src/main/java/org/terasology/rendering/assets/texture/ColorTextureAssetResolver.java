@@ -38,7 +38,7 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
 
     @Override
     public AssetUri resolve(Name partialUri) {
-        String[] parts = partialUri.toString().split("\\.", 2);
+        String[] parts = partialUri.toLowerCase().split("\\.", 2);
         if (parts.length != 2) {
             return null;
         }
@@ -56,7 +56,7 @@ public class ColorTextureAssetResolver implements AssetResolver<Texture, Texture
             return null;
         }
 
-        String[] parts = uri.getAssetName().toString().split("\\.", 2);
+        String[] parts = uri.getAssetName().toLowerCase().split("\\.", 2);
         if (parts.length != 2) {
             return null;
         }

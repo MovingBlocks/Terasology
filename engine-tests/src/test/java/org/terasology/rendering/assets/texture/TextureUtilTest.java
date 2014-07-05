@@ -65,7 +65,7 @@ public class TextureUtilTest {
     public void testColorTransformedToAssetUriTransformedToColor() throws Exception {
         Color expectedColor = Color.RED;
         AssetUri assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        Color actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toString().substring("color.".length()));
+        Color actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toLowerCase().substring("color.".length()));
         assertEquals(expectedColor, actualColor);
 
         int red = 0x12;
@@ -74,7 +74,7 @@ public class TextureUtilTest {
         int alpha = 0xe;
         expectedColor = new Color(red, green, blue, alpha);
         assetUri = TextureUtil.getTextureUriForColor(expectedColor);
-        actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toString().substring("color.".length()));
+        actualColor = TextureUtil.getColorForColorName(assetUri.getAssetName().toLowerCase().substring("color.".length()));
         assertEquals(expectedColor, actualColor);
     }
 }
