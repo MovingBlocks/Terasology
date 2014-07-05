@@ -77,7 +77,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
+                Side side = Side.valueOf(blockUri.getIdentifier().toUpperCase());
                 return blocks.get(side);
             } catch (IllegalArgumentException e) {
                 return null;

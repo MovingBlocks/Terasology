@@ -75,7 +75,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                byte connections = Byte.parseByte(blockUri.getIdentifier().toString());
+                byte connections = Byte.parseByte(blockUri.getIdentifier().toLowerCase());
                 return blocks.get(connections);
             } catch (IllegalArgumentException e) {
                 return null;
