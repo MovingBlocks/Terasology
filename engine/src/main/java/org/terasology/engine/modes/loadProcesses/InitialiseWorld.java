@@ -19,10 +19,13 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -31,9 +34,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.physics.Physics;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
@@ -71,11 +73,11 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class),
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
                 CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
 
         StorageManager storageManager = CoreRegistry.put(StorageManager.class,
-                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
+                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
@@ -111,6 +113,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
+        CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
 
         // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
         worldProvider.getTime().setMilliseconds(worldInfo.getTime());

@@ -126,7 +126,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
+        worldProvider.dispose();
 
     }
 

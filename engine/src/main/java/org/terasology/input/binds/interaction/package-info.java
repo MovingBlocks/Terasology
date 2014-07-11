@@ -23,5 +23,5 @@
                 "engine:frob"
         }) package org.terasology.input.binds.interaction;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.input.InputCategory;

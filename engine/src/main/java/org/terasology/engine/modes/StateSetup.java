@@ -54,11 +54,11 @@ public class StateSetup implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
 
-        //lets get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
-                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        eventSystem = CoreRegistry.get(EventSystem.class);
+        // let's get the entity event system running
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), CoreRegistry.get(NetworkSystem.class),
+                                                        CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
 
+        eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
 
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
@@ -71,7 +71,6 @@ public class StateSetup implements GameState {
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         localPlayer.setClientEntity(localPlayerEntity);
 

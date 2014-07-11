@@ -29,7 +29,8 @@ public enum ViewDistance {
     MODERATE("Moderate", 2, new Vector3i(13, 7, 13)),
     FAR("Far", 3, new Vector3i(17, 7, 17)),
     ULTRA("Ultra", 4, new Vector3i(25, 7, 25)),
-    MEGA("Mega", 5, new Vector3i(33, 7, 33));
+    MEGA("Mega", 5, new Vector3i(33, 7, 33)),
+    EXTREME("Extreme", new Vector3i(63, 7, 63));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 

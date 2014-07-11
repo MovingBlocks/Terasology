@@ -54,17 +54,20 @@ public class CameraTargetSystem extends BaseComponentSystem {
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
-    private float eyeFocusDistance;
+    private float focalDistance;
 
     public boolean isTargetAvailable() {
         return target.exists() || targetBlockPos != null;
     }
 
     public EntityRef getTarget() {
+        return target;
+    }
+
+    public void updateTarget() {
         if (!target.exists() && targetBlockPos != null && blockRegistry != null) {
             target = blockRegistry.getEntityAt(targetBlockPos);
         }
-        return target;
     }
 
     public Vector3f getHitPosition() {
@@ -83,10 +86,9 @@ public class CameraTargetSystem extends BaseComponentSystem {
     public void update(float delta) {
         // Repair lost target
         // TODO: Improvements to temporary chunk handling will remove the need for this
-        if (!target.exists() && targetBlockPos != null && blockRegistry != null) {
-            target = blockRegistry.getEntityAt(targetBlockPos);
-        }
         boolean lostTarget = false;
+
+        updateTarget();
         if (!target.exists()) {
             targetBlockPos = null;
             lostTarget = true;
@@ -97,7 +99,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
 
         Physics physicsRenderer = CoreRegistry.get(Physics.class);
         HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE, filter);
-        updateEyeDistance(hitInfo, delta);
+        updateFocalDistance(hitInfo, delta);
         Vector3i newBlockPos = null;
 
         EntityRef newTarget = EntityRef.NULL;
@@ -119,18 +121,18 @@ public class CameraTargetSystem extends BaseComponentSystem {
         targetBlockPos = newBlockPos;
     }
 
-    private void updateEyeDistance(HitResult hitInfo, float delta) {
+    private void updateFocalDistance(HitResult hitInfo, float delta) {
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
             playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
 
-            if (eyeFocusDistance == Float.MAX_VALUE) {
-                eyeFocusDistance = playerToTargetRay.length();
+            if (focalDistance == Float.MAX_VALUE) {
+                focalDistance = playerToTargetRay.length();
             } else {
-                eyeFocusDistance = TeraMath.lerp(eyeFocusDistance, playerToTargetRay.length(), delta * 20.0f);
+                focalDistance = TeraMath.lerpf(focalDistance, playerToTargetRay.length(), delta * 20.0f);
             }
         } else {
-            eyeFocusDistance = Float.MAX_VALUE;
+            focalDistance = Float.MAX_VALUE;
         }
     }
 
@@ -161,7 +163,15 @@ public class CameraTargetSystem extends BaseComponentSystem {
         return new Vector3i(hitPosition, 0.5f);
     }
 
-    public float getEyeFocusDistance() {
-        return eyeFocusDistance;
+    /**
+     * Returns the distance between the camera and the target object.
+     * One usage of this is to generate out-of-focus effects: the
+     * target object remains sharp while further away objects (and
+     * potentially also nearer ones) are rendered out-of-focus (blurred).
+     *
+     * @return Returns the distance between the camera and the target object.
+     */
+    public float getFocalDistance() {
+        return focalDistance;
     }
 }

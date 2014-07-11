@@ -37,6 +37,12 @@ public class LocalPlayer {
     public LocalPlayer() {
     }
 
+    // TODO: As per Immortius answer in Pull Request #1088,
+    // TODO: there appears to be situations in which LocalPlayer is instantiated
+    // TODO: but the client entity is -not- set, i.e. in the headless server.
+    // TODO: However, it's unclear why the headless server needs a LocalPlayer,
+    // TODO: instance. If that can be avoided the code in the following method
+    // TODO: might be more rightfully placed in the LocalPlayer constructor.
     public void setClientEntity(EntityRef entity) {
         this.clientEntity = entity;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
@@ -46,9 +52,22 @@ public class LocalPlayer {
         }
     }
 
+    public EntityRef getClientEntity() {
+        return clientEntity;
+    }
+
+    public EntityRef getCharacterEntity() {
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+        if (client != null) {
+            return client.character;
+        }
+        return EntityRef.NULL;
+    }
+
     public boolean isValid() {
-        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class)
-                && getCharacterEntity().hasComponent(CharacterComponent.class) && getCharacterEntity().hasComponent(CharacterMovementComponent.class);
+        EntityRef characterEntity = getCharacterEntity();
+        return characterEntity.exists() && characterEntity.hasComponent(LocationComponent.class) && characterEntity.hasComponent(CharacterComponent.class)
+               && characterEntity.hasComponent(CharacterMovementComponent.class);
     }
 
     public Vector3f getPosition() {
@@ -69,22 +88,6 @@ public class LocalPlayer {
             return new Quat4f(0, 0, 0, 1);
         }
         return location.getWorldRotation();
-    }
-
-    public EntityRef getCharacterEntity() {
-        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
-        if (client != null) {
-            return client.character;
-        }
-        return EntityRef.NULL;
-    }
-
-    public Vector3f getVelocity() {
-        CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
-        if (movement != null) {
-            return new Vector3f(movement.getVelocity());
-        }
-        return new Vector3f();
     }
 
     public Quat4f getViewRotation() {
@@ -110,12 +113,19 @@ public class LocalPlayer {
         return QuaternionUtil.quatRotate(rot, dir, dir);
     }
 
+    public Vector3f getVelocity() {
+        CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
+        if (movement != null) {
+            return new Vector3f(movement.getVelocity());
+        }
+        return new Vector3f();
+    }
+
+
     public String toString() {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)",
                 getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
     }
 
-    public EntityRef getClientEntity() {
-        return clientEntity;
-    }
+
 }

@@ -31,6 +31,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.atlas.Atlas;
 import org.terasology.rendering.assets.atlas.AtlasData;
@@ -209,7 +210,7 @@ public class WorldAtlasImpl implements WorldAtlas {
     }
 
     private void createTextureAtlas(final Texture texture) {
-        final Map<String, Map<String, SubtextureData>> textureAtlases = Maps.newHashMap();
+        final Map<Name, Map<Name, SubtextureData>> textureAtlases = Maps.newHashMap();
         final Vector2f texSize = new Vector2f(getRelativeTileSize(), getRelativeTileSize());
         tileIndexes.forEachEntry(new TObjectIntProcedure<AssetUri>() {
             @Override
@@ -217,10 +218,10 @@ public class WorldAtlasImpl implements WorldAtlas {
                 Vector2f coords = getTexCoords(index);
                 SubtextureData subtextureData = new SubtextureData(texture, Rect2f.createFromMinAndSize(coords, texSize));
 
-                Map<String, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getNormalisedModuleName());
+                Map<Name, SubtextureData> textureAtlas = textureAtlases.get(tileUri.getModuleName());
                 if (textureAtlas == null) {
                     textureAtlas = Maps.newHashMap();
-                    textureAtlases.put(tileUri.getNormalisedModuleName(), textureAtlas);
+                    textureAtlases.put(tileUri.getModuleName(), textureAtlas);
                 }
                 textureAtlas.put(tileUri.getAssetName(), subtextureData);
 
@@ -228,9 +229,9 @@ public class WorldAtlasImpl implements WorldAtlas {
             }
         });
 
-        for (Map.Entry<String, Map<String, SubtextureData>> atlas : textureAtlases.entrySet()) {
+        for (Map.Entry<Name, Map<Name, SubtextureData>> atlas : textureAtlases.entrySet()) {
             AtlasData data = new AtlasData(atlas.getValue());
-            Assets.generateAsset(new AssetUri(AssetType.ATLAS, atlas.getKey(), "terrain"), data, Atlas.class);
+            Assets.generateAsset(new AssetUri(AssetType.ATLAS, atlas.getKey(), new Name("terrain")), data, Atlas.class);
         }
     }
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering;
 
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -66,6 +68,9 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     public ShaderManagerLwjgl() {
         logger.info("Loading Terasology shader manager...");
+        logger.info("LWJGL: {} / {}", Sys.getVersion(), LWJGLUtil.getPlatformName());
+        logger.info("GL_VENDOR: {}", GL11.glGetString(GL11.GL_VENDOR));
+        logger.info("GL_RENDERER: {}", GL11.glGetString(GL11.GL_RENDERER));
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
         logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
 

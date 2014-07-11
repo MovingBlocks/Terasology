@@ -19,7 +19,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.math.Rect2i;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.TextureRegion;

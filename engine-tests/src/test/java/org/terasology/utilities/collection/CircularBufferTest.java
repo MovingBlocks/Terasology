@@ -15,18 +15,15 @@
  */
 package org.terasology.utilities.collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.ImmutableList;
+import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.junit.Test;
-import org.terasology.protobuf.NetData.Color.Builder;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Immortius
@@ -61,22 +58,22 @@ public class CircularBufferTest {
         assertEquals((Integer) 3, buffer.popLast());
         assertTrue(buffer.isEmpty());
     }
-    
+
     @Test
     public void testCollectionMethods() {
-        
+
         Collection<Integer> buffer = CircularBuffer.create(4);
 
         buffer.addAll(ImmutableList.of(1, 2, 3, 4, 5, 6));
         buffer.add(4);
-        
+
         assertTrue(buffer.contains(5));
         assertTrue(buffer.containsAll(ImmutableList.of(5, 4)));
     }
-    
+
     @Test
     public void testGetSet() {
-        
+
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
 
         buffer.addAll(ImmutableList.of(11, 12, 0, 1, 2, 3));
@@ -93,7 +90,7 @@ public class CircularBufferTest {
         assertEquals((Integer) 6, buffer.get(3));
 
     }
-    
+
     @Test
     public void insert() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(4);
@@ -105,7 +102,7 @@ public class CircularBufferTest {
 
         // remove from the left side
         assertEquals((Integer) 1, buffer.remove(0));
-        
+
         // remove from the right side
         assertEquals((Integer) 7, buffer.remove(1));
 
@@ -136,7 +133,7 @@ public class CircularBufferTest {
         assertTrue(buffer.isEmpty());
     }
 
-    
+
     @Test(expected = IllegalStateException.class)
     public void iteratorRemoveTwice() {
         CircularBuffer<Integer> buffer = CircularBuffer.create(2);
@@ -163,5 +160,5 @@ public class CircularBufferTest {
         it.remove();
         it.next();
         it.remove();
-    }    
+    }
 }

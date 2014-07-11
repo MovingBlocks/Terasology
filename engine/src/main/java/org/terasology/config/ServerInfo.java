@@ -16,17 +16,15 @@
 
 package org.terasology.config;
 
-import org.terasology.engine.TerasologyConstants;
-
 /**
  * @author Immortius
  */
 public class ServerInfo {
     private String name;
     private String address;
-    private int port = TerasologyConstants.DEFAULT_PORT;
+    private int port;
 
-    public ServerInfo(String name, String address) {
+    public ServerInfo(String name, String address, int port) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Server name must not be null or empty");
         }
@@ -35,6 +33,7 @@ public class ServerInfo {
         }
         this.name = name;
         this.address = address;
+        this.port = port;
     }
 
     public String getName() {

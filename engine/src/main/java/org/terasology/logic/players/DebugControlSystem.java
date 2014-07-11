@@ -80,8 +80,24 @@ public class DebugControlSystem extends BaseComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onToggleViewDistance(ToggleViewDistanceButton button, EntityRef entity) {
-        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
+    public void onIncreaseViewDistance(IncreaseViewDistanceButton button, EntityRef entity) {
+        int viewDistance = config.getRendering().getViewDistance().getIndex();
+        int maxViewDistance = ViewDistance.values().length - 1;
+
+        if (viewDistance != maxViewDistance) {
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)));
+        }
+        button.consume();
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDecreaseViewDistance(DecreaseViewDistanceButton button, EntityRef entity) {
+        int viewDistance = config.getRendering().getViewDistance().getIndex();
+        int minViewDistance = 0;
+
+        if (viewDistance != minViewDistance) {
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)));
+        }
         button.consume();
     }
 

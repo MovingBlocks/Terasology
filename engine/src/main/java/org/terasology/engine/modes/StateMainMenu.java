@@ -18,6 +18,7 @@ package org.terasology.engine.modes;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.ConsoleImpl;
 import org.terasology.logic.console.internal.ConsoleSystem;
@@ -28,7 +29,6 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -39,7 +39,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * The class implements the main game menu.
@@ -71,7 +71,7 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
 
         //lets get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class),
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(),
                 CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
@@ -105,7 +105,7 @@ public class StateMainMenu implements GameState {
         //guiManager.openWindow("main");
         CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error", messageOnLoad);
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
     }
 

@@ -24,23 +24,24 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import com.google.common.collect.Lists;
+import org.terasology.naming.Name;
 
 public class AssetSourceCollection implements AssetSource {
 
-    private String sourceId;
+    private Name sourceId;
     private Iterable<AssetSource> assetSources;
 
-    public AssetSourceCollection(String sourceId, Iterable<AssetSource> assetSources) {
+    public AssetSourceCollection(Name sourceId, Iterable<AssetSource> assetSources) {
         this.sourceId = sourceId;
         this.assetSources = assetSources;
     }
 
-    public AssetSourceCollection(String sourceId, AssetSource ... assetSources) {
+    public AssetSourceCollection(Name sourceId, AssetSource ... assetSources) {
         this(sourceId, Arrays.asList(assetSources));
     }
 
     @Override
-    public String getSourceId() {
+    public Name getSourceId() {
         return sourceId;
     }
 

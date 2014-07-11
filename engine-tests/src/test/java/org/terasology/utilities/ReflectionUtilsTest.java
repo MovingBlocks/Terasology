@@ -16,9 +16,9 @@
 package org.terasology.utilities;
 
 import org.junit.Test;
-import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.reflection.copy.CopyStrategy;
 
 import static org.junit.Assert.assertEquals;
 

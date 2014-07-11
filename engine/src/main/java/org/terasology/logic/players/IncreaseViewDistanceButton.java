@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine.module;
+package org.terasology.logic.players;
 
-import org.reflections.Reflections;
-import org.terasology.asset.AssetSource;
-
-import java.io.IOException;
-import java.io.InputStream;
+import org.terasology.input.ActivateMode;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
-public interface Module {
-
-    AssetSource getModuleSource();
-
-    String getId();
-
-    Version getVersion();
-
-    Reflections getReflections();
-
-    boolean isCodeModule();
-
-    ModuleInfo getModuleInfo();
-
-    boolean isDataAvailable();
-
-    InputStream getData() throws IOException;
-
-    long getSize();
+@RegisterBindButton(id = "increaseViewDistance", description = "Increase View Distance", mode = ActivateMode.PRESS, category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.HOME)
+public class IncreaseViewDistanceButton extends BindButtonEvent {
 }

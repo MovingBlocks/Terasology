@@ -17,7 +17,7 @@ package org.terasology.world.generator.plugin;
 
 import com.google.common.collect.Lists;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -25,7 +25,6 @@ import org.terasology.reflection.metadata.DefaultClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
@@ -34,10 +33,10 @@ public class WorldGeneratorPluginLibrary {
 
     private ClassLibrary<WorldGeneratorPlugin> library;
 
-    public WorldGeneratorPluginLibrary(ModuleManager moduleManager, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+    public WorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         library = new DefaultClassLibrary<>(reflectFactory, copyStrategyLibrary);
-        for (Map.Entry<String, Class<? extends WorldGeneratorPlugin>> entry : moduleManager.findAllSubclassesOf(WorldGeneratorPlugin.class).entries()) {
-            library.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+        for (Class<? extends WorldGeneratorPlugin> entry : moduleEnvironment.getSubtypesOf(WorldGeneratorPlugin.class)) {
+            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);
         }
     }
 

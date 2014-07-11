@@ -33,93 +33,280 @@
                 }
             },
             {
-                "type": "UIBox",
+                "type": "ScrollableArea",
                 "content": {
-                    "type": "ColumnLayout",
-                    "columns": 4,
-                    "verticalSpacing": 8,
-                    "horizontalSpacing": 8,
-                    "family": "option-grid",
-                    "contents": [
-                        "Graphics Quality:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "quality"
-                        },
-                        "Environment Effects:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "environmentEffects"
-                        },
-                        "Viewing Distance:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "viewDistance"
-                        },
-                        "Reflections:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "reflections"
-                        },
-                        "FOV:",
-                        {
-                            "type": "UISlider",
-                            "id": "fov"
-                        },
-                        "Blur Intensity:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "blur"
-                        },
-                        "Bobbing:",
-                        {
-                            "type": "UICheckbox",
-                            "id": "bobbing"
-                        },
-                        "Fullscreen:",
-                        {
-                            "type": "UICheckbox",
-                            "id": "fullscreen"
-                        },
-                        "Dynamic Shadows:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "shadows"
-                        },
-                        "Outline:",
-                        {
-                            "type": "UICheckbox",
-                            "id": "outline"
-                        },
-                        "VSync:",
-                        {
-                            "type": "UICheckbox",
-                            "id": "vsync"
-                        },
-                        "Camera:",
-                        {
-                            "type": "UIDropdown",
-                            "id": "camera"
+                    "type": "UIBox",
+                    "content": {
+                        "type": "ColumnLayout",
+                        "columns": 4,
+                        "verticalSpacing": 8,
+                        "horizontalSpacing": 8,
+                        "family": "option-grid",
+                        "contents": [
+                            {
+                                "type": "UILabel",
+                                "text": "Window / Graphic Settings: "
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Preset: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "graphicsPreset"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "V-Sync: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "vsync"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Camera / Graphic Detail Settings: "
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Camera Setting: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "camera"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Outline: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "outline"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Cloud Shadows: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "cloudShadow"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Parallax Mapping: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "parallax"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Film Grain: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "filmGrain"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Bobbing: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "bobbing"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Fov amount: "
+                            },
+                            {
+                                "type": "UISlider",
+                                "id": "fov"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "View Distance: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "viewDistance"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UIButton",
+                                "text": "Reset fov amount",
+                                "id": "fovReset"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "High-End / Experimental Settings: "
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Eye-Adaption: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "eyeAdaptation"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Motion Blur: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "motionBlur"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Water Reflections: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "reflections"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Shadows: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "shadows"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Oculus Rift Support: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "oculusVrSupport"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UIButton",
+                                "text": "Advanced Settings",
+                                "id": "advancedVideo"
+                            }
+                        ],
+                        "layoutInfo": {
+                            "width": 720,
+                            "height": 240,
+                            "position-horizontal-center": {},
+                            "position-top": {
+                                "target": "BOTTOM",
+                                "offset": 16,
+                                "widget": "subtitle"
+                            },
+                            "position-bottom": {
+                                "target": "TOP",
+                                "offset": 32,
+                                "widget": "close"
+                            }
                         }
-                    ],
+                    },
                     "layoutInfo": {
-                        "width": 720,
-                        "height": 240,
+                        "width": 300,
                         "position-horizontal-center": {},
                         "position-top": {
                             "target": "BOTTOM",
-                            "offset": 16,
                             "widget": "subtitle"
                         },
                         "position-bottom": {
                             "target": "TOP",
-                            "offset": 32,
-                            "widget": "close"
+                            "widget": "actionButtons",
+                            "offset": 16
                         }
                     }
                 },
                 "layoutInfo": {
                     "width": 740,
+                    "height": 364,
                     "use-content-height": true,
                     "position-horizontal-center": {},
                     "position-top": {

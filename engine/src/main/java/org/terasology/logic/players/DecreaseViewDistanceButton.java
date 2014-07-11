@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.engine;
+package org.terasology.logic.players;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.terasology.input.ActivateMode;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.Keyboard;
+import org.terasology.input.RegisterBindButton;
 
 /**
- * Types annotated with API are available for modules.
- *
  * @author Immortius
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.TYPE, ElementType.PACKAGE})
-public @interface API {
+@RegisterBindButton(id = "decreaseViewDistance", description = "Decrease View Distance", mode = ActivateMode.PRESS, category = "general")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.END)
+public class DecreaseViewDistanceButton extends BindButtonEvent {
 }

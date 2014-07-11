@@ -15,13 +15,11 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.registry.In;
@@ -38,10 +36,11 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 /**
  * A config screen for world generation
+ *
  * @author Martin Steiger
  */
 public class ConfigWorldGenScreen extends CoreScreenLayer {
@@ -62,24 +61,20 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     @Override
     public void onOpened() {
         super.onOpened();
-        
+
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());
         properties.clear();
-        
+
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
-        Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
-
         try {
-            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
             WorldGenerator wg = worldGeneratorManager.createGenerator(info.getUri());
-
             if (wg.getConfigurator().isPresent()) {
                 WorldConfigurator worldConfig = wg.getConfigurator().get();
 
                 params = Maps.newHashMap(worldConfig.getProperties());
-                
+
                 for (String key : params.keySet()) {
                     Class<? extends Component> clazz = params.get(key).getClass();
                     Component comp = config.getModuleConfig(generatorUri, key, clazz);
@@ -94,15 +89,12 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
                 }
             } else {
                 logger.info(info.getUri().toString() + " does not support configuration");
-                return;
             }
         } catch (UnresolvedWorldGeneratorException e) {
-            logger.error("Unable to load world generator: " + info.getUri().toString());
-        } finally {
-            moduleManager.disableAllModules();
+            logger.error("Requested unavailable world generator", e);
         }
     }
-    
+
     @Override
     public void onClosed() {
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
@@ -122,7 +114,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
             }
         });
     }
-    
+
 }
 
 

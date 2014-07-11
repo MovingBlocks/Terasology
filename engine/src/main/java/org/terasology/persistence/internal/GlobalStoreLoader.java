@@ -25,8 +25,6 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -35,6 +33,8 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -50,7 +50,7 @@ final class GlobalStoreLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalStoreLoader.class);
 
-    private ModuleManager moduleManager;
+    private ModuleEnvironment environment;
     private EngineEntityManager entityManager;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
@@ -58,10 +58,10 @@ final class GlobalStoreLoader {
     private PrefabSerializer prefabSerializer;
     private List<StoreMetadata> refTables;
 
-    public GlobalStoreLoader(ModuleManager moduleManager, EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
+    public GlobalStoreLoader(ModuleEnvironment environment, EngineEntityManager entityManager, PrefabSerializer prefabSerializer) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
-        this.moduleManager = moduleManager;
+        this.environment = environment;
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entitySerializer = new EntitySerializer(entityManager);
         this.prefabSerializer = prefabSerializer;
@@ -107,7 +107,7 @@ final class GlobalStoreLoader {
         for (EntityData.Prefab prefabData : globalStore.getPrefabList()) {
             if (!prefabManager.exists(prefabData.getName())) {
                 if (!prefabData.hasParentName()) {
-                    Module module = moduleManager.getActiveModule(new SimpleUri(prefabData.getName()).getNormalisedModuleName());
+                    Module module = environment.get(new SimpleUri(prefabData.getName()).getModuleName());
                     try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                         createPrefab(prefabData);
                     } catch (Exception e) {
@@ -130,7 +130,7 @@ final class GlobalStoreLoader {
             if (prefabData.hasParentName() && pendingPrefabs.containsKey(prefabData.getParentName())) {
                 loadPrefab(pendingPrefabs.get(prefabData.getParentName()), pendingPrefabs);
             }
-            Module module = moduleManager.getActiveModule(new SimpleUri(prefabData.getName()).getNormalisedModuleName());
+            Module module = environment.get(new SimpleUri(prefabData.getName()).getModuleName());
             try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(module)) {
                 result = createPrefab(prefabData);
             } catch (Exception e) {

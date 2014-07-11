@@ -20,5 +20,5 @@
         displayName = "General"
         ) package org.terasology.input.binds.general;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.input.InputCategory;

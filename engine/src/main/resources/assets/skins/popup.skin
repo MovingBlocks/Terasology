@@ -1,0 +1,17 @@
+{
+    "inherit" : "default",
+    "elements" : {
+        "UIButton" : {
+            "modes" : {
+                "disabled" : {
+                    "text-color" : "AAAAAAFF"
+                }
+            }
+        }
+    },
+    "families" : {
+        "title" : {
+            "font" : "title"
+        }
+    }
+}

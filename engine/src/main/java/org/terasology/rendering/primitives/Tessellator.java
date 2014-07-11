@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.world.block.shapes.BlockMeshPart;

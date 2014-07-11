@@ -153,6 +153,10 @@ public class ItemIcon extends CoreWidget {
 
     @Override
     public UIWidget getTooltip() {
-        return tooltip;
+        if (tooltip.getList().size() > 0) {
+            return tooltip;
+        } else {
+            return null;
+        }
     }
 }

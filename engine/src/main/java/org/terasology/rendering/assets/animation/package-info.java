@@ -16,4 +16,4 @@
 
 @API package org.terasology.rendering.assets.animation;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 /**
  * Base class for decorator nodes, which have exactly one child (the decorated node).

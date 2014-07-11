@@ -16,7 +16,7 @@
 
 package org.terasology.utilities.random;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3f;

@@ -1,5 +1,5 @@
 {
-    "type" : "errorMessagePopup",
+    "type" : "waitPopup",
     "skin" : "messageBox",
     "contents" : {
         "type" : "relativeLayout",
@@ -19,7 +19,7 @@
                         "contents" : [
                             {
                                 "type" : "UILabel",
-                                "text" : "Error",
+                                "text" : "Title",
                                 "id" : "title",
                                 "family" : "title"
                             },
@@ -39,8 +39,8 @@
                             },
                             {
                                 "type" : "UIButton",
-                                "text" : "Ok",
-                                "id" : "ok"
+                                "text" : "Cancel",
+                                "id" : "cancel"
                             }
                         ]
                     }

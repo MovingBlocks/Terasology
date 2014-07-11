@@ -18,7 +18,7 @@ package org.terasology.audio.loaders;
 
 import org.terasology.asset.AssetLoader;
 import org.terasology.audio.StreamingSoundData;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.io.InputStream;

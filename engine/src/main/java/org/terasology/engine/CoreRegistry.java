@@ -15,6 +15,8 @@
  */
 package org.terasology.engine;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * @author Immortius
  * @deprecated Please use org.terasology.registry.CoreRegistry instead. Support for this class will be dropped in the future.

@@ -27,7 +27,6 @@ import org.terasology.reflection.copy.strategy.MappedContainerCopyStrategy;
 import org.terasology.reflection.copy.strategy.SetCopyStrategy;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.utilities.ReflectionUtil;
 
 import java.lang.reflect.Modifier;
@@ -49,8 +48,6 @@ import java.util.Set;
  */
 public class CopyStrategyLibrary {
     private static final Logger logger = LoggerFactory.getLogger(CopyStrategyLibrary.class);
-
-    private ModuleManager moduleManager;
 
     private Map<Class<?>, CopyStrategy<?>> strategies = Maps.newHashMap();
     private CopyStrategy<?> defaultStrategy = new ReturnAsIsStrategy();

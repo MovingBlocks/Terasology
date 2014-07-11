@@ -25,12 +25,13 @@ import org.terasology.utilities.random.FastRandom;
 
 /**
  * A simple test for {@link SimplexNoise}
+ *
  * @author Martin Steiger
  */
 public class NoiseTest {
 
     private static final Logger logger = LoggerFactory.getLogger(NoiseTest.class);
-    
+
     @Test
     public void speedTest() {
         int seed = "asdf".hashCode();
@@ -38,10 +39,10 @@ public class NoiseTest {
         int count = 1000000;
         FastRandom pfr = new FastRandom(seed);
         FastRandom sfr = new FastRandom(seed);
-        
+
         PerlinNoise pn = new PerlinNoise(seed);
         SimplexNoise sn = new SimplexNoise(seed);
-        
+
         for (int i = 0; i < warmUp; i++) {
             float posX = pfr.nextFloat() * 1000f;
             float posY = pfr.nextFloat() * 1000f;
@@ -49,7 +50,7 @@ public class NoiseTest {
 
             pn.noise(posX, posY, posZ);
         }
-        
+
         for (int i = 0; i < warmUp; i++) {
             float posX = sfr.nextFloat() * 1000f;
             float posY = sfr.nextFloat() * 1000f;
@@ -59,7 +60,7 @@ public class NoiseTest {
         }
 
         long start = System.nanoTime();
-        
+
         for (int i = 0; i < count; i++) {
             float posX = pfr.nextFloat() * 1000f;
             float posY = pfr.nextFloat() * 1000f;
@@ -67,11 +68,11 @@ public class NoiseTest {
 
             pn.noise(posX, posY, posZ);
         }
-        
+
         logger.info("Perlin Noise : " + (System.nanoTime() - start) / 1000000 + "ms.");
 
         start = System.nanoTime();
-        
+
         for (int i = 0; i < count; i++) {
             float posX = sfr.nextFloat() * 1000f;
             float posY = sfr.nextFloat() * 1000f;
@@ -79,8 +80,8 @@ public class NoiseTest {
 
             sn.noise(posX, posY, posZ);
         }
-        
+
         logger.info("Simplex Noise : " + (System.nanoTime() - start) / 1000000 + "ms.");
-        
+
     }
 }

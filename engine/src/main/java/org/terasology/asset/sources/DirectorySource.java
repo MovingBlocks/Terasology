@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,7 +34,7 @@ public class DirectorySource extends AbstractSource {
 
     private static final Logger logger = LoggerFactory.getLogger(DirectorySource.class);
 
-    public DirectorySource(String id, Path rootAssetsDirectory, Path rootOverridesDirectory, Path rootDeltaDirectory) {
+    public DirectorySource(Name id, Path rootAssetsDirectory, Path rootOverridesDirectory, Path rootDeltaDirectory) {
         super(id);
 
         clear();
@@ -56,7 +57,7 @@ public class DirectorySource extends AbstractSource {
                 } else if (Files.isRegularFile(child)) {
                     Path relativePath = basePath.relativize(child);
                     Path modulePath = relativePath.subpath(0, 1);
-                    AssetUri uri = getUri(modulePath.toString(), modulePath.relativize(relativePath));
+                    AssetUri uri = getUri(new Name(modulePath.toString()), modulePath.relativize(relativePath));
                     if (uri != null) {
                         try {
                             addOverride(uri, child.toUri().toURL());
@@ -80,7 +81,7 @@ public class DirectorySource extends AbstractSource {
                 } else if (Files.isRegularFile(child)) {
                     Path relativePath = basePath.relativize(child);
                     Path modulePath = relativePath.subpath(0, 1);
-                    AssetUri uri = getUri(modulePath.toString(), modulePath.relativize(relativePath));
+                    AssetUri uri = getUri(new Name(modulePath.toString()), modulePath.relativize(relativePath));
                     if (uri != null) {
                         try {
                             setDelta(uri, child.toUri().toURL());

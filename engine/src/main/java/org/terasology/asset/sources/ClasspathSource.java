@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -35,7 +36,7 @@ public class ClasspathSource implements AssetSource {
 
     private AssetSource source;
 
-    public ClasspathSource(String id, URL sourceUrl, String baseAssetsPath, String baseOverridesPath, String baseDeltasPath) {
+    public ClasspathSource(Name id, URL sourceUrl, String baseAssetsPath, String baseOverridesPath, String baseDeltasPath) {
         try {
             Path codePath = Paths.get(sourceUrl.toURI());
             if (Files.isRegularFile(codePath)) {
@@ -48,7 +49,7 @@ public class ClasspathSource implements AssetSource {
         }
     }
 
-    public ClasspathSource(String id, CodeSource cs, String baseAssetsPath, String baseOverridesPath, String baseDeltasPath) {
+    public ClasspathSource(Name id, CodeSource cs, String baseAssetsPath, String baseOverridesPath, String baseDeltasPath) {
         if (cs == null) {
             throw new IllegalStateException("Can't access assets: CodeSource is null");
         }
@@ -68,7 +69,7 @@ public class ClasspathSource implements AssetSource {
     }
 
     @Override
-    public String getSourceId() {
+    public Name getSourceId() {
         return source.getSourceId();
     }
 

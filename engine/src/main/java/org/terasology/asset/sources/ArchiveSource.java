@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class ArchiveSource extends AbstractSource {
 
     private final Logger logger = LoggerFactory.getLogger(ArchiveSource.class);
 
-    public ArchiveSource(String sourceId, File archive, String assetsPath, String overridesPath, String deltasPath) {
+    public ArchiveSource(Name sourceId, File archive, String assetsPath, String overridesPath, String deltasPath) {
         super(sourceId);
 
         try {
@@ -70,7 +71,7 @@ public class ArchiveSource extends AbstractSource {
                     if (moduleIndex == -1) {
                         continue;
                     }
-                    String moduleName = key.substring(0, moduleIndex);
+                    Name moduleName = new Name(key.substring(0, moduleIndex));
                     key = key.substring(moduleIndex + 1);
 
                     AssetUri uri = getUri(moduleName, key);
@@ -113,7 +114,7 @@ public class ArchiveSource extends AbstractSource {
                     if (moduleIndex == -1) {
                         continue;
                     }
-                    String moduleName = key.substring(0, moduleIndex);
+                    Name moduleName = new Name(key.substring(0, moduleIndex));
                     key = key.substring(moduleIndex + 1);
 
                     AssetUri uri = getUri(moduleName, key);

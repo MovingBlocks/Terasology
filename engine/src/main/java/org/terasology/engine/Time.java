@@ -15,6 +15,8 @@
  */
 package org.terasology.engine;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * The timer manages all time in the game.
  * <ol>
