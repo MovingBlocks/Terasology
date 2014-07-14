@@ -61,7 +61,7 @@ public class ModuleManager {
         metadataReader = new ModuleMetadataReader();
         metadataReader.registerExtension(SERVER_SIDE_ONLY_EXT, Boolean.TYPE);
         Module engineModule;
-        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/assets/module.txt"))) {
+        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"))) {
             ModuleMetadata metadata = metadataReader.read(reader);
             engineModule = ClasspathModule.create(metadata, getClass(), Module.class);
         } catch (IOException e) {
