@@ -19,18 +19,16 @@ package org.terasology;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.newdawn.slick.util.Log;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.nullAudio.NullAudioManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
@@ -40,6 +38,9 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.module.ModuleRegistry;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -62,9 +63,11 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 
+import com.google.common.collect.Sets;
+
 import java.io.IOException;
 import java.nio.file.FileSystem;
-import java.security.CodeSource;
+import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 
@@ -78,9 +81,10 @@ public class HeadlessEnvironment extends Environment {
 
     /**
      * Setup a headless ( = no graphics ) environment
+     * @param modules a set of module names that should be loaded (latest version)
      */
-    public HeadlessEnvironment() {
-        super();
+    public HeadlessEnvironment(Name ... modules) {
+        super(modules);
     }
 
     @Override
@@ -185,11 +189,23 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupModuleManager() throws Exception {
+    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
         ModuleManager moduleManager = ModuleManagerFactory.create();
+        ModuleRegistry registry = moduleManager.getRegistry();
+
+        Set<Module> mods = Sets.newHashSet();
+        for (Name modName : moduleNames) {
+            Module module = registry.getLatestModuleVersion(modName);
+            mods.add(module);
+        }
+
+        ModuleEnvironment modEnv = moduleManager.loadEnvironment(mods, true);
+        
+        Log.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
+        
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
-
+    
     /**
      * @throws IOException ShrinkWrap errors
      */

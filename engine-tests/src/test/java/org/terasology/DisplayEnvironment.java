@@ -23,10 +23,7 @@ import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.config.Config;
-import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -75,6 +72,13 @@ import org.terasology.world.block.shapes.BlockShapeImpl;
 public class DisplayEnvironment extends HeadlessEnvironment {
 
     private GLBufferPool bufferPool = new GLBufferPool(true);
+
+    /**
+     * @param modules a set of module names that should be loaded (latest version)
+     */
+    public DisplayEnvironment(Name ... modules) {
+        super(modules);
+    }
 
     @Override
     protected void setupDisplay() {

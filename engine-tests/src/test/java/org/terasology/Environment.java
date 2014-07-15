@@ -18,8 +18,13 @@ package org.terasology;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.naming.Name;
+
+import com.google.common.collect.Sets;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Setup an empty Terasology environment
@@ -32,23 +37,25 @@ public class Environment {
 
     /**
      * Default setup order
+     * @param modules 
      */
-    public Environment() {
+    public Environment(Name ... moduleNames) {
+
         try {
-            reset();
+            reset(Sets.newHashSet(moduleNames));
         } catch (Exception e) {
             logger.error("Error", e);
             throw new RuntimeException(e);
         }
     }
 
-    protected void reset() throws Exception {
+    protected void reset(Set<Name> moduleNames) throws Exception {
 
         setupPathManager();
 
         setupConfig();
 
-        setupModuleManager();
+        setupModuleManager(moduleNames);
 
         setupDisplay();
 
@@ -83,7 +90,7 @@ public class Environment {
         // empty
     }
 
-    protected void setupModuleManager() throws Exception {
+    protected void setupModuleManager(Set<Name> moduleNames) throws Exception {
         // empty
     }
 
