@@ -48,7 +48,7 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
             float seaLevel = (float) seaLevelFacet.getSeaLevel();
 
             // update the surface height so that it spikes up to sea level
-            Vector2i middlePos = new Vector2i(centerChunkPos.getX(), centerChunkPos.getZ());
+            Vector2i middlePos = new Vector2i(centerChunkPos.x, centerChunkPos.z);
             for (Vector2i pos : facet.getWorldRegion()) {
                 float originalValue = facet.getWorld(pos);
                 if (seaLevel > originalValue) {

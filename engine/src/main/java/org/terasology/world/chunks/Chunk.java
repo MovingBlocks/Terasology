@@ -15,7 +15,8 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.engine.API;
+
+import org.terasology.module.sandbox.API;
 
 /**
  * @author Immortius

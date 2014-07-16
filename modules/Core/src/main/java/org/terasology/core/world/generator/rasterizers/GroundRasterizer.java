@@ -44,10 +44,10 @@ public class GroundRasterizer implements WorldRasterizer {
             for (int z = 0; z < chunk.getChunkSizeZ(); ++z) {
                 float surfaceHeight = surfaceHeightData.get(x, z);
                 int y;
-                for (y = 0; y < chunk.getChunkSizeY() && y + chunkOffset.getY() < surfaceHeight; ++y) {
+                for (y = 0; y < chunk.getChunkSizeY() && y + chunkOffset.y < surfaceHeight; ++y) {
                     chunk.setBlock(x, y, z, stone);
                 }
-                for (; y < chunk.getChunkSizeY() && y + chunkOffset.getY() <= 32; ++y) {
+                for (; y < chunk.getChunkSizeY() && y + chunkOffset.y <= 32; ++y) {
                     chunk.setBlock(x, y, z, water);
                 }
             }

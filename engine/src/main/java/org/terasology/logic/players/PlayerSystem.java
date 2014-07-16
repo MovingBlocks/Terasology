@@ -133,9 +133,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             int seaLevel = seaLevelFacet.getSeaLevel();
 
             for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.getX(), pos.getZ()));
+                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
                 if (height > seaLevel) {
-                    pos.setY(height);
+                    pos.y = height;
                     if (findOpenVerticalPosition(pos)) {
                         return pos;
                     }

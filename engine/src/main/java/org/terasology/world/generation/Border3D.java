@@ -57,7 +57,7 @@ public class Border3D {
     }
 
     public Rect2i expandTo2D(Vector3i size) {
-        return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.getX() + getSides() - 1, size.getZ() + getSides() - 1);
+        return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
     }
 
     public Region3i expandTo3D(Region3i region) {
@@ -67,7 +67,7 @@ public class Border3D {
 
     public Region3i expandTo3D(Vector3i size) {
         return Region3i.createFromMinMax(new Vector3i(-sides, -bottom, -sides),
-                new Vector3i(size.getX() + sides - 1, size.getY() + top - 1, size.getZ() + sides - 1));
+                new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
     }
 
     @Override

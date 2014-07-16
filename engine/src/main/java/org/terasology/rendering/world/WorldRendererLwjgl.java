@@ -37,6 +37,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
@@ -156,6 +157,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /* EVENTS */
     private final WorldTimeEventManager worldTimeEventManager;
 
+    /* PHYSICS */
+    // TODO: Remove physics handling from world renderer
+    private final BulletPhysics bulletPhysics;
+
     /* STATISTICS */
     private int statDirtyChunks;
     private int statVisibleChunks;
@@ -181,6 +186,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
+        bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
         skysphere = new Skysphere(this);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
@@ -1193,7 +1199,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                        + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, fog: %.1f, seed: \"%s\", title: \"%s\")",
+                + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, fog: %.1f, seed: \"%s\", title: \"%s\")",
 
                 ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
                 getPlayerBiome(),
@@ -1274,6 +1280,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     public float getTick() {
         return tick;
+    }
+
+
+    public BulletPhysics getBulletRenderer() {
+        return bulletPhysics;
     }
 
     public Camera getActiveCamera() {

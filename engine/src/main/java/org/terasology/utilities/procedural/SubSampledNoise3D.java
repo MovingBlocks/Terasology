@@ -16,10 +16,8 @@
 package org.terasology.utilities.procedural;
 
 import com.google.common.math.IntMath;
-import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
@@ -77,7 +75,7 @@ public class SubSampledNoise3D implements Noise3D {
             Vector3i offset = new Vector3i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY(), subRegion.minZ() - fullRegion.minZ());
             for (int z = 0; z < subRegion.size().z; ++z) {
                 for (int y = 0; y < subRegion.size().y; ++y) {
-                    System.arraycopy(fullData, offset.getX() + fullRegion.sizeX() * (y + offset.getY() + fullRegion.sizeY() * (z + offset.getZ())),
+                    System.arraycopy(fullData, offset.x + fullRegion.sizeX() * (y + offset.y + fullRegion.sizeY() * (z + offset.z)),
                             result, subRegion.sizeX() * (y + subRegion.sizeY() * z), subRegion.size().x);
                 }
             }

@@ -80,9 +80,9 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
         }
 
         for (Vector3i chunkCoordinate : chunkCoordinates) {
-            Vector3i minWorldPosForChunk = new Vector3i(ChunkConstants.SIZE_X * chunkCoordinate.getX(),
-                    ChunkConstants.SIZE_Y * chunkCoordinate.getY(),
-                    ChunkConstants.SIZE_Z * chunkCoordinate.getZ());
+            Vector3i minWorldPosForChunk = new Vector3i(ChunkConstants.SIZE_X * chunkCoordinate.x,
+                    ChunkConstants.SIZE_Y * chunkCoordinate.y,
+                    ChunkConstants.SIZE_Z * chunkCoordinate.z);
             Region3i chunkWorldRegion = Region3i.createFromMinAndSize(minWorldPosForChunk, ChunkConstants.CHUNK_SIZE);
 
             int hmX = (((chunkWorldRegion.minX() / chunkWorldRegion.sizeX()) % 512) + 512) % 512;
@@ -102,8 +102,8 @@ public class HeightMapSurfaceHeightProvider implements FacetProvider {
 
             for (Vector2i pos : worldRegion) {
                 Vector3i localPos = TeraMath.calcBlockPos(new Vector3i(pos.x, 0, pos.y));
-                int x = localPos.getX();
-                int z = localPos.getZ();
+                int x = localPos.x;
+                int z = localPos.z;
                 //calculate avg height
                 float interpolatedHeight = (float) lerp(x / (double) ChunkConstants.CHUNK_REGION.sizeX(), lerp(z / (double) ChunkConstants.CHUNK_REGION.sizeZ(), p10, p11),
                         lerp(z / (double) ChunkConstants.CHUNK_REGION.sizeZ(), p00, p01));

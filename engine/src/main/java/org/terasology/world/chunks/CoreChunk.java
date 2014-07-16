@@ -15,24 +15,23 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.engine.API;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
 /**
  * This interface describes the core of a chunk:
  * <ul>
- *     <li>Chunk position</li>
- *     <li>Block read/write</li>
- *     <li>Liquid read/write</li>
- *     <li>Chunk to world position conversion</li>
- *     <li>Chunk size and region</li>
- *     <li>Locking</li>
+ * <li>Chunk position</li>
+ * <li>Block read/write</li>
+ * <li>Liquid read/write</li>
+ * <li>Chunk to world position conversion</li>
+ * <li>Chunk size and region</li>
+ * <li>Locking</li>
  * </ul>
  * This is everything available during chunk generation. Light is not included because it is a derived from the blocks.
- *
  */
 @API
 public interface CoreChunk {

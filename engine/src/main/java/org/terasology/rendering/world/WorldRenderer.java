@@ -18,6 +18,7 @@ package org.terasology.rendering.world;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
 import org.terasology.world.WorldProvider;
@@ -53,6 +54,8 @@ public interface WorldRenderer {
     void render(StereoRenderState mono);
 
     void dispose();
+
+    PhysicsEngine getBulletRenderer();
 
     boolean pregenerateChunks();
 

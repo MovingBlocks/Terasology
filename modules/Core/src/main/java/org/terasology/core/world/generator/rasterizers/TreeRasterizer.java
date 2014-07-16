@@ -104,11 +104,11 @@ public class TreeRasterizer implements WorldRasterizer {
 
         for (Vector3i pos : facet.getRelativeRegion()) {
             float facetValue = facet.get(pos);
-            WorldBiomeProvider.Biome biome = biomeFacet.get(pos.getX(), pos.getZ());
+            WorldBiomeProvider.Biome biome = biomeFacet.get(pos.x, pos.z);
             if (facetValue > 0) {
                 for (TreeGenerator generator : treeGeneratorLookup.get(biome)) {
                     if (generator.getGenerationProbability() > (facetValue / 256f)) {
-                        generator.generate(chunk, new FastRandom((long) facetValue), pos.getX(), pos.getY(), pos.getZ());
+                        generator.generate(chunk, new FastRandom((long) facetValue), pos.x, pos.y, pos.z);
                         break;
                     }
                 }

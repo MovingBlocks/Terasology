@@ -15,8 +15,8 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.engine.API;
 import org.terasology.math.AABB;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.primitives.ChunkMesh;
 
 /**

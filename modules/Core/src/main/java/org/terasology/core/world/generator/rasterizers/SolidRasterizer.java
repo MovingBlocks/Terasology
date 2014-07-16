@@ -69,7 +69,7 @@ public class SolidRasterizer implements WorldRasterizer {
                 Block block = getSurfaceBlock(depth, pos.y + chunk.getChunkWorldOffsetY(), biome);
                 chunk.setBlock(pos, block);
             } else {
-                int posY = pos.getY() + chunk.getChunkWorldOffsetY();
+                int posY = pos.y + chunk.getChunkWorldOffsetY();
 
                 if (posY == 32 && WorldBiomeProvider.Biome.SNOW == biomeFacet.get(pos2d)) {
                     chunk.setBlock(pos, ice);
