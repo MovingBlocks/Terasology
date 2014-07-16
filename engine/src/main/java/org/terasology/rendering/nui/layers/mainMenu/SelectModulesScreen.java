@@ -67,6 +67,8 @@ public class SelectModulesScreen extends CoreScreenLayer {
         modulesLookup = Maps.newHashMap();
         sortedModules = Lists.newArrayList();
 
+        populateModuleInformation();
+
         Collections.sort(sortedModules, new Comparator<ModuleSelectionInfo>() {
             @Override
             public int compare(ModuleSelectionInfo o1, ModuleSelectionInfo o2) {
@@ -74,7 +76,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             }
         });
 
-        populateModuleInformation();
         for (ModuleSelectionInfo info : sortedModules) {
             info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
         }
