@@ -38,9 +38,11 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
+import org.terasology.module.ResolutionResult;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
@@ -193,19 +195,19 @@ public class HeadlessEnvironment extends Environment {
         ModuleManager moduleManager = ModuleManagerFactory.create();
         ModuleRegistry registry = moduleManager.getRegistry();
 
-        Set<Module> mods = Sets.newHashSet();
-        for (Name modName : moduleNames) {
-            Module module = registry.getLatestModuleVersion(modName);
-            mods.add(module);
+        DependencyResolver resolver = new DependencyResolver(registry);
+        ResolutionResult result = resolver.resolve(moduleNames);
+
+        if (result.isSuccess()) {
+            ModuleEnvironment modEnv = moduleManager.loadEnvironment(result.getModules(), true);
+            Log.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
+        } else {
+            Log.error("Could not resolve module dependencies for " + moduleNames);
         }
 
-        ModuleEnvironment modEnv = moduleManager.loadEnvironment(mods, true);
-        
-        Log.debug("Loaded modules: " + modEnv.getModuleIdsOrderedByDependencies());
-        
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
-    
+
     /**
      * @throws IOException ShrinkWrap errors
      */

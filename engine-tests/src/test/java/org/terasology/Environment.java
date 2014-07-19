@@ -23,7 +23,6 @@ import org.terasology.naming.Name;
 import com.google.common.collect.Sets;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
