@@ -26,9 +26,9 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.Updates;
-import org.terasology.world.generation.facets.HumidityFacet;
-import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector2f;
 import java.util.Iterator;
@@ -36,7 +36,7 @@ import java.util.Iterator;
 /**
  * Adds surface height for hill and mountain regions. Mountain and hill regions are based off of temperature and humidity.
  */
-@Requires({@Facet(SeaLevelTemperatureFacet.class), @Facet(HumidityFacet.class)})
+@Requires({@Facet(SurfaceTemperatureFacet.class), @Facet(SurfaceHumidityFacet.class)})
 @Updates(@Facet(SurfaceHeightFacet.class))
 public class PerlinHillsAndMountainsProvider implements FacetProvider {
 
@@ -55,8 +55,8 @@ public class PerlinHillsAndMountainsProvider implements FacetProvider {
 
         float[] mountainData = mountainNoise.noise(facet.getWorldRegion());
         float[] hillData = hillNoise.noise(facet.getWorldRegion());
-        SeaLevelTemperatureFacet temperatureData = region.getRegionFacet(SeaLevelTemperatureFacet.class);
-        HumidityFacet humidityData = region.getRegionFacet(HumidityFacet.class);
+        SurfaceTemperatureFacet temperatureData = region.getRegionFacet(SurfaceTemperatureFacet.class);
+        SurfaceHumidityFacet humidityData = region.getRegionFacet(SurfaceHumidityFacet.class);
 
         float[] heightData = facet.getInternal();
         Iterator<Vector2i> positionIterator = facet.getRelativeRegion().iterator();

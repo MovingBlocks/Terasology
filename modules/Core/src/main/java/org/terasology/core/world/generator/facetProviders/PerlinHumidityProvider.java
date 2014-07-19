@@ -24,14 +24,14 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
-import org.terasology.world.generation.facets.HumidityFacet;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
 
 import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-@Produces(HumidityFacet.class)
+@Produces(SurfaceHumidityFacet.class)
 public class PerlinHumidityProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
@@ -44,14 +44,14 @@ public class PerlinHumidityProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        Border3D border = region.getBorderForFacet(HumidityFacet.class);
-        HumidityFacet facet = new HumidityFacet(region.getRegion(), border);
+        Border3D border = region.getBorderForFacet(SurfaceHumidityFacet.class);
+        SurfaceHumidityFacet facet = new SurfaceHumidityFacet(region.getRegion(), border);
 
         float[] noise = humidityNoise.noise(facet.getWorldRegion());
         for (int i = 0; i < noise.length; ++i) {
             noise[i] = TeraMath.clamp((noise[i] + 1f) * 0.5f);
         }
         facet.set(noise);
-        region.setRegionFacet(HumidityFacet.class, facet);
+        region.setRegionFacet(SurfaceHumidityFacet.class, facet);
     }
 }

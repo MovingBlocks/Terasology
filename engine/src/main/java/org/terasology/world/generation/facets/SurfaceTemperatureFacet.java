@@ -22,9 +22,9 @@ import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 /**
  * @author Immortius
  */
-public class SeaLevelTemperatureFacet extends BaseFieldFacet2D {
+public class SurfaceTemperatureFacet extends BaseFieldFacet2D {
 
-    public SeaLevelTemperatureFacet(Region3i targetRegion, Border3D border) {
+    public SurfaceTemperatureFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 }

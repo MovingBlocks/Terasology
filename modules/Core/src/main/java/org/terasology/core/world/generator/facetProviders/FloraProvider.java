@@ -15,17 +15,17 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.terasology.core.world.Biome;
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.utilities.procedural.NoiseTable;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.BiomeFacet;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
@@ -56,10 +56,10 @@ public class FloraProvider implements FacetProvider {
             for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
                 int height = TeraMath.floorToInt(surface.get(x, z));
                 if (height >= minY && height < maxY) {
-                    WorldBiomeProvider.Biome biome = biomeFacet.get(x, z);
+                    Biome biome = biomeFacet.get(x, z);
                     height = height - minY + facet.getRelativeRegion().minY();
 
-                    if ((biome == WorldBiomeProvider.Biome.FOREST || biome == WorldBiomeProvider.Biome.PLAINS) && density.get(x, height, z) > 0
+                    if ((biome == Biome.FOREST || biome == Biome.PLAINS) && density.get(x, height, z) > 0
                             && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) > 180) {
                         facet.set(x, height + 1, z, true);
                     }

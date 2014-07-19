@@ -15,17 +15,17 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
+import org.terasology.core.world.Biome;
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.facets.BiomeFacet;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
@@ -65,13 +65,13 @@ public class SolidRasterizer implements WorldRasterizer {
                 chunk.setBlock(pos, stone);
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - pos.y - chunk.getChunkWorldOffsetY();
-                WorldBiomeProvider.Biome biome = biomeFacet.get(pos2d);
+                Biome biome = biomeFacet.get(pos2d);
                 Block block = getSurfaceBlock(depth, pos.y + chunk.getChunkWorldOffsetY(), biome);
                 chunk.setBlock(pos, block);
             } else {
                 int posY = pos.y + chunk.getChunkWorldOffsetY();
 
-                if (posY == 32 && WorldBiomeProvider.Biome.SNOW == biomeFacet.get(pos2d)) {
+                if (posY == 32 && Biome.SNOW == biomeFacet.get(pos2d)) {
                     chunk.setBlock(pos, ice);
                 } else if (posY <= 32) {
                     chunk.setBlock(pos, water);
@@ -80,7 +80,7 @@ public class SolidRasterizer implements WorldRasterizer {
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height, WorldBiomeProvider.Biome type) {
+    private Block getSurfaceBlock(int depth, int height, Biome type) {
         switch (type) {
             case FOREST:
             case PLAINS:

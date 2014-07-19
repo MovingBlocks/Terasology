@@ -23,15 +23,15 @@ import org.terasology.utilities.procedural.SubSampledNoise2D;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
-import org.terasology.world.generation.facets.SeaLevelTemperatureFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius
  */
-@Produces(SeaLevelTemperatureFacet.class)
-public class PerlinTemperatureProvider implements FacetProvider {
+@Produces(SurfaceTemperatureFacet.class)
+public class PerlinSurfaceTemperatureProvider implements FacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise2D temperatureNoise;
@@ -43,7 +43,7 @@ public class PerlinTemperatureProvider implements FacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        SeaLevelTemperatureFacet facet = new SeaLevelTemperatureFacet(region.getRegion(), region.getBorderForFacet(SeaLevelTemperatureFacet.class));
+        SurfaceTemperatureFacet facet = new SurfaceTemperatureFacet(region.getRegion(), region.getBorderForFacet(SurfaceTemperatureFacet.class));
         float[] noise = this.temperatureNoise.noise(facet.getWorldRegion());
 
         for (int i = 0; i < noise.length; ++i) {
@@ -51,6 +51,6 @@ public class PerlinTemperatureProvider implements FacetProvider {
         }
 
         facet.set(noise);
-        region.setRegionFacet(SeaLevelTemperatureFacet.class, facet);
+        region.setRegionFacet(SurfaceTemperatureFacet.class, facet);
     }
 }

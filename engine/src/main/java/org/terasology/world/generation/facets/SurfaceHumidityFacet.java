@@ -16,15 +16,15 @@
 package org.terasology.world.generation.facets;
 
 import org.terasology.math.Region3i;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import org.terasology.world.generation.facets.base.BaseFieldFacet2D;
 
 /**
- * @author Immortius
+ * Values in between 0-1
  */
-public class BiomeFacet extends BaseObjectFacet2D<WorldBiomeProvider.Biome> {
-    public BiomeFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border, WorldBiomeProvider.Biome.class);
+public class SurfaceHumidityFacet extends BaseFieldFacet2D {
+
+    public SurfaceHumidityFacet(Region3i targetRegion, Border3D border) {
+        super(targetRegion, border);
     }
 }

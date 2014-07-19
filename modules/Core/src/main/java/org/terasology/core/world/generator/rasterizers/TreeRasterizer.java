@@ -18,20 +18,20 @@ package org.terasology.core.world.generator.rasterizers;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import org.terasology.core.world.Biome;
 import org.terasology.core.world.generator.chunkGenerators.TreeGenerator;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorCactus;
 import org.terasology.core.world.generator.chunkGenerators.TreeGeneratorLSystem;
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.Vector3i;
 import org.terasology.utilities.random.FastRandom;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
-import org.terasology.world.generation.facets.BiomeFacet;
 
 import java.util.Map;
 
@@ -41,7 +41,7 @@ import java.util.Map;
 public class TreeRasterizer implements WorldRasterizer {
 
     private Block tallGrass;
-    private Multimap<WorldBiomeProvider.Biome, TreeGenerator> treeGeneratorLookup = ArrayListMultimap.create();
+    private Multimap<Biome, TreeGenerator> treeGeneratorLookup = ArrayListMultimap.create();
 
     public TreeRasterizer(BlockManager blockManager) {
 
@@ -82,19 +82,19 @@ public class TreeRasterizer implements WorldRasterizer {
         TreeGenerator cactus = new TreeGeneratorCactus().setTrunkType(blockManager.getBlock("core:Cactus")).setGenerationProbability(0.05f);
 
         // Add the trees to the generator lists
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);
+        treeGeneratorLookup.put(Biome.MOUNTAINS, oakTree);
+        treeGeneratorLookup.put(Biome.MOUNTAINS, pineTree);
 
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.FOREST, oakTree);
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.FOREST, pineTree);
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
+        treeGeneratorLookup.put(Biome.FOREST, oakTree);
+        treeGeneratorLookup.put(Biome.FOREST, pineTree);
+        treeGeneratorLookup.put(Biome.FOREST, oakVariationTree);
 
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.SNOW, birkTree);
+        treeGeneratorLookup.put(Biome.SNOW, birkTree);
 
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.PLAINS, redTree);
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.PLAINS, oakTree);
+        treeGeneratorLookup.put(Biome.PLAINS, redTree);
+        treeGeneratorLookup.put(Biome.PLAINS, oakTree);
 
-        treeGeneratorLookup.put(WorldBiomeProvider.Biome.DESERT, cactus);
+        treeGeneratorLookup.put(Biome.DESERT, cactus);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class TreeRasterizer implements WorldRasterizer {
 
         for (Vector3i pos : facet.getRelativeRegion()) {
             float facetValue = facet.get(pos);
-            WorldBiomeProvider.Biome biome = biomeFacet.get(pos.x, pos.z);
+            Biome biome = biomeFacet.get(pos.x, pos.z);
             if (facetValue > 0) {
                 for (TreeGenerator generator : treeGeneratorLookup.get(biome)) {
                     if (generator.getGenerationProbability() > (facetValue / 256f)) {
