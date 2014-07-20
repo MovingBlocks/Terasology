@@ -44,7 +44,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @In
     private GameEngine engine;
 
-
     @In
     private Config config;
 
@@ -54,8 +53,6 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
-
-
         UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
             videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
@@ -131,22 +128,22 @@ public class VideoSettingsScreen extends CoreScreenLayer {
         WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "eyeAdaptation", BindHelper.bindBeanProperty("eyeAdaptation", config.getRendering(), Boolean.TYPE));
-        WidgetUtil.trySubscribe(this, "fovReset", new ActivateEventListener() {
+        WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
 
+        WidgetUtil.trySubscribe(this, "fovReset", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget widget) {
                 CameraSettingBinding cam;
                 fovSlider.setValue(100.0f);
-
             }
         });
+
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
             }
         });
-
     }
 
     @Override

@@ -76,6 +76,22 @@
                                 "id": "vsync"
                             },
                             {
+                                "type": "UILabel",
+                                "text": "Fullscreen: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "fullscreen"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
                                 "type": "UISpace",
                                 "size": [1, 13]
                             },
@@ -106,6 +122,14 @@
                             {
                                 "type": "UISpace",
                                 "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Blur: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "blur"
                             },
                             {
                                 "type": "UILabel",
@@ -205,6 +229,14 @@
                                 "size": [1, 13]
                             },
                             {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
                                 "type": "UILabel",
                                 "text": "High-End / Experimental Settings: "
                             },
@@ -219,6 +251,14 @@
                             {
                                 "type": "UISpace",
                                 "size": [1, 13]
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Environment Effects: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id": "environmentEffects"
                             },
                             {
                                 "type": "UILabel",
@@ -271,7 +311,8 @@
                             {
                                 "type": "UIButton",
                                 "text": "Advanced Settings",
-                                "id": "advancedVideo"
+                                "id": "advancedVideo",
+                                "enabled" : false
                             }
                         ],
                         "layoutInfo": {
