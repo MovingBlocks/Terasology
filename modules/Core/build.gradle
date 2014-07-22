@@ -89,8 +89,8 @@ dependencies {
         // Dependency on the engine itself (actually its built jar file)
         compile project(':engine')
 
-        // Unit tests for the engine have been split out into their own sub-project (eases some config)
-        testCompile project(':engine-tests')
+        // Engine unit tests contain classes that module unit tests can extend, so need to be compile, not testCompile
+        compile project(':engine-tests')
 
         if (moduleDepends.size() > 0) {
             println "* $project.name has extra dependencies:"
@@ -151,7 +151,7 @@ dependencies {
         // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
         // Tricky scenario: Building a module with a transitive dependency on engine-tests - that seems to be ignored
         compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
-        testCompile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
+        compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
 
         // To get Terasology module dependencies we simply declare them against Artifactory
         moduleDepends.each {
