@@ -30,12 +30,6 @@ public interface WorldGenerator {
 
     void createChunk(CoreChunk chunk);
 
-    float getFog(float x, float y, float z);
-
-    float getTemperature(float x, float y, float z);
-
-    float getHumidity(float x, float y, float z);
-
     void initialize();
 
     Optional<WorldConfigurator> getConfigurator();

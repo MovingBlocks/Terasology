@@ -158,8 +158,6 @@ public interface WorldProviderCore {
 
     WorldTime getTime();
 
-    float getFog(float x, float y, float z);
-
     float getTemperature(float x, float y, float z);
 
     float getHumidity(float x, float y, float z);

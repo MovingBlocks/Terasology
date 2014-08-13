@@ -130,11 +130,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public float getFog(float x, float y, float z) {
-        return base.getFog(x, y, z);
-    }
-
-    @Override
     public float getTemperature(float x, float y, float z) {
         return base.getTemperature(x, y, z);
     }

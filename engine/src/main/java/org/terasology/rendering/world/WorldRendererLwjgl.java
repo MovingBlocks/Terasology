@@ -1199,7 +1199,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, fog: %.1f, seed: \"%s\", title: \"%s\")",
+                + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
 
                 ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
                 getPlayerBiome(),
@@ -1212,7 +1212,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 renderedTrianglesUnit,
                 statChunkMeshEmpty,
                 statChunkNotReady,
-                worldProvider.getFog(activeCamera.getPosition()),
                 worldProvider.getSeed(),
                 worldProvider.getTitle()
         );

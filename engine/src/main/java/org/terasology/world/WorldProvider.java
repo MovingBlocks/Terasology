@@ -107,8 +107,6 @@ public interface WorldProvider extends WorldProviderCore {
 
     byte getTotalLight(Vector3i pos);
 
-    float getFog(Vector3f pos);
-
     float getTemperature(Vector3f pos);
 
     float getHumidity(Vector3f pos);

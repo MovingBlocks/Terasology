@@ -91,21 +91,6 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     @Override
-    public float getFog(float x, float y, float z) {
-        return biomeProvider.getFogAt(x, y, z);
-    }
-
-    @Override
-    public float getTemperature(float x, float y, float z) {
-        return biomeProvider.getTemperatureAt((int) x, (int) z);
-    }
-
-    @Override
-    public float getHumidity(float x, float y, float z) {
-        return biomeProvider.getHumidityAt((int) x, (int) z);
-    }
-
-    @Override
     public Color get(String layerName, int x, int z) {
         switch (layerName) {
             case "Biome":

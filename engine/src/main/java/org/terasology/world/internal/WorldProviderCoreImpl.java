@@ -18,7 +18,6 @@ package org.terasology.world.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -28,15 +27,19 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3D;
-import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.*;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.chunks.LitChunk;
+import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.World;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
@@ -56,7 +59,6 @@ import org.terasology.world.time.WorldTimeImpl;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Immortius
@@ -71,8 +73,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private GeneratingChunkProvider chunkProvider;
     private WorldTime worldTime;
 
-    private Noise3D fogNoise;
-
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
@@ -83,7 +83,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
-        this.fogNoise = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 42 * 42), 8);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -294,21 +293,32 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public float getFog(float x, float y, float z) {
-        return 0;
-        //return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.noise(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
-    }
-
-    @Override
     public float getTemperature(float x, float y, float z) {
-        return 0;
-
-        //return chunkProvider.getWorldGenerator().getTemperature(x, y, z);
+        Vector3i position = new Vector3i(x, y, z, 0.5f);
+        Region3i region3i = Region3i.createFromMinAndSize(position, Vector3i.one());
+        World world = chunkProvider.getWorldGenerator().getWorld();
+        if (world != null) {
+            Region region = world.getWorldData(region3i);
+            SurfaceTemperatureFacet surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
+            if (surfaceTemperatureFacet != null) {
+                return surfaceTemperatureFacet.getWorld(position.x, position.z);
+            }
+        }
+        return 0.5f;
     }
 
     @Override
     public float getHumidity(float x, float y, float z) {
-        return 0;
-        //return chunkProvider.getWorldGenerator().getHumidity(x, y, z);
+        Vector3i position = new Vector3i(x, y, z, 0.5f);
+        Region3i region3i = Region3i.createFromMinAndSize(position, Vector3i.one());
+        World world = chunkProvider.getWorldGenerator().getWorld();
+        if (world != null) {
+            Region region = world.getWorldData(region3i);
+            SurfaceHumidityFacet surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
+            if (surfaceHumidityFacet != null) {
+                return surfaceHumidityFacet.getWorld(position.x, position.z);
+            }
+        }
+        return 0.5f;
     }
 }
