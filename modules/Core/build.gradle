@@ -215,6 +215,8 @@ task cacheReflections {
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
     doFirst {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        file(sourceSets.main.output.classesDir.toString()).mkdirs()
         Reflections reflections = new ConfigurationBuilder()
                 .addUrls(sourceSets.main.output.classesDir.toURI().toURL())
                 .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
