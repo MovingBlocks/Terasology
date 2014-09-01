@@ -16,36 +16,37 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
-import org.terasology.core.world.generator.facetProviders.BiomeProvider;
-import org.terasology.core.world.generator.facetProviders.EnsureSpawnableChunkZeroProvider;
-import org.terasology.core.world.generator.facetProviders.FloraProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinBaseSurfaceProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHillsAndMountainsProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinOceanProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
-import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.TreeProvider;
+import com.google.common.collect.Sets;
+import org.terasology.core.world.generator.facetProviders.*;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
+import org.terasology.math.Rect2i;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.Color;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldBuilder;
+import org.terasology.world.generation.WorldFacet;
+import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 import org.terasology.world.generator.RegisterWorldGenerator;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
+import org.terasology.world.generator.WorldGenerator2DPreview;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
  */
 @RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin Faceted", description = "Faceted world generator")
-public class PerlinFacetedWorldGenerator implements WorldGenerator {
+public class PerlinFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
     private final SimpleUri uri;
     private String worldSeed;
@@ -63,12 +64,10 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-    }
 
-    @Override
-    public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         world = new WorldBuilder(worldSeed.hashCode())
+                .addProvider(new World2dPreviewProvider())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinSurfaceTemperatureProvider())
@@ -82,10 +81,16 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
                 .addProvider(new TreeProvider())
                 .addProvider(new EnsureSpawnableChunkZeroProvider())
                         //.addRasterizer(new GroundRasterizer(blockManager))
-                .addRasterizer(new FloraRasterizer(blockManager))
-                .addRasterizer(new TreeRasterizer(blockManager))
-                .addRasterizer(new SolidRasterizer(blockManager))
+                .addRasterizer(new FloraRasterizer())
+                .addRasterizer(new TreeRasterizer())
+                .addRasterizer(new SolidRasterizer())
                 .build();
+
+    }
+
+    @Override
+    public void initialize() {
+        world.initialize();
     }
 
     @Override
@@ -102,4 +107,26 @@ public class PerlinFacetedWorldGenerator implements WorldGenerator {
     public World getWorld() {
         return world;
     }
+
+    @Override
+    public Color get(String layerName, Rect2i area) {
+        Map<String, Class<? extends WorldFacet>> namedFacets = getWorld().getNamedFacets();
+        Class<? extends WorldFacet> facetType = namedFacets.get(layerName);
+        Region3i area3d = Region3i.createFromMinAndSize(new Vector3i(area.minX(), 0, area.minY()), new Vector3i(area.sizeX(), 1, area.sizeY()));
+        Region region = getWorld().getWorldData(area3d);
+        ColorSummaryFacet colorSummaryFacet = (ColorSummaryFacet) region.getFacet(facetType);
+        return colorSummaryFacet.getColor();
+    }
+
+    @Override
+    public Iterable<String> getLayers() {
+        Set<String> layerNames = Sets.newHashSet();
+        for (Map.Entry<String, Class<? extends WorldFacet>> namedFacet : getWorld().getNamedFacets().entrySet()) {
+            if (ColorSummaryFacet.class.isAssignableFrom(namedFacet.getValue())) {
+                layerNames.add(namedFacet.getKey());
+            }
+        }
+        return layerNames;
+    }
+
 }

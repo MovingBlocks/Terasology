@@ -16,20 +16,11 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
-import org.terasology.core.world.generator.facetProviders.BiomeProvider;
-import org.terasology.core.world.generator.facetProviders.FloraProvider;
-import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
-import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.TreeProvider;
+import org.terasology.core.world.generator.facetProviders.*;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.World;
 import org.terasology.world.generation.WorldBuilder;
@@ -63,7 +54,6 @@ public class HeightMapWorldGenerator implements WorldGenerator {
 
     @Override
     public void initialize() {
-        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         world = new WorldBuilder(worldSeed.hashCode())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new HeightMapSurfaceHeightProvider())
@@ -73,9 +63,9 @@ public class HeightMapWorldGenerator implements WorldGenerator {
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new FloraProvider())
                 .addProvider(new TreeProvider())
-                .addRasterizer(new FloraRasterizer(blockManager))
-                .addRasterizer(new TreeRasterizer(blockManager))
-                .addRasterizer(new SolidRasterizer(blockManager))
+                .addRasterizer(new FloraRasterizer())
+                .addRasterizer(new TreeRasterizer())
+                .addRasterizer(new SolidRasterizer())
                 .build();
     }
 

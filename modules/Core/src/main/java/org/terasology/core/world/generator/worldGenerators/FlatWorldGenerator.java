@@ -16,14 +16,7 @@
 package org.terasology.core.world.generator.worldGenerators;
 
 import com.google.common.base.Optional;
-import org.terasology.core.world.generator.facetProviders.BiomeProvider;
-import org.terasology.core.world.generator.facetProviders.FlatSurfaceHeightProvider;
-import org.terasology.core.world.generator.facetProviders.FloraProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
-import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
-import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
-import org.terasology.core.world.generator.facetProviders.TreeProvider;
+import org.terasology.core.world.generator.facetProviders.*;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
@@ -71,9 +64,9 @@ public class FlatWorldGenerator implements WorldGenerator {
                 .addProvider(new SurfaceToDensityProvider())
                 .addProvider(new FloraProvider())
                 .addProvider(new TreeProvider())
-                .addRasterizer(new FloraRasterizer(blockManager))
-                .addRasterizer(new TreeRasterizer(blockManager))
-                .addRasterizer(new SolidRasterizer(blockManager))
+                .addRasterizer(new FloraRasterizer())
+                .addRasterizer(new TreeRasterizer())
+                .addRasterizer(new SolidRasterizer())
                 .build();
     }
 

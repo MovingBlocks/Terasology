@@ -17,6 +17,7 @@ package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.math.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -32,7 +33,9 @@ public class FloraRasterizer implements WorldRasterizer {
 
     private Block tallGrass;
 
-    public FloraRasterizer(BlockManager blockManager) {
+    @Override
+    public void initialize() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         tallGrass = blockManager.getBlock("core:TallGrass1");
     }
 

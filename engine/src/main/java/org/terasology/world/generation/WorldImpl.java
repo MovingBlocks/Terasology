@@ -16,6 +16,7 @@
 package org.terasology.world.generation;
 
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
 import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
@@ -56,6 +57,27 @@ public class WorldImpl implements World {
         Region chunkRegion = getWorldData(chunk.getRegion());
         for (WorldRasterizer rasterizer : worldRasterizers) {
             rasterizer.generateChunk(chunk, chunkRegion);
+        }
+    }
+
+    @Override
+    public Map<String, Class<? extends WorldFacet>> getNamedFacets() {
+        Map<String, Class<? extends WorldFacet>> facets = Maps.newHashMap();
+
+        for (Class<? extends WorldFacet> facetClass : facetProviderChains.keySet()) {
+            FacetName facetName = facetClass.getAnnotation(FacetName.class);
+            if (facetName != null && !facets.containsKey(facetName.value())) {
+                facets.put(facetName.value(), facetClass);
+            }
+        }
+
+        return facets;
+    }
+
+    @Override
+    public void initialize() {
+        for (WorldRasterizer rasterizer : worldRasterizers) {
+            rasterizer.initialize();
         }
     }
 }

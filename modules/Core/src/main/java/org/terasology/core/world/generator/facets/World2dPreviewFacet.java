@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.core.world.generator.facets;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.rendering.nui.Color;
+import org.terasology.world.generation.FacetName;
+import org.terasology.world.generation.WorldFacet;
+import org.terasology.world.generation.facets.base.ColorSummaryFacet;
 
-/**
- * @author Immortius
- */
-public interface WorldRasterizer {
-    void initialize();
+@FacetName("Surface")
+public class World2dPreviewFacet implements WorldFacet, ColorSummaryFacet {
+    Color color;
 
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
 }

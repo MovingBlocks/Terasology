@@ -15,13 +15,10 @@
  */
 package org.terasology.world.generation;
 
-import org.terasology.world.chunks.CoreChunk;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-/**
- * @author Immortius
- */
-public interface WorldRasterizer {
-    void initialize();
-
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FacetName {
+    String value();
 }

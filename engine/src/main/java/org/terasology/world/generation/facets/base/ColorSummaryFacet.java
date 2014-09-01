@@ -13,15 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.world.chunks.CoreChunk;
+import org.terasology.rendering.nui.Color;
 
-/**
- * @author Immortius
- */
-public interface WorldRasterizer {
-    void initialize();
-
-    void generateChunk(CoreChunk chunk, Region chunkRegion);
+public interface ColorSummaryFacet {
+    Color getColor();
 }

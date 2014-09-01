@@ -20,6 +20,7 @@ import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
@@ -42,7 +43,9 @@ public class SolidRasterizer implements WorldRasterizer {
     private Block snow;
     private Block dirt;
 
-    public SolidRasterizer(BlockManager blockManager) {
+    @Override
+    public void initialize() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         stone = blockManager.getBlock("core:stone");
         water = blockManager.getBlock("core:water");
         ice = blockManager.getBlock("core:Ice");

@@ -16,6 +16,7 @@
 package org.terasology.core.world.generator.rasterizers;
 
 import org.terasology.math.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.CoreChunk;
@@ -31,7 +32,9 @@ public class GroundRasterizer implements WorldRasterizer {
     private Block stone;
     private Block water;
 
-    public GroundRasterizer(BlockManager blockManager) {
+    @Override
+    public void initialize() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         stone = blockManager.getBlock("core:stone");
         water = blockManager.getBlock("core:water");
     }

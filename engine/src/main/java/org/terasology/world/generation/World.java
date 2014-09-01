@@ -18,6 +18,8 @@ package org.terasology.world.generation;
 import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
+import java.util.Map;
+
 /**
  * @author Immortius
  */
@@ -28,4 +30,8 @@ public interface World {
     Region getWorldData(Region3i region);
 
     void rasterizeChunk(CoreChunk chunk);
+
+    Map<String, Class<? extends WorldFacet>> getNamedFacets();
+
+    void initialize();
 }

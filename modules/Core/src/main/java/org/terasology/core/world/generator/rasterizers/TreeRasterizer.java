@@ -26,6 +26,7 @@ import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.math.LSystemRule;
 import org.terasology.math.Vector3i;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -43,7 +44,9 @@ public class TreeRasterizer implements WorldRasterizer {
     private Block tallGrass;
     private Multimap<Biome, TreeGenerator> treeGeneratorLookup = ArrayListMultimap.create();
 
-    public TreeRasterizer(BlockManager blockManager) {
+    @Override
+    public void initialize() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
         Map<Character, LSystemRule> rules = ImmutableMap.<Character, LSystemRule>builder()
                 .put('A', new LSystemRule("[&FFBFA]////[&BFFFA]////[&FBFFA]", 1.0f))
