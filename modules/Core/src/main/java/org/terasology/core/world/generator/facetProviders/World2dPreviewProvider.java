@@ -18,7 +18,11 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.core.world.generator.facets.World2dPreviewFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.nui.Color;
-import org.terasology.world.generation.*;
+import org.terasology.world.generation.Facet;
+import org.terasology.world.generation.FacetProvider;
+import org.terasology.world.generation.GeneratingRegion;
+import org.terasology.world.generation.Produces;
+import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
