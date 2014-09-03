@@ -131,35 +131,7 @@ task extractNatives {
     dependsOn extractMacOSXNatives
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Section for project modules (equally set up as modules in IntelliJ)                                               //
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Move this to the generated subproject gradle files? Or use project.childProjects even here?
-// TODO: This pretty much has been made obsolete by changes elsewhere. Do a last check (especially of libs) then remove
-subprojects {
-    // MODULES - most "exposed" project component type, users will supply these so need to be careful
-    if (project.getParent().name == "modules" ) {
-        // TODO: Verify a user-provided build.gradle cannot override the one we create
-        // Maybe Jenkins module builds should delete if exists then re-copy in from main project ?
-        println "Iterating over subprojects - Found a module: $project.name"
-    } else if (project.getParent().name == "facades" ) {
-        // FACADES - front-ends to the engine, fully under our control
-        println "Iterating over subprojects - Found a facade: " + project.name
-    } else if (project.getParent().name == "libs" ) {
-        println "Iterating over subprojects - Found a lib: " + project.name
-
-        apply plugin: 'java'
-        apply plugin: 'eclipse'
-        apply plugin: 'idea'
-    } else if (project.getParent().name == "meta" ) {
-        println "Iterating over a meta-module: " + project.name
-        apply plugin: 'eclipse'
-        apply plugin: 'idea'
-    } else {
-        println "Iterating over something else: " + project.name
-    }
-}
+// TODO: Test meta modules and other libs - not that there's really much to test other than being able to Git via Gradle
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Helper tasks                                                                                                      //

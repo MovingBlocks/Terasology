@@ -100,7 +100,8 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
-task setupServerConfig() {
+// By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
+task setupServerConfig() << {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
     
     def json = new JsonBuilder()
@@ -133,12 +134,12 @@ task setupServerConfig() {
     config.text = json.toPrettyString()
 }
 
-task setupServerModules(type: Sync) {
+task setupServerModules(type: Sync) << {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
     if (project.hasProperty('extraModules')) {
         // Grab modules from Artifactory - cheats by declaring them as dependencies
-        extraModules.split(',').each { String module ->
+        extraModules.tokenize(' ,').each { String module ->
             println "Extra module: " + module
             dependencies {
                 modules group: 'org.terasology.modules', name: module, version: '+'
@@ -247,7 +248,7 @@ task distModules (type: Sync) {
 
     // If the execution was supplied with an extraModules property then include those modules as well
     if (project.hasProperty('extraModules')) {
-        extraModules.split(',').each { String dependency ->
+        extraModules.tokenize(' ,').each { String dependency ->
             println "Extra module: " + dependency
 
             // See if the supplied extra already exists in the local workspace, in that case don't add it again
@@ -276,6 +277,8 @@ task distModules (type: Sync) {
 }
 
 task distAppZip (type: Zip) {
+    dependsOn distApp
+    dependsOn distModules
     from "$distsDir/app"
     archiveName = "Terasology.zip"
 }

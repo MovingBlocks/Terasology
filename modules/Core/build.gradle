@@ -1,4 +1,5 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
+// TODO: Verify a user-provided build.gradle (from the git repo) cannot override the one we create - Jenkins security risk
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
 apply from: "$rootDir/config/gradle/common.gradle"
