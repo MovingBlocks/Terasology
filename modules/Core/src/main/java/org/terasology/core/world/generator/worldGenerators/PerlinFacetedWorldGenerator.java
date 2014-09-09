@@ -57,7 +57,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-@RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin Faceted", description = "Faceted world generator")
+@RegisterWorldGenerator(id = "facetedperlin", displayName = "Perlin", description = "Faceted world generator")
 public class PerlinFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
     private final SimpleUri uri;

@@ -20,13 +20,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.core.world.internal.WorldBiomeProviderImpl;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.Color;
-import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
@@ -48,7 +46,6 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
 
     private String worldSeed;
-    private WorldBiomeProvider biomeProvider;
     private final List<ChunkGenerationPass> generationPasses = Lists.newArrayList();
     private final SimpleUri uri;
 
@@ -66,9 +63,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-        biomeProvider = new WorldBiomeProviderImpl(seed);
         for (final ChunkGenerationPass generator : generationPasses) {
-            setBiome(generator);
             generator.setWorldSeed(seed);
         }
     }
@@ -79,12 +74,7 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     }
 
     private void registerPass(final ChunkGenerationPass generator) {
-        setBiome(generator);
         generator.setWorldSeed(worldSeed);
-    }
-
-    private void setBiome(ChunkGenerationPass generator) {
-        generator.setWorldBiomeProvider(biomeProvider);
     }
 
     @Override

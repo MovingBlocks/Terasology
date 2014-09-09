@@ -38,8 +38,6 @@ import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
-import org.terasology.world.generation.facets.SurfaceHumidityFacet;
-import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
@@ -293,32 +291,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public float getTemperature(float x, float y, float z) {
-        Vector3i position = new Vector3i(x, y, z, 0.5f);
-        Region3i region3i = Region3i.createFromMinAndSize(position, Vector3i.one());
+    public Region getWorldData(Region3i region) {
         World world = chunkProvider.getWorldGenerator().getWorld();
         if (world != null) {
-            Region region = world.getWorldData(region3i);
-            SurfaceTemperatureFacet surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
-            if (surfaceTemperatureFacet != null) {
-                return surfaceTemperatureFacet.getWorld(position.x, position.z);
-            }
+            return world.getWorldData(region);
+        } else {
+            return null;
         }
-        return 0.5f;
     }
 
-    @Override
-    public float getHumidity(float x, float y, float z) {
-        Vector3i position = new Vector3i(x, y, z, 0.5f);
-        Region3i region3i = Region3i.createFromMinAndSize(position, Vector3i.one());
-        World world = chunkProvider.getWorldGenerator().getWorld();
-        if (world != null) {
-            Region region = world.getWorldData(region3i);
-            SurfaceHumidityFacet surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
-            if (surfaceHumidityFacet != null) {
-                return surfaceHumidityFacet.getWorld(position.x, position.z);
-            }
-        }
-        return 0.5f;
-    }
 }

@@ -1199,10 +1199,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
+                        + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
 
                 ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
-                getPlayerBiome(),
                 worldProvider.getTime().getDays(),
                 DefaultRenderingProcess.getInstance().getExposure(),
                 statDirtyChunks,
@@ -1257,12 +1256,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     public float getDaylight() {
         return skysphere.getDaylight();
-    }
-
-    //TODO: make this data into key value pairs
-    public String getPlayerBiome() {
-        Vector3f pos = getPlayerPosition();
-        return "Temperature: " + worldProvider.getTemperature(pos) + " Humidity: " + worldProvider.getHumidity(pos);
     }
 
     public WorldProvider getWorldProvider() {

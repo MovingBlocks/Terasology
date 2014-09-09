@@ -16,10 +16,12 @@
 
 package org.terasology.world.internal;
 
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.generation.Region;
 import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
@@ -102,6 +104,11 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
+    public Region getWorldData(Region3i region) {
+        return core.getWorldData(region);
+    }
+
+    @Override
     public void processPropagation() {
         core.processPropagation();
     }
@@ -116,13 +123,4 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
         core.unregisterListener(listener);
     }
 
-    @Override
-    public float getTemperature(Vector3f pos) {
-        return core.getTemperature(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public float getHumidity(Vector3f pos) {
-        return core.getHumidity(pos.x, pos.y, pos.z);
-    }
 }
