@@ -18,27 +18,13 @@ package org.terasology.rendering.assets.font;
 
 import org.terasology.asset.Asset;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.nui.HorizontalAlign;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
  */
 public interface Font extends Asset<FontData> {
-
-    void drawString(int x, int y, String text, org.newdawn.slick.Color color);
-
-    /**
-     * Produces a map of texture to mesh to render the given text.
-     *
-     * @param lines
-     * @return A map of texture to mesh, where each texture is a font page and each mesh is the characters of that mesh page.
-     */
-    Map<Material, Mesh> createTextMesh(List<String> lines, int width, HorizontalAlign alignment);
 
     int getWidth(String text);
 
@@ -51,4 +37,6 @@ public interface Font extends Asset<FontData> {
     Vector2i getSize(List<String> lines);
 
     boolean hasCharacter(Character c);
+
+    FontCharacter getCharacterData(Character c);
 }

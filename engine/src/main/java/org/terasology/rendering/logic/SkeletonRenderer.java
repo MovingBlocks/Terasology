@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
@@ -38,6 +37,7 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.MatrixUtils;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.material.Material;
@@ -65,26 +65,18 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
+public class SkeletonRenderer extends BaseComponentSystem implements RenderSystem, UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(SkeletonRenderer.class);
 
+    @In
     private EntityManager entityManager;
+
+    @In
     private WorldRenderer worldRenderer;
 
     @In
     private Config config;
-
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
-    }
-
-    @Override
-    public void shutdown() {
-
-    }
 
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
     public void newSkeleton(OnActivatedComponent event, EntityRef entity) {
@@ -203,6 +195,8 @@ public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
             Vector3f worldPositionCameraSpace = new Vector3f();
             worldPositionCameraSpace.sub(worldPos, cameraPosition);
+
+            worldPos.y -= skeletalMesh.heightOffset;
 
             float worldScale = location.getWorldScale();
             matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);

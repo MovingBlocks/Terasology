@@ -20,8 +20,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.AttackRequest;
@@ -30,9 +29,9 @@ import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
@@ -43,6 +42,7 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
+import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -51,7 +51,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterSystem
-public class CharacterSystem implements ComponentSystem {
+public class CharacterSystem extends BaseComponentSystem {
 
     @In
     private Physics physics;
@@ -74,15 +74,11 @@ public class CharacterSystem implements ComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
-    }
-
-    @Override
-    public void shutdown() {
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    public void onDeath(DestroyEvent event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
         character.controller.send(new DeathEvent());
         // TODO: Don't just destroy, ragdoll or create particle effect or something (possible allow another system to handle)
@@ -143,7 +139,7 @@ public class CharacterSystem implements ComponentSystem {
                 }
             }
 
-            result.getEntity().send(new DoDamageEvent(damage, damageType, character));
+            result.getEntity().send(new DoDamageEvent(damage, damageType, character, event.getItem()));
         }
     }
 

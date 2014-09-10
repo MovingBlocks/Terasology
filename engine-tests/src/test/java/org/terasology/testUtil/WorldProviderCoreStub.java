@@ -17,12 +17,13 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
-import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.WorldChangeListener;
-import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.block.Block;
+import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.WorldInfo;
+import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
@@ -38,6 +39,11 @@ public class WorldProviderCoreStub implements WorldProviderCore {
 
     public WorldProviderCoreStub(Block air) {
         this.air = air;
+    }
+
+    @Override
+    public EntityRef getWorldEntity() {
+        return EntityRef.NULL;
     }
 
     @Override

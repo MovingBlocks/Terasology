@@ -23,7 +23,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.identity.BadEncryptedDataException;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
@@ -111,7 +111,7 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
 
         // Identity has been established, inform the server handler and withdraw from the pipeline
         ctx.getPipeline().remove(this);
-        serverConnectionHandler.channelAuthenticated(clientCert, ctx);
+        serverConnectionHandler.channelAuthenticated(clientCert);
     }
 
     private void processNewIdentityRequest(NetData.NewIdentityRequest newIdentityRequest, ChannelHandlerContext ctx) {
@@ -147,7 +147,7 @@ public class ServerHandshakeHandler extends SimpleChannelUpstreamHandler {
 
             // Identity has been established, inform the server handler and withdraw from the pipeline
             ctx.getPipeline().remove(this);
-            serverConnectionHandler.channelAuthenticated(clientCertificates.getPublicCert(), ctx);
+            serverConnectionHandler.channelAuthenticated(clientCertificates.getPublicCert());
         } catch (BadEncryptedDataException e) {
             logger.error("Received invalid encrypted pre-master secret, ending connection attempt");
             ctx.getChannel().close();

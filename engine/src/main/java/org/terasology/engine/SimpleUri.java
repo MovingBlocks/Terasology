@@ -17,7 +17,8 @@ package org.terasology.engine;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.module.UriUtil;
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
 
 /**
  * A URI to identify standard objects in Terasology - components, events, etc. These URIs are always in the form: <module-name>:<object-name>. They are case-insensitive (using
@@ -26,12 +27,9 @@ import org.terasology.engine.module.UriUtil;
  * @author synopia
  */
 @API
-public class SimpleUri extends AbstractBaseUri {
-    private String moduleName = "";
-    private String objectName = "";
-
-    private String normalisedModuleName = "";
-    private String normalisedObjectName = "";
+public class SimpleUri implements Uri, Comparable<SimpleUri> {
+    private Name moduleName = Name.EMPTY;
+    private Name objectName = Name.EMPTY;
 
     /**
      * Creates an empty, invalid SimpleUri
@@ -41,52 +39,61 @@ public class SimpleUri extends AbstractBaseUri {
 
     /**
      * Creates a SimpleUri for the given module:object combo
+     *
      * @param moduleName
      * @param objectName
      */
     public SimpleUri(String moduleName, String objectName) {
+        this(new Name(moduleName), new Name(objectName));
+    }
+
+    /**
+     * Creates a SimpleUri for the given module:object combo
+     *
+     * @param moduleName
+     * @param objectName
+     */
+    public SimpleUri(Name moduleName, String objectName) {
+        this(moduleName, new Name(objectName));
+    }
+
+    /**
+     * Creates a SimpleUri for the given module:object combo
+     *
+     * @param moduleName
+     * @param objectName
+     */
+    public SimpleUri(Name moduleName, Name objectName) {
         Preconditions.checkNotNull(moduleName);
         Preconditions.checkNotNull(objectName);
         this.moduleName = moduleName;
         this.objectName = objectName;
-        this.normalisedModuleName = UriUtil.normalise(moduleName);
-        this.normalisedObjectName = UriUtil.normalise(objectName);
     }
 
     /**
      * Creates a SimpleUri from a string in the format "module:object". If the string does not match this format, it will be marked invalid
+     *
      * @param simpleUri
      */
     public SimpleUri(String simpleUri) {
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
-            moduleName = split[0];
-            normalisedModuleName = UriUtil.normalise(split[0]);
-            objectName = split[1];
-            normalisedObjectName = UriUtil.normalise(split[1]);
+            moduleName = new Name(split[0]);
+            objectName = new Name(split[1]);
         }
     }
 
     @Override
-    public String getModuleName() {
+    public Name getModuleName() {
         return moduleName;
     }
 
-    @Override
-    public String getNormalisedModuleName() {
-        return normalisedModuleName;
-    }
-
-    public String getObjectName() {
+    public Name getObjectName() {
         return objectName;
     }
 
-    public String getNormalisedObjectName() {
-        return normalisedObjectName;
-    }
-
     public boolean isValid() {
-        return !normalisedModuleName.isEmpty() && !normalisedObjectName.isEmpty();
+        return !moduleName.isEmpty() && !objectName.isEmpty();
     }
 
     @Override
@@ -98,28 +105,28 @@ public class SimpleUri extends AbstractBaseUri {
     }
 
     @Override
-    public String toNormalisedString() {
-        if (!isValid()) {
-            return "";
-        }
-        return normalisedModuleName + MODULE_SEPARATOR + normalisedObjectName;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }
         if (obj instanceof SimpleUri) {
             SimpleUri other = (SimpleUri) obj;
-            return Objects.equal(normalisedModuleName, other.normalisedModuleName) && Objects.equal(normalisedObjectName, other.normalisedObjectName);
+            return Objects.equal(moduleName, other.moduleName) && Objects.equal(objectName, other.objectName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(normalisedModuleName, normalisedObjectName);
+        return Objects.hashCode(moduleName, objectName);
     }
 
+    @Override
+    public int compareTo(SimpleUri o) {
+        int result = moduleName.compareTo(o.getModuleName());
+        if (result == 0) {
+            result = objectName.compareTo(o.getObjectName());
+        }
+        return result;
+    }
 }

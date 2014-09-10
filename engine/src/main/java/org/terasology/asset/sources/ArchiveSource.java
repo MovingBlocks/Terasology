@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +36,13 @@ public class ArchiveSource extends AbstractSource {
 
     private final Logger logger = LoggerFactory.getLogger(ArchiveSource.class);
 
-    public ArchiveSource(String sourceId, File archive, String assetsPath, String overridesPath) {
+    public ArchiveSource(Name sourceId, File archive, String assetsPath, String overridesPath, String deltasPath) {
         super(sourceId);
 
         try {
             scanArchiveForAssets(archive, assetsPath);
             scanArchiveForOverrides(archive, overridesPath);
+            scanArchiveForDeltas(archive, deltasPath);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
@@ -66,7 +68,10 @@ public class ArchiveSource extends AbstractSource {
                 if (entryPath.startsWith(overridesPath)) {
                     String key = entryPath.substring(overridesPath.length() + 1);
                     int moduleIndex = key.indexOf('/');
-                    String moduleName = key.substring(0, moduleIndex);
+                    if (moduleIndex == -1) {
+                        continue;
+                    }
+                    Name moduleName = new Name(key.substring(0, moduleIndex));
                     key = key.substring(moduleIndex + 1);
 
                     AssetUri uri = getUri(moduleName, key);
@@ -79,6 +84,49 @@ public class ArchiveSource extends AbstractSource {
                     // Using a jar protocol for zip files, because cannot register new protocols for the applet
                     URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
                     addOverride(uri, url);
+                }
+            }
+        } finally {
+            archive.close();
+        }
+    }
+
+    private void scanArchiveForDeltas(File file, String deltaPath) throws IOException {
+        ZipFile archive;
+
+        if (file.getName().endsWith(".jar")) {
+            archive = new JarFile(file, false);
+        } else {
+            archive = new ZipFile(file);
+        }
+
+        try {
+            Enumeration<? extends ZipEntry> lister = archive.entries();
+
+            while (lister.hasMoreElements()) {
+                ZipEntry entry = lister.nextElement();
+                String entryPath = entry.getName();
+                logger.debug("Found {}", entryPath);
+
+                if (entryPath.startsWith(deltaPath)) {
+                    String key = entryPath.substring(deltaPath.length() + 1);
+                    int moduleIndex = key.indexOf('/');
+                    if (moduleIndex == -1) {
+                        continue;
+                    }
+                    Name moduleName = new Name(key.substring(0, moduleIndex));
+                    key = key.substring(moduleIndex + 1);
+
+                    AssetUri uri = getUri(moduleName, key);
+                    if (uri == null || !uri.isValid()) {
+                        continue;
+                    }
+
+                    logger.debug("Discovered delta {} at {}", uri, entryPath);
+
+                    // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                    URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
+                    setDelta(uri, url);
                 }
             }
         } finally {
@@ -121,4 +169,5 @@ public class ArchiveSource extends AbstractSource {
             archive.close();
         }
     }
+
 }

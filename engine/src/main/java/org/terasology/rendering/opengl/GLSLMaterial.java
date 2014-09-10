@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,27 +27,21 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.math.MatrixUtils;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.assets.material.Material;
+import org.terasology.rendering.assets.material.BaseMaterial;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.shader.ShaderParameters;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Tuple2f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Tuple4f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,7 +53,7 @@ import java.util.Set;
  * @author Immortius
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class GLSLMaterial extends AbstractAsset<MaterialData> implements Material {
+public class GLSLMaterial extends BaseMaterial {
 
     private static final Logger logger = LoggerFactory.getLogger(GLSLMaterial.class);
 
@@ -67,7 +61,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
     private TIntIntMap shaderPrograms = new TIntIntHashMap();
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<>();
-    private TIntObjectMap<OpenGLTexture> textureMap = new TIntObjectHashMap<>();
+    private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<>();
     private GLSLShader shader;
     private boolean activeFeaturesChanged;
     private TObjectIntMap<UniformId> uniformLocationMap = new TObjectIntHashMap<>();
@@ -124,6 +118,14 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
     @Override
     public void recompile() {
+        TIntIntIterator it = shaderPrograms.iterator();
+        while (it.hasNext()) {
+            it.advance();
+            GL20.glDeleteProgram(it.value());
+        }
+        shaderPrograms.clear();
+        uniformLocationMap.clear();
+
         shaderPrograms.put(0, shader.linkShaderProgram(0));
         for (Set<ShaderProgramFeature> permutation : Sets.powerSet(shader.getAvailableFeatures())) {
             int featureMask = ShaderProgramFeature.getBitset(permutation);
@@ -135,8 +137,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void reload(MaterialData data) {
-        Util.checkGLError();
+    public final void reload(MaterialData data) {
         dispose();
 
         shader = (GLSLShader) data.getShader();
@@ -168,14 +169,15 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
                 case 4:
                     setFloat4(entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2], entry.getValue()[3]);
                     break;
+                default:
+                    logger.error("MaterialData contains float array entry of size > 4");
+                    break;
             }
         }
-        Util.checkGLError();
     }
 
     @Override
     public void dispose() {
-        Util.checkGLError();
         logger.debug("Disposing material {}.", getURI());
 
         TIntIntIterator it = shaderPrograms.iterator();
@@ -186,8 +188,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
         shaderPrograms.clear();
         uniformLocationMap.clear();
         shader = null;
-        Util.checkGLError();
-
     }
 
     @Override
@@ -218,7 +218,7 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
             bindMap.put(desc, texId);
         }
 
-        textureMap.put(texId, (OpenGLTexture) texture);
+        textureMap.put(texId, texture);
     }
 
     @Override
@@ -248,21 +248,8 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setCamera(Camera camera) {
-        setMatrix4("viewMatrix", camera.getViewMatrix());
-        setMatrix4("projMatrix", camera.getProjectionMatrix());
-        setMatrix4("viewProjMatrix", camera.getViewProjectionMatrix());
-        setMatrix4("invProjMatrix", camera.getInverseProjectionMatrix());
-    }
-
-    @Override
     public boolean supportsFeature(ShaderProgramFeature feature) {
         return shader.getAvailableFeatures().contains(feature);
-    }
-
-    @Override
-    public void setFloat(String desc, float f) {
-        setFloat(desc, f, false);
     }
 
     @Override
@@ -289,11 +276,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setFloat1(String desc, FloatBuffer buffer) {
-        setFloat1(desc, buffer, false);
-    }
-
-    @Override
     public void setFloat1(String desc, FloatBuffer buffer, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -314,11 +296,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setFloat2(String desc, float f1, float f2) {
-        setFloat2(desc, f1, f2, false);
     }
 
     @Override
@@ -345,21 +322,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setFloat2(String name, Tuple2f value) {
-        setFloat2(name, value.x, value.y);
-    }
-
-    @Override
-    public void setFloat2(String name, Tuple2f value, boolean currentOnly) {
-        setFloat2(name, value.x, value.y, currentOnly);
-    }
-
-    @Override
-    public void setFloat2(String desc, FloatBuffer buffer) {
-        setFloat2(desc, buffer, false);
-    }
-
-    @Override
     public void setFloat2(String desc, FloatBuffer buffer, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -380,11 +342,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setFloat3(String desc, float f1, float f2, float f3) {
-        setFloat3(desc, f1, f2, f3, false);
     }
 
     @Override
@@ -411,21 +368,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setFloat3(String name, Tuple3f value) {
-        setFloat3(name, value.x, value.y, value.z);
-    }
-
-    @Override
-    public void setFloat3(String name, Tuple3f value, boolean currentOnly) {
-        setFloat3(name, value.x, value.y, value.z, currentOnly);
-    }
-
-    @Override
-    public void setFloat3(String desc, FloatBuffer buffer) {
-        setFloat3(desc, buffer, false);
-    }
-
-    @Override
     public void setFloat3(String desc, FloatBuffer buffer, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -446,11 +388,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
-        setFloat4(desc, f1, f2, f3, f4, false);
     }
 
     @Override
@@ -477,21 +414,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setFloat4(String name, Tuple4f value) {
-        setFloat4(name, value.x, value.y, value.z, value.w);
-    }
-
-    @Override
-    public void setFloat4(String name, Tuple4f value, boolean currentOnly) {
-        setFloat4(name, value.x, value.y, value.z, value.w, currentOnly);
-    }
-
-    @Override
-    public void setFloat4(String desc, FloatBuffer buffer) {
-        setFloat4(desc, buffer, false);
-    }
-
-    @Override
     public void setFloat4(String desc, FloatBuffer buffer, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -512,11 +434,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setInt(String desc, int i) {
-        setInt(desc, i, false);
     }
 
     @Override
@@ -543,11 +460,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setBoolean(String desc, boolean value) {
-        setBoolean(desc, value, false);
-    }
-
-    @Override
     public void setBoolean(String desc, boolean value, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -568,11 +480,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setMatrix3(String desc, Matrix3f value) {
-        setMatrix3(desc, value, false);
     }
 
     @Override
@@ -599,11 +506,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setMatrix3(String desc, FloatBuffer value) {
-        setMatrix3(desc, value, false);
-    }
-
-    @Override
     public void setMatrix3(String desc, FloatBuffer value, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -627,11 +529,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
     }
 
     @Override
-    public void setMatrix4(String desc, Matrix4f value) {
-        setMatrix4(desc, value, false);
-    }
-
-    @Override
     public void setMatrix4(String desc, Matrix4f value, boolean currentOnly) {
         if (isDisposed()) {
             return;
@@ -652,11 +549,6 @@ public class GLSLMaterial extends AbstractAsset<MaterialData> implements Materia
 
             restoreStateAfterUniformsSet();
         }
-    }
-
-    @Override
-    public void setMatrix4(String desc, FloatBuffer value) {
-        setMatrix3(desc, value, false);
     }
 
     @Override

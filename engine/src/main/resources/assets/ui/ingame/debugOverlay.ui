@@ -1,0 +1,39 @@
+{
+    "type" : "debugOverlay",
+    "skin" : "debugOverlay",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "ColumnLayout",
+                "contents" : [
+                    {
+                        "type" : "UILabel",
+                        "id" : "debugLine1"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "id" : "debugLine2"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "id" : "debugLine3"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "id" : "debugLine4"
+                    },
+                    {
+                        "type" : "UILabel",
+                        "id" : "metrics"
+                    }
+                ],
+                "layoutInfo" : {
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-vertical-top" : {}
+                }
+            }
+        ]
+    }
+}

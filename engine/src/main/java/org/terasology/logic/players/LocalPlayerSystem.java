@@ -17,17 +17,15 @@ package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
-import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.interaction.FrobButton;
+import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.binds.movement.RunButton;
 import org.terasology.input.binds.movement.StrafeMovementAxis;
@@ -40,13 +38,13 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
@@ -66,11 +64,12 @@ import javax.vecmath.Vector3f;
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
-public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
+public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
+    @In
     private LocalPlayer localPlayer;
+    @In
     private CameraTargetSystem cameraTargetSystem;
-    private Time time;
-
+    @In
     private WorldProvider worldProvider;
     private Camera playerCamera;
 
@@ -89,21 +88,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
-
-    @In
-    private SlotBasedInventoryManager inventoryManager;
-
-    @Override
-    public void initialise() {
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        localPlayer = CoreRegistry.get(LocalPlayer.class);
-        time = CoreRegistry.get(Time.class);
-        cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -224,9 +208,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
             BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
             if (blockComp != null || blockRegion != null) {
                 Block block = worldProvider.getBlock(blockPos);
-                if (block.isTargetable()) {
-                    aabb = block.getBounds(blockPos);
-                }
+                aabb = block.getBounds(blockPos);
             } else {
                 MeshComponent mesh = target.getComponent(MeshComponent.class);
                 LocationComponent location = target.getComponent(LocationComponent.class);

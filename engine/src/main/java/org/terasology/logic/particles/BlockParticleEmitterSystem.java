@@ -25,13 +25,14 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.logic.NearestSortingList;
@@ -78,7 +79,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists
 @RegisterSystem(RegisterMode.CLIENT)
-public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
+public class BlockParticleEmitterSystem extends BaseComponentSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
 
     @In
@@ -229,7 +230,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     private void render(Iterable<EntityRef> particleEntities) {
-        Assets.getMaterial("engine:particle").enable();
+        Assets.getMaterial("engine:prog.particle").enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -341,7 +342,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         mat.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
         mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
@@ -352,7 +353,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     protected void renderParticle(Particle particle, Block block, float temperature, float humidity, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);

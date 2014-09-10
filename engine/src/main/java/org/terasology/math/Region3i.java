@@ -187,8 +187,9 @@ public final class Region3i implements Iterable<Vector3i> {
      */
     public Vector3f center() {
         Vector3f result = min.toVector3f();
-        result.add(size.toVector3f());
-        result.scale(0.5f);
+        Vector3f halfSize = size.toVector3f();
+        halfSize.scale(0.5f);
+        result.add(halfSize);
         return result;
     }
 

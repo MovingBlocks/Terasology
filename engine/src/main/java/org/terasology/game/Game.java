@@ -19,10 +19,13 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModuleConfig;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.EngineTime;
-import org.terasology.engine.module.Module;
+import org.terasology.engine.ComponentSystemManager;
+import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.module.Module;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldProvider;
@@ -43,7 +46,10 @@ public class Game {
     private String name = "";
     private String seed = "";
 
-    public Game(EngineTime time) {
+    private TerasologyEngine terasologyEngine;
+
+    public Game(TerasologyEngine terasologyEngine, EngineTime time) {
+        this.terasologyEngine = terasologyEngine;
         this.time = time;
     }
 
@@ -59,20 +65,24 @@ public class Game {
     }
 
     public void save() {
+        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.preSave();
+        }
+        terasologyEngine.stopThreads();
+
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
             BlockManager blockManager = CoreRegistry.get(BlockManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
             ModuleConfig moduleConfig = new ModuleConfig();
-            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
-                moduleConfig.addModule(module.getId());
-            }
-
             GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
-            for (Module module : CoreRegistry.get(ModuleManager.class).getActiveModules()) {
+            for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+                moduleConfig.addModule(module.getId());
                 gameManifest.addModule(module.getId(), module.getVersion());
             }
+
             List<String> registeredBlockFamilies = Lists.newArrayList();
             for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
                 registeredBlockFamilies.add(family.getURI().toString());
@@ -93,6 +103,12 @@ public class Game {
                 logger.error("Failed to save game", e);
             }
             storageManager.shutdown();
+        }
+
+        terasologyEngine.restartThreads();
+
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.postSave();
         }
 
 

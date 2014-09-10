@@ -1,0 +1,16 @@
+{
+    "inherit" : "default",
+    "elements" : {
+        "UIScreenLayer" : {
+            "background-scale-mode" : "stretch",
+            "background" : "reddenedBackground"
+        },
+        "UIButton" : {
+            "min-width" : 128,
+            "min-height" : 32
+        },
+        "UILabel" : {
+            "font" : "title"
+        }
+    }
+}

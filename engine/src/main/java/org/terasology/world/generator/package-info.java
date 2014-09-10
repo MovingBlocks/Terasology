@@ -16,4 +16,4 @@
 
 @API package org.terasology.world.generator;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

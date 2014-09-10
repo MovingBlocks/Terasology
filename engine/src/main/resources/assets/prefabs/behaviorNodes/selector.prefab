@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "SelectorNode",
+        "name"      : "Selector",
+        "category"  : "logic",
+        "shape"     : "diamond",
+        "description": "Composite\nEvaluates the children one by one.\nStarts next child, if previous child finishes with FAILURE.\nSUCCESS: as soon as a child finishes SUCCESS.\nFAILURE: when all children finished with FAILURE.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

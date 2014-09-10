@@ -21,12 +21,14 @@ import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.SubRegion;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.widgets.UIScrollbar;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -35,8 +37,17 @@ import java.util.Iterator;
 public class ScrollableArea extends CoreLayout {
     private static final int SCROLL_MULTIPLIER = -42;
 
+    @LayoutConfig
     private UIWidget content;
+
+    @LayoutConfig
+    private boolean stickToBottom;
+
     private UIScrollbar scrollbar = new UIScrollbar();
+
+
+    private boolean moveToBottomPending;
+    private boolean moveToTopPending;
 
     private InteractionListener scrollListener = new BaseInteractionListener() {
         @Override
@@ -48,18 +59,29 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int contentHeight = canvas.calculateRestrictedSize(content, canvas.size()).y;
+        int contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x, Integer.MAX_VALUE)).y;
         if (canvas.size().y < contentHeight) {
             int scrollbarWidth = canvas.calculateRestrictedSize(scrollbar, canvas.size()).x;
-            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, canvas.size().y)).y;
+            contentHeight = canvas.calculateRestrictedSize(content, new Vector2i(canvas.size().x - scrollbarWidth, Integer.MAX_VALUE)).y;
+
+            boolean atBottom = scrollbar.getRange() == scrollbar.getValue();
+
+            Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
+            scrollbar.setRange(contentHeight - contentRegion.height());
+            if ((stickToBottom && atBottom) || moveToBottomPending) {
+                scrollbar.setValue(scrollbar.getRange());
+                moveToBottomPending = false;
+            }
+            if (moveToTopPending) {
+                scrollbar.setValue(0);
+                moveToTopPending = false;
+            }
 
             canvas.addInteractionRegion(scrollListener);
             canvas.drawWidget(scrollbar, Rect2i.createFromMinAndSize(canvas.size().x - scrollbarWidth, 0,
                     scrollbarWidth, canvas.size().y));
 
             // Draw content
-            Rect2i contentRegion = Rect2i.createFromMinAndSize(0, 0, canvas.size().x - scrollbarWidth, canvas.size().y);
-            scrollbar.setRange(contentHeight - contentRegion.height());
             try (SubRegion ignored = canvas.subRegion(contentRegion, true)) {
                 canvas.drawWidget(content, Rect2i.createFromMinAndSize(0, -scrollbar.getValue(), canvas.size().x, contentHeight));
             }
@@ -74,7 +96,7 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sizeHint;
+        return canvas.calculatePreferredSize(content);
     }
 
     @Override
@@ -84,11 +106,31 @@ public class ScrollableArea extends CoreLayout {
 
     @Override
     public Iterator<UIWidget> iterator() {
-        return Arrays.asList(content).iterator();
+        if (content != null) {
+            return Arrays.asList(content).iterator();
+        }
+        return Collections.emptyIterator();
     }
 
     @Override
     public void addWidget(UIWidget element, LayoutHint hint) {
-
+        content = element;
     }
+
+    public boolean isStickToBottom() {
+        return stickToBottom;
+    }
+
+    public void setStickToBottom(boolean stickToBottom) {
+        this.stickToBottom = stickToBottom;
+    }
+
+    public void moveToBottom() {
+        moveToBottomPending = true;
+    }
+
+    public void moveToTop() {
+        moveToTopPending = true;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.terasology.audio.nullAudio;
 
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
 import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
@@ -44,31 +44,47 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void playSound(Sound sound) {
+    public void playSound(StaticSound sound) {
     }
 
     @Override
-    public void playSound(Sound sound, float volume) {
+    public void playSound(StaticSound sound, float volume) {
     }
 
     @Override
-    public void playSound(Sound sound, float volume, int priority) {
+    public void playSound(StaticSound sound, float volume, int priority) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position) {
+    public void playSound(StaticSound sound, Vector3f position) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position, float volume) {
+    public void playSound(StaticSound sound, Vector3f position, float volume) {
     }
 
     @Override
-    public void playSound(Sound sound, Vector3f position, float volume, int priority) {
+    public void playSound(StaticSound sound, Vector3f position, float volume, int priority) {
     }
 
     @Override
-    public void playMusic(Sound sound) {
+    public void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener) {
+    }
+
+    @Override
+    public void playMusic(StreamingSound sound) {
+    }
+
+    @Override
+    public void playMusic(StreamingSound sound, float volume) {
+    }
+
+    @Override
+    public void playMusic(StreamingSound sound, AudioEndListener endListener) {
+    }
+
+    @Override
+    public void playMusic(StreamingSound sound, float volume, AudioEndListener endListener) {
     }
 
     @Override

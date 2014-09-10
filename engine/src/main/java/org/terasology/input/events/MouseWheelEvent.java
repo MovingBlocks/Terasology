@@ -17,19 +17,27 @@
 package org.terasology.input.events;
 
 
+import org.terasology.math.Vector2i;
+
 /**
  * @author Immortius
  */
 public class MouseWheelEvent extends InputEvent {
 
     private int wheelTurns;
+    private Vector2i mousePosition = new Vector2i();
 
-    public MouseWheelEvent(int wheelTurns, float delta) {
+    public MouseWheelEvent(Vector2i mousePosition, int wheelTurns, float delta) {
         super(delta);
         this.wheelTurns = wheelTurns;
+        this.mousePosition.set(mousePosition);
     }
 
     public int getWheelTurns() {
         return wheelTurns;
+    }
+
+    public Vector2i getMousePosition() {
+        return mousePosition;
     }
 }

@@ -26,6 +26,7 @@ public class TeraMathTest {
 
     private static final double MAX_DOUBLE_ERROR = 0.00001;
 
+
     @Test
     public void getEdgeRegion() {
         Region3i region = Region3i.createFromMinAndSize(new Vector3i(16, 0, 16), new Vector3i(16, 128, 16));
@@ -86,6 +87,7 @@ public class TeraMathTest {
         }
     }
 
+
     // JUnit's assertEquals(expected, value, delta) uses delta as the maximum difference from expected and value
     // This approach is not acceptable for large doubles whose precision decreases as numbers grows
     // Therefore this function uses delta as the maximum deviation of the actual from the expected value
@@ -105,4 +107,6 @@ public class TeraMathTest {
             fail(msg);
         }
     }
+
+
 }

@@ -43,7 +43,7 @@ public class LoadPrefabs extends StepBasedLoadProcess {
     public boolean step() {
         if (prefabs.hasNext()) {
             Assets.get(prefabs.next(), Prefab.class);
-            step();
+            stepDone();
         }
         return !prefabs.hasNext();
     }
@@ -52,5 +52,10 @@ public class LoadPrefabs extends StepBasedLoadProcess {
     public void begin() {
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         setTotalSteps(Lists.newArrayList(Assets.list(AssetType.PREFAB)).size());
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

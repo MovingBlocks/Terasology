@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import static org.junit.Assert.assertEquals;
-
-import java.awt.Color;
-import java.nio.ByteBuffer;
-
 import org.junit.Test;
 import org.terasology.rendering.assets.texture.Texture.FilterMode;
 import org.terasology.rendering.assets.texture.Texture.WrapMode;
+import org.terasology.rendering.nui.Color;
+
+import java.nio.ByteBuffer;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author mkienenb@gmail.com
@@ -73,8 +73,8 @@ public class TextureDataFactoryTest {
 
         assertEquals(16, textureData.getWidth());
         assertEquals(16, textureData.getHeight());
-        assertEquals(FilterMode.Nearest, textureData.getFilterMode());
-        assertEquals(WrapMode.Repeat, textureData.getWrapMode());
+        assertEquals(FilterMode.NEAREST, textureData.getFilterMode());
+        assertEquals(WrapMode.REPEAT, textureData.getWrapMode());
         assertEquals(Texture.Type.TEXTURE2D, textureData.getType());
         assertEquals(1, textureData.getDepth());
     }

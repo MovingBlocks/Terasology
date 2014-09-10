@@ -42,7 +42,10 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
     public Byte deserialize(PersistedData data, DeserializationContext context) {
         if (data.isBytes()) {
             return data.getAsBytes()[0];
+        } else if (data.isNumber()) {
+            return (byte) data.getAsInteger();
         }
+
         return null;
     }
 

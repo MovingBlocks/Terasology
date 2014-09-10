@@ -23,13 +23,16 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.logic.common.DisplayNameComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -40,12 +43,12 @@ import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
-import org.terasology.logic.common.DisplayInformationComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
@@ -53,6 +56,7 @@ import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -125,6 +129,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private AtomicInteger receivedBytes = new AtomicInteger();
     private AtomicInteger sentMessages = new AtomicInteger();
     private AtomicInteger sentBytes = new AtomicInteger();
+    private Color color;
 
     public NetClient(Channel channel, NetworkSystemImpl networkSystem, PublicIdentityCertificate identity) {
         this.channel = channel;
@@ -142,7 +147,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     public String getName() {
         ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
         if (clientComp != null) {
-            DisplayInformationComponent displayInfo = clientComp.clientInfo.getComponent(DisplayInformationComponent.class);
+            DisplayNameComponent displayInfo = clientComp.clientInfo.getComponent(DisplayNameComponent.class);
             if (displayInfo != null) {
                 return displayInfo.name;
             }
@@ -151,15 +156,41 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
+    public Color getColor() {
+        ClientComponent clientComp = getEntity().getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
+            if (colorComp != null) {
+                return colorComp.color;
+            }
+        }
+        return color;
+    }
+    
+    @Override
     public String getId() {
         return identity.getId();
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+
+        ClientComponent client = getEntity().getComponent(ClientComponent.class);
+        if (client != null) {
+            ColorComponent colorInfo = client.clientInfo.getComponent(ColorComponent.class);
+            if (colorInfo != null) {
+                colorInfo.color = color;
+                client.clientInfo.saveComponent(colorInfo);
+            }
+        }
+        
+    }
+    
     public void setName(String name) {
         this.name = name;
         ClientComponent client = getEntity().getComponent(ClientComponent.class);
         if (client != null) {
-            DisplayInformationComponent displayInfo = client.clientInfo.getComponent(DisplayInformationComponent.class);
+            DisplayNameComponent displayInfo = client.clientInfo.getComponent(DisplayNameComponent.class);
             if (displayInfo != null) {
                 displayInfo.name = name;
                 client.clientInfo.saveComponent(displayInfo);
@@ -170,6 +201,11 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     @Override
     public void disconnect() {
         super.disconnect();
+        
+        if (channel.isOpen()) {
+            channel.close().awaitUninterruptibly();
+        }
+        
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         if (worldProvider != null) {
             worldProvider.unregisterListener(this);
@@ -294,7 +330,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         this.eventSerializer = newEventSerializer;
         this.entitySystemLibrary = newSystemLibrary;
 
-        createEntity(name, entityManager);
+        createEntity(name, color, entityManager);
     }
 
     @Override

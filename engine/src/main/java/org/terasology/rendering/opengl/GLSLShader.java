@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.opengl;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -23,16 +24,15 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingDebugConfig;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.assets.shader.ShaderParameterMetadata;
@@ -80,10 +80,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
                 InputStream uniformsStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalUniformsIncl.glsl");
                 InputStream definesStream = GLSLShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalDefinesIncl.glsl")
         ) {
-            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
-            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
-            includedDefines = CharStreams.toString(new InputStreamReader(definesStream));
-            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream));
+            includedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream, Charsets.UTF_8));
+            includedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream, Charsets.UTF_8));
+            includedDefines = CharStreams.toString(new InputStreamReader(definesStream, Charsets.UTF_8));
+            includedUniforms = CharStreams.toString(new InputStreamReader(uniformsStream, Charsets.UTF_8));
         } catch (IOException e) {
             logger.error("Failed to load Include shader resources");
         }
@@ -159,7 +159,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     @Override
     public void reload(ShaderData data) {
-        Util.checkGLError();
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();
@@ -170,7 +169,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         }
         updateAvailableFeatures();
         recompile();
-        Util.checkGLError();
     }
 
     private static StringBuilder createShaderBuilder() {
@@ -238,14 +236,8 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         if (config.getRendering().isDynamicShadowsPcfFiltering()) {
             builder.append("#define DYNAMIC_SHADOWS_PCF \n");
         }
-        if (config.getRendering().isVolumetricFog()) {
-            builder.append("#define VOLUMETRIC_FOG \n");
-        }
         if (config.getRendering().isCloudShadows()) {
             builder.append("#define CLOUD_SHADOWS \n");
-        }
-        if (config.getRendering().isVolumetricLighting()) {
-            builder.append("#define VOLUMETRIC_LIGHTING \n");
         }
         if (config.getRendering().isLocalReflections()) {
             builder.append("#define LOCAL_REFLECTIONS \n");
@@ -273,10 +265,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
             // TODO: Have our own shader language and parse this stuff out properly
             if (shaderProgramBase.getFragmentProgram().contains(feature.toString())) {
-                logger.info("Fragment shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Fragment shader feature '" + feature.toString() + "' is available...");
                 availableFeatures.add(feature);
             } else if (shaderProgramBase.getVertexProgram().contains(feature.toString())) {
-                logger.info("Vertex shader feature '" + feature.toString() + "' is available...");
+                logger.debug("Vertex shader feature '" + feature.toString() + "' is available...");
                 availableFeatures.add(feature);
             }
         }
@@ -296,7 +288,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
             compileShaders(permutation);
             counter++;
         }
-        logger.info("Compiled {} permutations for {}.", counter, getURI());
+        logger.debug("Compiled {} permutations for {}.", counter, getURI());
     }
 
     private void compileShader(int type, Set<ShaderProgramFeature> features) {
@@ -341,7 +333,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         Path path = PathManager.getInstance().getShaderLogPath().resolve(debugShaderType.toLowerCase() + "_" + strippedTitle + "_" + featureHash + ".glsl");
         try (BufferedWriter writer = Files.newBufferedWriter(path, TerasologyConstants.CHARSET)) {
             writer.write(shader.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Failed to dump shader source.");
         }
 
@@ -366,10 +358,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
                             for (int i = 0; i < lineNumberInt - 1; ++i) {
                                 reader.nextLine();
                             }
-    
+
                             errorLine = reader.nextLine();
                             errorLine = "Error prone line: '" + errorLine + "'";
-    
+
                             logger.warn("{} \n Line: {}", error, errorLine);
                         }
                         break;

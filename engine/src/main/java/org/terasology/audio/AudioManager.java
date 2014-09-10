@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,19 +36,27 @@ public interface AudioManager {
 
     void setMute(boolean mute);
 
-    void playSound(Sound sound);
+    void playSound(StaticSound sound);
 
-    void playSound(Sound sound, float volume);
+    void playSound(StaticSound sound, float volume);
 
-    void playSound(Sound sound, float volume, int priority);
+    void playSound(StaticSound sound, float volume, int priority);
 
-    void playSound(Sound sound, Vector3f position);
+    void playSound(StaticSound sound, Vector3f position);
 
-    void playSound(Sound sound, Vector3f position, float volume);
+    void playSound(StaticSound sound, Vector3f position, float volume);
 
-    void playSound(Sound sound, Vector3f position, float volume, int priority);
+    void playSound(StaticSound sound, Vector3f position, float volume, int priority);
 
-    void playMusic(Sound sound);
+    void playSound(StaticSound sound, Vector3f position, float volume, int priority, AudioEndListener endListener);
+
+    void playMusic(StreamingSound music);
+
+    void playMusic(StreamingSound music, float volume);
+
+    void playMusic(StreamingSound music, AudioEndListener endListener);
+
+    void playMusic(StreamingSound music, float volume, AudioEndListener endListener);
 
     /**
      * Update AudioManager sound sources

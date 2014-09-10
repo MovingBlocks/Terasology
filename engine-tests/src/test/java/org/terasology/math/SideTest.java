@@ -30,4 +30,15 @@ public class SideTest {
             assertEquals(side, Side.inDirection(side.getVector3i().x, side.getVector3i().y, side.getVector3i().z));
         }
     }
+
+    @Test
+    public void relativeSides() {
+        Side side = Side.FRONT;
+        assertEquals(Side.LEFT, side.getRelativeSide(Direction.LEFT));
+        assertEquals(Side.RIGHT, side.getRelativeSide(Direction.RIGHT));
+        assertEquals(Side.TOP, side.getRelativeSide(Direction.UP));
+        assertEquals(Side.BOTTOM, side.getRelativeSide(Direction.DOWN));
+        assertEquals(Side.FRONT, side.getRelativeSide(Direction.FORWARD));
+        assertEquals(Side.BACK, side.getRelativeSide(Direction.BACKWARD));
+    }
 }

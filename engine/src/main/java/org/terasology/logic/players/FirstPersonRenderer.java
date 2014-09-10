@@ -19,28 +19,24 @@ import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.asset.Asset;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
-import org.terasology.logic.manager.GUIManager;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.gui.widgets.UIInventoryGrid;
-import org.terasology.rendering.icons.Icon;
-import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.iconmesh.IconMeshFactory;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -65,7 +61,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.CLIENT)
-public class FirstPersonRenderer implements RenderSystem {
+public class FirstPersonRenderer extends BaseComponentSystem implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(FirstPersonRenderer.class);
 
     @In
@@ -74,8 +70,6 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     @In
     private WorldRenderer worldRenderer;
-    @In
-    private SlotBasedInventoryManager inventoryManager;
 
     private Mesh handMesh;
     private Texture handTex;
@@ -91,10 +85,6 @@ public class FirstPersonRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
         handTex = Assets.getTexture("engine:char");
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @Override
@@ -120,9 +110,8 @@ public class FirstPersonRenderer implements RenderSystem {
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta, (float) java.lang.Math.PI / 8f, 0.05f);
         float handMovementAnimationOffset = character.handAnimation;
 
-        UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
-        int invSlotIndex = character.selectedItem + toolbar.getStartSlot();
-        EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
+        int invSlotIndex = character.selectedItem;
+        EntityRef heldItem = InventoryUtils.getItemAt(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {
@@ -145,7 +134,7 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private void renderHand(float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:block");
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -167,8 +156,8 @@ public class FirstPersonRenderer implements RenderSystem {
         shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
-    private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:block");
+    private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();
@@ -180,22 +169,20 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPushMatrix();
 
-        glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
+        float textureScale = Math.max(iconTexture.getWidth(), iconTexture.getHeight()) / 16f;
+
+        glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, (-1.5f - handMovementAnimationOffset * 0.5f) * (float) Math.pow(textureScale, 0.5));
         glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(-20f, 1.0f, 0.0f, 0.0f);
         glRotatef(-80f, 0.0f, 1.0f, 0.0f);
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
-        glScalef(0.75f, 0.75f, 0.75f);
+        float scale = 0.75f * (float) Math.pow(textureScale, 0.5);
+        glScalef(scale, scale, scale);
 
-        Mesh itemMesh = iconMeshes.get(iconName);
-        if (itemMesh == null) {
-            Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.generateItemMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "icon." + iconName),
-                    icon.getTexture(), icon.getX(), icon.getY());
-            iconMeshes.put(iconName, itemMesh);
+        if (iconTexture instanceof Asset<?>) {
+            Mesh itemMesh = IconMeshFactory.getIconMesh(iconTexture);
+            itemMesh.render();
         }
-
-        itemMesh.render();
 
         glPopMatrix();
 
@@ -207,7 +194,7 @@ public class FirstPersonRenderer implements RenderSystem {
         Vector3f playerPos = localPlayer.getPosition();
 
         // Adjust the brightness of the block according to the current position of the player
-        Material shader = Assets.getMaterial("engine:block");
+        Material shader = Assets.getMaterial("engine:prog.block");
         shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         shader.enable();

@@ -16,7 +16,7 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.base.Preconditions;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
@@ -263,4 +263,7 @@ public class Color {
         return toHex();
     }
 
+    public int getRepresentation() {
+        return representation;
+    }
 }

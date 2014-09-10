@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "InverterNode",
+        "name"      : "Inverter",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Decorator\nInverts the child.\nSUCCESS: when child finishes FAILURE.\nFAILURE: when child finishes SUCCESS.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

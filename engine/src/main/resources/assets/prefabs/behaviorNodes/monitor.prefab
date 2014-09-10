@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "MonitorNode",
+        "name"      : "Monitor",
+        "category"  : "logic",
+        "shape"     : "diamond",
+        "description": "Parallel\n\nSUCCESS: as soon as one child node finishes SUCCESS\nFAILURE: as soon as one child node finishes FAILURE.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

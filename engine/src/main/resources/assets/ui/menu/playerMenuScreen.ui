@@ -1,0 +1,115 @@
+{
+    "type" : "PlayerSettingsScreen",
+    "skin" : "mainmenu",
+    "contents" : {
+        "type" : "relativeLayout",
+        "contents" : [
+            {
+                "type" : "UIImage",
+                "image" : "engine:terasology",
+                "id" : "title",
+                "layoutInfo" : {
+                    "width" : 512,
+                    "height" : 128,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            },
+            {
+                "type" : "UILabel",
+                "text" : "Player Settings",
+                "family" : "title",
+                "id" : "subtitle",
+                "layoutInfo" : {
+                    "height" : 48,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "widget" : "title"
+                    }
+                }
+            },
+            {
+                "type" : "UIBox",
+                "content" : {
+                    "type" : "ColumnLayout",
+                    "family" : "option-grid",
+                    "columns" : 2,
+                    "column-widths" : [0.35, 0.65],
+                    "verticalSpacing" : 8,
+                    "horizontalSpacing" : 8,
+
+                    "contents" : [
+                        {
+                            "type" : "UILabel",
+                            "text" : "Player Name:"
+                        },
+                        {
+                            "type" : "UIText",
+                            "id"   : "playername"
+                        },
+                        {
+                            "type" : "UILabel",
+                            "text" : "Player Color (RGB):"
+                        },
+                        {
+                            "type" : "RowLayout",
+                            "contents" : [
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "red"
+                                },
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "green"
+                                },
+                                {
+                                    "type" : "UISlider",
+                                    "id" : "blue"
+                                },
+                                {
+                                    "type" : "UIImage",
+                                    "id"   : "image"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "layoutInfo" : {
+                    "width" : 450,
+                    "use-content-height" : true,
+                    "position-horizontal-center" : {},
+                    "position-top" : {
+                        "target" : "BOTTOM",
+                        "offset" : 16,
+                        "widget" : "subtitle"
+                    },
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "offset" : 32,
+                        "widget" : "close"
+                    }
+                }
+            },
+            {
+                "type" : "UIButton",
+                "text" : "Back",
+                "id" : "close",
+                "layoutInfo" : {
+                    "height" : 32,
+                    "width" : 200,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 48
+                    }
+                }
+
+            }
+
+        ]
+    }
+}

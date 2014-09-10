@@ -16,18 +16,22 @@
 
 package org.terasology.asset;
 
-import org.terasology.audio.Sound;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.naming.Name;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.subtexture.Subtexture;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.subtexture.Subtexture;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 
 import java.util.List;
@@ -61,7 +65,7 @@ public final class Assets {
     /**
      * @return An iterable over the list of available modules
      */
-    public static Iterable<String> listModules() {
+    public static Iterable<Name> listModules() {
         return CoreRegistry.get(AssetManager.class).listModuleNames();
     }
 
@@ -69,23 +73,29 @@ public final class Assets {
      * @param uri
      * @return The requested asset, or null if it doesn't exist.
      */
-    public static Asset get(AssetUri uri) {
+    public static Asset<?> get(AssetUri uri) {
         return CoreRegistry.get(AssetManager.class).loadAsset(uri);
     }
 
-    public static Asset get(AssetType type, String uri) {
-        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
+    public static Asset<?> get(AssetType type, String uri) {
+        if (uri != null && !uri.isEmpty()) {
+            return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri);
+        }
+        return null;
     }
 
-    public static <T extends Asset> T get(AssetType type, String uri, Class<T> assetClass) {
-        return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
+    public static <T extends Asset<?>> T get(AssetType type, String uri, Class<T> assetClass) {
+        if (uri != null && !uri.isEmpty()) {
+            return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, uri, assetClass);
+        }
+        return null;
     }
 
     /**
      * @param name
      * @return The resolved asset, or
      */
-    public static Asset resolve(AssetType type, String name) {
+    public static Asset<?> resolve(AssetType type, String name) {
         return CoreRegistry.get(AssetManager.class).resolveAndLoad(type, name);
     }
 
@@ -107,8 +117,8 @@ public final class Assets {
      * @param <T>
      * @return The requested asset, or null if it doesn't exist or isn't of the expected class.
      */
-    public static <T extends Asset> T get(AssetUri uri, Class<T> assetClass) {
-        Asset result = get(uri);
+    public static <T extends Asset<?>> T get(AssetUri uri, Class<T> assetClass) {
+        Asset<?> result = get(uri);
         if (result != null && assetClass.isAssignableFrom(result.getClass())) {
             return assetClass.cast(result);
         }
@@ -129,6 +139,15 @@ public final class Assets {
      * @return The requested texture, or null if it doesn't exist
      */
     public static Texture getTexture(String module, String assetName) {
+        return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
+    }
+
+    /**
+     * @param module
+     * @param assetName
+     * @return The requested texture, or null if it doesn't exist
+     */
+    public static Texture getTexture(Name module, String assetName) {
         return get(new AssetUri(AssetType.TEXTURE, module, assetName), Texture.class);
     }
 
@@ -178,8 +197,8 @@ public final class Assets {
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound getSound(String simpleUri) {
-        return get(AssetType.SOUND, simpleUri, Sound.class);
+    public static StaticSound getSound(String simpleUri) {
+        return get(AssetType.SOUND, simpleUri, StaticSound.class);
     }
 
     /**
@@ -187,16 +206,16 @@ public final class Assets {
      * @param assetName
      * @return The requested sound, or null if it doesn't exist
      */
-    public static Sound getSound(String module, String assetName) {
-        return get(new AssetUri(AssetType.SOUND, module, assetName), Sound.class);
+    public static StaticSound getSound(String module, String assetName) {
+        return get(new AssetUri(AssetType.SOUND, module, assetName), StaticSound.class);
     }
 
     /**
      * @param simpleUri The two-part uri for asset ("module:assetName")
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound getMusic(String simpleUri) {
-        return get(AssetType.MUSIC, simpleUri, Sound.class);
+    public static StreamingSound getMusic(String simpleUri) {
+        return get(AssetType.MUSIC, simpleUri, StreamingSound.class);
     }
 
     /**
@@ -204,8 +223,8 @@ public final class Assets {
      * @param assetName
      * @return The requested music, or null if it doesn't exist
      */
-    public static Sound getMusic(String module, String assetName) {
-        return get(new AssetUri(AssetType.MUSIC, module, assetName), Sound.class);
+    public static StreamingSound getMusic(String module, String assetName) {
+        return get(new AssetUri(AssetType.MUSIC, module, assetName), StreamingSound.class);
     }
 
     /**
@@ -280,8 +299,16 @@ public final class Assets {
         return get(AssetType.PREFAB, simpleUri, Prefab.class);
     }
 
+    public static BehaviorTree getBehaviorTree(String simpleUri) {
+        return get(AssetType.BEHAVIOR, simpleUri, BehaviorTree.class);
+    }
+
     public static UISkin getSkin(String uri) {
         return get(AssetType.UI_SKIN, uri, UISkin.class);
+    }
+
+    public static UIElement getUIElement(String uri) {
+        return get(AssetType.UI_ELEMENT, uri, UIElement.class);
     }
 
     public static <T extends Asset<U>, U extends AssetData> T generateAsset(AssetUri uri, U data, Class<T> assetClass) {
@@ -300,18 +327,25 @@ public final class Assets {
         return null;
     }
 
-    public static void dispose(Asset asset) {
+    public static void dispose(Asset<?> asset) {
         CoreRegistry.get(AssetManager.class).dispose(asset);
     }
 
     public static TextureRegion getTextureRegion(String simpleUri) {
+        if (simpleUri.isEmpty()) {
+            return null;
+        }
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         AssetUri uri = assetManager.resolve(AssetType.TEXTURE, simpleUri);
-        if (uri == null) {
-            uri = assetManager.resolve(AssetType.SUBTEXTURE, simpleUri);
-        }
         if (uri != null) {
-            return (TextureRegion) assetManager.loadAsset(uri);
+            Texture result = assetManager.tryLoadAsset(uri, Texture.class);
+            if (result != null) {
+                return result;
+            }
+        }
+        uri = assetManager.resolve(AssetType.SUBTEXTURE, simpleUri);
+        if (uri != null) {
+            return assetManager.loadAsset(uri, Subtexture.class);
         }
         return null;
     }

@@ -15,39 +15,32 @@
  */
 package org.terasology.logic.actions;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.events.OpenInventoryEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.rendering.gui.windows.UIScreenContainer;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.ingame.inventory.ContainerScreen;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
-public class AccessInventoryAction implements ComponentSystem {
+public class AccessInventoryAction extends BaseComponentSystem {
 
     @In
     private NetworkSystem networkSystem;
 
-    @Override
-    public void initialise() {
-
-    }
-
-    @Override
-    public void shutdown() {
-    }
+    @In
+    private NUIManager nuiManager;
 
     @ReceiveEvent(components = {AccessInventoryActionComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivate(ActivateEvent event, EntityRef entity) {
@@ -63,8 +56,10 @@ public class AccessInventoryAction implements ComponentSystem {
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
         ClientComponent controller = entity.getComponent(CharacterComponent.class).controller.getComponent(ClientComponent.class);
         if (controller.local && event.getContainer().hasComponent(InventoryComponent.class)) {
-            UIScreenContainer containerScreen = (UIScreenContainer) CoreRegistry.get(GUIManager.class).openWindow("container");
-            containerScreen.openContainer(event.getContainer(), entity);
+            ContainerScreen screen = nuiManager.pushScreen("engine:containerScreen", ContainerScreen.class);
+            if (screen != null) {
+                screen.setContainerEntity(event.getContainer());
+            }
         }
     }
 

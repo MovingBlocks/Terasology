@@ -23,6 +23,7 @@ import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,8 +37,8 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
 import org.terasology.math.Rotation;
+import org.terasology.module.Module;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
@@ -71,12 +72,13 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
     }
 
     @Override
-    public BlockShapeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        return gson.fromJson(new InputStreamReader(stream), BlockShapeData.class);
+    public BlockShapeData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
+        return gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), BlockShapeData.class);
     }
 
-    private class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
+    private static class BlockShapeHandler implements JsonDeserializer<BlockShapeData> {
 
+        public static final String DISPLAY_NAME = "displayName";
         public static final String PITCH_SYMMETRIC = "pitchSymmetric";
         public static final String YAW_SYMMETRIC = "yawSymmetric";
         public static final String ROLL_SYMMETRIC = "rollSymmetric";
@@ -96,6 +98,10 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         public BlockShapeData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             BlockShapeData shape = new BlockShapeData();
             JsonObject shapeObj = json.getAsJsonObject();
+
+            if (shapeObj.has(DISPLAY_NAME)) {
+                shape.setDisplayName(shapeObj.getAsJsonPrimitive(DISPLAY_NAME).getAsString());
+            }
 
             for (BlockPart part : BlockPart.values()) {
                 if (shapeObj.has(part.toString().toLowerCase(Locale.ENGLISH))) {
@@ -230,7 +236,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             return new ColliderInfo(offset, new SphereShape(radius));
         }
 
-        private class ColliderInfo {
+        private static class ColliderInfo {
             public Vector3f offset;
             public CollisionShape collisionShape;
 
@@ -241,7 +247,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
         }
     }
 
-    private class BlockMeshPartHandler implements JsonDeserializer<BlockMeshPart> {
+    private static class BlockMeshPartHandler implements JsonDeserializer<BlockMeshPart> {
 
         @Override
         public BlockMeshPart deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

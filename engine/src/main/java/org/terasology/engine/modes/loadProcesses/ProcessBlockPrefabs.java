@@ -15,7 +15,7 @@
  */
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
@@ -36,5 +36,10 @@ public class ProcessBlockPrefabs extends SingleStepLoadProcess {
         BlockManagerImpl blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
         blockManager.subscribe(new BlockPrefabManager(CoreRegistry.get(EntityManager.class), blockManager));
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

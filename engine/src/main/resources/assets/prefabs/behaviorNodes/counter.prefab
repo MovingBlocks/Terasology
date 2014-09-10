@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "CounterNode",
+        "name"      : "Counter",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Decorator\nStarts child a limit number of times.\nSUCCESS: when child finished with SUCCESSn times.\nFAILURE: as soon as child finishes with FAILURE.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

@@ -27,26 +27,22 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.Event;
-import org.terasology.entitySystem.event.internal.EventReceiver;
-import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnAddedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
+import org.terasology.entitySystem.event.Event;
+import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.event.internal.EventReceiver;
+import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -54,26 +50,29 @@ import org.terasology.entitySystem.stubs.ForceBlockActiveComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.RetainedOnBlockChangeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.testUtil.WorldProviderCoreStub;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.internal.BlockManagerImpl;
+import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -95,6 +94,7 @@ public class EntityAwareWorldProviderTest {
     private BlockManagerImpl blockManager;
     private WorldProviderCoreStub worldStub;
 
+    private Block plainBlock;
     private Block blockWithString;
     private Block blockWithDifferentString;
     private Block blockWithRetainedComponent;
@@ -103,14 +103,14 @@ public class EntityAwareWorldProviderTest {
     private Block blockInFamilyTwo;
 
     @BeforeClass
-    public static void commonSetup() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+    public static void commonSetup() throws Exception {
+        moduleManager = CoreRegistry.put(ModuleManager.class, ModuleManagerFactory.create());
     }
 
     @Before
     public void setup() {
         GameThread.setGameThread();
-        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager())));
+        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
             @Override
@@ -125,9 +125,12 @@ public class EntityAwareWorldProviderTest {
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         worldStub = new WorldProviderCoreStub(BlockManager.getAir());
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
+
+        plainBlock = new Block();
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:plainBlock"), plainBlock), true);
 
         blockWithString = new Block();
         PrefabData prefabData = new PrefabData();
@@ -160,7 +163,7 @@ public class EntityAwareWorldProviderTest {
         blockInFamilyTwo.setKeepActive(true);
         blockManager.addBlockFamily(new HorizontalBlockFamily(new BlockUri("test:blockFamily"),
                 ImmutableMap.<Side, Block>of(Side.FRONT, blockInFamilyOne, Side.LEFT, blockInFamilyTwo, Side.RIGHT, blockInFamilyTwo, Side.BACK, blockInFamilyOne),
-                NullIterator.<String>newInstance()), true);
+                Collections.<String>emptyList()), true);
 
         keepActiveBlock = new Block();
         keepActiveBlock.setKeepActive(true);
@@ -427,6 +430,31 @@ public class EntityAwareWorldProviderTest {
         assertNotNull(entity.getComponent(IntegerComponent.class));
     }
 
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyAlteredOnChangeToDifferentPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), blockWithDifferentString);
+        assertEquals(blockWithDifferentString.getPrefab(), entity.getPrefabURI().toSimpleString());
+    }
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyRemovedOnChangeToBlockWithNoPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), plainBlock);
+        assertEquals(null, entity.getParentPrefab());
+    }
+
+    @Test
+    public void testBlockEntityPrefabCorrectlyAddedOnChangeToBlockWithPrefab() {
+        worldProvider.setBlock(Vector3i.zero(), plainBlock);
+        EntityRef entity = worldProvider.getBlockEntityAt(Vector3i.zero());
+        worldProvider.setBlock(Vector3i.zero(), blockWithString);
+        assertEquals(blockWithString.getPrefab(), entity.getParentPrefab().getURI().toSimpleString());
+    }
+
     public static class LifecycleEventChecker {
         public List<EventInfo> receivedEvents = Lists.newArrayList();
 
@@ -447,20 +475,12 @@ public class EntityAwareWorldProviderTest {
         }
     }
 
-    public static class BlockEventChecker implements ComponentSystem {
+    public static class BlockEventChecker extends BaseComponentSystem {
 
         public boolean addedReceived;
         public boolean activateReceived;
         public boolean deactivateReceived;
         public boolean removedReceived;
-
-        @Override
-        public void initialise() {
-        }
-
-        @Override
-        public void shutdown() {
-        }
 
         @ReceiveEvent(components = BlockComponent.class)
         public void onAdded(OnAddedComponent event, EntityRef entity) {

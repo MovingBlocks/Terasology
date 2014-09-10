@@ -48,5 +48,8 @@ public class CacheTextures extends StepBasedLoadProcess {
         return !uris.hasNext();
     }
 
-
+    @Override
+    public int getExpectedCost() {
+        return 1;
+    }
 }

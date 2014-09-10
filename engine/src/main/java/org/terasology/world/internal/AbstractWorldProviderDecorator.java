@@ -16,6 +16,7 @@
 
 package org.terasology.world.internal;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
@@ -31,6 +32,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     public AbstractWorldProviderDecorator(WorldProviderCore base) {
         this.base = base;
+    }
+
+    @Override
+    public EntityRef getWorldEntity() {
+        return base.getWorldEntity();
     }
 
     @Override

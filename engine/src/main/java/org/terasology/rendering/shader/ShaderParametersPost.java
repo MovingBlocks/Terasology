@@ -21,7 +21,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -67,7 +67,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setInt("texBlur", texId++, true);
 
             if (cameraTargetSystem != null) {
-                program.setFloat("blurFocusDistance", cameraTargetSystem.getEyeFocusDistance(), true);
+                program.setFloat("blurFocusDistance", cameraTargetSystem.getFocalDistance(), true);
             }
 
             program.setFloat("blurStart", blurStart, true);

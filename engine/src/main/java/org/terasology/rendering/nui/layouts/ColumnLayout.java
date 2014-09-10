@@ -25,6 +25,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.UIWidget;
 
@@ -36,14 +37,20 @@ import java.util.List;
  */
 public class ColumnLayout extends CoreLayout<LayoutHint> {
 
+    @LayoutConfig
     private int columns = 1;
+    @LayoutConfig
     private int horizontalSpacing;
+    @LayoutConfig
     private int verticalSpacing;
-    @SerializedName("auto-size-columns")
+    @LayoutConfig
     private boolean autoSizeColumns;
+    @LayoutConfig
+    private boolean fillVerticalSpace = true;
 
     private List<UIWidget> widgetList = Lists.newArrayList();
 
+    @LayoutConfig
     @SerializedName("column-widths")
     private float[] columnWidths = new float[]{1.0f};
 
@@ -145,9 +152,15 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
                 usedHeight += row.height;
             }
             usedHeight += (rowInfos.size() - 1) * verticalSpacing;
-            int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
-            for (RowInfo row : rowInfos) {
-                row.height += extraSpacePerRow;
+
+            if (fillVerticalSpace) {
+                int extraSpacePerRow = (canvas.size().y - usedHeight) / rowInfos.size();
+
+                for (RowInfo row : rowInfos) {
+                    row.height += extraSpacePerRow;
+                }
+            } else {
+                rowOffsetY = (canvas.size().y - usedHeight) / 2;
             }
             for (int rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
                 List<UIWidget> row = rows.get(rowIndex);
@@ -175,7 +188,9 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         for (int i = 0; i < columns && i < row.size(); ++i) {
             UIWidget widget = row.get(i);
             Vector2i cellSize = new Vector2i(availableWidth, areaHint.y);
-            cellSize.x *= columnWidths[i];
+            if (!autoSizeColumns) {
+                cellSize.x *= columnWidths[i];
+            }
             if (widget != null) {
                 Vector2i contentSize = canvas.calculateRestrictedSize(widget, cellSize);
                 rowInfo.widgetSizes.add(contentSize);
@@ -348,5 +363,9 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         private int height;
         private List<Vector2i> widgetSizes = Lists.newArrayList();
 
+        @Override
+        public String toString() {
+            return super.toString() + "{height:" + height + ", widgetSizes:" + widgetSizes + "}";
+        }
     }
 }

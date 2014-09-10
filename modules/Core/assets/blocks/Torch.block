@@ -18,7 +18,7 @@
  * Torches catch on fire and stuff. On purpose!
  */
 {
-    "rotation" : "AlignToSurface",
+    "rotation" : "attachedToSurface",
     "sides" : {
         "shape" : "TorchWall"
     },
@@ -33,5 +33,8 @@
     "hardness" : 1,
     "inventory" : {
         "directPickup" : true
+    },
+    "entity": {
+        "prefab": "Core:Torch"
     }
 }

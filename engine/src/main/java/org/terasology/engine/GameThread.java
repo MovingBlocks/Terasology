@@ -34,7 +34,7 @@ import java.util.concurrent.Semaphore;
  */
 public final class GameThread {
 
-    private static Thread gameThread;
+    private static volatile Thread gameThread;
     private static BlockingDeque<Runnable> pendingRunnables = Queues.newLinkedBlockingDeque();
 
     private GameThread() {

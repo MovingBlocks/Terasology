@@ -1,0 +1,36 @@
+{
+    "type" : "loadingScreen",
+    "skin" : "mainMenu",
+    "contents" : {
+        "type" : "RelativeLayout",
+        "contents" : [
+            {
+                "type" : "UILabel",
+                "id" : "statusLabel",
+                "layoutInfo" : {
+                    "use-content-height" : true,
+                    "use-content-width" : true,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "offset" : 64
+                    }
+                }
+            },
+            {
+                "type" : "UILoadBar",
+                "id" : "progressBar",
+                "fillTexture" : "statusBar",
+                "layoutInfo" : {
+                    "use-content-height" : true,
+                    "use-content-width" : true,
+                    "position-horizontal-center" : {},
+                    "position-bottom" : {
+                        "target" : "TOP",
+                        "widget" : "statusLabel",
+                        "offset" : 8
+                    }
+                }
+            }
+        ]
+    }
+}

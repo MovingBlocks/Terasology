@@ -16,16 +16,18 @@
 package org.terasology.rendering.nui.widgets;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.asset.Assets;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
+import org.terasology.rendering.nui.LayoutConfig;
 import org.terasology.rendering.nui.TextLineBuilder;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
@@ -37,11 +39,22 @@ import java.util.List;
  */
 public class UIButton extends CoreWidget {
     public static final String DOWN_MODE = "down";
+    public static final String DISABLED_MODE = "disabled";
 
+    @LayoutConfig
     private Binding<TextureRegion> image = new DefaultBinding<>();
+
+    @LayoutConfig
     private Binding<String> text = new DefaultBinding<>("");
-    private Binding<Sound> clickSound = new DefaultBinding<>(Assets.getSound("engine:click"));
+
+    @LayoutConfig
+    private Binding<StaticSound> clickSound = new DefaultBinding<StaticSound>(Assets.getSound("engine:click"));
+
+    @LayoutConfig
     private Binding<Float> clickVolume = new DefaultBinding<>(1.0f);
+
+    @LayoutConfig
+    private Binding<Boolean> enabled = new DefaultBinding<>(Boolean.TRUE);
 
     private boolean down;
 
@@ -95,7 +108,10 @@ public class UIButton extends CoreWidget {
             canvas.drawTexture(image.get());
         }
         canvas.drawText(text.get());
-        canvas.addInteractionRegion(interactionListener);
+
+        if (enabled.get()) {
+            canvas.addInteractionRegion(interactionListener);
+        }
     }
 
     @Override
@@ -107,7 +123,9 @@ public class UIButton extends CoreWidget {
 
     @Override
     public String getMode() {
-        if (down) {
+        if (!enabled.get()) {
+            return DISABLED_MODE;
+        } else if (down) {
             return DOWN_MODE;
         } else if (interactionListener.isMouseOver()) {
             return HOVER_MODE;
@@ -145,15 +163,15 @@ public class UIButton extends CoreWidget {
         return image.get();
     }
 
-    public void bindClickSound(Binding<Sound> binding) {
+    public void bindClickSound(Binding<StaticSound> binding) {
         clickSound = binding;
     }
 
-    public Sound getClickSound() {
+    public StaticSound getClickSound() {
         return clickSound.get();
     }
 
-    public void setClickSound(Sound val) {
+    public void setClickSound(StaticSound val) {
         clickSound.set(val);
     }
 
@@ -167,6 +185,18 @@ public class UIButton extends CoreWidget {
 
     public void setClickVolume(float val) {
         clickVolume.set(val);
+    }
+    
+    public void bindEnabled(Binding<Boolean> binding) {
+        enabled = binding;
+    }
+
+    public boolean isEnabled() {
+        return enabled.get();
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled.set(enabled);
     }
 
     public void subscribe(ActivateEventListener listener) {

@@ -23,8 +23,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author Immortius
+ * @deprecated Please use org.terasology.registry.In instead. Support for this annotation will be dropped in the future.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Deprecated
 public @interface In {
 }

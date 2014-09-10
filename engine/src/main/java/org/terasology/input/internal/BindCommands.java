@@ -16,31 +16,23 @@
 package org.terasology.input.internal;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.registry.In;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class BindCommands implements ComponentSystem {
+public class BindCommands extends BaseComponentSystem {
 
     @In
     private InputSystem inputSystem;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @Command(shortDescription = "Maps a key to a function")
     public String bindKey(@CommandParam("key") String key, @CommandParam("function") String bind) {
@@ -52,7 +44,7 @@ public class BindCommands implements ComponentSystem {
             builder.append(bind);
             return builder.toString();
         }
-        return "Unknown key: " + key;
+        throw new IllegalArgumentException("Unknown key: " + key);
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY")
@@ -62,6 +54,18 @@ public class BindCommands implements ComponentSystem {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.Q, new SimpleUri("engine:left"));
 
         return "Changed key bindings to AZERTY keyboard layout.";
+    }
+
+    @Command(shortDescription = "Switches to typical keybinds for DVORAK")
+    public String dvorak() {
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.E, new SimpleUri("engine:left"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.C, new SimpleUri("engine:inventory"));
+        inputSystem.linkBindButtonToKey(Keyboard.KeyId.PERIOD, new SimpleUri("engine:useItem"));
+
+        return "Changed key bindings to DVORAK keyboard layout.";
     }
 
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")

@@ -19,4 +19,4 @@
  */
 @API package org.terasology.rendering.nui.layouts.relative;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;

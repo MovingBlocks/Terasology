@@ -19,7 +19,7 @@ package org.terasology.logic.location;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 
 import javax.vecmath.Quat4f;
@@ -30,15 +30,7 @@ import java.util.Iterator;
  * @author Immortius
  */
 @RegisterSystem
-public class Location implements ComponentSystem {
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+public class Location extends BaseComponentSystem {
 
     /**
      * Attaches an entity to another entity. Both must have location components.

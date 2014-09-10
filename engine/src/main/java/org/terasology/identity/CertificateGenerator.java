@@ -15,6 +15,8 @@
  */
 package org.terasology.identity;
 
+import com.google.common.base.Charsets;
+
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -63,7 +65,7 @@ public class CertificateGenerator {
             RSAPrivateKeySpec priv = keyFactory.getKeySpec(kp.getPrivate(), RSAPrivateKeySpec.class);
             String uuid = UUID.randomUUID().toString();
             signer.initSign(kp.getPrivate(), new SecureRandom());
-            signer.update(uuid.getBytes());
+            signer.update(uuid.getBytes(Charsets.UTF_8));
             signer.update(pub.getModulus().toByteArray());
             signer.update(pub.getPublicExponent().toByteArray());
             byte[] rawSig = signer.sign();
@@ -102,7 +104,7 @@ public class CertificateGenerator {
 
             String uuid = UUID.randomUUID().toString();
             signer.initSign(signingKey, new SecureRandom());
-            signer.update(uuid.getBytes());
+            signer.update(uuid.getBytes(Charsets.UTF_8));
             signer.update(pub.getModulus().toByteArray());
             signer.update(pub.getPublicExponent().toByteArray());
             byte[] rawSig = signer.sign();

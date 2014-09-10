@@ -17,11 +17,11 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 
 /**
@@ -40,8 +40,15 @@ public class InitialiseSystems extends SingleStepLoadProcess {
         BlockEntityRegistry blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
         CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, entitySystemLibrary, blockEntityRegistry);
-        CoreRegistry.get(ComponentSystemManager.class).initialise();
+        ComponentSystemManager csm = CoreRegistry.get(ComponentSystemManager.class);
+        csm.initialise();
+
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 }

@@ -16,14 +16,12 @@
 
 package org.terasology.logic.players;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Keyboard;
 import org.terasology.input.binds.general.HideHUDButton;
@@ -31,10 +29,10 @@ import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.console.ConsoleMessageEvent;
 import org.terasology.logic.health.DoDamageEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
+import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.ingame.metrics.DebugOverlay;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -43,27 +41,29 @@ import org.terasology.world.WorldProvider;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
-@RegisterSystem
-public class DebugControlSystem implements ComponentSystem {
-
-    private UIScreenMetrics metrics;
+@RegisterSystem(RegisterMode.CLIENT)
+public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private GameEngine engine;
 
     @In
     private WorldProvider world;
+
     @In
     private WorldRenderer worldRenderer;
+
     @In
     private Config config;
 
-    @Override
-    public void initialise() {
-    }
+    @In
+    private NUIManager nuiManager;
+
+    private DebugOverlay overlay;
 
     @Override
-    public void shutdown() {
+    public void initialise() {
+        overlay = nuiManager.addOverlay("engine:debugOverlay", DebugOverlay.class);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -75,12 +75,30 @@ public class DebugControlSystem implements ComponentSystem {
             config.getRendering().getDebug().setFirstPersonElementsHidden(hide);
             config.getRendering().getDebug().setHudHidden(hide);
 
-            for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
-                element.setVisible(!hide);
-            }
-
             event.consume();
         }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onIncreaseViewDistance(IncreaseViewDistanceButton button, EntityRef entity) {
+        int viewDistance = config.getRendering().getViewDistance().getIndex();
+        int maxViewDistance = ViewDistance.values().length - 1;
+
+        if (viewDistance != maxViewDistance) {
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1)));
+        }
+        button.consume();
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDecreaseViewDistance(DecreaseViewDistanceButton button, EntityRef entity) {
+        int viewDistance = config.getRendering().getViewDistance().getIndex();
+        int minViewDistance = 0;
+
+        if (viewDistance != minViewDistance) {
+            config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() - 1)));
+        }
+        button.consume();
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -104,6 +122,8 @@ public class DebugControlSystem implements ComponentSystem {
                 case Keyboard.KeyId.LEFT:
                     world.getTime().setDays(world.getTime().getDays() - 0.02f);
                     event.consume();
+                    break;
+                default:
                     break;
             }
         }
@@ -135,33 +155,28 @@ public class DebugControlSystem implements ComponentSystem {
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
                     event.consume();
                     break;
+                default:
+                    break;
             }
         }
 
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F1:
                 engine.setFocus(!engine.hasFocus());
-                Mouse.setGrabbed(engine.hasFocus());
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:
                 config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
-            case Keyboard.KeyId.F:
-                toggleViewingDistance();
+            case Keyboard.KeyId.F4:
+                overlay.toggleMetricsMode();
                 event.consume();
                 break;
-            case Keyboard.KeyId.F4:
-                metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
-                metrics.toggleMode();
-                event.consume();
+            default:
                 break;
 
         }
     }
 
-    private void toggleViewingDistance() {
-        config.getRendering().setViewDistance(ViewDistance.forIndex((config.getRendering().getViewDistance().getIndex() + 1) % ViewDistance.values().length));
-    }
 }

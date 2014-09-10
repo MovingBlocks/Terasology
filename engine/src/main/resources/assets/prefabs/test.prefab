@@ -1,0 +1,15 @@
+{
+    "location" : {},
+    "RigidBody" : {
+        "kinematic" : true,
+        "collisionGroup" : "engine:world",
+        "collidesWith" : ["engine:debris","engine:sensor","engine:character"]
+    },
+    "BoxShape" : {
+        "extents" : [1, 1, 1]
+    },
+    "Mesh" : {
+        "mesh" : "engine:cube",
+        "material" : "engine:default"
+    }
+}

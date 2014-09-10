@@ -17,13 +17,13 @@ package org.terasology.world.block.family;
 
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.utilities.collection.NullIterator;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
@@ -35,7 +35,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     private Block block;
 
     public SymmetricFamily(BlockUri uri, Block block) {
-        this(uri, block, NullIterator.<String>newInstance());
+        this(uri, block, Collections.<String>emptyList());
     }
 
     public SymmetricFamily(BlockUri uri, Block block, Iterable<String> categories) {
@@ -48,11 +48,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
     @Override
     public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
         return block;
-    }
-
-    @Override
-    public Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
-        return oldBlock;
     }
 
     @Override

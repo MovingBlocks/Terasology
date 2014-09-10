@@ -17,15 +17,18 @@ package org.terasology.entitySystem.entity.internal;
 
 import gnu.trove.set.TIntSet;
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public interface EngineEntityManager extends EntityManager {
+public interface EngineEntityManager extends LowLevelEntityManager {
+
+    void setEntityRefStrategy(RefStrategy strategy);
 
     /**
      * Creates an entity but doesn't send any lifecycle events.
@@ -35,7 +38,19 @@ public interface EngineEntityManager extends EntityManager {
      * @param components
      * @return The newly created entity ref.
      */
-    EntityRef createEntityWithoutEvents(Iterable<Component> components);
+    EntityRef createEntityWithoutLifecycleEvents(Iterable<Component> components);
+
+    /**
+     * Creates an entity but doesn't send any lifecycle events.
+     * <p/>
+     * This is used by the block entity system to give an illusion of permanence to temporary block entities.
+     *
+     * @param prefab
+     * @return The newly created entity ref.
+     */
+    EntityRef createEntityWithoutLifecycleEvents(String prefab);
+
+    EntityRef createEntityWithoutLifecycleEvents(Prefab prefab);
 
     /**
      * Destroys an entity without sending lifecycle events.

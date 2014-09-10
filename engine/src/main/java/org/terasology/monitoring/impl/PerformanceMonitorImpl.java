@@ -27,10 +27,13 @@ import gnu.trove.map.hash.TObjectLongHashMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectIntProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
-import org.lwjgl.Sys;
 
 import java.util.Deque;
 import java.util.List;
+
+import org.terasology.engine.EngineTime;
+import org.terasology.engine.Time;
+import org.terasology.registry.CoreRegistry;
 
 /**
  * Active implementation of Performance Monitor
@@ -55,12 +58,14 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private TObjectIntMap<String> lastRunningThreads;
 
     private Thread mainThread;
+    private EngineTime timer;
 
     public PerformanceMonitorImpl() {
+        timer = (EngineTime) CoreRegistry.get(Time.class);
         activityStack = Queues.newArrayDeque();
         metricData = Lists.newLinkedList();
         runningTotals = new TObjectLongHashMap<>();
-        timerTicksPerSecond = Sys.getTimerResolution();
+        timerTicksPerSecond = 1000;
         currentData = new TObjectLongHashMap<>();
         spikeData = new TObjectDoubleHashMap<>();
         runningThreads = TCollections.synchronizedMap(new TObjectIntHashMap<String>());
@@ -127,7 +132,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
         Activity newActivity = new Activity();
         newActivity.name = activity;
-        newActivity.startTime = Sys.getTime();
+        newActivity.startTime = timer.getRawTimeInMs();
         if (!activityStack.isEmpty()) {
             Activity currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
@@ -142,7 +147,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         }
 
         Activity oldActivity = activityStack.pop();
-        long time = Sys.getTime();
+        long time = timer.getRawTimeInMs();
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
         currentData.adjustOrPutValue(oldActivity.name, total, total);
 

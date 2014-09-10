@@ -23,13 +23,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
@@ -41,6 +43,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetMetricSource;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.Server;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
@@ -71,6 +74,8 @@ import java.util.concurrent.BlockingQueue;
 public class ServerImpl implements Server {
     private static final Logger logger = LoggerFactory.getLogger(ServerImpl.class);
 
+    private int clientEntityNetId;
+
     private NetworkSystemImpl networkSystem;
     private Channel channel;
     private NetMetricSource metricsSource;
@@ -89,8 +94,6 @@ public class ServerImpl implements Server {
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
-
-    private EntityRef clientEntity = EntityRef.NULL;
 
     private EngineTime time;
 
@@ -117,16 +120,20 @@ public class ServerImpl implements Server {
     }
 
     void setClientId(int id) {
-        clientEntity = new NetEntityRef(id, networkSystem);
+        clientEntityNetId = id;
     }
 
     @Override
     public EntityRef getClientEntity() {
-        return clientEntity;
+        return networkSystem.getEntity(clientEntityNetId);
     }
 
     @Override
-    public NetData.ServerInfoMessage getInfo() {
+    public ServerInfoMessage getInfo() {
+        return new ServerInfoMessageImpl(serverInfo);
+    }
+    
+    public NetData.ServerInfoMessage getRawInfo() {
         return serverInfo;
     }
 
@@ -202,7 +209,7 @@ public class ServerImpl implements Server {
 
     private boolean isOwned(EntityRef entity) {
         EntityRef owner = networkSystem.getOwnerEntity(entity);
-        return clientEntity.equals(owner);
+        return getClientEntity().equals(owner);
     }
 
 
@@ -256,9 +263,9 @@ public class ServerImpl implements Server {
             int netId = removeEntity.getNetId();
             EntityRef entity = networkSystem.getEntity(netId);
             if (entity.exists()) {
-                networkSystem.unregisterNetworkEntity(entity);
                 logger.info("Destroying entity: {}", entity);
                 entity.destroy();
+                networkSystem.unregisterClientNetworkEntity(netId);
             }
         }
     }
@@ -338,17 +345,7 @@ public class ServerImpl implements Server {
     }
 
     private void createEntityMessage(NetData.CreateEntityMessage message) {
-        EntityRef newEntity = entitySerializer.deserialize(message.getEntity());
-        if (newEntity == null) {
-            logger.error("Received entity is null");
-            return;
-        } else if (newEntity.getComponent(NetworkComponent.class) == null) {
-            logger.error("Received entity with no NetworkComponent: {}", newEntity);
-        } else if (newEntity.getComponent(NetworkComponent.class).getNetworkId() == 0) {
-            logger.error("Received entity with null network id: {}", newEntity);
-        }
-        logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).getNetworkId());
-        networkSystem.registerNetworkEntity(newEntity);
+        entitySerializer.deserialize(message.getEntity());
     }
 
     @Override

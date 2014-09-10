@@ -47,7 +47,7 @@ final class TaskProcessor<T extends Task> implements Runnable {
             try {
                 T task = queue.take();
                 try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getName())) {
-                    task.enact();
+                    task.run();
                 }
                 if (task.isTerminateSignal()) {
                     running = false;

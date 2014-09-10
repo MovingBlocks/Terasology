@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "RepeatNode",
+        "name"      : "Repeat",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Decorator\nRepeats the child node forever.\nSUCCESS: Never.\nFAILURE: as soon as decorated node finishes with FAILURE.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

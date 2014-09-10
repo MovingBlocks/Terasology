@@ -18,11 +18,10 @@ package org.terasology.logic.players;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
 import org.terasology.rendering.logic.LightComponent;
@@ -33,17 +32,7 @@ import org.terasology.world.block.items.BlockItemComponent;
  * @author Immortius
  */
 @RegisterSystem
-public class HoldLuminousBlockSystem implements ComponentSystem {
-    @In
-    private SlotBasedInventoryManager inventoryManager;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
+public class HoldLuminousBlockSystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onInventorySlotChanged(InventorySlotChangedEvent event, EntityRef entity, CharacterComponent character) {
@@ -63,7 +52,7 @@ public class HoldLuminousBlockSystem implements ComponentSystem {
             return;
         }
 
-        int slot = inventoryManager.findSlotWithItem(item.getOwner(), item);
+        int slot = InventoryUtils.getSlotWithItem(item.getOwner(), item);
         if (slot != -1 && item.getOwner().hasComponent(CharacterComponent.class)) {
             CharacterComponent character = item.getOwner().getComponent(CharacterComponent.class);
             if (slot == character.selectedItem) {

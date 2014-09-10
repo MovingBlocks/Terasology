@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 import org.terasology.asset.Asset;
 import org.terasology.asset.Assets;
 import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegion;
 
 /**
  * @author Immortius

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package org.terasology.config;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.events.ChangeViewRangeRequest;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.cameras.PerspectiveCameraSettings;
+import org.terasology.rendering.nui.layers.mainMenu.videoSettings.CameraSetting;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -31,10 +33,10 @@ public class RenderingConfig {
     private PixelFormat pixelFormat = new PixelFormat().withDepthBits(24);
     private int windowPosX = -1;
     private int windowPosY = -1;
-    private int windowWidth = 1280;
+    private int windowWidth = 1152;
     private int windowHeight = 720;
     private boolean fullscreen;
-    private ViewDistance viewDistance = ViewDistance.NEAR;
+    private ViewDistance viewDistance = ViewDistance.MODERATE;
     private boolean flickeringLight = true;
     private boolean animateGrass = true;
     private boolean animateWater;
@@ -44,14 +46,14 @@ public class RenderingConfig {
     private int blurIntensity = 2;
     private boolean reflectiveWater;
     private boolean vignette = true;
-    private boolean motionBlur;
+    private boolean motionBlur = true;
     private boolean ssao;
     private boolean filmGrain = true;
     private boolean outline = true;
-    private boolean lightShafts;
+    private boolean lightShafts = true;
     private boolean eyeAdaptation = true;
-    private boolean bloom;
-    private boolean dynamicShadows;
+    private boolean bloom = true;
+    private boolean dynamicShadows = true;
     private boolean oculusVrSupport;
     private int maxTextureAtlasResolution = 4096;
     private int maxChunksUsedForShadowMapping = 1024;
@@ -59,17 +61,20 @@ public class RenderingConfig {
     private boolean normalMapping;
     private boolean parallaxMapping;
     private boolean dynamicShadowsPcfFiltering;
-    private boolean volumetricFog = true;
-    private boolean cloudShadows;
+    private boolean cloudShadows = true;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
-    private int meshLimit = 20;
-    private boolean volumetricLighting;
+    private int meshLimit = 400;
     private boolean inscattering = true;
-    private boolean localReflections = true;
+    private boolean localReflections;
     private boolean vSync;
+    private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
+
+    public PerspectiveCameraSettings getCameraSettings() {
+        return cameraSettings;
+    }
 
     public PixelFormat getPixelFormat() {
         return pixelFormat;
@@ -337,28 +342,12 @@ public class RenderingConfig {
         this.dynamicShadowsPcfFiltering = dynamicShadowsPcfFiltering;
     }
 
-    public boolean isVolumetricFog() {
-        return this.volumetricFog;
-    }
-
-    public void setVolumetricFog(boolean volumetricFog) {
-        this.volumetricFog = volumetricFog;
-    }
-
     public boolean isCloudShadows() {
         return cloudShadows;
     }
 
     public void setCloudShadows(boolean cloudShadows) {
         this.cloudShadows = cloudShadows;
-    }
-
-    public boolean isVolumetricLighting() {
-        return this.volumetricLighting;
-    }
-
-    public void setVolumetricLighting(boolean volumetricLighting) {
-        this.volumetricLighting = volumetricLighting;
     }
 
     public boolean isLocalReflections() {

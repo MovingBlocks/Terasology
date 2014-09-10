@@ -20,14 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
+import org.terasology.registry.In;
 import org.terasology.world.ChunkView;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldComponent;
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 // TODO: Fix this for changes to world
 // TODO: Also just fix it, it is terribly broken
 //@RegisterSystem(RegisterMode.AUTHORITY)
-public class LiquidSimulator implements ComponentSystem {
+public class LiquidSimulator extends BaseComponentSystem {
 
     private static final int NUM_THREADS = 2;
     private static final byte MAX_LIQUID_DEPTH = 0x7;

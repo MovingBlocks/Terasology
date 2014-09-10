@@ -35,15 +35,17 @@ public class RowLayoutHint implements LayoutHint {
         return relativeWidth;
     }
 
-    public void setRelativeWidth(float relativeWidth) {
-        this.relativeWidth = relativeWidth;
+    public RowLayoutHint setRelativeWidth(float width) {
+        this.relativeWidth = width;
+        return this;
     }
 
     public boolean isUseContentWidth() {
         return useContentWidth;
     }
 
-    public void setUseContentWidth(boolean useContentWidth) {
-        this.useContentWidth = useContentWidth;
+    public RowLayoutHint setUseContentWidth(boolean value) {
+        this.useContentWidth = value;
+        return this;
     }
 }

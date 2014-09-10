@@ -19,9 +19,12 @@ import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ColorComponent;
+import org.terasology.rendering.logic.MeshComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -31,11 +34,9 @@ import javax.vecmath.Vector3f;
 public class PlayerFactory {
 
     private EntityManager entityManager;
-    private SlotBasedInventoryManager inventoryManager;
 
-    public PlayerFactory(EntityManager entityManager, SlotBasedInventoryManager inventoryManager) {
+    public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.inventoryManager = inventoryManager;
     }
 
     public EntityRef newInstance(Vector3f spawnPosition, EntityRef controller) {
@@ -44,6 +45,14 @@ public class PlayerFactory {
         builder.setOwner(controller);
         EntityRef transferSlot = entityManager.create("engine:transferSlot");
 
+        ClientComponent clientComp = controller.getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            ColorComponent colorComp = clientComp.clientInfo.getComponent(ColorComponent.class);
+            
+            MeshComponent meshComp = builder.getComponent(MeshComponent.class);
+            meshComp.color = colorComp.color;
+        }
+        
         CharacterComponent playerComponent = builder.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         playerComponent.movingItem = transferSlot;
@@ -51,7 +60,7 @@ public class PlayerFactory {
 
         EntityRef player = builder.build();
 
-        player.send(new SelectedItemChangedEvent(EntityRef.NULL, inventoryManager.getItemInSlot(player, 0)));
+        player.send(new SelectedItemChangedEvent(EntityRef.NULL, InventoryUtils.getItemAt(player, 0)));
 
         return player;
     }

@@ -18,12 +18,10 @@ package org.terasology.input;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.device.InputAction;
 import org.terasology.input.device.KeyboardDevice;
@@ -50,6 +48,8 @@ import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ import java.util.Map;
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */
-public class InputSystem implements ComponentSystem {
+public class InputSystem extends BaseComponentSystem {
 
     @In
     private Config config;
@@ -86,6 +86,7 @@ public class InputSystem implements ComponentSystem {
     private LocalPlayer localPlayer;
     private CameraTargetSystem targetSystem;
 
+    @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         targetSystem = CoreRegistry.get(CameraTargetSystem.class);
@@ -150,6 +151,8 @@ public class InputSystem implements ComponentSystem {
                 break;
             case MOUSE_WHEEL:
                 linkBindButtonToMouseWheel(input.getId(), bindId);
+                break;
+            default:
                 break;
         }
     }
@@ -241,7 +244,7 @@ public class InputSystem implements ComponentSystem {
                     int id = action.getInput().getId();
                     if (id != -1) {
                         MouseInput button = MouseInput.find(action.getInput().getType(), action.getInput().getId());
-                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), mouse.getPosition(), delta);
+                        boolean consumed = sendMouseEvent(button, action.getState().isDown(), action.getMousePosition(), delta);
 
                         BindableButtonImpl bind = mouseButtonBinds.get(button);
                         if (bind != null) {
@@ -262,7 +265,7 @@ public class InputSystem implements ComponentSystem {
                 case MOUSE_WHEEL:
                     int dir = action.getInput().getId();
                     if (dir != 0 && action.getTurns() != 0) {
-                        boolean consumed = sendMouseWheelEvent(dir * action.getTurns(), delta);
+                        boolean consumed = sendMouseWheelEvent(action.getMousePosition(), dir * action.getTurns(), delta);
 
                         BindableButtonImpl bind = (dir == 1) ? mouseWheelUpBind : mouseWheelDownBind;
                         if (bind != null) {
@@ -396,8 +399,8 @@ public class InputSystem implements ComponentSystem {
         return consumed;
     }
 
-    private boolean sendMouseWheelEvent(int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(wheelTurns, delta);
+    private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
         setupTarget(mouseWheelEvent);
         for (EntityRef entity : getInputEntities()) {
             entity.send(mouseWheelEvent);

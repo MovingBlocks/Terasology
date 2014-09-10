@@ -15,10 +15,14 @@
  */
 package org.terasology.asset;
 
+import org.terasology.naming.Name;
+
 /**
  * @author Immortius
  */
 public interface AssetResolver<T extends Asset<U>, U extends AssetData> {
+
+    AssetUri resolve(Name partialUri);
 
     T resolve(AssetUri uri, AssetFactory<U, T> factory);
 

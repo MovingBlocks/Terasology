@@ -22,8 +22,8 @@ import org.terasology.benchmark.PrintToConsoleCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.benchmark.Benchmark;
-import org.terasology.classMetadata.reflect.ByteCodeReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
+import org.terasology.reflection.reflect.ByteCodeReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.List;
 

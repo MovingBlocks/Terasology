@@ -17,7 +17,7 @@
 package org.terasology.rendering;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
 

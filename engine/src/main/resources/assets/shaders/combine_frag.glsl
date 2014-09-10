@@ -18,10 +18,10 @@ uniform sampler2D texSceneOpaque;
 uniform sampler2D texSceneOpaqueDepth;
 uniform sampler2D texSceneOpaqueNormals;
 uniform sampler2D texSceneOpaqueLightBuffer;
-uniform sampler2D texSceneTransparent;
+uniform sampler2D texSceneReflectiveRefractive;
 
 #if defined (LOCAL_REFLECTIONS)
-uniform sampler2D texSceneTransparentNormals;
+uniform sampler2D texSceneReflectiveRefractiveNormals;
 
 uniform mat4 invProjMatrix;
 uniform mat4 projMatrix;
@@ -65,7 +65,7 @@ void main() {
     vec4 colorOpaque = texture2D(texSceneOpaque, gl_TexCoord[0].xy);
     float depthOpaque = texture2D(texSceneOpaqueDepth, gl_TexCoord[0].xy).r * 2.0 - 1.0;
     vec4 normalOpaque = texture2D(texSceneOpaqueNormals, gl_TexCoord[0].xy);
-    vec4 colorTransparent = texture2D(texSceneTransparent, gl_TexCoord[0].xy);
+    vec4 colorTransparent = texture2D(texSceneReflectiveRefractive, gl_TexCoord[0].xy);
     vec4 lightBufferOpaque = texture2D(texSceneOpaqueLightBuffer, gl_TexCoord[0].xy);
 
 #if defined (VOLUMETRIC_FOG)
@@ -76,7 +76,7 @@ void main() {
 #if defined (LOCAL_REFLECTIONS)
     vec3 worldPositionViewSpace = reconstructViewPos(depthOpaque, gl_TexCoord[0].xy, invProjMatrix);
 
-    vec4 transparentNormalColorValue = texture2D(texSceneTransparentNormals, gl_TexCoord[0].xy).xyzw;
+    vec4 transparentNormalColorValue = texture2D(texSceneReflectiveRefractiveNormals, gl_TexCoord[0].xy).xyzw;
     vec3 reflectionNormal = transparentNormalColorValue.xyz * 2.0 - 1.0;
     vec3 viewingDirection = normalize(worldPositionViewSpace.xyz);
 
@@ -123,7 +123,7 @@ void main() {
             }
 
             // TODO: Find a better way to do this... Using the previous frame buffer caused too much lag though
-            vec4 tempColTransparent = texture2D(texSceneTransparent, screenSpaceRayPosition.xy * 0.5 + 0.5).rgba;
+            vec4 tempColTransparent = texture2D(texSceneReflectiveRefractive, screenSpaceRayPosition.xy * 0.5 + 0.5).rgba;
             vec3 tempColOpaque = texture2D(texSceneOpaque, screenSpaceRayPosition.xy * 0.5 + 0.5).rgb;
 
             float fade = clamp(1.0 - tempColTransparent.a, 0.0, 1.0);

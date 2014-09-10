@@ -16,13 +16,12 @@
 package org.terasology.logic.characters;
 
 import org.terasology.audio.AudioManager;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.FootstepEvent;
@@ -32,10 +31,11 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.health.DamageSoundComponent;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
+import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 
@@ -45,7 +45,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
-public class CharacterSoundSystem implements ComponentSystem {
+public class CharacterSoundSystem extends BaseComponentSystem {
 
     private static final long MIN_TIME = 10;
     private Random random = new FastRandom();
@@ -56,18 +56,10 @@ public class CharacterSoundSystem implements ComponentSystem {
     @In
     private AudioManager audioManager;
 
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
     @ReceiveEvent
     public void onFootstep(FootstepEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = random.nextItem(characterSounds.footstepSounds);
+            StaticSound sound = random.nextItem(characterSounds.footstepSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.footstepVolume));
             characterSounds.lastSoundTime = time.getGameTimeInMs();
             entity.saveComponent(characterSounds);
@@ -77,7 +69,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     @ReceiveEvent
     public void onJump(JumpEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = null;
+            StaticSound sound = null;
             if (characterSounds.jumpSounds.size() > 0) {
                 sound = random.nextItem(characterSounds.jumpSounds);
             } else if (characterSounds.footstepSounds.size() > 0) {
@@ -98,7 +90,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         }
 
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = null;
+            StaticSound sound = null;
             if (characterSounds.landingSounds.size() > 0) {
                 sound = random.nextItem(characterSounds.landingSounds);
             } else if (characterSounds.footstepSounds.size() > 0) {
@@ -120,7 +112,7 @@ public class CharacterSoundSystem implements ComponentSystem {
 
         if (velocity > healthComponent.horizontalDamageSpeedThreshold) {
             if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-                Sound sound = random.nextItem(characterSounds.landingSounds);
+                StaticSound sound = random.nextItem(characterSounds.landingSounds);
                 if (sound != null) {
                     entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume));
                     characterSounds.lastSoundTime = time.getGameTimeInMs();
@@ -134,7 +126,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     public void onDamaged(OnDamagedEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             DamageSoundComponent damageSounds = event.getType().getComponent(DamageSoundComponent.class);
-            Sound sound = null;
+            StaticSound sound = null;
             if (damageSounds != null && !damageSounds.sounds.isEmpty()) {
                 sound = random.nextItem(damageSounds.sounds);
             } else if (!characterSounds.damageSounds.isEmpty()) {
@@ -150,9 +142,9 @@ public class CharacterSoundSystem implements ComponentSystem {
     }
 
     @ReceiveEvent
-    public void onDeath(NoHealthEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
+    public void onDeath(DestroyEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.deathSounds.size() > 0) {
-            Sound sound = random.nextItem(characterSounds.deathSounds);
+            StaticSound sound = random.nextItem(characterSounds.deathSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.deathVolume));
         }
     }
@@ -160,7 +152,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     @ReceiveEvent
     public void onRespawn(OnPlayerSpawnedEvent event, EntityRef character, CharacterSoundComponent characterSounds) {
         if (characterSounds.respawnSounds.size() > 0) {
-            Sound sound = random.nextItem(characterSounds.respawnSounds);
+            StaticSound sound = random.nextItem(characterSounds.respawnSounds);
             character.send(new PlaySoundEvent(character, sound, characterSounds.respawnVolume));
         }
     }
@@ -168,7 +160,7 @@ public class CharacterSoundSystem implements ComponentSystem {
     @ReceiveEvent
     public void onSwimStroke(SwimStrokeEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         if (characterSounds.swimSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            Sound sound = random.nextItem(characterSounds.swimSounds);
+            StaticSound sound = random.nextItem(characterSounds.swimSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.swimmingVolume));
             characterSounds.lastSoundTime = time.getGameTimeInMs();
             entity.saveComponent(characterSounds);
@@ -181,7 +173,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         if (event.getCharacterRelativePosition().y == 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
             boolean oldBlockIsLiquid = event.getOldBlock().isLiquid();
             boolean newBlockIsLiquid = event.getNewBlock().isLiquid();
-            Sound sound = null;
+            StaticSound sound = null;
             if (!oldBlockIsLiquid && newBlockIsLiquid) {
                 sound = random.nextItem(characterSounds.enterWaterSounds);
             } else if (oldBlockIsLiquid && !newBlockIsLiquid) {

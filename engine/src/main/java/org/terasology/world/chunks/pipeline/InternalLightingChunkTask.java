@@ -36,7 +36,7 @@ public class InternalLightingChunkTask extends AbstractChunkTask {
     }
 
     @Override
-    public void enact() {
+    public void run() {
         ChunkImpl chunk = getProvider().getChunkForProcessing(getPosition());
         if (chunk == null) {
             return;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "jump", description = "Jump", repeating = false)
+@RegisterBindButton(id = "jump", description = "Jump / Ascend", repeating = false)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.SPACE)
 public class JumpButton extends BindButtonEvent {
 }

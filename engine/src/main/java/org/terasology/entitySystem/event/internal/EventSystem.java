@@ -49,6 +49,12 @@ public interface EventSystem {
     void registerEventHandler(ComponentSystem handler);
 
     /**
+     * Unregister an object as an event handler.
+     * @param handler
+     */
+    void unregisterEventHandler(ComponentSystem handler);
+
+    /**
      * Registers an event receiver object
      *
      * @param eventReceiver

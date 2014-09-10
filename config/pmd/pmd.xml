@@ -25,4 +25,5 @@
     <rule ref="rulesets/sunsecure.xml"/>
 <!-- <rule ref="rulesets/typeresolution.xml"/> -->
     <rule ref="rulesets/unusedcode.xml"/>
+    <exclude-pattern>.*/org.terasology.protobuf/.*</exclude-pattern>
 </ruleset>

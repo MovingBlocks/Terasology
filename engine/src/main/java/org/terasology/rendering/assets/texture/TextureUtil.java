@@ -16,10 +16,15 @@
 
 package org.terasology.rendering.assets.texture;
 
-import java.awt.Color;
+import com.google.common.primitives.UnsignedBytes;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.Rect2i;
+import org.terasology.rendering.nui.Color;
+
+import java.awt.image.BufferedImage;
+import java.nio.ByteBuffer;
 
 public final class TextureUtil {
     public static final String GENERATED_COLOR_NAME_PREFIX = "color";
@@ -29,9 +34,8 @@ public final class TextureUtil {
 
     /**
      * Returns a AssetUri which represents a Texture of that color.
-     * 
+     *
      * @param color, including alpha, of the texture to represent.
-     * 
      * @return an asset Uri for the texture
      */
     public static AssetUri getTextureUriForColor(Color color) {
@@ -47,32 +51,31 @@ public final class TextureUtil {
      * Method to convert the color string hex representation back to a color.
      * Package-only access as it is for internal use in ColorTextureAssetResolver,
      * but should be here for maintenance with the color-to-color-string code.
-     * 
-     * @param sb StringBuilder into which to append name
+     *
+     * @param sb    StringBuilder into which to append name
      * @param color represented by hexColorName
-     * 
      * @return hexColorName RRGGBBAA in lower-case hex notation
      */
     private static void appendColorName(StringBuilder sb, Color color) {
-        int red = color.getRed();
+        int red = color.r();
         if (red < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(red));
 
-        int green = color.getGreen();
+        int green = color.g();
         if (green < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(green));
 
-        int blue = color.getBlue();
+        int blue = color.b();
         if (blue < 16) {
             sb.append('0');
         }
         sb.append(Integer.toHexString(blue));
 
-        int alpha = color.getAlpha();
+        int alpha = color.a();
         if (alpha < 16) {
             sb.append('0');
         }
@@ -83,9 +86,8 @@ public final class TextureUtil {
      * Method to convert the color string hex representation back to a color.
      * Package-only access as it is for internal use in ColorTextureAssetResolver,
      * but should be here for maintenance with the color-to-color-string code.
-     * 
+     *
      * @param hexColorName RRGGBBAA in lower-case hex notation
-     * 
      * @return color represented by hexColorName
      */
     static/* package-only */Color getColorForColorName(String hexColorName) {
@@ -104,5 +106,53 @@ public final class TextureUtil {
         int blue = Integer.parseInt(blueString, 16);
         int alpha = Integer.parseInt(alphaString, 16);
         return new Color(red, green, blue, alpha);
+    }
+
+    public static BufferedImage convertToImage(TextureRegion textureRegion) {
+        final int width = textureRegion.getWidth();
+        final int height = textureRegion.getHeight();
+
+        final Rect2i pixelRegion = textureRegion.getPixelRegion();
+        final Texture texture = textureRegion.getTexture();
+        ByteBuffer textureBytes = texture.getData().getBuffers()[0];
+        int stride = texture.getWidth() * 4;
+        int posX = pixelRegion.minX();
+        int posY = pixelRegion.minY();
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int r = UnsignedBytes.toInt(textureBytes.get((posY + y) * stride + (posX + x) * 4));
+                int g = UnsignedBytes.toInt(textureBytes.get((posY + y) * stride + (posX + x) * 4 + 1));
+                int b = UnsignedBytes.toInt(textureBytes.get((posY + y) * stride + (posX + x) * 4 + 2));
+                int a = UnsignedBytes.toInt(textureBytes.get((posY + y) * stride + (posX + x) * 4 + 3));
+
+                int argb = (a << 24) + (r << 16) + (g << 8) + b;
+                image.setRGB(x, y, argb);
+            }
+        }
+        return image;
+    }
+
+    public static ByteBuffer convertToByteBuffer(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        ByteBuffer data = ByteBuffer.allocateDirect(4 * width * height);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int argb = image.getRGB(x, y);
+                int r = (argb >> 16) & 0xFF;
+                int g = (argb >> 8) & 0xFF;
+                int b = argb & 0xFF;
+                int a = (argb >> 24) & 0xFF;
+                data.put(UnsignedBytes.checkedCast(r));
+                data.put(UnsignedBytes.checkedCast(g));
+                data.put(UnsignedBytes.checkedCast(b));
+                data.put(UnsignedBytes.checkedCast(a));
+            }
+        }
+        data.rewind();
+        return data;
     }
 }

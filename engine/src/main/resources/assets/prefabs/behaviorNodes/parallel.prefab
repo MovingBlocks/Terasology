@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "ParallelNode",
+        "name"      : "Parallel",
+        "category"  : "logic",
+        "shape"     : "diamond",
+        "description": "Composite\nAll children are evaluated in parallel. Policies for success and failure will define when this node finishes and in which state.\nSUCCESS: when success policy is fulfilled (one or all children SUCCESS).\nFAILURE, when failure policy is fulfilled (one or all children FAILURE).",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

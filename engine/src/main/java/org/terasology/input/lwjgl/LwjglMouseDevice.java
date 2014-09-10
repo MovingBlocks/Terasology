@@ -47,17 +47,22 @@ public class LwjglMouseDevice implements MouseDevice {
     }
 
     @Override
+    public boolean isVisible() {
+        return !Mouse.isGrabbed();
+    }
+
+    @Override
     public Queue<InputAction> getInputQueue() {
         Queue<InputAction> result = Queues.newArrayDeque();
 
         while (Mouse.next()) {
             if (Mouse.getEventButton() != -1) {
                 ButtonState state = (Mouse.getEventButtonState()) ? ButtonState.DOWN : ButtonState.UP;
-                result.add(new InputAction(InputType.MOUSE_BUTTON.getInput(Mouse.getEventButton()), state));
+                result.add(new InputAction(InputType.MOUSE_BUTTON.getInput(Mouse.getEventButton()), state, getPosition()));
             }
             if (Mouse.getEventDWheel() != 0) {
                 int id = (Mouse.getEventDWheel() > 0) ? 1 : -1;
-                result.add(new InputAction(InputType.MOUSE_WHEEL.getInput(id), id * Mouse.getEventDWheel() / 120));
+                result.add(new InputAction(InputType.MOUSE_WHEEL.getInput(id), id * Mouse.getEventDWheel() / 120, getPosition()));
             }
         }
 

@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldComponent;
@@ -33,18 +33,10 @@ import java.util.Set;
  * @author Immortius
  */
 @RegisterSystem
-public class ChunkEventErrorLogger implements ComponentSystem {
+public class ChunkEventErrorLogger extends BaseComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(ChunkEventErrorLogger.class);
 
     private Set<Vector3i> loadedChunks = Sets.newHashSet();
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     @ReceiveEvent(components = {WorldComponent.class})
     public void onNewChunk(OnChunkLoaded chunkAvailable, EntityRef worldEntity) {

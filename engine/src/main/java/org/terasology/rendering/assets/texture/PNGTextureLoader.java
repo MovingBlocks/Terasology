@@ -16,13 +16,14 @@
 
 package org.terasology.rendering.assets.texture;
 
+import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
     }
 
     @Override
-    public TextureData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public TextureData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         InputStream pngStream = null;
         if (urls.get(0).toString().endsWith(".png")) {
             pngStream = stream;
@@ -72,18 +73,18 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             int height = decoder.getHeight();
             int width = decoder.getWidth();
 
-            Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
-            Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
+            Texture.FilterMode filterMode = Texture.FilterMode.NEAREST;
+            Texture.WrapMode wrapMode = Texture.WrapMode.CLAMP;
             Texture.Type type = Texture.Type.TEXTURE2D;
 
             // TODO: Change asset loader setup so that the default filter mode can be set per asset location
             if (urls.get(0).toString().contains("/fonts/")) {
-                filterMode = Texture.FilterMode.Linear;
+                filterMode = Texture.FilterMode.LINEAR;
             }
 
             for (URL url : urls) {
                 if (url.toString().endsWith(".texinfo")) {
-                    try (InputStreamReader reader = new InputStreamReader(url.openStream())) {
+                    try (InputStreamReader reader = new InputStreamReader(url.openStream(), Charsets.UTF_8)) {
                         TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                         if (metadata.filterMode != null) {
                             filterMode = metadata.filterMode;
@@ -130,6 +131,8 @@ public class PNGTextureLoader implements AssetLoader<TextureData> {
             } else {
                 return new TextureData(width, height, new ByteBuffer[]{data}, wrapMode, filterMode);
             }
+        } catch (UnsupportedOperationException e) {
+            throw new IOException(e);
         } finally {
             pngStream.close();
         }

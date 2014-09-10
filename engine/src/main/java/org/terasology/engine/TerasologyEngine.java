@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,37 +16,23 @@
 
 package org.terasology.engine;
 
-import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.audio.AudioManager;
-import org.terasology.audio.nullAudio.NullAudioManager;
-import org.terasology.audio.openAL.OpenALManager;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
-import org.terasology.config.RenderingConfig;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
-import org.terasology.engine.internal.TimeLwjgl;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.DisplayDevice;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
@@ -54,9 +40,8 @@ import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
 import org.terasology.input.InputSystem;
-import org.terasology.input.lwjgl.LwjglKeyboardDevice;
-import org.terasology.input.lwjgl.LwjglMouseDevice;
-import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.behavior.asset.BehaviorTree;
+import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -65,67 +50,31 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.physics.CollisionGroupManager;
-import org.terasology.rendering.ShaderManager;
-import org.terasology.rendering.VertexBufferObjectManager;
-import org.terasology.rendering.assets.animation.MeshAnimation;
-import org.terasology.rendering.assets.animation.MeshAnimationData;
-import org.terasology.rendering.assets.animation.MeshAnimationImpl;
-import org.terasology.rendering.assets.atlas.Atlas;
-import org.terasology.rendering.assets.atlas.AtlasData;
-import org.terasology.rendering.assets.font.Font;
-import org.terasology.rendering.assets.font.FontData;
-import org.terasology.rendering.assets.material.Material;
-import org.terasology.rendering.assets.material.MaterialData;
-import org.terasology.rendering.assets.mesh.Mesh;
-import org.terasology.rendering.assets.mesh.MeshData;
-import org.terasology.rendering.assets.shader.Shader;
-import org.terasology.rendering.assets.shader.ShaderData;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
-import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
-import org.terasology.rendering.assets.subtexture.Subtexture;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
-import org.terasology.rendering.assets.subtexture.SubtextureFromAtlasResolver;
-import org.terasology.rendering.assets.texture.ColorTextureAssetResolver;
-import org.terasology.rendering.assets.texture.Texture;
-import org.terasology.rendering.assets.texture.TextureData;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.internal.NUIManagerInternal;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.asset.UIData;
+import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
-import org.terasology.rendering.opengl.GLSLMaterial;
-import org.terasology.rendering.opengl.GLSLShader;
-import org.terasology.rendering.opengl.OpenGLFont;
-import org.terasology.rendering.opengl.OpenGLMesh;
-import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
-import org.terasology.rendering.opengl.OpenGLTexture;
-import org.terasology.utilities.LWJGLHelper;
+import org.terasology.utilities.concurrency.ShutdownTask;
+import org.terasology.utilities.concurrency.Task;
+import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.version.TerasologyVersion;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 
-import javax.swing.*;
-
-import java.awt.*;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Immortius
@@ -140,18 +89,23 @@ public class TerasologyEngine implements GameEngine {
     private boolean disposed;
     private GameState pendingState;
 
-    private AudioManager audioManager;
     private Config config;
 
     private EngineTime time;
-    private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+    private final TaskMaster<Task> commonThreadPool = TaskMaster.createFIFOTaskMaster("common", 16);
 
-    private Canvas customViewPort;
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
     private Set<StateChangeSubscriber> stateChangeSubscribers = Sets.newLinkedHashSet();
 
-    public TerasologyEngine() {
+    private Deque<EngineSubsystem> subsystems;
+
+    public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
+        this.subsystems = Queues.newArrayDeque(subsystems);
+    }
+
+    public Iterable<EngineSubsystem> getSubsystems() {
+        return subsystems;
     }
 
     @Override
@@ -159,38 +113,62 @@ public class TerasologyEngine implements GameEngine {
         if (initialised) {
             return;
         }
-        initLogger();
+
+        Stopwatch sw = Stopwatch.createStarted();
 
         try {
             logger.info("Initializing Terasology...");
             logger.info(TerasologyVersion.getInstance().toString());
-            logger.info("Platform: {}", System.getProperty("os.name"));
             logger.info("Home path: {}", PathManager.getInstance().getHomePath());
             logger.info("Install path: {}", PathManager.getInstance().getInstallPath());
-            logger.info("Java version: {}", System.getProperty("java.version"));
+            logger.info("Java: {} in {}", System.getProperty("java.version"), System.getProperty("java.home"));
+            logger.info("Java VM: {}, version: {}", System.getProperty("java.vm.name"), System.getProperty("java.vm.version"));
+            logger.info("OS: {}, arch: {}, version: {}", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
+            logger.info("Max. Memory: {} MB", Runtime.getRuntime().maxMemory() / (1024 * 1024));
+            logger.info("Processors: {}", Runtime.getRuntime().availableProcessors());
 
             initConfig();
 
-            LWJGLHelper.initNativeLibs();
-            initTimer(); // Dependent on LWJGL
+            for (EngineSubsystem subsystem : getSubsystems()) {
+                subsystem.preInitialise();
+            }
+
+            // Verify required systems are available
+            time = (EngineTime) CoreRegistry.get(Time.class);
+            if (time == null) {
+                throw new IllegalStateException("Time not registered as a core system.");
+            }
+
             initManagers();
-            initDisplay();
-            initOpenGL();
-            initOpenAL();
+
+            for (EngineSubsystem subsystem : getSubsystems()) {
+                subsystem.postInitialise(config);
+            }
+
+            // Verify required systems are available
+            if (CoreRegistry.get(DisplayDevice.class) == null) {
+                throw new IllegalStateException("DisplayDevice not registered as a core system.");
+            }
+            if (CoreRegistry.get(RenderingSubsystemFactory.class) == null) {
+                throw new IllegalStateException("EngineSubsystemFactory not registered as a core system.");
+            }
+            if (CoreRegistry.get(InputSystem.class) == null) {
+                throw new IllegalStateException("InputSystem not registered as a core system.");
+            }
+
             initAssets();
-            initControls();
-            updateInputConfig();
-            CoreRegistry.putPermanently(GUIManager.class, new GUIManager(this));
-            CoreRegistry.putPermanently(NUIManager.class, new NUIManagerInternal(CoreRegistry.get(AssetManager.class)));
 
             if (config.getSystem().isMonitoringEnabled()) {
                 new AdvancedMonitor().setVisible(true);
             }
             initialised = true;
-        } catch (Throwable t) {
-            logger.error("Failed to initialise Terasology", t);
-            throw new RuntimeException("Failed to initialise Terasology", t);
+        } catch (RuntimeException e) {
+            logger.error("Failed to initialise Terasology", e);
+            throw e;
         }
+
+        double secs = 0.001 * sw.elapsed(TimeUnit.MILLISECONDS);
+        logger.info("Initialization completed in {}sec.", String.format("%.2f", secs));
     }
 
     private void initAssets() {
@@ -215,6 +193,19 @@ public class TerasologyEngine implements GameEngine {
                 return new UISkin(uri, data);
             }
         });
+        assetManager.setAssetFactory(AssetType.BEHAVIOR, new AssetFactory<BehaviorTreeData, BehaviorTree>() {
+            @Override
+            public BehaviorTree buildAsset(AssetUri uri, BehaviorTreeData data) {
+                return new BehaviorTree(uri, data);
+            }
+        });
+        assetManager.setAssetFactory(AssetType.UI_ELEMENT, new AssetFactory<UIData, UIElement>() {
+            @Override
+            public UIElement buildAsset(AssetUri uri, UIData data) {
+                return new UIElement(uri, data);
+            }
+        });
+
     }
 
     private void initConfig() {
@@ -228,8 +219,8 @@ public class TerasologyEngine implements GameEngine {
         } else {
             config = new Config();
         }
-        if (!config.getDefaultModSelection().hasModule("core")) {
-            config.getDefaultModSelection().addModule("core");
+        if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_MODULE)) {
+            config.getDefaultModSelection().addModule(TerasologyConstants.CORE_MODULE);
         }
         if (config.getSecurity().getServerPrivateCertificate() == null) {
             CertificateGenerator generator = new CertificateGenerator();
@@ -239,33 +230,6 @@ public class TerasologyEngine implements GameEngine {
         }
         logger.info("Video Settings: " + config.getRendering().toString());
         CoreRegistry.putPermanently(Config.class, config);
-    }
-
-    private void updateInputConfig() {
-        config.getInput().getBinds().updateForChangedMods();
-        config.save();
-    }
-
-    private void initLogger() {
-        if (LWJGLUtil.DEBUG) {
-            // Pipes System.out and err to log, because that's where lwjgl writes it to.
-            System.setOut(new PrintStream(System.out) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
-
-                @Override
-                public void print(final String message) {
-                    logger.info(message);
-                }
-            });
-            System.setErr(new PrintStream(System.err) {
-                private Logger logger = LoggerFactory.getLogger("org.lwjgl");
-
-                @Override
-                public void print(final String message) {
-                    logger.error(message);
-                }
-            });
-        }
     }
 
     @Override
@@ -282,9 +246,9 @@ public class TerasologyEngine implements GameEngine {
             mainLoop();
 
             cleanup();
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -299,14 +263,15 @@ public class TerasologyEngine implements GameEngine {
             if (!running) {
                 disposed = true;
                 initialised = false;
-                Mouse.destroy();
-                Keyboard.destroy();
-                Display.destroy();
-                audioManager.dispose();
+                Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+                while (iter.hasNext()) {
+                    EngineSubsystem subsystem = iter.next();
+                    subsystem.dispose();
+                }
             }
-        } catch (Throwable t) {
-            logger.error("Uncaught exception", t);
-            throw new RuntimeException("Uncaught exception", t);
+        } catch (RuntimeException e) {
+            logger.error("Uncaught exception", e);
+            throw e;
         }
     }
 
@@ -321,6 +286,11 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
+    public GameState getState() {
+        return currentState;
+    }
+
+    @Override
     public void changeState(GameState newState) {
         if (currentState != null) {
             pendingState = newState;
@@ -331,265 +301,67 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void submitTask(final String name, final Runnable task) {
-        threadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                Thread.currentThread().setName("Engine-Task-Pool");
-                try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                    task.run();
-                } catch (RejectedExecutionException e) {
-                    ThreadMonitor.addError(e);
-                    logger.error("Thread submitted after shutdown requested: {}", name);
-                } catch (Throwable e) {
-                    ThreadMonitor.addError(e);
+        try {
+            commonThreadPool.put(new Task() {
+                @Override
+                public String getName() {
+                    return name;
                 }
-            }
-        });
-    }
 
-    @Override
-    public int getActiveTaskCount() {
-        return threadPool.getActiveCount();
-    }
+                @Override
+                public void run() {
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                    Thread.currentThread().setName("Engine-Task-Pool");
+                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
+                        task.run();
+                    } catch (RejectedExecutionException e) {
+                        ThreadMonitor.addError(e);
+                        logger.error("Thread submitted after shutdown requested: {}", name);
+                    } catch (Throwable e) {
+                        ThreadMonitor.addError(e);
+                    }
+                }
 
-    private void initOpenAL() {
-        if (config.getAudio().isDisableSound()) {
-            audioManager = new NullAudioManager();
-        } else {
-            audioManager = new OpenALManager(config.getAudio());
-        }
-        CoreRegistry.putPermanently(AudioManager.class, audioManager);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
-        assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
-    }
-
-    private void initDisplay() {
-        try {
-            setDisplayMode();
-
-            RenderingConfig rc = config.getRendering();
-            Display.setLocation(rc.getWindowPosX(), rc.getWindowPosY());
-            Display.setParent(customViewPort);
-            Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create(rc.getPixelFormat());
-            Display.setVSyncEnabled(rc.isVSync());
-        } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
-        }
-    }
-
-    private void initOpenGL() {
-        checkOpenGL();
-        resizeViewport();
-        initOpenGLParams();
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        assetManager.setAssetFactory(AssetType.TEXTURE, new AssetFactory<TextureData, Texture>() {
-            @Override
-            public Texture buildAsset(AssetUri uri, TextureData data) {
-                return new OpenGLTexture(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.FONT, new AssetFactory<FontData, Font>() {
-            @Override
-            public Font buildAsset(AssetUri uri, FontData data) {
-                return new OpenGLFont(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SHADER, new AssetFactory<ShaderData, Shader>() {
-            @Override
-            public Shader buildAsset(AssetUri uri, ShaderData data) {
-                return new GLSLShader(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.MATERIAL, new AssetFactory<MaterialData, Material>() {
-            @Override
-            public Material buildAsset(AssetUri uri, MaterialData data) {
-                return new GLSLMaterial(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.MESH, new AssetFactory<MeshData, Mesh>() {
-            @Override
-            public Mesh buildAsset(AssetUri uri, MeshData data) {
-                return new OpenGLMesh(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SKELETON_MESH, new AssetFactory<SkeletalMeshData, SkeletalMesh>() {
-            @Override
-            public SkeletalMesh buildAsset(AssetUri uri, SkeletalMeshData data) {
-                return new OpenGLSkeletalMesh(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.ANIMATION, new AssetFactory<MeshAnimationData, MeshAnimation>() {
-            @Override
-            public MeshAnimation buildAsset(AssetUri uri, MeshAnimationData data) {
-                return new MeshAnimationImpl(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.ATLAS, new AssetFactory<AtlasData, Atlas>() {
-            @Override
-            public Atlas buildAsset(AssetUri uri, AtlasData data) {
-                return new Atlas(uri, data);
-            }
-        });
-        assetManager.setAssetFactory(AssetType.SUBTEXTURE, new AssetFactory<SubtextureData, Subtexture>() {
-            @Override
-            public Subtexture buildAsset(AssetUri uri, SubtextureData data) {
-                return new Subtexture(uri, data);
-            }
-        });
-        assetManager.addResolver(AssetType.SUBTEXTURE, new SubtextureFromAtlasResolver());
-        assetManager.addResolver(AssetType.TEXTURE, new ColorTextureAssetResolver());
-        CoreRegistry.putPermanently(ShaderManager.class, new ShaderManager());
-        CoreRegistry.get(ShaderManager.class).initShaders();
-        VertexBufferObjectManager.getInstance();
-
-    }
-
-    private void checkOpenGL() {
-        boolean canRunGame = GLContext.getCapabilities().OpenGL11
-                & GLContext.getCapabilities().OpenGL12
-                & GLContext.getCapabilities().OpenGL14
-                & GLContext.getCapabilities().OpenGL15
-                & GLContext.getCapabilities().GL_ARB_framebuffer_object
-                & GLContext.getCapabilities().GL_ARB_texture_float
-                & GLContext.getCapabilities().GL_ARB_half_float_pixel
-                & GLContext.getCapabilities().GL_ARB_shader_objects;
-
-        if (!canRunGame) {
-            String message = "Your GPU driver is not supporting the mandatory versions or extensions of OpenGL. Considered updating your GPU drivers? Exiting...";
-            logger.error(message);
-            JOptionPane.showMessageDialog(null, message, "Mandatory OpenGL version(s) or extension(s) not supported", JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
-        }
-
-    }
-
-    private void resizeViewport() {
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
-    }
-
-    public void initOpenGLParams() {
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_NORMALIZE);
-        glDepthFunc(GL_LEQUAL);
-    }
-
-    private void initControls() {
-        try {
-            Keyboard.create();
-            Keyboard.enableRepeatEvents(true);
-            Mouse.create();
-            Mouse.setGrabbed(false);
-            InputSystem inputSystem = CoreRegistry.putPermanently(InputSystem.class, new InputSystem());
-            inputSystem.setMouseDevice(new LwjglMouseDevice());
-            inputSystem.setKeyboardDevice(new LwjglKeyboardDevice());
-        } catch (LWJGLException e) {
-            logger.error("Could not initialize controls.", e);
-            System.exit(1);
+                @Override
+                public boolean isTerminateSignal() {
+                    return false;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to submit task {}, running on main thread", name, e);
+            task.run();
         }
     }
 
     private void initManagers() {
         GameThread.setGameThread();
-        ModuleManager moduleManager = initModuleManager();
+        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
 
         ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
 
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
-        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager));
+        AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        assetManager.setEnvironment(moduleManager.getEnvironment());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
-        CoreRegistry.putPermanently(Game.class, new Game(time));
+        CoreRegistry.putPermanently(Game.class, new Game(this, time));
+        assetManager.setEnvironment(moduleManager.getEnvironment());
 
         AssetType.registerAssetTypes(assetManager);
-        ClasspathSource source = new ClasspathSource(TerasologyConstants.ENGINE_MODULE,
-                getClass().getProtectionDomain().getCodeSource(), TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY);
-        assetManager.addAssetSource(source);
-
         ApplyModulesUtil.applyModules();
-    }
-
-    private ModuleManager initModuleManager() {
-        ModuleSecurityManager moduleSecurityManager = new ModuleSecurityManager();
-        ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManagerImpl(moduleSecurityManager));
-        moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAPIPackage("java.lang.ref");
-        moduleSecurityManager.addAPIPackage("java.math");
-        moduleSecurityManager.addAPIPackage("java.util");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
-        moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIPackage("java.awt");
-        moduleSecurityManager.addAPIPackage("java.awt.geom");
-        moduleSecurityManager.addAPIPackage("java.awt.image");
-        moduleSecurityManager.addAPIPackage("com.google.common.annotations");
-        moduleSecurityManager.addAPIPackage("com.google.common.cache");
-        moduleSecurityManager.addAPIPackage("com.google.common.collect");
-        moduleSecurityManager.addAPIPackage("com.google.common.base");
-        moduleSecurityManager.addAPIPackage("com.google.common.math");
-        moduleSecurityManager.addAPIPackage("com.google.common.primitives");
-        moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
-        moduleSecurityManager.addAPIPackage("gnu.trove");
-        moduleSecurityManager.addAPIPackage("gnu.trove.decorator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.function");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.linked");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.custom_hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.queue");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
-        moduleSecurityManager.addAPIPackage("javax.vecmath");
-        
-        moduleSecurityManager.addAllowedPermission(new AWTPermission("accessClipboard"));
-
-        moduleSecurityManager.addAPIClass(Joiner.class);
-        moduleSecurityManager.addAPIClass(IOException.class);
-        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
-        moduleSecurityManager.addAPIClass(LoggerFactory.class);
-        moduleSecurityManager.addAPIClass(Logger.class);
-        for (Class<?> apiClass : moduleManager.getActiveModuleReflections().getTypesAnnotatedWith(API.class)) {
-            if (apiClass.isSynthetic()) {
-                // This is a package-info
-                moduleSecurityManager.addAPIPackage(apiClass.getPackage().getName());
-            } else {
-                moduleSecurityManager.addAPIClass(apiClass);
-            }
-        }
-        
-        System.setSecurityManager(moduleSecurityManager);
-        return moduleManager;
-    }
-
-    private void initTimer() {
-        time = new TimeLwjgl();
-        CoreRegistry.putPermanently(Time.class, time);
     }
 
     private void cleanup() {
         logger.info("Shutting down Terasology...");
-        
-        if (!Display.isFullscreen() && Display.isVisible()) {
-            config.getRendering().setWindowPosX(Display.getX());
-            config.getRendering().setWindowPosY(Display.getY());
+
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+        while (iter.hasNext()) {
+            EngineSubsystem subsystem = iter.next();
+            subsystem.shutdown(config);
         }
 
         config.save();
@@ -597,27 +369,29 @@ public class TerasologyEngine implements GameEngine {
             currentState.dispose();
             currentState = null;
         }
-        terminateThreads();
+
+        stopThreads();
     }
 
-    private void terminateThreads() {
-        threadPool.shutdown();
-        try {
-            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            logger.error("Error terminating thread pool.", e);
-        }
+    public void stopThreads() {
+        commonThreadPool.shutdown(new ShutdownTask(), false);
+    }
+
+    public void restartThreads() {
+        commonThreadPool.restart();
     }
 
     private void mainLoop() {
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        while (running && !Display.isCloseRequested()) {
+        while (running && !display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
-            if (!Display.isActive() && isHibernationAllowed()) {
+            if (!display.isActive() && isHibernationAllowed()) {
                 time.setPaused(true);
                 Iterator<Float> updateCycles = time.tick();
                 while (updateCycles.hasNext()) {
@@ -629,7 +403,7 @@ public class TerasologyEngine implements GameEngine {
                     logger.warn("Display inactivity sleep interrupted", e);
                 }
 
-                Display.processMessages();
+                display.processMessages();
                 time.setPaused(false);
                 continue;
             }
@@ -656,28 +430,24 @@ public class TerasologyEngine implements GameEngine {
                 PerformanceMonitor.endActivity();
             }
 
+            float delta = totalDelta / 1000f;
+
+            for (EngineSubsystem subsystem : getSubsystems()) {
+                PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName());
+                subsystem.preUpdate(currentState, delta);
+                PerformanceMonitor.endActivity();
+            }
+
             GameThread.processWaitingProcesses();
 
-            PerformanceMonitor.startActivity("Render");
-            Display.update();
-            Display.sync(60);
-            currentState.render();
-            PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.startActivity("Audio");
-            audioManager.update(totalDelta / 1000f);
-            PerformanceMonitor.endActivity();
-
-            PerformanceMonitor.startActivity("Input");
-            currentState.handleInput(totalDelta / 1000f);
-            PerformanceMonitor.endActivity();
+            for (EngineSubsystem subsystem : getSubsystems()) {
+                PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName());
+                subsystem.postUpdate(currentState, delta);
+                PerformanceMonitor.endActivity();
+            }
 
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
-
-            if (Display.wasResized()) {
-                resizeViewport();
-            }
         }
         PerformanceMonitor.endActivity();
         running = false;
@@ -699,21 +469,10 @@ public class TerasologyEngine implements GameEngine {
         for (StateChangeSubscriber subscriber : stateChangeSubscribers) {
             subscriber.onStateChange();
         }
-    }
-
-    private void setDisplayMode() {
-        try {
-            if (config.getRendering().isFullscreen()) {
-                Display.setDisplayMode(Display.getDesktopDisplayMode());
-                Display.setFullscreen(true);
-            } else {
-                Display.setDisplayMode(config.getRendering().getDisplayMode());
-                Display.setResizable(true);
-            }
-        } catch (LWJGLException e) {
-            logger.error("Can not initialize graphics device.", e);
-            System.exit(1);
-        }
+        // drain input queues
+        InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
+        inputSystem.getMouseDevice().getInputQueue();
+        inputSystem.getKeyboard().getInputQueue();
     }
 
     public boolean isFullscreen() {
@@ -723,15 +482,9 @@ public class TerasologyEngine implements GameEngine {
     public void setFullscreen(boolean state) {
         if (config.getRendering().isFullscreen() != state) {
             config.getRendering().setFullscreen(state);
-            setDisplayMode();
-            resizeViewport();
-            CoreRegistry.get(GUIManager.class).update(true);
+            DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+            display.setFullscreen(state);
         }
-    }
-
-    public void setVSync(boolean state) {
-        config.getRendering().setVSync(state);
-        Display.setVSyncEnabled(state);
     }
 
     public boolean isHibernationAllowed() {
@@ -743,7 +496,8 @@ public class TerasologyEngine implements GameEngine {
     }
 
     public boolean hasFocus() {
-        return gameFocused && Display.isActive();
+        DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
+        return gameFocused && display.isActive();
     }
 
     @Override
@@ -763,9 +517,5 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
         stateChangeSubscribers.remove(subscriber);
-    }
-
-    public void setCustomViewport(Canvas canvas) {
-        this.customViewPort = canvas;
     }
 }

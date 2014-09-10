@@ -66,14 +66,16 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     private void initializeBuffers() {
-        buffers = new int[BUFFER_POOL_SIZE];
+        if (buffers.length == 0) {
+            buffers = new int[BUFFER_POOL_SIZE];
 
-        for (int i = 0; i < buffers.length; i++) {
-            buffers[i] = AL10.alGenBuffers();
-            OpenALException.checkState("Creating buffer");
+            for (int i = 0; i < buffers.length; i++) {
+                buffers[i] = AL10.alGenBuffers();
+                OpenALException.checkState("Creating buffer");
+            }
+
+            this.lastUpdatedBuffer = buffers[0];
         }
-
-        this.lastUpdatedBuffer = buffers[0];
     }
 
     @Override
@@ -86,18 +88,19 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
         return stream.getSamplingRate();
     }
 
+    @Override
     public int getBufferSize() {
         return alGetBufferi(lastUpdatedBuffer, AL_SIZE);
     }
 
     @Override
     public void play() {
-        audioManager.playSound(this);
+        audioManager.playMusic(this);
     }
 
     @Override
     public void play(float volume) {
-        audioManager.playSound(this, volume);
+        audioManager.playMusic(this, volume);
     }
 
     public int getBufferId() {
@@ -110,10 +113,10 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
 
     @Override
     public void dispose() {
-        // TODO: Fix this
-        for (int i = 0; i < buffers.length; i++) {
-            if (buffers[i] != 0) {
-                AL10.alDeleteBuffers(buffers[i]);
+        // TODO: Fix this - probably failing if sound is playing
+        for (int buffer : buffers) {
+            if (buffer != 0) {
+                AL10.alDeleteBuffers(buffer);
             }
         }
         OpenALException.checkState("Deleting buffer data");
@@ -122,7 +125,6 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
 
     @Override
     public void reload(StreamingSoundData data) {
-        dispose();
         stream = data;
         this.initializeBuffers();
     }

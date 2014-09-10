@@ -116,8 +116,13 @@ message JoinMessage {
     optional string name = 1;
     optional string version = 2;
     optional sint32 viewDistanceLevel = 3;
+    optional Color color = 4;
 
     extensions 5000 to max;
+}
+
+message Color {
+	optional uint32 rgba = 1;
 }
 
 message JoinCompleteMessage {

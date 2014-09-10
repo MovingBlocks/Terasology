@@ -57,11 +57,6 @@ public class AllSidesFamily extends AbstractBlockFamily implements SideDefinedBl
     }
 
     @Override
-    public Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
-        return oldBlock;
-    }
-
-    @Override
     public Block getBlockForSide(Side side) {
         return sideBlocks.get(side);
     }
@@ -70,7 +65,7 @@ public class AllSidesFamily extends AbstractBlockFamily implements SideDefinedBl
     public Block getBlockFor(BlockUri blockUri) {
         if (getURI().equals(blockUri.getFamilyUri())) {
             try {
-                Side side = Side.valueOf(blockUri.getIdentifier().toUpperCase(Locale.ENGLISH));
+                Side side = Side.valueOf(blockUri.getIdentifier().toUpperCase());
                 return sideBlocks.get(side);
             } catch (IllegalArgumentException e) {
                 return null;

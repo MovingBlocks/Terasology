@@ -23,9 +23,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.asset.Assets;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameThread;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.ComponentContainer;
@@ -34,8 +33,8 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityChangeSubscriber;
-import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
+import org.terasology.entitySystem.entity.lifecycleEvents.BeforeEntityCreated;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -48,6 +47,8 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.Block;
@@ -67,7 +68,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
-            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class, EntityInfoComponent.class);
+            ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class);
 
     private EngineEntityManager entityManager;
 
@@ -94,6 +95,22 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     public void initialise() {
         entityManager.subscribe(this);
+    }
+
+    @Override
+    public void preBegin() {
+    }
+
+    @Override
+    public void postBegin() {
+    }
+
+    @Override
+    public void preSave() {
+    }
+
+    @Override
+    public void postSave() {
     }
 
     @Override
@@ -216,15 +233,37 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
      * @param type        The new type of the block
      */
     private void updateBlockEntityComponents(EntityRef blockEntity, Block oldType, Block type, Set<Class<? extends Component>> retainComponents) {
-        Prefab oldPrefab = (!oldType.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(oldType.getPrefab()) : null;
-        Prefab newPrefab = (!type.getPrefab().isEmpty()) ? entityManager.getPrefabManager().getPrefab(type.getPrefab()) : null;
+        BlockComponent blockComponent = blockEntity.getComponent(BlockComponent.class);
 
-        for (ComponentMetadata<?> metadata : entityManager.getComponentLibrary().iterateComponentMetadata()) {
-            if (!COMMON_BLOCK_COMPONENTS.contains(metadata.getType()) && !metadata.isRetainUnalteredOnBlockChange()
-                    && (newPrefab == null || !newPrefab.hasComponent(metadata.getType())) && !retainComponents.contains(metadata.getType())) {
-                blockEntity.removeComponent(metadata.getType());
+        Prefab oldPrefab = Assets.getPrefab(oldType.getPrefab());
+        EntityBuilder oldEntityBuilder = entityManager.newBuilder(oldPrefab);
+        oldEntityBuilder.addComponent(new BlockComponent(oldType, new Vector3i(blockComponent.getPosition())));
+        BeforeEntityCreated oldEntityEvent = new BeforeEntityCreated(oldPrefab, oldEntityBuilder.iterateComponents());
+        blockEntity.send(oldEntityEvent);
+        for (Component comp : oldEntityEvent.getResultComponents()) {
+            oldEntityBuilder.addComponent(comp);
+        }
+
+        Prefab newPrefab = Assets.getPrefab(type.getPrefab());
+        EntityBuilder newEntityBuilder = entityManager.newBuilder(newPrefab);
+        newEntityBuilder.addComponent(new BlockComponent(type, new Vector3i(blockComponent.getPosition())));
+        BeforeEntityCreated newEntityEvent = new BeforeEntityCreated(newPrefab, newEntityBuilder.iterateComponents());
+        blockEntity.send(newEntityEvent);
+        for (Component comp : newEntityEvent.getResultComponents()) {
+            newEntityBuilder.addComponent(comp);
+        }
+
+        for (Component component : blockEntity.iterateComponents()) {
+            if (!COMMON_BLOCK_COMPONENTS.contains(component.getClass())
+                    && !entityManager.getComponentLibrary().getMetadata(component.getClass()).isRetainUnalteredOnBlockChange()
+                    && !newEntityBuilder.hasComponent(component.getClass()) && !retainComponents.contains(component.getClass())) {
+                blockEntity.removeComponent(component.getClass());
             }
         }
+
+
+        blockComponent.setBlock(type);
+        blockEntity.saveComponent(blockComponent);
 
         HealthComponent health = blockEntity.getComponent(HealthComponent.class);
         if (health == null && type.isDestructible()) {
@@ -237,31 +276,11 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             blockEntity.saveComponent(health);
         }
 
-        if (Objects.equal(newPrefab, oldPrefab)) {
-            return;
+        for (Component comp : newEntityBuilder.iterateComponents()) {
+            copyIntoPrefab(blockEntity, comp, retainComponents);
         }
 
-        if (newPrefab != null) {
-            for (Component comp : newPrefab.iterateComponents()) {
-                copyIntoPrefab(blockEntity, comp, retainComponents);
-            }
 
-            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
-            if (entityInfo == null) {
-                entityInfo = new EntityInfoComponent();
-                entityInfo.parentPrefab = newPrefab.getName();
-                blockEntity.addComponent(entityInfo);
-            } else if (!entityInfo.parentPrefab.equals(newPrefab.getName())) {
-                entityInfo.parentPrefab = newPrefab.getName();
-                blockEntity.saveComponent(entityInfo);
-            }
-        } else if (oldPrefab != null) {
-            EntityInfoComponent entityInfo = blockEntity.getComponent(EntityInfoComponent.class);
-            if (entityInfo != null) {
-                entityInfo.parentPrefab = "";
-                blockEntity.saveComponent(entityInfo);
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -294,7 +313,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private EntityRef createBlockEntity(Vector3i blockPosition, Block block) {
         EntityBuilder builder = entityManager.newBuilder(block.getPrefab());
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
-        builder.addComponent(new BlockComponent(blockPosition));
+        builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
             builder.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
         }
@@ -305,7 +324,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         EntityRef blockEntity;
         if (isTemporary) {
-            blockEntity = builder.buildNoEvents();
+            blockEntity = builder.buildWithoutLifecycleEvents();
             temporaryBlockEntities.add(blockEntity);
         } else {
             blockEntity = builder.build();

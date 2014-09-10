@@ -37,4 +37,9 @@ public interface MouseDevice extends InputDevice {
      * @return The current state of the given button
      */
     boolean isButtonDown(int button);
+
+    /**
+     * @return Whether the mouse cursor is visible
+     */
+    boolean isVisible();
 }

@@ -1,0 +1,30 @@
+{
+    "type": "minichatOverlay",
+    "skin": "minichat",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "RelativeLayout",
+                "contents": [
+                    {
+                        "type": "UILabel",
+                        "id": "message",
+                        "layoutInfo": {
+                            "position-left": {},
+                            "position-right": {},
+                            "use-content-height": true,
+                            "position-bottom": {}
+                        }
+                    }
+                ],
+                "layoutInfo": {
+                    "width" : 500,
+                    "position-bottom": {
+                        "target": "BOTTOM"
+                    }
+                }
+            }
+        ]
+    }
+}

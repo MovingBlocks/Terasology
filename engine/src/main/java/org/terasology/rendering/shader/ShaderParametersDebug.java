@@ -17,7 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -66,7 +66,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 break;
             case TRANSPARENT_COLOR:
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                DefaultRenderingProcess.getInstance().bindFboTexture("sceneTransparent");
+                DefaultRenderingProcess.getInstance().bindFboTexture("sceneReflectiveRefractive");
                 program.setInt("texDebug", texId++, true);
                 break;
             case SSAO:
@@ -114,10 +114,7 @@ public class ShaderParametersDebug extends ShaderParametersBase {
                 DefaultRenderingProcess.getInstance().bindFboTexture("lightShafts");
                 program.setInt("texDebug", texId++, true);
                 break;
-            case VOLUMETRIC_LIGHTING:
-                GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                DefaultRenderingProcess.getInstance().bindFboTexture("volumetricLighting");
-                program.setInt("texDebug", texId++, true);
+            default:
                 break;
         }
 

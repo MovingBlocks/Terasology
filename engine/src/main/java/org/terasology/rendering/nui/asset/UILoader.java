@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.asset;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,13 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.module.Module;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2f;
@@ -43,13 +39,14 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
-import org.terasology.persistence.typeHandling.extensionTypes.Color4fTypeHanlder;
+import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
@@ -64,23 +61,30 @@ import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3iTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector4fTypeHandler;
 import org.terasology.physics.CollisionGroup;
-import org.terasology.rendering.assets.TextureRegion;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
+import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.LayoutHint;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -88,8 +92,7 @@ import javax.vecmath.Vector4f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
@@ -108,7 +111,7 @@ public class UILoader implements AssetLoader<UIData> {
 
 
     @Override
-    public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UIData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
@@ -117,11 +120,12 @@ public class UILoader implements AssetLoader<UIData> {
         TypeSerializationLibrary library = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
         library.add(BlockFamily.class, new BlockFamilyTypeHandler());
         library.add(Block.class, new BlockTypeHandler());
-        library.add(Color4f.class, new Color4fTypeHanlder());
+        library.add(Color.class, new ColorTypeHandler());
         library.add(Quat4f.class, new Quat4fTypeHandler());
         library.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         library.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
-        library.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
+        library.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        library.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         library.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         library.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         library.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
@@ -138,6 +142,7 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Prefab.class, new PrefabTypeHandler());
         library.add(Border.class, new BorderTypeHandler());
         library.add(TextureRegion.class, new TextureRegionTypeHandler());
+        library.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
 
         GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
@@ -148,7 +153,7 @@ public class UILoader implements AssetLoader<UIData> {
         }
         Gson gson = gsonBuilder.create();
 
-        try (JsonReader reader = new JsonReader(new InputStreamReader(stream))) {
+        try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UIData.class);
         }
@@ -184,6 +189,10 @@ public class UILoader implements AssetLoader<UIData> {
 
         @Override
         public UIWidget deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+                return new UILabel(json.getAsString());
+            }
+
             JsonObject jsonObject = json.getAsJsonObject();
 
             String type = jsonObject.get("type").getAsString();
@@ -198,22 +207,14 @@ public class UILoader implements AssetLoader<UIData> {
                 id = jsonObject.get("id").getAsString();
             }
 
-            UIWidget element;
+            UIWidget element = elementMetadata.newInstance();
             if (id != null) {
-                try {
-                    Constructor<? extends UIWidget> constructor = elementMetadata.getType().getConstructor(String.class);
-                    constructor.setAccessible(true);
-                    element = constructor.newInstance(id);
-
-                } catch (NoSuchMethodException e) {
-                    logger.warn("UIWidget type {} lacks id constructor", elementMetadata.getUri());
-                    element = elementMetadata.newInstance();
-                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-                    logger.warn("Failed to construct {} with id", elementMetadata.getUri(), e);
-                    element = elementMetadata.newInstance();
+                FieldMetadata fieldMetadata = elementMetadata.getField("id");
+                if (fieldMetadata == null) {
+                    logger.warn("UIWidget type {} lacks id field", elementMetadata.getUri());
+                } else {
+                    fieldMetadata.setValue(element, id);
                 }
-            } else {
-                element = elementMetadata.newInstance();
             }
 
             // Deserialize normal fields.
@@ -255,7 +256,8 @@ public class UILoader implements AssetLoader<UIData> {
                             LayoutHint hint = null;
                             if (child.isJsonObject()) {
                                 JsonObject childObject = child.getAsJsonObject();
-                                if (layoutHintType != null && childObject.has(LAYOUT_INFO_FIELD)) {
+                                if (layoutHintType != null && !layoutHintType.isInterface() && !Modifier.isAbstract(layoutHintType.getModifiers())
+                                        && childObject.has(LAYOUT_INFO_FIELD)) {
                                     hint = context.deserialize(childObject.get(LAYOUT_INFO_FIELD), layoutHintType);
                                 }
                             }

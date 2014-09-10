@@ -25,6 +25,22 @@ public abstract class BaseComponentSystem implements ComponentSystem {
     }
 
     @Override
+    public void preBegin() {
+    }
+
+    @Override
+    public void postBegin() {
+    }
+
+    @Override
+    public void preSave() {
+    }
+
+    @Override
+    public void postSave() {
+    }
+
+    @Override
     public void shutdown() {
     }
 }

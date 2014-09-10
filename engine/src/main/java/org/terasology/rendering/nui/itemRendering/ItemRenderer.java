@@ -35,4 +35,6 @@ public interface ItemRenderer<T> {
     void draw(T value, Canvas canvas, Rect2i subregion);
 
     Vector2i getPreferredSize(T value, Canvas canvas);
+
+    String getTooltip(T value);
 }

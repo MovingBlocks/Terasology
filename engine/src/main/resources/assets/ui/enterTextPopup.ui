@@ -1,0 +1,53 @@
+{
+    "type" : "enterTextPopup",
+    "contents" : {
+        "type" : "relativeLayout",
+            "contents" : [
+                {
+                    "type" : "UIBox",
+                    "layoutInfo" : {
+                        "width" : 500,
+                        "use-content-height" : true,
+                        "position-horizontal-center" : {},
+                        "position-vertical-center" : {}
+                    },
+                    "content" : {
+                        "type" : "ColumnLayout",
+                        "columns" : 1,
+                        "verticalSpacing" : 8,
+                        "contents" : [
+                            {
+                                "type" : "UILabel",
+                                "text" : "Enter name",
+                                "family" : "title"
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 16]
+                            },
+                            {
+                                "type" : "UIText",
+                                "text" : "",
+                                "id" : "text"
+
+                            },
+                            {
+                                "type" : "UISpace",
+                                "size" : [1, 16]
+                            },
+                            {
+                                "type" : "UIButton",
+                                "text" : "Ok",
+                                "id" : "ok"
+                            },
+                            {
+                                "type" : "UIButton",
+                                "text" : "Cancel",
+                                "id" : "cancel"
+                            }
+                        ]
+                    }
+                }
+            ]
+    }
+}

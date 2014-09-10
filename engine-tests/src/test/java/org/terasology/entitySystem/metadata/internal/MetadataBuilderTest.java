@@ -17,16 +17,17 @@ package org.terasology.entitySystem.metadata.internal;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.classMetadata.DefaultClassMetadata;
-import org.terasology.classMetadata.FieldMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.metadata.DefaultClassMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Immortius
@@ -35,16 +36,15 @@ public class MetadataBuilderTest {
 
     private ReflectFactory factory = new ReflectionReflectFactory();
     private CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(factory);
-    private TypeSerializationLibrary metadataBuilder;
 
     @Before
     public void setup() {
-        this.metadataBuilder = new TypeSerializationLibrary(factory, copyStrategyLibrary);
     }
 
-    @Test(expected = NoSuchMethodException.class)
-    public void requireDefaultConstructor() throws Exception {
-        new DefaultClassMetadata<>(new SimpleUri(), NoDefaultConstructor.class, factory, copyStrategyLibrary);
+    @Test
+    public void detectLackOfDefaultConstructor() throws Exception {
+        DefaultClassMetadata<NoDefaultConstructor> metadata = new DefaultClassMetadata<>(new SimpleUri(), NoDefaultConstructor.class, factory, copyStrategyLibrary);
+        assertFalse(metadata.isConstructable());
     }
 
     @Test
@@ -52,6 +52,7 @@ public class MetadataBuilderTest {
         DefaultClassMetadata<Trivial> metadata = new DefaultClassMetadata<>(new SimpleUri(), Trivial.class, factory, copyStrategyLibrary);
         assertNotNull(metadata);
         assertEquals(0, metadata.getFieldCount());
+        assertTrue(metadata.isConstructable());
     }
 
     @Test

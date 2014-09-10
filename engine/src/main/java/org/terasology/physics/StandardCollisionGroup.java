@@ -22,14 +22,15 @@ import java.util.Locale;
  * @author Immortius
  */
 public enum StandardCollisionGroup implements CollisionGroup {
-    DEFAULT((short) 0b0000001),
-    STATIC((short) 0b0000010),
-    KINEMATIC((short) 0b0000100),
-    DEBRIS((short) 0b0001000),
-    SENSOR((short) 0b0010000),
-    CHARACTER((short) 0b0100000),
-    WORLD((short) 0b1000000),
-    ALL((short) 0b1111111);
+    DEFAULT((short) 0b00000001),
+    STATIC((short) 0b00000010),
+    KINEMATIC((short) 0b00000100),
+    DEBRIS((short) 0b00001000),
+    SENSOR((short) 0b00010000),
+    CHARACTER((short) 0b00100000),
+    WORLD((short) 0b01000000),
+    LIQUID((short) 0b10000000),
+    ALL((short) 0b11111111);
 
     private short flag;
 

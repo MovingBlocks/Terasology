@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-uniform sampler2D textureAtlas;
-
-uniform float light;
-uniform vec3 colorOffset;
-uniform bool textured;
-uniform float alpha;
+uniform float blockLight = 1.0;
+uniform float sunlight = 1.0;
 
 varying vec3 normal;
-varying vec4 vertexWorldPos;
 
 void main(){
-    vec4 color;
+    gl_FragData[0].rgba = gl_Color;
 
-    color = gl_Color;
-
-    // Apply light
-    color.rgb *= clamp(light, 0.0, 1.0);
-
-    color.a = alpha;
-
-    gl_FragColor = color;
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, sunlight);
+    gl_FragData[2].rgba = vec4(blockLight, blockLight, blockLight, 0.0);
 }

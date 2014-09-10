@@ -16,6 +16,7 @@
 
 package org.terasology.world.block.loader;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -32,7 +33,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.naming.Name;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.persistence.ModuleContext;
@@ -110,7 +112,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {
-            try {
+            try (ModuleContext.ContextSpan ignored = ModuleContext.setContext(blockDefUri.getModuleName())) {
                 JsonElement rawJson = readJson(blockDefUri);
                 if (rawJson != null) {
                     JsonObject blockDefJson = rawJson.getAsJsonObject();
@@ -140,8 +142,8 @@ public class BlockLoader implements BlockBuilderHelper {
                         }
                     }
                 }
-            } catch (JsonParseException | NullPointerException e) {
-                logger.error("Failed to load block '{}'", blockDefUri, e);
+            } catch (Exception e) {
+                logger.error("Error loading block {}", blockDefUri, e);
             }
         }
         result.shapelessDefinitions.addAll(loadAutoBlocks());
@@ -184,10 +186,22 @@ public class BlockLoader implements BlockBuilderHelper {
             def.shape = (shape.getURI().toSimpleString());
             if (shape.isCollisionYawSymmetric()) {
                 Block block = constructSingleBlock(blockDefUri, def);
+                if (block.getDisplayName().isEmpty()) {
+                    block.setDisplayName(shape.getDisplayName());
+                } else if (!shape.getDisplayName().isEmpty()) {
+                    block.setDisplayName(block.getDisplayName() + " " + shape.getDisplayName());
+                }
                 return new SymmetricFamily(uri, block, def.categories);
             } else {
                 Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                 constructHorizontalBlocks(blockDefUri, def, blockMap);
+                for (Block block : blockMap.values()) {
+                    if (block.getDisplayName().isEmpty()) {
+                        block.setDisplayName(shape.getDisplayName());
+                    } else if (!shape.getDisplayName().isEmpty()) {
+                        block.setDisplayName(block.getDisplayName() + " " + shape.getDisplayName());
+                    }
+                }
                 return new HorizontalBlockFamily(uri, blockMap, def.categories);
             }
         } catch (Exception e) {
@@ -267,7 +281,7 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
-        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        Block block = createRawBlock(blockDef, blockDefUri.getAssetName());
         block.setPrimaryAppearance(createAppearance(shape, tileUris, Rotation.none()));
         setBlockFullSides(block, shape, Rotation.none());
         block.setCollision(shape.getCollisionOffset(Rotation.none()), shape.getCollisionShape(Rotation.none()));
@@ -298,7 +312,7 @@ public class BlockLoader implements BlockBuilderHelper {
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
-        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        Block block = createRawBlock(blockDef, blockDefUri.getAssetName());
         block.setDirection(rotation.rotate(Side.FRONT));
         block.setPrimaryAppearance(createAppearance(shape, tileUris, rotation));
         setBlockFullSides(block, shape, rotation);
@@ -392,7 +406,7 @@ public class BlockLoader implements BlockBuilderHelper {
         }
     }
 
-    private Block createRawBlock(BlockDefinition def, String defaultName) {
+    private Block createRawBlock(BlockDefinition def, Name defaultName) {
         Block block = new Block();
         block.setLiquid(def.liquid);
         block.setWater(def.water);
@@ -416,7 +430,7 @@ public class BlockLoader implements BlockBuilderHelper {
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {
-            block.setDisplayName(properCase(defaultName));
+            block.setDisplayName(properCase(defaultName.toString()));
         }
 
         block.setMass(def.mass);
@@ -466,7 +480,7 @@ public class BlockLoader implements BlockBuilderHelper {
     private JsonElement readJson(AssetUri blockDefUri) {
         try (InputStream stream = CoreRegistry.get(AssetManager.class).getAssetStream(blockDefUri)) {
             if (stream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
                 return parser.parse(reader);
             } else {
                 logger.error("Failed to load block definition '{}'", blockDefUri);
@@ -524,6 +538,10 @@ public class BlockLoader implements BlockBuilderHelper {
         if (jsonObj.has("right")) {
             T value = context.deserialize(jsonObj.get("right"), type);
             target.put(BlockPart.RIGHT, value);
+        }
+        if (jsonObj.has("center")) {
+            T value = context.deserialize(jsonObj.get("center"), type);
+            target.put(BlockPart.CENTER, value);
         }
     }
 

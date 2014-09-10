@@ -18,7 +18,7 @@ package org.terasology.world.chunks.pipeline;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkSystem;
@@ -76,7 +76,7 @@ public class ChunkRequest implements Task, Comparable<ChunkRequest> {
     }
 
     @Override
-    public void enact() {
+    public void run() {
         switch (type) {
             case REVIEW:
                 for (Vector3i pos : region) {

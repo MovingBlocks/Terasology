@@ -16,19 +16,24 @@
 package org.terasology.logic.console.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.ButtonState;
+import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
+import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
+import org.terasology.rendering.nui.NUIManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,20 +42,23 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem
-public class ConsoleSystem implements ComponentSystem {
-
+public class ConsoleSystem extends BaseComponentSystem {
+    
     @In
     private Console console;
 
     @In
     private NetworkSystem networkSystem;
 
-    @Override
-    public void initialise() {
-    }
+    @In
+    private NUIManager nuiManager;
 
-    @Override
-    public void shutdown() {
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
+    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            nuiManager.toggleScreen("engine:console");
+            event.consume();
+        }
     }
 
     @Command(shortDescription = "General help", helpText = "Prints out short descriptions for all available commands.")
@@ -59,11 +67,9 @@ public class ConsoleSystem implements ComponentSystem {
         List<CommandInfo> commands = console.getCommandList();
         for (CommandInfo cmd : commands) {
             if (!msg.toString().isEmpty()) {
-                msg.append("\n");
+                msg.append(Message.NEW_LINE);
             }
-            msg.append(FontColor.toChar(ConsoleColors.COMMAND));
-            msg.append(cmd.getUsageMessage());
-            msg.append(FontColor.getReset());
+            msg.append(FontColor.getColored(cmd.getUsageMessage(), ConsoleColors.COMMAND));
             msg.append(" - ");
             msg.append(cmd.getShortDescription());
         }
@@ -80,23 +86,23 @@ public class ConsoleSystem implements ComponentSystem {
 
             for (CommandInfo cmd : cmdCollection) {
                 msg.append("=====================================================================================================================");
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 msg.append(cmd.getUsageMessage());
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 msg.append("=====================================================================================================================");
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
                 if (!cmd.getHelpText().isEmpty()) {
                     msg.append(cmd.getHelpText());
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                 } else if (!cmd.getShortDescription().isEmpty()) {
                     msg.append(cmd.getShortDescription());
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(System.lineSeparator());
+                    msg.append(Message.NEW_LINE);
                 }
-                msg.append(System.lineSeparator());
+                msg.append(Message.NEW_LINE);
             }
             return msg.toString();
         }
@@ -112,10 +118,10 @@ public class ConsoleSystem implements ComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
-        List<String> params = console.splitParameters(event.getParams());
+        List<String> params = event.getParams();
         for (CommandInfo cmd : console.getCommand(event.getCommand())) {
             if (cmd.getParameterCount() == params.size() && cmd.isRunOnServer()) {
-                console.execute(event.getCommand() + " " + event.getParams(), entity);
+                console.execute(event.getCommand(), event.getParams(), entity);
                 break;
             }
         }

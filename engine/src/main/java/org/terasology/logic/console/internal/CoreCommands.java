@@ -16,32 +16,49 @@
 package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.base.Function;
+
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.TerasologyEngine;
+import org.terasology.engine.modes.StateLoading;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.health.NoHealthEvent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.JoinStatus;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.WorldDumper;
 import org.terasology.persistence.serializers.PrefabSerializer;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
+import org.terasology.rendering.assets.material.MaterialData;
+import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
+import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -50,13 +67,15 @@ import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class CoreCommands implements ComponentSystem {
+public class CoreCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
@@ -77,11 +96,43 @@ public class CoreCommands implements ComponentSystem {
 
     @Override
     public void initialise() {
-        pickupBuilder = new PickupBuilder();
+        pickupBuilder = new PickupBuilder(entityManager);
     }
 
-    @Override
-    public void shutdown() {
+    @Command(shortDescription = "Reloads a skin")
+    public String reloadSkin(@CommandParam("skin") String skin) {
+        AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
+        UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
+        if (uiSkinData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiSkinData);
+            return "Success";
+        } else {
+            return "Unable to resolve skin '" + skin + "'";
+        }
+    }
+
+    @Command(shortDescription = "Reloads a shader")
+    public String reloadShader(@CommandParam("shader") String shader) {
+        AssetUri uri = new AssetUri(AssetType.SHADER, shader);
+        ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
+        if (shaderData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, shaderData);
+            return "Success";
+        } else {
+            return "Unable to resolve shader '" + shader + "'";
+        }
+    }
+
+    @Command(shortDescription = "Reloads a material")
+    public String reloadMaterial(@CommandParam("material") String material) {
+        AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
+        MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
+        if (materialData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, materialData);
+            return "Success";
+        } else {
+            return "Unable to resolve material '" + material + "'";
+        }
     }
 
     @Command(shortDescription = "Toggles Fullscreen Mode")
@@ -108,7 +159,7 @@ public class CoreCommands implements ComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
-            clientComp.character.send(new NoHealthEvent(clientComp.character, EngineDamageTypes.DIRECT.get()));
+            clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
         }
     }
 
@@ -139,6 +190,56 @@ public class CoreCommands implements ComponentSystem {
         CoreRegistry.get(GameEngine.class).shutdown();
     }
 
+    @Command(shortDescription = "Join a game using the default port " + TerasologyConstants.DEFAULT_PORT)
+    public void join(@CommandParam("address") final String address) {
+        join(address, TerasologyConstants.DEFAULT_PORT);
+    }
+    
+    @Command(shortDescription = "Join a game")
+    public void join(@CommandParam("address") final String address, @CommandParam("port") final int port) {
+
+        Callable<JoinStatus> operation = new Callable<JoinStatus>() {
+
+            @Override
+            public JoinStatus call() throws InterruptedException {
+                NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+                JoinStatus joinStatus = networkSystem.join(address, port);
+                return joinStatus;
+            }
+        };
+
+        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
+        popup.onSuccess(new Function<JoinStatus, Void>() {
+            
+            @Override
+            public Void apply(JoinStatus result) {
+                GameEngine engine = CoreRegistry.get(GameEngine.class);
+                if (result.getStatus() != JoinStatus.Status.FAILED) {
+                    engine.changeState(new StateLoading(result));               
+                } else {
+                    MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                    screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
+                }
+                
+                return null;
+            }
+        });
+        popup.startOperation(operation, true);
+    }
+
+    @Command(shortDescription = "Leaves the current game and returns to main menu")
+    public String leave() {
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        if (networkSystem.getMode() != NetworkMode.NONE) {
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            return "Leaving..";
+        } else {
+            return "Not connected";
+        }
+    }
+    
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
         EntityRef cameraTarget = cameraTargetSystem.getTarget();
@@ -156,7 +257,7 @@ public class CoreCommands implements ComponentSystem {
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
     @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public void spawnPrefab(@CommandParam("prefabId") String prefabName, EntityRef entity) {
+    public String spawnPrefab(@CommandParam("prefabId") String prefabName, EntityRef entity) {
         Camera camera = worldRenderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -174,6 +275,11 @@ public class CoreCommands implements ComponentSystem {
         Prefab prefab = Assets.getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
             entityManager.create(prefab, spawnPos, rotation);
+            return "Done";
+        } else if (prefab == null) {
+            return "Unknown prefab";
+        } else {
+            return "Prefab cannot be spawned (no location component)";
         }
     }
 

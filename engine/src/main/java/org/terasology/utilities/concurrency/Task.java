@@ -23,7 +23,7 @@ public interface Task {
 
     String getName();
 
-    void enact();
+    void run();
 
     boolean isTerminateSignal();
 }

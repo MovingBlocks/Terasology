@@ -17,7 +17,8 @@ package org.terasology.input.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.terasology.engine.CoreRegistry;
+
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,10 +28,10 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
+
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +54,8 @@ public class BindableButtonImpl implements BindableButton {
     private boolean repeating;
     private int repeatTime;
     private long lastActivateTime;
+
+    private boolean consumedActivation;
 
     private Time time;
 
@@ -116,7 +119,7 @@ public class BindableButtonImpl implements BindableButton {
 
     @Override
     public ButtonState getState() {
-        return (activeInputs.isEmpty()) ? ButtonState.UP : ButtonState.DOWN;
+        return (activeInputs.isEmpty() || consumedActivation) ? ButtonState.UP : ButtonState.DOWN;
     }
 
     /**
@@ -164,6 +167,7 @@ public class BindableButtonImpl implements BindableButton {
             activeInputs.add(input);
             if (previouslyEmpty && mode.isActivatedOnPress()) {
                 lastActivateTime = time.getGameTimeInMs();
+                consumedActivation = keyConsumed;
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
                 }
@@ -205,7 +209,7 @@ public class BindableButtonImpl implements BindableButton {
         long activateTime = this.time.getGameTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
             lastActivateTime = activateTime;
-            if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
+            if (!consumedActivation) {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
@@ -246,5 +250,10 @@ public class BindableButtonImpl implements BindableButton {
             }
         }
         return false;
+    }
+    
+    @Override
+    public String toString() {
+        return "BindableButtonEventImpl [" + id + ", \"" + displayName + "\", " + buttonEvent + "]"; 
     }
 }

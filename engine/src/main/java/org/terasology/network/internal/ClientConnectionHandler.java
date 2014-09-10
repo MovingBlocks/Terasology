@@ -22,14 +22,17 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.Time;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.Version;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.module.ModuleLoader;
+import org.terasology.naming.Name;
+import org.terasology.naming.Version;
 import org.terasology.network.JoinStatus;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -148,10 +151,13 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
                     }
 
                     Files.copy(tempModuleLocation, finalPath);
+                    ModuleLoader loader = new ModuleLoader(moduleManager.getModuleMetadataReader());
+                    loader.setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
+
+                    moduleManager.getRegistry().add(loader.load(finalPath));
                     receivingModule = null;
 
                     if (missingModules.isEmpty()) {
-                        moduleManager.refresh();
                         sendJoin();
                     }
                 } else {
@@ -184,7 +190,7 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
         // Request missing modules
         for (NetData.ModuleInfo info : message.getModuleList()) {
-            if (null == moduleManager.getModule(info.getModuleId(), Version.create(info.getModuleVersion()))) {
+            if (null == moduleManager.getRegistry().getModule(new Name(info.getModuleId()), new Version(info.getModuleVersion()))) {
                 missingModules.add(info.getModuleId().toLowerCase(Locale.ENGLISH));
             }
         }
@@ -204,8 +210,14 @@ public class ClientConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private void sendJoin() {
         Config config = CoreRegistry.get(Config.class);
-        channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(NetData.JoinMessage.newBuilder().setName(config.getPlayer().getName())
-                .setViewDistanceLevel(config.getRendering().getViewDistance().getIndex())).build());
+        NetData.JoinMessage.Builder bldr = NetData.JoinMessage.newBuilder();
+        NetData.Color.Builder clrbldr = NetData.Color.newBuilder();
+
+        bldr.setName(config.getPlayer().getName());
+        bldr.setViewDistanceLevel(config.getRendering().getViewDistance().getIndex());
+        bldr.setColor(clrbldr.setRgba(config.getPlayer().getColor().rgba()).build());
+
+        channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setJoin(bldr).build());
     }
 
     public void channelAuthenticated(ChannelHandlerContext ctx) {

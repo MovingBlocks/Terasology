@@ -19,11 +19,14 @@ package org.terasology.engine.modes.loadProcesses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
@@ -43,6 +46,7 @@ import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;
@@ -68,8 +72,12 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
+
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
+                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
+
         StorageManager storageManager = CoreRegistry.put(StorageManager.class,
-                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
+                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
             FastRandom random = new FastRandom();
@@ -82,8 +90,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         WorldGenerator worldGenerator;
         try {
             worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(worldInfo.getWorldGenerator());
-            worldGenerator.initialize();
-            worldGenerator.setWorldSeed(worldInfo.getSeed());
+            CoreRegistry.put(WorldGenerator.class, worldGenerator);
         } catch (UnresolvedWorldGeneratorException e) {
             logger.error("Unable to load world generator", e);
             CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Failed to resolve world generator."));
@@ -99,7 +106,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
-        WorldRenderer worldRenderer = new WorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
+        WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
@@ -112,5 +120,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         worldProvider.getTime().setMilliseconds(worldInfo.getTime());
 
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 5;
     }
 }

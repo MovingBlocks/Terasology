@@ -19,10 +19,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.utilities.ReflectionUtil;
-import org.terasology.utilities.collection.NullIterator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * @author Immortius
@@ -30,6 +31,8 @@ import java.util.Map;
 public class UIStyleFamily {
     private UIStyle baseStyle;
     private Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyleLookup = Maps.newHashMap();
+
+    private Map<Class<? extends UIWidget>, List<Class<? extends UIWidget>>> cachedInheritanceTree = new WeakHashMap<>();
 
     public UIStyleFamily(UIStyle baseStyle, Map<Class<? extends UIWidget>, Table<String, String, UIStyle>> elementStyles) {
         this.baseStyle = baseStyle;
@@ -47,7 +50,7 @@ public class UIStyleFamily {
     public Iterable<String> getPartsFor(Class<? extends UIWidget> widget) {
         Table<String, String, UIStyle> styles = elementStyleLookup.get(widget);
         if (styles == null) {
-            return NullIterator.newInstance();
+            return Collections.emptyList();
         }
         return styles.rowKeySet();
     }
@@ -55,7 +58,7 @@ public class UIStyleFamily {
     public Iterable<String> getModesFor(Class<? extends UIWidget> widget, String part) {
         Table<String, String, UIStyle> styles = elementStyleLookup.get(widget);
         if (styles == null) {
-            return NullIterator.newInstance();
+            return Collections.emptyList();
         }
         return styles.row(part).keySet();
     }
@@ -76,12 +79,20 @@ public class UIStyleFamily {
     }
 
     public UIStyle getElementStyle(Class<? extends UIWidget> element, String part, String mode) {
-        List<Class<? extends UIWidget>> classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+
+        List<Class<? extends UIWidget>> classes = cachedInheritanceTree.get(element);
+        if (classes == null) {
+            classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+            cachedInheritanceTree.put(element, classes);
+        }
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
             if (elementStyles != null) {
                 style = elementStyles.get(part, mode);
+                if (style == null && part.equals(UIWidget.BASE_PART)) {
+                    style = elementStyles.get("", mode);
+                }
                 if (style == null) {
                     style = elementStyles.get(part, "");
                 }

@@ -15,12 +15,26 @@
  */
 package org.terasology.engine;
 
+import com.google.common.collect.Lists;
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.subsystem.EngineSubsystem;
+import org.terasology.engine.subsystem.headless.HeadlessAudio;
+import org.terasology.engine.subsystem.headless.HeadlessGraphics;
+import org.terasology.engine.subsystem.headless.HeadlessInput;
+import org.terasology.engine.subsystem.headless.HeadlessTimer;
+import org.terasology.engine.subsystem.headless.mode.StateHeadlessSetup;
+import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
+import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
+import org.terasology.engine.subsystem.lwjgl.LwjglInput;
+import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 
 /**
  * Main method for launching Terasology
@@ -29,20 +43,29 @@ import java.nio.file.Paths;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
+
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
+    private static final String HEADLESS_ARG = "-headless";
+    private static final String NO_CRASH_REPORT_ARG = "-noCrashReport";
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
+        boolean crashReportEnabled = true;
         try {
+            boolean isHeadless = false;
             Path homePath = null;
             for (String arg : args) {
                 if (arg.startsWith(HOME_ARG)) {
                     homePath = Paths.get(arg.substring(HOME_ARG.length()));
                 } else if (arg.equals(LOCAL_ARG)) {
                     homePath = Paths.get("");
+                } else if (arg.equals(HEADLESS_ARG)) {
+                    isHeadless = true;
+                } else if (arg.equals(NO_CRASH_REPORT_ARG)) {
+                    crashReportEnabled = false;
                 }
             }
             if (homePath != null) {
@@ -50,33 +73,52 @@ public final class Terasology {
             } else {
                 PathManager.getInstance().useDefaultHomePath();
             }
-            TerasologyEngine engine = new TerasologyEngine();
-            engine.init();
-            engine.run(new StateMainMenu());
-            engine.dispose();
-        } catch (Throwable t) {
-            String text = getNestedMessageText(t);
-            JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+
+            Collection<EngineSubsystem> subsystemList;
+            if (isHeadless) {
+                subsystemList = Lists.newArrayList(new HeadlessGraphics(), new HeadlessTimer(), new HeadlessAudio(), new HeadlessInput());
+            } else {
+                subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
+            }
+
+            TerasologyEngine engine = new TerasologyEngine(subsystemList);
+            try {
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+            } finally {
+                try {
+                    engine.dispose();
+                } catch (Exception e) {
+                    // Just log this one to System.err because we don't want it 
+                    // to replace the one that came first (thrown above).
+                    e.printStackTrace();
+                }
+            }
+        } catch (RuntimeException | IOException e) {
+
+            if (!GraphicsEnvironment.isHeadless()) {
+                Path logPath = Paths.get(".");
+                try {
+                    Path gameLogPath = PathManager.getInstance().getLogPath();
+                    if (gameLogPath != null) {
+                        logPath = gameLogPath;
+                    }
+                } catch (Exception eat) {
+                    // eat silently
+                }
+
+                if (crashReportEnabled) {
+                    Path logFile = logPath.resolve("Terasology.log");
+
+                    CrashReporter.report(e, logFile);
+                }
+            }
         }
         System.exit(0);
     }
 
-    private static String getNestedMessageText(Throwable t) {
-        String nl = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-
-        Throwable cause = t;
-        while (cause != null && cause != cause.getCause()) {
-            if (cause.getMessage() != null) {
-                sb.append(cause.getClass().getSimpleName());
-                sb.append(": ");
-                sb.append(cause.getLocalizedMessage());
-                sb.append(nl);
-            }
-
-            cause = cause.getCause();
-        }
-
-        return sb.toString();
-    }
 }

@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "pause", description = "Pause", category = "general")
+@RegisterBindButton(id = "pause", description = "Ingame Menu", category = "general")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.ESCAPE)
 public class PauseButton extends BindButtonEvent {
 }

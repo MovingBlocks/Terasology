@@ -17,7 +17,7 @@ package org.terasology.world.generator.internal;
 
 import org.terasology.engine.SimpleUri;
 
-import java.util.Locale;
+import java.util.Objects;
 
 /**
  * @author Immortius
@@ -48,6 +48,23 @@ public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 
     @Override
     public int compareTo(WorldGeneratorInfo o) {
-        return displayName.toLowerCase(Locale.ENGLISH).compareTo(o.displayName.toLowerCase(Locale.ENGLISH));
+        return displayName.compareTo(o.displayName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof WorldGeneratorInfo) {
+            WorldGeneratorInfo other = (WorldGeneratorInfo) obj;
+            return Objects.equals(uri, other.getUri()) && Objects.equals(other.displayName, displayName);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uri, displayName);
     }
 }

@@ -15,10 +15,10 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.copying.CopyStrategy;
-import org.terasology.classMetadata.reflect.InaccessibleFieldException;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.copy.CopyStrategy;
+import org.terasology.reflection.reflect.InaccessibleFieldException;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;

@@ -15,10 +15,11 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.google.common.base.Preconditions;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.mesh.MeshData;
 import org.terasology.world.block.shapes.BlockMeshPart;
@@ -102,7 +103,15 @@ public class Tessellator {
         nextIndex += vertices.length;
     }
 
+    public void addMeshPartDoubleSided(BlockMeshPart part) {
+        addMeshPart(part, true);
+    }
+
     public void addMeshPart(BlockMeshPart part) {
+        addMeshPart(part, false);
+    }
+
+    private void addMeshPart(BlockMeshPart part, boolean doubleSided) {
         for (int i = 0; i < part.size(); ++i) {
             Vector3f vertex = part.getVertex(i);
             meshData.getVertices().add(vertex.x);
@@ -131,6 +140,17 @@ public class Tessellator {
         for (int i = 0; i < part.indicesSize(); ++i) {
             meshData.getIndices().add(nextIndex + part.getIndex(i));
         }
+        if (doubleSided) {
+            for (int i = 0; i < part.indicesSize(); i += 3) {
+                int i1 = nextIndex + part.getIndex(i);
+                int i2 = nextIndex + part.getIndex(i + 1);
+                int i3 = nextIndex + part.getIndex(i + 2);
+                meshData.getIndices().add(i1);
+                meshData.getIndices().add(i3);
+                meshData.getIndices().add(i2);
+            }
+        }
+
         nextIndex += part.size();
     }
 
@@ -151,6 +171,7 @@ public class Tessellator {
     }
 
     public Mesh generateMesh(AssetUri uri) {
+        Preconditions.checkNotNull(uri);
         Mesh result = Assets.generateAsset(uri, meshData, Mesh.class);
         meshData = new MeshData();
         return result;
@@ -161,4 +182,6 @@ public class Tessellator {
         meshData = new MeshData();
         return result;
     }
+
+
 }

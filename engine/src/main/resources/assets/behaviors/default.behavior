@@ -1,0 +1,14 @@
+{"model": {
+    "nodeType": "RepeatNode",
+    "nodeId": 0,
+    "node": {
+        "child": {
+            "nodeType": "SequenceNode",
+            "nodeId": 1,
+            "node": {
+                "children": [
+                ]
+            }
+        }
+    }
+}}

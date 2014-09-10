@@ -18,24 +18,25 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.Share;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.Message;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -45,6 +46,7 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +56,7 @@ import java.util.List;
  */
 @RegisterSystem
 @Share(BlockCommands.class)
-public class BlockCommands implements ComponentSystem {
+public class BlockCommands extends BaseComponentSystem {
 
     // TODO: Remove once camera is handled better
     @In
@@ -75,15 +77,14 @@ public class BlockCommands implements ComponentSystem {
     @In
     private LocalPlayer localPlayer;
 
+    @In
+    private EntityManager entityManager;
+
     private BlockItemFactory blockItemFactory;
 
     @Override
     public void initialise() {
-        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
-    }
-
-    @Override
-    public void shutdown() {
+        blockItemFactory = new BlockItemFactory(entityManager);
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera)
@@ -103,7 +104,7 @@ public class BlockCommands implements ComponentSystem {
             blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
 
         } else if (matchingUris.isEmpty()) {
-            return "No block found for '" + blockName + "'";
+            throw new IllegalArgumentException("No block found for '" + blockName + "'");
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -120,7 +121,7 @@ public class BlockCommands implements ComponentSystem {
             builder.append((int) spawnPos.x).append((int) spawnPos.y).append((int) spawnPos.z).append(")");
             return builder.toString();
         }
-        return "Sorry, something went wrong!";
+        throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)")
@@ -137,7 +138,7 @@ public class BlockCommands implements ComponentSystem {
         StringBuilder items = new StringBuilder();
         for (String item : stringItems) {
             if (!items.toString().isEmpty()) {
-                items.append(System.lineSeparator());
+                items.append(Message.NEW_LINE);
             }
             items.append(item);
         }
@@ -149,24 +150,24 @@ public class BlockCommands implements ComponentSystem {
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> registeredBlocks = sortItems(blockManager.listRegisteredBlockUris());
         for (BlockUri blockUri : registeredBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
 
         stringBuilder.append("Available Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("----------------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> availableBlocks = sortItems(blockManager.listAvailableBlockUris());
         for (BlockUri blockUri : availableBlocks) {
             stringBuilder.append(blockUri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -177,15 +178,15 @@ public class BlockCommands implements ComponentSystem {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
             stringBuilder.append("-----------");
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
             List<BlockUri> categoryBlocks = sortItems(blockManager.getBlockFamiliesWithCategory(category));
             for (BlockUri uri : categoryBlocks) {
                 stringBuilder.append(uri.toString());
-                stringBuilder.append(System.lineSeparator());
+                stringBuilder.append(Message.NEW_LINE);
             }
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
         return stringBuilder.toString();
     }
@@ -194,13 +195,13 @@ public class BlockCommands implements ComponentSystem {
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.toSimpleString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -210,13 +211,13 @@ public class BlockCommands implements ComponentSystem {
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         stringBuilder.append("-----------------");
-        stringBuilder.append(System.lineSeparator());
+        stringBuilder.append(Message.NEW_LINE);
         List<BlockUri> sortedUris = sortItems(blockManager.listFreeformBlockUris());
         for (BlockUri uri : sortedUris) {
             stringBuilder.append(uri.toString());
-            stringBuilder.append(System.lineSeparator());
+            stringBuilder.append(Message.NEW_LINE);
         }
 
         return stringBuilder.toString();
@@ -234,7 +235,7 @@ public class BlockCommands implements ComponentSystem {
             BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
             return giveBlock(blockFamily, quantity, client);
         } else if (matchingUris.isEmpty()) {
-            return "No block found for '" + uri + "'";
+            throw new IllegalArgumentException("No block found for '" + uri + "'");
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -249,7 +250,7 @@ public class BlockCommands implements ComponentSystem {
     public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity, EntityRef client) {
         List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
         if (resolvedBlockUris.isEmpty()) {
-            return "No block found for '" + uri + "'";
+            throw new IllegalArgumentException("No block found for '" + uri + "'");
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
@@ -258,7 +259,7 @@ public class BlockCommands implements ComponentSystem {
         }
         List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUri);
         if (resolvedShapeUris.isEmpty()) {
-            return "No shape found for '" + shapeUri + "'";
+            throw new IllegalArgumentException("No shape found for '" + shapeUri + "'");
         } else if (resolvedShapeUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique shape name, possible matches: ");
@@ -278,7 +279,7 @@ public class BlockCommands implements ComponentSystem {
             return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
         }
 
-        return "Invalid block or shape";
+        throw new IllegalArgumentException("Invalid block or shape");
     }
 
     /**
@@ -294,10 +295,11 @@ public class BlockCommands implements ComponentSystem {
 
         EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
-            return "Unknown block or item";
+            throw new IllegalArgumentException("Unknown block or item");
         }
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
-        if (!inventoryManager.giveItem(playerEntity, item)) {
+
+        if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
             item.destroy();
         }
 

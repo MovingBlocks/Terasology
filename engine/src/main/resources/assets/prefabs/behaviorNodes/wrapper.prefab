@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "WrapperNode",
+        "name"      : "Wrapper",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Decorator\nAlways finishes with SUCCESS.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

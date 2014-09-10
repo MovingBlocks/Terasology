@@ -15,14 +15,15 @@
  */
 package org.terasology.rendering.assets.mesh;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
@@ -45,8 +46,8 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
     private static final Logger logger = LoggerFactory.getLogger(ObjMeshLoader.class);
 
     @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    public MeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
 
         List<Vector3f> rawVertices = Lists.newArrayList();
         List<Vector3f> rawNormals = Lists.newArrayList();
@@ -214,7 +215,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
                         logger.warn("Skipping unsupported obj statement on line {}:\"{}\"", lineNum, line);
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new IOException(String.format("Failed to process line %d:\"%s\"", lineNum, line), e);
         }
     }

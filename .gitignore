@@ -32,7 +32,7 @@ facades/PC/Terasology.launch
 
 #Ignore OSX
 Icon
-Icon?
+
 
 #Ignore Windows
 ehthumbs.db
@@ -43,6 +43,7 @@ Thumbs.db
 /saves/
 /screenshots/
 /logs/
+/terasology-server/
 config.cfg
 entityDump.txt
 
@@ -63,8 +64,10 @@ extensions
 /modules/*
 !/modules/Core
 !/modules/subprojects.gradle
-
-libs
+/meta/*
+!/meta/subprojects.gradle
+/libs/*
+!/libs/subprojects.gradle
 
 # Ignore weird stuff that might be obsolete
 .DS_Store

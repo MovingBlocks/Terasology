@@ -16,12 +16,10 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.binds.interaction.AttackButton;
 import org.terasology.input.binds.inventory.DropItemButton;
@@ -35,22 +33,23 @@ import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.SlotBasedInventoryManager;
-import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.event.SelectItemRequest;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.hud.HudToolbar;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class PlayerInventorySystem implements ComponentSystem {
+public class PlayerInventorySystem extends BaseComponentSystem {
 
     @In
     private LocalPlayer localPlayer;
@@ -65,24 +64,16 @@ public class PlayerInventorySystem implements ComponentSystem {
     private WorldRenderer worldRenderer;
 
     @In
-    private SlotBasedInventoryManager inventoryManager;
+    private NUIManager nuiManager;
 
     private long lastInteraction;
     private long lastTimeThrowInteraction;
 
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
     @ReceiveEvent
     public void onSlotChangeRequested(SelectItemRequest request, EntityRef character, CharacterComponent characterComp) {
         if (request.getSlot() >= 0 && request.getSlot() < 10 && request.getSlot() != characterComp.selectedItem) {
-            EntityRef oldItem = inventoryManager.getItemInSlot(character, characterComp.selectedItem);
-            EntityRef newItem = inventoryManager.getItemInSlot(character, request.getSlot());
+            EntityRef oldItem = InventoryUtils.getItemAt(character, characterComp.selectedItem);
+            EntityRef newItem = InventoryUtils.getItemAt(character, request.getSlot());
             characterComp.selectedItem = request.getSlot();
             character.saveComponent(characterComp);
             character.send(new SelectedItemChangedEvent(oldItem, newItem));
@@ -120,7 +111,7 @@ public class PlayerInventorySystem implements ComponentSystem {
 
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
 
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedItem);
+        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, character.selectedItem);
 
         entity.send(new UseItemRequest(selectedItemEntity));
 
@@ -137,7 +128,7 @@ public class PlayerInventorySystem implements ComponentSystem {
         }
 
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedItem);
+        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, character.selectedItem);
 
         entity.send(new AttackRequest(selectedItemEntity));
 
@@ -150,7 +141,7 @@ public class PlayerInventorySystem implements ComponentSystem {
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onDropItemRequest(DropItemButton event, EntityRef entity) {
         CharacterComponent character = entity.getComponent(CharacterComponent.class);
-        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, character.selectedItem);
+        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, character.selectedItem);
 
         if (selectedItemEntity.equals(EntityRef.NULL)) {
             return;
@@ -163,18 +154,17 @@ public class PlayerInventorySystem implements ComponentSystem {
         }
 
         //resize the crosshair
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
 
-        crossHair.setTextureSize(new Vector2f(22f, 22f));
-        // compute drop power
+        HudToolbar toolbar = nuiManager.getHUD().getHUDElement("engine:toolbar", HudToolbar.class);
+        if (toolbar != null) {
+            toolbar.setChargeAmount(getDropPower());
+        }
+
         float dropPower = getDropPower();
-        //update crosshair to show progress/power
-        crossHair.setTextureOrigin(new Vector2f((46f + 22f * dropPower), 23f));
-
         //handle when we finally let go
         if (!event.isDown()) {
             // Compute new position
-            dropPower *= 25f;
+            dropPower *= 150f;
 
             // TODO: This will change when camera are handled better (via a component)
             Camera playerCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
@@ -203,23 +193,19 @@ public class PlayerInventorySystem implements ComponentSystem {
     }
 
     public void resetDropMark() {
-        UIImage crossHair = (UIImage) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        HudToolbar toolbar = nuiManager.getHUD().getHUDElement("engine:toolbar", HudToolbar.class);
+        if (toolbar != null) {
+            toolbar.setChargeAmount(0);
+        }
         lastTimeThrowInteraction = 0;
-        crossHair.setTextureSize(new Vector2f(20f, 20f));
-        crossHair.setTextureOrigin(new Vector2f(24f, 24f));
     }
 
     private float getDropPower() {
         if (lastTimeThrowInteraction == 0) {
             return 0;
         }
-        float dropPower = (float) Math.floor((time.getGameTimeInMs() - lastTimeThrowInteraction) / 200);
-
-        if (dropPower > 6) {
-            dropPower = 6;
-        }
-
-        return dropPower;
+        float dropPower = (float) (time.getGameTimeInMs() - lastTimeThrowInteraction) / 1200f;
+        return Math.min(1.0f, dropPower);
     }
 
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.console.internal;
 
+import java.util.List;
+
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
 
@@ -27,12 +29,12 @@ import org.terasology.network.ServerEvent;
 final class CommandEvent implements Event {
 
     private String command;
-    private String params;
+    private List<String> params;
 
     CommandEvent() {
     }
 
-    CommandEvent(String command, String params) {
+    CommandEvent(String command, List<String> params) {
         this.command = command;
         this.params = params;
     }
@@ -41,7 +43,7 @@ final class CommandEvent implements Event {
         return command;
     }
 
-    public String getParams() {
+    public List<String> getParams() {
         return params;
     }
 }

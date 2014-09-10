@@ -19,8 +19,8 @@ package org.terasology.benchmark.reflectFactory;
 import org.terasology.benchmark.AbstractBenchmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.reflect.ObjectConstructor;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ObjectConstructor;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.logic.location.LocationComponent;
 
 /**

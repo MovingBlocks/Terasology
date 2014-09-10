@@ -16,7 +16,6 @@
 
 package org.terasology.logic.characters.events;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 
@@ -25,7 +24,6 @@ import org.terasology.network.ServerEvent;
  */
 @ServerEvent(lagCompensate = true)
 public class FrobRequest extends NetworkEvent {
-    private EntityRef item = EntityRef.NULL;
 
     public FrobRequest() {
     }

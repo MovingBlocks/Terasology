@@ -17,7 +17,8 @@
 package org.terasology.world.chunks;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.module.sandbox.API;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -25,6 +26,7 @@ import org.terasology.math.Vector3i;
 /**
  * @author Immortius
  */
+@API
 public final class ChunkConstants {
     public static final int SIZE_X = 16;
     public static final int SIZE_Y = 256;

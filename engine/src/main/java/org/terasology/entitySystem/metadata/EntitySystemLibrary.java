@@ -16,9 +16,9 @@
 
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 /**
  * The set of metadata libraries used by the entity system

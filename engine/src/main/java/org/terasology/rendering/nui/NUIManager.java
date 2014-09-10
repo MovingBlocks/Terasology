@@ -16,37 +16,73 @@
 package org.terasology.rendering.nui;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.classMetadata.ClassLibrary;
 import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.reflection.metadata.ClassLibrary;
+import org.terasology.rendering.nui.asset.UIElement;
+import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
 /**
  * @author Immortius
  */
 public interface NUIManager extends ComponentSystem, FocusManager {
 
+    HUDScreenLayer getHUD();
+
+    boolean isHUDVisible();
+
+    void setHUDVisible(boolean visible);
+
+    boolean isOpen(String screenUri);
+
+    boolean isOpen(AssetUri screenUri);
+
+    boolean isOpen(UIElement element);
+
+    UIScreenLayer getScreen(AssetUri screenUri);
+
+    UIScreenLayer getScreen(String screenUri);
+
+    void closeScreen(String screenUri);
+
+    void closeScreen(AssetUri screenUri);
+
+    void closeScreen(UIScreenLayer screen);
+
+    void closeScreen(UIElement element);
+
+    void toggleScreen(String screenUri);
+
+    void toggleScreen(AssetUri screenUri);
+
+    void toggleScreen(UIElement element);
+
     UIScreenLayer pushScreen(AssetUri screenUri);
 
     UIScreenLayer pushScreen(String screenUri);
 
-    <T extends UIScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
+    UIScreenLayer pushScreen(UIElement element);
 
-    <T extends UIScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
+    <T extends CoreScreenLayer> T pushScreen(AssetUri screenUri, Class<T> expectedType);
 
-    void pushScreen(UIScreenLayer screen);
+    <T extends CoreScreenLayer> T pushScreen(String screenUri, Class<T> expectedType);
+
+    <T extends CoreScreenLayer> T pushScreen(UIElement element, Class<T> expectedType);
 
     void popScreen();
 
-    UIScreenLayer setScreen(AssetUri screenUri);
+    <T extends ControlWidget> T addOverlay(String screenUri, Class<T> expectedType);
 
-    UIScreenLayer setScreen(String screenUri);
+    <T extends ControlWidget> T addOverlay(AssetUri screenUri, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T setScreen(AssetUri screenUri, Class<T> expectedType);
+    <T extends ControlWidget> T addOverlay(UIElement element, Class<T> expectedType);
 
-    <T extends UIScreenLayer> T setScreen(String screenUri, Class<T> expectedType);
+    void removeOverlay(UIElement overlay);
 
-    void setScreen(UIScreenLayer screen);
+    void removeOverlay(String uri);
 
-    void closeScreens();
+    void removeOverlay(AssetUri uri);
+
+    void clear();
 
     void render();
 
@@ -57,4 +93,10 @@ public interface NUIManager extends ComponentSystem, FocusManager {
     void setFocus(UIWidget element);
 
     UIWidget getFocus();
+
+    boolean isReleasingMouse();
+
+    boolean isForceReleasingMouse();
+
+    void setForceReleasingMouse(boolean value);
 }

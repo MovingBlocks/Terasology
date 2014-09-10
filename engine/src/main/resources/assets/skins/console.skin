@@ -1,0 +1,33 @@
+{
+    "inherit": "default",
+    "elements": {
+        "UILabel": {
+            "text-align-horizontal": "LEFT",
+            "text-align-vertical": "top",
+            "text-shadowed": false
+        }
+    },
+    "families": {
+        "history": {
+            "elements": {
+                "UIText": {
+                    "background": "",
+                    "text-shadowed": false,
+                    "background-border": {
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 0,
+                        "right": 0
+                    },
+                    "margin": {
+                        "top": 0,
+                        "bottom": 0,
+                        "left": 0,
+                        "right": 0
+                    }
+                }
+            }
+        }
+    }
+
+}

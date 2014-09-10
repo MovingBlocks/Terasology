@@ -16,6 +16,7 @@
 package org.terasology.world.block;
 
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.naming.Name;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public abstract class BlockManager {
 
-    private static final String AIR_ID = "air";
+    private static final Name AIR_ID = new Name("air");
     private static final Block AIR;
     private static final BlockFamily AIR_FAMILY;
 
@@ -66,6 +67,7 @@ public abstract class BlockManager {
     public abstract List<BlockUri> resolveAllBlockFamilyUri(String uri);
 
     public abstract BlockUri resolveBlockFamilyUri(String name);
+
     /**
      * @return A map of the mapping between Block Uris and Ids
      */

@@ -17,10 +17,10 @@ package org.terasology.entitySystem.metadata;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.AbstractClassLibrary;
-import org.terasology.classMetadata.ClassMetadata;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.reflection.metadata.AbstractClassLibrary;
+import org.terasology.reflection.metadata.ClassMetadata;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.event.Event;
 

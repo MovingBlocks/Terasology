@@ -37,7 +37,6 @@ import java.util.List;
  * @author Immortius
  */
 public class UIDropdown<T> extends CoreWidget {
-    private static final String BOX = "box";
     private static final String LIST = "list";
     private static final String LIST_ITEM = "list-item";
 
@@ -75,7 +74,6 @@ public class UIDropdown<T> extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        canvas.setPart(BOX);
         canvas.drawBackground();
         try (SubRegion ignored = canvas.subRegion(canvas.getCurrentStyle().getMargin().shrink(canvas.getRegion()), false)) {
             if (selection.get() != null) {
@@ -96,7 +94,7 @@ public class UIDropdown<T> extends CoreWidget {
 
             int itemHeight = itemMargin.getTotalHeight() + font.getLineHeight();
             canvas.setPart(LIST_ITEM);
-            for (int i = 0; i < options.get().size(); ++i) {
+            for (int i = 0; i < optionListeners.size(); ++i) {
                 if (optionListeners.get(i).isMouseOver()) {
                     canvas.setMode(HOVER_MODE);
                 } else {
@@ -114,7 +112,6 @@ public class UIDropdown<T> extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
-        canvas.setPart(BOX);
         if (selection.get() != null) {
             return canvas.getCurrentStyle().getMargin().grow(optionRenderer.getPreferredSize(selection.get(), canvas));
         }

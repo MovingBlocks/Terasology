@@ -164,7 +164,7 @@ public final class TeraMath {
      * @return
      */
     public static boolean isFinite(float value) {
-        return value != Float.NaN && value != Float.NEGATIVE_INFINITY && value != Float.POSITIVE_INFINITY;
+        return !Float.isNaN(value) && !Float.isInfinite(value);
     }
 
     /**
@@ -174,7 +174,7 @@ public final class TeraMath {
      * @return
      */
     public static boolean isFinite(double value) {
-        return value != Double.NaN && value != Double.NEGATIVE_INFINITY && value != Double.POSITIVE_INFINITY;
+        return !Double.isNaN(value) && !Double.isInfinite(value);
     }
 
     /**
@@ -333,6 +333,69 @@ public final class TeraMath {
             temp *= temp;
         }
         return base;
+    }
+
+
+    /**
+     * Modulus operation, where the result has the same sign as the divisor.
+     * <p/>
+     * Modulus(a, b) differs from a % b in that the result of the first has the
+     * same sign as a, while the latter has the same sign as b.
+     *
+     * @param dividend The value that is divided
+     * @param divisor  The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     * @author DizzyDragon
+     */
+    public static double modulus(double dividend, double divisor) {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the divisor.
+     * <p/>
+     * Modulus(a, b) differs from a % b in that the result of the first has the
+     * same sign as a, while the latter has the same sign as b.
+     *
+     * @param dividend The value that is divided
+     * @param divisor  The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     * @author DizzyDragon
+     */
+    public static float modulus(float dividend, float divisor) {
+        return ((dividend % divisor) + divisor) % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the dividend.
+     * <p/>
+     * Modulus(a, b) equals a % b.
+     * This function (alias) exists primarily to be used in places where both modulus and % are used,
+     * to make a clearer distinction between the two operations.
+     *
+     * @param dividend The value that is divided
+     * @param divisor  The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     * @author DizzyDragon
+     */
+    public static double remainder(double dividend, double divisor) {
+        return dividend % divisor;
+    }
+
+    /**
+     * Modulus operation, where the result has the same sign as the dividend.
+     * <p/>
+     * Modulus(a, b) equals a % b.
+     * This function (alias) exists primarily to be used in places where both modulus and % are used,
+     * to make a clearer distinction between the two operations.
+     *
+     * @param dividend The value that is divided
+     * @param divisor  The value with which is divided
+     * @return The remainder of (dividend / divisor) as a number in the range [0, divisor)
+     * @author DizzyDragon
+     */
+    public static float remainder(float dividend, float divisor) {
+        return dividend % divisor;
     }
 
     /**
@@ -552,6 +615,7 @@ public final class TeraMath {
      * Lowest power of two greater or equal to val
      * <p/>
      * For values &lt;= 0 returns 0
+     * For values &gt;= 2 ^ 30 returns 0. (2^30 is the largest power of 2 that fits within a int).
      *
      * @param val
      * @return The lowest power of two greater or equal to val
@@ -564,15 +628,18 @@ public final class TeraMath {
         result = (result >> 8) | result;
         result = (result >> 16) | result;
         result++;
-        return result;
+
+        return (result & ~(Integer.MIN_VALUE));
     }
 
     /**
      * @param val
      * @return Whether val is a power of two
+     * @deprecated Use com.google.common.math.IntMath.isPowerOfTwo instead
      */
+    @Deprecated
     public static boolean isPowerOfTwo(int val) {
-        return val == ceilPowerOfTwo(val);
+        return com.google.common.math.IntMath.isPowerOfTwo(val);
     }
 
     /**
@@ -588,6 +655,31 @@ public final class TeraMath {
         }
         return power;
     }
+    
+    /**
+     * Perlin's blending spline (interpolation function)
+     * <p>
+     * 6t<sup>5</sup>-15t<sup>4</sup>+10t<sup>3</sup>
+     * </p>
+     * It has both 1st and 2nd derivative of 0 at 0 and 1 
+     * @param t
+     */
+    public static double fadePerlin(double t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
+    /**
+     * Hermite's blending spline h01 (interpolation function)
+     * <p> 
+     * 3t<sup>2</sup>-2t<sup>3</sup>
+     * </p>
+     * It has a 1st derivative of 0 at 0 and 1 
+     * @param t
+     */
+    public static double fadeHermite(double t) {
+        return t * t * (3 - 2 * t);
+    }
+    
 
     public static int floorToInt(float val) {
         int i = (int) val;

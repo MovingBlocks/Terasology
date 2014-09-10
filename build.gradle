@@ -5,6 +5,11 @@
  * - View tasks for this project: $ gradlew tasks
  */
 
+// Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
+apply from: 'config/gradle/utility.gradle'
+apply from: 'config/gradle/ide.gradle'
+apply from: 'config/gradle/artifactory.gradle'
+
 // Needed for extending the "clean" task to also delete custom stuff defined here like natives
 apply plugin: 'base'
 
@@ -14,12 +19,32 @@ apply plugin: 'idea'
 // The root project should not be an eclipse project. It keeps eclipse (4.2) from finding the sub-projects.
 //apply plugin: 'eclipse'
 
-apply plugin: 'checkstyle'
-apply plugin: 'pmd'
+// Git plugin details at https://github.com/ajoberstar/gradle-git
+import org.ajoberstar.gradle.git.tasks.*
 
-// Separate build file for structure heavy stuff like using Git to fetch other repos to embed within the project
-apply from: 'utility.gradle'
-apply from: 'ide.gradle'
+// Dependencies needed for what our Gradle scripts themselves use. It cannot be included via an external Gradle file :-(
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://dl.bintray.com/jfrog/jfrog-jars'
+        }
+    }
+
+    dependencies {
+        // Artifactory plugin
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+
+        // Git plugin for Gradle
+        classpath 'org.ajoberstar:gradle-git:0.6.3'
+
+        // Needed for caching reflected data during builds
+        classpath 'org.reflections:reflections:0.9.9-RC1'
+    }
+}
+
+// The root project doesn't publish anything
+artifactoryPublish.skip = true
 
 /*
  * To Update Gradle Wrapper:
@@ -45,7 +70,7 @@ ext {
     // Lib dir for use in manifest entries etc (like in :engine). A separate "libsDir" exists, auto-created by Gradle
     subDirLibs = 'libs'
 
-    LwjglVersion = '2.9.0'
+    LwjglVersion = '2.9.1'
 }
 
 // Declare remote repositories we're interested in - library files will be fetched from here
@@ -127,6 +152,12 @@ subprojects {
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
+    } else if (project.getParent().name == "meta" ) {
+        println "Iterating over a meta-module: " + project.name
+        apply plugin: 'eclipse'
+        apply plugin: 'idea'
+    } else {
+        println "Iterating over something else: " + project.name
     }
 }
 
@@ -176,6 +207,17 @@ clean.doLast {
     println "Cleaned root - don't forget to re-extract the natives! 'gradlew extractNatives' or a dependent task"
 }
 
+task protobufCompileWindows(type:Exec) {
+    description = "Run 'Protobuf Compiler' (Windows)"
+    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=engine\\src\\main\\protobuf', '--java_out', 'engine\\src\\main\\java', 'engine\\src\\main\\protobuf\\*'
+}
+
+// TODO: add linux protobuf compiler and if we do maybe straighten out tasks for better abbreviations
+//task runProtobufLinux(type:Exec) {
+//    description = "Run 'Protobuf Compiler' (Linux)"
+//    commandLine 'protobuf/compiler/protoc', '--proto_path=engine/src/main/protobuf', '--java_out', 'engine/src/main/java engine/src/main/protobuf/*'
+//}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,17 +237,17 @@ idea {
     // Exclude special dirs
     module.excludeDirs += file('natives')
     module.excludeDirs += file('protobuf')
-    module.excludeDirs += file('gradle')
 
     // Exclude output dirs
     module.excludeDirs += file('logs')
     module.excludeDirs += file('saves')
     module.excludeDirs += file('screenshots')
+    module.excludeDirs += file('terasology-server')
 
     project {
         // Set JDK
         jdkName = '1.7'
-		wildcards -= '!?*.groovy'
+        wildcards -= '!?*.groovy'
 
         ipr {
             withXml { xmlProvider ->
@@ -236,20 +278,4 @@ idea {
 
 cleanIdea.doLast {
     new File('Terasology.iws').delete()
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Checkstyle stuff                                                                                                  //
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// TODO: Should probably put this in a separate Gradle file and import everywhere. Maybe a Java version too with sourceCompatibility?
-checkstyle {
-    ignoreFailures = true
-    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
-}
-
-pmd {
-    ignoreFailures = true
-    ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
 }

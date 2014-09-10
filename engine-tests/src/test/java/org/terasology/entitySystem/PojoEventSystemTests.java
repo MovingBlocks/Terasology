@@ -18,25 +18,25 @@ package org.terasology.entitySystem;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.event.internal.EventSystemImpl;
-import org.terasology.entitySystem.entity.internal.PojoEntityManager;
-import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 
 import java.util.List;
 
@@ -182,6 +182,18 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.receivedList.size());
     }
 
+    @Test
+    public void testChildEventReceivedByUnfilteredHandler() {
+        entity.addComponent(new IntegerComponent());
+        TestEventHandler handler = new TestEventHandler();
+        eventSystem.registerEvent(new SimpleUri("test:childEvent"), TestChildEvent.class);
+        eventSystem.registerEventHandler(handler);
+
+        TestChildEvent event = new TestChildEvent();
+        eventSystem.send(entity, event);
+        assertEquals(1, handler.unfilteredEvents.size());
+    }
+
     private static class TestEvent extends AbstractConsumableEvent {
 
     }
@@ -190,10 +202,11 @@ public class PojoEventSystemTests {
 
     }
 
-    public static class TestEventHandler implements ComponentSystem {
+    public static class TestEventHandler extends BaseComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
         List<Received> childEventReceived = Lists.newArrayList();
+        List<Received> unfilteredEvents = Lists.newArrayList();
 
         @ReceiveEvent(components = StringComponent.class)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
@@ -208,6 +221,11 @@ public class PojoEventSystemTests {
         @ReceiveEvent(components = IntegerComponent.class)
         public void handleChildEvent(TestChildEvent event, EntityRef entity) {
             childEventReceived.add(new Received(event, entity));
+        }
+
+        @ReceiveEvent
+        public void handleUnfilteredTestEvent(TestEvent event, EntityRef entity) {
+            unfilteredEvents.add(new Received(event, entity));
         }
 
         public void initialise() {
@@ -230,7 +248,7 @@ public class PojoEventSystemTests {
     }
 
 
-    public static class TestHighPriorityEventHandler implements ComponentSystem {
+    public static class TestHighPriorityEventHandler extends BaseComponentSystem {
 
         public boolean cancel;
 
@@ -269,7 +287,7 @@ public class PojoEventSystemTests {
         }
     }
 
-    public static class TestCompoundComponentEventHandler implements ComponentSystem {
+    public static class TestCompoundComponentEventHandler extends BaseComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
 

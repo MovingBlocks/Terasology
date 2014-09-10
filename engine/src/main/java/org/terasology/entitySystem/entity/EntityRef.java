@@ -16,7 +16,7 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
@@ -33,6 +33,14 @@ import org.terasology.persistence.serializers.EntitySerializer;
 public abstract class EntityRef implements MutableComponentContainer {
 
     public static final EntityRef NULL = NullEntityRef.getInstance();
+
+    /**
+     * Copies this entity, creating a new entity with identical components.
+     * Note: You will need to be careful when copying entities, particularly around ownership - this method does nothing to prevent you ending up
+     * with multiple entities owning the same entities.
+     * @return A copy of this entity.
+     */
+    public abstract EntityRef copy();
 
     /**
      * @return Does this entity exist - that is, is not deleted.

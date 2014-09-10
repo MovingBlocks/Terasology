@@ -11985,6 +11985,20 @@ public final class NetData {
      * <code>optional sint32 viewDistanceLevel = 3;</code>
      */
     int getViewDistanceLevel();
+
+    // optional .Color color = 4;
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    boolean hasColor();
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    org.terasology.protobuf.NetData.Color getColor();
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    org.terasology.protobuf.NetData.ColorOrBuilder getColorOrBuilder();
   }
   /**
    * Protobuf type {@code JoinMessage}
@@ -12050,6 +12064,19 @@ public final class NetData {
             case 24: {
               bitField0_ |= 0x00000004;
               viewDistanceLevel_ = input.readSInt32();
+              break;
+            }
+            case 34: {
+              org.terasology.protobuf.NetData.Color.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
+                subBuilder = color_.toBuilder();
+              }
+              color_ = input.readMessage(org.terasology.protobuf.NetData.Color.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(color_);
+                color_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000008;
               break;
             }
           }
@@ -12194,10 +12221,33 @@ public final class NetData {
       return viewDistanceLevel_;
     }
 
+    // optional .Color color = 4;
+    public static final int COLOR_FIELD_NUMBER = 4;
+    private org.terasology.protobuf.NetData.Color color_;
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    public boolean hasColor() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    public org.terasology.protobuf.NetData.Color getColor() {
+      return color_;
+    }
+    /**
+     * <code>optional .Color color = 4;</code>
+     */
+    public org.terasology.protobuf.NetData.ColorOrBuilder getColorOrBuilder() {
+      return color_;
+    }
+
     private void initFields() {
       name_ = "";
       version_ = "";
       viewDistanceLevel_ = 0;
+      color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12227,6 +12277,9 @@ public final class NetData {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeSInt32(3, viewDistanceLevel_);
       }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeMessage(4, color_);
+      }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
@@ -12248,6 +12301,10 @@ public final class NetData {
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeSInt32Size(3, viewDistanceLevel_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, color_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -12358,6 +12415,7 @@ public final class NetData {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getColorFieldBuilder();
         }
       }
       private static Builder create() {
@@ -12372,6 +12430,12 @@ public final class NetData {
         bitField0_ = (bitField0_ & ~0x00000002);
         viewDistanceLevel_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
+        if (colorBuilder_ == null) {
+          color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
+        } else {
+          colorBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -12412,6 +12476,14 @@ public final class NetData {
           to_bitField0_ |= 0x00000004;
         }
         result.viewDistanceLevel_ = viewDistanceLevel_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        if (colorBuilder_ == null) {
+          result.color_ = color_;
+        } else {
+          result.color_ = colorBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -12440,6 +12512,9 @@ public final class NetData {
         }
         if (other.hasViewDistanceLevel()) {
           setViewDistanceLevel(other.getViewDistanceLevel());
+        }
+        if (other.hasColor()) {
+          mergeColor(other.getColor());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -12654,6 +12729,123 @@ public final class NetData {
         return this;
       }
 
+      // optional .Color color = 4;
+      private org.terasology.protobuf.NetData.Color color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder> colorBuilder_;
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public boolean hasColor() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public org.terasology.protobuf.NetData.Color getColor() {
+        if (colorBuilder_ == null) {
+          return color_;
+        } else {
+          return colorBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public Builder setColor(org.terasology.protobuf.NetData.Color value) {
+        if (colorBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          color_ = value;
+          onChanged();
+        } else {
+          colorBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public Builder setColor(
+          org.terasology.protobuf.NetData.Color.Builder builderForValue) {
+        if (colorBuilder_ == null) {
+          color_ = builderForValue.build();
+          onChanged();
+        } else {
+          colorBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public Builder mergeColor(org.terasology.protobuf.NetData.Color value) {
+        if (colorBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+              color_ != org.terasology.protobuf.NetData.Color.getDefaultInstance()) {
+            color_ =
+              org.terasology.protobuf.NetData.Color.newBuilder(color_).mergeFrom(value).buildPartial();
+          } else {
+            color_ = value;
+          }
+          onChanged();
+        } else {
+          colorBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000008;
+        return this;
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public Builder clearColor() {
+        if (colorBuilder_ == null) {
+          color_ = org.terasology.protobuf.NetData.Color.getDefaultInstance();
+          onChanged();
+        } else {
+          colorBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public org.terasology.protobuf.NetData.Color.Builder getColorBuilder() {
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return getColorFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      public org.terasology.protobuf.NetData.ColorOrBuilder getColorOrBuilder() {
+        if (colorBuilder_ != null) {
+          return colorBuilder_.getMessageOrBuilder();
+        } else {
+          return color_;
+        }
+      }
+      /**
+       * <code>optional .Color color = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder> 
+          getColorFieldBuilder() {
+        if (colorBuilder_ == null) {
+          colorBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.terasology.protobuf.NetData.Color, org.terasology.protobuf.NetData.Color.Builder, org.terasology.protobuf.NetData.ColorOrBuilder>(
+                  color_,
+                  getParentForChildren(),
+                  isClean());
+          color_ = null;
+        }
+        return colorBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:JoinMessage)
     }
 
@@ -12663,6 +12855,402 @@ public final class NetData {
     }
 
     // @@protoc_insertion_point(class_scope:JoinMessage)
+  }
+
+  public interface ColorOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // optional uint32 rgba = 1;
+    /**
+     * <code>optional uint32 rgba = 1;</code>
+     */
+    boolean hasRgba();
+    /**
+     * <code>optional uint32 rgba = 1;</code>
+     */
+    int getRgba();
+  }
+  /**
+   * Protobuf type {@code Color}
+   */
+  public static final class Color extends
+      com.google.protobuf.GeneratedMessage
+      implements ColorOrBuilder {
+    // Use Color.newBuilder() to construct.
+    private Color(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private Color(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final Color defaultInstance;
+    public static Color getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public Color getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Color(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              rgba_ = input.readUInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.terasology.protobuf.NetData.internal_static_Color_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.terasology.protobuf.NetData.internal_static_Color_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.terasology.protobuf.NetData.Color.class, org.terasology.protobuf.NetData.Color.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<Color> PARSER =
+        new com.google.protobuf.AbstractParser<Color>() {
+      public Color parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Color(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Color> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional uint32 rgba = 1;
+    public static final int RGBA_FIELD_NUMBER = 1;
+    private int rgba_;
+    /**
+     * <code>optional uint32 rgba = 1;</code>
+     */
+    public boolean hasRgba() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional uint32 rgba = 1;</code>
+     */
+    public int getRgba() {
+      return rgba_;
+    }
+
+    private void initFields() {
+      rgba_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeUInt32(1, rgba_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, rgba_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.NetData.Color parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.terasology.protobuf.NetData.Color parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.terasology.protobuf.NetData.Color parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.Color prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Color}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.terasology.protobuf.NetData.ColorOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.NetData.internal_static_Color_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.NetData.internal_static_Color_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.terasology.protobuf.NetData.Color.class, org.terasology.protobuf.NetData.Color.Builder.class);
+      }
+
+      // Construct using org.terasology.protobuf.NetData.Color.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        rgba_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.NetData.internal_static_Color_descriptor;
+      }
+
+      public org.terasology.protobuf.NetData.Color getDefaultInstanceForType() {
+        return org.terasology.protobuf.NetData.Color.getDefaultInstance();
+      }
+
+      public org.terasology.protobuf.NetData.Color build() {
+        org.terasology.protobuf.NetData.Color result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.terasology.protobuf.NetData.Color buildPartial() {
+        org.terasology.protobuf.NetData.Color result = new org.terasology.protobuf.NetData.Color(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.rgba_ = rgba_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.NetData.Color) {
+          return mergeFrom((org.terasology.protobuf.NetData.Color)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.terasology.protobuf.NetData.Color other) {
+        if (other == org.terasology.protobuf.NetData.Color.getDefaultInstance()) return this;
+        if (other.hasRgba()) {
+          setRgba(other.getRgba());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.terasology.protobuf.NetData.Color parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.terasology.protobuf.NetData.Color) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // optional uint32 rgba = 1;
+      private int rgba_ ;
+      /**
+       * <code>optional uint32 rgba = 1;</code>
+       */
+      public boolean hasRgba() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional uint32 rgba = 1;</code>
+       */
+      public int getRgba() {
+        return rgba_;
+      }
+      /**
+       * <code>optional uint32 rgba = 1;</code>
+       */
+      public Builder setRgba(int value) {
+        bitField0_ |= 0x00000001;
+        rgba_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional uint32 rgba = 1;</code>
+       */
+      public Builder clearRgba() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        rgba_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:Color)
+    }
+
+    static {
+      defaultInstance = new Color(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:Color)
   }
 
   public interface JoinCompleteMessageOrBuilder extends
@@ -23119,6 +23707,11 @@ public final class NetData {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_JoinMessage_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_Color_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Color_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_JoinCompleteMessage_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -23234,38 +23827,40 @@ public final class NetData {
       "(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001(\005*\t\010\210\'",
       "\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002" +
       " \001(\005\022\t\n\001z\030\003 \001(\005\"\036\n\021ServerInfoRequest*\t\010\210" +
-      "\'\020\200\200\200\200\002\"R\n\013JoinMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007" +
+      "\'\020\200\200\200\200\002\"i\n\013JoinMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007" +
       "version\030\002 \001(\t\022\031\n\021viewDistanceLevel\030\003 \001(\021" +
-      "*\t\010\210\'\020\200\200\200\200\002\"2\n\023JoinCompleteMessage\022\020\n\010cl" +
-      "ientId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\301\002\n\021ServerInfoMe" +
-      "ssage\022\033\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007bl" +
-      "ockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tco" +
-      "mponent\030\004 \003(\0132\022.SerializationInfo\022!\n\005eve" +
-      "nt\030\005 \003(\0132\022.SerializationInfo\022\023\n\007assetId\030",
-      "\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023registerB" +
-      "lockFamily\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(\0132\n.Wo" +
-      "rldInfo\022\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001" +
-      "(\t\022\014\n\004time\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo" +
-      "\022\r\n\005title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002" +
-      "\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002i" +
-      "d\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004" +
-      " \001(\014*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010moduleI" +
-      "d\030\001 \001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200" +
-      "\002\",\n\rModuleRequest\022\020\n\010moduleId\030\001 \001(\t*\t\010\210",
-      "\'\020\200\200\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id\030\001 \001(\t\022" +
-      "\017\n\007version\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030" +
-      "\017 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006module" +
-      "\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendError\022\017\n\007" +
-      "message\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntity" +
-      "Message\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037" +
-      "\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200" +
-      "\200\002\"N\n\023UpdateEntityMessage\022\035\n\006entity\030\001 \001(" +
-      "\0132\r.PackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200" +
-      "\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005",
-      "*\t\010\210\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030" +
-      "\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBl" +
-      "ockPos\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$" +
-      "\n\027org.terasology.protobufB\007NetDataH\001"
+      "\022\025\n\005color\030\004 \001(\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Co" +
+      "lor\022\014\n\004rgba\030\001 \001(\r\"2\n\023JoinCompleteMessage" +
+      "\022\020\n\010clientId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\301\002\n\021Server" +
+      "InfoMessage\022\033\n\006module\030\001 \003(\0132\013.ModuleInfo" +
+      "\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t" +
+      "\022%\n\tcomponent\030\004 \003(\0132\022.SerializationInfo\022",
+      "!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\023\n\007as" +
+      "setId\030\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023reg" +
+      "isterBlockFamily\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(" +
+      "\0132\n.WorldInfo\022\017\n\007version\030\017 \001(\t\022\020\n\010gameNa" +
+      "me\030\020 \001(\t\022\014\n\004time\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWor" +
+      "ldInfo\022\r\n\005title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'" +
+      "\020\200\200\200\200\002\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001(" +
+      "\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fiel" +
+      "dIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010m" +
+      "oduleId\030\001 \001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210",
+      "\'\020\200\200\200\200\002\",\n\rModuleRequest\022\020\n\010moduleId\030\001 \001" +
+      "(\t*\t\010\210\'\020\200\200\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id\030" +
+      "\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005" +
+      "error\030\017 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006" +
+      "module\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendErr" +
+      "or\022\017\n\007message\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023Create" +
+      "EntityMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedEn" +
+      "tity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t\010" +
+      "\210\'\020\200\200\200\200\002\"N\n\023UpdateEntityMessage\022\035\n\006entit" +
+      "y\030\001 \001(\0132\r.PackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010",
+      "\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netId" +
+      "\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010tar" +
+      "getId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016ta" +
+      "rgetBlockPos\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200" +
+      "\200\200\200\002B$\n\027org.terasology.protobufB\007NetData" +
+      "H\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -23349,81 +23944,87 @@ public final class NetData {
           internal_static_JoinMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_JoinMessage_descriptor,
-              new java.lang.String[] { "Name", "Version", "ViewDistanceLevel", });
-          internal_static_JoinCompleteMessage_descriptor =
+              new java.lang.String[] { "Name", "Version", "ViewDistanceLevel", "Color", });
+          internal_static_Color_descriptor =
             getDescriptor().getMessageTypes().get(13);
+          internal_static_Color_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_Color_descriptor,
+              new java.lang.String[] { "Rgba", });
+          internal_static_JoinCompleteMessage_descriptor =
+            getDescriptor().getMessageTypes().get(14);
           internal_static_JoinCompleteMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_JoinCompleteMessage_descriptor,
               new java.lang.String[] { "ClientId", });
           internal_static_ServerInfoMessage_descriptor =
-            getDescriptor().getMessageTypes().get(14);
+            getDescriptor().getMessageTypes().get(15);
           internal_static_ServerInfoMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ServerInfoMessage_descriptor,
               new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "Version", "GameName", "Time", });
           internal_static_WorldInfo_descriptor =
-            getDescriptor().getMessageTypes().get(15);
+            getDescriptor().getMessageTypes().get(16);
           internal_static_WorldInfo_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_WorldInfo_descriptor,
               new java.lang.String[] { "Title", "Time", });
           internal_static_SerializationInfo_descriptor =
-            getDescriptor().getMessageTypes().get(16);
+            getDescriptor().getMessageTypes().get(17);
           internal_static_SerializationInfo_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_SerializationInfo_descriptor,
               new java.lang.String[] { "Name", "Id", "FieldName", "FieldIds", });
           internal_static_ModuleInfo_descriptor =
-            getDescriptor().getMessageTypes().get(17);
+            getDescriptor().getMessageTypes().get(18);
           internal_static_ModuleInfo_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleInfo_descriptor,
               new java.lang.String[] { "ModuleId", "ModuleVersion", });
           internal_static_ModuleRequest_descriptor =
-            getDescriptor().getMessageTypes().get(18);
+            getDescriptor().getMessageTypes().get(19);
           internal_static_ModuleRequest_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleRequest_descriptor,
               new java.lang.String[] { "ModuleId", });
           internal_static_ModuleDataHeader_descriptor =
-            getDescriptor().getMessageTypes().get(19);
+            getDescriptor().getMessageTypes().get(20);
           internal_static_ModuleDataHeader_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleDataHeader_descriptor,
               new java.lang.String[] { "Id", "Version", "Size", "Error", });
           internal_static_ModuleData_descriptor =
-            getDescriptor().getMessageTypes().get(20);
+            getDescriptor().getMessageTypes().get(21);
           internal_static_ModuleData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleData_descriptor,
               new java.lang.String[] { "Module", });
           internal_static_ModuleSendError_descriptor =
-            getDescriptor().getMessageTypes().get(21);
+            getDescriptor().getMessageTypes().get(22);
           internal_static_ModuleSendError_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleSendError_descriptor,
               new java.lang.String[] { "Message", });
           internal_static_CreateEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(22);
+            getDescriptor().getMessageTypes().get(23);
           internal_static_CreateEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_CreateEntityMessage_descriptor,
               new java.lang.String[] { "Entity", "BlockPos", });
           internal_static_UpdateEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(23);
+            getDescriptor().getMessageTypes().get(24);
           internal_static_UpdateEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_UpdateEntityMessage_descriptor,
               new java.lang.String[] { "Entity", "NetId", });
           internal_static_RemoveEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(24);
+            getDescriptor().getMessageTypes().get(25);
           internal_static_RemoveEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RemoveEntityMessage_descriptor,
               new java.lang.String[] { "NetId", });
           internal_static_EventMessage_descriptor =
-            getDescriptor().getMessageTypes().get(25);
+            getDescriptor().getMessageTypes().get(26);
           internal_static_EventMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EventMessage_descriptor,

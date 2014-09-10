@@ -1,0 +1,21 @@
+{
+    "inherit": "default",
+    "elements": {
+        "ScrollableArea": {
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            }
+        },
+
+        "UILabel": {
+            "text-align-horizontal": "LEFT",
+            "text-align-vertical": "top",
+            "text-shadowed": false
+        }
+    }
+
+}

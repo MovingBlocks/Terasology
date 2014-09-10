@@ -17,12 +17,18 @@ package org.terasology.engine.modes;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
-import org.terasology.classMetadata.reflect.ReflectFactory;
+import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.internal.ConsoleImpl;
+import org.terasology.logic.console.internal.ConsoleSystem;
+import org.terasology.logic.console.internal.CoreCommands;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
@@ -33,12 +39,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
-import org.terasology.rendering.nui.mainMenu.ErrorMessagePopup;
-
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * The class implements the main game menu.
@@ -70,8 +71,10 @@ public class StateMainMenu implements GameState {
     public void init(GameEngine gameEngine) {
 
         //lets get the entity event system running
-        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class), CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
+        entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(),
+                CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         eventSystem = CoreRegistry.get(EventSystem.class);
+        CoreRegistry.put(Console.class, new ConsoleImpl());
 
         nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
@@ -82,10 +85,13 @@ public class StateMainMenu implements GameState {
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
+        componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
+        componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         inputSystem = CoreRegistry.get(InputSystem.class);
-        componentSystemManager.register(inputSystem, "engine:InputSystem");
+
+        new RegisterInputSystem().step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
 
@@ -99,7 +105,7 @@ public class StateMainMenu implements GameState {
         //guiManager.openWindow("main");
         CoreRegistry.get(NUIManager.class).pushScreen("engine:mainMenuScreen");
         if (!messageOnLoad.isEmpty()) {
-            nuiManager.pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error", messageOnLoad);
+            nuiManager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error", messageOnLoad);
         }
     }
 
@@ -109,7 +115,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.shutdown();
         stopBackgroundMusic();
-        nuiManager.closeScreens();
+        nuiManager.clear();
 
         entityManager.clear();
         CoreRegistry.clear();
@@ -137,9 +143,6 @@ public class StateMainMenu implements GameState {
 
     @Override
     public void render() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glLoadIdentity();
-
         nuiManager.render();
     }
 

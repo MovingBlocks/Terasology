@@ -27,6 +27,12 @@ public class WorldGenerationConfig {
     private float snowGrassDensity = 0.001f;
     private float mountainGrassDensity = 0.2f;
     private float desertGrassDensity = 0.001f;
+    private float coalDensity = 0.050f;
+    private float ironDensity = 0.010f;
+    private float copperDensity = 0.010f;
+    private float goldDensity = 0.005f;
+    private float diamondDensity = 0.001f;
+    private float gravelDensity = 0.050f;
 
     public float getForestGrassDensity() {
         return forestGrassDensity;
@@ -102,5 +108,53 @@ public class WorldGenerationConfig {
                 setDesertGrassDensity(density);
                 break;
         }
+    }
+
+    public float getCoalDensity() {
+        return coalDensity;
+    }
+
+    public void setCoalDensity(float coalDensity) {
+        this.coalDensity = coalDensity;
+    }
+
+    public float getIronDensity() {
+        return ironDensity;
+    }
+
+    public void setIronDensity(float ironDensity) {
+        this.ironDensity = ironDensity;
+    }
+
+    public float getCopperDensity() {
+        return copperDensity;
+    }
+
+    public void setCopperDensity(float copperDensity) {
+        this.copperDensity = copperDensity;
+    }
+
+    public float getGoldDensity() {
+        return goldDensity;
+    }
+
+    public void setGoldDensity(float goldDensity) {
+        this.goldDensity = goldDensity;
+    }
+
+    public float getDiamondDensity() {
+        return diamondDensity;
+    }
+
+    public void setDiamondDensity(float diamondDensity) {
+        this.diamondDensity = diamondDensity;
+    }
+
+    public float getGravelDensity() {
+        return gravelDensity;
+    }
+
+    public void setGravelDensity(float gravelDensity) {
+        this.gravelDensity = gravelDensity;
     }
 }

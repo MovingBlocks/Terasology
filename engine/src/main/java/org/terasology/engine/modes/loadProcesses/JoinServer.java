@@ -17,24 +17,28 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import com.google.common.collect.Maps;
+
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.engine.module.ModuleManager;
+import org.terasology.module.Module;
+import org.terasology.naming.NameVersion;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.Version;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
-import org.terasology.protobuf.NetData;
+import org.terasology.network.ServerInfoMessage;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -59,40 +63,39 @@ public class JoinServer implements LoadProcess {
     @Override
     public boolean step() {
         if (joinStatus.getStatus() == JoinStatus.Status.COMPLETE) {
-            NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
+            ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
             gameManifest.setTitle(serverInfo.getGameName());
-            for (NetData.WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
-                WorldInfo world = new WorldInfo();
-                world.setTime(worldInfo.getTime());
-                world.setTitle(worldInfo.getTitle());
-                gameManifest.addWorld(world);
+            for (WorldInfo worldInfo : serverInfo.getWorldInfoList()) {
+                gameManifest.addWorld(worldInfo);
             }
 
             Map<String, Short> blockMap = Maps.newHashMap();
-            for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
-                blockMap.put(serverInfo.getBlockName(i), (short) serverInfo.getBlockId(i));
+            for (Entry<Integer, String> entry : serverInfo.getBlockIds().entrySet()) {
+                String name = entry.getValue();
+                short id = entry.getKey().shortValue();
+                Short oldId = blockMap.put(name, id);
+                if (oldId != null && oldId != id) {
+                    logger.warn("Overwriting Id {} for {} with Id {}", oldId, name, id);
+                }
             }
             gameManifest.setRegisteredBlockFamilies(serverInfo.getRegisterBlockFamilyList());
             gameManifest.setBlockIdMap(blockMap);
             gameManifest.setTime(networkSystem.getServer().getInfo().getTime());
 
             ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-            moduleManager.disableAllModules();
 
-            for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
-                if (!moduleInfo.hasModuleId() || !moduleInfo.hasModuleVersion() || Version.create(moduleInfo.getModuleVersion()) == null) {
-                    logger.error("Received incomplete module info");
+            Set<Module> moduleSet = Sets.newLinkedHashSet();
+            for (NameVersion moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
+                Module module = moduleManager.getRegistry().getModule(moduleInfo.getName(), moduleInfo.getVersion());
+                if (module == null) {
+                    StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo);
+                    CoreRegistry.get(GameEngine.class).changeState(mainMenu);
+                    return false;
                 } else {
-                    Module module = moduleManager.getModule(moduleInfo.getModuleId(), Version.create(moduleInfo.getModuleVersion()));
-                    if (module == null) {
-                        StateMainMenu mainMenu = new StateMainMenu("Missing required module: " + moduleInfo.getModuleId() + ":" + moduleInfo.getModuleVersion());
-                        CoreRegistry.get(GameEngine.class).changeState(mainMenu);
-                        return false;
-                    } else {
-                        logger.debug("Activating module: {}:{}", moduleInfo.getModuleId(), moduleInfo.getModuleVersion());
-                        gameManifest.addModule(module.getId(), module.getVersion());
-                        moduleManager.enableModule(module);
-                    }
+
+                    logger.debug("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
+                    gameManifest.addModule(module.getId(), module.getVersion());
+                    moduleSet.add(module);
                 }
             }
 
@@ -114,5 +117,10 @@ public class JoinServer implements LoadProcess {
     @Override
     public float getProgress() {
         return joinStatus.getCurrentActivityProgress();
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 10;
     }
 }

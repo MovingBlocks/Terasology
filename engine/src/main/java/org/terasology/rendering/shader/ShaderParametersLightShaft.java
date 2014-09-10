@@ -17,7 +17,7 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.EditorRange;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
@@ -34,13 +34,13 @@ import javax.vecmath.Vector4f;
 public class ShaderParametersLightShaft extends ShaderParametersBase {
 
     @EditorRange(min = 0.0f, max = 10.0f)
-    private float density = 1.5f;
+    private float density = 1.0f;
     @EditorRange(min = 0.0f, max = 0.01f)
     private float exposure = 0.0075f;
     @EditorRange(min = 0.0f, max = 10.0f)
     private float weight = 8.0f;
     @EditorRange(min = 0.0f, max = 0.99f)
-    private float decay = 0.9f;
+    private float decay = 0.95f;
 
     @Override
     public void applyParameters(Material program) {

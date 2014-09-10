@@ -18,6 +18,7 @@ package org.terasology.network;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.ChunkRegionListener;
 
@@ -31,6 +32,8 @@ public interface Client extends ChunkRegionListener {
     String getName();
 
     String getId();
+
+    Color getColor();
 
     void disconnect();
 

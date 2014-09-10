@@ -17,9 +17,11 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
@@ -38,6 +40,9 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
     public boolean step() {
         CoreRegistry.get(ShaderManager.class).initShaders();
 
+        NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
+        ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
+
         // TODO: This should be elsewhere
         // Create gelatinousCubeMesh
         Tessellator tessellator = new Tessellator();
@@ -45,5 +50,10 @@ public class InitialiseGraphics extends SingleStepLoadProcess {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
         tessellator.generateMesh(new AssetUri(AssetType.MESH, TerasologyConstants.ENGINE_MODULE, "gelatinousCube"));
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 }

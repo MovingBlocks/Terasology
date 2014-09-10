@@ -16,6 +16,8 @@
 
 package org.terasology.identity;
 
+import com.google.common.base.Charsets;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -131,7 +133,7 @@ public class PublicIdentityCertificate {
             PublicKey key = keyFactory.generatePublic(keySpec);
             Signature signatureVerifier = Signature.getInstance(IdentityConstants.SIGNATURE_ALGORITHM);
             signatureVerifier.initVerify(key);
-            signatureVerifier.update(id.getBytes());
+            signatureVerifier.update(id.getBytes(Charsets.UTF_8));
             signatureVerifier.update(modulus.toByteArray());
             signatureVerifier.update(exponent.toByteArray());
             return signatureVerifier.verify(signature.toByteArray());

@@ -25,8 +25,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
@@ -36,6 +35,7 @@ import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.In;
 
 import javax.vecmath.Vector3f;
 
@@ -43,7 +43,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
+public class HealthSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private static final Logger logger = LoggerFactory.getLogger(HealthSystem.class);
 
     @In
@@ -51,14 +51,6 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     @In
     private org.terasology.engine.Time time;
-
-    @Override
-    public void initialise() {
-    }
-
-    @Override
-    public void shutdown() {
-    }
 
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(HealthComponent.class)) {
@@ -95,7 +87,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
             if (modifiedAmount > 0) {
                 doHeal(entity, modifiedAmount, instigator, health);
             } else if (modifiedAmount < 0) {
-                doDamage(entity, -modifiedAmount, EngineDamageTypes.HEALING.get(), instigator, health);
+                doDamage(entity, -modifiedAmount, EngineDamageTypes.HEALING.get(), instigator, EntityRef.NULL, health);
             }
         }
     }
@@ -114,7 +106,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         }
     }
 
-    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, HealthComponent targetHealthComponent) {
+    private void doDamage(EntityRef entity, int damageAmount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent targetHealthComponent) {
         HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);
@@ -125,27 +117,35 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         entity.saveComponent(health);
         entity.send(new OnDamagedEvent(damageAmount, damagedAmount, damageType, instigator));
         if (health.currentHealth == 0) {
-            entity.send(new NoHealthEvent(instigator, damageType));
+            entity.send(new DestroyEvent(instigator, directCause, damageType));
         }
     }
 
     @ReceiveEvent(components = {HealthComponent.class})
     public void onDamage(DoDamageEvent event, EntityRef entity) {
-        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator());
+        checkDamage(entity, event.getAmount(), event.getDamageType(), event.getInstigator(), event.getDirectCause(), null);
     }
 
-    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator) {
-        checkDamage(entity, amount, damageType, instigator, null);
-    }
-
-    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, HealthComponent health) {
-        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator));
+    private void checkDamage(EntityRef entity, int amount, Prefab damageType, EntityRef instigator, EntityRef directCause, HealthComponent health) {
+        BeforeDamagedEvent beforeDamage = entity.send(new BeforeDamagedEvent(amount, damageType, instigator, directCause));
         if (!beforeDamage.isConsumed()) {
-            int damageAmount = calculateTotal(beforeDamage.getBaseDamage(), beforeDamage.getMultipliers(), beforeDamage.getModifiers());
+            int damageAmount = TeraMath.floorToInt(beforeDamage.getResultValue());
             if (damageAmount > 0) {
-                doDamage(entity, damageAmount, damageType, instigator, health);
+                doDamage(entity, damageAmount, damageType, instigator, directCause, health);
             } else {
                 doHeal(entity, -damageAmount, instigator, health);
+            }
+        }
+    }
+
+    @ReceiveEvent
+    public void onDestroy(DestroyEvent event, EntityRef entity, HealthComponent healthComponent) {
+        BeforeDestroyEvent destroyCheck = new BeforeDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType());
+        entity.send(destroyCheck);
+        if (!destroyCheck.isConsumed()) {
+            entity.send(new DoDestroyEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType()));
+            if (healthComponent.destroyEntityOnNoHealth) {
+                entity.destroy();
             }
         }
     }
@@ -184,7 +184,7 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         if (event.getVelocity().y < 0 && -event.getVelocity().y > health.fallingDamageSpeedThreshold) {
             int damage = (int) ((-event.getVelocity().y - health.fallingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
-                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
+                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL, health);
             }
         }
     }
@@ -200,16 +200,18 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
         if (speed > health.horizontalDamageSpeedThreshold) {
             int damage = (int) ((speed - health.horizontalDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
             if (damage > 0) {
-                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, health);
+                checkDamage(entity, damage, EngineDamageTypes.PHYSICAL.get(), EntityRef.NULL, EntityRef.NULL, health);
             }
         }
     }
 
     // Debug commands
     @Command(shortDescription = "Reduce the player's health by an amount", runOnServer = true)
-    public void damage(@CommandParam("amount") int amount, EntityRef client) {
+    public String damage(@CommandParam("amount") int amount, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoDamageEvent(amount, EngineDamageTypes.DIRECT.get(), clientComp.character));
+        
+        return "Inflicted damage of " + amount;
     }
 
     @Command(shortDescription = "Restores your health to max", runOnServer = true)
@@ -226,22 +228,24 @@ public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
     }
 
     @Command(shortDescription = "Set max health", runOnServer = true)
-    public void setMaxHealth(@CommandParam("max") int max, EntityRef client) {
+    public String setMaxHealth(@CommandParam("max") int max, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             doHeal(clientComp.character, health.maxHealth, clientComp.character, health);
         }
+        return "Max health set to " + max;
     }
 
     @Command(shortDescription = "Set regen rate", runOnServer = true)
-    public void setRegenRaterate(@CommandParam("rate") float rate, EntityRef client) {
+    public String setRegenRate(@CommandParam("rate") float rate, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
             health.regenRate = rate;
             clientComp.character.saveComponent(health);
         }
+        return "Set regeneration rate to " + rate;
     }
 
     @Command(shortDescription = "Show your health")

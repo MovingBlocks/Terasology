@@ -16,12 +16,13 @@
 
 package org.terasology.rendering.md5;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
 import org.terasology.math.AABB;
+import org.terasology.module.Module;
 import org.terasology.rendering.assets.animation.MeshAnimationData;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
@@ -58,7 +59,7 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
 
     @Override
-    public MeshAnimationData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MeshAnimationData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try {
             MD5 md5 = parse(stream);
             return createAnimation(md5);
@@ -132,7 +133,7 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimationData> {
 
 
     private MD5 parse(InputStream stream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
         MD5 md5 = new MD5();
         String line = MD5ParserCommon.readToLine(reader, "MD5Version ");
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);

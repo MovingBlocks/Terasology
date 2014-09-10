@@ -15,10 +15,10 @@
  */
 package org.terasology.entitySystem.stubs;
 
-import java.util.Map;
-
 import org.terasology.entitySystem.Component;
 
+import java.util.Map;
+
 public final class OrderedMapTestComponent implements Component {
-    public Map<String,Long> orderedMap;
+    public Map<String, Long> orderedMap;
 }

@@ -15,9 +15,13 @@
  */
 package org.terasology.world.block.items;
 
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.world.block.family.BlockFamily;
@@ -46,8 +50,20 @@ public class BlockItemFactory {
             builder.addComponent(new LightComponent());
         }
 
+        // Copy the components from block prefab into the block item
+        Prefab prefab = Assets.getPrefab(blockFamily.getArchetypeBlock().getPrefab());
+        if (prefab != null) {
+            for (Component component : prefab.iterateComponents()) {
+                if (component.getClass().getAnnotation(AddToBlockBasedItem.class) != null) {
+                    builder.addComponent(entityManager.getComponentLibrary().copy(component));
+                }
+            }
+        }
+
+        DisplayNameComponent displayNameComponent = builder.getComponent(DisplayNameComponent.class);
+        displayNameComponent.name = blockFamily.getDisplayName();
+
         ItemComponent item = builder.getComponent(ItemComponent.class);
-        item.name = blockFamily.getDisplayName();
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) quantity;

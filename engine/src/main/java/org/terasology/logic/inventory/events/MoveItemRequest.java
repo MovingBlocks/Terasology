@@ -25,6 +25,8 @@ import org.terasology.network.ServerEvent;
  */
 @ServerEvent
 public class MoveItemRequest implements Event {
+    private EntityRef instigator;
+
     private EntityRef fromInventory = EntityRef.NULL;
     private int fromSlot;
     private EntityRef toInventory = EntityRef.NULL;
@@ -35,7 +37,8 @@ public class MoveItemRequest implements Event {
     protected MoveItemRequest() {
     }
 
-    public MoveItemRequest(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int changeId) {
+    public MoveItemRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int changeId) {
+        this.instigator = instigator;
         this.fromInventory = fromInventory;
         this.fromSlot = fromSlot;
         this.toInventory = toInventory;
@@ -61,5 +64,9 @@ public class MoveItemRequest implements Event {
 
     public int getChangeId() {
         return changeId;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

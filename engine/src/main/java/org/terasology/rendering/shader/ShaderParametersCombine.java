@@ -18,14 +18,12 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 /**
@@ -45,13 +43,6 @@ public class ShaderParametersCombine extends ShaderParametersBase {
     private float skyInscatteringStrength = 0.25f;
     @EditorRange(min = 0.0f, max = 1.0f)
     private float skyInscatteringThreshold = 0.8f;
-
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogGlobalDensity = 0.05f;
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogHeightFalloff = 0.1f;
-    @EditorRange(min = 0.001f, max = 0.1f)
-    private float volFogDensityAtViewer = 0.1f;
 
     @Override
     public void applyParameters(Material program) {
@@ -79,44 +70,21 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setInt("texSceneOpaqueLightBuffer", texId++, true);
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isVolumetricFog()) {
-            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-            if (activeCamera != null) {
-                program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix(), true);
+        DefaultRenderingProcess.FBO sceneReflectiveRefractive = DefaultRenderingProcess.getInstance().getFBO("sceneReflectiveRefractive");
 
-                Vector3f fogWorldPosition = new Vector3f(0.0f, -activeCamera.getPosition().y, 0.0f);
-                program.setFloat3("fogWorldPosition", fogWorldPosition.x, fogWorldPosition.y, fogWorldPosition.z, true);
-    
-                WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-                // Fog density is set according to the fog density provided by the world
-                // TODO: The 50% percent limit shouldn't be hardcoded
-                float worldFog = worldRenderer.getSmoothedPlayerSunlightValue()
-                        * Math.min(CoreRegistry.get(WorldProvider.class).getFog(activeCamera.getPosition()), 0.5f);
-    
-//                boolean headUnderWater = worldRenderer.isHeadUnderWater();
-//                if (headUnderWater) {
-//                    worldFog = 1.0f;
-//                }
-    
-                program.setFloat4("volumetricFogSettings", volFogDensityAtViewer, volFogGlobalDensity, volFogHeightFalloff, worldFog);
-        }
-    }
-
-        DefaultRenderingProcess.FBO sceneTransparent = DefaultRenderingProcess.getInstance().getFBO("sceneTransparent");
-
-        if (sceneTransparent != null) {
+        if (sceneReflectiveRefractive != null) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            sceneTransparent.bindTexture();
-            program.setInt("texSceneTransparent", texId++, true);
+            sceneReflectiveRefractive.bindTexture();
+            program.setInt("texSceneReflectiveRefractive", texId++, true);
         }
 
         if (CoreRegistry.get(Config.class).getRendering().isLocalReflections()) {
-            if (sceneTransparent != null) {
+            if (sceneReflectiveRefractive != null) {
                 GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-                sceneTransparent.bindNormalsTexture();
-                program.setInt("texSceneTransparentNormals", texId++, true);
+                sceneReflectiveRefractive.bindNormalsTexture();
+                program.setInt("texSceneReflectiveRefractiveNormals", texId++, true);
             }
-            
+
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
             if (activeCamera != null) {
                 program.setMatrix4("invProjMatrix", activeCamera.getInverseProjectionMatrix(), true);

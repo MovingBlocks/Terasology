@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.inventory;
 
-import org.terasology.engine.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.registry.CoreRegistry;
 
 import javax.vecmath.Vector3f;
 
@@ -32,15 +32,16 @@ import javax.vecmath.Vector3f;
 public final class PickupBuilder {
 
     private EntityManager entityManager;
-    private InventoryManager inventoryManager;
 
-
-    public PickupBuilder() {
-        this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.inventoryManager = CoreRegistry.get(InventoryManager.class);
+    public PickupBuilder(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan) {
+        return createPickupFor(itemEntity, pos, lifespan, false);
+    }
+
+    public EntityRef createPickupFor(EntityRef itemEntity, Vector3f pos, int lifespan, boolean dropAll) {
         ItemComponent itemComp = itemEntity.getComponent(ItemComponent.class);
         if (itemComp == null || !itemComp.pickupPrefab.exists()) {
             return EntityRef.NULL;
@@ -49,7 +50,17 @@ public final class PickupBuilder {
         EntityRef pickupItem = itemEntity;
         EntityRef owner = itemEntity.getOwner();
         if (owner.hasComponent(InventoryComponent.class)) {
-            pickupItem = inventoryManager.removeItem(owner, itemEntity, 1);
+            if (dropAll) {
+                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false);
+                if (removedItem != null) {
+                    pickupItem = removedItem;
+                }
+            } else {
+                final EntityRef removedItem = CoreRegistry.get(InventoryManager.class).removeItem(owner, EntityRef.NULL, pickupItem, false, 1);
+                if (removedItem != null) {
+                    pickupItem = removedItem;
+                }
+            }
         }
 
         //don't perform actual drop on client side

@@ -49,10 +49,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     /**
      * Init. a new L-System based tree generator.
      *
-     * @param initialAxiom  The initial axiom to use
-     * @param ruleSet       The rule set to use
-     * @param maxDepth      The maximum recursion depth
-     * @param angle         The angle
+     * @param initialAxiom The initial axiom to use
+     * @param ruleSet      The rule set to use
+     * @param maxDepth     The maximum recursion depth
+     * @param angle        The angle
      */
     public TreeGeneratorLSystem(String initialAxiom, Map<Character, LSystemRule> ruleSet, int maxDepth, float angle) {
         this.angle = angle;

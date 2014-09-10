@@ -18,7 +18,7 @@ package org.terasology.persistence.typeHandling.coreTypes;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.classMetadata.FieldMetadata;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;

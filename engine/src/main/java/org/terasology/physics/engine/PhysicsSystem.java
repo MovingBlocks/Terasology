@@ -17,7 +17,6 @@ package org.terasology.physics.engine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,20 +25,22 @@ import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.entity.lifecycleEvents.OnChangedComponent;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
-import org.terasology.entitySystem.systems.In;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
+import org.terasology.physics.events.ChangeVelocityEvent;
 import org.terasology.physics.events.CollideEvent;
+import org.terasology.physics.events.ForceEvent;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.physics.events.PhysicsResynchEvent;
+import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.block.BlockComponent;
 
@@ -57,7 +58,7 @@ import java.util.List;
  * @author Immortius
  */
 @RegisterSystem
-public class PhysicsSystem implements UpdateSubscriberSystem {
+public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
     private static final long TIME_BETWEEN_NETSYNCS = 200;
@@ -67,18 +68,14 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     private NetworkSystem networkSystem;
     @In
     private EntityManager entityManager;
+    @In
     private PhysicsEngine physics;
 
     private long lastNetsync;
 
     @Override
     public void initialise() {
-        physics = CoreRegistry.get(PhysicsEngine.class);
         lastNetsync = 0;
-    }
-
-    @Override
-    public void shutdown() {
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
@@ -96,6 +93,21 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
         physics.getRigidBody(entity).applyImpulse(event.getImpulse());
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class})
+    public void onForce(ForceEvent event, EntityRef entity) {
+        physics.getRigidBody(entity).applyForce(event.getForce());
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class})
+    public void onChangeVelocity(ChangeVelocityEvent event, EntityRef entity) {
+        if (event.getAngularVelocity() != null) {
+            physics.getRigidBody(entity).setAngularVelocity(event.getAngularVelocity());
+        }
+        if (event.getLinearVelocity() != null) {
+            physics.getRigidBody(entity).setLinearVelocity(event.getLinearVelocity());
+        }
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
@@ -141,7 +153,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
             entity.saveComponent(comp);
         }
 
-        if (networkSystem.getMode() == NetworkMode.SERVER && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+        if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
             lastNetsync = time.getGameTimeInMs();
         }

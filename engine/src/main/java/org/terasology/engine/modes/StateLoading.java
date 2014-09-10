@@ -18,10 +18,9 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
-import org.lwjgl.Sys;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
@@ -36,9 +35,12 @@ import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
 import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
 import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorldGenerator;
 import org.terasology.engine.modes.loadProcesses.JoinServer;
 import org.terasology.engine.modes.loadProcesses.LoadEntities;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
+import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
 import org.terasology.engine.modes.loadProcesses.PrepareWorld;
 import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
 import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
@@ -51,10 +53,11 @@ import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
-import org.terasology.rendering.gui.windows.UIScreenLoading;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.layers.mainMenu.loadingScreen.LoadingScreen;
 
 import java.util.Queue;
 
@@ -66,16 +69,17 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private GameManifest gameManifest;
-    private String serverAddress;
-    private int serverPort;
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
+    
+    private NUIManager nuiManager;
 
-    private GUIManager guiManager;
+    private LoadingScreen loadingScreen;
 
-    private UIScreenLoading loadingScreen;
+    private int progress;
+    private int maxProgress;
 
     /**
      * Constructor for server or single player games
@@ -87,7 +91,7 @@ public class StateLoading implements GameState {
         Preconditions.checkArgument(netMode != NetworkMode.CLIENT);
 
         this.gameManifest = gameManifest;
-        this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = netMode;
     }
 
@@ -98,7 +102,7 @@ public class StateLoading implements GameState {
      */
     public StateLoading(JoinStatus joinStatus) {
         this.gameManifest = new GameManifest();
-        this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.nuiManager = CoreRegistry.get(NUIManager.class);
         this.netMode = NetworkMode.CLIENT;
         this.joinStatus = joinStatus;
     }
@@ -108,7 +112,7 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
-
+        
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:
@@ -119,10 +123,15 @@ public class StateLoading implements GameState {
                 break;
         }
 
+        progress = 0;
+        maxProgress = 0;
+        for (LoadProcess process : loadProcesses) {
+            maxProgress += process.getExpectedCost();
+        }
+
         popStep();
-        guiManager.closeAllWindows();
-        loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
-        loadingScreen.updateStatus(current.getMessage(), current.getProgress() * 100f);
+        loadingScreen = nuiManager.pushScreen("engine:loadingScreen", LoadingScreen.class);
+        loadingScreen.updateStatus(current.getMessage(), current.getProgress());
     }
 
     private void initClient() {
@@ -140,6 +149,8 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseRemoteWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
+        loadProcesses.add(new PreBeginSystems());
+        loadProcesses.add(new PostBeginSystems());
         loadProcesses.add(new SetupRemotePlayer());
         loadProcesses.add(new AwaitCharacterSpawn());
         loadProcesses.add(new PrepareWorld());
@@ -161,17 +172,33 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseWorld(gameManifest));
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new LoadEntities());
+        loadProcesses.add(new PreBeginSystems());
         loadProcesses.add(new InitialiseBlockTypeEntities());
         loadProcesses.add(new CreateWorldEntity());
-        if (netMode == NetworkMode.SERVER) {
-            loadProcesses.add(new StartServer());
+        loadProcesses.add(new InitialiseWorldGenerator(gameManifest));
+        if (netMode.isServer()) {
+            boolean dedicated;
+            if (netMode == NetworkMode.DEDICATED_SERVER) {
+                dedicated = true;
+            } else if (netMode == NetworkMode.LISTEN_SERVER) {
+                dedicated = false;
+            } else {
+                throw new IllegalStateException("Invalid server mode: " + netMode);
+            }
+            loadProcesses.add(new StartServer(dedicated));
         }
-        loadProcesses.add(new SetupLocalPlayer());
-        loadProcesses.add(new AwaitCharacterSpawn());
+        loadProcesses.add(new PostBeginSystems());
+        if (netMode.hasLocalClient()) {
+            loadProcesses.add(new SetupLocalPlayer());
+            loadProcesses.add(new AwaitCharacterSpawn());
+        }
         loadProcesses.add(new PrepareWorld());
     }
 
     private void popStep() {
+        if (current != null) {
+            progress += current.getExpectedCost();
+        }
         current = null;
         if (!loadProcesses.isEmpty()) {
             current = loadProcesses.remove();
@@ -192,24 +219,27 @@ public class StateLoading implements GameState {
 
     @Override
     public void update(float delta) {
-        long startTime = 1000 * Sys.getTime() / Sys.getTimerResolution();
-        while (current != null && 1000 * Sys.getTime() / Sys.getTimerResolution() - startTime < 20) {
+        EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
+        long startTime = time.getRawTimeInMs();
+        while (current != null && time.getRawTimeInMs() - startTime < 20) {
             if (current.step()) {
                 popStep();
             }
         }
         if (current == null) {
-            CoreRegistry.get(GUIManager.class).closeWindow("loading");
+            nuiManager.closeScreen(loadingScreen);
+            nuiManager.setHUDVisible(true);
             CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
-            loadingScreen.updateStatus(current.getMessage(), 100f * current.getProgress());
-            guiManager.update();
+            float progressValue = (progress + current.getExpectedCost() * current.getProgress()) / maxProgress;
+            loadingScreen.updateStatus(current.getMessage(), progressValue);
+            nuiManager.update(delta);
         }
     }
 
     @Override
     public void render() {
-        CoreRegistry.get(GUIManager.class).render();
+        nuiManager.render();
     }
 
     @Override

@@ -18,6 +18,7 @@ package org.terasology.audio.openAL;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 
@@ -27,11 +28,11 @@ import java.util.Set;
 /**
  *
  */
-public abstract class BaseSoundPool implements SoundPool {
+public abstract class BaseSoundPool<SOUND extends Sound<?>, SOURCE extends SoundSource<SOUND>> implements SoundPool<SOUND, SOURCE> {
 
     private static final int DEFAULT_POOL_SIZE = 32;
 
-    protected Map<SoundSource, Integer> soundSources;
+    protected Map<SOURCE, Integer> soundSources;
 
     private float volume;
 
@@ -45,8 +46,8 @@ public abstract class BaseSoundPool implements SoundPool {
         this(DEFAULT_POOL_SIZE);
     }
 
-    public SoundSource getLockedSource() {
-        for (SoundSource source : soundSources.keySet()) {
+    public SOURCE getLockedSource() {
+        for (SOURCE source : soundSources.keySet()) {
             if (!isActive(source)) {
                 if (lock(source)) {
                     return source;
@@ -57,45 +58,49 @@ public abstract class BaseSoundPool implements SoundPool {
         return null;
     }
 
-    public SoundSource getSource(Sound sound, int priority) {
+    @Override
+    public SOURCE getSource(SOUND sound, int priority) {
         if (sound == null) {
             return null;
         }
 
-        // @todo should be optimized (performance crucial)
-        for (SoundSource source : soundSources.keySet()) {
+        // TODO: should be optimized (performance crucial)
+        for (SOURCE source : soundSources.keySet()) {
             if (!isActive(source)) {
                 soundSources.put(source, priority);
-                return source.setAudio(sound);
+                return (SOURCE) source.setAudio(sound);
             }
         }
 
         // No free sound found, will look by priority
-        for (Map.Entry<SoundSource, Integer> entry : soundSources.entrySet()) {
-            SoundSource source = entry.getKey();
+        for (Map.Entry<SOURCE, Integer> entry : soundSources.entrySet()) {
+            SOURCE source = entry.getKey();
             Integer soundPriority = entry.getValue();
 
             if (soundPriority < priority) { // sound playing wil lower priority than our query
                 soundSources.put(source, priority);
-                return source.setAudio(sound);
+                return (SOURCE) source.setAudio(sound);
             }
         }
 
         return null;
     }
 
-    public SoundSource getSource(Sound sound) {
+    @Override
+    public SOURCE getSource(SOUND sound) {
         return getSource(sound, AudioManager.PRIORITY_NORMAL);
     }
 
-    public Set<SoundSource> getSources() {
+    @Override
+    public Set<SOURCE> getSources() {
         return soundSources.keySet();
     }
 
-    public Set<SoundSource> getInactiveSources() {
-        Set<SoundSource> inactiveSources = Sets.newHashSet();
+    @Override
+    public Set<SOURCE> getInactiveSources() {
+        Set<SOURCE> inactiveSources = Sets.newHashSet();
 
-        for (SoundSource source : soundSources.keySet()) {
+        for (SOURCE source : soundSources.keySet()) {
             if (!isActive(source)) {
                 inactiveSources.add(source);
             }
@@ -104,10 +109,11 @@ public abstract class BaseSoundPool implements SoundPool {
         return inactiveSources;
     }
 
-    public Set<SoundSource> getActiveSources() {
-        Set<SoundSource> inactiveSources = Sets.newHashSet();
+    @Override
+    public Set<SOURCE> getActiveSources() {
+        Set<SOURCE> inactiveSources = Sets.newHashSet();
 
-        for (SoundSource source : soundSources.keySet()) {
+        for (SOURCE source : soundSources.keySet()) {
             if (isActive(source)) {
                 inactiveSources.add(source);
             }
@@ -116,14 +122,16 @@ public abstract class BaseSoundPool implements SoundPool {
         return inactiveSources;
     }
 
+    @Override
     public void stopAll() {
-        for (SoundSource source : soundSources.keySet()) {
+        for (SOURCE source : soundSources.keySet()) {
             source.stop();
         }
     }
 
+    @Override
     public void update(float delta) {
-        for (SoundSource source : soundSources.keySet()) {
+        for (SOURCE source : soundSources.keySet()) {
             if (source.isPlaying()) {
                 source.update(delta);
             }
@@ -133,7 +141,7 @@ public abstract class BaseSoundPool implements SoundPool {
     @Override
     public void setVolume(float volume) {
         this.volume = volume;
-        for (SoundSource soundSource : soundSources.keySet()) {
+        for (SOURCE soundSource : soundSources.keySet()) {
             soundSource.updateGain();
         }
     }
@@ -143,20 +151,22 @@ public abstract class BaseSoundPool implements SoundPool {
         return this.volume;
     }
 
+    @Override
     public int size() {
         return soundSources.size();
     }
 
-    public boolean isInPool(SoundSource source) {
+    @Override
+    public boolean isInPool(SOURCE source) {
         return soundSources.containsKey(source);
     }
 
-    public boolean isLocked(SoundSource source) {
+    public boolean isLocked(SOURCE source) {
         Integer lock = soundSources.get(source);
         return lock != null && lock == AudioManager.PRIORITY_LOCKED;
     }
 
-    public boolean lock(SoundSource source) {
+    public boolean lock(SOURCE source) {
         if (isLocked(source) && !isInPool(source)) {
             return false;
         }
@@ -166,19 +176,28 @@ public abstract class BaseSoundPool implements SoundPool {
         return true;
     }
 
-    public void unlock(SoundSource source) {
+    public void unlock(SOURCE source) {
         soundSources.put(source, null);
     }
 
-    public boolean isActive(SoundSource source) {
+    public boolean isActive(SOURCE source) {
         return isLocked(source) || source.isPlaying();
     }
 
-    protected abstract SoundSource createSoundSource();
+    protected abstract SOURCE createSoundSource();
 
     private void fillPool(int capacity) {
         for (int i = 0; i < capacity; i++) {
             this.soundSources.put(createSoundSource(), null);
+        }
+    }
+
+    @Override
+    public void purge(Sound<?> sound) {
+        for (SOURCE source : soundSources.keySet()) {
+            if (sound.equals(source.getAudio())) {
+                source.purge();
+            }
         }
     }
 

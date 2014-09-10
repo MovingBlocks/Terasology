@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.naming.Name;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -36,17 +37,18 @@ import java.util.List;
 public abstract class AbstractSource implements AssetSource {
     private static final Logger logger = LoggerFactory.getLogger(AbstractSource.class);
 
-    private String sourceId;
+    private Name sourceId;
     private SetMultimap<AssetUri, URL> assets = HashMultimap.create();
     private SetMultimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
     private SetMultimap<AssetUri, URL> overrides = HashMultimap.create();
+    private SetMultimap<AssetUri, URL> deltas = HashMultimap.create();
 
-    public AbstractSource(String id) {
+    public AbstractSource(Name id) {
         sourceId = id;
     }
 
     @Override
-    public String getSourceId() {
+    public Name getSourceId() {
         return sourceId;
     }
 
@@ -71,6 +73,11 @@ public abstract class AbstractSource implements AssetSource {
     }
 
     @Override
+    public List<URL> getDelta(AssetUri uri) {
+        return Lists.newArrayList(deltas.get(uri));
+    }
+
+    @Override
     public Iterable<AssetUri> listOverrides() {
         return overrides.keySet();
     }
@@ -86,15 +93,20 @@ public abstract class AbstractSource implements AssetSource {
     }
 
     protected void addOverride(AssetUri uri, URL url) {
-        logger.debug("Adding override {} with urls {}", uri, url);
+        logger.debug("Adding override url {} -> {}", uri, url);
         overrides.put(uri, url);
+    }
+
+    protected void setDelta(AssetUri uri, URL url) {
+        logger.debug("Adding delta url {} -> {}", uri, url);
+        deltas.put(uri, url);
     }
 
     protected AssetUri getUri(Path relativePath) {
         return getUri(sourceId, relativePath);
     }
 
-    protected AssetUri getUri(String moduleId, Path relativePath) {
+    protected AssetUri getUri(Name moduleId, Path relativePath) {
         if (relativePath.getNameCount() > 1) {
             Path assetPath = relativePath.subpath(0, 1);
             Path filename = relativePath.getFileName();
@@ -112,7 +124,7 @@ public abstract class AbstractSource implements AssetSource {
         return getUri(sourceId, relativePath);
     }
 
-    protected AssetUri getUri(String moduleId, String relativePath) {
+    protected AssetUri getUri(Name moduleId, String relativePath) {
         String[] parts = relativePath.split("/", 2);
         if (parts.length > 1) {
             int lastSepIndex = parts[1].lastIndexOf("/");

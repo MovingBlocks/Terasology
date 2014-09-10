@@ -47,8 +47,8 @@ public class EntityBuilder implements MutableComponentContainer {
         return manager.create(components.values());
     }
 
-    public EntityRef buildNoEvents() {
-        return manager.createEntityWithoutEvents(components.values());
+    public EntityRef buildWithoutLifecycleEvents() {
+        return manager.createEntityWithoutLifecycleEvents(components.values());
     }
 
     @Override

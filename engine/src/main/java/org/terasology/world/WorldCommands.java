@@ -15,29 +15,19 @@
  */
 package org.terasology.world;
 
-import org.terasology.entitySystem.systems.ComponentSystem;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius
  */
-public class WorldCommands implements ComponentSystem {
+public class WorldCommands extends BaseComponentSystem {
 
     private ChunkProvider chunkProvider;
 
     public WorldCommands(ChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
-    }
-
-    @Override
-    public void initialise() {
-
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     @Command(shortDescription = "Purges all generated chunks which triggers re-generation")

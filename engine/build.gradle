@@ -1,17 +1,27 @@
-/*
- * This is a Gradle build file:
- * - Gradle Homepage: http://gradle.org/
- * - Gradle Documentation: http://gradle.org/documentation
- * - View tasks for this project: $ gradlew tasks
- */
+// The engine build is the primary Java project and has the primary list of dependencies
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'checkstyle'
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
+apply from: "$rootDir/config/gradle/common.gradle"
+apply from: "$rootDir/config/gradle/artifactory.gradle"
+
+// Get the gradle versioneye plugin from Maven central
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.standardout:gradle-versioneye-plugin:0.1.1'
+    }
+}
+
+apply plugin: 'versioneye'
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.text.SimpleDateFormat;
 
@@ -34,15 +44,12 @@ ext {
     displayVersion = versionBase
 }
 
-// TODO: Make a top-level commons.gradle and put repositories and global variables etc in there then include: it?
-
-// Declare remote repositories we're interested in - library files will be fetched from here
-repositories {
-    // Main Maven repo
-    mavenCentral()
-    // MovingBlocks Artifactory instance for libs not readily available elsewhere
-    maven {
-        url "http://www.movingblocks.net:8081/artifactory/repo"
+def convertGitBranch = { gitBranch ->
+    if (gitBranch != null) {
+        // Remove "origin/" from "origin/develop"
+        gitBranch.substring(gitBranch.lastIndexOf("/") + 1)
+    } else {
+        ""
     }
 }
 
@@ -83,11 +90,18 @@ configurations {
     devCompile.extendsFrom compile
 }
 
+// TODO: Remove when we don't need to rely on snapshots. Wonder why modules respected this set in root project, engine not so much
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 // Primary dependencies definition
 dependencies {
     // Main library files fetched online
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
-    compile group: 'com.google.guava', name: 'guava', version: '15.0'
+    compile group: 'org.terasology', name: 'gestalt-module', version: '1.2.2'
+    compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'com.google.guava', name: 'guava', version: '17.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
@@ -96,23 +110,26 @@ dependencies {
     compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
-    compile group: 'java3d', name: 'vecmath', version: '1.5.2'
+    compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     //compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
     compile group: 'org.newdawn.slick', name: 'slick', version: '237'
-    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.0'
-    compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.07'
+    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
+    compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.09'
     compile group: 'ec.util', name: 'MersenneTwister', version: '20'
+    compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.1'
+    compile group: 'com.miglayout', name: 'miglayout-core', version: '4.2'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    // Needed as "compile" for logback.groovy in IntelliJ - otherwise it could be left as a runtime only dependency
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.13'
-
+    // TODO: These could be moved into facade
+    compile group: 'org.terasology', name: 'CrashReporter', version: '1.1+', changing: true
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.7'
     // And here is Groovy to read the config file
-    runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
+    runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.3.6'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
@@ -125,60 +142,52 @@ jar {
 
     manifest {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID + ", " + displayVersion)
+        attributes("Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + convertGitBranch(env.GIT_BRANCH) + ", " + env.BUILD_ID + ", " + displayVersion)
     }
 }
 
-task distEngine (type: Sync) {
-    description = "Prepares the engine.jar for distribution"
-    into ("$distsDir/engine")
-    from jar
-}
-
-task distLibs (type: Sync) {
-    description = "Prepares the engine libs for distribution (useful for other builds)"
-    into ("$distsDir/libs")
-    from configurations.runtime
-}
-
-task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, resources)"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'sources'
-    from sourceSets.main.output
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    description = "Create a JAR with the JavaDoc for the java sources"
-    manifest.attributes("Implementation-Title": "Terasology-" + project.name)
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+task cacheReflections {
+    inputs.files project.classes.outputs.files
+    outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    dependsOn classes
+    doFirst {
+        Reflections reflections = new ConfigurationBuilder()
+                    .addUrls((configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL()))
+                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                    .build()
+        reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Version file stuff                                                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// First read the internal version out of the engine's module.txt
-def moduleFile = file('src/main/resources/assets/module.txt')
+// First read the internal version out of the engine's engine-module.txt
+def moduleFile = file('src/main/resources/engine-module.txt')
 
 if (!moduleFile.exists()) {
-    println "Y U NO EXIST MODULE.TXT!"
+    println "Failed to find engine-module.txt for engine"
+    throw new GradleException("Failed to find engine-module.txt for engine")
+}
+
+println "Scanning for version in engine-module.txt for engine"
+def slurper = new JsonSlurper()
+def moduleConfig = slurper.parseText(moduleFile.text)
+
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+version = moduleConfig.version
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.engine'
+
+// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
+if (env.BUILD_NUMBER != null) {
+    version += '-SNAPSHOT+' + env.BUILD_NUMBER
 } else {
-    println "Scanning for version in module.txt for engine"
-    def slurper = new JsonSlurper()
-    def moduleConfig = slurper.parseText(moduleFile.text)
-
-    // Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
-    version = moduleConfig.version
-
-    // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
-    group = 'org.terasology.engine'
-
-    // Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-    if (env.BUILD_NUMBER != null) {
-        version += '-SNAPSHOT+' + env.BUILD_NUMBER
-    }
+    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
+    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
+    println "Fancy local version: $version"
 }
 
 // This version info file actually goes inside the built jar and can be used at runtime
@@ -193,7 +202,7 @@ task createVersionInfoFile {
             ant.entry(key:'buildTag',value:env.BUILD_TAG)
             ant.entry(key:'buildUrl',value:env.BUILD_URL)
             ant.entry(key:'jobName',value:env.JOB_NAME)
-            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
+            ant.entry(key:'gitBranch',value:convertGitBranch(env.GIT_BRANCH))
             ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
             ant.entry(key:'dateTime',value:startDateTimeString)
             ant.entry(key:'displayVersion',value:displayVersion)
@@ -203,6 +212,24 @@ task createVersionInfoFile {
 }
 
 jar.dependsOn createVersionInfoFile
+jar.dependsOn cacheReflections
+
+// A configuration for publishing artifacts
+configurations {
+    published
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+    published javadocJar
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar, javadocJar
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
@@ -218,24 +245,4 @@ idea {
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
     }
-}
-
-//eclipse.jdt.file.withProperties { props ->
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.rawTypeReference', 'ignore');
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedLocal', 'ignore');
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.unusedPrivateMember', 'ignore');
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.incompleteEnumSwitch', 'ignore');
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.missingSerialVersion', 'ignore');
-//	props.setProperty('org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation', 'ignore');
-//}
-
-checkstyle {
-    ignoreFailures = true
-    configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    configProperties.samedir = checkstyle.configFile.parentFile
-}
-
-pmd {
-    ignoreFailures = true
-    ruleSetFiles = files("config/pmd/pmd.xml")
 }

@@ -23,15 +23,20 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.identity.PublicIdentityCertificate;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -60,7 +65,7 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
         serverHandler = ctx.getPipeline().get(ServerHandler.class);
     }
 
-    public void channelAuthenticated(PublicIdentityCertificate id, ChannelHandlerContext ctx) {
+    public void channelAuthenticated(PublicIdentityCertificate id) {
         this.identity = id;
     }
 
@@ -81,37 +86,42 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
 
     private void sendModules(List<NetData.ModuleRequest> moduleRequestList) {
         for (NetData.ModuleRequest request : moduleRequestList) {
-            Module module = moduleManager.getActiveModule(request.getModuleId());
             NetData.ModuleDataHeader.Builder result = NetData.ModuleDataHeader.newBuilder();
             result.setId(request.getModuleId());
-            if (module == null) {
-                result.setError("Module not available");
-            } else if (!module.isDataAvailable()) {
+            Module module = moduleManager.getEnvironment().get(new Name(request.getModuleId()));
+            if (module.isOnClasspath() || module.getLocations().size() != 1 || !Files.isReadable(module.getLocations().get(0))) {
                 result.setError("Module not available for download");
             } else {
-                result.setVersion(module.getVersion().toString());
-                result.setSize(module.getSize());
-            }
-            channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setModuleDataHeader(result).build());
-
-            if (module != null && module.isDataAvailable()) {
+                Path location = module.getLocations().get(0);
                 try {
-                    InputStream input = module.getData();
+                    result.setVersion(module.getVersion().toString());
+                    result.setSize(Files.size(location));
+                    channelHandlerContext.getChannel().write(NetData.NetMessage.newBuilder().setModuleDataHeader(result).build());
+                } catch (IOException e) {
+                    logger.error("Error sending module data header", e);
+                    channelHandlerContext.getChannel().close();
+                    break;
+                }
 
-                    long remainingData = module.getSize();
+                try (InputStream stream = new BufferedInputStream(Files.newInputStream(location))) {
+
+
+                    long remainingData = Files.size(location);
                     byte[] data = new byte[1024];
                     while (remainingData > 0) {
                         int nextBlock = (int) Math.min(remainingData, 1024);
-                        ByteStreams.read(input, data, 0, nextBlock);
+                        ByteStreams.read(stream, data, 0, nextBlock);
                         channelHandlerContext.getChannel().write(
                                 NetData.NetMessage.newBuilder().setModuleData(
                                         NetData.ModuleData.newBuilder().setModule(ByteString.copyFrom(data, 0, nextBlock))
-                                ).build());
+                                ).build()
+                        );
                         remainingData -= nextBlock;
                     }
                 } catch (IOException e) {
                     logger.error("Error sending module", e);
                     channelHandlerContext.getChannel().close();
+                    break;
                 }
             }
         }
@@ -121,6 +131,7 @@ public class ServerConnectionHandler extends SimpleChannelUpstreamHandler {
         logger.info("Received Start Join");
         NetClient client = new NetClient(channelHandlerContext.getChannel(), networkSystem, identity);
         client.setName(message.getName());
+        client.setColor(new Color(message.getColor().getRgba()));
         client.setViewDistanceMode(ViewDistance.forIndex(message.getViewDistanceLevel()));
         channelHandlerContext.getPipeline().remove(this);
         serverHandler.connectionComplete(client);

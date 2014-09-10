@@ -16,7 +16,10 @@
 
 package org.terasology.asset;
 
+import org.terasology.naming.Name;
+
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,7 +30,7 @@ public interface AssetSource {
     /**
      * @return The identifier for this asset source
      */
-    String getSourceId();
+    Name getSourceId();
 
     /**
      * The URL(s) related to a URI. There may be multiple
@@ -44,5 +47,7 @@ public interface AssetSource {
     List<URL> getOverride(AssetUri uri);
 
     Iterable<AssetUri> listOverrides();
+
+    Collection<URL> getDelta(AssetUri uri);
 
 }

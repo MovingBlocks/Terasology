@@ -43,7 +43,7 @@ public interface GameEngine {
     void shutdown();
 
     /**
-     * Cleans up the engine. Can only be
+     * Cleans up the engine. Can only be called after shutdown.
      */
     void dispose();
 
@@ -56,6 +56,11 @@ public interface GameEngine {
      * @return Whether the engine has been disposed
      */
     boolean isDisposed();
+
+    /**
+     * @return The current state of the engine
+     */
+    GameState getState();
 
     /**
      * Clears all states, replacing them with newState
@@ -74,11 +79,6 @@ public interface GameEngine {
      * @param task
      */
     void submitTask(String name, Runnable task);
-
-    /**
-     * @return Count of currently active tasks
-     */
-    int getActiveTaskCount();
 
     boolean isHibernationAllowed();
 

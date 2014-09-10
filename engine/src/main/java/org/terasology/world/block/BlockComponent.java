@@ -29,11 +29,14 @@ import javax.vecmath.Tuple3i;
 public final class BlockComponent implements Component {
     @Replicate
     Vector3i position = new Vector3i();
+    @Replicate
+    Block block;
 
     public BlockComponent() {
     }
 
-    public BlockComponent(Tuple3i pos) {
+    public BlockComponent(Block block, Tuple3i pos) {
+        this.block = block;
         this.position.set(pos);
     }
 
@@ -43,5 +46,13 @@ public final class BlockComponent implements Component {
 
     public void setPosition(Tuple3i pos) {
         position.set(pos);
+    }
+
+    public void setBlock(Block block) {
+        this.block = block;
+    }
+
+    public Block getBlock() {
+        return block;
     }
 }

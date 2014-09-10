@@ -18,58 +18,12 @@ package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.entity.EntityRef;
 
+import java.util.List;
+
 /**
  * @author Immortius
  */
 public interface InventoryManager {
-
-    /**
-     * Moves all items from one inventory to another, as far as possible
-     *
-     * @param fromInventory
-     * @param toInventory
-     */
-    void moveAll(EntityRef fromInventory, EntityRef toInventory);
-
-    /**
-     * @param inventoryEntity
-     * @param item
-     * @return Whether the given item can be added to the inventory
-     */
-    boolean canTakeItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * @param inventoryEntity
-     * @param item
-     * @return Whether the item was fully consumed in being added to the inventory
-     */
-    boolean giveItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * Removes an item from the inventory (but doesn't destroy it)
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    void removeItem(EntityRef inventoryEntity, EntityRef item);
-
-    /**
-     * Removes a number of an item from the inventory. If the count equals or exceeds actual stack size of the item,
-     * the entire stack is removed. Otherwise a new item is created of the correct stack size, and the existing item's
-     * stack size is decremented to match.
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    EntityRef removeItem(EntityRef inventoryEntity, EntityRef item, int stackCount);
-
-    /**
-     * Removes an item from the inventory and destroys it
-     *
-     * @param inventoryEntity
-     * @param item
-     */
-    void destroyItem(EntityRef inventoryEntity, EntityRef item);
 
     /**
      * @param itemA
@@ -85,11 +39,129 @@ public interface InventoryManager {
     int getStackSize(EntityRef item);
 
     /**
-     * This version of setStackSize will destroy the item if newStackSize is <=0
-     *
+     * @param inventoryEntity
+     * @param slot
+     * @return The item in the given slot
+     */
+    EntityRef getItemInSlot(EntityRef inventoryEntity, int slot);
+
+    /**
      * @param inventoryEntity
      * @param item
-     * @param newStackSize
+     * @return The slot containing the given item, or -1 if it wasn't found in the inventory
      */
-    void setStackSize(EntityRef inventoryEntity, EntityRef item, int newStackSize);
+    int findSlotWithItem(EntityRef inventoryEntity, EntityRef item);
+
+    /**
+     * @param inventoryEntity
+     * @return The number of slots the given entity has
+     */
+    int getNumSlots(EntityRef inventoryEntity);
+
+    /**
+     * Puts item into an inventory.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item);
+
+    /**
+     * Puts item into an inventory, into specified slot.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @param slot       Slot to which put the item into.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, int slot);
+
+    /**
+     * Puts item into an inventory, into specified range of slots.
+     *
+     * @param inventory  Inventory to put item into.
+     * @param instigator Instigator of the action.
+     * @param item       Item to put into inventory.
+     * @param slots      Range of slots to which put the item into.
+     * @return If the action was successful.
+     */
+    boolean giveItem(EntityRef inventory, EntityRef instigator, EntityRef item, List<Integer> slots);
+
+    /**
+     * Removes whole stack of item from an inventory.
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param item           Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved);
+
+    /**
+     * Removes specified amount of the item from an inventory.
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param item           Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @param count          Amount of items to remove.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, EntityRef item, boolean destroyRemoved, int count);
+
+    /**
+     * Removes whole stacks of item from an inventory. Items passed should be the same (indistinguishable).
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param items          Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved);
+
+    /**
+     * Removes specified amount of item from an inventory. Items passed should be the same (indistinguishable).
+     *
+     * @param inventory      Inventory to remove item from.
+     * @param instigator     Instigator of the action.
+     * @param items          Item to remove from inventory.
+     * @param destroyRemoved If the removed item should be destroyed.
+     * @param count          Amount of items to remove.
+     * @return If action fails - <code>null</code> value will be returned. If successful and destroyRemoved is true -
+     *         EntityRef.NULL will be returned, otherwise the removed item entity will be returned instead.
+     */
+    EntityRef removeItem(EntityRef inventory, EntityRef instigator, List<EntityRef> items, boolean destroyRemoved, int count);
+
+    /**
+     * Moves a specified amount of items from one inventory to another.
+     *
+     * @param fromInventory Inventory to move item from.
+     * @param instigator    Instigator of the action.
+     * @param slotFrom      Slot to move from.
+     * @param toInventory   Inventory to move item to.
+     * @param slotTo        Slot to move to.
+     * @param count         Amount of items to move.
+     * @return If the action was successful.
+     */
+    boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count);
+
+    /**
+     * Switches items in two inventories.
+     *
+     * @param fromInventory Inventory to switch item from.
+     * @param instigator    Instigator of the action.
+     * @param slotFrom      Slot to switch item from.
+     * @param toInventory   Inventory switch item to.
+     * @param slotTo        Slot to switch item to.
+     * @return If the action was successful.
+     */
+    boolean switchItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo);
 }

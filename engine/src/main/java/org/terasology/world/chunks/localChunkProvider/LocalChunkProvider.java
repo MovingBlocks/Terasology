@@ -29,7 +29,7 @@ import gnu.trove.procedure.TShortObjectProcedure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -559,7 +559,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         }
 
                         @Override
-                        public void enact() {
+                        public void run() {
                             ChunkStore chunkStore = storageManager.loadChunkStore(getPosition());
                             ChunkImpl chunk = chunkStore.getChunk();
 
@@ -592,7 +592,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                         }
 
                         @Override
-                        public void enact() {
+                        public void run() {
                             ChunkImpl chunk = new ChunkImpl(getPosition());
                             generator.createChunk(chunk);
                             if (nearCache.putIfAbsent(getPosition(), chunk) != null) {

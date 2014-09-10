@@ -1,23 +1,33 @@
 {
-    "parent" : "engine:iconItem",
-    "Item" : {
-        "name" : "Door",
-        "icon" : "door",
-        "renderWithIcon" : true,
-        "stackId" : "door",
-        "consumedOnUse" : true,
-        "usage" : "ON_BLOCK"
+    "parent": "engine:iconItem",
+    "DisplayName" : {
+        "name": "Door"
     },
-    "Door" : {
-        "topBlockFamily" : "DoorTop",
-        "bottomBlockFamily" : "DoorBottom",
-        "openSound" : "DoorOpen",
-        "closeSound" : "DoorClose"
+    "Item": {
+        "icon": "engine:items.door",
+        "renderWithIcon": true,
+        "stackId": "door",
+        "consumedOnUse": true,
+        "usage": "ON_BLOCK"
     },
-    "Health" : {
-        "currentHealth" : 5,
-        "maxHealth" : 5,
-        "regenRate" : 1,
-        "waitBeforeRegen" : 2
+    "Door": {
+        "topBlockFamily": "DoorTop",
+        "bottomBlockFamily": "DoorBottom",
+        "openSound": "DoorOpen",
+        "closeSound": "DoorClose"
+    },
+    "Health": {
+        "currentHealth": 5,
+        "maxHealth": 5,
+        "regenRate": 1,
+        "waitBeforeRegen": 2,
+        "destroyEntityOnNoHealth" : true
+
+    },
+    "BlockDropGrammar": {
+        "itemDrops": ["Core:door"]
+    },
+    "ActAsBlock" : {
+        "block" : "core:DoorTop"
     }
 }

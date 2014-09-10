@@ -9,9 +9,9 @@
             "axe", "redVial", "redFluff", "redFlower", "bowl", "brownBook", "bananas", "waterJug", "copperIngot", "wick", "", "", "", "roundMeshedFlask", "redRecipe", "purpleSkull",
             "sickle", "orangeVial", "pinkFluff", "", "lantern", "redBook", "door", "", "goldIngot", "pole", "", "", "", "purplePotion", "yellowRecipe", "blueSkull",
             "hammer", "greenVial", "greenFluff", "deathCap", "scissors", "blueBook", "", "", "ironIngot", "", "", "", "", "skullOnStick", "blueRecipe", "cyanSkull",
-            "knife", "purpleVial", "purpleFluff", "lavender", "", "", "", "", "", "", "", "", "", "", "", "greenSkull",
-            "sword", "cyanVial", "cyanFluff", "", "candle", "", "", "", "", "", "", "", "", "", "", "yellowSkull",
-            "bow", "blueVial", "blueFluff", "", "dynamiteStick", "", "", "", "", "", "", "", "", "", "", "orangeSkull",
+            "knife", "purpleVial", "purpleFluff", "lavender", "", "", "", "", "", "", "", "", "", "", "buildBlockJob", "greenSkull",
+            "sword", "cyanVial", "cyanFluff", "", "candle", "", "", "", "", "", "", "", "", "", "removeBlockJob", "yellowSkull",
+            "bow", "blueVial", "blueFluff", "", "dynamiteStick", "", "", "", "", "", "", "", "", "", "walkToJob", "orangeSkull",
             "crossbow", "blackVial", "brownFluff", "mandrake", "dynamite", "", "", "", "", "", "", "", "", "", "", "blackSkull",
             "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "whiteSkull"
 

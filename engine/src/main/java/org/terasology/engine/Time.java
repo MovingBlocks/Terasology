@@ -15,6 +15,8 @@
  */
 package org.terasology.engine;
 
+import org.terasology.module.sandbox.API;
+
 /**
  * The timer manages all time in the game.
  * <ol>
@@ -51,5 +53,10 @@ public interface Time {
      * @return The current game time, in seconds.
      */
     float getGameTime();
+
+    /**
+     * @return Real time in milliseconds.
+     */
+    long getRealTimeInMs();
 
 }

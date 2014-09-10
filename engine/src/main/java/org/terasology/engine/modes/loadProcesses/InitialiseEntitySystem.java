@@ -16,10 +16,11 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.network.NetworkSystem;
 
 /**
@@ -34,8 +35,14 @@ public class InitialiseEntitySystem extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        new EntitySystemBuilder().build(moduleManager, CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class));
+        new EntitySystemBuilder().build(moduleManager.getEnvironment(), CoreRegistry.get(NetworkSystem.class),
+                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 }

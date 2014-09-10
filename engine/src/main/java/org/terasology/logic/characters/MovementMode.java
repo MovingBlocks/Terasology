@@ -23,5 +23,6 @@ public enum MovementMode {
     WALKING,
     CLIMBING,
     SWIMMING,
-    GHOSTING
+    GHOSTING,
+    NONE
 }

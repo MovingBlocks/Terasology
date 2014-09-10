@@ -32,6 +32,18 @@ public class PrefabData implements AssetData, MutableComponentContainer {
     private Prefab parent;
     private boolean alwaysRelevant;
 
+    public static PrefabData createFromPrefab(Prefab prefab) {
+        PrefabData result = new PrefabData();
+        for (Component component : prefab.iterateComponents()) {
+            result.addComponent(component);
+        }
+
+        result.setAlwaysRelevant(prefab.isAlwaysRelevant());
+        result.setParent(prefab.getParent());
+        result.setPersisted(prefab.isPersisted());
+        return result;
+    }
+
     @Override
     public <T extends Component> T addComponent(T component) {
         components.put(component.getClass(), component);
@@ -89,4 +101,5 @@ public class PrefabData implements AssetData, MutableComponentContainer {
     public void setAlwaysRelevant(boolean alwaysRelevant) {
         this.alwaysRelevant = alwaysRelevant;
     }
+
 }

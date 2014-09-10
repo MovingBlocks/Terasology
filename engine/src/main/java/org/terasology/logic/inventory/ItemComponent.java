@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
+import org.terasology.rendering.assets.texture.TextureRegion;
 
 /**
  * Item data is stored using this component
@@ -27,12 +28,6 @@ import org.terasology.network.Replicate;
  * @author Immortius <immortius@gmail.com>
  */
 public final class ItemComponent implements Component {
-    /**
-     * The display name of this item
-     */
-    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public String name = "";
-
     /**
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
@@ -43,13 +38,16 @@ public final class ItemComponent implements Component {
      * Name of the icon this item should be rendered with
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
-    public String icon = "";
+    public TextureRegion icon;
 
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
      */
     @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String stackId = "";
+
+    @Replicate(value = FieldReplicateType.SERVER_TO_CLIENT, initialOnly = true)
+    public byte maxStackSize = 99;
 
     /**
      * How many of said item are there in this stack

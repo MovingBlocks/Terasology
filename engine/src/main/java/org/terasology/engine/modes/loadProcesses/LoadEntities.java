@@ -18,7 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.persistence.StorageManager;
 
 import java.io.IOException;
@@ -40,6 +42,15 @@ public class LoadEntities extends SingleStepLoadProcess {
 
     @Override
     public boolean step() {
+        EntityManager em = CoreRegistry.get(EntityManager.class);
+        boolean entityCreated = false;
+        for (EntityRef entity : em.getAllEntities()) {
+            entityCreated = true;
+            logger.error("Entity created before load: {}", entity.toFullDescription());
+        }
+        if (entityCreated) {
+            throw new IllegalStateException("Entity creation detected during component system initialisation, game load aborting");
+        }
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         try {
             storageManager.loadGlobalStore();
@@ -47,6 +58,11 @@ public class LoadEntities extends SingleStepLoadProcess {
             logger.error("Failed to load global data.", e);
         }
         return true;
+    }
+
+    @Override
+    public int getExpectedCost() {
+        return 1;
     }
 
 

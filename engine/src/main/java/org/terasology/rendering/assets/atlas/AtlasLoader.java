@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.assets.atlas;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,10 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.subtexture.SubtextureData;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
+import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.utilities.gson.Vector2iTypeAdapter;
 
@@ -51,15 +53,15 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
     }
 
     @Override
-    public AtlasData load(Module module, InputStream stream, List<URL> urls) throws IOException {
-        AtlasDefinition def = gson.fromJson(new InputStreamReader(stream), AtlasDefinition.class);
+    public AtlasData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
+        AtlasDefinition def = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), AtlasDefinition.class);
         Texture texture = Assets.getTexture(def.getTexture());
         if (texture != null) {
             Vector2i size = def.getTextureSize();
             if (size == null) {
                 size = new Vector2i(texture.getWidth(), texture.getHeight());
             }
-            Map<String, SubtextureData> result = Maps.newHashMap();
+            Map<Name, SubtextureData> result = Maps.newHashMap();
             if (def.getGrid() != null) {
                 process(def.getGrid(), texture, size, result);
             }
@@ -82,7 +84,7 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
 
     }
 
-    private void process(FreeformDefinition freeform, Texture texture, Vector2i size, Map<String, SubtextureData> out) {
+    private void process(FreeformDefinition freeform, Texture texture, Vector2i size, Map<Name, SubtextureData> out) {
         if (freeform.getName() == null || freeform.getName().isEmpty()) {
             logger.error("Bad subimage definition - missing mandatory property name");
             return;
@@ -98,14 +100,14 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
         Vector2f min = new Vector2f((float) freeform.getMin().x / size.x, (float) freeform.getMin().y / size.y);
         if (freeform.getSize() != null) {
             Vector2f itemSize = new Vector2f((float) freeform.getSize().x / size.x, (float) freeform.getSize().y / size.y);
-            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndSize(min, itemSize)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndSize(min, itemSize)));
         } else if (freeform.getMax() != null) {
             Vector2f max = new Vector2f((float) freeform.getMax().x / size.x, (float) freeform.getMax().y / size.y);
-            out.put(freeform.getName(), new SubtextureData(texture, Rect2f.createFromMinAndMax(min, max)));
+            out.put(new Name(freeform.getName()), new SubtextureData(texture, Rect2f.createFromMinAndMax(min, max)));
         }
     }
 
-    private void process(GridDefinition grid, Texture texture, Vector2i size, Map<String, SubtextureData> out) {
+    private void process(GridDefinition grid, Texture texture, Vector2i size, Map<Name, SubtextureData> out) {
         if (grid.getTileSize() == null) {
             logger.error("Bad grid definition - missing mandatory property tileSize");
             return;
@@ -128,7 +130,7 @@ public class AtlasLoader implements AssetLoader<AtlasData> {
                 pos.x += tileX * tileSize.x;
                 pos.y += tileY * tileSize.y;
                 Rect2f tileLocation = Rect2f.createFromMinAndSize(offset.x + tileX * tileSize.x, offset.y + tileY * tileSize.y, tileSize.x, tileSize.y);
-                out.put(name, new SubtextureData(texture, tileLocation));
+                out.put(new Name(name), new SubtextureData(texture, tileLocation));
             }
 
             tileX++;

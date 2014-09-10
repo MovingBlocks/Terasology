@@ -45,6 +45,7 @@ import java.util.Map;
  */
 public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements BlockShape {
 
+    private String displayName;
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private CollisionShape baseCollisionShape;
@@ -60,6 +61,11 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
         reload(data);
     }
 
+    @Override
+    public String getDisplayName() {
+        return displayName;
+    }
+
     public BlockMeshPart getMeshPart(BlockPart part) {
         return meshParts.get(part);
     }
@@ -71,6 +77,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     @Override
     public void reload(BlockShapeData data) {
         collisionShape.clear();
+        displayName = data.getDisplayName();
         for (BlockPart part : BlockPart.values()) {
             this.meshParts.put(part, data.getMeshPart(part));
         }
@@ -125,7 +132,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     private CollisionShape rotate(CollisionShape shape, Quat4f rot) {
         if (shape instanceof BoxShape) {
             BoxShape box = (BoxShape) shape;
-            Vector3f extents = box.getHalfExtentsWithoutMargin(new Vector3f());
+            Vector3f extents = box.getHalfExtentsWithMargin(new Vector3f());
             QuaternionUtil.quatRotate(rot, extents, extents);
             extents.absolute();
             return new BoxShape(extents);

@@ -1,0 +1,131 @@
+{
+    "type" : "engine:behaviorEditorScreen",
+    "skin" : "engine:behaviorEditor",
+    "contents" : {
+        "type" : "migLayout",
+        "layoutConstraints" : "",
+        "colConstraints" : "[min][grow, fill][min]",
+        "rowConstraints" : "[min][min][grow, fill][grow, fill]",
+        "contents" : [
+            {
+                "type" : "BehaviorEditor",
+                "id" : "tree",
+                "layoutInfo" : {
+                    "cc" : "cell 1 2, spany 2"
+                }
+            },
+            {
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "properties",
+                    "rowConstraints" : "[min]"
+                },
+                "layoutInfo" : {
+                    "cc" : "cell 2 2, aligny top, w 220!, h 300!"
+                }
+            },
+            {
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "entity_properties",
+                    "rowConstraints" : "[min]"
+                },
+                "layoutInfo" : {
+                    "cc" : "cell 2 3, aligny top, w 220!, h 300!"
+                }
+            },
+            {
+                "type" : "migLayout",
+                "layoutInfo" : {
+                    "cc" : "cell 0 0 3"
+                },
+                "contents" : [
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "select_entity",
+                        "layoutInfo" : {
+                            "cc" : "w 300!"
+                        }
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "copy",
+                        "text" : "copy"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "paste",
+                        "text" : "paste"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "layout",
+                        "text" : "layout"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "new",
+                        "text" : "new"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "remove",
+                        "text" : "remove"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "assign",
+                        "text" : "assign"
+                    }
+                ]
+            },
+            {
+                "type" : "migLayout",
+                "layoutInfo" : {
+                    "cc" : "cell 0 1 3"
+                },
+                "contents" : [
+                    {
+                        "type" : "UIDropdown",
+                        "id" : "select_tree",
+                        "layoutInfo" : {
+                            "cc" : "w 300!"
+                        }
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_reset",
+                        "text" : "[]"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_pause",
+                        "text" : "||"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_step",
+                        "text" : "|>"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "id" : "debug_run",
+                        "text" : ">>"
+                    }
+                ]
+            },
+            {
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "UIList",
+                    "id" : "palette"
+                },
+                "layoutInfo" : {
+                    "cc" : "cell 0 2, spany 2, h 500!"
+                }
+            }
+        ]
+    }
+}

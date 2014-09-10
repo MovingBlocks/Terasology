@@ -45,4 +45,8 @@ public interface LoadProcess {
      */
     float getProgress();
 
+    /**
+     * @return A relative cost for this process. A small process would have a cost of 1, a large process a bigger cost.
+     */
+    int getExpectedCost();
 }

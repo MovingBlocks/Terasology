@@ -22,22 +22,22 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.classMetadata.copying.CopyStrategyLibrary;
-import org.terasology.classMetadata.reflect.ReflectFactory;
-import org.terasology.classMetadata.reflect.ReflectionReflectFactory;
-import org.terasology.engine.CoreRegistry;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
-import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
-import org.terasology.persistence.typeSerialization.TypeSerializationLibrary;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Quat4fTypeHandler;
-import org.terasology.persistence.typeSerialization.typeHandlers.extension.Vector3fTypeHandler;
+import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
+import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -58,7 +58,8 @@ public class PojoPrefabManagerTest {
     private PojoPrefabManager prefabManager;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        ModuleManager moduleManager = ModuleManagerFactory.create();
         ReflectFactory reflectFactory = new ReflectionReflectFactory();
         CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
         TypeSerializationLibrary lib = new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary);
@@ -67,7 +68,7 @@ public class PojoPrefabManagerTest {
         entitySystemLibrary = new EntitySystemLibrary(reflectFactory, copyStrategyLibrary, lib);
         componentLibrary = entitySystemLibrary.getComponentLibrary();
         prefabManager = new PojoPrefabManager();
-        AssetManager assetManager = new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager()));
+        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {

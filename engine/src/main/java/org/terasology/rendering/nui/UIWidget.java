@@ -15,11 +15,15 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
+import org.terasology.rendering.nui.skin.UISkin;
+
+import java.util.Collection;
 
 /**
  * @author Immortius
@@ -30,8 +34,13 @@ public interface UIWidget extends Iterable<UIWidget> {
     String HOVER_MODE = "hover";
     String FOCUSED_MODE = "focused";
     String ACTIVE_MODE = "active";
+    String BASE_PART = "base";
 
     String getId();
+
+    UISkin getSkin();
+
+    void setSkin(UISkin skin);
 
     String getFamily();
 
@@ -48,12 +57,15 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     /**
      * Finds a widget with the given id and type, within the current widget and its contents.
+     *
      * @param id
      * @param type
      * @param <T>
      * @return The widget with the given id and type, or null.
      */
     <T extends UIWidget> T find(String id, Class<T> type);
+
+    <T extends UIWidget> Collection<T> findAll(Class<T> type);
 
     void onDraw(Canvas canvas);
 
@@ -69,10 +81,26 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     void onKeyEvent(KeyEvent event);
 
+    void onBindEvent(BindButtonEvent event);
+
     Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint);
 
     Vector2i getMaxContentSize(Canvas canvas);
 
     boolean isSkinAppliedByCanvas();
+
+    boolean canBeFocus();
+
+    void bindTooltip(Binding<UIWidget> bind);
+
+    void setTooltip(UIWidget value);
+
+    UIWidget getTooltip();
+
+    void bindTooltipString(Binding<String> bind);
+
+    void setTooltip(String value);
+
+    float getTooltipDelay();
 
 }

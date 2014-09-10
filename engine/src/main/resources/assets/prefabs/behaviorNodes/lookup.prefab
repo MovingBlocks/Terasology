@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "LookupNode",
+        "name"      : "Lookup",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Decorator\nNode that runs a behavior tree.\nSUCCESS: when tree finishes with SUCCESS.\nFAILURE: when tree finishes with FAILURE.",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

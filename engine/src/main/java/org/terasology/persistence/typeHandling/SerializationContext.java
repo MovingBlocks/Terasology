@@ -21,6 +21,7 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -201,7 +202,7 @@ public interface SerializationContext {
      * @param <T>
      * @return The serialized data
      */
-    <T> PersistedData create(Iterable<T> data, Class<T> type);
+    <T> PersistedData create(Collection<T> data, Class<T> type);
 
     /**
      * @return A 'null' PersistedData

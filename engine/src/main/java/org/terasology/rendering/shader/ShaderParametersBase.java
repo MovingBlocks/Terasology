@@ -16,7 +16,7 @@
 package org.terasology.rendering.shader;
 
 import org.terasology.config.Config;
-import org.terasology.engine.CoreRegistry;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
