@@ -32,7 +32,7 @@ public class PerlinNoise implements Noise3D {
      *
      * @param seed The seed value
      */
-    public PerlinNoise(int seed) {
+    public PerlinNoise(long seed) {
         FastRandom rand = new FastRandom(seed);
 
         noisePermutations = new int[512];
