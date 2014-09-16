@@ -43,7 +43,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Grants flight", runOnServer = true)
     public String flight(EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        clientComp.character.send(new SetMovementModeEvent(MovementMode.FLIGHT));
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.FLYING));
 
         return "Flight mode toggled";
     }

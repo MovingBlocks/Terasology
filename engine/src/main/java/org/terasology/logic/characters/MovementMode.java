@@ -24,7 +24,7 @@ public enum MovementMode {
     CLIMBING(0f, 1f, true, true, true, 3f, true),
     SWIMMING(0.05f, 2f, true, false, true, 2f, true),
     GHOSTING(0f, 4f, false, false, false, 5f, true),
-    FLIGHT(0f, 4f, true, false, false, 3f, true),
+    FLYING(0f, 4f, true, false, false, 3f, true),
     NONE(0f, 0f, false, false, false, 0f, true);
 
     public float scaleGravity;
