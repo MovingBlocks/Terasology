@@ -67,7 +67,7 @@ public abstract class ItemCell extends CoreWidget {
                         return itemComp.icon;
                     }
                     BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
-                    if (blockItemComp == null) {
+                    if (blockItemComp == null || blockItemComp.blockFamily == null) {
                         return Assets.getTextureRegion("engine:items.questionMark");
                     }
                 }
@@ -78,7 +78,7 @@ public abstract class ItemCell extends CoreWidget {
             @Override
             public Mesh get() {
                 BlockItemComponent blockItemComp = getTargetItem().getComponent(BlockItemComponent.class);
-                if (blockItemComp != null) {
+                if (blockItemComp != null && blockItemComp.blockFamily != null) {
                     return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
                 }
                 return null;

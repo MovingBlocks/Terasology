@@ -58,7 +58,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
                             return itemComp.icon;
                         }
                         BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
-                        if (blockItemComp == null) {
+                        if (blockItemComp == null || blockItemComp.blockFamily == null) {
                             return Assets.getTextureRegion("engine:items.questionMark");
                         }
                     }
@@ -69,7 +69,7 @@ public class TransferItemCursor extends CursorAttachment implements ControlWidge
                 @Override
                 public Mesh get() {
                     BlockItemComponent blockItemComp = getItem().getComponent(BlockItemComponent.class);
-                    if (blockItemComp != null) {
+                    if (blockItemComp != null && blockItemComp.blockFamily != null) {
                         return blockItemComp.blockFamily.getArchetypeBlock().getMesh();
                     }
                     return null;

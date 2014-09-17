@@ -41,7 +41,7 @@ public class PojoEntityRef extends BaseEntityRef {
     @Override
     public EntityRef copy() {
         if (exists) {
-            entityManager.create(entityManager.copyComponents(this).values());
+            return entityManager.create(entityManager.copyComponents(this).values());
         }
         return NULL;
     }
