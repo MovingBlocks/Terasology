@@ -50,6 +50,7 @@ import java.util.Set;
 public class ModuleManager {
 
     public static final String SERVER_SIDE_ONLY_EXT = "serverSideOnly";
+    public static final String IS_GAMEPLAY_EXT = "isGameplay";
 
     private ModuleSecurityManager moduleSecurityManager;
 
@@ -60,6 +61,7 @@ public class ModuleManager {
     public ModuleManager() {
         metadataReader = new ModuleMetadataReader();
         metadataReader.registerExtension(SERVER_SIDE_ONLY_EXT, Boolean.TYPE);
+        metadataReader.registerExtension(IS_GAMEPLAY_EXT, Boolean.TYPE);
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"))) {
             ModuleMetadata metadata = metadataReader.read(reader);

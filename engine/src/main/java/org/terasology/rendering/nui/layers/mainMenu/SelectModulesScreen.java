@@ -62,6 +62,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private DependencyResolver resolver;
 
     @Override
+    public void onOpened() {
+        super.onOpened();
+
+        for (ModuleSelectionInfo info : sortedModules) {
+            info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
+        }
+
+        refreshSelection();
+    }
+
+    @Override
     public void initialise() {
         resolver = new DependencyResolver(moduleManager.getRegistry());
         modulesLookup = Maps.newHashMap();
@@ -75,17 +86,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
                 return o1.getMetadata().getDisplayName().toString().compareTo(o2.getMetadata().getDisplayName().toString());
             }
         });
-
-        for (ModuleSelectionInfo info : sortedModules) {
-            info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
-        }
-
-        ResolutionResult currentSelectionResults = resolver.resolve(config.getDefaultModSelection().listModules());
-        if (currentSelectionResults.isSuccess()) {
-            setSelectedVersions(currentSelectionResults);
-        }
-
-        updateValidToSelect();
 
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
@@ -327,12 +327,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
             if (!previouslySelected) {
-                List<Name> selectedModules = getExplicitlySelectedModules();
-                for (ModuleSelectionInfo info : sortedModules) {
-                    info.setSelectedVersion(null);
-                }
-                setSelectedVersions(resolver.resolve(selectedModules));
-                updateValidToSelect();
+                refreshSelection();
             }
         }
     }
@@ -350,13 +345,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private void deselect(ModuleSelectionInfo target) {
         if (target.isExplicitSelection()) {
             target.setExplicitSelection(false);
-            List<Name> selectedModules = getExplicitlySelectedModules();
-            for (ModuleSelectionInfo info : sortedModules) {
-                info.setSelectedVersion(null);
-            }
-            setSelectedVersions(resolver.resolve(selectedModules));
-            updateValidToSelect();
+            refreshSelection();
         }
+    }
+
+    private void refreshSelection() {
+        List<Name> selectedModules = getExplicitlySelectedModules();
+        for (ModuleSelectionInfo info : sortedModules) {
+            info.setSelectedVersion(null);
+        }
+        setSelectedVersions(resolver.resolve(selectedModules));
+        updateValidToSelect();
     }
 
 

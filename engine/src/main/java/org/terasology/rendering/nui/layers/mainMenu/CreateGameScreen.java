@@ -20,7 +20,9 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
+import org.terasology.config.ModuleConfig;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.module.ModuleManager;
@@ -28,6 +30,7 @@ import org.terasology.game.GameManifest;
 import org.terasology.module.DependencyResolver;
 import org.terasology.module.Module;
 import org.terasology.module.ResolutionResult;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -42,6 +45,7 @@ import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
@@ -49,6 +53,8 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -223,6 +229,76 @@ public class CreateGameScreen extends CoreScreenLayer {
                 getManager().pushScreen("engine:selectModsScreen");
             }
         });
+
+        final UIDropdown<Module> gameplay = find("gameplay", UIDropdown.class);
+        gameplay.setOptions(getGameplayModules());
+        gameplay.bindSelection(new Binding<Module>() {
+            Module selected;
+
+            @Override
+            public Module get() {
+                return selected;
+            }
+
+            @Override
+            public void set(Module value) {
+                selected = value;
+                setSelectedGameplayModule(value);
+            }
+        });
+        gameplay.setOptionRenderer(new StringTextRenderer<Module>() {
+            @Override
+            public String getString(Module value) {
+                return value.getMetadata().getDisplayName().value();
+            }
+        });
+
+        UILabel gameplayDescription = find("gameplayDescription", UILabel.class);
+        gameplayDescription.bindText(new ReadOnlyBinding<String>() {
+            @Override
+            public String get() {
+                Module selectedModule = gameplay.getSelection();
+                if (selectedModule != null) {
+                    return selectedModule.getMetadata().getDescription().value();
+                } else {
+                    return "";
+                }
+
+            }
+        });
+
+    }
+
+    private void setSelectedGameplayModule(Module module) {
+        ModuleConfig moduleConfig = config.getDefaultModSelection();
+        moduleConfig.clear();
+        moduleConfig.addModule(module.getMetadata().getId());
+
+        if (!moduleConfig.hasModule(config.getWorldGeneration().getDefaultGenerator().getModuleName())) {
+            config.getWorldGeneration().setDefaultGenerator(new SimpleUri());
+        }
+        config.save();
+    }
+
+    private List<Module> getGameplayModules() {
+        List<Module> gameplayModules = Lists.newArrayList();
+        for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
+            Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
+            if (!latestVersion.isOnClasspath()) {
+                Boolean isGameplay = latestVersion.getMetadata().getExtension(ModuleManager.IS_GAMEPLAY_EXT, Boolean.class);
+                if (isGameplay != null && isGameplay) {
+                    gameplayModules.add(latestVersion);
+                }
+            }
+        }
+        Collections.sort(gameplayModules, new Comparator<Module>() {
+            @Override
+            public int compare(Module o1, Module o2) {
+                return o1.getMetadata().getDisplayName().value().compareTo(o2.getMetadata().getDisplayName().value());
+            }
+        });
+
+        return gameplayModules;
     }
 
     public boolean isLoadingAsServer() {
