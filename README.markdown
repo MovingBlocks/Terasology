@@ -144,6 +144,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [CakeLie](https://github.com/Terasology/CakeLie) - the cake may be a lie, but these cake and candy blocks are delicious!
 * [ChangingBlocks](https://github.com/Terasology/ChangingBlocks) - allows blocks that change over time (like crops that grow - which will happen if you also enable Crops)
 * [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities
+* [CommonWorld](https://github.com/Terasology/CommonWorld) - general world generation utility module
 * [CopperAndBronze](https://github.com/Terasology/CopperAndBronze) - another era for throughout the ages, this time copper and bronze (comes after wood and stone)
 * Core - mandatory content needed for normal game launch
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
