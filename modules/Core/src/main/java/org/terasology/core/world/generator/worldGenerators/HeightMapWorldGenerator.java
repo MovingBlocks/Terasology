@@ -57,10 +57,7 @@ public class HeightMapWorldGenerator implements WorldGenerator {
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-    }
 
-    @Override
-    public void initialize() {
         world = new WorldBuilder(worldSeed.hashCode())
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new HeightMapSurfaceHeightProvider())
@@ -74,6 +71,11 @@ public class HeightMapWorldGenerator implements WorldGenerator {
                 .addRasterizer(new TreeRasterizer())
                 .addRasterizer(new SolidRasterizer())
                 .build();
+    }
+
+    @Override
+    public void initialize() {
+        world.initialize();
     }
 
     @Override

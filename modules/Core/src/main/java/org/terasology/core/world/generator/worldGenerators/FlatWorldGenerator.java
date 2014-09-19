@@ -56,10 +56,7 @@ public class FlatWorldGenerator implements WorldGenerator {
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-    }
 
-    @Override
-    public void initialize() {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         world = new WorldBuilder(worldSeed.hashCode())
                 .addProvider(new SeaLevelProvider(32))
@@ -75,6 +72,11 @@ public class FlatWorldGenerator implements WorldGenerator {
                 .addRasterizer(new TreeRasterizer())
                 .addRasterizer(new SolidRasterizer())
                 .build();
+    }
+
+    @Override
+    public void initialize() {
+        world.initialize();
     }
 
     @Override
