@@ -16,6 +16,10 @@
 
 package org.terasology.utilities.procedural;
 
+import org.terasology.math.Rect2i;
+
+import javax.vecmath.Vector2f;
+
 /**
  * Provides or generates 2D noise
  * @author Martin Steiger
@@ -29,6 +33,5 @@ public interface Noise2D {
      * @param y Position on the y-axis
      * @return The noise value
      */
-    double noise(double x, double y);
-
+    float noise(float x, float y);
 }

@@ -21,6 +21,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.rendering.nui.Color;
 
@@ -56,6 +57,10 @@ public abstract class AbstractClient implements Client {
         DisplayNameComponent displayInfo = clientInfo.getComponent(DisplayNameComponent.class);
         displayInfo.name = name;
         clientInfo.saveComponent(displayInfo);
+        
+        // mark clientInfo entities with a dedicated component
+        ClientInfoComponent cic = new ClientInfoComponent();
+        clientInfo.addComponent(cic);
         
         ColorComponent colorComp = new ColorComponent();
         colorComp.color = color;

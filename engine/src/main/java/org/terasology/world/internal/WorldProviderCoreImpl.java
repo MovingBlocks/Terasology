@@ -23,12 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.utilities.procedural.BrownianNoise3D;
-import org.terasology.utilities.procedural.Noise3D;
-import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
 import org.terasology.world.block.Block;
@@ -38,6 +36,8 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.RenderableChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.World;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.propagation.BatchPropagator;
 import org.terasology.world.propagation.BlockChange;
@@ -71,8 +71,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private GeneratingChunkProvider chunkProvider;
     private WorldTime worldTime;
 
-    private Noise3D fogNoise;
-
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
@@ -83,7 +81,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
-        this.fogNoise = new BrownianNoise3D(new PerlinNoise(seed.hashCode() + 42 * 42), 8);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
@@ -168,7 +165,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            chunk.lock();
             Block oldBlockType = chunk.setBlock(blockPos, type);
+            chunk.unlock();
             if (oldBlockType != type) {
                 BlockChange oldChange = blockChanges.get(worldPos);
                 if (oldChange == null) {
@@ -185,6 +184,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 notifyBlockChanged(worldPos, type, oldBlockType);
             }
             return oldBlockType;
+
         }
         return null;
     }
@@ -291,17 +291,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public float getFog(float x, float y, float z) {
-        return (float) TeraMath.clamp(TeraMath.fastAbs(fogNoise.noise(getTime().getDays() * 0.1f, 0.01f, 0.01f) * 2.0f)) * chunkProvider.getWorldGenerator().getFog(x, y, z);
+    public Region getWorldData(Region3i region) {
+        World world = chunkProvider.getWorldGenerator().getWorld();
+        if (world != null) {
+            return world.getWorldData(region);
+        } else {
+            return null;
+        }
     }
 
-    @Override
-    public float getTemperature(float x, float y, float z) {
-        return chunkProvider.getWorldGenerator().getTemperature(x, y, z);
-    }
-
-    @Override
-    public float getHumidity(float x, float y, float z) {
-        return chunkProvider.getWorldGenerator().getHumidity(x, y, z);
-    }
 }

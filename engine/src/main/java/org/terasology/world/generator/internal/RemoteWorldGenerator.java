@@ -18,6 +18,7 @@ package org.terasology.world.generator.internal;
 import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
 import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -44,22 +45,12 @@ public class RemoteWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public float getFog(float x, float y, float z) {
-        return 0;
-    }
-
-    @Override
-    public float getTemperature(float x, float y, float z) {
-        return 0.5f;
-    }
-
-    @Override
-    public float getHumidity(float x, float y, float z) {
-        return 0.5f;
-    }
-
-    @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
     }
 }

@@ -31,8 +31,6 @@ import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameThread;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -60,6 +58,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -104,14 +103,14 @@ public class EntityAwareWorldProviderTest {
     private Block blockInFamilyTwo;
 
     @BeforeClass
-    public static void commonSetup() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+    public static void commonSetup() throws Exception {
+        moduleManager = CoreRegistry.put(ModuleManager.class, ModuleManagerFactory.create());
     }
 
     @Before
     public void setup() {
         GameThread.setGameThread();
-        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(new ModuleManagerImpl(new ModuleSecurityManager())));
+        AssetManager assetManager = CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
             @Override
@@ -126,7 +125,7 @@ public class EntityAwareWorldProviderTest {
         blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         worldStub = new WorldProviderCoreStub(BlockManager.getAir());
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 

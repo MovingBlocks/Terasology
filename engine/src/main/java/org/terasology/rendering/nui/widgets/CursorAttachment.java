@@ -95,6 +95,6 @@ public class CursorAttachment extends CoreWidget {
 
     @Override
     public boolean isVisible() {
-        return super.isVisible() && Mouse.isVisible();
+        return super.isVisible() && Mouse.isVisible() && getAttachment() != null && getAttachment().isVisible();
     }
 }

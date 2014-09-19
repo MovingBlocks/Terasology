@@ -18,15 +18,13 @@ package org.terasology.logic.behavior.asset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.reflect.ReflectFactory;
-
-import java.util.Map;
 
 /**
  * @author synopia
@@ -38,10 +36,10 @@ public class NodesClassLibrary extends AbstractClassLibrary<Node> {
         super(factory, copyStrategies);
     }
 
-    public void scan(ModuleManager moduleManager) {
-        for (Map.Entry<String, Class<? extends Node>> entry : moduleManager.findAllSubclassesOf(Node.class).entries()) {
-            logger.debug("Found node class {}", entry.getValue());
-            register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+    public void scan(ModuleEnvironment environment) {
+        for (Class<? extends Node> entry : environment.getSubtypesOf(Node.class)) {
+            logger.debug("Found node class {}", entry);
+            register(new SimpleUri(environment.getModuleProviding(entry), entry.getSimpleName()), entry);
         }
     }
 

@@ -15,6 +15,9 @@
  */
 package org.terasology.engine;
 
+import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
+
 /**
  * Uris are used to identify resources, like assets and systems introduced by mods. Uris can then be serialized/deserialized to and from Strings.
  * Uris are case-insensitive. They have a normalised form which is lower-case (using English casing).
@@ -25,7 +28,7 @@ package org.terasology.engine;
  * @author Immortius
  */
 @API
-public interface Uri extends Comparable<Uri> {
+public interface Uri {
     /**
      * The character(s) use to separate the module name from other parts of the Uri
      */
@@ -34,17 +37,7 @@ public interface Uri extends Comparable<Uri> {
     /**
      * @return The name of the module the resource in question resides in.
      */
-    String getModuleName();
-
-    /**
-     * @return The normalised form of the module name. Generally this means lower case.
-     */
-    String getNormalisedModuleName();
-
-    /**
-     * @return The normalised form of the uri. Generally this means lower case.
-     */
-    String toNormalisedString();
+    Name getModuleName();
 
     /**
      * @return Whether this uri represents a valid, well formed uri.

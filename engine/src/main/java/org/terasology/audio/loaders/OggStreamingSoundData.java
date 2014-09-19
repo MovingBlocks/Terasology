@@ -42,7 +42,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
     @Override
     public ByteBuffer readNextInto(ByteBuffer dataBuffer) {
         try {
-            int read = reader.read(dataBuffer, 0, dataBuffer.capacity());
+            reader.read(dataBuffer, 0, dataBuffer.capacity());
             dataBuffer.rewind();
             return dataBuffer;
         } catch (IOException e) {

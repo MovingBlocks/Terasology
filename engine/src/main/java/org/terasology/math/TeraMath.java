@@ -34,6 +34,13 @@ public final class TeraMath {
     private TeraMath() {
     }
 
+    /**
+     * a + b, but if the result exceeds Integer.MAX_VALUE then the result will be Integer.MAX_VALUE rather than overflowing.
+     *
+     * @param a
+     * @param b
+     * @return min(a + b, Integer.MAX_VALUE)
+     */
     public static int addClampAtMax(int a, int b) {
         long result = (long) a + (long) b;
         return (int) Math.min(result, Integer.MAX_VALUE);
@@ -102,6 +109,21 @@ public final class TeraMath {
             return 1.0;
         } else if (value < 0.0) {
             return 0.0;
+        }
+        return value;
+    }
+
+    /**
+     * Clamps a given value to be an element of [0..1].
+     *
+     * @param value
+     * @return
+     */
+    public static float clamp(float value) {
+        if (value > 1.0f) {
+            return 1.0f;
+        } else if (value < 0.0f) {
+            return 0.0f;
         }
         return value;
     }
@@ -410,16 +432,48 @@ public final class TeraMath {
     /**
      * Linear interpolation.
      */
-    public static double lerp(double x, double x1, double x2, double q00, double q01) {
-        return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
+    public static double lerp(double t, double x1, double x2, double q00, double q01) {
+        return ((x2 - t) / (x2 - x1)) * q00 + ((t - x1) / (x2 - x1)) * q01;
     }
 
-    public static double lerp(double x1, double x2, double p) {
-        return x1 * (1.0 - p) + x2 * p;
+    public static double lerp(double a, double b, double t) {
+        return a + t * (b - a);
     }
 
-    public static float lerpf(float x1, float x2, float p) {
-        return x1 * (1.0f - p) + x2 * p;
+    public static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
+
+    public static float biLerp(float q00, float q10, float q01, float q11, float tx, float ty) {
+        float lerpX1 = lerp(q00, q10, tx);
+        float lerpX2 = lerp(q01, q11, tx);
+        return TeraMath.lerp(lerpX1, lerpX2, ty);
+    }
+
+    public static double biLerp(double q00, double q10, double q01, double q11, double tx, double ty) {
+        double lerpX1 = lerp(q00, q10, tx);
+        double lerpX2 = lerp(q01, q11, tx);
+        return TeraMath.lerp(lerpX1, lerpX2, ty);
+    }
+
+    public static float triLerp(float q000, float q100, float q010, float q110, float q001, float q101, float q011, float q111, float tx, float ty, float tz) {
+        float x00 = lerp(q000, q100, tx);
+        float x10 = lerp(q010, q110, tx);
+        float x01 = lerp(q001, q101, tx);
+        float x11 = lerp(q011, q111, tx);
+        float y0 = lerp(x00, x10, ty);
+        float y1 = lerp(x01, x11, ty);
+        return lerp(y0, y1, tz);
+    }
+
+    public static double triLerp(double q000, double q100, double q010, double q110, double q001, double q101, double q011, double q111, double tx, double ty, double tz) {
+        double x00 = lerp(q000, q100, tx);
+        double x10 = lerp(q010, q110, tx);
+        double x01 = lerp(q001, q101, tx);
+        double x11 = lerp(q011, q111, tx);
+        double y0 = lerp(x00, x10, ty);
+        double y1 = lerp(x01, x11, ty);
+        return lerp(y0, y1, tz);
     }
 
     /**
@@ -437,53 +491,6 @@ public final class TeraMath {
     }
 
     /**
-     * Maps any given value to be positive only.
-     */
-    public static int mapToPositive(int x) {
-        return (x >= 0) ? x * 2 : -x * 2 - 1;
-    }
-
-    /**
-     * Recreates the original value after applying "mapToPositive".
-     */
-    public static int redoMapToPositive(int x) {
-        return (x % 2 == 0) ? x / 2 : -(x / 2) - 1;
-    }
-
-    /**
-     * Applies Cantor's pairing function to 2D coordinates.
-     *
-     * @param k1 X-coordinate
-     * @param k2 Y-coordinate
-     * @return Unique 1D value
-     */
-    public static int cantorize(int k1, int k2) {
-        return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     *
-     * @param c Cantor value
-     * @return Value along the x-axis
-     */
-    public static int cantorX(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
-        return j - cantorY(c);
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     *
-     * @param c Cantor value
-     * @return Value along the y-axis
-     */
-    public static int cantorY(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
-        return c - j * (j + 1) / 2;
-    }
-
-    /**
      * Returns the chunk position of a given coordinate.
      *
      * @param x The X-coordinate of the block
@@ -492,6 +499,7 @@ public final class TeraMath {
     public static int calcChunkPosX(int x, int chunkPowerX) {
         return (x >> chunkPowerX);
     }
+
     /**
      * Returns the chunk position of a given coordinate.
      *
@@ -624,31 +632,33 @@ public final class TeraMath {
         }
         return power;
     }
-    
+
     /**
      * Perlin's blending spline (interpolation function)
      * <p>
      * 6t<sup>5</sup>-15t<sup>4</sup>+10t<sup>3</sup>
      * </p>
-     * It has both 1st and 2nd derivative of 0 at 0 and 1 
+     * It has both 1st and 2nd derivative of 0 at 0 and 1
+     *
      * @param t
      */
-    public static double fadePerlin(double t) {
+    public static float fadePerlin(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
     /**
      * Hermite's blending spline h01 (interpolation function)
-     * <p> 
+     * <p>
      * 3t<sup>2</sup>-2t<sup>3</sup>
      * </p>
-     * It has a 1st derivative of 0 at 0 and 1 
+     * It has a 1st derivative of 0 at 0 and 1
+     *
      * @param t
      */
-    public static double fadeHermite(double t) {
+    public static float fadeHermite(float t) {
         return t * t * (3 - 2 * t);
     }
-    
+
 
     public static int floorToInt(float val) {
         int i = (int) val;
@@ -725,6 +735,7 @@ public final class TeraMath {
 
     /**
      * Populates a target array with the minimum value adjacent to each location, including the location itself.
+     *
      * @param source
      * @param target
      * @param populateMargins Whether to populate the edges of the target array
@@ -770,5 +781,9 @@ public final class TeraMath {
             // x == dimX - 1; y == dimY - 1
             target[dimX - 1 + dimX * (dimY - 1)] = Math.min(source[dimX - 2 + dimX * (dimY - 1)], source[dimX - 1 + dimX * (dimY - 2)]);
         }
+    }
+
+    public static float sqrt(float value) {
+        return (float) Math.sqrt(value);
     }
 }

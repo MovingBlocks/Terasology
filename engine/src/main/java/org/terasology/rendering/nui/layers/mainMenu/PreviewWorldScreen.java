@@ -22,11 +22,10 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.registry.In;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
@@ -78,10 +77,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
-        Module worldGeneratorModule = moduleManager.getLatestModuleVersion(info.getUri().getModuleName());
+
         try {
-            moduleManager.enableModuleAndDependencies(worldGeneratorModule);
-            WorldGenerator worldGenerator = CoreRegistry.get(WorldGeneratorManager.class).createGenerator(info.getUri());
+            WorldGenerator worldGenerator = worldGeneratorManager.createGenerator(info.getUri());
             seedBinding.setWorldGenerator(worldGenerator);
 
             if (worldGenerator instanceof WorldGenerator2DPreview) {
@@ -92,8 +90,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         } catch (UnresolvedWorldGeneratorException e) {
             // if errors happen, don't enable this feature
             logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview");
-        } finally {
-            moduleManager.disableAllModules();
         }
 
         zoomSlider = find("zoomSlider", UISlider.class);
@@ -101,7 +97,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             zoomSlider.setMinimum(1.0f);
             zoomSlider.setRange(99.f);
             zoomSlider.setIncrement(1.0f);
-            zoomSlider.setValue(64f);
+            zoomSlider.setValue(10f);
             zoomSlider.setPrecision(0);
         }
 
@@ -128,12 +124,14 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
-        if (currentSettings == null || !currentSettings.equals(newSettings)) {
-            Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
-            UIImage image = find("preview", UIImage.class);
-            image.setImage(tex);
-            currentSettings = newSettings;
+        if (previewGenerator != null) {
+            PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
+            if (currentSettings == null || !currentSettings.equals(newSettings)) {
+                Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
+                UIImage image = find("preview", UIImage.class);
+                image.setImage(tex);
+                currentSettings = newSettings;
+            }
         }
     }
 
@@ -164,7 +162,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             for (int x = 0; x < width; ++x) {
                 int px = (x + offX) * scale;
                 int py = (y + offY) * scale;
-                Color c = previewGenerator.get(layerName, px, py);
+                Rect2i area = Rect2i.createFromMinAndSize(px, py, scale, scale);
+                Color c = previewGenerator.get(layerName, area);
                 c.addToBuffer(buf);
             }
         }

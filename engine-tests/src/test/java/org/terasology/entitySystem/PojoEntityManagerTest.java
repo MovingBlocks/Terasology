@@ -26,8 +26,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.PojoEntityManager;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateComponent;
@@ -45,6 +43,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -69,9 +68,9 @@ public class PojoEntityManagerTest {
     private Prefab prefab;
 
     @BeforeClass
-    public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
-        AssetManager assetManager = new AssetManager(moduleManager);
+    public static void setupClass() throws Exception {
+        moduleManager = ModuleManagerFactory.create();
+        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {
@@ -85,7 +84,7 @@ public class PojoEntityManagerTest {
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = (PojoEntityManager) builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
+        entityManager = (PojoEntityManager) builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
 
         PrefabData protoPrefab = new PrefabData();
         protoPrefab.addComponent(new StringComponent("Test"));

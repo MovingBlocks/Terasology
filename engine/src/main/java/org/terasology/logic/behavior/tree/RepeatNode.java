@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.behavior.tree;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 /**
  * Repeats the child node forever.<br/>

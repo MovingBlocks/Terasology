@@ -18,44 +18,46 @@ package org.terasology.asset;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import org.terasology.engine.AbstractBaseUri;
-import org.terasology.engine.module.UriUtil;
+import org.terasology.engine.Uri;
+import org.terasology.naming.Name;
 
 /**
  * @author Immortius
  */
-public final class AssetUri extends AbstractBaseUri {
+public final class AssetUri implements Uri, Comparable<AssetUri> {
     public static final String TYPE_SEPARATOR = ":";
 
     private AssetType type;
 
-    private String moduleName = "";
-    private String assetName = "";
-    private String normalisedModuleName = "";
-    private String normalisedAssetName = "";
+    private Name moduleName = Name.EMPTY;
+    private Name assetName;
 
     public AssetUri() {
     }
 
     public AssetUri(AssetType type, String moduleName, String assetName) {
+        this(type, new Name(moduleName), new Name(assetName));
+    }
+
+    public AssetUri(AssetType type, Name moduleName, String assetName) {
+        this(type, moduleName, new Name(assetName));
+    }
+
+    public AssetUri(AssetType type, Name moduleName, Name assetName) {
         Preconditions.checkNotNull(type);
         Preconditions.checkNotNull(moduleName);
         Preconditions.checkNotNull(assetName);
         this.type = type;
         this.moduleName = moduleName;
         this.assetName = assetName;
-        this.normalisedModuleName = UriUtil.normalise(moduleName);
-        this.normalisedAssetName = UriUtil.normalise(assetName);
     }
 
     public AssetUri(AssetType type, String simpleUri) {
         this.type = type;
         String[] split = simpleUri.split(MODULE_SEPARATOR, 2);
         if (split.length > 1) {
-            moduleName = split[0];
-            assetName = split[1];
-            normalisedModuleName = UriUtil.normalise(split[0]);
-            normalisedAssetName = UriUtil.normalise(split[1]);
+            moduleName = new Name(split[0]);
+            assetName = new Name(split[1]);
         }
     }
 
@@ -65,10 +67,8 @@ public final class AssetUri extends AbstractBaseUri {
             type = AssetType.getTypeForId(typeSplit[0]);
             String[] packageSplit = typeSplit[1].split(MODULE_SEPARATOR, 2);
             if (packageSplit.length > 1) {
-                moduleName = packageSplit[0];
-                assetName = packageSplit[1];
-                normalisedModuleName = UriUtil.normalise(packageSplit[0]);
-                normalisedAssetName = UriUtil.normalise(packageSplit[1]);
+                moduleName = new Name(packageSplit[0]);
+                assetName = new Name(packageSplit[1]);
             }
         }
     }
@@ -77,22 +77,16 @@ public final class AssetUri extends AbstractBaseUri {
         return type;
     }
 
-    public String getModuleName() {
+    @Override
+    public Name getModuleName() {
         return moduleName;
     }
 
-    public String getNormalisedModuleName() {
-        return normalisedModuleName;
-    }
-
-    public String getAssetName() {
+    public Name getAssetName() {
         return assetName;
     }
 
-    public String getNormalisedAssetName() {
-        return normalisedAssetName;
-    }
-
+    @Override
     public boolean isValid() {
         return type != null && !moduleName.isEmpty() && !assetName.isEmpty();
     }
@@ -105,14 +99,6 @@ public final class AssetUri extends AbstractBaseUri {
         return type.getTypeId() + TYPE_SEPARATOR + moduleName + MODULE_SEPARATOR + assetName;
     }
 
-    @Override
-    public String toNormalisedString() {
-        if (!isValid()) {
-            return "";
-        }
-        return type.getTypeId() + TYPE_SEPARATOR + normalisedModuleName + MODULE_SEPARATOR + normalisedAssetName;
-    }
-
     /**
      * @return The asset uri, minus the type
      */
@@ -123,13 +109,6 @@ public final class AssetUri extends AbstractBaseUri {
         return moduleName + MODULE_SEPARATOR + assetName;
     }
 
-    public String toNormalisedSimpleString() {
-        if (!isValid()) {
-            return "";
-        }
-        return normalisedModuleName + MODULE_SEPARATOR + normalisedAssetName;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -138,16 +117,23 @@ public final class AssetUri extends AbstractBaseUri {
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
             return Objects.equal(type, other.type)
-                    && Objects.equal(normalisedModuleName, other.normalisedModuleName)
-                    && Objects.equal(normalisedAssetName, other.normalisedAssetName);
+                    && Objects.equal(moduleName, other.moduleName)
+                    && Objects.equal(assetName, other.assetName);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, normalisedModuleName, normalisedAssetName);
+        return Objects.hashCode(type, moduleName, assetName);
     }
 
-
+    @Override
+    public int compareTo(AssetUri o) {
+        int result = moduleName.compareTo(o.getModuleName());
+        if (result == 0 && assetName != null && o.assetName != null) {
+            result = assetName.compareTo(o.getAssetName());
+        }
+        return result;
+    }
 }

@@ -37,6 +37,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassLibrary;
@@ -45,7 +46,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.ControlWidget;
 import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.FocusManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -58,7 +58,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class NUIManagerInternal extends BaseComponentSystem implements NUIManager, FocusManager {
+public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
 
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
@@ -77,8 +77,9 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     public void refreshWidgetsLibrary() {
         widgetsLibrary = new WidgetLibrary(CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
-        for (Map.Entry<String, Class<? extends UIWidget>> entry : CoreRegistry.get(ModuleManager.class).findAllSubclassesOf(UIWidget.class).entries()) {
-            widgetsLibrary.register(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        for (Class<? extends UIWidget> type : environment.getSubtypesOf(UIWidget.class)) {
+            widgetsLibrary.register(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
         }
     }
 
@@ -196,8 +197,10 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
     public UIScreenLayer pushScreen(UIElement element) {
         if (element != null && element.getRootWidget() instanceof CoreScreenLayer) {
             CoreScreenLayer result = (CoreScreenLayer) element.getRootWidget();
-            result.setId(element.getURI().toNormalisedSimpleString());
-            pushScreen(result, element.getURI());
+            if (!screens.contains(result)) {
+                result.setId(element.getURI().toString());
+                pushScreen(result, element.getURI());
+            }
             return result;
         }
         return null;
@@ -230,7 +233,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         return null;
     }
 
-    public void pushScreen(CoreScreenLayer screen, AssetUri uri) {
+    private void pushScreen(CoreScreenLayer screen, AssetUri uri) {
         screen.setManager(this);
         prepare(screen);
         screens.push(screen);
@@ -312,6 +315,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         forceReleaseMouse = false;
     }
 
+    @Override
     public void render() {
         canvas.preRender();
         Deque<UIScreenLayer> screensToRender = Queues.newArrayDeque();
@@ -330,6 +334,7 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         canvas.postRender();
     }
 
+    @Override
     public void update(float delta) {
         canvas.processMousePosition(Mouse.getPosition());
 

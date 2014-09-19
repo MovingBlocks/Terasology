@@ -15,7 +15,7 @@
  */
 package org.terasology.world.selection;
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;

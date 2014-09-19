@@ -22,8 +22,8 @@ import gnu.trove.list.TIntList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
@@ -46,7 +46,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
     private static final Logger logger = LoggerFactory.getLogger(ObjMeshLoader.class);
 
     @Override
-    public MeshData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
 
         List<Vector3f> rawVertices = Lists.newArrayList();

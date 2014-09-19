@@ -16,13 +16,14 @@
 
 package org.terasology;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
  * Setup an empty Terasology environment
+ *
  * @author Martin Steiger
  */
 public class Environment {
@@ -40,7 +41,7 @@ public class Environment {
             throw new RuntimeException(e);
         }
     }
-    
+
     protected void reset() throws Exception {
 
         setupPathManager();
@@ -82,7 +83,7 @@ public class Environment {
         // empty
     }
 
-    protected void setupModuleManager() {
+    protected void setupModuleManager() throws Exception {
         // empty
     }
 
@@ -128,6 +129,7 @@ public class Environment {
 
     /**
      * Cleans up all resources (similar to AutoCloseable)
+     *
      * @throws Exception if something goes wrong
      */
     public void close() throws Exception {

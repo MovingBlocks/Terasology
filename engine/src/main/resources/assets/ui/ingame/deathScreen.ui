@@ -20,6 +20,21 @@
                         "type" : "UIButton",
                         "text" : "Respawn",
                         "id" : "respawn"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Settings",
+                        "id" : "settings"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Exit to Main Menu",
+                        "id" : "mainMenu"
+                    },
+                    {
+                        "type" : "UIButton",
+                        "text" : "Exit Terasology",
+                        "id" : "exitGame"
                     }
                 ],
                 "layoutInfo" : {

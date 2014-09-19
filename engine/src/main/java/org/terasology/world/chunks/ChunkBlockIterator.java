@@ -15,8 +15,8 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.engine.API;
 import org.terasology.math.Vector3i;
+import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
 
 /**

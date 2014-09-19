@@ -33,7 +33,7 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.assets.material.Material;
@@ -72,7 +72,7 @@ public class BlockSelectionRenderer {
         tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, .2f), texPos, effectsTextureWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh2 = tessellator.generateMesh();
-        defaultTextured = Assets.getMaterial("engine:defaultTextured");
+        defaultTextured = Assets.getMaterial("engine:prog.defaultTextured");
     }
 
     public void setEffectsTexture(Texture newEffectsTexture) {

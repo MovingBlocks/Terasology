@@ -17,7 +17,8 @@
 package org.terasology.reflection.metadata;
 
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 
 import java.util.List;
 
@@ -81,6 +82,8 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
      */
     ClassMetadata<? extends T, ?> resolve(String name);
 
+    List<ClassMetadata<? extends T, ?>> getMetadata(Name name);
+
     /**
      * Resolves a name referring to a component. This may be a uri ('engine:component') or just the name ('component').
      * The process used for resolution is:
@@ -94,7 +97,7 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T, ?>>
      * @param context The module from which it has been referred
      * @return The resolved component metadata, or null if it could not be resolve (or multiple matches were found)
      */
-    ClassMetadata<? extends T, ?> resolve(String name, String context);
+    ClassMetadata<? extends T, ?> resolve(String name, Name context);
 
     /**
      * Resolves a name referring to a component. This may be a uri ('engine:component') or just the component name ('component').

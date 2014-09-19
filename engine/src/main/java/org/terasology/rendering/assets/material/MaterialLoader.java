@@ -30,7 +30,7 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 import org.terasology.rendering.assets.shader.Shader;
 import org.terasology.rendering.assets.texture.Texture;
 
@@ -54,7 +54,7 @@ public class MaterialLoader implements AssetLoader<MaterialData> {
     }
 
     @Override
-    public MaterialData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public MaterialData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream, Charsets.UTF_8), MaterialMetadata.class);
 
         Shader shader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);

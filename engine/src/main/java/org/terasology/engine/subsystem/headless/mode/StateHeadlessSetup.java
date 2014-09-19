@@ -16,14 +16,16 @@
 package org.terasology.engine.subsystem.headless.mode;
 
 import org.terasology.config.Config;
+import org.terasology.config.WorldGenerationConfig;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateSetup;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.internal.WorldInfo;
@@ -49,24 +51,25 @@ public class StateHeadlessSetup extends StateSetup {
 
         GameManifest gameManifest = new GameManifest();
 
-        gameManifest.setTitle("headless");
-        gameManifest.setSeed("headless");
-
         Config config = CoreRegistry.get(Config.class);
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        for (String moduleName : config.getDefaultModSelection().listModules()) {
-            Module module = moduleManager.getLatestModuleVersion(moduleName);
+        for (Name moduleName : config.getDefaultModSelection().listModules()) {
+            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 gameManifest.addModule(module.getId(), module.getVersion());
             }
         }
 
-        SimpleUri worldGeneratorUri = config.getWorldGeneration().getDefaultGenerator();
+        WorldGenerationConfig worldGenConfig = config.getWorldGeneration();
+        SimpleUri worldGeneratorUri = worldGenConfig.getDefaultGenerator();
+
+        gameManifest.setTitle(worldGenConfig.getWorldTitle());
+        gameManifest.setSeed(worldGenConfig.getDefaultSeed());
 
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                 (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
-        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.SERVER));
+        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
     }
 
     @Override

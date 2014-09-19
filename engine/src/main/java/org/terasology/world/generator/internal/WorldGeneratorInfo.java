@@ -48,11 +48,7 @@ public class WorldGeneratorInfo implements Comparable<WorldGeneratorInfo> {
 
     @Override
     public int compareTo(WorldGeneratorInfo o) {
-        int nameComp = displayName.compareTo(o.displayName);
-        if (nameComp == 0) {
-            return uri.compareTo(o.uri);
-        }
-        return nameComp;
+        return displayName.compareTo(o.displayName);
     }
 
     @Override

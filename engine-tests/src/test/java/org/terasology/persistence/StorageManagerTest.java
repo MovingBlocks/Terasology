@@ -23,13 +23,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.asset.AssetManager;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -40,6 +36,9 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -86,20 +85,20 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+        moduleManager = ModuleManagerFactory.create();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        entityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
 
         BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
 
-        esm = new StorageManagerInternal(moduleManager, entityManager, false);
+        esm = new StorageManagerInternal(moduleManager.getEnvironment(), entityManager, false);
 
         CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(ModuleManager.class, new ModuleManagerImpl(new ModuleSecurityManager()));
-        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager));
+        CoreRegistry.put(ModuleManager.class, moduleManager);
+        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
     }
 
     @Test
@@ -192,8 +191,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager, newEntityManager);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager);
         newSM.loadGlobalStore();
         assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
     }
@@ -208,8 +207,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager, newEntityManager, false);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -231,8 +230,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager, newEntityManager, false);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -268,8 +267,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         esm.createGlobalStoreForSave().save();
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager, newEntityManager, false);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -291,8 +290,8 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         esm.flush();
 
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager, networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager, newEntityManager, false);
+        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);

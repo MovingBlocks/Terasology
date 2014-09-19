@@ -17,6 +17,7 @@ package org.terasology.math;
 
 import com.google.common.collect.Lists;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
  * 2D Rectangle
  */
 // TODO: Review and bring into line with Region3i's api
-public final class Rect2i {
+public final class Rect2i implements Iterable<Vector2i> {
     public static final Rect2i EMPTY = new Rect2i();
 
     // position
@@ -87,6 +88,10 @@ public final class Rect2i {
         return new Vector2i(posX, posY);
     }
 
+    public Vector2i max() {
+        return new Vector2i(maxX(), maxY());
+    }
+
     /**
      * @return The size of the region
      */
@@ -129,7 +134,7 @@ public final class Rect2i {
     /**
      * @param other
      * @return The Rect2i that is encompassed by both this and other. If they
-     *         do not overlap then the Rect2i.EMPTY is returned
+     * do not overlap then the Rect2i.EMPTY is returned
      */
     public Rect2i intersect(Rect2i other) {
         int minX = Math.max(posX, other.posX);
@@ -148,7 +153,7 @@ public final class Rect2i {
     }
 
     public boolean contains(int x, int y) {
-        return !isEmpty() && (x >= posX) && (y >= posY) && (x <= posX + w) && (y <= posY + h);
+        return !isEmpty() && (x >= posX) && (y >= posY) && (x < posX + w) && (y < posY + h);
     }
 
     public boolean encompasses(Rect2i other) {
@@ -230,5 +235,52 @@ public final class Rect2i {
         return result;
     }
 
+    public Rect2i expand(Vector2i amount) {
+        Vector2i expandedMin = min();
+        expandedMin.sub(amount);
+        Vector2i expandedMax = max();
+        expandedMax.add(amount);
+        return createFromMinAndMax(expandedMin, expandedMax);
+    }
 
+    public int sizeX() {
+        return w;
+    }
+
+    public int sizeY() {
+        return h;
+    }
+
+    /**
+     * Provides an iterator over the positions in the Rect2i. They are iterated from min to max, x before y (so all values at minY, then minY + 1, etc)
+     *
+     * @return An iterator over all positions in the Rect2i.
+     */
+    @Override
+    public Iterator<Vector2i> iterator() {
+        return new Iterator<Vector2i>() {
+
+            private Vector2i pos = new Vector2i(posX - 1, posY);
+
+            @Override
+            public boolean hasNext() {
+                return pos.getY() < maxY() || pos.getX() < maxX();
+            }
+
+            @Override
+            public Vector2i next() {
+                pos.x++;
+                if (pos.x > maxX()) {
+                    pos.x = posX;
+                    pos.y++;
+                }
+                return pos;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
 }

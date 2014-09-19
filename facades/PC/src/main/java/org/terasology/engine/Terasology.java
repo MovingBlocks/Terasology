@@ -16,6 +16,7 @@
 package org.terasology.engine;
 
 import com.google.common.collect.Lists;
+import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -29,7 +30,8 @@ import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 
-import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -41,14 +43,17 @@ import java.util.Collection;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
+
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
+    private static final String NO_CRASH_REPORT_ARG = "-noCrashReport";
 
     private Terasology() {
     }
 
     public static void main(String[] args) {
+        boolean crashReportEnabled = true;
         try {
             boolean isHeadless = false;
             Path homePath = null;
@@ -59,6 +64,8 @@ public final class Terasology {
                     homePath = Paths.get("");
                 } else if (arg.equals(HEADLESS_ARG)) {
                     isHeadless = true;
+                } else if (arg.equals(NO_CRASH_REPORT_ARG)) {
+                    crashReportEnabled = false;
                 }
             }
             if (homePath != null) {
@@ -75,35 +82,42 @@ public final class Terasology {
             }
 
             TerasologyEngine engine = new TerasologyEngine(subsystemList);
-            engine.init();
-            if (isHeadless) {
-                engine.run(new StateHeadlessSetup());
-            } else {
-                engine.run(new StateMainMenu());
+            try {
+                engine.init();
+                if (isHeadless) {
+                    engine.run(new StateHeadlessSetup());
+                } else {
+                    engine.run(new StateMainMenu());
+                }
+            } finally {
+                try {
+                    engine.dispose();
+                } catch (Exception e) {
+                    // Just log this one to System.err because we don't want it 
+                    // to replace the one that came first (thrown above).
+                    e.printStackTrace();
+                }
             }
-            engine.dispose();
-        } catch (Throwable t) {
-            String text = getNestedMessageText(t);
-            JOptionPane.showMessageDialog(null, text, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+        } catch (RuntimeException | IOException e) {
+
+            if (!GraphicsEnvironment.isHeadless()) {
+                Path logPath = Paths.get(".");
+                try {
+                    Path gameLogPath = PathManager.getInstance().getLogPath();
+                    if (gameLogPath != null) {
+                        logPath = gameLogPath;
+                    }
+                } catch (Exception eat) {
+                    // eat silently
+                }
+
+                if (crashReportEnabled) {
+                    Path logFile = logPath.resolve("Terasology.log");
+
+                    CrashReporter.report(e, logFile);
+                }
+            }
         }
     }
 
-    private static String getNestedMessageText(Throwable t) {
-        String nl = System.getProperty("line.separator");
-        StringBuilder sb = new StringBuilder();
-
-        Throwable cause = t;
-        while (cause != null && cause != cause.getCause()) {
-            if (cause.getMessage() != null) {
-                sb.append(cause.getClass().getSimpleName());
-                sb.append(": ");
-                sb.append(cause.getLocalizedMessage());
-                sb.append(nl);
-            }
-
-            cause = cause.getCause();
-        }
-
-        return sb.toString();
-    }
 }

@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
-import org.terasology.engine.module.Module;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2f;
@@ -39,6 +39,7 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
+import org.terasology.module.Module;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -78,6 +79,7 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UILayout;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.skin.UISkin;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.utilities.ReflectionUtil;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.world.block.Block;
@@ -109,7 +111,7 @@ public class UILoader implements AssetLoader<UIData> {
 
 
     @Override
-    public UIData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UIData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         NUIManager nuiManager = CoreRegistry.get(NUIManager.class);
         ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.get(CopyStrategyLibrary.class);
@@ -122,7 +124,8 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Quat4f.class, new Quat4fTypeHandler());
         library.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         library.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
-        library.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
+        library.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        library.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         library.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         library.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         library.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
@@ -186,6 +189,10 @@ public class UILoader implements AssetLoader<UIData> {
 
         @Override
         public UIWidget deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+                return new UILabel(json.getAsString());
+            }
+
             JsonObject jsonObject = json.getAsJsonObject();
 
             String type = jsonObject.get("type").getAsString();

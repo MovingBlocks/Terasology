@@ -32,6 +32,9 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -64,11 +67,25 @@ public final class ChunkTessellator {
 
         final Stopwatch watch = Stopwatch.createStarted();
 
+        Region region = generatingChunkProvider.getWorldData(chunkView.getWorldRegion());
+        SurfaceTemperatureFacet surfaceTemperatureFacet = null;
+        SurfaceHumidityFacet surfaceHumidityFacet = null;
+        if (region != null) {
+            surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
+            surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
+        }
+
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                 Vector3f worldPos = new Vector3f(chunkOffset.x + x, chunkOffset.y, chunkOffset.z + z);
-                float biomeTemp = generatingChunkProvider.getTemperature(worldPos);
-                float biomeHumidity = generatingChunkProvider.getHumidity(worldPos);
+                float biomeTemp = 0.5f;
+                if (surfaceTemperatureFacet != null) {
+                    biomeTemp = surfaceHumidityFacet.get(x, z);
+                }
+                float biomeHumidity = 0.5f;
+                if (surfaceHumidityFacet != null) {
+                    biomeHumidity = surfaceHumidityFacet.get(x, z);
+                }
 
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Block block = chunkView.getBlock(x, y, z);

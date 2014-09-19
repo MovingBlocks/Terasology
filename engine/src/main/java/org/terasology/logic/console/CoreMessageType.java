@@ -22,8 +22,10 @@ import org.terasology.rendering.nui.Color;
  * @author Immortius
  */
 public enum CoreMessageType implements MessageType {
-    CONSOLE(Color.BLACK),
-    CHAT(Color.GREEN);
+    CONSOLE(ConsoleColors.DEFAULT),
+    CHAT(ConsoleColors.CHAT),
+    ERROR(ConsoleColors.ERROR), 
+    NOTIFICATION(ConsoleColors.NOTIFICATION);
 
     private Color color;
 

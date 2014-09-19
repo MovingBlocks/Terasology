@@ -108,7 +108,7 @@ public class KinematicCharacterMover implements CharacterMover {
             updatePosition(characterMovementComponent, result, input, entity);
 
             if (input.isFirstRun()) {
-                checkBlockEntry(entity, new Vector3i(initial.getPosition()), new Vector3i(result.getPosition()), characterMovementComponent.height);
+                checkBlockEntry(entity, new Vector3i(initial.getPosition(), 0.5f), new Vector3i(result.getPosition(), 0.5f), characterMovementComponent.height);
             }
 
             if (result.getMode() != MovementMode.GHOSTING && result.getMode() != MovementMode.NONE) {
@@ -507,7 +507,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 newDir.scale(dist);
                 float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
 
-                // We step up if we're hitting a big slope, or if we're grazing 
+                // We step up if we're hitting a big slope, or if we're grazing
                 // the ground, otherwise we move up a shallow slope.
                 if (slope < slopeFactor || 1 - slope < physics.getEpsilon()) {
                     boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);

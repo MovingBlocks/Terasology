@@ -1,0 +1,51 @@
+// This include file applies our Artifactory related settings to places that need them (root project + modules)
+
+// Artifactory publishing requires these two (without maven we'd get no .pom with dependency info published)
+apply plugin: 'maven'
+apply plugin: 'artifactory'
+
+// Dependencies needed for what our Gradle scripts themselves use
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://dl.bintray.com/jfrog/jfrog-jars'
+        }
+    }
+
+    dependencies {
+        // This grabs the Artifactory plugin jars
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '2.2.3')
+    }
+}
+
+// This configures what we need to interact with the MovingBlocks Artifactory instance
+artifactory {
+    contextUrl = 'http://artifactory.movingblocks.net/artifactory'
+
+    // This is the target for publishing artifacts
+    publish {
+        repository {
+            repoKey = 'terasology-snapshot-local'
+            // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
+            // This way we make it so you can run locally without having the user/pass set - but if the artifactoryPublish task is called it'll fail
+            if (rootProject.hasProperty("artifactoryUser") && rootProject.hasProperty("artifactoryPass")) {
+                username = "$artifactoryUser"
+                password = "$artifactoryPass"
+            }
+            // Note that republishing artifacts under the same name (without an incremented SNAPSHOT for instance) may fail with "Forbidden"
+        }
+
+        defaults {
+            // These configurations are defined for modules. The root project doesn't publish anything so they're not needed there
+            publishConfigs('archives', 'published')
+        }
+    }
+
+    // This is the source where we get dependencies
+    resolve {
+        repository {
+            repoKey = 'terasology-snapshot-local'
+        }
+    }
+}

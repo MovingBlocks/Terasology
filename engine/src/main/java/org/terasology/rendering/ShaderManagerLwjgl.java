@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering;
 
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -36,7 +38,6 @@ import org.terasology.rendering.shader.ShaderParametersChunk;
 import org.terasology.rendering.shader.ShaderParametersCombine;
 import org.terasology.rendering.shader.ShaderParametersDebug;
 import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersGelCube;
 import org.terasology.rendering.shader.ShaderParametersHdr;
 import org.terasology.rendering.shader.ShaderParametersLightBufferPass;
 import org.terasology.rendering.shader.ShaderParametersLightGeometryPass;
@@ -67,9 +68,36 @@ public class ShaderManagerLwjgl implements ShaderManager {
 
     public ShaderManagerLwjgl() {
         logger.info("Loading Terasology shader manager...");
+        logger.info("LWJGL: {} / {}", Sys.getVersion(), LWJGLUtil.getPlatformName());
+        logger.info("GL_VENDOR: {}", GL11.glGetString(GL11.GL_VENDOR));
+        logger.info("GL_RENDERER: {}", GL11.glGetString(GL11.GL_RENDERER));
         logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
         logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        logger.info("EXTENSIONS: {}", GL11.glGetString(GL11.GL_EXTENSIONS));
+
+        String extStr = GL11.glGetString(GL11.GL_EXTENSIONS);
+
+        // log shader extensions in smaller packages, 
+        // because the full string can be extremely long 
+        int extsPerLine = 8;
+
+        // starting with OpenGL 3.0, extensions can also listed using
+        // GL_NUM_EXTENSIONS and glGetStringi(GL_EXTENSIONS, idx)
+        String[] exts = extStr.split(" ");
+        if (exts.length > 0) {
+            StringBuilder bldr = new StringBuilder(exts[0]); 
+            for (int i = 1; i < exts.length; i++) {
+                if (i % extsPerLine == 0) {
+                    logger.info("EXTENSIONS: {}", bldr.toString());
+                    bldr.setLength(0);
+                } else {
+                    bldr.append(" ");
+                }
+                bldr.append(exts[i]); 
+            }
+            if (bldr.length() > 0) {
+                logger.info("EXTENSIONS: {}", bldr.toString());
+            }
+        }
     }
 
     @Override
@@ -92,8 +120,6 @@ public class ShaderManagerLwjgl implements ShaderManager {
         prepareAndStoreShaderProgramInstance("chunk", new ShaderParametersChunk());
         prepareAndStoreShaderProgramInstance("particle", new ShaderParametersParticle());
         prepareAndStoreShaderProgramInstance("block", new ShaderParametersBlock());
-        prepareAndStoreShaderProgramInstance("gelatinousCube", new ShaderParametersGelCube());
-        prepareAndStoreShaderProgramInstance("animateOpacity", new ShaderParametersDefault());
         prepareAndStoreShaderProgramInstance("shadowMap", new ShaderParametersShadowMap());
         prepareAndStoreShaderProgramInstance("debug", new ShaderParametersDebug());
         prepareAndStoreShaderProgramInstance("ocDistortion", new ShaderParametersOcDistortion());
@@ -146,7 +172,7 @@ public class ShaderManagerLwjgl implements ShaderManager {
         Shader shader = Assets.getShader(uri);
         checkNotNull(shader, "Failed to resolve %s", uri);
         shader.recompile();
-        GLSLMaterial material = Assets.generateAsset(new AssetUri(AssetType.MATERIAL, uri), new MaterialData(shader), GLSLMaterial.class);
+        GLSLMaterial material = Assets.generateAsset(new AssetUri(AssetType.MATERIAL, "engine:prog." + title), new MaterialData(shader), GLSLMaterial.class);
         material.setShaderParameters(params);
 
         return material;

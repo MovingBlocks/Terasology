@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -71,7 +71,7 @@ public class UISkinLoader implements AssetLoader<UISkinData> {
     }
 
     @Override
-    public UISkinData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public UISkinData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
             return gson.fromJson(reader, UISkinData.class);

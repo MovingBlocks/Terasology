@@ -25,12 +25,12 @@ import gnu.trove.set.TIntSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
 import org.terasology.math.Vector3i;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.GlobalStore;
 import org.terasology.persistence.PlayerStore;
@@ -83,7 +83,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private Path playersPath;
 
-    private ModuleManager moduleManager;
+    private ModuleEnvironment environment;
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
@@ -98,13 +98,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private boolean storeChunksInZips = true;
 
-    public StorageManagerInternal(ModuleManager moduleManager, EngineEntityManager entityManager) {
-        this(moduleManager, entityManager, true);
+    public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
+        this(environment, entityManager, true);
     }
 
-    public StorageManagerInternal(ModuleManager moduleManager, EngineEntityManager entityManager, boolean storeChunksInZips) {
-        this.moduleManager = moduleManager;
+    public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
+        this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
@@ -156,7 +156,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         if (Files.isRegularFile(globalDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
-                GlobalStoreLoader loader = new GlobalStoreLoader(moduleManager, entityManager, prefabSerializer);
+                GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
                 loader.load(store);
                 for (StoreMetadata refTable : loader.getStoreMetadata()) {
                     storeMetadata.put(refTable.getId(), refTable);

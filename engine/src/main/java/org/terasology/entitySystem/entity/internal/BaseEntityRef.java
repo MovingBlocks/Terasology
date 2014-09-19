@@ -31,7 +31,7 @@ import java.util.Collections;
  */
 public abstract class BaseEntityRef extends EntityRef {
 
-    private LowLevelEntityManager entityManager;
+    protected LowLevelEntityManager entityManager;
 
     public BaseEntityRef(LowLevelEntityManager entityManager) {
         this.entityManager = entityManager;

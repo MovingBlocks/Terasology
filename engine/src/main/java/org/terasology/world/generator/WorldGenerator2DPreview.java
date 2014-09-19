@@ -15,16 +15,16 @@
  */
 package org.terasology.world.generator;
 
+import org.terasology.math.Rect2i;
 import org.terasology.rendering.nui.Color;
 
 public interface WorldGenerator2DPreview {
 
     /**
-     * @param x the x chunk coordinate
-     * @param z the z chunk coordinate
+     * @param area area to get a color for
      * @return never <code>null</code>
      */
-    Color get(String layerName, int x, int z);
+    Color get(String layerName, Rect2i area);
 
     /**
      * @return the named layers that can be rendered as 2D previews

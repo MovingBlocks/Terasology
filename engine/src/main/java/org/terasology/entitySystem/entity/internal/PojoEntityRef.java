@@ -17,6 +17,7 @@ package org.terasology.entitySystem.entity.internal;
 
 import com.google.common.base.Objects;
 import org.terasology.asset.AssetUri;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.network.NetworkComponent;
 
@@ -35,6 +36,14 @@ public class PojoEntityRef extends BaseEntityRef {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public EntityRef copy() {
+        if (exists) {
+            entityManager.create(entityManager.copyComponents(this).values());
+        }
+        return NULL;
     }
 
     @Override

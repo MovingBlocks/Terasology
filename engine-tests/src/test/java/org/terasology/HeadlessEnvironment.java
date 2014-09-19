@@ -16,12 +16,6 @@
 
 package org.terasology;
 
-import static org.mockito.Mockito.mock;
-
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.security.CodeSource;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -40,15 +34,13 @@ import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
+import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
@@ -58,6 +50,7 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UISkinData;
+import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.AttachedToSurfaceFamilyFactory;
 import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
@@ -69,9 +62,16 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
 
+import java.io.IOException;
+import java.nio.file.FileSystem;
+import java.security.CodeSource;
+
+import static org.mockito.Mockito.mock;
+
 /**
  * Setup a headless ( = no graphics ) environment.
  * Based on TerasologyTestingEnvironment code.
+ *
  * @author Martin Steiger
  */
 public class HeadlessEnvironment extends Environment {
@@ -82,13 +82,13 @@ public class HeadlessEnvironment extends Environment {
     public HeadlessEnvironment() {
         super();
     }
-    
+
     @Override
     protected void setupStorageManager() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = CoreRegistry.get(EngineEntityManager.class);
 
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager, engineEntityManager));
+        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager.getEnvironment(), engineEntityManager));
     }
 
     @Override
@@ -98,14 +98,14 @@ public class HeadlessEnvironment extends Environment {
         NetworkSystem networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
     }
-    
+
     @Override
     protected void setupEntitySystem() {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        
+
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        EngineEntityManager engineEntityManager = builder.build(moduleManager, networkSystem, new ReflectionReflectFactory());
+        EngineEntityManager engineEntityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
 
         CoreRegistry.put(EngineEntityManager.class, engineEntityManager);
     }
@@ -128,9 +128,8 @@ public class HeadlessEnvironment extends Environment {
 
     @Override
     protected void setupEmptyAssetManager() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        AssetManager assetManager = new AssetManager(moduleManager);
-        
+        AssetManager assetManager = new AssetManager(CoreRegistry.get(ModuleManager.class).getEnvironment());
+
         // mock an empy asset factory for all asset types
         for (AssetType type : AssetType.values()) {
             assetManager.setAssetFactory(type, mock(AssetFactory.class));
@@ -138,23 +137,14 @@ public class HeadlessEnvironment extends Environment {
 
         CoreRegistry.put(AssetManager.class, assetManager);
     }
-    
+
     @Override
     protected void setupAssetManager() {
         setupEmptyAssetManager();
-        
+
         AssetManager assetManager = CoreRegistry.get(AssetManager.class);
         AudioManager audioManager = CoreRegistry.get(AudioManager.class);
         AssetType.registerAssetTypes(assetManager);
-
-        CodeSource tsCodeSource = TerasologyEngine.class.getProtectionDomain().getCodeSource();
-        assetManager.addAssetSource(new ClasspathSource(TerasologyConstants.ENGINE_MODULE, tsCodeSource,
-                TerasologyConstants.ASSETS_SUBDIRECTORY, TerasologyConstants.OVERRIDES_SUBDIRECTORY));
-        
-        CodeSource thisCodeSource = HeadlessEnvironment.class.getProtectionDomain().getCodeSource();
-        assetManager.addAssetSource(new ClasspathSource("unittest", thisCodeSource, TerasologyConstants.ASSETS_SUBDIRECTORY,
-                TerasologyConstants.OVERRIDES_SUBDIRECTORY));
-
 
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
 
@@ -180,7 +170,7 @@ public class HeadlessEnvironment extends Environment {
 
         assetManager.setAssetFactory(AssetType.SOUND, audioManager.getStaticSoundFactory());
         assetManager.setAssetFactory(AssetType.MUSIC, audioManager.getStreamingSoundFactory());
-    }        
+    }
 
     @Override
     protected void setupAudio() {
@@ -195,8 +185,8 @@ public class HeadlessEnvironment extends Environment {
     }
 
     @Override
-    protected void setupModuleManager() {
-        ModuleManagerImpl moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+    protected void setupModuleManager() throws Exception {
+        ModuleManager moduleManager = ModuleManagerFactory.create();
         CoreRegistry.put(ModuleManager.class, moduleManager);
     }
 
@@ -210,17 +200,17 @@ public class HeadlessEnvironment extends Environment {
         PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
         PathManager.getInstance().setCurrentSaveTitle("world1");
     }
-    
+
     @Override
     protected void setupComponentManager() {
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
         componentSystemManager.initialise();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
     }
-    
+
     @Override
     protected void loadPrefabs() {
-        
+
         LoadPrefabs prefabLoadStep = new LoadPrefabs();
 
         boolean complete = false;
@@ -229,38 +219,20 @@ public class HeadlessEnvironment extends Environment {
             complete = prefabLoadStep.step();
         }
     }
-    
-    /**
-     * Activate all modules.
-     * Note: this requires that the {@link ModuleSecurityManager} gives permission to do that
-     */
-    public void activateAllModules() {
-        ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-        AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-        
-        // activate all modules
-        for (Module m : moduleManager.getModules()) {
-            moduleManager.enableModule(m);
-        }
-
-        moduleManager.applyActiveModules();
-        assetManager.refresh();
-        assetManager.applyOverrides();        
-    }
 
     @Override
     public void close() throws Exception {
         // it would be nice, if elements in the CoreRegistry implemented (Auto)Closeable
-        
+
         // The StorageManager creates a thread pool (through TaskMaster)
         // which isn't closed automatically
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
             storageManager.shutdown();
         }
-        
+
         CoreRegistry.clear();
-        
+
         super.close();
     }
 

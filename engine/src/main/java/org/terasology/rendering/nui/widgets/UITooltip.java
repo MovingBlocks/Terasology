@@ -15,37 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.rendering.nui.Canvas;
-import org.terasology.rendering.nui.databinding.Binding;
-
 /**
  * @author Immortius
  */
 public class UITooltip extends CursorAttachment {
 
-    private UILabel label;
-
-    public UITooltip() {
-        label = new UILabel();
-        setAttachment(label);
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (!getText().isEmpty()) {
-            super.onDraw(canvas);
-        }
-    }
-
-    public void bindBinding(Binding<String> binding) {
-        label.bindText(binding);
-    }
-
-    public String getText() {
-        return label.getText();
-    }
-
-    public void setText(String val) {
-        label.setText(val);
-    }
 }

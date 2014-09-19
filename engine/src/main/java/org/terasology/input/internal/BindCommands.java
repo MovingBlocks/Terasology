@@ -44,7 +44,7 @@ public class BindCommands extends BaseComponentSystem {
             builder.append(bind);
             return builder.toString();
         }
-        return "Unknown key: " + key;
+        throw new IllegalArgumentException("Unknown key: " + key);
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY")

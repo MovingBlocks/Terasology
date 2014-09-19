@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,14 +15,15 @@
  */
 package org.terasology.rendering.nui;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
-import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
+import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
 
@@ -216,7 +217,6 @@ public interface Canvas {
      * SubRegions are an AutoClosable, so ideally are used as a resource in a try-block, to ensure they are closed
      * when no longer needed.
      * <pre>
-     * {@code
      * try (SubRegion ignored = canvas.subRegion(region, true) {
      *    //.. draw within SubRegion.
      * }
@@ -228,6 +228,26 @@ public interface Canvas {
      * @return A SubRegion, to be closed when no long needed
      */
     SubRegion subRegion(Rect2i region, boolean crop);
+
+    /**
+     * Allocates a sub region for drawing to a target texture, until that SubRegion is closed.
+     * <p/>
+     * For each (texture) uri a FrameBufferObject and a target texture is created.
+     * Notice, the resulting texture is flipped. To draw it in the right order use:
+     * <pre>
+     * try (SubRegion ignored = canvas.subRegionFBO(uri, size) {
+     *    //.. draw within SubRegion.
+     * }
+     * Texture texture = Assets.get(uri, Texture.class);
+     * canvas.drawTextureRaw(texture, screenRegion, ScaleMode.SCALE_FIT, 0, 1f, 1f, -1f);
+     * </pre>
+     * <p/>
+     *
+     * @param uri    The URI to access the texture
+     * @param size   the size of the texture.
+     * @return A SubRegion, to be closed when no long needed
+     */
+    SubRegion subRegionFBO(AssetUri uri, Vector2i size);
 
     /**
      * When drawOnTop is set to true, subsequent drawing will be on top of everything else.
@@ -446,6 +466,24 @@ public interface Canvas {
      * @param region
      */
     void addInteractionRegion(InteractionListener listener, Rect2i region);
+
+    /**
+     * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the
+     * full area of the widget.
+     *
+     * @param listener
+     * @param tooltip
+     */
+    void addInteractionRegion(InteractionListener listener, UIWidget tooltip);
+
+    /**
+     * Adds an interaction region filling the desired region.
+     *
+     * @param listener
+     * @param tooltip
+     * @param region
+     */
+    void addInteractionRegion(InteractionListener listener, UIWidget tooltip, Rect2i region);
 
     /**
      * Adds an interaction region filling the region used to draw the current widget. The widget's margin is used to expand the interaction region to fill the

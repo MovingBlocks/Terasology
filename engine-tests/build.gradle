@@ -2,6 +2,7 @@
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
 apply from: "$rootDir/config/gradle/common.gradle"
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Java Section                                                                                                      //
@@ -16,6 +17,13 @@ sourceSets {
         }
     }
 }
+
+// Base the engine tests on the same version number as the engine
+version = project(':engine').version
+println "ENGINE TESTS VERSION: $version"
+
+// Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
+group = 'org.terasology.engine'
 
 // Primary dependencies definition
 dependencies {
@@ -32,18 +40,29 @@ dependencies {
     testRuntime group: 'org.codehaus.groovy', name: 'groovy', version: '2.1.7'
 }
 
-// Instructions for packaging a jar file for the engine
+// Instructions for packaging a jar file for the engine tests
 jar {
     duplicatesStrategy = 'exclude'
 
-    // Just copying test stuff, which isn't included by default
+    // Copy in test stuff, which isn't included by default
     from sourceSets.test.output
 }
 
-task distEngineTests (type: Sync) {
-    description = "Prepares the engine's tests for distribution (so later unit tests can extend utility classes)"
-    into ("$rootDir/engine/build/distributions/engine-tests")
-    from jar
+// A configuration for publishing artifacts
+configurations {
+    published
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+    published javadocJar
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar, javadocJar
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

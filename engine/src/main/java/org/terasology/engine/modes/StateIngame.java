@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.GameThread;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -33,6 +34,8 @@ import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -44,6 +47,8 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
+
+import java.util.Collections;
 
 /**
  * Play mode.
@@ -128,7 +133,8 @@ public class StateIngame implements GameState {
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
-        CoreRegistry.get(AssetManager.class).refresh();
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
+        CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
@@ -140,9 +146,9 @@ public class StateIngame implements GameState {
     public void update(float delta) {
         eventSystem.process();
 
-        for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
-            PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
-            updater.update(delta);
+        for (UpdateSubscriberSystem system : componentSystemManager.iterateUpdateSubscribers()) {
+            PerformanceMonitor.startActivity(system.getClass().getSimpleName());
+            system.update(delta);
             PerformanceMonitor.endActivity();
         }
 

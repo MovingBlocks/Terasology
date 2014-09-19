@@ -37,6 +37,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.RenderHelper;
@@ -156,6 +157,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /* EVENTS */
     private final WorldTimeEventManager worldTimeEventManager;
 
+    /* PHYSICS */
+    // TODO: Remove physics handling from world renderer
+    private final BulletPhysics bulletPhysics;
+
     /* STATISTICS */
     private int statDirtyChunks;
     private int statVisibleChunks;
@@ -181,6 +186,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
+        bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
         skysphere = new Skysphere(this);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
@@ -680,7 +686,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         PerformanceMonitor.startActivity("Render Light Geometry");
 
         DefaultRenderingProcess.getInstance().beginRenderLightGeometryStencilPass();
-        Material program = Assets.getMaterial("engine:simple");
+        Material program = Assets.getMaterial("engine:prog.simple");
         program.enable();
         program.setCamera(camera);
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
@@ -697,7 +703,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
          * LIGHT GEOMETRY PASS
          */
         DefaultRenderingProcess.getInstance().beginRenderLightGeometry();
-        program = Assets.getMaterial("engine:lightGeometryPass");
+        program = Assets.getMaterial("engine:prog.lightGeometryPass");
         for (EntityRef entity : entityManager.getEntitiesWith(LightComponent.class, LocationComponent.class)) {
             LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
             LightComponent lightComponent = entity.getComponent(LightComponent.class);
@@ -819,7 +825,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         camera.lookThroughNormalized();
         skysphere.render(camera);
 
-        Material chunkShader = Assets.getMaterial("engine:chunk");
+        Material chunkShader = Assets.getMaterial("engine:prog.chunk");
         chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
 
         if (config.getRendering().isReflectiveWater()) {
@@ -867,7 +873,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                             chunk.getPosition().z * ChunkConstants.SIZE_Z - cameraPosition.z);
 
             if (mode == ChunkRenderMode.DEFAULT || mode == ChunkRenderMode.REFLECTION) {
-                shader = Assets.getMaterial("engine:chunk");
+                shader = Assets.getMaterial("engine:prog.chunk");
                 shader.enable();
 
                 if (phase == ChunkMesh.RenderPhase.REFRACTIVE) {
@@ -887,7 +893,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 }
 
             } else if (mode == ChunkRenderMode.SHADOW_MAP) {
-                shader = Assets.getMaterial("engine:shadowMap");
+                shader = Assets.getMaterial("engine:prog.shadowMap");
                 shader.enable();
             } else if (mode == ChunkRenderMode.Z_PRE_PASS) {
                 CoreRegistry.get(ShaderManager.class).disableShader();
@@ -975,11 +981,16 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         updateTick(delta);
         PerformanceMonitor.endActivity();
 
-        worldProvider.processPropagation();
+        PerformanceMonitor.startActivity("Complete chunk update");
+        chunkProvider.completeUpdate();
+        PerformanceMonitor.endActivity();
 
-        // Free unused space
-        PerformanceMonitor.startActivity("Update Chunk Cache");
-        chunkProvider.update();
+        PerformanceMonitor.startActivity("Update Lighting");
+        worldProvider.processPropagation();
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Begin chunk update");
+        chunkProvider.beginUpdate();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");
@@ -1004,7 +1015,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         worldTimeEventManager.fireWorldTimeEvents();
         PerformanceMonitor.endActivity();
 
-        smoothedPlayerSunlightValue = TeraMath.lerpf(smoothedPlayerSunlightValue, getSunlightValue(), delta);
+        smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
 
     public void positionLightCamera() {
@@ -1113,7 +1124,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         Vector3i newChunkPos = calcCamChunkOffset();
         Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
 
-        chunkProvider.update();
+        chunkProvider.completeUpdate();
+        chunkProvider.beginUpdate();
         for (Vector3i pos : Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2))) {
             RenderableChunk chunk = chunkProvider.getChunk(pos);
             if (chunk == null) {
@@ -1187,10 +1199,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
 
         return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, fog: %.1f, seed: \"%s\", title: \"%s\")",
+                        + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
 
                 ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
-                getPlayerBiome(),
                 worldProvider.getTime().getDays(),
                 DefaultRenderingProcess.getInstance().getExposure(),
                 statDirtyChunks,
@@ -1200,9 +1211,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
                 renderedTrianglesUnit,
                 statChunkMeshEmpty,
                 statChunkNotReady,
-                worldProvider.getFog(activeCamera.getPosition()),
                 worldProvider.getSeed(),
-                worldProvider.getTitle());
+                worldProvider.getTitle()
+        );
     }
 
     public LocalPlayer getPlayer() {
@@ -1247,12 +1258,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return skysphere.getDaylight();
     }
 
-    //TODO: make this data into key value pairs
-    public String getPlayerBiome() {
-        Vector3f pos = getPlayerPosition();
-        return "Temperature: " + worldProvider.getTemperature(pos) + " Humidity: " + worldProvider.getHumidity(pos);
-    }
-
     public WorldProvider getWorldProvider() {
         return worldProvider;
     }
@@ -1267,6 +1272,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     public float getTick() {
         return tick;
+    }
+
+
+    public BulletPhysics getBulletRenderer() {
+        return bulletPhysics;
     }
 
     public Camera getActiveCamera() {

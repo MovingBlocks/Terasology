@@ -29,6 +29,8 @@ import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.logic.players.event.RespawnRequestEvent;
+import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -39,9 +41,14 @@ import org.terasology.persistence.PlayerStore;
 import org.terasology.registry.In;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.World;
+import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.generator.WorldGenerator;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -59,17 +66,18 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
     @In
     private WorldRenderer worldRenderer;
+    @In
+    private WorldGenerator worldGenerator;
+    @In
+    private WorldProvider worldProvider;
 
     @In
     private NetworkSystem networkSystem;
-
-    private ChunkProvider chunkProvider;
 
     private List<SpawningClientInfo> clientsPreparingToSpawn = Lists.newArrayList();
 
     @Override
     public void initialise() {
-        chunkProvider = worldRenderer.getChunkProvider();
     }
 
     @Override
@@ -77,12 +85,12 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         Iterator<SpawningClientInfo> i = clientsPreparingToSpawn.iterator();
         while (i.hasNext()) {
             SpawningClientInfo spawning = i.next();
-            if (worldRenderer.getWorldProvider().isBlockRelevant(spawning.position)) {
+            if (worldProvider.isBlockRelevant(spawning.position)) {
                 if (spawning.playerStore == null) {
-                    spawnPlayer(spawning.clientEntity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+                    spawnPlayer(spawning.clientEntity, getSafeSpawnPosition());
                 } else if (!spawning.playerStore.hasCharacter()) {
                     spawning.playerStore.restoreEntities();
-                    spawnPlayer(spawning.clientEntity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+                    spawnPlayer(spawning.clientEntity, getSafeSpawnPosition());
                 } else {
                     restoreCharacter(spawning.clientEntity, spawning.playerStore);
                 }
@@ -91,10 +99,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    private void spawnPlayer(EntityRef clientEntity, Vector3i spawnPos) {
-        while (worldRenderer.getWorldProvider().getBlock(spawnPos) == BlockManager.getAir() && spawnPos.y > 0) {
-            spawnPos.y--;
-        }
+    private void spawnPlayer(EntityRef clientEntity, Vector3i initialSpawnPosition) {
+
+        Vector3i spawnPos = getSafeSpawnPosition(initialSpawnPosition);
 
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {
@@ -104,11 +111,58 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 
             Client clientListener = networkSystem.getOwner(clientEntity);
             Vector3i distance = clientListener.getViewDistance().getChunkDistance();
-            worldRenderer.getChunkProvider().updateRelevanceEntity(clientEntity, distance);
+            updateRelevanceEntity(clientEntity, distance);
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
             playerCharacter.send(new OnPlayerSpawnedEvent());
         }
+    }
+
+    private Vector3i getSafeSpawnPosition() {
+        return getSafeSpawnPosition(new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
+    }
+
+    private Vector3i getSafeSpawnPosition(Vector3i spawnPos) {
+
+        World world = worldGenerator.getWorld();
+        if (world != null) {
+            // try and find somewhere in this chunk a spot to land
+            Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
+            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
+            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+            int seaLevel = seaLevelFacet.getSeaLevel();
+
+            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
+                if (height > seaLevel) {
+                    pos.y = height;
+                    if (findOpenVerticalPosition(pos)) {
+                        return pos;
+                    }
+                }
+            }
+        }
+        return spawnPos;
+    }
+
+    private boolean findOpenVerticalPosition(Vector3i spawnPos) {
+        // find a spot above the surface that is big enough for this character
+        int consecutiveAirBlocks = 0;
+        for (int i = 1; i < 20; i++) {
+            spawnPos.add(0, 1, 0);
+            if (worldProvider.getBlock(spawnPos) == BlockManager.getAir()) {
+                consecutiveAirBlocks++;
+            } else {
+                consecutiveAirBlocks = 0;
+            }
+
+            if (consecutiveAirBlocks >= 2) {
+                spawnPos.add(0, 1 - consecutiveAirBlocks, 0);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -116,9 +170,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         loc.setWorldPosition(connected.getPlayerStore().getRelevanceLocation());
         entity.saveComponent(loc);
-        worldRenderer.getChunkProvider().addRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance(), networkSystem.getOwner(entity));
+        addRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance(), networkSystem.getOwner(entity));
         if (connected.getPlayerStore().hasCharacter()) {
-            if (worldRenderer.getWorldProvider().isBlockRelevant(connected.getPlayerStore().getRelevanceLocation())) {
+            if (worldProvider.isBlockRelevant(connected.getPlayerStore().getRelevanceLocation())) {
                 restoreCharacter(entity, connected.getPlayerStore());
             } else {
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity, connected.getPlayerStore().getRelevanceLocation(), connected.getPlayerStore());
@@ -126,11 +180,11 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             }
         } else {
             Vector3i pos = Vector3i.zero();
-            if (chunkProvider.getChunk(pos) != null) {
-                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+            if (worldProvider.isBlockRelevant(pos)) {
+                spawnPlayer(entity, getSafeSpawnPosition());
             } else {
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity,
-                        new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
+                        getSafeSpawnPosition().toVector3f());
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }
@@ -141,10 +195,10 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         EntityRef character = playerStore.getCharacter();
         // TODO: adjust location to safe spot
         if (character == null) {
-            spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+            spawnPlayer(entity, getSafeSpawnPosition());
         } else {
             Client clientListener = networkSystem.getOwner(entity);
-            worldRenderer.getChunkProvider().updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
+            updateRelevanceEntity(entity, clientListener.getViewDistance().getChunkDistance());
             ClientComponent client = entity.getComponent(ClientComponent.class);
             client.character = character;
             entity.saveComponent(client);
@@ -157,9 +211,29 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
                 Location.attachChild(character, entity, new Vector3f(), new Quat4f(0, 0, 0, 1));
             } else {
                 character.destroy();
-                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+                spawnPlayer(entity, getSafeSpawnPosition());
             }
         }
+    }
+
+    private void updateRelevanceEntity(EntityRef entity, Vector3i chunkDistance) {
+        //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
+        //relevanceRegion.distance = chunkDistance;
+        //entity.saveComponent(relevanceRegion);
+        worldRenderer.getChunkProvider().updateRelevanceEntity(entity, chunkDistance);
+    }
+
+    private void removeRelevanceEntity(EntityRef entity) {
+        //entity.removeComponent(RelevanceRegionComponent.class);
+        worldRenderer.getChunkProvider().removeRelevanceEntity(entity);
+    }
+
+
+    private void addRelevanceEntity(EntityRef entity, Vector3i chunkDistance, Client owner) {
+        //RelevanceRegionComponent relevanceRegion = new RelevanceRegionComponent();
+        //relevanceRegion.distance = chunkDistance;
+        //entity.addComponent(relevanceRegion);
+        worldRenderer.getChunkProvider().addRelevanceEntity(entity, chunkDistance, owner);
     }
 
     @ReceiveEvent(components = ClientComponent.class)
@@ -168,6 +242,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         if (character.exists()) {
             event.getPlayerStore().setCharacter(character);
         }
+        removeRelevanceEntity(entity);
     }
 
     @ReceiveEvent(components = {ClientComponent.class})
@@ -175,15 +250,15 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (!client.character.exists()) {
             Vector3i pos = Vector3i.zero();
-            if (chunkProvider.getChunk(pos) != null) {
-                spawnPlayer(entity, new Vector3i(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+            if (worldProvider.isBlockRelevant(pos)) {
+                spawnPlayer(entity, getSafeSpawnPosition());
             } else {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
-                loc.setWorldPosition(new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z / 2));
+                loc.setWorldPosition(getSafeSpawnPosition().toVector3f());
                 entity.saveComponent(loc);
-                worldRenderer.getChunkProvider().updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
+                updateRelevanceEntity(entity, ViewDistance.LEGALLY_BLIND.getChunkDistance());
 
-                SpawningClientInfo info = new SpawningClientInfo(entity, new Vector3f(ChunkConstants.SIZE_X / 2, ChunkConstants.SIZE_Y / 2, ChunkConstants.SIZE_Z / 2));
+                SpawningClientInfo info = new SpawningClientInfo(entity, getSafeSpawnPosition().toVector3f());
                 clientsPreparingToSpawn.add(info);
             }
         }

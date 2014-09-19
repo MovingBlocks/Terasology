@@ -40,6 +40,8 @@ import javax.vecmath.Vector2f;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Collections;
 
 /**
  * @author synopia
@@ -234,7 +236,7 @@ public class BehaviorEditor extends ZoomableLayout {
 
         try {
             loader.save(os, data);
-            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null);
+            BehaviorTreeData copy = loader.load(null, new ByteArrayInputStream(os.toByteArray()), null, Collections.<URL>emptyList());
             Port.OutputPort parent = node.getInputPort().getTargetPort();
             copy.createRenderable();
             RenderableNode copyRenderable = copy.getRenderableNode(copy.getRoot());

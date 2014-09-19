@@ -32,6 +32,8 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
@@ -44,6 +46,9 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -230,7 +235,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     private void render(Iterable<EntityRef> particleEntities) {
-        Assets.getMaterial("engine:particle").enable();
+        Assets.getMaterial("engine:prog.particle").enable();
         glDisable(GL11.GL_CULL_FACE);
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -282,8 +287,17 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     private void renderBlockParticles(Vector3f worldPos, Vector3f cameraPosition, BlockParticleEffectComponent particleEffect) {
-        float temperature = worldProvider.getTemperature(worldPos);
-        float humidity = worldProvider.getHumidity(worldPos);
+        float temperature = 0.5f;
+        float humidity = 0.5f;
+
+        Vector3i worldPos3i = new Vector3i(worldPos, 0.5f);
+        Region region = worldProvider.getWorldData(Region3i.createFromCenterExtents(worldPos3i, 1));
+        if (region != null) {
+            SurfaceTemperatureFacet surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
+            temperature = surfaceTemperatureFacet.getWorld(worldPos3i.x, worldPos3i.z);
+            SurfaceHumidityFacet surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
+            humidity = surfaceHumidityFacet.getWorld(worldPos3i.x, worldPos3i.z);
+        }
 
         glPushMatrix();
         glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -342,7 +356,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         mat.setFloat4("colorOffset", particle.color.x, particle.color.y, particle.color.z, particle.color.w, true);
         mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
@@ -353,7 +367,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     protected void renderParticle(Particle particle, Block block, float temperature, float humidity, float light) {
-        Material mat = Assets.getMaterial("engine:particle");
+        Material mat = Assets.getMaterial("engine:prog.particle");
 
         Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);

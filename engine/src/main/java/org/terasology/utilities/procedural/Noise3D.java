@@ -30,6 +30,6 @@ public interface Noise3D {
      * @param z Position on the z-axis
      * @return The noise value
      */
-    double noise(double x, double y, double z);
+    float noise(float x, float y, float z);
 
 }

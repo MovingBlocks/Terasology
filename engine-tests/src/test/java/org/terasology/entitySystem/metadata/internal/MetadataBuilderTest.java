@@ -17,12 +17,12 @@ package org.terasology.entitySystem.metadata.internal;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.engine.SimpleUri;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
 import org.terasology.reflection.metadata.FieldMetadata;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.engine.SimpleUri;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

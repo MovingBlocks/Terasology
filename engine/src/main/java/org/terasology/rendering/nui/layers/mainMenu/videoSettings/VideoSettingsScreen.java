@@ -44,20 +44,22 @@ public class VideoSettingsScreen extends CoreScreenLayer {
     @In
     private GameEngine engine;
 
+
     @In
     private Config config;
 
     public VideoSettingsScreen() {
-
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void initialise() {
-        UIDropdown<VideoQuality> videoQuality = find("quality", UIDropdown.class);
+
+
+        UIDropdown<Preset> videoQuality = find("graphicsPreset", UIDropdown.class);
         if (videoQuality != null) {
-            videoQuality.setOptions(Lists.newArrayList(VideoQuality.NICE, VideoQuality.EPIC, VideoQuality.INSANE, VideoQuality.UBER));
-            videoQuality.bindSelection(new VideoQualityBinding(config.getRendering()));
+            videoQuality.setOptions(Lists.newArrayList(Preset.CUSTOM, Preset.MINIMAL, Preset.NICE, Preset.EPIC, Preset.INSANE, Preset.UBER));
+            videoQuality.bindSelection(new PresetBinding(config.getRendering()));
         }
 
         UIDropdown<EnvironmentalEffects> environmentalEffects = find("environmentEffects", UIDropdown.class);
@@ -106,7 +108,7 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             dynamicShadows.bindSelection(new DynamicShadowsBinding(config.getRendering()));
         }
 
-        UISlider fovSlider = find("fov", UISlider.class);
+        final UISlider fovSlider = find("fov", UISlider.class);
         if (fovSlider != null) {
             fovSlider.setIncrement(5.0f);
             fovSlider.setPrecision(0);
@@ -120,17 +122,31 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             cameraSetting.setOptions(Arrays.asList(CameraSetting.values()));
             cameraSetting.bindSelection(new CameraSettingBinding(config.getRendering()));
         }
-
-        WidgetUtil.tryBindCheckbox(this, "fullscreen", BindHelper.bindBeanProperty("fullscreen", engine, Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "oculusVrSupport", BindHelper.bindBeanProperty("oculusVrSupport", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "cloudShadow", BindHelper.bindBeanProperty("cloudShadows", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "parallax", BindHelper.bindBeanProperty("parallaxMapping", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "filmGrain", BindHelper.bindBeanProperty("filmGrain", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "motionBlur", BindHelper.bindBeanProperty("motionBlur", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "bobbing", BindHelper.bindBeanProperty("cameraBobbing", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "outline", BindHelper.bindBeanProperty("outline", config.getRendering(), Boolean.TYPE));
         WidgetUtil.tryBindCheckbox(this, "vsync", BindHelper.bindBeanProperty("vSync", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.tryBindCheckbox(this, "eyeAdaptation", BindHelper.bindBeanProperty("eyeAdaptation", config.getRendering(), Boolean.TYPE));
+        WidgetUtil.trySubscribe(this, "fovReset", new ActivateEventListener() {
+
+            @Override
+            public void onActivated(UIWidget widget) {
+                CameraSettingBinding cam;
+                fovSlider.setValue(100.0f);
+
+            }
+        });
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
                 getManager().popScreen();
             }
         });
+
     }
 
     @Override

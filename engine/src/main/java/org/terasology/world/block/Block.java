@@ -631,7 +631,7 @@ public final class Block {
             return;
         }
 
-        Material mat = Assets.getMaterial("engine:block");
+        Material mat = Assets.getMaterial("engine:prog.block");
         mat.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
         mat.enable();

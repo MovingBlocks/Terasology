@@ -1,0 +1,15 @@
+{
+    "inherit": "default",
+    "elements": {
+        "UIList": {
+            "parts": {
+                "item": {
+                    "text-align-horizontal": "left",
+                    "text-color": "ffffffff",
+                    "text-shadowed": "false",
+                    "background": ""
+                }
+            }
+        }
+    }
+}

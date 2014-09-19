@@ -91,7 +91,7 @@ public class SelectGameScreen extends CoreScreenLayer {
                         gameList.setSelection(null);
                     } catch (Exception e) {
                         logger.error("Failed to delete saved game", e);
-                        getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Deleting Game", e.getMessage());
+                        getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Deleting Game", e.getMessage());
                     }
                 }
             }
@@ -116,10 +116,10 @@ public class SelectGameScreen extends CoreScreenLayer {
 
             config.getWorldGeneration().setDefaultSeed(manifest.getSeed());
             config.getWorldGeneration().setWorldTitle(manifest.getTitle());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(manifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             logger.error("Failed to load saved game", e);
-            getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Error Loading Game", e.getMessage());
+            getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Error Loading Game", e.getMessage());
         }
     }
 

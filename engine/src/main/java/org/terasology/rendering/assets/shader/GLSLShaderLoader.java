@@ -25,7 +25,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +48,7 @@ public class GLSLShaderLoader implements AssetLoader<ShaderData> {
     }
 
     @Override
-    public ShaderData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public ShaderData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();

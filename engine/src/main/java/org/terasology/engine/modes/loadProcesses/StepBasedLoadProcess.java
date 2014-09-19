@@ -23,14 +23,14 @@ import org.terasology.engine.modes.LoadProcess;
 public abstract class StepBasedLoadProcess implements LoadProcess {
 
     private int stepsComplete;
-    private int totalSteps;
+    private int totalSteps = 1;
 
     protected void stepDone() {
         stepsComplete++;
     }
 
     protected void setTotalSteps(int amount) {
-        this.totalSteps = Math.min(1, amount);
+        this.totalSteps = Math.max(1, amount);
     }
 
     @Override

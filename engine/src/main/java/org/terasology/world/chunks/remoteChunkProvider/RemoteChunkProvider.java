@@ -26,8 +26,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
@@ -67,14 +67,15 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private ChunkGenerationPipeline pipeline;
 
-    private RemoteWorldGenerator remoteWorldGenerator;
-    private LightMerger lightMerger = new LightMerger(this);
+    private WorldGenerator remoteWorld;
+
+    private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
 
-        remoteWorldGenerator = new RemoteWorldGenerator();
+        remoteWorld = new RemoteWorldGenerator();
     }
 
     public void subscribe(ChunkReadyListener chunkReadyListener) {
@@ -106,7 +107,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void update() {
+    public void beginUpdate() {
         if (listener != null) {
             List<Chunk> newReadyChunks = Lists.newArrayList();
             readyChunks.drainTo(newReadyChunks);
@@ -135,16 +136,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         }
     }
 
-    private boolean makeChunkAvailable(Chunk chunk) {
+    private boolean makeChunkAvailable(final Chunk chunk) {
         for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
             if (chunkCache.get(pos) == null) {
                 return false;
             }
         }
-        chunk.markReady();
-        lightMerger.merge(chunk);
-        listener.onChunkReady(chunk.getPosition());
-        worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+
+        lightMerger.beginMerge(chunk, chunk);
         return true;
     }
 
@@ -238,6 +237,16 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
+    public void completeUpdate() {
+        Chunk chunk = lightMerger.completeMerge();
+        if (chunk != null) {
+            chunk.markReady();
+            listener.onChunkReady(chunk.getPosition());
+            worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
+        }
+    }
+
+    @Override
     public void onChunkIsReady(Chunk chunk) {
         try {
             readyChunks.put(chunk);
@@ -249,7 +258,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public WorldGenerator getWorldGenerator() {
         //TODO: send this information over the wire
-        return remoteWorldGenerator;
+        return remoteWorld;
     }
 
     @Override

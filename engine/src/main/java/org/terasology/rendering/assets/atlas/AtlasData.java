@@ -16,6 +16,7 @@
 package org.terasology.rendering.assets.atlas;
 
 import org.terasology.asset.AssetData;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import java.util.Map;
@@ -25,13 +26,13 @@ import java.util.Map;
  */
 public class AtlasData implements AssetData {
 
-    private Map<String, SubtextureData> subtextures;
+    private Map<Name, SubtextureData> subtextures;
 
-    public AtlasData(Map<String, SubtextureData> subtextureMap) {
+    public AtlasData(Map<Name, SubtextureData> subtextureMap) {
         this.subtextures = subtextureMap;
     }
 
-    public Map<String, SubtextureData> getSubtextures() {
+    public Map<Name, SubtextureData> getSubtextures() {
         return subtextures;
     }
 }

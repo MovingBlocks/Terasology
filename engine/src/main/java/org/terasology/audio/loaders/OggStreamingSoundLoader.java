@@ -18,7 +18,7 @@ package org.terasology.audio.loaders;
 
 import org.terasology.asset.AssetLoader;
 import org.terasology.audio.StreamingSoundData;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class OggStreamingSoundLoader implements AssetLoader<StreamingSoundData> {
     @Override
-    public StreamingSoundData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public StreamingSoundData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         return new OggStreamingSoundData(urls.get(0));
     }
 }

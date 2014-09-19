@@ -16,6 +16,10 @@
 
 package org.terasology.utilities.procedural;
 
+import org.terasology.math.Rect2i;
+
+import javax.vecmath.Vector2f;
+
 /**
  * Computes Brownian noise based on some noise generator.
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
@@ -49,11 +53,11 @@ public class BrownianNoise2D extends BrownianNoise implements Noise2D {
      * @return The noise value in the range [-getScale()..getScale()]
      */
     @Override
-    public double noise(double x, double y) {
-        double result = 0.0;
+    public float noise(float x, float y) {
+        float result = 0.0f;
 
-        double workingX = x;
-        double workingY = y;
+        float workingX = x;
+        float workingY = y;
         for (int i = 0; i < getOctaves(); i++) {
             result += other.noise(workingX, workingY) * getSpectralWeight(i);
 
@@ -63,5 +67,5 @@ public class BrownianNoise2D extends BrownianNoise implements Noise2D {
 
         return result;
     }
-    
+
 }

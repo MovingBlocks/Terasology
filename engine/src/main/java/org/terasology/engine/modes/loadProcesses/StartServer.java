@@ -16,17 +16,27 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.terasology.engine.TerasologyConstants;
+import org.terasology.config.Config;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.exceptions.HostingFailedException;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.layers.mainMenu.ErrorMessagePopup;
+import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 
 /**
  * @author Immortius
  */
 public class StartServer extends SingleStepLoadProcess {
+
+    private boolean dedicated;
+
+    /**
+     * @param dedicated true, if server should be dedicated (i.e. with local client)
+     */
+    public StartServer(boolean dedicated) {
+        this.dedicated = dedicated;
+    }
+
     @Override
     public String getMessage() {
         return "Starting Server";
@@ -35,9 +45,11 @@ public class StartServer extends SingleStepLoadProcess {
     @Override
     public boolean step() {
         try {
-            CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
+            Config config = CoreRegistry.get(Config.class);
+            int port = config.getNetwork().getServerPort();
+            CoreRegistry.get(NetworkSystem.class).host(port, dedicated);
         } catch (HostingFailedException e) {
-            CoreRegistry.get(NUIManager.class).pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class).setError("Failed to Host",
+            CoreRegistry.get(NUIManager.class).pushScreen(MessagePopup.ASSET_URI, MessagePopup.class).setMessage("Failed to Host",
                     e.getMessage() + " - Reverting to single player");
         }
         return true;

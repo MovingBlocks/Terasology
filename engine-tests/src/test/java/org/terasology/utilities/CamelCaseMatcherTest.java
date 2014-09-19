@@ -16,65 +16,65 @@
 
 package org.terasology.utilities;
 
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.ImmutableList;
+import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests {@link CamelCaseMatcher}
+ *
  * @author Martin Steiger
  */
 public class CamelCaseMatcherTest {
-    
+
     @Test
     public void testDefault() {
         List<String> commands = ImmutableList.of("MyPossibleResultString");
-        List<String> queries = ImmutableList.of("MyPossibleResultString", "MPRS", 
-                "MPRString", "MyPosResStr" , "M", "MyP*RString", "*PosResString", "My*String");
-        
+        List<String> queries = ImmutableList.of("MyPossibleResultString", "MPRS",
+                "MPRString", "MyPosResStr", "M", "MyP*RString", "*PosResString", "My*String");
+
         for (String query : queries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-            assertTrue("The query did not match the command",  matches.size() == 1);
+            assertTrue("The query did not match the command", matches.size() == 1);
         }
     }
-    
+
     @Test
     public void testTeraCommands() {
-        List<String> commands = ImmutableList.of("azerty", "bindKey", "clearChunkCache", "countAI", 
-                "damage", "debugTarget", "destroyAI", "destroyEntitiesUsingPrefab", "dumpEntities", 
-                "exit", "fullscreen", "generateNameList", "generateNameList", "ghost", "giveBlock", 
-                "giveBlock", "giveItem", "health", "help", "hjump", "hspeed", "initNameGenerator", 
-                "kill", "listBlocks", "listBlocksByCategory", "listFreeShapeBlocks", "listItems", 
-                "listShapes", "mute", "neo", "nextName", "placeBlock", "playTestSound", "purgeWorld", 
-                "restoreSpeed", "say", "setGroundFriction", "setJumpSpeed", "setMaxGhostSpeed", 
-                "setMaxGroundSpeed", "setMaxHealth", "setRegenRaterate", "showHealth", "showMovement", 
+        List<String> commands = ImmutableList.of("azerty", "bindKey", "clearChunkCache", "countAI",
+                "damage", "debugTarget", "destroyAI", "destroyEntitiesUsingPrefab", "dumpEntities",
+                "exit", "fullscreen", "generateNameList", "generateNameList", "ghost", "giveBlock",
+                "giveBlock", "giveItem", "health", "help", "hjump", "hspeed", "initNameGenerator",
+                "kill", "listBlocks", "listBlocksByCategory", "listFreeShapeBlocks", "listItems",
+                "listShapes", "mute", "neo", "nextName", "placeBlock", "playTestSound", "purgeWorld",
+                "restoreSpeed", "say", "setGroundFriction", "setJumpSpeed", "setMaxGhostSpeed",
+                "setMaxGroundSpeed", "setMaxHealth", "setRegenRaterate", "showHealth", "showMovement",
                 "sleigh", "spawnBlock", "spawnPrefab", "stepHeight", "teleport");
 
         List<String> noHitQueries = ImmutableList.of("asdfd", "AvDS", "MPRString");
 
         for (String query : noHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-            assertTrue("The query '" + query + "' should not match any command",  matches.size() == 0);
+            assertTrue("The query '" + query + "' should not match any command", matches.size() == 0);
         }
 
         List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
-        
+
         for (String query : oneHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
             assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
         }
 
         List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
-        
+
         for (String query : multiHitQueries) {
             Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
-            assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(),  matches.size() > 1);
+            assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(), matches.size() > 1);
         }
     }
-    
+
 }

@@ -22,9 +22,11 @@ import org.terasology.config.Config;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateLoading;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.GameManifest;
+import org.terasology.module.DependencyResolver;
+import org.terasology.module.Module;
+import org.terasology.module.ResolutionResult;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -154,27 +156,33 @@ public class CreateGameScreen extends CoreScreenLayer {
             @Override
             public void onActivated(UIWidget button) {
                 if (worldGenerator.getSelection() == null) {
-                    ErrorMessagePopup errorMessagePopup = getManager().pushScreen("engine:errorMessagePopup", ErrorMessagePopup.class);
+                    MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     if (errorMessagePopup != null) {
-                        errorMessagePopup.setError("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
+                        errorMessagePopup.setMessage("No World Generator Selected", "Select a world generator (you may need to activate a mod with a generator first).");
                     }
                 } else {
                     GameManifest gameManifest = new GameManifest();
 
                     gameManifest.setTitle(worldName.getText());
                     gameManifest.setSeed(seed.getText());
-                    for (String moduleName : config.getDefaultModSelection().listModules()) {
-                        Module module = moduleManager.getLatestModuleVersion(moduleName);
-                        if (module != null) {
-                            gameManifest.addModule(module.getId(), module.getVersion());
+                    DependencyResolver resolver = new DependencyResolver(moduleManager.getRegistry());
+                    ResolutionResult result = resolver.resolve(config.getDefaultModSelection().listModules());
+                    if (!result.isSuccess()) {
+                        MessagePopup errorMessagePopup = getManager().pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
+                        if (errorMessagePopup != null) {
+                            errorMessagePopup.setMessage("Invalid Module Selection", "Please review your module seleciton and try again");
                         }
+                        return;
+                    }
+                    for (Module module : result.getModules()) {
+                        gameManifest.addModule(module.getId(), module.getVersion());
                     }
 
                     WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                             (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
                     gameManifest.addWorld(worldInfo);
 
-                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.SERVER : NetworkMode.NONE));
+                    gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
                 }
             }
         });
@@ -202,7 +210,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                 getManager().pushScreen("engine:configWorldGen");
             }
         });
-        
+
         WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {

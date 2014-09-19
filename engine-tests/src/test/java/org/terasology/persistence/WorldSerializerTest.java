@@ -20,15 +20,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -38,6 +34,9 @@ import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.persistence.serializers.WorldSerializer;
 import org.terasology.persistence.serializers.WorldSerializerImpl;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import java.util.Collections;
 
@@ -56,8 +55,8 @@ public class WorldSerializerTest {
     private WorldSerializer worldSerializer;
 
     @BeforeClass
-    public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
+    public static void setupClass() throws Exception {
+        moduleManager = ModuleManagerFactory.create();
     }
 
     @Before
@@ -66,7 +65,7 @@ public class WorldSerializerTest {
         AssetManager assetManager = CoreRegistry.put(AssetManager.class, mock(AssetManager.class));
         when(assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class)).thenReturn(Collections.<Prefab>emptyList());
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
+        entityManager = builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);

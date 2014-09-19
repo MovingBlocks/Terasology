@@ -19,7 +19,7 @@ package org.terasology.rendering.nui.properties;
  * Created by synopia on 03.01.14.
  */
 
-import org.terasology.engine.API;
+import org.terasology.module.sandbox.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -16,9 +16,13 @@
 
 package org.terasology.network.internal;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.entity.internal.BaseEntityRef;
+import org.terasology.network.NetworkComponent;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -52,6 +56,23 @@ public class NetEntityRef extends BaseEntityRef {
     @Override
     public int hashCode() {
         return Objects.hashCode(networkId);
+    }
+
+    @Override
+    public EntityRef copy() {
+        if (!isActive()) {
+            return NULL;
+        }
+        Map<Class<? extends Component>, Component> classComponentMap = entityManager.copyComponents(this);
+        if (networkSystem.getMode().isAuthority()) {
+            NetworkComponent netComp = (NetworkComponent) classComponentMap.get(NetworkComponent.class);
+            if (netComp != null) {
+                netComp.setNetworkId(0);
+            }
+        } else {
+            classComponentMap.remove(NetworkComponent.class);
+        }
+        return entityManager.create(classComponentMap.values());
     }
 
     @Override

@@ -1,0 +1,25 @@
+{
+    "inherit": "default",
+    "elements": {
+        "UILabel": {
+            "text-align-horizontal": "LEFT",
+            "text-align-vertical": "bottom",
+            "text-shadowed": false,
+
+            "background" : "engine:area",
+            "background-border" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            },
+            "margin" : {
+                "top" : 4,
+                "bottom" : 4,
+                "left" : 4,
+                "right" : 4
+            }            
+        }
+    }
+
+}

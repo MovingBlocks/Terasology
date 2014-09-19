@@ -16,35 +16,40 @@ Setup
 
 Terasology requires Java 7, the newer the better - [download it here](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
 
-For easy setup you can use our launcher - [download it here](https://github.com/MovingBlocks/TerasologyLauncher/releases)
+For easy setup (recommended) you can use our launcher - [download it here](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
 For direct downloads you can get the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
 
 You can use the Windows executable or one of the default launch scripts to start the game. They will setup your Java Virtual Machine to allocate up to 1024 MB of memory. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x [scriptname].sh".
 
+To name yourself for a multiplayer game use Settings / Player
+
 Controls
 --------
 
-Note that these instructions are meant for the stable release. The latest develop build may differ and for more detailed instructions accurate to that release see our [GitHub Wiki](https://github.com/MovingBlocks/Terasology/wiki)
+Note: Keys between the latest stable and latest develop build may differ.
 
 * [W,A,S,D] - Movement
-* [E] - Activate (Chest, TNT, etc)
+* [E] - Activate / Use (while pointing at a chest, TNT blocks, etc)
 * [Q] - Throw held (block) item (hold down to charge for a longer throw!)
-* [Space] - Jump
+* [Space] - Jump / Ascend
+* [Ctrl] - Crouch / Descend
 * [Shift] - Hold to run
-* [Left click] - Activate left click action (default = remove block)
-* [Right click] - Activate right click action (default = place block)
-* [Mouse wheel up/down] - Cycle through toolbar slots
+* [Left click] - Trigger left click action (default = remove block)
+* [Right click] - Trigger right click action (default = place block)
+* [Mouse wheel up/down] - Cycle through toolbar slots OR pick up / deposit items into stacks in an inventory one at a time
 * [1..0] - Change the active toolbar slot
 * [I] - Toggle inventory screen
 * [H] - Hide user interface
-* [F] - Toggle viewing distance (near, moderate, far, ultra)
-* [`] - Toggle developer console (the "grave" key, above tab)
+* [T] - Toggle chat interface (effectively a mini-console that only does chat)
+* [`] - Toggle full developer console (the "grave" key, above tab)
 * [Tab] - Auto-completion in the console
+* [Home] - Increase viewing distance
+* [End] - Decrease viewing distance
 * [Escape] - Show/hide the game menu screen
 * [F1] - Toggle window focus
 * [F3] - Toggle debug mode and information
-* [F4] - Different debug metrics
+* [F5] - Show behavior tree editor
 * ~~[F5] - Show block picker GUI element~~
 
 Debug Features
@@ -55,6 +60,7 @@ Only works when the F3 debug mode is enabled (and may come and go)
 * [Arrow up/down] - Adjust the current time in small steps
 * [Arrow left/right] - Adjust the current time in larger steps
 * [R] - Debug render wire-frame
+* [F4] - Cycle advanced debug metrics
 * [F6] - Debug rendering enabled
 * [F7] - Cycle debug rendering stage
 * [F8] - Debug render chunk bounding boxes
@@ -70,12 +76,13 @@ May move slot or disappear as development continues
 * Railgun  - Bigger bada boom, in a straight line!
 * ~~Minituarizer (scissors) - Left click one block, then another, then somewhere else to "clone" your selection in a tiny accurate representation~~
 * Goodie chest - place it and open with 'e' for assorted goodies
-* Sapling - an organically growing tree (grows one or a few blocks at a time)
+
+More or completely alternative line-ups with certain modules / world types selected
 
 Console Commands
 --------
 
-Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like rS for restoreSpeed)
+Press the `grave` key (usually the ony immediately above `tab`) to show the in-game console. Block names and some other things are not capital sensitive while command names are. Copy paste is supported and up/down arrow will cycle through commands you've used before. Hitting `tab` with a partially typed command will auto-complete it (including abbreviated camel case like lS for listShapes). For partial commands with multiple completion candidates you can `tab` again to cycle through them.
 
 * help - Show in-game help (more thorough)
 * ghost - fly / no-clip mode (old double-jump for "god" mode)
@@ -84,8 +91,7 @@ Press the `grave` key (usually the ony immediately above `tab`) to show the in-g
 * restoreSpeed - normalizes speed (both horizontal and vertical)
 * help "giveBlock" - Shows detailed help on the "giveBlock" command
 * giveBlock "Water" - Gives 16 water blocks
-* giveBlock "Stone" "Slope" - Gives you 16 clay blocks in the "slope" shape
-* giveBlock "Marble" "Stair" 99 - Gives you 99 marble stair blocks
+* giveBlock "Stone" "Stair" 99 - Gives you 99 stone stair blocks
 * giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
 * giveBlock "TNT" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * listBlocks - Lists all actively used blocks (have been loaded for the world)
@@ -99,11 +105,12 @@ Building and running from source
 
 Run any commands in the project root directory
 
-*  Download / clone the source from GitHub
-*  To prepare for IntelliJ run: `gradlew idea`
-*  To prepare for Eclipse run: `gradlew eclipse`
-*  To run from the command line: `gradlew run`
-*  For more tasks: `gradlew tasks`
+* Download / clone the source from GitHub
+* To prepare for IntelliJ run: `gradlew idea`
+* To prepare for Eclipse run: `gradlew eclipse`
+* To run from the command line: `gradlew run`
+* Start a headless server: `gradlew start` (stores data in /terasology-server - the Gradle command blocks until server is killed)
+* For more tasks: `gradlew tasks`
 
 You may also need to tweak IDE settings further for your convenience, in particular for Eclipse. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
@@ -116,17 +123,24 @@ If you want to pull down the source code for a module you can easily do so via G
 
 This fetches the module source for the "Sample" module and the second command fetches any dependencies and updates the IntelliJ project structure so you can see it as a module. Likewise for Eclipse or any other setup you should run any one `gradlew` command to make sure the new module's dependencies have been fetched as well. See [Codebase Structure](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) in the wiki for more.
 
+[![Build Status](http://jenkins.movingblocks.net/job/Terasology/badge/icon)](http://jenkins.movingblocks.net/job/Terasology/)
+[![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
+
 Modules
 --------
 
-Content, gameplay mechanics, and mostly everything other than the engine that allows the game to run is stored in what we call "modules" which are _similar_ to the traditional meaning of "mods" but intended to be smaller building blocks you'd normally put several of together to make one true "mod".
+Content, gameplay mechanics, and mostly everything other than the engine that allows the game to run is stored in what we call "modules" which are _similar_ to the traditional meaning of "mods" but intended to be smaller building blocks you'd normally put several of together to make one traditional "mod".
 
 Modules must be enabled during world creation by selecting them using the "Modules" button. Some world generator types may be registered by a module and auto-select that and maybe other modules if you choose that world type. Modules may also enable additional console commands (listed by the "help" command when active).
 
+As opposed to engine level projects listed under https://github.com/MovingBlocks all modules are listed under a different GitHub organization at https://github.com/Terasology
+
 Here's a list of modules bundled with the game by default (as of this writing anyway - this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.movingblocks.net/view/Modules and you can download updated modules from there if needed.
 
+* [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
 * [BlockNetwork](https://github.com/Terasology/BlockNetwork) - a framework to support blocks that can communicate with each other in some fashion
+* [Breathing](https://github.com/Terasology/Breathing) - without this you can't breathe! But you also don't need to. Enable it to drown properly in water (or not!)
 * [CakeLie](https://github.com/Terasology/CakeLie) - the cake may be a lie, but these cake and candy blocks are delicious!
 * [ChangingBlocks](https://github.com/Terasology/ChangingBlocks) - allows blocks that change over time (like crops that grow - which will happen if you also enable Crops)
 * [Cities](https://github.com/Terasology/Cities) - procedural city placer and plot organizer, also places roads to connect cities
@@ -134,17 +148,21 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * Core - mandatory content needed for normal game launch
 * [Crops](https://github.com/Terasology/Crops) - a series of crop-like plants with multiple growth stages
 * [Fences](https://github.com/Terasology/Fences) - fences!
+* [Fluid](https://github.com/Terasology/Fluid) - adds support for fluid in non-world situations (such as for storage in workstations)
 * [FunnyBlocks](https://github.com/Terasology/FunnyBlocks) - cheese wheels and bowling pins - why not
+* [Genome](https://github.com/Terasology/Genome) - genetics WOO! Complete with DNA letters and mutating plants. Part of the Wood & Stone line-up
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
-* [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such
+* [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key 'J'
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
+* [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module 
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
+* [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
 * [Minerals](https://github.com/Terasology/Minerals) - a large collection of mineral blocks
-* [Miniion](https://github.com/Terasology/Miniion) - old school miniions are back! Mostly working :D
-* [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis)
+* [Miniion](https://github.com/Terasology/Miniion) - base creature control system, used by MasterOfOreon - old module that has gone through a few redesigns
+* [Minimap](https://github.com/Terasology/Minimap) - a basic minimap using "slicing" (showing a single layer at a time as per a selected axis). Show/hide with 'M' by default
 * [MoreLights](https://github.com/Terasology/MoreLights) - assorted illuminated blocks
 * [MultiBlock](https://github.com/Terasology/MultiBlock) - supports the concept of multiple blocks being part of the same structure
 * [NameGenerator](https://github.com/Terasology/NameGenerator) - can create random themed names for use by other modules, or via console using commands like `generateNameList 10`
@@ -152,13 +170,16 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Pathfinding](https://github.com/Terasology/Pathfinding) - framework for pathfinding used by other modules
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Wood and Stone gameplay
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock "portal"`
+* [Rails](https://github.com/Terasology/Rails) - Railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
+* [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
+* [TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
-* [Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons
+* ~~[Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons~~
 
 Some of the modules in action:
 
@@ -179,7 +200,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Halamix2, Jtsessions, emanuele3d
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
 * World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias

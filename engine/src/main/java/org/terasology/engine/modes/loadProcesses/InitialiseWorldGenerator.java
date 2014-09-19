@@ -48,8 +48,8 @@ public class InitialiseWorldGenerator extends SingleStepLoadProcess {
         WorldGenerator worldGenerator;
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
         worldGenerator = CoreRegistry.get(WorldGenerator.class);
-        worldGenerator.initialize();
         worldGenerator.setWorldSeed(worldInfo.getSeed());
+        worldGenerator.initialize();
 
         return true;
     }

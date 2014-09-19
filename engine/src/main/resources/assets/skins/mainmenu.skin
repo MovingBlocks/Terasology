@@ -1,58 +1,74 @@
 {
-    "inherit" : "default",
-    "elements" : {
-        "UIScreenLayer" : {
-            "background-scale-mode" : "scale_fill",
-            "background" : "menuBackground"
+    "inherit": "default",
+    "elements": {
+        "UIScreenLayer": {
+            "background-scale-mode": "scale_fill",
+            "background": "menuBackground"
+        },
+        "UIButton": {
+            "modes": {
+                "disabled": {
+                    "text-color": "AAAAAAFF"
+                }
+            }
         }
     },
-    "families" : {
-        "menu-options" : {
-            "elements" : {
-                "UIButton" : {
-                    "min-width" : 192,
-                    "min-height" : 32
+    "families": {
+        "menu-options": {
+            "elements": {
+                "UIButton": {
+                    "min-width": 192,
+                    "min-height": 32
 
                 }
             }
         },
-        "option-grid" : {
-            "elements" : {
-                "UILabel" : {
-                    "text-align-vertical" : "middle",
-                    "text-align-horizontal" : "right"
+        "option-grid": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "middle",
+                    "text-align-horizontal": "right"
                 }
             }
         },
-        "title" : {
-            "font" : "title"
+        "title": {
+            "font": "title"
         },
-        "error" : {
-            "text-color" : "FF4444FF"
+        "error": {
+            "text-color": "FF4444FF"
         },
-        "heading-input" : {
-            "font" : "title",
-            "text-align-horizontal" : "left"
+        "highlight": {
+            "text-color": "FFFF00FF"
         },
-        "left-label" : {
-            "elements" : {
-                "UILabel" : {
-                    "text-align-vertical" : "bottom",
-                    "text-align-horizontal" : "left"
+        "heading-input": {
+            "font": "title",
+            "text-align-horizontal": "left"
+        },
+        "left-label": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "bottom",
+                    "text-align-horizontal": "left"
                 }
             }
         },
-        "module-list" : {
-            "elements" : {
-                "UIList" : {
-                    "parts" : {
-                        "item" : {
-                            "modes" : {
-                                "enabled" : {
-                                    "text-color" : "FFFF00FF"
+        "module-list": {
+            "elements": {
+                "UIList": {
+                    "parts": {
+                        "item": {
+                            "modes": {
+                                "enabled": {
+                                    "text-color": "00FF00FF"
                                 },
-                                "disabled" : {
-                                    "text-color" : "AAAAAAFF"
+                                "dependency": {
+                                    "text-color": "FFFF00FF"
+                                },
+                                "disabled": {
+                                    "text-color": "AAAAAAFF"
+                                },
+                                "invalid": {
+                                    "text-color": "FF0000FF"
                                 }
                             }
                         }
@@ -60,11 +76,11 @@
                 }
             }
         },
-        "description" : {
-            "elements" : {
-                "UILabel" : {
-                    "text-align-vertical" : "top",
-                    "text-align-horizontal" : "left"
+        "description": {
+            "elements": {
+                "UILabel": {
+                    "text-align-vertical": "top",
+                    "text-align-horizontal": "left"
                 }
             }
         }

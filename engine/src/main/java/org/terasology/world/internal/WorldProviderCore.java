@@ -16,9 +16,11 @@
 package org.terasology.world.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.block.Block;
+import org.terasology.world.generation.Region;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 
@@ -158,9 +160,5 @@ public interface WorldProviderCore {
 
     WorldTime getTime();
 
-    float getFog(float x, float y, float z);
-
-    float getTemperature(float x, float y, float z);
-
-    float getHumidity(float x, float y, float z);
+    Region getWorldData(Region3i region);
 }

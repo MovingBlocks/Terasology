@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.engine.module.UriUtil;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -38,6 +37,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Actor;
 import org.terasology.logic.behavior.tree.Interpreter;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
@@ -63,7 +63,7 @@ import java.util.Map;
 @RegisterSystem
 @Share(BehaviorSystem.class)
 public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
-    public static final String BEHAVIORS = UriUtil.normalise("Behaviors");
+    public static final Name BEHAVIORS = new Name("Behaviors");
 
     @In
     private EntityManager entityManager;
@@ -127,10 +127,10 @@ public class BehaviorSystem extends BaseComponentSystem implements UpdateSubscri
         Path savePath;
         AssetUri uri = tree.getURI();
         if (BEHAVIORS.equals(uri.getModuleName())) {
-            savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("assets").resolve("behaviors");
+            savePath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("assets").resolve("behaviors");
         } else {
-            Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS).resolve("overrides");
-            savePath = overridesPath.resolve(uri.getModuleName()).resolve("behaviors");
+            Path overridesPath = PathManager.getInstance().getHomeModPath().resolve(BEHAVIORS.toString()).resolve("overrides");
+            savePath = overridesPath.resolve(uri.getModuleName().toString()).resolve("behaviors");
         }
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
         try {

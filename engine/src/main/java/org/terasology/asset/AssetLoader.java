@@ -16,7 +16,7 @@
 
 package org.terasology.asset;
 
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,5 +44,5 @@ public interface AssetLoader<T extends AssetData> {
      * @return The loaded asset, or null
      * @throws IOException If there is any error loading the asset
      */
-    T load(Module module, InputStream stream, List<URL> urls) throws IOException;
+    T load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException;
 }

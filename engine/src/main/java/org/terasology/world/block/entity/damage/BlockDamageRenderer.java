@@ -75,7 +75,7 @@ public class BlockDamageRenderer extends BaseComponentSystem implements RenderSy
             return;
         }
 
-        Material defaultTextured = Assets.getMaterial("engine:defaultTextured");
+        Material defaultTextured = Assets.getMaterial("engine:prog.defaultTextured");
         defaultTextured.activateFeature(ShaderProgramFeature.FEATURE_ALPHA_REJECT);
         defaultTextured.enable();
 

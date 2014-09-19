@@ -20,7 +20,7 @@ import com.google.common.math.IntMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -42,7 +42,7 @@ public class TileLoader implements AssetLoader<TileData> {
     }
 
     @Override
-    public TileData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public TileData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         BufferedImage image = ImageIO.read(stream);
         if (!IntMath.isPowerOfTwo(image.getHeight()) || !(image.getWidth() == image.getHeight())) {
             throw new IOException("Invalid tile - must be square with power-of-two sides");

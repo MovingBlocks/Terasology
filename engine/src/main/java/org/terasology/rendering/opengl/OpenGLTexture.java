@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
+
+import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.GL_CLAMP;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
@@ -98,8 +100,12 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
                 GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, data.getBuffers().length - 1);
 
-                for (int i = 0; i < data.getBuffers().length; i++) {
-                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
+                if (data.getBuffers().length > 0) {
+                    for (int i = 0; i < data.getBuffers().length; i++) {
+                        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, i, GL11.GL_RGBA, width >> i, height >> i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
+                    }
+                } else {
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
                 }
                 break;
             case TEXTURE3D:
@@ -116,8 +122,12 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
                 GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
                 GL11.glTexParameteri(GL12.GL_TEXTURE_3D, GL12.GL_TEXTURE_MAX_LEVEL, data.getBuffers().length - 1);
 
-                for (int i = 0; i < data.getBuffers().length; i++) {
-                    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
+                if (data.getBuffers().length > 0) {
+                    for (int i = 0; i < data.getBuffers().length; i++) {
+                        GL12.glTexImage3D(GL12.GL_TEXTURE_3D, i, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffers()[i]);
+                    }
+                } else {
+                    GL12.glTexImage3D(GL12.GL_TEXTURE_3D, 0, GL11.GL_RGBA, width, height, depth, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
                 }
 
                 break;

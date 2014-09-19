@@ -16,7 +16,7 @@
 
 package org.terasology.core.config;
 
-import org.terasology.world.WorldBiomeProvider;
+import org.terasology.core.world.Biome;
 
 /**
  * @author Immortius
@@ -74,7 +74,7 @@ public class WorldGenerationConfig {
         this.desertGrassDensity = desertGrassDensity;
     }
 
-    public float getGrassDensity(WorldBiomeProvider.Biome biome) {
+    public float getGrassDensity(Biome biome) {
         switch (biome) {
             case PLAINS:
                 return getPlainsGrassDensity();
@@ -90,7 +90,7 @@ public class WorldGenerationConfig {
         return 1.0f;
     }
 
-    public void setGrassDensity(WorldBiomeProvider.Biome biome, float density) {
+    public void setGrassDensity(Biome biome, float density) {
         switch (biome) {
             case PLAINS:
                 setPlainsGrassDensity(density);

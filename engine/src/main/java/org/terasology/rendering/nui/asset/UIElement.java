@@ -17,11 +17,13 @@ package org.terasology.rendering.nui.asset;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.UIWidget;
 
 /**
  * @author Immortius
  */
+@API
 public class UIElement extends AbstractAsset<UIData> {
 
     private UIWidget rootWidget;

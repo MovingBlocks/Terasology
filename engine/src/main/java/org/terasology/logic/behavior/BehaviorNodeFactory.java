@@ -97,7 +97,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
                 }, new StringTextRenderer<AssetUri>() {
                     @Override
                     public String getString(AssetUri value) {
-                        return value.getAssetName();
+                        return value.getAssetName().toString();
                     }
                 }
         );
@@ -109,7 +109,7 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
                 }, new StringTextRenderer<AssetUri>() {
                     @Override
                     public String getString(AssetUri value) {
-                        return value.getAssetName();
+                        return value.getAssetName().toString();
                     }
                 }
         );

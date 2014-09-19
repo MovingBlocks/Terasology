@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
 import org.terasology.logic.behavior.tree.LookupNode;
 import org.terasology.logic.behavior.tree.Node;
+import org.terasology.module.Module;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.CoreRegistry;
 
@@ -70,7 +70,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
     }
 
     @Override
-    public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public BehaviorTreeData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         BehaviorTreeData data = new BehaviorTreeData();
         try (JsonReader reader = new JsonReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             reader.setLenient(true);
@@ -206,7 +206,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                 if (value == null) {
                     out.value("");
                 } else {
-                    out.value(value.getURI().toNormalisedSimpleString());
+                    out.value(value.getURI().toSimpleString());
                 }
             }
 

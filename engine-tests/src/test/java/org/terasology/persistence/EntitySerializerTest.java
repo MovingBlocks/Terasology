@@ -24,15 +24,11 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.reflection.reflect.ReflectionReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.module.ModuleManagerImpl;
-import org.terasology.engine.module.ModuleSecurityManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityInfoComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -45,6 +41,9 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.testUtil.ModuleManagerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -63,9 +62,9 @@ public class EntitySerializerTest {
     private Prefab prefab;
 
     @BeforeClass
-    public static void setupClass() {
-        moduleManager = new ModuleManagerImpl(new ModuleSecurityManager());
-        AssetManager assetManager = new AssetManager(moduleManager);
+    public static void setupClass() throws Exception {
+        moduleManager = ModuleManagerFactory.create();
+        AssetManager assetManager = new AssetManager(moduleManager.getEnvironment());
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {
@@ -79,7 +78,7 @@ public class EntitySerializerTest {
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build(moduleManager, mock(NetworkSystem.class), new ReflectionReflectFactory());
+        entityManager = builder.build(moduleManager.getEnvironment(), mock(NetworkSystem.class), new ReflectionReflectFactory());
         entityManager.getComponentLibrary().register(new SimpleUri("test", "gettersetter"), GetterSetterComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "string"), StringComponent.class);
         entityManager.getComponentLibrary().register(new SimpleUri("test", "integer"), IntegerComponent.class);

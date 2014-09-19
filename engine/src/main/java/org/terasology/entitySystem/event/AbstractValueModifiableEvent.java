@@ -25,8 +25,9 @@ import gnu.trove.list.array.TFloatArrayList;
 public abstract class AbstractValueModifiableEvent implements Event {
     private float baseValue;
 
-    private TFloatList multipliers = new TFloatArrayList();
     private TFloatList modifiers = new TFloatArrayList();
+    private TFloatList multipliers = new TFloatArrayList();
+    private TFloatList postModifiers = new TFloatArrayList();
 
     protected AbstractValueModifiableEvent(float baseValue) {
         this.baseValue = baseValue;
@@ -44,6 +45,10 @@ public abstract class AbstractValueModifiableEvent implements Event {
         modifiers.add(amount);
     }
 
+    public void addPostMultiply(float amount) {
+        postModifiers.add(amount);
+    }
+
     public float getResultValue() {
         // For now, add all modifiers and multiply by all multipliers. Negative modifiers cap to zero, but negative
         // multipliers remain.
@@ -54,12 +59,15 @@ public abstract class AbstractValueModifiableEvent implements Event {
             result += modifierIter.next();
         }
         result = Math.max(0, result);
-        if (result == 0) {
-            return 0;
-        }
+
         TFloatIterator multiplierIter = multipliers.iterator();
         while (multiplierIter.hasNext()) {
             result *= multiplierIter.next();
+        }
+
+        final TFloatIterator postModifierIter = postModifiers.iterator();
+        while (postModifierIter.hasNext()) {
+            result += postModifierIter.next();
         }
         return result;
     }

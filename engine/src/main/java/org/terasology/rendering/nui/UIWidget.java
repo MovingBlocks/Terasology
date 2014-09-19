@@ -91,11 +91,15 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     boolean canBeFocus();
 
-    void bindTooltip(Binding<String> bind);
+    void bindTooltip(Binding<UIWidget> bind);
+
+    void setTooltip(UIWidget value);
+
+    UIWidget getTooltip();
+
+    void bindTooltipString(Binding<String> bind);
 
     void setTooltip(String value);
-
-    String getTooltip();
 
     float getTooltipDelay();
 

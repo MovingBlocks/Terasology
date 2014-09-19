@@ -21,7 +21,8 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.engine.module.Module;
+import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.texture.Texture;
@@ -61,7 +62,7 @@ public class FontLoader implements AssetLoader<FontData> {
             "chnl=" + INTEGER_PATTERN + "\\s*");
 
     @Override
-    public FontData load(Module module, InputStream stream, List<URL> urls) throws IOException {
+    public FontData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             FontDataBuilder builder = new FontDataBuilder();
             parseHeader(reader.readLine());
@@ -111,7 +112,7 @@ public class FontLoader implements AssetLoader<FontData> {
         }
     }
 
-    private void parsePage(FontDataBuilder builder, String moduleName, String pageInfo) throws IOException {
+    private void parsePage(FontDataBuilder builder, Name moduleName, String pageInfo) throws IOException {
         Matcher pageMatcher = pagePattern.matcher(pageInfo);
         if (pageMatcher.matches()) {
             int pageId = Integer.parseInt(pageMatcher.group(1));

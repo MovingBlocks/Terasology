@@ -16,12 +16,10 @@
 
 package org.terasology.engine.bootstrap;
 
-import com.google.common.collect.ListMultimap;
 import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
+import org.terasology.audio.StaticSound;
+import org.terasology.audio.StreamingSound;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.Module;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -42,6 +40,7 @@ import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.NodesClassLibrary;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -79,18 +78,18 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.Map;
 
 /**
  * @author Immortius
  */
+// TODO: Review - This could be a static class but its existence is also questionable.
 public class EntitySystemBuilder {
 
-    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
-        return build(moduleManager, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
+    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory) {
+        return build(environment, networkSystem, reflectFactory, new CopyStrategyLibrary(reflectFactory));
     }
 
-    public EngineEntityManager build(ModuleManager moduleManager, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
+    public EngineEntityManager build(ModuleEnvironment environment, NetworkSystem networkSystem, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         // Entity Manager
         PojoEntityManager entityManager = CoreRegistry.put(EntityManager.class, new PojoEntityManager());
         CoreRegistry.put(EngineEntityManager.class, entityManager);
@@ -111,22 +110,24 @@ public class EntitySystemBuilder {
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         // Event System
-        entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), networkSystem));
-        CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
+        EventSystem eventSystem = new EventSystemImpl(library.getEventLibrary(), networkSystem);
+        entityManager.setEventSystem(eventSystem);
+        CoreRegistry.put(EventSystem.class, eventSystem);
 
+        // TODO: Review - NodeClassLibrary related to the UI for behaviours. Should not be here and probably not even in the CoreRegistry
         CoreRegistry.put(OneOfProviderFactory.class, new OneOfProviderFactory());
 
+        // Behaviour Trees Node Library
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
-        nodesClassLibrary.scan(moduleManager);
+        nodesClassLibrary.scan(environment);
 
-        registerComponents(library.getComponentLibrary(), moduleManager);
-        registerEvents(entityManager.getEventSystem(), moduleManager);
+        registerComponents(library.getComponentLibrary(), environment);
+        registerEvents(entityManager.getEventSystem(), environment);
         return entityManager;
     }
 
     private TypeSerializationLibrary buildTypeLibrary(PojoEntityManager entityManager, ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
-        Vector3iTypeHandler vector3iHandler = new Vector3iTypeHandler();
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
         serializationLibrary.add(BlockFamily.class, new BlockFamilyTypeHandler());
         serializationLibrary.add(Block.class, new BlockTypeHandler());
@@ -135,7 +136,8 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(AssetType.TEXTURE, Texture.class));
         serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(AssetType.UI_ELEMENT, UIElement.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(AssetType.MESH, Mesh.class));
-        serializationLibrary.add(Sound.class, new AssetTypeHandler<>(AssetType.SOUND, Sound.class));
+        serializationLibrary.add(StaticSound.class, new AssetTypeHandler<>(AssetType.SOUND, StaticSound.class));
+        serializationLibrary.add(StreamingSound.class, new AssetTypeHandler<>(AssetType.MUSIC, StreamingSound.class));
         serializationLibrary.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         serializationLibrary.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
@@ -144,7 +146,7 @@ public class EntitySystemBuilder {
         serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
         serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
         serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
-        serializationLibrary.add(Vector3i.class, vector3iHandler);
+        serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
         serializationLibrary.add(CollisionGroup.class, new CollisionGroupTypeHandler());
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
         serializationLibrary.add(EntityRef.class, new EntityRefTypeHandler(entityManager));
@@ -153,22 +155,19 @@ public class EntitySystemBuilder {
         return serializationLibrary;
     }
 
-    private void registerComponents(ComponentLibrary library, ModuleManager moduleManager) {
-        for (Module module : moduleManager.getActiveCodeModules()) {
-            for (Class<? extends Component> componentType : module.getReflections().getSubTypesOf(Component.class)) {
-                if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
-                    String componentName = MetadataUtil.getComponentClassName(componentType);
-                    library.register(new SimpleUri(module.getId(), componentName), componentType);
-                }
+    private void registerComponents(ComponentLibrary library, ModuleEnvironment environment) {
+        for (Class<? extends Component> componentType : environment.getSubtypesOf(Component.class)) {
+            if (componentType.getAnnotation(DoNotAutoRegister.class) == null) {
+                String componentName = MetadataUtil.getComponentClassName(componentType);
+                library.register(new SimpleUri(environment.getModuleProviding(componentType), componentName), componentType);
             }
         }
     }
 
-    private void registerEvents(EventSystem eventSystem, ModuleManager moduleManager) {
-        ListMultimap<String, Class<? extends Event>> allSubclassesOf = moduleManager.findAllSubclassesOf(Event.class);
-        for (Map.Entry<String, Class<? extends Event>> entry : allSubclassesOf.entries()) {
-            if (entry.getValue().getAnnotation(DoNotAutoRegister.class) == null) {
-                eventSystem.registerEvent(new SimpleUri(entry.getKey(), entry.getValue().getSimpleName()), entry.getValue());
+    private void registerEvents(EventSystem eventSystem, ModuleEnvironment environment) {
+        for (Class<? extends Event> type : environment.getSubtypesOf(Event.class)) {
+            if (type.getAnnotation(DoNotAutoRegister.class) == null) {
+                eventSystem.registerEvent(new SimpleUri(environment.getModuleProviding(type), type.getSimpleName()), type);
             }
         }
     }

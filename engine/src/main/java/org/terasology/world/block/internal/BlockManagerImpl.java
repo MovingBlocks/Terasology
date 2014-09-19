@@ -32,11 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.Assets;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.engine.module.Module;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
@@ -67,7 +69,7 @@ public class BlockManagerImpl extends BlockManager {
     private static final short UNKNOWN_ID = (short) 65535;
     private static final int MAX_ID = 65534;
 
-    private ModuleManager moduleManager;
+    private ModuleEnvironment environment;
 
     /* Families */
     private final Set<BlockUri> freeformBlockUris = Sets.newHashSet();
@@ -95,7 +97,7 @@ public class BlockManagerImpl extends BlockManager {
                             boolean generateNewIds,
                             BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
-        this.moduleManager = CoreRegistry.get(ModuleManager.class);
+        this.environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
         blockLoader = new BlockLoader(CoreRegistry.get(AssetManager.class), blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
@@ -175,8 +177,8 @@ public class BlockManagerImpl extends BlockManager {
                     logger.error("Missing id for block {} in registered family {}", block.getURI(), familyUri);
                     block.setId(UNKNOWN_ID);
                 }
-                registerFamily(family);
             }
+            registerFamily(family);
         } else {
             logger.error("Block family not available: {}", familyUri);
         }
@@ -252,8 +254,8 @@ public class BlockManagerImpl extends BlockManager {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : Assets.listModules()) {
-                BlockUri modUri = new BlockUri(packageName, uri);
+            for (Name moduleId : Assets.listModules()) {
+                BlockUri modUri = new BlockUri(moduleId, new Name(uri));
                 if (hasBlockFamily(modUri)) {
                     matches.add(modUri);
                 }
@@ -274,14 +276,14 @@ public class BlockManagerImpl extends BlockManager {
             default:
                 Module context = ModuleContext.getContext();
                 if (context != null) {
-                    Set<String> dependencies = moduleManager.getDependencyNamesOf(context);
+                    Set<Name> dependencies = environment.getDependencyNamesOf(context.getId());
                     Iterator<BlockUri> iterator = matches.iterator();
                     while (iterator.hasNext()) {
                         BlockUri possibleUri = iterator.next();
-                        if (context.getId().equals(possibleUri.getNormalisedModuleName())) {
+                        if (context.getId().equals(possibleUri.getModuleName())) {
                             return possibleUri;
                         }
-                        if (!dependencies.contains(possibleUri.getNormalisedModuleName())) {
+                        if (!dependencies.contains(possibleUri.getModuleName())) {
                             iterator.remove();
                         }
                     }

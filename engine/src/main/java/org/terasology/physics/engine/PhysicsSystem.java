@@ -32,7 +32,6 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
@@ -154,7 +153,7 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
             entity.saveComponent(comp);
         }
 
-        if (networkSystem.getMode() == NetworkMode.SERVER && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+        if (networkSystem.getMode().isServer() && time.getGameTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
             sendSyncMessages();
             lastNetsync = time.getGameTimeInMs();
         }

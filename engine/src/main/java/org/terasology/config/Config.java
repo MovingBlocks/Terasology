@@ -29,7 +29,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-
 import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,10 @@ import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.Component;
 import org.terasology.input.Input;
+import org.terasology.naming.Name;
+import org.terasology.naming.Version;
+import org.terasology.naming.gson.NameTypeAdapter;
+import org.terasology.naming.gson.VersionTypeAdapter;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.InputHandler;
 import org.terasology.utilities.gson.SetMultimapTypeAdapter;
@@ -157,6 +160,7 @@ public final class Config {
      * @throws IOException
      */
     public static Config load(Path fromFile) throws IOException {
+        logger.info("Reading config file {}", fromFile);
         try (Reader reader = Files.newBufferedReader(fromFile, TerasologyConstants.CHARSET)) {
             Gson gson = createGson();
             JsonElement baseConfig = gson.toJsonTree(new Config());
@@ -175,6 +179,8 @@ public final class Config {
 
     protected static Gson createGson() {
         return new GsonBuilder()
+                .registerTypeAdapter(Name.class, new NameTypeAdapter())
+                .registerTypeAdapter(Version.class, new VersionTypeAdapter())
                 .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
                 .registerTypeAdapter(SetMultimap.class, new SetMultimapTypeAdapter<>(Input.class))
                 .registerTypeAdapter(SecurityConfig.class, new SecurityConfig.Handler())
@@ -191,7 +197,7 @@ public final class Config {
                 .registerTypeAdapterFactory(new UriTypeAdapterFactory())
                 .setPrettyPrinting().create();
     }
-    
+
     private static void merge(JsonObject target, JsonObject from) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -219,10 +225,10 @@ public final class Config {
         }
         return Collections.unmodifiableSet(map.keySet());
     }
-    
+
     /**
-     * @param uri the uri to look up
-     * @param key the look-up key
+     * @param uri   the uri to look up
+     * @param key   the look-up key
      * @param clazz the class to convert the data to
      * @return a config component for the given uri and class or <code>null</code>
      */
@@ -230,16 +236,16 @@ public final class Config {
         Map<String, JsonElement> map = moduleConfigs.get(uri);
         if (map == null) {
             return null;
-        } 
-        
+        }
+
         JsonElement element = map.get(key);
         Gson gson = createGsonForModules();
         return gson.fromJson(element, clazz);
     }
 
     /**
-     * @param generatorUri the generator Uri 
-     * @param configs the new config params for the world generator
+     * @param generatorUri the generator Uri
+     * @param configs      the new config params for the world generator
      */
     public void setModuleConfigs(SimpleUri generatorUri, Map<String, Component> configs) {
         Gson gson = createGsonForModules();
@@ -250,7 +256,7 @@ public final class Config {
         }
         this.moduleConfigs.put(generatorUri, map);
     }
-    
+
     private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
 
         @Override

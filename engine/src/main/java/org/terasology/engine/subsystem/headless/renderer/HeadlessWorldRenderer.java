@@ -24,6 +24,8 @@ import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.physics.bullet.BulletPhysics;
+import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
@@ -56,11 +58,16 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     private final List<RenderableChunk> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
     private Vector3i chunkPos = new Vector3i();
 
+    /* PHYSICS */
+    // TODO: Remove physics handling from world renderer
+    private final BulletPhysics bulletPhysics;
+
     private Config config;
 
     public HeadlessWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
+        bulletPhysics = new BulletPhysics(worldProvider);
 
         localPlayerSystem.setPlayerCamera(noCamera);
         config = CoreRegistry.get(Config.class);
@@ -98,6 +105,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     }
 
     @Override
+    public PhysicsEngine getBulletRenderer() {
+        return bulletPhysics;
+    }
+
+    @Override
     public void setPlayer(LocalPlayer localPlayer) {
         // TODO Auto-generated method stub
 
@@ -110,7 +122,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
         // Free unused space
         PerformanceMonitor.startActivity("Update Chunk Cache");
-        chunkProvider.update();
+        chunkProvider.beginUpdate();
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Update Close Chunks");
@@ -126,7 +138,7 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
+        worldProvider.dispose();
 
     }
 
