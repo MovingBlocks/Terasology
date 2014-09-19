@@ -21,7 +21,7 @@ buildscript {
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance
 artifactory {
-    contextUrl = 'http://artifactory.movingblocks.net/artifactory'
+    contextUrl = 'http://artifactory.terasology.org:8081/artifactory'
 
     // This is the target for publishing artifacts
     publish {
