@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class ModuleConfig {
     private List<Name> modules = Lists.newArrayList();
+    private String defaultGameplayModuleName = "";
 
     public ModuleConfig() {
     }
@@ -33,6 +34,7 @@ public class ModuleConfig {
     public void copy(ModuleConfig other) {
         this.modules.clear();
         this.modules.addAll(other.modules);
+        this.defaultGameplayModuleName = other.defaultGameplayModuleName;
     }
 
     public void addModule(Name id) {
@@ -59,5 +61,13 @@ public class ModuleConfig {
 
     public void clear() {
         modules.clear();
+    }
+
+    public String getDefaultGameplayModuleName() {
+        return defaultGameplayModuleName;
+    }
+
+    public void setDefaultGameplayModuleName(String defaultGameplayModuleName) {
+        this.defaultGameplayModuleName = defaultGameplayModuleName;
     }
 }

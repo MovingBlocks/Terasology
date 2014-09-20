@@ -25,7 +25,7 @@ public class WorldGenerationConfig {
     private String worldTitle = "New World";
     private String defaultSeed = "nowater4";
 
-    private SimpleUri defaultGenerator = new SimpleUri("core:perlin");
+    private SimpleUri defaultGenerator = new SimpleUri();
 
     public String getWorldTitle() {
         return worldTitle;

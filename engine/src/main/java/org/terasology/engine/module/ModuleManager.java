@@ -51,6 +51,7 @@ public class ModuleManager {
 
     public static final String SERVER_SIDE_ONLY_EXT = "serverSideOnly";
     public static final String IS_GAMEPLAY_EXT = "isGameplay";
+    public static final String DEFAULT_WORLD_GENERATOR_EXT = "defaultWorldGenerator";
 
     private ModuleSecurityManager moduleSecurityManager;
 
@@ -62,6 +63,7 @@ public class ModuleManager {
         metadataReader = new ModuleMetadataReader();
         metadataReader.registerExtension(SERVER_SIDE_ONLY_EXT, Boolean.TYPE);
         metadataReader.registerExtension(IS_GAMEPLAY_EXT, Boolean.TYPE);
+        metadataReader.registerExtension(DEFAULT_WORLD_GENERATOR_EXT, String.class);
         Module engineModule;
         try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"))) {
             ModuleMetadata metadata = metadataReader.read(reader);
