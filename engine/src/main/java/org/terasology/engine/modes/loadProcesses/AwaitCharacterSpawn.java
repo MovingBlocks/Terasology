@@ -48,7 +48,8 @@ public class AwaitCharacterSpawn implements LoadProcess {
             worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             return true;
         } else {
-            worldRenderer.getChunkProvider().update();
+            worldRenderer.getChunkProvider().completeUpdate();
+            worldRenderer.getChunkProvider().beginUpdate();
         }
         return false;
     }

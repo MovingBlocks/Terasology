@@ -18,7 +18,6 @@ package org.terasology.world.chunks.blockdata;
 
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -34,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
-public abstract class TeraArray implements Externalizable {
+public abstract class TeraArray {
 
     private int sizeX;
     private int sizeY;

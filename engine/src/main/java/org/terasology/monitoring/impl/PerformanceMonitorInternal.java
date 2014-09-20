@@ -32,4 +32,6 @@ public interface PerformanceMonitorInternal {
     TObjectDoubleMap<String> getRunningMean();
 
     TObjectDoubleMap<String> getDecayingSpikes();
+
+    TObjectDoubleMap<String> getAllocationMean();
 }

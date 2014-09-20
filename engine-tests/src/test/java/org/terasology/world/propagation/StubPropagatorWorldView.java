@@ -18,6 +18,7 @@ package org.terasology.world.propagation;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
@@ -30,19 +31,39 @@ import java.util.Map;
 public class StubPropagatorWorldView implements PropagatorWorldView {
     private TObjectByteMap<Vector3i> lightData = new TObjectByteHashMap<>();
     private Map<Vector3i, Block> blockData = Maps.newHashMap();
+    private Region3i relevantRegion;
+
+    public StubPropagatorWorldView(Region3i relevantRegion) {
+        this.relevantRegion = relevantRegion;
+    }
+
+    public StubPropagatorWorldView(Region3i relevantRegion, Map<Vector3i, Block> blockData) {
+        this(relevantRegion);
+        this.blockData = blockData;
+    }
 
     @Override
     public byte getValueAt(Vector3i pos) {
+        if (!relevantRegion.encompasses(pos)) {
+            return UNAVAILABLE;
+        }
         return lightData.get(pos);
     }
 
     @Override
     public void setValueAt(Vector3i pos, byte value) {
-        lightData.put(pos, value);
+        if (!relevantRegion.encompasses(pos)) {
+            throw new IllegalArgumentException("Position out of bounds: " + pos);
+        }
+        lightData.put(new Vector3i(pos), value);
     }
 
     @Override
     public Block getBlockAt(Vector3i pos) {
+        if (!relevantRegion.encompasses(pos)) {
+            throw new IllegalArgumentException("Position out of bounds: " + pos);
+        }
+
         Block result = blockData.get(pos);
         if (result == null) {
             return BlockManager.getAir();
@@ -51,6 +72,10 @@ public class StubPropagatorWorldView implements PropagatorWorldView {
     }
 
     public void setBlockAt(Vector3i pos, Block block) {
+        if (!relevantRegion.encompasses(pos)) {
+            throw new IllegalArgumentException("Position out of bounds: " + pos);
+        }
+
         blockData.put(pos, block);
     }
 }

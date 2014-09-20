@@ -23785,82 +23785,81 @@ public final class NetData {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020NetMessage.proto\032\020EntityData.proto\032\014Ch" +
-      "unks.proto\"\325\006\n\nNetMessage\022\036\n\tchunkInfo\030\002" +
-      " \003(\0132\013.ChunkStore\0220\n\017invalidateChunk\030\003 \003" +
-      "(\0132\027.InvalidateChunkMessage\022(\n\013blockChan" +
-      "ge\030\004 \003(\0132\023.BlockChangeMessage\022*\n\014createE" +
-      "ntity\030\005 \003(\0132\024.CreateEntityMessage\022*\n\014rem" +
-      "oveEntity\030\006 \003(\0132\024.RemoveEntityMessage\022*\n" +
-      "\014updateEntity\030\007 \003(\0132\024.UpdateEntityMessag" +
-      "e\022\034\n\005event\030\010 \003(\0132\r.EventMessage\022\014\n\004time\030" +
-      "\t \001(\003\022-\n\021serverInfoRequest\030\017 \001(\0132\022.Serve",
-      "rInfoRequest\022&\n\nserverInfo\030\020 \001(\0132\022.Serve" +
-      "rInfoMessage\022<\n\025blockFamilyRegistered\030\021 " +
-      "\003(\0132\035.BlockFamilyRegisteredMessage\022\032\n\004jo" +
-      "in\030\022 \001(\0132\014.JoinMessage\022%\n\rmoduleRequest\030" +
-      "\023 \003(\0132\016.ModuleRequest\022+\n\020moduleDataHeade" +
-      "r\030\024 \001(\0132\021.ModuleDataHeader\022\037\n\nmoduleData" +
-      "\030\025 \001(\0132\013.ModuleData\022*\n\014joinComplete\030\026 \001(" +
-      "\0132\024.JoinCompleteMessage\022\'\n\016handshakeHell" +
-      "o\030d \001(\0132\017.HandshakeHello\022/\n\022newIdentityR" +
-      "equest\030e \001(\0132\023.NewIdentityRequest\022-\n\021pro",
-      "visionIdentity\030f \001(\0132\022.ProvisionIdentity" +
-      "\0225\n\025handshakeVerification\030g \001(\0132\026.Handsh" +
-      "akeVerification*\t\010\210\'\020\200\200\200\200\002\"a\n\016HandshakeH" +
-      "ello\022\016\n\006random\030\001 \001(\014\022!\n\013certificate\030\002 \001(" +
-      "\0132\014.Certificate\022\021\n\ttimestamp\030\003 \001(\022*\t\010\210\'\020" +
-      "\200\200\200\200\002\"H\n\022NewIdentityRequest\022\027\n\017preMaster" +
-      "Secret\030\001 \001(\014\022\016\n\006random\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"" +
-      "=\n\021ProvisionIdentity\022\035\n\025encryptedCertifi" +
-      "cates\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"]\n\016CertificateSet" +
-      "\022\'\n\021publicCertificate\030\001 \001(\0132\014.Certificat",
-      "e\022\027\n\017privateExponent\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"5\n" +
-      "\025HandshakeVerification\022\021\n\tsignature\030\001 \001(" +
-      "\014*\t\010\210\'\020\200\200\200\200\002\"Z\n\013Certificate\022\n\n\002id\030\001 \001(\t\022" +
-      "\017\n\007modulus\030\002 \001(\014\022\020\n\010exponent\030\003 \001(\014\022\021\n\tsi" +
-      "gnature\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"L\n\034BlockFamilyR" +
-      "egisteredMessage\022\020\n\010blockUri\030\001 \003(\t\022\017\n\007bl" +
-      "ockId\030\002 \003(\005*\t\010\210\'\020\200\200\200\200\002\"?\n\026InvalidateChun" +
-      "kMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iData*\t\010\210" +
-      "\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022\032\n\003pos\030\001 \001" +
-      "(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001(\005*\t\010\210\'",
-      "\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002" +
-      " \001(\005\022\t\n\001z\030\003 \001(\005\"\036\n\021ServerInfoRequest*\t\010\210" +
-      "\'\020\200\200\200\200\002\"i\n\013JoinMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007" +
-      "version\030\002 \001(\t\022\031\n\021viewDistanceLevel\030\003 \001(\021" +
-      "\022\025\n\005color\030\004 \001(\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Co" +
-      "lor\022\014\n\004rgba\030\001 \001(\r\"2\n\023JoinCompleteMessage" +
-      "\022\020\n\010clientId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\301\002\n\021Server" +
-      "InfoMessage\022\033\n\006module\030\001 \003(\0132\013.ModuleInfo" +
-      "\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t" +
-      "\022%\n\tcomponent\030\004 \003(\0132\022.SerializationInfo\022",
-      "!\n\005event\030\005 \003(\0132\022.SerializationInfo\022\023\n\007as" +
-      "setId\030\006 \003(\005B\002\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023reg" +
-      "isterBlockFamily\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(" +
-      "\0132\n.WorldInfo\022\017\n\007version\030\017 \001(\t\022\020\n\010gameNa" +
-      "me\030\020 \001(\t\022\014\n\004time\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWor" +
-      "ldInfo\022\r\n\005title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'" +
-      "\020\200\200\200\200\002\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001(" +
-      "\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fiel" +
-      "dIds\030\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010m" +
-      "oduleId\030\001 \001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210",
-      "\'\020\200\200\200\200\002\",\n\rModuleRequest\022\020\n\010moduleId\030\001 \001" +
-      "(\t*\t\010\210\'\020\200\200\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id\030" +
-      "\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005" +
-      "error\030\017 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006" +
-      "module\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendErr" +
-      "or\022\017\n\007message\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023Create" +
-      "EntityMessage\022\035\n\006entity\030\001 \001(\0132\r.PackedEn" +
-      "tity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t\010" +
-      "\210\'\020\200\200\200\200\002\"N\n\023UpdateEntityMessage\022\035\n\006entit" +
-      "y\030\001 \001(\0132\r.PackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010",
-      "\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netId" +
-      "\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010tar" +
-      "getId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016ta" +
-      "rgetBlockPos\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200" +
-      "\200\200\200\002B$\n\027org.terasology.protobufB\007NetData" +
-      "H\001"
+      "\n\020NetMessage.proto\032\020EntityData.proto\"\325\006\n" +
+      "\nNetMessage\022\036\n\tchunkInfo\030\002 \003(\0132\013.ChunkSt" +
+      "ore\0220\n\017invalidateChunk\030\003 \003(\0132\027.Invalidat" +
+      "eChunkMessage\022(\n\013blockChange\030\004 \003(\0132\023.Blo" +
+      "ckChangeMessage\022*\n\014createEntity\030\005 \003(\0132\024." +
+      "CreateEntityMessage\022*\n\014removeEntity\030\006 \003(" +
+      "\0132\024.RemoveEntityMessage\022*\n\014updateEntity\030" +
+      "\007 \003(\0132\024.UpdateEntityMessage\022\034\n\005event\030\010 \003" +
+      "(\0132\r.EventMessage\022\014\n\004time\030\t \001(\003\022-\n\021serve" +
+      "rInfoRequest\030\017 \001(\0132\022.ServerInfoRequest\022&",
+      "\n\nserverInfo\030\020 \001(\0132\022.ServerInfoMessage\022<" +
+      "\n\025blockFamilyRegistered\030\021 \003(\0132\035.BlockFam" +
+      "ilyRegisteredMessage\022\032\n\004join\030\022 \001(\0132\014.Joi" +
+      "nMessage\022%\n\rmoduleRequest\030\023 \003(\0132\016.Module" +
+      "Request\022+\n\020moduleDataHeader\030\024 \001(\0132\021.Modu" +
+      "leDataHeader\022\037\n\nmoduleData\030\025 \001(\0132\013.Modul" +
+      "eData\022*\n\014joinComplete\030\026 \001(\0132\024.JoinComple" +
+      "teMessage\022\'\n\016handshakeHello\030d \001(\0132\017.Hand" +
+      "shakeHello\022/\n\022newIdentityRequest\030e \001(\0132\023" +
+      ".NewIdentityRequest\022-\n\021provisionIdentity",
+      "\030f \001(\0132\022.ProvisionIdentity\0225\n\025handshakeV" +
+      "erification\030g \001(\0132\026.HandshakeVerificatio" +
+      "n*\t\010\210\'\020\200\200\200\200\002\"a\n\016HandshakeHello\022\016\n\006random" +
+      "\030\001 \001(\014\022!\n\013certificate\030\002 \001(\0132\014.Certificat" +
+      "e\022\021\n\ttimestamp\030\003 \001(\022*\t\010\210\'\020\200\200\200\200\002\"H\n\022NewId" +
+      "entityRequest\022\027\n\017preMasterSecret\030\001 \001(\014\022\016" +
+      "\n\006random\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"=\n\021ProvisionId" +
+      "entity\022\035\n\025encryptedCertificates\030\001 \001(\014*\t\010" +
+      "\210\'\020\200\200\200\200\002\"]\n\016CertificateSet\022\'\n\021publicCert" +
+      "ificate\030\001 \001(\0132\014.Certificate\022\027\n\017privateEx",
+      "ponent\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"5\n\025HandshakeVeri" +
+      "fication\022\021\n\tsignature\030\001 \001(\014*\t\010\210\'\020\200\200\200\200\002\"Z" +
+      "\n\013Certificate\022\n\n\002id\030\001 \001(\t\022\017\n\007modulus\030\002 \001" +
+      "(\014\022\020\n\010exponent\030\003 \001(\014\022\021\n\tsignature\030\004 \001(\014*" +
+      "\t\010\210\'\020\200\200\200\200\002\"L\n\034BlockFamilyRegisteredMessa" +
+      "ge\022\020\n\010blockUri\030\001 \003(\t\022\017\n\007blockId\030\002 \003(\005*\t\010" +
+      "\210\'\020\200\200\200\200\002\"?\n\026InvalidateChunkMessage\022\032\n\003po" +
+      "s\030\001 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"M\n\022Blo" +
+      "ckChangeMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iD" +
+      "ata\022\020\n\010newBlock\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vect",
+      "or3iData\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(" +
+      "\005\"\036\n\021ServerInfoRequest*\t\010\210\'\020\200\200\200\200\002\"i\n\013Joi" +
+      "nMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022" +
+      "\031\n\021viewDistanceLevel\030\003 \001(\021\022\025\n\005color\030\004 \001(" +
+      "\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Color\022\014\n\004rgba\030\001 " +
+      "\001(\r\"2\n\023JoinCompleteMessage\022\020\n\010clientId\030\001" +
+      " \001(\005*\t\010\210\'\020\200\200\200\200\002\"\301\002\n\021ServerInfoMessage\022\033\n" +
+      "\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007blockId\030\002 " +
+      "\003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tcomponent\030" +
+      "\004 \003(\0132\022.SerializationInfo\022!\n\005event\030\005 \003(\013",
+      "2\022.SerializationInfo\022\023\n\007assetId\030\006 \003(\005B\002\020" +
+      "\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023registerBlockFami" +
+      "ly\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(\0132\n.WorldInfo\022" +
+      "\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001(\t\022\014\n\004ti" +
+      "me\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005titl" +
+      "e\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Seri" +
+      "alizationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022" +
+      "\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210" +
+      "\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t\022" +
+      "\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n\rMod",
+      "uleRequest\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"" +
+      "W\n\020ModuleDataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007versi" +
+      "on\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(\t*\t\010" +
+      "\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006module\030\001 \001(\014*\t" +
+      "\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendError\022\017\n\007message\030" +
+      "\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022" +
+      "\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010blockP" +
+      "os\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023Up" +
+      "dateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.Pack" +
+      "edEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023Re",
+      "moveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200" +
+      "\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n" +
+      "\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030\003" +
+      " \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.te" +
+      "rasology.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -24036,7 +24035,6 @@ public final class NetData {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           org.terasology.protobuf.EntityData.getDescriptor(),
-          org.terasology.protobuf.ChunksProtobuf.getDescriptor(),
         }, assigner);
   }
 

@@ -15,34 +15,81 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
-import org.terasology.core.logic.generators.DefaultGenerators;
-import org.terasology.core.world.generator.AbstractBaseWorldGenerator;
-import org.terasology.core.world.generator.chunkGenerators.BasicHMTerrainGenerator;
-import org.terasology.core.world.generator.chunkGenerators.FloraGenerator;
-import org.terasology.core.world.generator.chunkGenerators.ForestGenerator;
-import org.terasology.core.world.generator.chunkGenerators.OreGenerator;
-import org.terasology.core.world.liquid.LiquidsGenerator;
+import com.google.common.base.Optional;
+import org.terasology.core.world.generator.facetProviders.BiomeProvider;
+import org.terasology.core.world.generator.facetProviders.FloraProvider;
+import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
+import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
+import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
+import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
+import org.terasology.core.world.generator.facetProviders.TreeProvider;
+import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
+import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
+import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
+import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
+import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
+import org.terasology.world.generator.WorldConfigurator;
+import org.terasology.world.generator.WorldGenerator;
 
 /**
  * @author Immortius
  */
 @RegisterWorldGenerator(id = "heightMap", displayName = "Height Map", description = "Generates the world using a height map")
-public class HeightMapWorldGenerator extends AbstractBaseWorldGenerator {
+public class HeightMapWorldGenerator implements WorldGenerator {
+
+    private final SimpleUri uri;
+    private String worldSeed;
+    private World world;
 
     public HeightMapWorldGenerator(SimpleUri uri) {
-        super(uri);
+        this.uri = uri;
+    }
+
+    @Override
+    public final SimpleUri getUri() {
+        return uri;
+    }
+
+    @Override
+    public void setWorldSeed(final String seed) {
+        worldSeed = seed;
+
+        world = new WorldBuilder(worldSeed.hashCode())
+                .addProvider(new SeaLevelProvider())
+                .addProvider(new HeightMapSurfaceHeightProvider())
+                .addProvider(new PerlinHumidityProvider())
+                .addProvider(new PerlinSurfaceTemperatureProvider())
+                .addProvider(new BiomeProvider())
+                .addProvider(new SurfaceToDensityProvider())
+                .addProvider(new FloraProvider())
+                .addProvider(new TreeProvider())
+                .addRasterizer(new FloraRasterizer())
+                .addRasterizer(new TreeRasterizer())
+                .addRasterizer(new SolidRasterizer())
+                .build();
     }
 
     @Override
     public void initialize() {
-        register(new BasicHMTerrainGenerator());
-        register(new FloraGenerator());
-        register(new LiquidsGenerator());
-        register(new OreGenerator());
-        ForestGenerator forestGenerator = new ForestGenerator();
-        DefaultGenerators.addDefaultForestGenerators(forestGenerator);
-        register(forestGenerator);
+        world.initialize();
+    }
+
+    @Override
+    public void createChunk(CoreChunk chunk) {
+        world.rasterizeChunk(chunk);
+    }
+
+    @Override
+    public Optional<WorldConfigurator> getConfigurator() {
+        return Optional.absent();
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 }

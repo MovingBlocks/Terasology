@@ -31,7 +31,7 @@ public interface ChunkRegionListener {
      * @param pos
      * @param chunk
      */
-    void onChunkRelevant(Vector3i pos, ChunkImpl chunk);
+    void onChunkRelevant(Vector3i pos, Chunk chunk);
 
     /**
      * Invoked when a chunk ceases to be relevant for this chunk region (

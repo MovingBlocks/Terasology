@@ -81,6 +81,13 @@ public final class PerformanceMonitor {
     }
 
     /**
+     * @return A mapping of activities to a running mean of memory allocation
+     */
+    public static TObjectDoubleMap<String> getAllocationMean() {
+        return instance.getAllocationMean();
+    }
+
+    /**
      * Allows the enabling/deactivation of the Performance Monitoring system.
      * When disabled calls to startActivity()/endActivity() and rollCycle() are ignored
      * and all data is purged.

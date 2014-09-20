@@ -60,7 +60,7 @@ public interface ChunkProvider {
      * @param entity
      * @param distance The region (in chunks) around the entity that should be near cached
      */
-    void addRelevanceEntity(EntityRef entity, int distance);
+    void addRelevanceEntity(EntityRef entity, Vector3i distance);
 
     /**
      * Requests that a region around the given entity be maintained in near cache
@@ -69,7 +69,7 @@ public interface ChunkProvider {
      * @param distance The region (in chunks) around the entity that should be near cached
      * @param listener A listener to chunk region events
      */
-    void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener);
+    void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener);
 
     /**
      * Retrieves the ChunkRelevanceRegion object for the given entity
@@ -77,7 +77,7 @@ public interface ChunkProvider {
      * @param entity
      * @return The chunk relevance region, or null
      */
-    void updateRelevanceEntity(EntityRef entity, int distance);
+    void updateRelevanceEntity(EntityRef entity, Vector3i distance);
 
     /**
      * Removes an entity from producing a caching region
@@ -87,9 +87,14 @@ public interface ChunkProvider {
     void removeRelevanceEntity(EntityRef entity);
 
     /**
+     * Finish adding any pending chunks
+     */
+    void completeUpdate();
+
+    /**
      * Updates the near cache based on the movement of the caching entities
      */
-    void update();
+    void beginUpdate();
 
     /**
      * @param pos
@@ -100,20 +105,22 @@ public interface ChunkProvider {
     /**
      * Returns the chunk at the given position if possible.
      *
+     *
      * @param x The chunk position on the x-axis
      * @param y The chunk position on the y-axis
      * @param z The chunk position on the z-axis
      * @return The chunk, or null if the chunk is not ready
      */
-    ChunkImpl getChunk(int x, int y, int z);
+    Chunk getChunk(int x, int y, int z);
 
     /**
      * Returns the chunk at the given position if possible.
      *
+     *
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready
      */
-    ChunkImpl getChunk(Vector3i chunkPos);
+    Chunk getChunk(Vector3i chunkPos);
 
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using

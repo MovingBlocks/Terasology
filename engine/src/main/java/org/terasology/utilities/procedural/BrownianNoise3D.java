@@ -50,12 +50,12 @@ public class BrownianNoise3D extends BrownianNoise implements Noise3D {
      * @return The noise value in the range [-getScale()..getScale()]
      */
     @Override
-    public double noise(double x, double y, double z) {
-        double result = 0.0;
+    public float noise(float x, float y, float z) {
+        float result = 0.0f;
 
-        double workingX = x;
-        double workingY = y;
-        double workingZ = z;
+        float workingX = x;
+        float workingY = y;
+        float workingZ = z;
         for (int i = 0; i < getOctaves(); i++) {
             result += other.noise(workingX, workingY, workingZ) * getSpectralWeight(i);
 

@@ -16,42 +16,39 @@
 package org.terasology.monitoring.impl;
 
 import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class NullPerformanceMonitor implements PerformanceMonitorInternal {
     private TObjectDoubleMap<String> metrics = new TObjectDoubleHashMap<>();
-    private TObjectIntMap<String> threads = new TObjectIntHashMap<>();
 
-    public void startThread(String name) {
-    }
-
-    public void endThread(String name) {
-    }
-
+    @Override
     public void rollCycle() {
     }
 
+    @Override
     public void startActivity(String activity) {
     }
 
+    @Override
     public void endActivity() {
     }
 
+    @Override
     public TObjectDoubleMap<String> getRunningMean() {
         return metrics;
     }
 
+    @Override
     public TObjectDoubleMap<String> getDecayingSpikes() {
         return metrics;
     }
 
-    public TObjectIntMap<String> getRunningThreads() {
-        return threads;
+    @Override
+    public TObjectDoubleMap<String> getAllocationMean() {
+        return metrics;
     }
 
 }

@@ -118,7 +118,6 @@ public final class Terasology {
                 }
             }
         }
-        System.exit(0);
     }
 
 }

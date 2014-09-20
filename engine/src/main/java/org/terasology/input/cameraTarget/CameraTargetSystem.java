@@ -129,7 +129,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
             if (focalDistance == Float.MAX_VALUE) {
                 focalDistance = playerToTargetRay.length();
             } else {
-                focalDistance = TeraMath.lerpf(focalDistance, playerToTargetRay.length(), delta * 20.0f);
+                focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * 20.0f);
             }
         } else {
             focalDistance = Float.MAX_VALUE;
@@ -175,3 +175,4 @@ public class CameraTargetSystem extends BaseComponentSystem {
         return focalDistance;
     }
 }
+

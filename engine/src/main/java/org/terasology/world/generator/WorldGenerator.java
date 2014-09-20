@@ -15,12 +15,10 @@
  */
 package org.terasology.world.generator;
 
-import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
-import org.terasology.world.ChunkView;
-import org.terasology.world.chunks.Chunk;
-
 import com.google.common.base.Optional;
+import org.terasology.engine.SimpleUri;
+import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
 
 /**
  * @author Immortius
@@ -30,17 +28,11 @@ public interface WorldGenerator {
 
     void setWorldSeed(String seed);
 
-    void applySecondPass(Vector3i chunkPos, ChunkView view);
-
-    void createChunk(Chunk chunk);
-
-    float getFog(float x, float y, float z);
-
-    float getTemperature(float x, float y, float z);
-
-    float getHumidity(float x, float y, float z);
+    void createChunk(CoreChunk chunk);
 
     void initialize();
 
     Optional<WorldConfigurator> getConfigurator();
+
+    World getWorld();
 }

@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public interface StorageManager {
      * @param chunk The chunk to be saved
      * @return The new chunk store
      */
-    ChunkStore createChunkStoreForSave(ChunkImpl chunk);
+    ChunkStore createChunkStoreForSave(Chunk chunk);
 
     /**
      * Loads a saved chunk store
@@ -68,12 +69,6 @@ public interface StorageManager {
      * @param chunkPos
      */
     ChunkStore loadChunkStore(Vector3i chunkPos);
-
-    /**
-     * @param chunkPos
-     * @return Whether the storage manager has the desired chunk store
-     */
-    boolean containsChunkStoreFor(Vector3i chunkPos);
 
     void flush() throws IOException;
 

@@ -110,7 +110,6 @@ public class ConsoleScreen extends CoreScreenLayer {
                 return messageList.toString();
             }
         });
-
     }
 
     @Override

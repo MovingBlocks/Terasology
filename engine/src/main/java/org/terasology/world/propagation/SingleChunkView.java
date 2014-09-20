@@ -18,6 +18,7 @@ package org.terasology.world.propagation;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
@@ -26,9 +27,9 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 public class SingleChunkView implements PropagatorWorldView {
 
     private final PropagationRules rules;
-    private final ChunkImpl chunk;
+    private final LitChunk chunk;
 
-    public SingleChunkView(PropagationRules rules, ChunkImpl chunk) {
+    public SingleChunkView(PropagationRules rules, LitChunk chunk) {
         this.rules = rules;
         this.chunk = chunk;
     }

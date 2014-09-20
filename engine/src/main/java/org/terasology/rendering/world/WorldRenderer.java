@@ -15,20 +15,25 @@
  */
 package org.terasology.rendering.world;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
+import org.terasology.math.Vector3i;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkProvider;
 
+import javax.vecmath.Vector3f;
+
 public interface WorldRenderer {
     float BLOCK_LIGHT_POW = 0.96f;
     float BLOCK_LIGHT_SUN_POW = 0.96f;
     float BLOCK_INTENSITY_FACTOR = 1.25f;
+
+    void onChunkLoaded(Vector3i chunkPos);
+
+    void onChunkUnloaded(Vector3i chunkPos);
 
     public enum WorldRenderingStage {
         DEFAULT,
@@ -84,4 +89,5 @@ public interface WorldRenderer {
 
     WorldRenderingStage getCurrentRenderStage();
 
+    String getMetrics();
 }

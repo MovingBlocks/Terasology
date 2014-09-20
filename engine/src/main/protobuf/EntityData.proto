@@ -2,8 +2,6 @@
  * @author Immortius <immortius@gmail.com>
  */
 
-import "Chunks.proto";
-
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "EntityData";
 option optimize_for = SPEED;
@@ -115,26 +113,35 @@ message PlayerStore {
     extensions 5000 to max;
 }
 
-enum ChunkState {
-    ADJACENCY_GENERATION_PENDING      = 0;
-    INTERNAL_LIGHT_GENERATION_PENDING = 1;
-    DEPRECATED_1                      = 2;
-    DEPRECATED_2                      = 3;
-    COMPLETE                          = 4;
-}
-
 message ChunkStore {
     optional EntityStore store       = 1;
     optional sint32    x             = 2;
     optional sint32    y             = 3;
     optional sint32    z             = 4;
 
-    optional ChunkState state         = 5;
+    optional int32 deprecated_data_3    = 5;
 
-    optional TeraArray block_data        = 6;
-    optional TeraArray deprecated_data_1 = 7;
-    optional TeraArray deprecated_data_2 = 8;
-    optional TeraArray liquid_data       = 9;
+    optional bytes deprecated_data_4 = 6;
+    optional bytes deprecated_data_1 = 7;
+    optional bytes deprecated_data_2 = 8;
+    optional bytes deprecated_data_5 = 9;
+
+    optional RunLengthEncoding16 block_data = 10;
+    optional RunLengthEncoding8 liquid_data = 11;
+
+    extensions 5000 to max;
+}
+
+message RunLengthEncoding16 {
+    repeated sint32 runLengths = 1 [packed=true];
+    repeated sint32 values = 2 [packed=true];
+
+    extensions 5000 to max;
+}
+
+message RunLengthEncoding8 {
+    repeated sint32 runLengths = 1 [packed=true];
+    optional bytes values = 2;
 
     extensions 5000 to max;
 }

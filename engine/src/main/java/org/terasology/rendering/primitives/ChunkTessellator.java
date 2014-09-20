@@ -21,20 +21,20 @@ import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
 import org.terasology.math.Direction;
-import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
-import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.internal.ChunkViewCoreImpl;
+import org.terasology.world.generation.Region;
+import org.terasology.world.generation.facets.SurfaceHumidityFacet;
+import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -67,11 +67,25 @@ public final class ChunkTessellator {
 
         final Stopwatch watch = Stopwatch.createStarted();
 
+        Region region = generatingChunkProvider.getWorldData(chunkView.getWorldRegion());
+        SurfaceTemperatureFacet surfaceTemperatureFacet = null;
+        SurfaceHumidityFacet surfaceHumidityFacet = null;
+        if (region != null) {
+            surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
+            surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
+        }
+
         for (int x = 0; x < ChunkConstants.SIZE_X; x++) {
             for (int z = 0; z < ChunkConstants.SIZE_Z; z++) {
                 Vector3f worldPos = new Vector3f(chunkOffset.x + x, chunkOffset.y, chunkOffset.z + z);
-                float biomeTemp = generatingChunkProvider.getTemperature(worldPos);
-                float biomeHumidity = generatingChunkProvider.getHumidity(worldPos);
+                float biomeTemp = 0.5f;
+                if (surfaceTemperatureFacet != null) {
+                    biomeTemp = surfaceHumidityFacet.get(x, z);
+                }
+                float biomeHumidity = 0.5f;
+                if (surfaceHumidityFacet != null) {
+                    biomeHumidity = surfaceHumidityFacet.get(x, z);
+                }
 
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Block block = chunkView.getBlock(x, y, z);
@@ -96,33 +110,6 @@ public final class ChunkTessellator {
         return mesh;
     }
 
-    public ChunkMesh generateMinaturizedMesh(MiniatureChunk miniatureChunk) {
-        PerformanceMonitor.startActivity("GenerateMinuatureMesh");
-        ChunkMesh mesh = new ChunkMesh(bufferPool);
-
-        MiniatureChunk[] chunks = {miniatureChunk};
-        ChunkViewCoreImpl localChunkView = new ChunkViewCoreImpl(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
-        localChunkView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
-
-        for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
-            for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {
-                for (int y = 0; y < MiniatureChunk.SIZE_Y; y++) {
-                    Block block = miniatureChunk.getBlock(x, y, z);
-
-                    if (block != null && !block.isInvisible()) {
-                        generateBlockVertices(localChunkView, mesh, x, y, z, 0.0f, 0.0f);
-                    }
-                }
-            }
-        }
-
-        generateOptimizedBuffers(localChunkView, mesh);
-        statVertexArrayUpdateCount++;
-
-        PerformanceMonitor.endActivity();
-        return mesh;
-    }
-
     private void generateOptimizedBuffers(ChunkView chunkView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
@@ -132,9 +119,9 @@ public final class ChunkTessellator {
             elements.finalVertices = BufferUtils.createIntBuffer(
                     elements.vertices.size() + /* POSITION */
                             elements.tex.size() + /* TEX0 (UV0 and flags) */
-                            elements.tex.size()  + /* TEX1 (lighting data) */
-                            elements.flags.size()  + /* FLAGS */
-                            elements.color.size()  + /* COLOR */
+                            elements.tex.size() + /* TEX1 (lighting data) */
+                            elements.flags.size() + /* FLAGS */
+                            elements.color.size() + /* COLOR */
                             elements.normals.size()  /* NORMALS */
             );
 
@@ -341,10 +328,6 @@ public final class ChunkTessellator {
 
         for (Side side : Side.values()) {
             drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), block, side);
-        }
-
-        if (y == 0) {
-            drawDir[Side.BOTTOM.ordinal()] = false;
         }
 
         // If the block is lowered, some more faces may have to be drawn

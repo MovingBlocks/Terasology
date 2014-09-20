@@ -23,16 +23,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.Time;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -43,6 +39,7 @@ import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.logic.characters.PredictionSystem;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -56,6 +53,7 @@ import org.terasology.persistence.serializers.EventSerializer;
 import org.terasology.persistence.serializers.NetworkEntitySerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.WorldChangeListener;
@@ -63,8 +61,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.world.chunks.Chunk;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -117,7 +114,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
-    private Map<Vector3i, ChunkImpl> readyChunks = Maps.newLinkedHashMap();
+    private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
     private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
 
 
@@ -166,7 +163,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
         }
         return color;
     }
-    
+
     @Override
     public String getId() {
         return identity.getId();
@@ -183,9 +180,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                 client.clientInfo.saveComponent(colorInfo);
             }
         }
-        
+
     }
-    
+
     public void setName(String name) {
         this.name = name;
         ClientComponent client = getEntity().getComponent(ClientComponent.class);
@@ -260,9 +257,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
                         distance = chunkDistance;
                     }
                 }
-                ChunkImpl chunk = readyChunks.remove(pos);
+                Chunk chunk = readyChunks.remove(pos);
                 relevantChunks.add(pos);
-                message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
+                message.addChunkInfo(chunk.encode());
             }
         } else {
             chunkSendCounter = 1.0f;
@@ -372,7 +369,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, ChunkImpl chunk) {
+    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
         invalidatedChunks.remove(pos);
         readyChunks.put(pos, chunk);
     }
