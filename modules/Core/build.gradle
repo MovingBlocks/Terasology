@@ -73,6 +73,11 @@ if (env.BUILD_NUMBER != null) {
     //println "Fancy local MODULE version for $project.name: $version"
 }
 
+// TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 // Set dependencies. Note that the dependency information from module.txt is used for other Terasology modules
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
