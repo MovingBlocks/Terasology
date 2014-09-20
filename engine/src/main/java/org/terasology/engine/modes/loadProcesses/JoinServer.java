@@ -17,23 +17,22 @@
 package org.terasology.engine.modes.loadProcesses;
 
 import com.google.common.collect.Maps;
-
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.module.Module;
-import org.terasology.naming.NameVersion;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.LoadProcess;
 import org.terasology.engine.modes.StateMainMenu;
+import org.terasology.engine.module.ModuleManager;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
+import org.terasology.module.Module;
+import org.terasology.naming.NameVersion;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.ServerInfoMessage;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.internal.WorldInfo;
 
 import java.util.Map;
@@ -92,12 +91,12 @@ public class JoinServer implements LoadProcess {
                     CoreRegistry.get(GameEngine.class).changeState(mainMenu);
                     return false;
                 } else {
-
                     logger.debug("Activating module: {}:{}", moduleInfo.getName(), moduleInfo.getVersion());
                     gameManifest.addModule(module.getId(), module.getVersion());
                     moduleSet.add(module);
                 }
             }
+            moduleManager.loadEnvironment(moduleSet, true);
 
             CoreRegistry.get(Game.class).load(gameManifest);
             ApplyModulesUtil.applyModules();
