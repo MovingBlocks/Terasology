@@ -42,7 +42,7 @@ import org.terasology.utilities.concurrency.AbstractTask;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.Chunk;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -234,7 +234,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public ChunkStore createChunkStoreForSave(ChunkImpl chunk) {
+    public ChunkStore createChunkStoreForSave(Chunk chunk) {
         return new ChunkStoreInternal(chunk, this, entityManager);
     }
 
@@ -292,26 +292,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
         }
         return chunkData;
-    }
-
-    @Override
-    public boolean containsChunkStoreFor(Vector3i chunkPos) {
-        if (pendingProcessingChunkStore.containsKey(chunkPos) || compressedChunkStore.containsKey(chunkPos)) {
-            return true;
-        }
-        if (storeChunksInZips) {
-            Path chunkZipPath = getWorldPath().resolve(getChunkZipFilename(getChunkZipPosition(chunkPos)));
-            if (Files.isRegularFile(chunkZipPath)) {
-                try (FileSystem zip = FileSystems.newFileSystem(chunkZipPath, null)) {
-                    return Files.isRegularFile(zip.getPath(getChunkFilename(chunkPos)));
-                } catch (IOException e) {
-                    logger.error("Failed to access chunk zip {}", chunkZipPath, e);
-                }
-            }
-            return false;
-        } else {
-            return Files.isRegularFile(getWorldPath().resolve(getChunkFilename(chunkPos)));
-        }
     }
 
     private void flushChunkStores() throws IOException {

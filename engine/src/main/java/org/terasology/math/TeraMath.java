@@ -34,6 +34,13 @@ public final class TeraMath {
     private TeraMath() {
     }
 
+    /**
+     * a + b, but if the result exceeds Integer.MAX_VALUE then the result will be Integer.MAX_VALUE rather than overflowing.
+     *
+     * @param a
+     * @param b
+     * @return min(a + b, Integer.MAX_VALUE)
+     */
     public static int addClampAtMax(int a, int b) {
         long result = (long) a + (long) b;
         return (int) Math.min(result, Integer.MAX_VALUE);
@@ -102,6 +109,21 @@ public final class TeraMath {
             return 1.0;
         } else if (value < 0.0) {
             return 0.0;
+        }
+        return value;
+    }
+
+    /**
+     * Clamps a given value to be an element of [0..1].
+     *
+     * @param value
+     * @return
+     */
+    public static float clamp(float value) {
+        if (value > 1.0f) {
+            return 1.0f;
+        } else if (value < 0.0f) {
+            return 0.0f;
         }
         return value;
     }
@@ -410,16 +432,48 @@ public final class TeraMath {
     /**
      * Linear interpolation.
      */
-    public static double lerp(double x, double x1, double x2, double q00, double q01) {
-        return ((x2 - x) / (x2 - x1)) * q00 + ((x - x1) / (x2 - x1)) * q01;
+    public static double lerp(double t, double x1, double x2, double q00, double q01) {
+        return ((x2 - t) / (x2 - x1)) * q00 + ((t - x1) / (x2 - x1)) * q01;
     }
 
-    public static double lerp(double x1, double x2, double p) {
-        return x1 * (1.0 - p) + x2 * p;
+    public static double lerp(double a, double b, double t) {
+        return a + t * (b - a);
     }
 
-    public static float lerpf(float x1, float x2, float p) {
-        return x1 * (1.0f - p) + x2 * p;
+    public static float lerp(float a, float b, float t) {
+        return a + t * (b - a);
+    }
+
+    public static float biLerp(float q00, float q10, float q01, float q11, float tx, float ty) {
+        float lerpX1 = lerp(q00, q10, tx);
+        float lerpX2 = lerp(q01, q11, tx);
+        return TeraMath.lerp(lerpX1, lerpX2, ty);
+    }
+
+    public static double biLerp(double q00, double q10, double q01, double q11, double tx, double ty) {
+        double lerpX1 = lerp(q00, q10, tx);
+        double lerpX2 = lerp(q01, q11, tx);
+        return TeraMath.lerp(lerpX1, lerpX2, ty);
+    }
+
+    public static float triLerp(float q000, float q100, float q010, float q110, float q001, float q101, float q011, float q111, float tx, float ty, float tz) {
+        float x00 = lerp(q000, q100, tx);
+        float x10 = lerp(q010, q110, tx);
+        float x01 = lerp(q001, q101, tx);
+        float x11 = lerp(q011, q111, tx);
+        float y0 = lerp(x00, x10, ty);
+        float y1 = lerp(x01, x11, ty);
+        return lerp(y0, y1, tz);
+    }
+
+    public static double triLerp(double q000, double q100, double q010, double q110, double q001, double q101, double q011, double q111, double tx, double ty, double tz) {
+        double x00 = lerp(q000, q100, tx);
+        double x10 = lerp(q010, q110, tx);
+        double x01 = lerp(q001, q101, tx);
+        double x11 = lerp(q011, q111, tx);
+        double y0 = lerp(x00, x10, ty);
+        double y1 = lerp(x01, x11, ty);
+        return lerp(y0, y1, tz);
     }
 
     /**
@@ -437,53 +491,6 @@ public final class TeraMath {
     }
 
     /**
-     * Maps any given value to be positive only.
-     */
-    public static int mapToPositive(int x) {
-        return (x >= 0) ? x * 2 : -x * 2 - 1;
-    }
-
-    /**
-     * Recreates the original value after applying "mapToPositive".
-     */
-    public static int redoMapToPositive(int x) {
-        return (x % 2 == 0) ? x / 2 : -(x / 2) - 1;
-    }
-
-    /**
-     * Applies Cantor's pairing function to 2D coordinates.
-     *
-     * @param k1 X-coordinate
-     * @param k2 Y-coordinate
-     * @return Unique 1D value
-     */
-    public static int cantorize(int k1, int k2) {
-        return ((k1 + k2) * (k1 + k2 + 1) / 2) + k2;
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     *
-     * @param c Cantor value
-     * @return Value along the x-axis
-     */
-    public static int cantorX(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
-        return j - cantorY(c);
-    }
-
-    /**
-     * Inverse function of Cantor's pairing function.
-     *
-     * @param c Cantor value
-     * @return Value along the y-axis
-     */
-    public static int cantorY(int c) {
-        int j = (int) (java.lang.Math.sqrt(0.25 + 2 * c) - 0.5);
-        return c - j * (j + 1) / 2;
-    }
-
-    /**
      * Returns the chunk position of a given coordinate.
      *
      * @param x The X-coordinate of the block
@@ -493,20 +500,6 @@ public final class TeraMath {
         return (x >> chunkPowerX);
     }
 
-    public static int calcChunkPosX(int x) {
-        return calcChunkPosX(x, ChunkConstants.POWER_X);
-    }
-
-    /**
-     * Returns the chunk position of a given coordinate
-     *
-     * @param y
-     * @return The Y-coordinate of the chunk
-     */
-    public static int calcChunkPosY(int y) {
-        return calcChunkPosY(y, ChunkConstants.POWER_Y);
-    }
-
     /**
      * Returns the chunk position of a given coordinate.
      *
@@ -514,8 +507,7 @@ public final class TeraMath {
      * @return The Y-coordinate of the chunk
      */
     public static int calcChunkPosY(int y, int chunkPowerY) {
-        return 0;
-        //return (y >> chunkPowerY);
+        return (y >> chunkPowerY);
     }
 
     /**
@@ -528,18 +520,12 @@ public final class TeraMath {
         return (z >> chunkPowerZ);
     }
 
-    /**
-     * Returns the chunk position of a given coordinate
-     *
-     * @param z The Z-coordinate of the block
-     * @return The Z-coordinate of the chunk
-     */
-    public static int calcChunkPosZ(int z) {
-        return calcChunkPosZ(z, ChunkConstants.POWER_Z);
-    }
-
     public static Vector3i calcChunkPos(Vector3i pos, Vector3i chunkPower) {
         return calcChunkPos(pos.x, pos.y, pos.z, chunkPower);
+    }
+
+    public static Vector3i calcChunkPos(Vector3f pos) {
+        return calcChunkPos(new Vector3i(pos, 0.5f));
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -564,13 +550,8 @@ public final class TeraMath {
         return blockX & chunkPosFilterX;
     }
 
-
-    public static int calcBlockPosX(int blockX) {
-        return calcBlockPosX(blockX, ChunkConstants.INNER_CHUNK_POS_FILTER_X);
-    }
-
-    public static int calcBlockPosY(int blockY) {
-        return blockY;
+    public static int calcBlockPosY(int blockY, int chunkPosFilterY) {
+        return blockY & chunkPosFilterY;
     }
 
     /**
@@ -583,10 +564,6 @@ public final class TeraMath {
         return blockZ & chunkPosFilterZ;
     }
 
-    public static int calcBlockPosZ(int blockZ) {
-        return calcBlockPosZ(blockZ, ChunkConstants.INNER_CHUNK_POS_FILTER_Z);
-    }
-
     public static Vector3i calcBlockPos(Vector3i worldPos) {
         return calcBlockPos(worldPos.x, worldPos.y, worldPos.z, ChunkConstants.INNER_CHUNK_POS_FILTER);
     }
@@ -596,13 +573,13 @@ public final class TeraMath {
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkFilterSize) {
-        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y), calcBlockPosZ(z, chunkFilterSize.z));
+        return new Vector3i(calcBlockPosX(x, chunkFilterSize.x), calcBlockPosY(y, chunkFilterSize.y), calcBlockPosZ(z, chunkFilterSize.z));
     }
 
     public static Region3i getChunkRegionAroundWorldPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent, 0, -extent);
+        Vector3i minPos = new Vector3i(-extent, -extent, -extent);
         minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, 0, extent);
+        Vector3i maxPos = new Vector3i(extent, extent, extent);
         maxPos.add(pos);
 
         Vector3i minChunk = TeraMath.calcChunkPos(minPos);
@@ -655,31 +632,33 @@ public final class TeraMath {
         }
         return power;
     }
-    
+
     /**
      * Perlin's blending spline (interpolation function)
      * <p>
      * 6t<sup>5</sup>-15t<sup>4</sup>+10t<sup>3</sup>
      * </p>
-     * It has both 1st and 2nd derivative of 0 at 0 and 1 
+     * It has both 1st and 2nd derivative of 0 at 0 and 1
+     *
      * @param t
      */
-    public static double fadePerlin(double t) {
+    public static float fadePerlin(float t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
     /**
      * Hermite's blending spline h01 (interpolation function)
-     * <p> 
+     * <p>
      * 3t<sup>2</sup>-2t<sup>3</sup>
      * </p>
-     * It has a 1st derivative of 0 at 0 and 1 
+     * It has a 1st derivative of 0 at 0 and 1
+     *
      * @param t
      */
-    public static double fadeHermite(double t) {
+    public static float fadeHermite(float t) {
         return t * t * (3 - 2 * t);
     }
-    
+
 
     public static int floorToInt(float val) {
         int i = (int) val;
@@ -744,5 +723,67 @@ public final class TeraMath {
             edgeMax.z = max.z;
         }
         return Region3i.createFromMinMax(edgeMin, edgeMax);
+    }
+
+    public static int calculate3DArrayIndex(Vector3i pos, Vector3i size) {
+        return calculate3DArrayIndex(pos.x, pos.y, pos.z, size);
+    }
+
+    public static int calculate3DArrayIndex(int x, int y, int z, Vector3i size) {
+        return x + size.x * (z + size.z * (y));
+    }
+
+    /**
+     * Populates a target array with the minimum value adjacent to each location, including the location itself.
+     *
+     * @param source
+     * @param target
+     * @param populateMargins Whether to populate the edges of the target array
+     */
+    public static void populateMinAdjacent2D(int[] source, int[] target, int dimX, int dimY, boolean populateMargins) {
+        System.arraycopy(source, 0, target, 0, target.length);
+
+        // 0 < x < dimX - 1; 0 < y < dimY - 1
+        for (int y = 1; y < dimY - 1; ++y) {
+            for (int x = 1; x < dimX - 1; ++x) {
+                target[x + y * dimX] = Math.min(Math.min(source[x + (y - 1) * dimX], source[x + (y + 1) * dimX]),
+                        Math.min(source[x + 1 + y * dimX], source[x - 1 + y * dimX]));
+            }
+        }
+
+        if (populateMargins) {
+            // x == 0, y == 0
+            target[0] = Math.min(source[1], source[dimX]);
+
+            // 0 < x < dimX - 1, y == 0
+            for (int x = 1; x < dimX - 1; ++x) {
+                target[x] = Math.min(source[x - 1], Math.min(source[x + 1], source[x + dimX]));
+            }
+
+            // x == dimX - 1, y == 0
+            target[dimX - 1] = Math.min(source[2 * dimX - 1], source[dimX - 2]);
+
+            // 0 < y < dimY - 1
+            for (int y = 1; y < dimY - 1; ++y) {
+                // x == 0
+                target[y * dimX] = Math.min(source[dimX * (y - 1)], Math.min(source[dimX * (y + 1)], source[1 + dimX * y]));
+                // x == dimX - 1
+                target[dimX - 1 + y * dimX] = Math.min(source[dimX - 1 + dimX * (y - 1)], Math.min(source[dimX - 1 + dimX * (y + 1)], source[dimX - 2 + dimX * y]));
+            }
+            // x == 0, y == dimY - 1
+            target[dimX * (dimY - 1)] = Math.min(source[1 + dimX * (dimY - 1)], source[dimX * (dimY - 2)]);
+
+            // 0 < x < dimX - 1; y == dimY - 1
+            for (int x = 1; x < dimX - 1; ++x) {
+                target[x + dimX * (dimY - 1)] = Math.min(source[x - 1 + dimX * (dimY - 1)], Math.min(source[x + 1 + dimX * (dimY - 1)], source[x + dimX * (dimY - 2)]));
+            }
+
+            // x == dimX - 1; y == dimY - 1
+            target[dimX - 1 + dimX * (dimY - 1)] = Math.min(source[dimX - 2 + dimX * (dimY - 1)], source[dimX - 1 + dimX * (dimY - 2)]);
+        }
+    }
+
+    public static float sqrt(float value) {
+        return (float) Math.sqrt(value);
     }
 }

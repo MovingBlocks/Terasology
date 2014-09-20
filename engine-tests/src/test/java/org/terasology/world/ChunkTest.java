@@ -27,6 +27,7 @@ import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.NullWorldAtlas;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ChunkTest extends TerasologyTestingEnvironment {
 
-    private ChunkImpl chunk;
+    private Chunk chunk;
     private BlockManagerImpl blockManager;
 
     @Before

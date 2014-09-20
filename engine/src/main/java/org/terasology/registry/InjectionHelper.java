@@ -19,9 +19,11 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -60,6 +62,29 @@ public final class InjectionHelper {
                         }
                     }
                 }
+                return null;
+            }
+        });
+    }
+
+    public static <T> void inject(final Object object, final Class<? extends Annotation> annotation, final Map<Class<? extends T>, T> source) {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                for (Field field : ReflectionUtils.getAllFields(object.getClass(), ReflectionUtils.withAnnotation(annotation))) {
+                    Object value = source.get(field.getType());
+                    if (value != null) {
+                        try {
+                            field.setAccessible(true);
+                            field.set(object, value);
+                        } catch (IllegalAccessException e) {
+                            logger.error("Failed to inject value {} into field {}", value, field, e);
+                        }
+                    } else {
+                        logger.error("Failed to inject into field {}, nothing to inject", field);
+                    }
+                }
+
                 return null;
             }
         });

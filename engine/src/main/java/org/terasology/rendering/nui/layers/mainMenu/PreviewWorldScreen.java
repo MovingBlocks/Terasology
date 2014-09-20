@@ -23,6 +23,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
@@ -96,7 +97,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             zoomSlider.setMinimum(1.0f);
             zoomSlider.setRange(99.f);
             zoomSlider.setIncrement(1.0f);
-            zoomSlider.setValue(64f);
+            zoomSlider.setValue(10f);
             zoomSlider.setPrecision(0);
         }
 
@@ -123,12 +124,14 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     @Override
     public void update(float delta) {
         super.update(delta);
-        PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
-        if (currentSettings == null || !currentSettings.equals(newSettings)) {
-            Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
-            UIImage image = find("preview", UIImage.class);
-            image.setImage(tex);
-            currentSettings = newSettings;
+        if (previewGenerator != null) {
+            PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
+            if (currentSettings == null || !currentSettings.equals(newSettings)) {
+                Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
+                UIImage image = find("preview", UIImage.class);
+                image.setImage(tex);
+                currentSettings = newSettings;
+            }
         }
     }
 
@@ -159,7 +162,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             for (int x = 0; x < width; ++x) {
                 int px = (x + offX) * scale;
                 int py = (y + offY) * scale;
-                Color c = previewGenerator.get(layerName, px, py);
+                Rect2i area = Rect2i.createFromMinAndSize(px, py, scale, scale);
+                Color c = previewGenerator.get(layerName, area);
                 c.addToBuffer(buf);
             }
         }

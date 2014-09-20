@@ -18,41 +18,50 @@ package org.terasology.world.propagation.light;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-import org.terasology.world.chunks.internal.ChunkImpl;
+import org.terasology.world.chunks.ChunkConstants;
+import org.terasology.world.chunks.LitChunk;
+import org.terasology.world.propagation.PropagatorWorldView;
+import org.terasology.world.propagation.SingleChunkView;
 
 /**
  * @author Immortius
  */
 public class SunlightPropagationRules extends CommonLightPropagationRules {
-    public static final byte MAX_VALUE = 15;
 
-    @Override
-    public byte getBlockValue(Block block) {
-        return 0;
+    private PropagatorWorldView regenWorldView;
+
+    public SunlightPropagationRules(PropagatorWorldView regenWorldView) {
+        this.regenWorldView = regenWorldView;
     }
 
-    @Override
+    public SunlightPropagationRules(LitChunk chunk) {
+        this.regenWorldView = new SingleChunkView(new SunlightRegenPropagationRules(), chunk);
+    }
+
+    public byte getFixedValue(Block block, Vector3i pos) {
+        byte lightVal = (byte) (regenWorldView.getValueAt(pos) - ChunkConstants.SUNLIGHT_REGEN_THRESHOLD);
+        return (lightVal > 0) ? lightVal : 0;
+    }
+
     public byte propagateValue(byte existingValue, Side side, Block from) {
-        if (existingValue == MAX_VALUE && side == Side.BOTTOM && !from.isLiquid()) {
-            return MAX_VALUE;
-        }
-        return (byte) (existingValue - 1);
+        return (existingValue > 0) ? (byte) (existingValue - 1) : 0;
     }
 
-    @Override
     public byte getMaxValue() {
-        return MAX_VALUE;
+        return ChunkConstants.MAX_SUNLIGHT;
+    }
+
+    public byte getValue(LitChunk chunk, Vector3i pos) {
+        return getValue(chunk, pos.x, pos.y, pos.z);
     }
 
     @Override
-    public byte getValue(ChunkImpl chunk, Vector3i pos) {
-        return chunk.getSunlight(pos);
+    public byte getValue(LitChunk chunk, int x, int y, int z) {
+        return chunk.getSunlight(x, y, z);
     }
 
-    @Override
-    public void setValue(ChunkImpl chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
         chunk.setSunlight(pos, value);
     }
-
 
 }

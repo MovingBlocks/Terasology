@@ -17,24 +17,25 @@ package org.terasology.rendering.world;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND("Legally Blind", 0, 4),
-    NEAR("Near", 1, 8),
-    MODERATE("Moderate", 2, 16),
-    FAR("Far", 3, 32),
-    ULTRA("Ultra", 4, 64),
-    MEGA("Mega", 5, 128),
-    EXTREME("Extreme", 6, 512);
+    LEGALLY_BLIND("Legally Blind", 0, new Vector3i(5, 5, 5)),
+    NEAR("Near", 1, new Vector3i(9, 7, 9)),
+    MODERATE("Moderate", 2, new Vector3i(13, 7, 13)),
+    FAR("Far", 3, new Vector3i(17, 7, 17)),
+    ULTRA("Ultra", 4, new Vector3i(25, 7, 25)),
+    MEGA("Mega", 5, new Vector3i(33, 7, 33)),
+    EXTREME("Extreme", 6, new Vector3i(63, 7, 63));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 
     private String displayName;
-    private int chunkDistance;
+    private Vector3i chunkDistance;
     private int index;
 
     static {
@@ -43,13 +44,13 @@ public enum ViewDistance {
         }
     }
 
-    private ViewDistance(String displayName, int index, int chunkDistance) {
+    private ViewDistance(String displayName, int index, Vector3i chunkDistance) {
         this.displayName = displayName;
         this.index = index;
         this.chunkDistance = chunkDistance;
     }
 
-    public int getChunkDistance() {
+    public Vector3i getChunkDistance() {
         return chunkDistance;
     }
 

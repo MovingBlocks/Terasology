@@ -15,6 +15,7 @@
  */
 package org.terasology.math;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import javax.vecmath.Vector3f;
@@ -32,14 +33,15 @@ import java.util.EnumMap;
  */
 public enum Side {
     TOP(Vector3i.up(), true, false, true),
+    BOTTOM(Vector3i.down(), true, false, true),
     LEFT(new Vector3i(-1, 0, 0), false, true, true),
     RIGHT(new Vector3i(1, 0, 0), false, true, true),
     FRONT(new Vector3i(0, 0, -1), true, true, false),
-    BACK(new Vector3i(0, 0, 1), true, true, false),
-    BOTTOM(Vector3i.down(), true, false, true);
+    BACK(new Vector3i(0, 0, 1), true, true, false);
 
     private static EnumMap<Side, Side> reverseMap;
     private static Side[] horizontalSides;
+    private static Side[] verticalSides;
     private static EnumMap<Side, Side> clockwiseYawSide;
     private static EnumMap<Side, Side> anticlockwiseYawSide;
     private static EnumMap<Side, Side> clockwisePitchSide;
@@ -47,8 +49,17 @@ public enum Side {
     private static EnumMap<Side, Side> clockwiseRollSide;
     private static EnumMap<Side, Side> anticlockwiseRollSide;
     private static EnumMap<Side, Direction> conversionMap;
+    private static EnumMap<Side, ImmutableList<Side>> tangents;
 
     static {
+        tangents = new EnumMap<>(Side.class);
+        tangents.put(TOP, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        tangents.put(BOTTOM, ImmutableList.of(LEFT, RIGHT, FRONT, BACK));
+        tangents.put(LEFT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        tangents.put(RIGHT, ImmutableList.of(TOP, BOTTOM, FRONT, BACK));
+        tangents.put(FRONT, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+        tangents.put(BACK, ImmutableList.of(TOP, BOTTOM, LEFT, RIGHT));
+
         reverseMap = new EnumMap<>(Side.class);
         reverseMap.put(TOP, BOTTOM);
         reverseMap.put(LEFT, RIGHT);
@@ -99,6 +110,7 @@ public enum Side {
         anticlockwiseRollSide.put(Side.RIGHT, Side.BOTTOM);
 
         horizontalSides = new Side[]{LEFT, RIGHT, FRONT, BACK};
+        verticalSides = new Side[]{TOP, BOTTOM};
     }
 
     private Vector3i vector3iDir;
@@ -118,6 +130,10 @@ public enum Side {
      */
     public static Side[] horizontalSides() {
         return horizontalSides;
+    }
+
+    public static Side[] verticalSides() {
+        return verticalSides;
     }
 
     public static Side inDirection(int x, int y, int z) {
@@ -276,5 +292,14 @@ public enum Side {
         } else {
             return this;
         }
+    }
+
+    public boolean isVertical() {
+        return !canYaw;
+    }
+
+
+    public Iterable<Side> tangents() {
+        return tangents.get(this);
     }
 }

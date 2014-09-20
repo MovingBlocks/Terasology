@@ -27,6 +27,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
@@ -100,7 +101,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, ChunkImpl chunk) {
+    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
     }
 
     @Override

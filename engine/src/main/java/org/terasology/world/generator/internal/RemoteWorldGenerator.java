@@ -15,14 +15,12 @@
  */
 package org.terasology.world.generator.internal;
 
+import com.google.common.base.Optional;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.ChunkView;
+import org.terasology.world.chunks.CoreChunk;
+import org.terasology.world.generation.World;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
-
-import com.google.common.base.Optional;
 
 public class RemoteWorldGenerator implements WorldGenerator {
 
@@ -43,30 +41,16 @@ public class RemoteWorldGenerator implements WorldGenerator {
     }
 
     @Override
-    public void applySecondPass(Vector3i chunkPos, ChunkView view) {
-    }
-
-    @Override
-    public void createChunk(Chunk chunk) {
-    }
-
-    @Override
-    public float getFog(float x, float y, float z) {
-        return 0;
-    }
-
-    @Override
-    public float getTemperature(float x, float y, float z) {
-        return 0.5f;
-    }
-
-    @Override
-    public float getHumidity(float x, float y, float z) {
-        return 0.5f;
+    public void createChunk(CoreChunk chunk) {
     }
 
     @Override
     public Optional<WorldConfigurator> getConfigurator() {
         return Optional.absent();
+    }
+
+    @Override
+    public World getWorld() {
+        return null;
     }
 }

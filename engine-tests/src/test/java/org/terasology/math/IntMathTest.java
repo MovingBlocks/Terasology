@@ -22,7 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.chunks.ChunkConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,15 +99,6 @@ public class IntMathTest {
         assertEquals(-1, TeraMath.ceilToInt(-1f));
     }
 
-    @Test
-    public void testChunkPosX() {
-        assertEquals(0, TeraMath.calcChunkPosX(1));
-        assertEquals(1, TeraMath.calcChunkPosX(ChunkConstants.SIZE_X));
-        assertEquals(-1, TeraMath.calcChunkPosX(-1));
-        assertEquals(-2, TeraMath.calcChunkPosX(-ChunkConstants.SIZE_X - 1));
-    }
-
-
     /**
      * Tests TeraMath.ceilPowerOfTwo for inputs that are
      * powers of two themselves, or are have a distance of 1 to a power of two.
@@ -140,7 +130,7 @@ public class IntMathTest {
      *
      * @return list of powers of two
      */
-    private static List<Integer> generateAllPowersOfTwo() {
+    private static final List<Integer> generateAllPowersOfTwo() {
         List<Integer> powersOfTwo = new ArrayList<>();
 
         int value = 1;

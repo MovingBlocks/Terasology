@@ -56,8 +56,9 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.internal.BlockManagerImpl;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
-import org.terasology.world.chunks.Chunks;
+import org.terasology.world.chunks.internal.ChunkSerializer;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.util.Collections;
@@ -90,7 +91,7 @@ public class ServerImpl implements Server {
 
     private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
-    private BlockingQueue<ChunkImpl> chunkQueue = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
     private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
@@ -177,9 +178,9 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks() {
         if (remoteWorldProvider != null) {
-            List<ChunkImpl> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
+            List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
             chunkQueue.drainTo(chunks);
-            for (ChunkImpl chunk : chunks) {
+            for (Chunk chunk : chunks) {
                 remoteWorldProvider.receiveChunk(chunk);
             }
         }
@@ -295,7 +296,7 @@ public class ServerImpl implements Server {
 
     private void processReceivedChunks(NetData.NetMessage message) {
         for (EntityData.ChunkStore chunkInfo : message.getChunkInfoList()) {
-            ChunkImpl chunk = Chunks.getInstance().decode(chunkInfo);
+            Chunk chunk = ChunkSerializer.decode(chunkInfo);
             chunkQueue.offer(chunk);
         }
     }

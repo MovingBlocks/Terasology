@@ -16,8 +16,8 @@
 package org.terasology.world.propagation.light;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.propagation.AbstractFullWorldView;
 
@@ -31,21 +31,12 @@ public class SunlightWorldView extends AbstractFullWorldView {
     }
 
     @Override
-    public byte getValueAt(Vector3i pos) {
-        byte result = super.getValueAt(pos);
-        if (result == UNAVAILABLE && pos.y == ChunkConstants.SIZE_Y) {
-            return SunlightPropagationRules.MAX_VALUE;
-        }
-        return result;
-    }
-
-    @Override
-    protected byte getValueAt(ChunkImpl chunk, Vector3i pos) {
+    protected byte getValueAt(LitChunk chunk, Vector3i pos) {
         return chunk.getSunlight(pos);
     }
 
     @Override
-    protected void setValueAt(ChunkImpl chunk, Vector3i pos, byte value) {
+    protected void setValueAt(LitChunk chunk, Vector3i pos, byte value) {
         chunk.setSunlight(pos, value);
     }
 

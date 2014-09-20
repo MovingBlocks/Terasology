@@ -132,11 +132,32 @@ public class Region3iTest {
 
     @Test
     public void testEncompasses() {
-        Region3i region = Region3i.createFromMinMax(new Vector3i(), new Vector3i(2, 2, 2));
-        for (Vector3i v : region) {
-            assertTrue(region.encompasses(v));
-        }
-        assertFalse(region.encompasses(new Vector3i(2, 2, 3)));
+        Region3i region = Region3i.createFromMinAndSize(new Vector3i(), new Vector3i(1, 1, 1));
+        assertTrue(region.encompasses(0, 0, 0));
+
+        assertFalse(region.encompasses(1, 0, 0));
+        assertFalse(region.encompasses(1, 0, 1));
+        assertFalse(region.encompasses(0, 0, 1));
+        assertFalse(region.encompasses(-1, 0, -1));
+        assertFalse(region.encompasses(-1, 0, 0));
+        assertFalse(region.encompasses(-1, 0, -1));
+        assertFalse(region.encompasses(0, 0, -1));
+
+        assertFalse(region.encompasses(1, 1, 0));
+        assertFalse(region.encompasses(1, 1, 1));
+        assertFalse(region.encompasses(0, 1, 1));
+        assertFalse(region.encompasses(-1, 1, -1));
+        assertFalse(region.encompasses(-1, 1, 0));
+        assertFalse(region.encompasses(-1, 1, -1));
+        assertFalse(region.encompasses(0, 1, -1));
+
+        assertFalse(region.encompasses(1, -1, 0));
+        assertFalse(region.encompasses(1, -1, 1));
+        assertFalse(region.encompasses(0, -1, 1));
+        assertFalse(region.encompasses(-1, -1, -1));
+        assertFalse(region.encompasses(-1, -1, 0));
+        assertFalse(region.encompasses(-1, -1, -1));
+        assertFalse(region.encompasses(0, -1, -1));
     }
 
     @Test
