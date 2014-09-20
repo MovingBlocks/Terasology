@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -188,12 +189,13 @@ public class CreateGameScreen extends CoreScreenLayer {
         });
 
         UIButton previewSeed = find("previewSeed", UIButton.class);
-        previewSeed.bindVisible(new ReadOnlyBinding<Boolean>() {
+        ReadOnlyBinding<Boolean> worldGeneratorSelected = new ReadOnlyBinding<Boolean>() {
             @Override
             public Boolean get() {
                 return worldGenerator != null && worldGenerator.getSelection() != null;
             }
-        });
+        };
+        previewSeed.bindEnabled(worldGeneratorSelected);
         WidgetUtil.trySubscribe(this, "previewSeed", new ActivateEventListener() {
             @Override
             public void onActivated(UIWidget button) {
@@ -204,12 +206,16 @@ public class CreateGameScreen extends CoreScreenLayer {
             }
         });
 
-        WidgetUtil.trySubscribe(this, "config", new ActivateEventListener() {
-            @Override
-            public void onActivated(UIWidget button) {
-                getManager().pushScreen("engine:configWorldGen");
-            }
-        });
+        UIButton configButton = find("config", UIButton.class);
+        if (configButton != null) {
+            configButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget button) {
+                    getManager().pushScreen("engine:configWorldGen");
+                }
+            });
+            configButton.bindEnabled(worldGeneratorSelected);
+        }
 
         WidgetUtil.trySubscribe(this, "mods", new ActivateEventListener() {
             @Override

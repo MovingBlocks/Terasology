@@ -68,6 +68,10 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
 
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
+
+        if (info == null)
+            return;
+
         try {
             WorldGenerator wg = worldGeneratorManager.createGenerator(info.getUri());
             if (wg.getConfigurator().isPresent()) {
