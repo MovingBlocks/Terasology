@@ -25,17 +25,17 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeDeactivateCompon
 import org.terasology.entitySystem.entity.lifecycleEvents.OnActivatedComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.registry.In;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.registry.Share;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
+import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.registry.In;
+import org.terasology.registry.Share;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
@@ -104,14 +104,10 @@ public class ServerCharacterPredictionSystem extends BaseComponentSystem impleme
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = new CharacterStateEvent(lastState);
         newState.setSequenceNumber(lastState.getSequenceNumber());
-        if (event.getMode() == MovementMode.GHOSTING) {
-            if (lastState.getMode() != MovementMode.GHOSTING) {
-                newState.setMode(MovementMode.GHOSTING);
-            } else {
-                newState.setMode(MovementMode.WALKING);
-            }
-        } else {
+        if (event.getMode() != lastState.getMode()) {
             newState.setMode(event.getMode());
+        } else {
+            newState.setMode(MovementMode.WALKING);
         }
         stateBuffer.add(newState);
         CharacterStateEvent.setToState(character, newState);

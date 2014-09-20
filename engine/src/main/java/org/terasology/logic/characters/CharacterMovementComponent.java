@@ -42,22 +42,13 @@ public final class CharacterMovementComponent implements Component {
     // Speed settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     @Range(min = 0, max = 10)
-    public float maxGroundSpeed = 1.2f;
-    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    @Range(min = 0, max = 10)
-    public float maxWaterSpeed = 2.0f;
-    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    @Range(min = 0, max = 10)
-    public float maxGhostSpeed = 5.0f;
+    public float speedMultiplier = 1.0f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     @Range(min = 0, max = 10)
     public float runFactor = 1.5f;
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
     @Range(min = 0, max = 10)
     public float jumpSpeed = 10.0f;
-    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    @Range(min = 0, max = 10)
-    public float maxClimbSpeed = 3.0f;
 
     // Movement settings
     @Replicate(FieldReplicateType.SERVER_TO_OWNER)
@@ -67,12 +58,7 @@ public final class CharacterMovementComponent implements Component {
     @Range(min = 0, max = 1)
     public float slopeFactor = 0.6f; // Cosine of the maximum slope traversable. 1 is no slope, 0 is any slope
 
-    // Determines how easily the play can change direction
-    // TODO: Separate player agiliy from environmental friction, and ground from air control
-    @Replicate(FieldReplicateType.SERVER_TO_OWNER)
-    public float groundFriction = 8.0f;
     public float distanceBetweenFootsteps = 1f;
-    public float distanceBetweenSwimStrokes = 1f;
     public boolean faceMovementDirection;
 
     // Current movement mode

@@ -40,47 +40,25 @@ public class MovementDebugCommands extends BaseComponentSystem {
         return "Ghost mode toggled";
     }
 
-    @Command(shortDescription = "Set ground friction", runOnServer = true)
-    public String setGroundFriction(@CommandParam("amount") float amount, EntityRef client) {
+    @Command(shortDescription = "Grants flight", runOnServer = true)
+    public String flight(EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-        if (move != null) {
-            float oldFric = move.groundFriction;
+        clientComp.character.send(new SetMovementModeEvent(MovementMode.FLYING));
 
-            move.groundFriction = amount;
-            clientComp.character.saveComponent(move);
-            
-            return "Ground friction set to " + amount + " (was " + oldFric + ")"; 
-        }
-        
-        return "";
+        return "Flight mode toggled";
     }
 
-    @Command(shortDescription = "Set max ground speed", helpText = "Set maxGroundSpeed", runOnServer = true)
-    public String setMaxGroundSpeed(@CommandParam("amount") float amount, EntityRef client) {
+
+    @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true)
+    public String setSpeedMultiplier(@CommandParam("amount") float amount, EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
-            float oldSpeed = move.maxGroundSpeed;
-            move.maxGroundSpeed = amount;
+            float oldSpeedMultipler = move.speedMultiplier;
+            move.speedMultiplier = amount;
             clientComp.character.saveComponent(move);
 
-            return "Max ground speed set to " + amount + " (was " + oldSpeed + ")"; 
-        }
-        
-        return "";
-    }
-
-    @Command(shortDescription = "Set max ghost speed", runOnServer = true)
-    public String setMaxGhostSpeed(@CommandParam("amount") float amount, EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-        if (move != null) {
-            float oldSpeed = move.maxGhostSpeed;
-            move.maxGhostSpeed = amount;
-            clientComp.character.saveComponent(move);
-            
-            return "Max ghost speed set to " + amount + " (was " + oldSpeed + ")"; 
+            return "Speed multiplier set to " + amount + " (was " + oldSpeedMultipler + ")";
         }
         
         return "";
@@ -106,9 +84,9 @@ public class MovementDebugCommands extends BaseComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
-            return "Your groundFriction:" + move.groundFriction + " maxGroudspeed:" + move.maxGroundSpeed + " JumpSpeed:"
-                    + move.jumpSpeed + " maxWaterSpeed:" + move.maxWaterSpeed + " maxGhostSpeed:" + move.maxGhostSpeed + " SlopeFactor:"
-                    + move.slopeFactor + " runFactor:" + move.runFactor;
+            return "Your SpeedMultiplier:" + move.speedMultiplier + " JumpSpeed:"
+                    + move.jumpSpeed + " SlopeFactor:"
+                    + move.slopeFactor + " RunFactor:" + move.runFactor;
         }
         return "You're dead I guess.";
     }
@@ -118,10 +96,8 @@ public class MovementDebugCommands extends BaseComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
-            move.maxGhostSpeed = 50f;
+            move.speedMultiplier = 10f;
             move.jumpSpeed = 24f;
-            move.maxGroundSpeed = 20f;
-            move.maxWaterSpeed = 12f;
             clientComp.character.saveComponent(move);
             
             return "High-speed mode activated";
@@ -153,14 +129,11 @@ public class MovementDebugCommands extends BaseComponentSystem {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
-            move.maxGhostSpeed = 3f;
-            move.jumpSpeed = 12f;
-            move.maxGroundSpeed = 5f;
-            move.maxWaterSpeed = 2f;
+            move.jumpSpeed = 10f;
+            move.speedMultiplier = 1f;
             move.runFactor = 1.5f;
             move.stepHeight = 0.35f;
             move.slopeFactor = 0.6f;
-            move.groundFriction = 8.0f;
             move.distanceBetweenFootsteps = 1f;
             clientComp.character.saveComponent(move);
             
