@@ -205,6 +205,22 @@
                                 "id": "fovReset"
                             },
                             {
+                                "type": "UILabel",
+                                "text": "Frame Limit: "
+                            },
+                            {
+                                "type": "UISlider",
+                                "id": "frameLimit"
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
+                                "type": "UISpace",
+                                "size": [1, 13]
+                            },
+                            {
                                 "type": "UISpace",
                                 "size": [1, 13]
                             },

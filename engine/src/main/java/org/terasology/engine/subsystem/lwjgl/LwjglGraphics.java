@@ -111,7 +111,11 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
     @Override
     public void postUpdate(GameState currentState, float delta) {
         Display.update();
-        Display.sync(60);
+
+        int frameLimit = CoreRegistry.get(Config.class).getRendering().getFrameLimit();
+        if (frameLimit > 0) {
+            Display.sync(frameLimit);
+        }
         currentState.render();
 
         if (Display.wasResized()) {

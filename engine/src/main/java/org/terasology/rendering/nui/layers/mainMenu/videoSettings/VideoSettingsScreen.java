@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu.videoSettings;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.BindHelper;
+import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.itemRendering.StringTextRenderer;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIDropdown;
@@ -112,6 +114,45 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             fovSlider.setMinimum(70);
             fovSlider.setRange(50);
             fovSlider.bindValue(BindHelper.bindBeanProperty("fieldOfView", config.getRendering(), Float.TYPE));
+        }
+
+        final UISlider frameLimitSlider = find("frameLimit", UISlider.class);
+        if (frameLimitSlider != null) {
+            frameLimitSlider.setIncrement(5.0f);
+            frameLimitSlider.setPrecision(0);
+            frameLimitSlider.setMinimum(30);
+            frameLimitSlider.setRange(175); // Goes up to 205 (which is off)
+            // Frame limit > 200 is just displayed and treated as "off"
+            frameLimitSlider.setLabelFunction(new Function<Float, String>() {
+                @Override
+                public String apply(Float input) {
+                    if (input > 200) {
+                        return " Off "; // Spaces to get wider than "200" (otherwise the display jumps around)
+                    } else {
+                        return String.valueOf(input.intValue());
+                    }
+                }
+            });
+            frameLimitSlider.bindValue(new Binding<Float>() {
+                @Override
+                public Float get() {
+                    if (config.getRendering().getFrameLimit() == -1) {
+                        return 205f;
+                    } else {
+                        return (float) config.getRendering().getFrameLimit();
+                    }
+                }
+
+                @Override
+                public void set(Float value) {
+                    int frameLimit = value.intValue();
+                    if (frameLimit > 200) {
+                        config.getRendering().setFrameLimit(-1);
+                    } else {
+                        config.getRendering().setFrameLimit(frameLimit);
+                    }
+                }
+            });
         }
 
         UIDropdown<CameraSetting> cameraSetting = find("camera", UIDropdown.class);

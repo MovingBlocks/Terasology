@@ -64,6 +64,7 @@ public class RenderingConfig {
     private boolean cloudShadows = true;
     private boolean renderNearest = true;
     private int particleEffectLimit = 10;
+    private int frameLimit = 60;
     private int meshLimit = 400;
     private boolean inscattering = true;
     private boolean localReflections;
@@ -400,6 +401,14 @@ public class RenderingConfig {
 
     public RenderingDebugConfig getDebug() {
         return debug;
+    }
+
+    public int getFrameLimit() {
+        return frameLimit;
+    }
+
+    public void setFrameLimit(int frameLimit) {
+        this.frameLimit = frameLimit;
     }
 
     @Override

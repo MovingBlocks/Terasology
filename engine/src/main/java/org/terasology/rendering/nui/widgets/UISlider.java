@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
+import com.google.common.base.Function;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -84,6 +85,7 @@ public class UISlider extends CoreWidget {
     private int sliderWidth;
     private boolean active;
     private String formatString = "0.0";
+    private Function<Float, String> labelFunction;
 
     public UISlider() {
     }
@@ -92,14 +94,26 @@ public class UISlider extends CoreWidget {
         super(id);
     }
 
+    private String getDisplayText() {
+        if (labelFunction != null) {
+            return labelFunction.apply(value.get());
+        } else {
+            return String.format("%." + precision + "f", value.get());
+        }
+    }
+
+    public void setLabelFunction(Function<Float, String> labelFunction) {
+        this.labelFunction = labelFunction;
+    }
+
     @Override
     public void onDraw(Canvas canvas) {
         canvas.setPart(SLIDER);
         canvas.drawBackground();
 
         canvas.setPart(TICKER);
-        String display = String.format("%." + precision + "f", value.get());
-        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
+        String display = getDisplayText();
+        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(display);
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
 
         sliderWidth = canvas.size().x - tickerWidth;
@@ -126,7 +140,7 @@ public class UISlider extends CoreWidget {
         }
 
         canvas.setPart(TICKER);
-        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(formatString);
+        int tickerWidth = canvas.getCurrentStyle().getFont().getWidth(getDisplayText());
         tickerWidth += canvas.getCurrentStyle().getMargin().getTotalWidth();
         result.x = Math.max(result.x, tickerWidth);
         if (canvas.getCurrentStyle().getFixedWidth() != 0) {
