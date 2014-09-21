@@ -39,7 +39,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
      */
     public AttachedToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
         super(uri, categories);
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             Block block = blocks.get(side);
             if (block != null) {
                 this.blocks.put(side, block);

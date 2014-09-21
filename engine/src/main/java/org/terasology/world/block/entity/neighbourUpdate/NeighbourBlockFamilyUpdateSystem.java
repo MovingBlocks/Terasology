@@ -99,7 +99,7 @@ public class NeighbourBlockFamilyUpdateSystem extends BaseComponentSystem implem
     }
 
     private void processUpdateForBlockLocation(Vector3i blockLocation) {
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             Vector3i neighborLocation = new Vector3i(blockLocation);
             neighborLocation.add(side.getVector3i());
             Block neighborBlock = worldProvider.getBlock(neighborLocation);
