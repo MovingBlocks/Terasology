@@ -29,6 +29,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldComponent;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkProvider;
@@ -39,12 +41,7 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
 import org.terasology.world.liquid.LiquidData;
-import org.terasology.world.propagation.BatchPropagator;
-import org.terasology.world.propagation.BlockChange;
-import org.terasology.world.propagation.PropagationRules;
-import org.terasology.world.propagation.PropagatorWorldView;
-import org.terasology.world.propagation.StandardBatchPropagator;
-import org.terasology.world.propagation.SunlightRegenBatchPropagator;
+import org.terasology.world.propagation.*;
 import org.terasology.world.propagation.light.LightPropagationRules;
 import org.terasology.world.propagation.light.LightWorldView;
 import org.terasology.world.propagation.light.SunlightPropagationRules;
@@ -74,6 +71,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
     private Map<Vector3i, BlockChange> blockChanges = Maps.newHashMap();
+    private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
@@ -209,6 +207,16 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
+    private void notifyBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
+        // TODO: Could use a read/write lock.
+        // TODO: Review, should only happen on main thread (as should changes to listeners)
+        synchronized (listeners) {
+            for (WorldChangeListener listener : listeners) {
+                listener.onBiomeChanged(pos, newBiome, originalBiome);
+            }
+        }
+    }
+
     @Override
     public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
@@ -251,6 +259,48 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
         logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", x, y, z);
         return BlockManager.getAir();
+    }
+
+    @Override
+    public Biome getBiome(Vector3i pos) {
+        Vector3i chunkPos = TeraMath.calcChunkPos(pos);
+        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = TeraMath.calcBlockPos(pos);
+            return chunk.getBiome(blockPos.x, blockPos.y, blockPos.z);
+        }
+        logger.warn("Attempted to access unavailable chunk via block at {}, {}, {}", pos.x, pos.y, pos.z);
+        return BiomeManager.getUnknownBiome();
+    }
+
+    @Override
+    public Biome setBiome(Vector3i worldPos, Biome biome) {
+        Vector3i chunkPos = TeraMath.calcChunkPos(worldPos);
+        CoreChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = TeraMath.calcBlockPos(worldPos);
+            chunk.lock();
+            Biome oldBiomeType = chunk.setBiome(blockPos.x, blockPos.y, blockPos.z, biome);
+            chunk.unlock();
+            if (oldBiomeType != biome) {
+                BiomeChange oldChange = biomeChanges.get(worldPos);
+                if (oldChange == null) {
+                    biomeChanges.put(worldPos, new BiomeChange(worldPos, oldBiomeType, biome));
+                } else {
+                    oldChange.setTo(biome);
+                }
+                for (Vector3i pos : TeraMath.getChunkRegionAroundWorldPos(worldPos, 1)) {
+                    RenderableChunk dirtiedChunk = chunkProvider.getChunk(pos);
+                    if (dirtiedChunk != null) {
+                        dirtiedChunk.setDirty(true);
+                    }
+                }
+                notifyBiomeChanged(worldPos, biome, oldBiomeType);
+            }
+            return oldBiomeType;
+
+        }
+        return null;
     }
 
     @Override

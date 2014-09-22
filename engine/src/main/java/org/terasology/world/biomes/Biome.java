@@ -13,18 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.facets;
+package org.terasology.world.biomes;
 
-import org.terasology.core.world.CoreBiome;
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import org.terasology.engine.SimpleUri;
+import org.terasology.module.sandbox.API;
 
-/**
- * @author Immortius
- */
-public class BiomeFacet extends BaseObjectFacet2D<CoreBiome> {
-    public BiomeFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border, CoreBiome.class);
-    }
+@API
+public interface Biome {
+
+    /**
+     * @return An identifier that includes both the Module the biome originates from
+     * and a unique biome id (unique to that module).
+     */
+    String getId();
+
+    /**
+     * Returns human readable name of the biome.
+     */
+    String getName();
+
+    float getFog();
+
+    float getHumidity();
+
+    float getTemperature();
+
 }

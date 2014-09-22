@@ -15,7 +15,7 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import org.terasology.core.world.Biome;
+import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.Vector2i;
 import org.terasology.world.generation.Border3D;
@@ -49,15 +49,15 @@ public class BiomeProvider implements FacetProvider {
             float temp = temperature.get(pos);
             float hum = temp * surfaceHumidityFacet.get(pos);
             if (temp >= 0.5f && hum < 0.3f) {
-                biomeFacet.set(pos, Biome.DESERT);
+                biomeFacet.set(pos, CoreBiome.DESERT);
             } else if (hum >= 0.3f && hum <= 0.6f && temp >= 0.5f) {
-                biomeFacet.set(pos, Biome.PLAINS);
+                biomeFacet.set(pos, CoreBiome.PLAINS);
             } else if (temp <= 0.3f && hum > 0.5f) {
-                biomeFacet.set(pos, Biome.SNOW);
+                biomeFacet.set(pos, CoreBiome.SNOW);
             } else if (hum >= 0.2f && hum <= 0.6f && temp < 0.5f) {
-                biomeFacet.set(pos, Biome.MOUNTAINS);
+                biomeFacet.set(pos, CoreBiome.MOUNTAINS);
             } else {
-                biomeFacet.set(pos, Biome.FOREST);
+                biomeFacet.set(pos, CoreBiome.FOREST);
             }
         }
         region.setRegionFacet(BiomeFacet.class, biomeFacet);

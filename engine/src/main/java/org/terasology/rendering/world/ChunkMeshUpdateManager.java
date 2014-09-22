@@ -111,7 +111,7 @@ public final class ChunkMeshUpdateManager {
                 c.setDirty(false);
                 int meshHeight = ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS;
                 for (int seg = 0; seg < WorldRendererLwjgl.VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, c.getPosition(), meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
                 }
 
                 c.setPendingMesh(newMeshes);

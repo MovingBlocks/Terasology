@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world;
+package org.terasology.world.biomes;
 
-public enum Biome {
-    MOUNTAINS(true, 0.95f), SNOW(false, 1.0f), DESERT(true, 0.0f), FOREST(true, 0.9f), PLAINS(true, 0.0f);
+import org.terasology.module.sandbox.API;
 
-    private boolean vegetationFriendly;
-    private float fog;
+/**
+ * Implement this interface in your module to register your biomes with the engine.
+ */
+@API
+public interface BiomeRegistrator {
 
-    private Biome(boolean vegetationFriendly, float fog) {
-        this.vegetationFriendly = vegetationFriendly;
-        this.fog = fog;
-    }
+    void registerBiomes(BiomeRegistry registry);
 
-    public boolean isVegetationFriendly() {
-        return vegetationFriendly;
-    }
-
-    public float getFog() {
-        return fog;
-    }
 }

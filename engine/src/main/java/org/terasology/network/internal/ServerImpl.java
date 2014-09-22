@@ -51,13 +51,14 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkSerializer;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
@@ -88,13 +89,15 @@ public class ServerImpl implements Server {
     private NetworkEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private BlockManagerImpl blockManager;
+    private BiomeManager biomeManager;
 
     private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
-    private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyUpdates = ArrayListMultimap.create();
+    private ListMultimap<Vector3i, NetData.BlockChangeMessage> awaitingChunkReadyBlockUpdates = ArrayListMultimap.create();
+    private ListMultimap<Vector3i, NetData.BiomeChangeMessage> awaitingChunkReadyBiomeUpdates = ArrayListMultimap.create();
 
     private EngineTime time;
 
@@ -114,6 +117,7 @@ public class ServerImpl implements Server {
         this.entitySerializer = newEntitySerializer;
         this.blockEntityRegistry = newBlockEntityRegistry;
         blockManager = (BlockManagerImpl) CoreRegistry.get(BlockManager.class);
+        biomeManager = CoreRegistry.get(BiomeManager.class);
     }
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
@@ -246,6 +250,7 @@ public class ServerImpl implements Server {
             processReceivedChunks(message);
             processInvalidatedChunks(message);
             processBlockChanges(message);
+            processBiomeChanges(message);
             processRemoveEntities(message);
             for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {
                 createEntityMessage(createEntity);
@@ -281,7 +286,22 @@ public class ServerImpl implements Server {
             if (worldProvider.isBlockRelevant(pos)) {
                 worldProvider.setBlock(pos, newBlock);
             } else {
-                awaitingChunkReadyUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
+                awaitingChunkReadyBlockUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
+            }
+        }
+    }
+
+    private void processBiomeChanges(NetData.NetMessage message) {
+        for (NetData.BiomeChangeMessage biomeChange : message.getBiomeChangeList()) {
+            logger.debug("Received block change to {}", blockManager.getBlock((short) biomeChange.getNewBiome()));
+            // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
+            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+            Vector3i pos = NetMessageUtil.convert(biomeChange.getPos());
+            if (worldProvider.isBlockRelevant(pos)) {
+                Biome newBiome = biomeManager.getBiomeByShortId((short) biomeChange.getNewBiome());
+                worldProvider.setBiome(pos, newBiome);
+            } else {
+                awaitingChunkReadyBiomeUpdates.put(TeraMath.calcChunkPos(pos), biomeChange);
             }
         }
     }
@@ -290,7 +310,8 @@ public class ServerImpl implements Server {
         for (NetData.InvalidateChunkMessage chunk : message.getInvalidateChunkList()) {
             Vector3i chunkPos = NetMessageUtil.convert(chunk.getPos());
             remoteWorldProvider.invalidateChunks(chunkPos);
-            awaitingChunkReadyUpdates.removeAll(chunkPos);
+            awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
+            awaitingChunkReadyBiomeUpdates.removeAll(chunkPos);
         }
     }
 
@@ -367,12 +388,20 @@ public class ServerImpl implements Server {
 
     @Override
     public void onChunkReady(Vector3i chunkPos) {
-        List<NetData.BlockChangeMessage> updateMessages = awaitingChunkReadyUpdates.removeAll(chunkPos);
-        for (NetData.BlockChangeMessage message : updateMessages) {
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+
+        List<NetData.BlockChangeMessage> updateBlockMessages = awaitingChunkReadyBlockUpdates.removeAll(chunkPos);
+        for (NetData.BlockChangeMessage message : updateBlockMessages) {
             Vector3i pos = NetMessageUtil.convert(message.getPos());
             Block newBlock = blockManager.getBlock((short) message.getNewBlock());
             worldProvider.setBlock(pos, newBlock);
+        }
+
+        List<NetData.BiomeChangeMessage> updateBiomeMessages = awaitingChunkReadyBiomeUpdates.removeAll(chunkPos);
+        for (NetData.BiomeChangeMessage message : updateBiomeMessages) {
+            Vector3i pos = NetMessageUtil.convert(message.getPos());
+            Biome newBiome = biomeManager.getBiomeByShortId((short) message.getNewBiome());
+            worldProvider.setBiome(pos, newBiome);
         }
     }
 }

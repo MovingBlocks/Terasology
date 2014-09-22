@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -85,6 +87,27 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
+    public Biome getBiome(float x, float y, float z) {
+        return getBiome(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
+    }
+
+    @Override
+    public Biome getBiome(Vector3i pos) {
+        return getBiome(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public Biome getBiome(int blockX, int blockY, int blockZ) {
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return BiomeManager.getUnknownBiome();
+        }
+
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        Vector3i blockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
+        return chunks[chunkIndex].getBiome(blockPos.x, blockPos.y, blockPos.z);
+    }
+
+    @Override
     public byte getSunlight(float x, float y, float z) {
         return getSunlight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
@@ -138,6 +161,24 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
             chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize), type);
         } else {
             logger.warn("Attempt to modify block outside of the view");
+        }
+    }
+
+    @Override
+    public void setBiome(Vector3i pos, Biome biome) {
+        setBiome(pos.x, pos.y, pos.z, biome);
+    }
+
+    @Override
+    public void setBiome(int blockX, int blockY, int blockZ, Biome biome) {
+        if (!locked.get()) {
+            throw new IllegalStateException("Attempted to modify biome though an unlocked view");
+        } else if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            Vector3i pos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
+            chunks[chunkIndex].setBiome(pos.x, pos.y, pos.z, biome);
+        } else {
+            logger.warn("Attempt to modify biome outside of the view");
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.terasology.core.world.generator.rasterizers;
 
-import org.terasology.core.world.Biome;
+import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
@@ -63,18 +63,20 @@ public class SolidRasterizer implements WorldRasterizer {
         Vector2i pos2d = new Vector2i();
         for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
             pos2d.set(pos.x, pos.z);
+            CoreBiome biome = biomeFacet.get(pos2d);
+            chunk.setBiome(pos.x, pos.y, pos.z, biome);
+
             float density = solidityFacet.get(pos);
             if (density >= 32) {
                 chunk.setBlock(pos, stone);
             } else if (density >= 0) {
                 int depth = TeraMath.floorToInt(surfaceFacet.get(pos2d)) - pos.y - chunk.getChunkWorldOffsetY();
-                Biome biome = biomeFacet.get(pos2d);
                 Block block = getSurfaceBlock(depth, pos.y + chunk.getChunkWorldOffsetY(), biome);
                 chunk.setBlock(pos, block);
             } else {
                 int posY = pos.y + chunk.getChunkWorldOffsetY();
 
-                if (posY == 32 && Biome.SNOW == biomeFacet.get(pos2d)) {
+                if (posY == 32 && CoreBiome.SNOW == biomeFacet.get(pos2d)) {
                     chunk.setBlock(pos, ice);
                 } else if (posY <= 32) {
                     chunk.setBlock(pos, water);
@@ -83,7 +85,7 @@ public class SolidRasterizer implements WorldRasterizer {
         }
     }
 
-    private Block getSurfaceBlock(int depth, int height, Biome type) {
+    private Block getSurfaceBlock(int depth, int height, CoreBiome type) {
         switch (type) {
             case FOREST:
             case PLAINS:

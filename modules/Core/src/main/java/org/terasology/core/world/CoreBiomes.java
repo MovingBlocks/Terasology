@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator.facets;
+package org.terasology.core.world;
 
-import org.terasology.core.world.CoreBiome;
-import org.terasology.math.Region3i;
-import org.terasology.world.generation.Border3D;
-import org.terasology.world.generation.facets.base.BaseObjectFacet2D;
+import org.terasology.world.biomes.BiomeRegistry;
+import org.terasology.world.biomes.BiomeRegistrator;
 
 /**
- * @author Immortius
+ * Registers all core biomes with the engine.
  */
-public class BiomeFacet extends BaseObjectFacet2D<CoreBiome> {
-    public BiomeFacet(Region3i targetRegion, Border3D border) {
-        super(targetRegion, border, CoreBiome.class);
+public class CoreBiomes implements BiomeRegistrator {
+
+    @Override
+    public void registerBiomes(BiomeRegistry registry) {
+        for (CoreBiome coreBiome : CoreBiome.values()) {
+            registry.registerBiome(coreBiome);
+        }
     }
+
 }

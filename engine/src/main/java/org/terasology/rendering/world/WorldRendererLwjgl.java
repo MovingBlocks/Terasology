@@ -189,7 +189,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(worldProvider, bufferPool);
+        chunkTessellator = new ChunkTessellator(bufferPool);
         skysphere = new Skysphere(this);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
@@ -1141,8 +1141,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
                 ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
                 for (int seg = 0; seg < VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = chunkTessellator.generateMesh(view, chunk.getPosition(),
-                            ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS, seg * (ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS));
+                    newMeshes[seg] = chunkTessellator.generateMesh(view,
+                        ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS, seg * (ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS));
                 }
 
                 chunk.setPendingMesh(newMeshes);

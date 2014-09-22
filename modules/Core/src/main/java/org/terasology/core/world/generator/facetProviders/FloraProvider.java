@@ -15,7 +15,7 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
-import org.terasology.core.world.Biome;
+import org.terasology.core.world.CoreBiome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.PlantFacet;
 import org.terasology.entitySystem.Component;
@@ -60,10 +60,10 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
             for (int x = facet.getRelativeRegion().minX(); x <= facet.getRelativeRegion().maxX(); ++x) {
                 int height = TeraMath.floorToInt(surface.get(x, z));
                 if (height >= minY && height < maxY) {
-                    Biome biome = biomeFacet.get(x, z);
+                    CoreBiome biome = biomeFacet.get(x, z);
                     height = height - minY + facet.getRelativeRegion().minY();
 
-                    if ((biome == Biome.FOREST || biome == Biome.PLAINS) && density.get(x, height, z) > 0
+                    if ((biome == CoreBiome.FOREST || biome == CoreBiome.PLAINS) && density.get(x, height, z) > 0
                             && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) < configuration.density) {
                         facet.set(x, height + 1, z, true);
                     }

@@ -60,6 +60,7 @@ import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.testUtil.WorldProviderCoreStub;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
@@ -126,7 +127,7 @@ public class EntityAwareWorldProviderTest {
         NetworkSystem networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
         entityManager = builder.build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        worldStub = new WorldProviderCoreStub(BlockManager.getAir());
+        worldStub = new WorldProviderCoreStub();
         worldProvider = new EntityAwareWorldProvider(worldStub, entityManager);
 
         plainBlock = new Block();

@@ -11900,6 +11900,20 @@ public final class EntityData {
      * <code>optional .RunLengthEncoding8 liquid_data = 11;</code>
      */
     org.terasology.protobuf.EntityData.RunLengthEncoding8OrBuilder getLiquidDataOrBuilder();
+
+    // optional .RunLengthEncoding16 biome_data = 12;
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    boolean hasBiomeData();
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    org.terasology.protobuf.EntityData.RunLengthEncoding16 getBiomeData();
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBiomeDataOrBuilder();
   }
   /**
    * Protobuf type {@code ChunkStore}
@@ -12029,6 +12043,19 @@ public final class EntityData {
                 liquidData_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000400;
+              break;
+            }
+            case 98: {
+              org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000800) == 0x00000800)) {
+                subBuilder = biomeData_.toBuilder();
+              }
+              biomeData_ = input.readMessage(org.terasology.protobuf.EntityData.RunLengthEncoding16.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(biomeData_);
+                biomeData_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000800;
               break;
             }
           }
@@ -12265,6 +12292,28 @@ public final class EntityData {
       return liquidData_;
     }
 
+    // optional .RunLengthEncoding16 biome_data = 12;
+    public static final int BIOME_DATA_FIELD_NUMBER = 12;
+    private org.terasology.protobuf.EntityData.RunLengthEncoding16 biomeData_;
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    public boolean hasBiomeData() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    public org.terasology.protobuf.EntityData.RunLengthEncoding16 getBiomeData() {
+      return biomeData_;
+    }
+    /**
+     * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+     */
+    public org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBiomeDataOrBuilder() {
+      return biomeData_;
+    }
+
     private void initFields() {
       store_ = org.terasology.protobuf.EntityData.EntityStore.getDefaultInstance();
       x_ = 0;
@@ -12277,6 +12326,7 @@ public final class EntityData {
       deprecatedData5_ = com.google.protobuf.ByteString.EMPTY;
       blockData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
       liquidData_ = org.terasology.protobuf.EntityData.RunLengthEncoding8.getDefaultInstance();
+      biomeData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -12297,6 +12347,12 @@ public final class EntityData {
       }
       if (hasLiquidData()) {
         if (!getLiquidData().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (hasBiomeData()) {
+        if (!getBiomeData().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -12347,6 +12403,9 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeMessage(11, liquidData_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeMessage(12, biomeData_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -12401,6 +12460,10 @@ public final class EntityData {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(11, liquidData_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(12, biomeData_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -12514,6 +12577,7 @@ public final class EntityData {
           getStoreFieldBuilder();
           getBlockDataFieldBuilder();
           getLiquidDataFieldBuilder();
+          getBiomeDataFieldBuilder();
         }
       }
       private static Builder create() {
@@ -12556,6 +12620,12 @@ public final class EntityData {
           liquidDataBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000400);
+        if (biomeDataBuilder_ == null) {
+          biomeData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+        } else {
+          biomeDataBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -12640,6 +12710,14 @@ public final class EntityData {
         } else {
           result.liquidData_ = liquidDataBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        if (biomeDataBuilder_ == null) {
+          result.biomeData_ = biomeData_;
+        } else {
+          result.biomeData_ = biomeDataBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -12689,6 +12767,9 @@ public final class EntityData {
         if (other.hasLiquidData()) {
           mergeLiquidData(other.getLiquidData());
         }
+        if (other.hasBiomeData()) {
+          mergeBiomeData(other.getBiomeData());
+        }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -12709,6 +12790,12 @@ public final class EntityData {
         }
         if (hasLiquidData()) {
           if (!getLiquidData().isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (hasBiomeData()) {
+          if (!getBiomeData().isInitialized()) {
             
             return false;
           }
@@ -13364,6 +13451,123 @@ public final class EntityData {
           liquidData_ = null;
         }
         return liquidDataBuilder_;
+      }
+
+      // optional .RunLengthEncoding16 biome_data = 12;
+      private org.terasology.protobuf.EntityData.RunLengthEncoding16 biomeData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder> biomeDataBuilder_;
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public boolean hasBiomeData() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16 getBiomeData() {
+        if (biomeDataBuilder_ == null) {
+          return biomeData_;
+        } else {
+          return biomeDataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public Builder setBiomeData(org.terasology.protobuf.EntityData.RunLengthEncoding16 value) {
+        if (biomeDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          biomeData_ = value;
+          onChanged();
+        } else {
+          biomeDataBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public Builder setBiomeData(
+          org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder builderForValue) {
+        if (biomeDataBuilder_ == null) {
+          biomeData_ = builderForValue.build();
+          onChanged();
+        } else {
+          biomeDataBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public Builder mergeBiomeData(org.terasology.protobuf.EntityData.RunLengthEncoding16 value) {
+        if (biomeDataBuilder_ == null) {
+          if (((bitField0_ & 0x00000800) == 0x00000800) &&
+              biomeData_ != org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance()) {
+            biomeData_ =
+              org.terasology.protobuf.EntityData.RunLengthEncoding16.newBuilder(biomeData_).mergeFrom(value).buildPartial();
+          } else {
+            biomeData_ = value;
+          }
+          onChanged();
+        } else {
+          biomeDataBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000800;
+        return this;
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public Builder clearBiomeData() {
+        if (biomeDataBuilder_ == null) {
+          biomeData_ = org.terasology.protobuf.EntityData.RunLengthEncoding16.getDefaultInstance();
+          onChanged();
+        } else {
+          biomeDataBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000800);
+        return this;
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder getBiomeDataBuilder() {
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return getBiomeDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      public org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder getBiomeDataOrBuilder() {
+        if (biomeDataBuilder_ != null) {
+          return biomeDataBuilder_.getMessageOrBuilder();
+        } else {
+          return biomeData_;
+        }
+      }
+      /**
+       * <code>optional .RunLengthEncoding16 biome_data = 12;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder> 
+          getBiomeDataFieldBuilder() {
+        if (biomeDataBuilder_ == null) {
+          biomeDataBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.terasology.protobuf.EntityData.RunLengthEncoding16, org.terasology.protobuf.EntityData.RunLengthEncoding16.Builder, org.terasology.protobuf.EntityData.RunLengthEncoding16OrBuilder>(
+                  biomeData_,
+                  getParentForChildren(),
+                  isClean());
+          biomeData_ = null;
+        }
+        return biomeDataBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:ChunkStore)
@@ -17779,30 +17983,31 @@ public final class EntityData {
       "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rch" +
       "aracterPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002" +
       "\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030" +
-      "\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\260\002\n\nChunkStore\022\033\n\005store" +
+      "\022 \001(\010*\t\010\210\'\020\200\200\200\200\002\"\332\002\n\nChunkStore\022\033\n\005store" +
       "\030\001 \001(\0132\014.EntityStore\022\t\n\001x\030\002 \001(\021\022\t\n\001y\030\003 \001" +
       "(\021\022\t\n\001z\030\004 \001(\021\022\031\n\021deprecated_data_3\030\005 \001(\005" +
       "\022\031\n\021deprecated_data_4\030\006 \001(\014\022\031\n\021deprecate" +
       "d_data_1\030\007 \001(\014\022\031\n\021deprecated_data_2\030\010 \001(" +
       "\014\022\031\n\021deprecated_data_5\030\t \001(\014\022(\n\nblock_da" +
       "ta\030\n \001(\0132\024.RunLengthEncoding16\022(\n\013liquid",
-      "_data\030\013 \001(\0132\023.RunLengthEncoding8*\t\010\210\'\020\200\200" +
-      "\200\200\002\"L\n\023RunLengthEncoding16\022\026\n\nrunLengths" +
-      "\030\001 \003(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200\200\200" +
-      "\002\"G\n\022RunLengthEncoding8\022\026\n\nrunLengths\030\001 " +
-      "\003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\204\001\n\023E" +
-      "ntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.Store" +
-      "Type\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeInte" +
-      "gerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002\020\001*\t" +
-      "\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 \003(" +
-      "\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017c",
-      "omponent_class\030\003 \003(\t\022\026\n\016next_entity_id\030\020" +
-      " \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013pre" +
-      "fab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 \003(" +
-      "\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\tSt" +
-      "oreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkSto" +
-      "reType\020\002B\'\n\027org.terasology.protobufB\nEnt" +
-      "ityDataH\001"
+      "_data\030\013 \001(\0132\023.RunLengthEncoding8\022(\n\nbiom" +
+      "e_data\030\014 \001(\0132\024.RunLengthEncoding16*\t\010\210\'\020" +
+      "\200\200\200\200\002\"L\n\023RunLengthEncoding16\022\026\n\nrunLengt" +
+      "hs\030\001 \003(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200" +
+      "\200\200\002\"G\n\022RunLengthEncoding8\022\026\n\nrunLengths\030" +
+      "\001 \003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\204\001\n" +
+      "\023EntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.Sto" +
+      "reType\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeIn" +
+      "tegerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002\020\001" +
+      "*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 ",
+      "\003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n" +
+      "\017component_class\030\003 \003(\t\022\026\n\016next_entity_id" +
+      "\030\020 \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013p" +
+      "refab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 " +
+      "\003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\t" +
+      "StoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkS" +
+      "toreType\020\002B\'\n\027org.terasology.protobufB\nE" +
+      "ntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -17868,7 +18073,7 @@ public final class EntityData {
           internal_static_ChunkStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ChunkStore_descriptor,
-              new java.lang.String[] { "Store", "X", "Y", "Z", "DeprecatedData3", "DeprecatedData4", "DeprecatedData1", "DeprecatedData2", "DeprecatedData5", "BlockData", "LiquidData", });
+              new java.lang.String[] { "Store", "X", "Y", "Z", "DeprecatedData3", "DeprecatedData4", "DeprecatedData1", "DeprecatedData2", "DeprecatedData5", "BlockData", "LiquidData", "BiomeData", });
           internal_static_RunLengthEncoding16_descriptor =
             getDescriptor().getMessageTypes().get(10);
           internal_static_RunLengthEncoding16_fieldAccessorTable = new

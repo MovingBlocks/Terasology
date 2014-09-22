@@ -17,6 +17,7 @@ message NetMessage {
     repeated UpdateEntityMessage updateEntity = 7;
     repeated EventMessage event = 8;
     optional int64 time = 9;
+    repeated BiomeChangeMessage biomeChange = 10;
 
     optional ServerInfoRequest serverInfoRequest = 15;
     optional ServerInfoMessage serverInfo = 16;
@@ -96,6 +97,13 @@ message InvalidateChunkMessage {
 message BlockChangeMessage {
     optional Vector3iData pos = 1;
     optional int32 newBlock = 2;
+
+    extensions 5000 to max;
+}
+
+message BiomeChangeMessage {
+    optional Vector3iData pos = 1;
+    optional int32 newBiome = 2;
 
     extensions 5000 to max;
 }

@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.generation.Region;
 import org.terasology.world.liquid.LiquidData;
@@ -112,6 +113,16 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public Biome setBiome(Vector3i pos, Biome biome) {
+        return base.setBiome(pos, biome);
+    }
+
+    @Override
+    public Biome getBiome(Vector3i pos) {
+        return base.getBiome(pos);
+    }
+
+    @Override
     public byte getLight(int x, int y, int z) {
         return base.getLight(x, y, z);
     }
@@ -140,4 +151,5 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     public Region getWorldData(Region3i region) {
         return base.getWorldData(region);
     }
+
 }

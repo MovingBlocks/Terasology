@@ -26,12 +26,15 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
@@ -119,9 +122,13 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
-                    return String.format("total vus: %s | worldTime: %.2f",
+                    Vector3i blockPos = new Vector3i(localPlayer.getPosition());
+                    Biome biome = worldProvider.getBiome(blockPos);
+                    String biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
+                    return String.format("total vus: %s | worldTime: %.2f | biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
-                            worldProvider.getTime().getDays());
+                            worldProvider.getTime().getDays(),
+                            biomeId);
                 }
             });
         }

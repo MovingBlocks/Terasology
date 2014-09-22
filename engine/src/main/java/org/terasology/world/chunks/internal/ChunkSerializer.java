@@ -32,11 +32,12 @@ import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
  */
 public class ChunkSerializer {
 
-    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray liquidData) {
+    public static EntityData.ChunkStore.Builder encode(Vector3i pos, TeraArray blockData, TeraArray liquidData, TeraArray biomeData) {
         final EntityData.ChunkStore.Builder b = EntityData.ChunkStore.newBuilder()
                 .setX(pos.x).setY(pos.y).setZ(pos.z);
         b.setBlockData(runLengthEncode16(blockData));
         b.setLiquidData(runLengthEncode8(liquidData));
+        b.setBiomeData(runLengthEncode16(biomeData));
 
         return b;
     }
@@ -56,7 +57,8 @@ public class ChunkSerializer {
 
         final TeraArray blockData = runLengthDecode(message.getBlockData());
         final TeraArray liquidData = runLengthDecode(message.getLiquidData());
-        return new ChunkImpl(pos, blockData, liquidData);
+        final TeraArray biomeData = runLengthDecode(message.getBiomeData());
+        return new ChunkImpl(pos, blockData, liquidData, biomeData);
     }
 
     private static EntityData.RunLengthEncoding16 runLengthEncode16(TeraArray array) {

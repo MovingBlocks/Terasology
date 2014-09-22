@@ -18,6 +18,7 @@ package org.terasology.world.chunks;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.module.sandbox.API;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
 
@@ -44,6 +45,10 @@ public interface CoreChunk {
     Block setBlock(int x, int y, int z, Block block);
 
     Block setBlock(Vector3i pos, Block block);
+
+    Biome setBiome(int x, int y, int z, Biome biome);
+
+    Biome getBiome(int x, int y, int z);
 
     void setLiquid(Vector3i pos, LiquidData state);
 
