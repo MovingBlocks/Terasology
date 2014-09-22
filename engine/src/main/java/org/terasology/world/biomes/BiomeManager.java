@@ -66,9 +66,36 @@ public class BiomeManager implements BiomeRegistry {
 
         }
 
-        registerBiome(UnknownBiome.INSTANCE); // Always assigned id 0
+        BiMap<Short, Biome> currentIdMap = HashBiMap.create(biomeShortIdMap); // Make a copy before we start modifying it
+        biomeShortIdMap.clear();
 
-        // TODO: Import knownBiomeIdMap
+        // Always register the unknown biome first, so it gets id 0, which is the default for all chunks
+        registerBiome(UnknownBiome.INSTANCE);
+
+        for (Map.Entry<String, Short> entry : knownBiomeIdMap.entrySet()) {
+            if (entry.getKey().equals(getUnknownBiome().getId()))
+                continue; // The unknown biome is handled internally
+
+            Biome biome = biomeIdMap.get(entry.getKey());
+            if (biome == null) {
+                throw new IllegalStateException("Save game references biome " + entry.getKey() +  " which is no " +
+                    "longer available.");
+            }
+            if (biomeShortIdMap.put(entry.getValue(), biome) != null) {
+                throw new IllegalStateException("Biome short id " + entry.getValue() + " is present multiple times " +
+                    "in the save game (latest is mapped to " + biome.getId() + ".");
+            }
+            logger.info("Restored biome {} with short id {} from save game.", entry.getKey(), entry.getValue());
+            currentIdMap.values().remove(biome);
+        }
+
+        // Handle all new biomes that weren't present in the save game
+        for (Biome biome : currentIdMap.values()) {
+            short freeBiomeId = getFreeBiomeId();
+            biomeShortIdMap.put(freeBiomeId, biome);
+            logger.info("Registered new biome {} with id {} that wasn't present in the save game.", biome.getId(),
+                freeBiomeId);
+        }
 
     }
 
@@ -169,7 +196,7 @@ public class BiomeManager implements BiomeRegistry {
     /**
      * @return A biome that can be used to avoid a null pointer in cases where the real biome is unknown, i.e.
      * when the chunk has not yet been loaded.
-     *
+     * <p/>
      * TODO: Decide how a caller can determine that he got the unknown biome and not the real one.
      */
     public static Biome getUnknownBiome() {

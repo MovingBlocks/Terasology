@@ -29,11 +29,15 @@ import org.terasology.engine.EngineTime;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.persistence.StorageManager;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -74,6 +78,7 @@ public class Game {
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
             BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+            BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
             ModuleConfig moduleConfig = new ModuleConfig();
@@ -89,6 +94,15 @@ public class Game {
             }
             gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
             gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
+            List<Biome> biomes = biomeManager.getBiomes();
+            Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
+            for (Biome biome : biomes) {
+                short shortId = biomeManager.getBiomeShortId(biome);
+                String id = biomeManager.getBiomeId(biome);
+                biomeIdMap.put(id, shortId);
+            }
+            gameManifest.setBiomeIdMap(biomeIdMap);
+
             gameManifest.addWorld(worldProvider.getWorldInfo());
 
             try {
