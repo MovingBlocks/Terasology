@@ -147,9 +147,4 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
         return base.getTime();
     }
 
-    @Override
-    public Region getWorldData(Region3i region) {
-        return base.getWorldData(region);
-    }
-
 }

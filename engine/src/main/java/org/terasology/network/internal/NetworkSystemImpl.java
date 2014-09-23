@@ -81,6 +81,8 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
+import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -112,6 +114,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private EventSerializer eventSerializer;
     private NetworkEntitySerializer entitySerializer;
     private BlockManager blockManager;
+    private BiomeManager biomeManager;
     private OwnershipHelper ownershipHelper;
 
     private ChannelFactory factory;
@@ -243,6 +246,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.clear();
         netClientList.clear();
         blockManager = null;
+        biomeManager = null;
         ownerLookup.clear();
         ownedLookup.clear();
         ownershipHelper = null;
@@ -491,6 +495,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         this.entityManager = newEntityManager;
         this.entityManager.subscribe(this);
         this.blockManager = CoreRegistry.get(BlockManager.class);
+        this.biomeManager = CoreRegistry.get(BiomeManager.class);
         this.ownershipHelper = new OwnershipHelper(newEntityManager.getComponentLibrary());
         this.storageManager = CoreRegistry.get(StorageManager.class);
         this.entitySystemLibrary = library;
@@ -782,6 +787,11 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         for (Map.Entry<String, Short> blockMapping : blockManager.getBlockIdMap().entrySet()) {
             serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
             serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
+        }
+        for (Biome biome : biomeManager.getBiomes()) {
+            serverInfoMessageBuilder.addBiomeId(biome.getId());
+            short shortId = biomeManager.getBiomeShortId(biome);
+            serverInfoMessageBuilder.addBiomeShortId(shortId);
         }
         for (BlockFamily registeredBlockFamily : blockManager.listRegisteredBlockFamilies()) {
             serverInfoMessageBuilder.addRegisterBlockFamily(registeredBlockFamily.getURI().toString());

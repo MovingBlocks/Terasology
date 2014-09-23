@@ -42,6 +42,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
@@ -287,17 +288,11 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
     }
 
     private void renderBlockParticles(Vector3f worldPos, Vector3f cameraPosition, BlockParticleEffectComponent particleEffect) {
-        float temperature = 0.5f;
-        float humidity = 0.5f;
 
         Vector3i worldPos3i = new Vector3i(worldPos, 0.5f);
-        Region region = worldProvider.getWorldData(Region3i.createFromCenterExtents(worldPos3i, 1));
-        if (region != null) {
-            SurfaceTemperatureFacet surfaceTemperatureFacet = region.getFacet(SurfaceTemperatureFacet.class);
-            temperature = surfaceTemperatureFacet.getWorld(worldPos3i.x, worldPos3i.z);
-            SurfaceHumidityFacet surfaceHumidityFacet = region.getFacet(SurfaceHumidityFacet.class);
-            humidity = surfaceHumidityFacet.getWorld(worldPos3i.x, worldPos3i.z);
-        }
+        Biome biome = worldProvider.getBiome(worldPos3i);
+        float temperature = biome.getTemperature();
+        float humidity = biome.getHumidity();
 
         glPushMatrix();
         glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);

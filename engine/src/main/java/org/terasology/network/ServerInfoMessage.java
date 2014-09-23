@@ -46,6 +46,8 @@ public interface ServerInfoMessage {
      */
     Map<Integer, String> getBlockIds();
 
+    Map<Short, String> getBiomeIds();
+
     /**
      * @return
      */

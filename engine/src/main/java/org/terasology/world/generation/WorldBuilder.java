@@ -75,7 +75,7 @@ public class WorldBuilder {
         // TODO: ensure the required providers are present
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        return new WorldImpl(seed, providerChains, rasterizers, determineBorders(providerChains));
+        return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains));
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {

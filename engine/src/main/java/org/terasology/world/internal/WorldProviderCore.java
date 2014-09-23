@@ -180,5 +180,4 @@ public interface WorldProviderCore {
 
     WorldTime getTime();
 
-    Region getWorldData(Region3i region);
 }

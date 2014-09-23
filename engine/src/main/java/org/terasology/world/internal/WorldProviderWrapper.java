@@ -104,11 +104,6 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
-    public Region getWorldData(Region3i region) {
-        return core.getWorldData(region);
-    }
-
-    @Override
     public void processPropagation() {
         core.processPropagation();
     }

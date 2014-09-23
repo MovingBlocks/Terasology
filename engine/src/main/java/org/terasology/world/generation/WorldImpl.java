@@ -27,24 +27,16 @@ import java.util.Map;
  * @author Immortius
  */
 public class WorldImpl implements World {
-    private long seed;
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
     private List<WorldRasterizer> worldRasterizers;
     private Map<Class<? extends WorldFacet>, Border3D> borders;
 
-    public WorldImpl(long seed,
-                     ListMultimap<Class<? extends WorldFacet>,
-                             FacetProvider> facetProviderChains,
+    public WorldImpl(ListMultimap<Class<? extends WorldFacet>,
+        FacetProvider> facetProviderChains,
                      List<WorldRasterizer> worldRasterizers, Map<Class<? extends WorldFacet>, Border3D> borders) {
-        this.seed = seed;
         this.facetProviderChains = facetProviderChains;
         this.worldRasterizers = worldRasterizers;
         this.borders = borders;
-    }
-
-    @Override
-    public long getSeed() {
-        return seed;
     }
 
     @Override

@@ -38,8 +38,6 @@ import org.terasology.world.chunks.internal.GeneratingChunkProvider;
 import org.terasology.world.chunks.pipeline.AbstractChunkTask;
 import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
 import org.terasology.world.chunks.pipeline.ChunkTask;
-import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.generator.internal.RemoteWorldGenerator;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
@@ -67,15 +65,11 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private ChunkGenerationPipeline pipeline;
 
-    private WorldGenerator remoteWorld;
-
     private LightMerger<Chunk> lightMerger = new LightMerger<>(this);
 
     public RemoteChunkProvider() {
         pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         ChunkMonitor.fireChunkProviderInitialized(this);
-
-        remoteWorld = new RemoteWorldGenerator();
     }
 
     public void subscribe(ChunkReadyListener chunkReadyListener) {
@@ -253,12 +247,6 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         } catch (InterruptedException e) {
             logger.warn("Failed to add chunk to ready queue", e);
         }
-    }
-
-    @Override
-    public WorldGenerator getWorldGenerator() {
-        //TODO: send this information over the wire
-        return remoteWorld;
     }
 
     @Override

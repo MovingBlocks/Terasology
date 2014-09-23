@@ -25,8 +25,6 @@ import java.util.Map;
  */
 public interface World {
 
-    long getSeed();
-
     Region getWorldData(Region3i region);
 
     void rasterizeChunk(CoreChunk chunk);

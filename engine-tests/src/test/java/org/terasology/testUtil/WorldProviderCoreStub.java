@@ -178,8 +178,4 @@ public class WorldProviderCoreStub implements WorldProviderCore {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public Region getWorldData(Region3i region) {
-        return null;
-    }
 }

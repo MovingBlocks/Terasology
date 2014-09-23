@@ -14833,6 +14833,40 @@ public final class NetData {
     org.terasology.protobuf.NetData.WorldInfoOrBuilder getWorldInfoOrBuilder(
         int index);
 
+    // repeated sint32 biomeShortId = 10 [packed = true];
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    java.util.List<java.lang.Integer> getBiomeShortIdList();
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    int getBiomeShortIdCount();
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    int getBiomeShortId(int index);
+
+    // repeated string biomeId = 11;
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    java.util.List<java.lang.String>
+    getBiomeIdList();
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    int getBiomeIdCount();
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    java.lang.String getBiomeId(int index);
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getBiomeIdBytes(int index);
+
     // optional string version = 15;
     /**
      * <code>optional string version = 15;</code>
@@ -15022,6 +15056,35 @@ public final class NetData {
               worldInfo_.add(input.readMessage(org.terasology.protobuf.NetData.WorldInfo.PARSER, extensionRegistry));
               break;
             }
+            case 80: {
+              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+                biomeShortId_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000200;
+              }
+              biomeShortId_.add(input.readSInt32());
+              break;
+            }
+            case 82: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000200) == 0x00000200) && input.getBytesUntilLimit() > 0) {
+                biomeShortId_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x00000200;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                biomeShortId_.add(input.readSInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 90: {
+              if (!((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
+                biomeId_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000400;
+              }
+              biomeId_.add(input.readBytes());
+              break;
+            }
             case 122: {
               bitField0_ |= 0x00000001;
               version_ = input.readBytes();
@@ -15071,6 +15134,12 @@ public final class NetData {
         }
         if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
           worldInfo_ = java.util.Collections.unmodifiableList(worldInfo_);
+        }
+        if (((mutable_bitField0_ & 0x00000200) == 0x00000200)) {
+          biomeShortId_ = java.util.Collections.unmodifiableList(biomeShortId_);
+        }
+        if (((mutable_bitField0_ & 0x00000400) == 0x00000400)) {
+          biomeId_ = new com.google.protobuf.UnmodifiableLazyStringList(biomeId_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -15386,6 +15455,60 @@ public final class NetData {
       return worldInfo_.get(index);
     }
 
+    // repeated sint32 biomeShortId = 10 [packed = true];
+    public static final int BIOMESHORTID_FIELD_NUMBER = 10;
+    private java.util.List<java.lang.Integer> biomeShortId_;
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    public java.util.List<java.lang.Integer>
+        getBiomeShortIdList() {
+      return biomeShortId_;
+    }
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    public int getBiomeShortIdCount() {
+      return biomeShortId_.size();
+    }
+    /**
+     * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+     */
+    public int getBiomeShortId(int index) {
+      return biomeShortId_.get(index);
+    }
+    private int biomeShortIdMemoizedSerializedSize = -1;
+
+    // repeated string biomeId = 11;
+    public static final int BIOMEID_FIELD_NUMBER = 11;
+    private com.google.protobuf.LazyStringList biomeId_;
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    public java.util.List<java.lang.String>
+        getBiomeIdList() {
+      return biomeId_;
+    }
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    public int getBiomeIdCount() {
+      return biomeId_.size();
+    }
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    public java.lang.String getBiomeId(int index) {
+      return biomeId_.get(index);
+    }
+    /**
+     * <code>repeated string biomeId = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getBiomeIdBytes(int index) {
+      return biomeId_.getByteString(index);
+    }
+
     // optional string version = 15;
     public static final int VERSION_FIELD_NUMBER = 15;
     private java.lang.Object version_;
@@ -15498,6 +15621,8 @@ public final class NetData {
       assetUri_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       registerBlockFamily_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       worldInfo_ = java.util.Collections.emptyList();
+      biomeShortId_ = java.util.Collections.emptyList();
+      biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       version_ = "";
       gameName_ = "";
       time_ = 0L;
@@ -15579,6 +15704,16 @@ public final class NetData {
       }
       for (int i = 0; i < worldInfo_.size(); i++) {
         output.writeMessage(9, worldInfo_.get(i));
+      }
+      if (getBiomeShortIdList().size() > 0) {
+        output.writeRawVarint32(82);
+        output.writeRawVarint32(biomeShortIdMemoizedSerializedSize);
+      }
+      for (int i = 0; i < biomeShortId_.size(); i++) {
+        output.writeSInt32NoTag(biomeShortId_.get(i));
+      }
+      for (int i = 0; i < biomeId_.size(); i++) {
+        output.writeBytes(11, biomeId_.getByteString(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(15, getVersionBytes());
@@ -15669,6 +15804,29 @@ public final class NetData {
       for (int i = 0; i < worldInfo_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, worldInfo_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < biomeShortId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeSInt32SizeNoTag(biomeShortId_.get(i));
+        }
+        size += dataSize;
+        if (!getBiomeShortIdList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        biomeShortIdMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < biomeId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(biomeId_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getBiomeIdList().size();
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -15837,12 +15995,16 @@ public final class NetData {
         } else {
           worldInfoBuilder_.clear();
         }
-        version_ = "";
+        biomeShortId_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000200);
-        gameName_ = "";
+        biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000400);
-        time_ = 0L;
+        version_ = "";
         bitField0_ = (bitField0_ & ~0x00000800);
+        gameName_ = "";
+        bitField0_ = (bitField0_ & ~0x00001000);
+        time_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
 
@@ -15935,15 +16097,26 @@ public final class NetData {
         } else {
           result.worldInfo_ = worldInfoBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((bitField0_ & 0x00000200) == 0x00000200)) {
+          biomeShortId_ = java.util.Collections.unmodifiableList(biomeShortId_);
+          bitField0_ = (bitField0_ & ~0x00000200);
+        }
+        result.biomeShortId_ = biomeShortId_;
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+          biomeId_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              biomeId_);
+          bitField0_ = (bitField0_ & ~0x00000400);
+        }
+        result.biomeId_ = biomeId_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000001;
         }
         result.version_ = version_;
-        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00000002;
         }
         result.gameName_ = gameName_;
-        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00000004;
         }
         result.time_ = time_;
@@ -16117,13 +16290,33 @@ public final class NetData {
             }
           }
         }
+        if (!other.biomeShortId_.isEmpty()) {
+          if (biomeShortId_.isEmpty()) {
+            biomeShortId_ = other.biomeShortId_;
+            bitField0_ = (bitField0_ & ~0x00000200);
+          } else {
+            ensureBiomeShortIdIsMutable();
+            biomeShortId_.addAll(other.biomeShortId_);
+          }
+          onChanged();
+        }
+        if (!other.biomeId_.isEmpty()) {
+          if (biomeId_.isEmpty()) {
+            biomeId_ = other.biomeId_;
+            bitField0_ = (bitField0_ & ~0x00000400);
+          } else {
+            ensureBiomeIdIsMutable();
+            biomeId_.addAll(other.biomeId_);
+          }
+          onChanged();
+        }
         if (other.hasVersion()) {
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000800;
           version_ = other.version_;
           onChanged();
         }
         if (other.hasGameName()) {
-          bitField0_ |= 0x00000400;
+          bitField0_ |= 0x00001000;
           gameName_ = other.gameName_;
           onChanged();
         }
@@ -17557,13 +17750,172 @@ public final class NetData {
         return worldInfoBuilder_;
       }
 
+      // repeated sint32 biomeShortId = 10 [packed = true];
+      private java.util.List<java.lang.Integer> biomeShortId_ = java.util.Collections.emptyList();
+      private void ensureBiomeShortIdIsMutable() {
+        if (!((bitField0_ & 0x00000200) == 0x00000200)) {
+          biomeShortId_ = new java.util.ArrayList<java.lang.Integer>(biomeShortId_);
+          bitField0_ |= 0x00000200;
+         }
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public java.util.List<java.lang.Integer>
+          getBiomeShortIdList() {
+        return java.util.Collections.unmodifiableList(biomeShortId_);
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public int getBiomeShortIdCount() {
+        return biomeShortId_.size();
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public int getBiomeShortId(int index) {
+        return biomeShortId_.get(index);
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public Builder setBiomeShortId(
+          int index, int value) {
+        ensureBiomeShortIdIsMutable();
+        biomeShortId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public Builder addBiomeShortId(int value) {
+        ensureBiomeShortIdIsMutable();
+        biomeShortId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public Builder addAllBiomeShortId(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureBiomeShortIdIsMutable();
+        super.addAll(values, biomeShortId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated sint32 biomeShortId = 10 [packed = true];</code>
+       */
+      public Builder clearBiomeShortId() {
+        biomeShortId_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000200);
+        onChanged();
+        return this;
+      }
+
+      // repeated string biomeId = 11;
+      private com.google.protobuf.LazyStringList biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureBiomeIdIsMutable() {
+        if (!((bitField0_ & 0x00000400) == 0x00000400)) {
+          biomeId_ = new com.google.protobuf.LazyStringArrayList(biomeId_);
+          bitField0_ |= 0x00000400;
+         }
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public java.util.List<java.lang.String>
+          getBiomeIdList() {
+        return java.util.Collections.unmodifiableList(biomeId_);
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public int getBiomeIdCount() {
+        return biomeId_.size();
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public java.lang.String getBiomeId(int index) {
+        return biomeId_.get(index);
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getBiomeIdBytes(int index) {
+        return biomeId_.getByteString(index);
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public Builder setBiomeId(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureBiomeIdIsMutable();
+        biomeId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public Builder addBiomeId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureBiomeIdIsMutable();
+        biomeId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public Builder addAllBiomeId(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureBiomeIdIsMutable();
+        super.addAll(values, biomeId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public Builder clearBiomeId() {
+        biomeId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string biomeId = 11;</code>
+       */
+      public Builder addBiomeIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureBiomeIdIsMutable();
+        biomeId_.add(value);
+        onChanged();
+        return this;
+      }
+
       // optional string version = 15;
       private java.lang.Object version_ = "";
       /**
        * <code>optional string version = 15;</code>
        */
       public boolean hasVersion() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       /**
        * <code>optional string version = 15;</code>
@@ -17603,7 +17955,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000200;
+  bitField0_ |= 0x00000800;
         version_ = value;
         onChanged();
         return this;
@@ -17612,7 +17964,7 @@ public final class NetData {
        * <code>optional string version = 15;</code>
        */
       public Builder clearVersion() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000800);
         version_ = getDefaultInstance().getVersion();
         onChanged();
         return this;
@@ -17625,7 +17977,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000200;
+  bitField0_ |= 0x00000800;
         version_ = value;
         onChanged();
         return this;
@@ -17637,7 +17989,7 @@ public final class NetData {
        * <code>optional string gameName = 16;</code>
        */
       public boolean hasGameName() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       /**
        * <code>optional string gameName = 16;</code>
@@ -17677,7 +18029,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00001000;
         gameName_ = value;
         onChanged();
         return this;
@@ -17686,7 +18038,7 @@ public final class NetData {
        * <code>optional string gameName = 16;</code>
        */
       public Builder clearGameName() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00001000);
         gameName_ = getDefaultInstance().getGameName();
         onChanged();
         return this;
@@ -17699,7 +18051,7 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000400;
+  bitField0_ |= 0x00001000;
         gameName_ = value;
         onChanged();
         return this;
@@ -17711,7 +18063,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public boolean hasTime() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       /**
        * <code>optional int64 time = 17;</code>
@@ -17723,7 +18075,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public Builder setTime(long value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00002000;
         time_ = value;
         onChanged();
         return this;
@@ -17732,7 +18084,7 @@ public final class NetData {
        * <code>optional int64 time = 17;</code>
        */
       public Builder clearTime() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00002000);
         time_ = 0L;
         onChanged();
         return this;
@@ -24816,35 +25168,36 @@ public final class NetData {
       "\022\031\n\021viewDistanceLevel\030\003 \001(\021\022\025\n\005color\030\004 \001" +
       "(\0132\006.Color*\t\010\210\'\020\200\200\200\200\002\"\025\n\005Color\022\014\n\004rgba\030\001" +
       " \001(\r\"2\n\023JoinCompleteMessage\022\020\n\010clientId\030" +
-      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\301\002\n\021ServerInfoMessage\022\033",
+      "\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"\354\002\n\021ServerInfoMessage\022\033",
       "\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007blockId\030\002" +
       " \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tcomponent" +
       "\030\004 \003(\0132\022.SerializationInfo\022!\n\005event\030\005 \003(" +
       "\0132\022.SerializationInfo\022\023\n\007assetId\030\006 \003(\005B\002" +
       "\020\001\022\020\n\010assetUri\030\007 \003(\t\022\033\n\023registerBlockFam" +
       "ily\030\010 \003(\t\022\035\n\tworldInfo\030\t \003(\0132\n.WorldInfo" +
-      "\022\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001(\t\022\014\n\004t" +
-      "ime\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005tit" +
-      "le\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Ser" +
-      "ializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005",
-      "\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010" +
-      "\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t" +
-      "\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n\rMo" +
-      "duleRequest\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002" +
-      "\"W\n\020ModuleDataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007vers" +
-      "ion\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(\t*\t" +
-      "\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006module\030\001 \001(\014*" +
-      "\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendError\022\017\n\007message" +
-      "\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessage" +
-      "\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010block",
-      "Pos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023U" +
-      "pdateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.Pac" +
-      "kedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023R" +
-      "emoveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200" +
-      "\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005\022\025" +
-      "\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPos\030" +
-      "\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.t" +
-      "erasology.protobufB\007NetDataH\001"
+      "\022\030\n\014biomeShortId\030\n \003(\021B\002\020\001\022\017\n\007biomeId\030\013 " +
+      "\003(\t\022\017\n\007version\030\017 \001(\t\022\020\n\010gameName\030\020 \001(\t\022\014" +
+      "\n\004time\030\021 \001(\003*\t\010\210\'\020\200\200\200\200\002\"3\n\tWorldInfo\022\r\n\005" +
+      "title\030\001 \001(\t\022\014\n\004time\030\002 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021",
+      "SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 " +
+      "\001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014" +
+      "*\t\010\210\'\020\200\200\200\200\002\"@\n\nModuleInfo\022\020\n\010moduleId\030\001 " +
+      "\001(\t\022\025\n\rmoduleVersion\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\",\n" +
+      "\rModuleRequest\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200" +
+      "\200\200\002\"W\n\020ModuleDataHeader\022\n\n\002id\030\001 \001(\t\022\017\n\007v" +
+      "ersion\030\002 \001(\t\022\014\n\004size\030\003 \001(\003\022\r\n\005error\030\017 \001(" +
+      "\t*\t\010\210\'\020\200\200\200\200\002\"\'\n\nModuleData\022\016\n\006module\030\001 \001" +
+      "(\014*\t\010\210\'\020\200\200\200\200\002\"-\n\017ModuleSendError\022\017\n\007mess" +
+      "age\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMess",
+      "age\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010bl" +
+      "ockPos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N" +
+      "\n\023UpdateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r." +
+      "PackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/" +
+      "\n\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210" +
+      "\'\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(" +
+      "\005\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockP" +
+      "os\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027or" +
+      "g.terasology.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -24952,7 +25305,7 @@ public final class NetData {
           internal_static_ServerInfoMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ServerInfoMessage_descriptor,
-              new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "Version", "GameName", "Time", });
+              new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetId", "AssetUri", "RegisterBlockFamily", "WorldInfo", "BiomeShortId", "BiomeId", "Version", "GameName", "Time", });
           internal_static_WorldInfo_descriptor =
             getDescriptor().getMessageTypes().get(17);
           internal_static_WorldInfo_fieldAccessorTable = new

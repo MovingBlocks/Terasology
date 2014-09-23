@@ -110,6 +110,4 @@ public interface WorldProvider extends WorldProviderCore {
 
     byte getTotalLight(Vector3i pos);
 
-    Region getWorldData(Region3i region);
-
 }

@@ -36,7 +36,5 @@ public interface GeneratingChunkProvider extends ChunkProvider {
      */
     void onChunkIsReady(Chunk chunk);
 
-    WorldGenerator getWorldGenerator();
-
     Chunk getChunkUnready(Vector3i pos);
 }

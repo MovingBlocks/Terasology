@@ -350,14 +350,4 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         return worldTime;
     }
 
-    @Override
-    public Region getWorldData(Region3i region) {
-        World world = chunkProvider.getWorldGenerator().getWorld();
-        if (world != null) {
-            return world.getWorldData(region);
-        } else {
-            return null;
-        }
-    }
-
 }
