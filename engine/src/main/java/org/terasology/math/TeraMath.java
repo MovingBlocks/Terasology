@@ -536,8 +536,35 @@ public final class TeraMath {
         return calcChunkPos(x, y, z, ChunkConstants.CHUNK_POWER);
     }
 
+    public static Vector3i[] calcChunkPos(Region3i region) {
+        return calcChunkPos(region, ChunkConstants.CHUNK_POWER);
+    }
+
     public static Vector3i calcChunkPos(int x, int y, int z, Vector3i chunkPower) {
         return new Vector3i(calcChunkPosX(x, chunkPower.x), calcChunkPosY(y, chunkPower.y), calcChunkPosZ(z, chunkPower.z));
+    }
+
+    public static Vector3i[] calcChunkPos(Region3i region, Vector3i chunkPower) {
+        int minX = calcChunkPosX(region.minX(), chunkPower.x);
+        int minY = calcChunkPosY(region.minY(), chunkPower.y);
+        int minZ = calcChunkPosZ(region.minZ(), chunkPower.z);
+
+        int maxX = calcChunkPosX(region.maxX(), chunkPower.x);
+        int maxY = calcChunkPosY(region.maxY(), chunkPower.y);
+        int maxZ = calcChunkPosZ(region.maxZ(), chunkPower.z);
+
+        int size = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+
+        Vector3i[] result = new Vector3i[size];
+        int index = 0;
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    result[index++] = new Vector3i(x, y, z);
+                }
+            }
+        }
+        return result;
     }
 
     /**

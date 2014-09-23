@@ -87,6 +87,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public boolean isRegionRelevant(Region3i region) {
+        return base.isRegionRelevant(region);
+    }
+
+    @Override
     public Block setBlock(Vector3i pos, Block type) {
         return base.setBlock(pos, type);
     }
