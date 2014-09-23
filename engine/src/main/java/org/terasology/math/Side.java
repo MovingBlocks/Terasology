@@ -19,7 +19,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import javax.vecmath.Vector3f;
+
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  * The six sides of a block and a slew of related utility.
@@ -50,6 +52,7 @@ public enum Side {
     private static EnumMap<Side, Side> anticlockwiseRollSide;
     private static EnumMap<Side, Direction> conversionMap;
     private static EnumMap<Side, ImmutableList<Side>> tangents;
+    private static ImmutableList<Side> allSides = ImmutableList.<Side>builder().add(values()).build();
 
     static {
         tangents = new EnumMap<>(Side.class);
@@ -123,6 +126,13 @@ public enum Side {
         this.canPitch = canPitch;
         this.canYaw = canYaw;
         this.canRoll = canRoll;
+    }
+
+    /**
+     * @return an immutable list of all sides (similar to {@link #values()}, but without the clone() overhead)
+     */
+    public static List<Side> allSides() {
+        return allSides;
     }
 
     /**

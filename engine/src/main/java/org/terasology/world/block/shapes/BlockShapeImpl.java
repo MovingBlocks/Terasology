@@ -81,7 +81,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
         for (BlockPart part : BlockPart.values()) {
             this.meshParts.put(part, data.getMeshPart(part));
         }
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             this.fullSide.put(side, data.isBlockingSide(side));
         }
         this.baseCollisionShape = data.getCollisionShape();

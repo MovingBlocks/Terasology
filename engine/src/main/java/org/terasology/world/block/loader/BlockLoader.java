@@ -389,14 +389,14 @@ public class BlockLoader implements BlockBuilderHelper {
     }
 
     private void setBlockFullSides(Block block, BlockShape shape, Rotation rot) {
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             BlockPart targetPart = BlockPart.fromSide(rot.rotate(side));
             block.setFullSide(targetPart.getSide(), shape.isBlockingSide(side));
         }
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             BlockPart part = BlockPart.fromSide(side);
             BlockMeshPart meshPart = shape
                     .getMeshPart(part)

@@ -295,7 +295,7 @@ public final class ChunkTessellator {
 
         // Gather adjacent blocks
         Map<Side, Block> adjacentBlocks = Maps.newEnumMap(Side.class);
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             Vector3i offset = side.getVector3i();
             Block blockToCheck = view.getBlock(x + offset.x, y + offset.y, z + offset.z);
             adjacentBlocks.put(side, blockToCheck);
@@ -326,7 +326,7 @@ public final class ChunkTessellator {
 
         boolean[] drawDir = new boolean[6];
 
-        for (Side side : Side.values()) {
+        for (Side side : Side.allSides()) {
             drawDir[side.ordinal()] = blockAppearance.getPart(BlockPart.fromSide(side)) != null && isSideVisibleForBlockTypes(adjacentBlocks.get(side), block, side);
         }
 
@@ -350,7 +350,7 @@ public final class ChunkTessellator {
             drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
             if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
-                for (Side dir : Side.values()) {
+                for (Side dir : Side.allSides()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                         block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
@@ -360,7 +360,7 @@ public final class ChunkTessellator {
             }
         }
 
-        for (Side dir : Side.values()) {
+        for (Side dir : Side.allSides()) {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?

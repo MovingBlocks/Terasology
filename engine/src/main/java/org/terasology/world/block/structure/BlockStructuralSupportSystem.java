@@ -96,7 +96,7 @@ public class BlockStructuralSupportSystem extends BaseComponentSystem implements
                 gatheringEntity.addComponent(new InventoryComponent(GATHERING_INVENTORY_SLOT_COUNT));
             }
             try {
-                for (Side side : Side.values()) {
+                for (Side side : Side.allSides()) {
                     validateSupportForBlockOnSide(event.getBlockPosition(), side);
                 }
 
