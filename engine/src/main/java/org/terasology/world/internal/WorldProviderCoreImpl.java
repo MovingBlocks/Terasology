@@ -160,6 +160,16 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
+    public boolean isRegionRelevant(Region3i region) {
+        for (Vector3i chunkPos : TeraMath.calcChunkPos(region)) {
+            if (!chunkProvider.isChunkReady(chunkPos)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public Block setBlock(Vector3i worldPos, Block type) {
         Vector3i chunkPos = TeraMath.calcChunkPos(worldPos);
         CoreChunk chunk = chunkProvider.getChunk(chunkPos);

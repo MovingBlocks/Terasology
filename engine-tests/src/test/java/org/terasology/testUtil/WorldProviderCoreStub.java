@@ -93,6 +93,11 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     }
 
     @Override
+    public boolean isRegionRelevant(Region3i region) {
+        return true;
+    }
+
+    @Override
     public Block setBlock(Vector3i pos, Block type) {
         Block old = blocks.put(pos, type);
         if (old == null) {

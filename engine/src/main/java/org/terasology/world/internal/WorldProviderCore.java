@@ -92,6 +92,8 @@ public interface WorldProviderCore {
      */
     boolean isBlockRelevant(int x, int y, int z);
 
+    boolean isRegionRelevant(Region3i region);
+
     /**
      * Places a block of a specific type at a given position
      *

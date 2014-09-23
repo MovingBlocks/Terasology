@@ -16,6 +16,8 @@
 package org.terasology.math;
 
 import org.junit.Test;
+import org.terasology.config.Config;
+import org.terasology.registry.CoreRegistry;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -108,5 +110,19 @@ public class TeraMathTest {
         }
     }
 
+    @Test
+    public void regionPositions() {
+        CoreRegistry.put(Config.class, new Config());
 
+        assertEquals(1, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(0, 0, 0))).length);
+        assertEquals(1, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(31, 63, 31))).length);
+        assertEquals(2, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31))).length);
+        assertEquals(4, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 32))).length);
+        assertEquals(8, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 64, 32))).length);
+        assertEquals(12, TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(-1, 0, 0), new Vector3i(32, 64, 32))).length);
+
+        Vector3i[] chunks = TeraMath.calcChunkPos(Region3i.createFromMinMax(new Vector3i(0, 0, 0), new Vector3i(32, 63, 31)));
+        assertEquals(new Vector3i(0, 0, 0), chunks[0]);
+        assertEquals(new Vector3i(1, 0, 0), chunks[1]);
+    }
 }
