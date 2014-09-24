@@ -34,12 +34,16 @@ import org.terasology.logic.health.DamageSoundComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.OnDamagedEvent;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -56,10 +60,24 @@ public class CharacterSoundSystem extends BaseComponentSystem {
     @In
     private AudioManager audioManager;
 
+    @In
+    private WorldProvider worldProvider;
+
     @ReceiveEvent
-    public void onFootstep(FootstepEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (characterSounds.footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
-            StaticSound sound = random.nextItem(characterSounds.footstepSounds);
+    public void onFootstep(FootstepEvent event, EntityRef entity, LocationComponent locationComponent, CharacterSoundComponent characterSounds) {
+
+        List<StaticSound> footstepSounds = characterSounds.footstepSounds;
+
+        // Check if the block the character is standing on has footstep sounds
+        Block block = worldProvider.getBlock(locationComponent.getLocalPosition());
+        if (block != null) {
+            if (!block.getSounds().getStepSounds().isEmpty()) {
+                footstepSounds = block.getSounds().getStepSounds();
+            }
+        }
+
+        if (footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
+            StaticSound sound = random.nextItem(footstepSounds);
             entity.send(new PlaySoundEvent(entity, sound, characterSounds.footstepVolume));
             characterSounds.lastSoundTime = time.getGameTimeInMs();
             entity.saveComponent(characterSounds);

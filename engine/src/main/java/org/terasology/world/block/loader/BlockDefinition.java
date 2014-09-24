@@ -50,6 +50,7 @@ public class BlockDefinition {
     public boolean doubleSided;
     public boolean shadowCasting = true;
     public boolean waving;
+    public String sounds;
 
     public byte luminance;
 

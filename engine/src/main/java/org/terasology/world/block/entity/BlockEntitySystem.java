@@ -15,8 +15,8 @@
  */
 package org.terasology.world.block.entity;
 
-import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.StaticSound;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -43,6 +43,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockSounds;
 import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.entity.damage.BlockDamagedComponent;
 import org.terasology.world.block.family.BlockFamily;
@@ -86,12 +87,12 @@ public class BlockEntitySystem extends BaseComponentSystem {
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void doDestroy(DoDestroyEvent event, EntityRef entity, ActAsBlockComponent blockComponent) {
-        commonDestroyed(event, entity);
+        commonDestroyed(event, entity, blockComponent.block.getArchetypeBlock());
     }
 
     @ReceiveEvent(priority = EventPriority.PRIORITY_LOW)
     public void doDestroy(DoDestroyEvent event, EntityRef entity, BlockComponent blockComponent) {
-        commonDestroyed(event, entity);
+        commonDestroyed(event, entity, blockComponent.getBlock());
         worldProvider.setBlock(blockComponent.getPosition(), BlockManager.getAir());
     }
 
@@ -145,13 +146,17 @@ public class BlockEntitySystem extends BaseComponentSystem {
         return block.isDirectPickup() || (blockDamageModifierComponent != null && blockDamageModifierComponent.directPickup);
     }
 
-    private void commonDestroyed(DoDestroyEvent event, EntityRef entity) {
+    private void commonDestroyed(DoDestroyEvent event, EntityRef entity, Block block) {
         entity.send(new CreateBlockDropsEvent(event.getInstigator(), event.getDirectCause(), event.getDamageType()));
 
         BlockDamageModifierComponent blockDamageModifierComponent = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
         // TODO: Configurable via block definition
         if (blockDamageModifierComponent == null || !blockDamageModifierComponent.skipPerBlockEffects) {
-            entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
+            BlockSounds sounds = block.getSounds();
+            if (!sounds.getDestroySounds().isEmpty()) {
+                StaticSound sound = random.nextItem(sounds.getDestroySounds());
+                entity.send(new PlaySoundEvent(sound, 0.6f));
+            }
         }
     }
 
@@ -216,8 +221,11 @@ public class BlockEntitySystem extends BaseComponentSystem {
             dustBuilder.build();
         }
 
-        // TODO: Configurable via block definition
-        audioManager.playSound(Assets.getSound("engine:Dig"), location);
+        BlockSounds sounds = family.getArchetypeBlock().getSounds();
+        if (!sounds.getDigSounds().isEmpty()) {
+            StaticSound sound = random.nextItem(sounds.getDigSounds());
+            audioManager.playSound(sound, location);
+        }
     }
 
     @ReceiveEvent(netFilter = RegisterMode.AUTHORITY)
