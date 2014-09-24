@@ -98,7 +98,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
                 @Override
                 public void draw(ModuleSelectionInfo value, Canvas canvas) {
-                    if (value.isSelected() && value.isExplicitSelection()) {
+                    if (isSelectedGameplayModule(value)) {
+                        canvas.setMode("gameplay");
+                    } else if (value.isSelected() && value.isExplicitSelection()) {
                         canvas.setMode("enabled");
                     } else if (value.isSelected()) {
                         canvas.setMode("dependency");
@@ -343,10 +345,16 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void deselect(ModuleSelectionInfo target) {
-        if (target.isExplicitSelection()) {
+        // only deselect if it is already selected and if it is not the currently selected gameplay module
+        if (target.isExplicitSelection()
+                && !isSelectedGameplayModule(target)) {
             target.setExplicitSelection(false);
             refreshSelection();
         }
+    }
+
+    private boolean isSelectedGameplayModule(ModuleSelectionInfo target) {
+        return target.getMetadata().getId().equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
     }
 
     private void refreshSelection() {
