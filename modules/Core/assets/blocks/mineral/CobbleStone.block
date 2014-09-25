@@ -22,5 +22,6 @@
 "mass" : 96,
 "hardness" : 6,
 "categories" : ["stone"],
-"displayName": "Cobble Stone"
+"displayName": "Cobble Stone",
+"sounds": "Core:stone"
 }

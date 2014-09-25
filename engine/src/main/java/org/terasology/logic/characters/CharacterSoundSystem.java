@@ -36,6 +36,7 @@ import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.health.OnDamagedEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.event.OnPlayerSpawnedEvent;
+import org.terasology.math.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -69,11 +70,11 @@ public class CharacterSoundSystem extends BaseComponentSystem {
         List<StaticSound> footstepSounds = characterSounds.footstepSounds;
 
         // Check if the block the character is standing on has footstep sounds
-        Block block = worldProvider.getBlock(locationComponent.getLocalPosition());
-        if (block != null) {
-            if (!block.getSounds().getStepSounds().isEmpty()) {
-                footstepSounds = block.getSounds().getStepSounds();
-            }
+        Vector3i blockPos = new Vector3i(locationComponent.getLocalPosition());
+        blockPos.y--; // The block *below* the character's feet is interesting to us
+        Block block = worldProvider.getBlock(blockPos);
+        if (block != null && !block.getSounds().getStepSounds().isEmpty()) {
+            footstepSounds = block.getSounds().getStepSounds();
         }
 
         if (footstepSounds.size() > 0 && characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {

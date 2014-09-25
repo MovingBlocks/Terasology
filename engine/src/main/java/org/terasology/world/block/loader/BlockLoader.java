@@ -441,9 +441,13 @@ public class BlockLoader implements BlockBuilderHelper {
             if (sounds == null) {
                 logger.warn("Block definition {} references block sounds {}, which don't exist.",
                     defaultName, def.sounds);
+                block.setSounds(soundsRegistry.getDefaultBlockSounds());
             } else {
                 block.setSounds(sounds);
             }
+        } else {
+            // Always set to default sounds, even if none are specified
+            block.setSounds(soundsRegistry.getDefaultBlockSounds());
         }
 
         block.setMass(def.mass);

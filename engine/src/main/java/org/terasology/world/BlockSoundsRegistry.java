@@ -30,4 +30,10 @@ public interface BlockSoundsRegistry {
      */
     BlockSounds getBlockSounds(String uri);
 
+    /**
+     * Gets the default block sounds for blocks that specify no other behaviour.
+     * @return Never null.
+     */
+    BlockSounds getDefaultBlockSounds();
+
 }

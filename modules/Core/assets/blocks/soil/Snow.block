@@ -23,5 +23,6 @@
     "tiles" : {
         "sides" : "SnowSide",
         "bottom" : "dirt"
-    }
+    },
+    "sounds": "Core:snow"
 }

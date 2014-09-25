@@ -330,10 +330,15 @@ public class BlockManagerImpl extends BlockManager {
 
     @Override
     public BlockSounds getBlockSounds(String uri) {
-        BlockSounds sounds = blockSounds.get(uri);
+        return blockSounds.get(uri);
+    }
+
+    @Override
+    public BlockSounds getDefaultBlockSounds() {
+        BlockSounds sounds = getBlockSounds(BlockSounds.DEFAULT_ID);
         if (sounds == null) {
-            logger.warn("Tried to retrieve block sounds with URI {}, which didn't exist.", uri);
-            return BlockSounds.NULL;
+            throw new IllegalStateException("Default block sounds are missing from engine module: "
+                + BlockSounds.DEFAULT_ID);
         }
         return sounds;
     }

@@ -20,5 +20,6 @@
     "tiles" : {
         "topBottom" : "OakTrunk",
         "sides" : "BirkBark"
-    }
+    },
+    "sounds": "Core:wood"
 }

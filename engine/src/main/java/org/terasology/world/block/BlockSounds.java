@@ -28,13 +28,18 @@ import java.util.List;
 public class BlockSounds {
 
     /**
+     * The ID of the default block sounds.
+     */
+    public static final String DEFAULT_ID = "engine:default";
+
+    /**
      * Default block sounds. Used instead of a null value to avoid additional null-checks.
      */
     public static final BlockSounds NULL = new BlockSounds(
-        "engine:default",
+        "engine:null",
         Collections.<StaticSound>emptyList(),
-        Collections.singletonList(Assets.getSound("engine:RemoveBlock")),
-        Collections.singletonList(Assets.getSound("engine:Dig"))
+        Collections.<StaticSound>emptyList(),
+        Collections.<StaticSound>emptyList()
     );
 
     private final String uri;
