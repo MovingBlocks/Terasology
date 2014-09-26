@@ -273,12 +273,12 @@ public class ServerImpl implements Server {
 
     private void processBlockChanges(NetData.NetMessage message) {
         for (NetData.BlockChangeMessage blockChange : message.getBlockChangeList()) {
-            logger.debug("Received block change to {}", blockManager.getBlock((byte) blockChange.getNewBlock()));
+            Block newBlock = blockManager.getBlock((short) blockChange.getNewBlock());
+            logger.debug("Received block change to {}", newBlock);
             // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(blockChange.getPos());
             if (worldProvider.isBlockRelevant(pos)) {
-                Block newBlock = blockManager.getBlock((byte) blockChange.getNewBlock());
                 worldProvider.setBlock(pos, newBlock);
             } else {
                 awaitingChunkReadyUpdates.put(TeraMath.calcChunkPos(pos), blockChange);
@@ -371,7 +371,7 @@ public class ServerImpl implements Server {
         for (NetData.BlockChangeMessage message : updateMessages) {
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
             Vector3i pos = NetMessageUtil.convert(message.getPos());
-            Block newBlock = blockManager.getBlock((byte) message.getNewBlock());
+            Block newBlock = blockManager.getBlock((short) message.getNewBlock());
             worldProvider.setBlock(pos, newBlock);
         }
     }

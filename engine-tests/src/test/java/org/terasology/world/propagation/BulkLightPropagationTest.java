@@ -64,28 +64,28 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         fullLight = new Block();
         fullLight.setDisplayName("Torch");
         fullLight.setUri(new BlockUri("engine:torch"));
-        fullLight.setId((byte) 2);
+        fullLight.setId((short) 2);
         fullLight.setLuminance(ChunkConstants.MAX_LIGHT);
         blockManager.addBlockFamily(new SymmetricFamily(fullLight.getURI(), fullLight), true);
 
         weakLight = new Block();
         weakLight.setDisplayName("PartLight");
         weakLight.setUri(new BlockUri("engine:weakLight"));
-        weakLight.setId((byte) 3);
+        weakLight.setId((short) 3);
         weakLight.setLuminance((byte) 2);
         blockManager.addBlockFamily(new SymmetricFamily(weakLight.getURI(), weakLight), true);
 
         mediumLight = new Block();
         mediumLight.setDisplayName("MediumLight");
         mediumLight.setUri(new BlockUri("engine:mediumLight"));
-        mediumLight.setId((byte) 4);
+        mediumLight.setId((short) 4);
         mediumLight.setLuminance((byte) 5);
         blockManager.addBlockFamily(new SymmetricFamily(mediumLight.getURI(), mediumLight), true);
 
         solid = new Block();
         solid.setDisplayName("Solid");
         solid.setUri(new BlockUri("engine:solid"));
-        solid.setId((byte) 5);
+        solid.setId((short) 5);
         for (Side side : Side.values()) {
             solid.setFullSide(side, true);
         }
@@ -94,7 +94,7 @@ public class BulkLightPropagationTest extends TerasologyTestingEnvironment {
         solidMediumLight = new Block();
         solidMediumLight.setDisplayName("SolidMediumLight");
         solidMediumLight.setUri(new BlockUri("engine:solidMediumLight"));
-        solidMediumLight.setId((byte) 6);
+        solidMediumLight.setId((short) 6);
         solidMediumLight.setLuminance((byte) 5);
         for (Side side : Side.values()) {
             solidMediumLight.setFullSide(side, true);

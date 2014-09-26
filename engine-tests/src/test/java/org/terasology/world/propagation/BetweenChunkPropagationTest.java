@@ -81,7 +81,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         solid = new Block();
         solid.setDisplayName("Solid");
         solid.setUri(new BlockUri("engine:solid"));
-        solid.setId((byte) 5);
+        solid.setId((short) 5);
         for (Side side : Side.values()) {
             solid.setFullSide(side, true);
         }
