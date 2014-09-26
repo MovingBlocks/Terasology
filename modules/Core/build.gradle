@@ -196,6 +196,7 @@ task createSkeleton() {
     mkdir('assets/atlas')
     mkdir('assets/behaviors')
     mkdir('assets/blocks')
+    mkdir('assets/blockSounds')
     mkdir('assets/blockTiles')
     mkdir('assets/fonts')
     mkdir('assets/materials')
