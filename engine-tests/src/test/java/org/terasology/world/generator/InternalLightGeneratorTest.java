@@ -56,7 +56,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
-        solidBlock.setId((byte) 1);
+        solidBlock.setId((short) 1);
         for (Side side : Side.values()) {
             solidBlock.setFullSide(side, true);
         }
@@ -66,7 +66,7 @@ public class InternalLightGeneratorTest extends TerasologyTestingEnvironment {
         fullLight = new Block();
         fullLight.setDisplayName("Torch");
         fullLight.setUri(new BlockUri("engine:torch"));
-        fullLight.setId((byte) 2);
+        fullLight.setId((short) 2);
         fullLight.setLuminance(ChunkConstants.MAX_LIGHT);
         blockManager.addBlockFamily(new SymmetricFamily(fullLight.getURI(), fullLight), true);
     }
