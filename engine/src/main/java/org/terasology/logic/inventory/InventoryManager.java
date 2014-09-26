@@ -154,6 +154,19 @@ public interface InventoryManager {
     boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count);
 
     /**
+     * Tries to move a item smartly to the specified slots.
+     * It will try to fill up existing stacks if possible.
+     *
+     * @param fromInventory Inventory to move item from.
+     * @param instigator    Instigator of the action.
+     * @param slotFrom      Slot to move from.
+     * @param toInventory   Inventory to move item to.
+     * @param toSlots   slots to move the item to.     *
+     * @return If the action was successful. The action counts as successful if at least one item got moved.
+     */
+    boolean moveItemToSlots(EntityRef instigator, EntityRef fromInventory, int slotFrom, EntityRef toInventory, List<Integer> toSlots);
+
+    /**
      * Switches items in two inventories.
      *
      * @param fromInventory Inventory to switch item from.

@@ -24,10 +24,7 @@ import org.terasology.logic.inventory.events.InventorySlotChangedEvent;
 import org.terasology.logic.inventory.events.InventorySlotStackSizeChangedEvent;
 import org.terasology.registry.CoreRegistry;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -223,6 +220,98 @@ public final class InventoryUtils {
         return true;
     }
 
+    /**
+     * @param from has to provide {@link InventoryComponent} for a successful transfer\
+     * @param fromSlot slot number to take the item from
+     * @param to has to provide {@link InventoryComponent} for a successful transfer
+     * @param toSlots slots that will be checked if they contain already the same type of item and have space
+     * @return true if any amount > 0 got moved to the target
+     */
+    static boolean moveToExistingStacksInSlots(EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
+        EntityRef fromItem = getItemAt(from, fromSlot);
+        ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
+        if (fromItemComp == null) {
+            return false;
+        }
+
+        int newFromStackCount = fromItemComp.stackCount;
+        int slotCount = getSlotCount(to);
+        for (int toSlot :toSlots) {
+            EntityRef toItem = getItemAt(to, toSlot);
+            if (isSameItem(toItem, fromItem)) {
+                ItemComponent toItemComp = toItem.getComponent(ItemComponent.class);
+                if (toItemComp == null) {
+                    continue;
+                }
+                int spaceLeft = toItemComp.maxStackSize - toItemComp.stackCount ;
+                if (spaceLeft > 0) {
+                    int amountToTransfer = Math.min(spaceLeft, newFromStackCount);
+                    adjustStackSize(to, toSlot, toItemComp.stackCount + amountToTransfer);
+                    newFromStackCount -= amountToTransfer;
+                }
+            }
+        }
+        if (newFromStackCount == 0) {
+            putItemIntoSlot(from, EntityRef.NULL, fromSlot);
+            return true;
+        } else {
+            if (newFromStackCount != fromItemComp.stackCount) {
+                adjustStackSize(from, fromSlot, newFromStackCount);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @param instigator used to verify if the action is allowed
+     * @param to has to provide {@link InventoryComponent} for a successful transfer
+     * @param slotFrom slot number to take the items from.
+     * @param from has to provide {@link InventoryComponent} for a successful transfer
+     * @param toSlots slots that will be checked if they are free
+     * @return true if at least 1 item got moved from the specified location.
+     */
+    static boolean moveToFreeSlots(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, List<Integer> toSlots) {
+        EntityRef fromItem = getItemAt(from, slotFrom);
+        ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
+        if (fromItemComp == null) {
+            return false;
+        }
+
+        for (int toSlot :toSlots) {
+            EntityRef toItem = getItemAt(to, toSlot);
+            if (!toItem.exists()) {
+                BeforeItemPutInInventory putTo = new BeforeItemPutInInventory(instigator, fromItem, toSlot);
+                to.send(putTo);
+                boolean allowed = !putTo.isConsumed();
+                if (allowed) {
+                    putItemIntoSlot(to, fromItem, toSlot);
+                    putItemIntoSlot(from, EntityRef.NULL, slotFrom);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    static boolean moveItemToSlots(EntityRef instigator, EntityRef from, int fromSlot, EntityRef to, List<Integer> toSlots) {
+        EntityRef fromItem = InventoryUtils.getItemAt(from, fromSlot);
+        BeforeItemRemovedFromInventory removeFrom = new BeforeItemRemovedFromInventory(instigator, fromItem, fromSlot);
+        from.send(removeFrom);
+        if (removeFrom.isConsumed()) {
+            return false;
+        }
+
+        boolean movedToStack = moveToExistingStacksInSlots(from, fromSlot, to, toSlots);
+
+        boolean movedToFreeSlot = moveToFreeSlots(instigator, from, fromSlot, to, toSlots);
+
+        return movedToStack || movedToFreeSlot;
+    }
+
+
     static boolean moveItem(EntityRef instigator, EntityRef from, int slotFrom, EntityRef to, int slotTo) {
         if (checkForStacking(from, slotFrom, to, slotTo)) {
             return true;
@@ -244,7 +333,7 @@ public final class InventoryUtils {
         EntityRef itemFrom = getItemAt(from, slotFrom);
         EntityRef itemTo = getItemAt(to, slotTo);
 
-        if (itemFrom.exists() && itemTo.exists() && canStackInto(itemFrom, itemTo)) {
+        if (itemFrom.exists() && itemTo.exists() && canStackInto(itemFrom, itemTo )) {
             int fromCount = itemFrom.getComponent(ItemComponent.class).stackCount;
             int toCount = itemTo.getComponent(ItemComponent.class).stackCount;
             adjustStackSize(to, slotTo, fromCount + toCount);
@@ -311,4 +400,5 @@ public final class InventoryUtils {
         item.saveComponent(itemComponent);
         entity.send(new InventorySlotStackSizeChangedEvent(slot, oldSize, newCount));
     }
+
 }
