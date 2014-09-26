@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
+import org.terasology.config.RenderingConfig;
 import org.terasology.editor.EditorRange;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.registry.CoreRegistry;
@@ -263,7 +264,12 @@ public class DefaultRenderingProcess {
             rtFullHeight = org.lwjgl.opengl.Display.getHeight();
         }
 
-        if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()) {
+        RenderingConfig renderingConfig = CoreRegistry.get(Config.class).getRendering();
+
+        rtFullWidth *= renderingConfig.getFboScale() / 100f;
+        rtFullHeight *= renderingConfig.getFboScale() / 100f;
+
+        if (renderingConfig.isOculusVrSupport()) {
             if (overwriteRtWidth == 0) {
                 rtFullWidth *= OculusVrHelper.getScaleFactor();
             }
