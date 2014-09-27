@@ -213,12 +213,12 @@
                                 "id": "frameLimit"
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UILabel",
+                                "text": "Render Quality: "
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UISlider",
+                                "id": "fboScale"
                             },
                             {
                                 "type": "UISpace",

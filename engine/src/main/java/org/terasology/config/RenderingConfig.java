@@ -69,6 +69,7 @@ public class RenderingConfig {
     private boolean inscattering = true;
     private boolean localReflections;
     private boolean vSync;
+    private int fboScale = 100;
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
@@ -409,6 +410,14 @@ public class RenderingConfig {
 
     public void setFrameLimit(int frameLimit) {
         this.frameLimit = frameLimit;
+    }
+
+    public int getFboScale() {
+        return fboScale;
+    }
+
+    public void setFboScale(int fboScale) {
+        this.fboScale = fboScale;
     }
 
     @Override
