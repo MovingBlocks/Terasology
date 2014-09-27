@@ -58,6 +58,9 @@
                     "parts": {
                         "item": {
                             "modes": {
+                                "gameplay": {
+                                    "text-color": "2B65ECFF"
+                                },
                                 "enabled": {
                                     "text-color": "00FF00FF"
                                 },

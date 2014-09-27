@@ -56,6 +56,40 @@
                         },
                         {
                             "type" : "UILabel",
+                            "text" : "Choose Gameplay (like a mod pack):"
+                        },
+                        {
+                            "type" : "RowLayout",
+                            "horizontalSpacing" : 16,
+                            "contents" : [
+                                {
+                                    "type" : "UIDropdown",
+                                    "id" : "gameplay",
+                                    "layoutInfo" : {
+                                        "relativeWidth" : 0.7
+                                    }
+                                },
+                                {
+                                    "type" : "UIButton",
+                                    "text" : "Modules...",
+                                    "id" : "mods"
+                                }
+                            ]
+                        },
+                        {
+                            "type" : "UISpace",
+                            "size" : [1, 16]
+                        },
+                        {
+                            "type" : "UILabel",
+                            "id" : "gameplayDescription"
+                        },
+                        {
+                            "type" : "UISpace",
+                            "size" : [1, 16]
+                        },
+                        {
+                            "type" : "UILabel",
                             "text" : "Seed:"
                         },
                         {
@@ -120,11 +154,6 @@
                 "id" : "actionsRow",
                 "horizontalSpacing" : 4,
                 "contents" : [
-                    {
-                        "type" : "UIButton",
-                        "text" : "Modules...",
-                        "id" : "mods"
-                    },
                     {
                         "type" : "UIButton",
                         "text" : "Play",

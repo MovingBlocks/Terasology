@@ -62,6 +62,17 @@ public class SelectModulesScreen extends CoreScreenLayer {
     private DependencyResolver resolver;
 
     @Override
+    public void onOpened() {
+        super.onOpened();
+
+        for (ModuleSelectionInfo info : sortedModules) {
+            info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
+        }
+
+        refreshSelection();
+    }
+
+    @Override
     public void initialise() {
         resolver = new DependencyResolver(moduleManager.getRegistry());
         modulesLookup = Maps.newHashMap();
@@ -76,17 +87,6 @@ public class SelectModulesScreen extends CoreScreenLayer {
             }
         });
 
-        for (ModuleSelectionInfo info : sortedModules) {
-            info.setExplicitSelection(config.getDefaultModSelection().hasModule(info.getMetadata().getId()));
-        }
-
-        ResolutionResult currentSelectionResults = resolver.resolve(config.getDefaultModSelection().listModules());
-        if (currentSelectionResults.isSuccess()) {
-            setSelectedVersions(currentSelectionResults);
-        }
-
-        updateValidToSelect();
-
         final UIList<ModuleSelectionInfo> moduleList = find("moduleList", UIList.class);
         if (moduleList != null) {
             moduleList.setList(sortedModules);
@@ -98,7 +98,9 @@ public class SelectModulesScreen extends CoreScreenLayer {
 
                 @Override
                 public void draw(ModuleSelectionInfo value, Canvas canvas) {
-                    if (value.isSelected() && value.isExplicitSelection()) {
+                    if (isSelectedGameplayModule(value)) {
+                        canvas.setMode("gameplay");
+                    } else if (value.isSelected() && value.isExplicitSelection()) {
                         canvas.setMode("enabled");
                     } else if (value.isSelected()) {
                         canvas.setMode("dependency");
@@ -327,12 +329,7 @@ public class SelectModulesScreen extends CoreScreenLayer {
             boolean previouslySelected = target.isSelected();
             target.setExplicitSelection(true);
             if (!previouslySelected) {
-                List<Name> selectedModules = getExplicitlySelectedModules();
-                for (ModuleSelectionInfo info : sortedModules) {
-                    info.setSelectedVersion(null);
-                }
-                setSelectedVersions(resolver.resolve(selectedModules));
-                updateValidToSelect();
+                refreshSelection();
             }
         }
     }
@@ -348,15 +345,25 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void deselect(ModuleSelectionInfo target) {
-        if (target.isExplicitSelection()) {
+        // only deselect if it is already selected and if it is not the currently selected gameplay module
+        if (target.isExplicitSelection()
+                && !isSelectedGameplayModule(target)) {
             target.setExplicitSelection(false);
-            List<Name> selectedModules = getExplicitlySelectedModules();
-            for (ModuleSelectionInfo info : sortedModules) {
-                info.setSelectedVersion(null);
-            }
-            setSelectedVersions(resolver.resolve(selectedModules));
-            updateValidToSelect();
+            refreshSelection();
         }
+    }
+
+    private boolean isSelectedGameplayModule(ModuleSelectionInfo target) {
+        return target.getMetadata().getId().equals(new Name(config.getDefaultModSelection().getDefaultGameplayModuleName()));
+    }
+
+    private void refreshSelection() {
+        List<Name> selectedModules = getExplicitlySelectedModules();
+        for (ModuleSelectionInfo info : sortedModules) {
+            info.setSelectedVersion(null);
+        }
+        setSelectedVersions(resolver.resolve(selectedModules));
+        updateValidToSelect();
     }
 
 
