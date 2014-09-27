@@ -56,7 +56,7 @@
                         },
                         {
                             "type" : "UILabel",
-                            "text" : "Choose Gameplay (like a mod pack):"
+                            "text" : "Gameplay Template (can click 'modules' to customize further):"
                         },
                         {
                             "type" : "RowLayout",

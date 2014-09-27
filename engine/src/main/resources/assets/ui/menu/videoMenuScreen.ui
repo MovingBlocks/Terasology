@@ -214,7 +214,7 @@
                             },
                             {
                                 "type": "UILabel",
-                                "text": "Render Quality: "
+                                "text": "Resolution Scale: "
                             },
                             {
                                 "type": "UISlider",
