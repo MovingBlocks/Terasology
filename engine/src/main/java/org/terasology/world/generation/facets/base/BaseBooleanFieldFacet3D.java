@@ -75,7 +75,7 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
 
     @Override
     public void setWorld(Vector3i pos, boolean value) {
-
+        setWorld(pos.x, pos.y, pos.z, value);
     }
 
     @Override
