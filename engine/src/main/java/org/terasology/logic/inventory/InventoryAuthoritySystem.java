@@ -26,11 +26,7 @@ import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.inventory.action.MoveItemAction;
 import org.terasology.logic.inventory.action.RemoveItemAction;
 import org.terasology.logic.inventory.action.SwitchItemAction;
-import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
-import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
-import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.logic.inventory.events.MoveItemAmountRequest;
-import org.terasology.logic.inventory.events.MoveItemRequest;
+import org.terasology.logic.inventory.events.*;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
@@ -42,6 +38,7 @@ import java.util.Map;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Florian <florian@fkoeberle.de>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share(value = InventoryManager.class)
@@ -248,10 +245,20 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     @ReceiveEvent
     public void moveItemRequest(MoveItemRequest request, EntityRef entity) {
         try {
-            if (!(request instanceof MoveItemAmountRequest)) {
-                InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
-                        request.getToInventory(), request.getToSlot());
-            }
+            InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
+                     request.getToInventory(), request.getToSlot());
+
+        } finally {
+            entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
+        }
+    }
+
+    @ReceiveEvent
+    public void moveItemToSlotsRequest(MoveItemToSlotsRequest request, EntityRef entity) {
+        try {
+            InventoryUtils.moveItemToSlots(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
+                    request.getToInventory(), request.getToSlots());
+
         } finally {
             entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));
         }
@@ -368,6 +375,11 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     @Override
     public boolean moveItem(EntityRef fromInventory, EntityRef instigator, int slotFrom, EntityRef toInventory, int slotTo, int count) {
         return InventoryUtils.moveItemAmount(instigator, fromInventory, slotFrom, toInventory, slotTo, count);
+    }
+
+    @Override
+    public boolean moveItemToSlots(EntityRef instigator, EntityRef fromInventory, int slotFrom, EntityRef toInventory, List<Integer> toSlots) {
+        return InventoryUtils.moveItemToSlots(instigator, fromInventory, slotFrom, toInventory, toSlots);
     }
 
     @Override

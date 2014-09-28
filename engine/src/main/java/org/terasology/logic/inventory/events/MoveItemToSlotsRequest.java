@@ -19,27 +19,30 @@ package org.terasology.logic.inventory.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.network.ServerEvent;
 
+import java.util.List;
+
 /**
- * @author Immortius
+ * Represents the request to move the item smarly to to one or more of the specified slots.
+ * Stacks will be filled up first before an empty slot will be used.
+ *
+ * Usually triggered by a shift click on an item.
+ *
  * @author Florian <florian@fkoeberle.de>
  */
 @ServerEvent
-public class MoveItemAmountRequest extends AbstractMoveItemRequest {
-    private int toSlot;
-    private int amount;
+public class MoveItemToSlotsRequest extends AbstractMoveItemRequest {
 
-    protected MoveItemAmountRequest() {
+    private List<Integer> toSlots;
+
+    protected MoveItemToSlotsRequest() {
     }
 
-    public MoveItemAmountRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount, int changeId) {
+    public MoveItemToSlotsRequest(EntityRef instigator, EntityRef fromInventory, int fromSlot, EntityRef toInventory, List<Integer> toSlots, int changeId) {
         super(instigator, fromInventory, fromSlot, toInventory, changeId);
-        this.toSlot = toSlot;
-        this.amount = amount;
+        this.toSlots = toSlots;
     }
 
-    public int getAmount() {
-        return amount;
+    public List<Integer> getToSlots() {
+        return toSlots;
     }
-
-    public int getToSlot() { return toSlot; }
 }

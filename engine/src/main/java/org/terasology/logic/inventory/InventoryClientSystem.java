@@ -23,9 +23,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.action.MoveItemAction;
 import org.terasology.logic.inventory.action.SwitchItemAction;
-import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
-import org.terasology.logic.inventory.events.MoveItemAmountRequest;
-import org.terasology.logic.inventory.events.MoveItemRequest;
+import org.terasology.logic.inventory.events.*;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -36,16 +34,18 @@ import java.util.Map;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
+ * @author Florian <florian@fkoeberle.de>
  */
 @RegisterSystem(RegisterMode.REMOTE_CLIENT)
 @Share(value = InventoryManager.class)
 public class InventoryClientSystem extends BaseComponentSystem implements InventoryManager {
+
     @In
     private LocalPlayer localPlayer;
     @In
     private EntitySystemLibrary entitySystemLibrary;
 
-    private Map<Integer, MoveItemRequest> pendingMoves = new LinkedHashMap<>();
+    private Map<Integer, AbstractMoveItemRequest> pendingMoves = new LinkedHashMap<>();
 
     private int changeId;
 
@@ -68,13 +68,19 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
     }
 
     private void recalculatePredictedState() {
-        for (MoveItemRequest request : pendingMoves.values()) {
-            if (request instanceof MoveItemAmountRequest) {
-                int amount = ((MoveItemAmountRequest) request).getAmount();
-                InventoryUtils.moveItemAmount(request.getInstigator(), request.getFromInventory(),
-                        request.getFromSlot(), request.getToInventory(), request.getToSlot(), amount);
-            } else {
-                InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(), request.getToInventory(), request.getToSlot());
+        for (AbstractMoveItemRequest request : pendingMoves.values()) {
+            if (request instanceof MoveItemRequest){
+                MoveItemRequest r = (MoveItemRequest) request;
+                InventoryUtils.moveItem(r.getInstigator(), r.getFromInventory(), r.getFromSlot(), r.getToInventory(),
+                        r.getToSlot());
+            } else if (request instanceof MoveItemAmountRequest) {
+                MoveItemAmountRequest r = (MoveItemAmountRequest) request;
+                InventoryUtils.moveItemAmount(r.getInstigator(), r.getFromInventory(), r.getFromSlot(),
+                        r.getToInventory(), r.getToSlot(), r.getAmount());
+            } else if (request instanceof MoveItemToSlotsRequest) {
+                MoveItemToSlotsRequest r = (MoveItemToSlotsRequest) request;
+                InventoryUtils.moveItemToSlots(r.getInstigator(), r.getFromInventory(), r.getFromSlot(),
+                        r.getToInventory(), r.getToSlots());
             }
         }
     }
@@ -147,6 +153,21 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
 
         MoveItemAmountRequest request = new MoveItemAmountRequest(instigator, fromInventory,
                 slotFrom, toInventory, slotTo, count, changeId++);
+        pendingMoves.put(request.getChangeId(), request);
+        localPlayer.getClientEntity().send(request);
+
+        return true;
+    }
+
+
+    @Override
+    public boolean moveItemToSlots(EntityRef instigator, EntityRef fromInventory, int slotFrom, EntityRef toInventory, List<Integer> toSlots) {
+        if (!InventoryUtils.moveItemToSlots(instigator, fromInventory, slotFrom, toInventory, toSlots)) {
+            return false;
+        }
+
+        MoveItemToSlotsRequest request = new MoveItemToSlotsRequest(instigator, fromInventory,
+                slotFrom, toInventory, toSlots, changeId++);
         pendingMoves.put(request.getChangeId(), request);
         localPlayer.getClientEntity().send(request);
 
