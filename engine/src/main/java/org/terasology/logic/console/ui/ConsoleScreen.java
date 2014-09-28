@@ -52,6 +52,8 @@ public class ConsoleScreen extends CoreScreenLayer {
 
     private UICommandEntry commandLine;
 
+    private boolean welcomePrinted;
+
     private InteractionListener screenListener = new BaseInteractionListener() {
         @Override
         public boolean onMouseClick(MouseInput button, Vector2i pos) {
@@ -116,6 +118,18 @@ public class ConsoleScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
         getManager().setFocus(commandLine);
+
+        if (!welcomePrinted) {
+            console.addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
+                Message.NEW_LINE +
+                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
+                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
+                "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
+                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
+                "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
+                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
+            welcomePrinted = true;
+        }
     }
 
     @Override

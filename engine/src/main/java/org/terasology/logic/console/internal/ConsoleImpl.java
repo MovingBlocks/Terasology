@@ -76,17 +76,6 @@ public class ConsoleImpl implements Console {
 
     private boolean commandsSorted;
 
-    public ConsoleImpl() {
-        addMessage("Welcome to the wonderful world of Terasology!" + Message.NEW_LINE +
-                Message.NEW_LINE +
-                "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
-                "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
-                "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
-                "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
-                "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
-                "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
-    }
-
     /**
      * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
      *
