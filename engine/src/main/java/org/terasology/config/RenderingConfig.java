@@ -69,6 +69,7 @@ public class RenderingConfig {
     private boolean inscattering = true;
     private boolean localReflections;
     private boolean vSync;
+    private boolean clampLighting;
     private int fboScale = 100;
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
@@ -418,6 +419,14 @@ public class RenderingConfig {
 
     public void setFboScale(int fboScale) {
         this.fboScale = fboScale;
+    }
+
+    public boolean isClampLighting() {
+        return clampLighting;
+    }
+
+    public void setClampLighting(boolean clampLighting) {
+        this.clampLighting = clampLighting;
     }
 
     @Override

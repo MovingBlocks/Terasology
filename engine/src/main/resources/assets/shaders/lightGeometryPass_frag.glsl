@@ -148,5 +148,10 @@ void main() {
     color *= attenuation;
 #endif
 
+// TODO A 3D wizard should take a look at this. Configurable for the moment to make better comparisons possible.
+#if defined (CLAMP_LIGHTING)
+    gl_FragData[0].rgba = clamp(vec4(color.r, color.g, color.b, specular), 0.0, 1.05);
+#else
     gl_FragData[0].rgba = vec4(color.r, color.g, color.b, specular);
+#endif
 }

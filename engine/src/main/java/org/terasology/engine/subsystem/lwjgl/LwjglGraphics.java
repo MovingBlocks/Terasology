@@ -16,8 +16,7 @@
 package org.terasology.engine.subsystem.lwjgl;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.*;
 import org.newdawn.slick.opengl.ImageIOImageData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +161,22 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
             } catch (IOException | IllegalArgumentException e) {
                 logger.warn("Could not set icon", e);
             }
-            Display.create(rc.getPixelFormat());
+
+            if (config.getRendering().getDebug().isEnabled()) {
+                try {
+                    ContextAttribs ctxAttribs = new ContextAttribs().withDebug(true);
+                    Display.create(config.getRendering().getPixelFormat(), ctxAttribs);
+
+                    GL43.glDebugMessageCallback(new KHRDebugCallback(new DebugCallback()));
+                } catch (LWJGLException e) {
+                    logger.warn("Unable to create an OpenGL debug context. Maybe your graphics card does not support it.", e);
+                    Display.create(rc.getPixelFormat()); // Create a normal context instead
+                }
+
+            } else {
+                Display.create(rc.getPixelFormat());
+            }
+
             Display.setVSyncEnabled(rc.isVSync());
         } catch (LWJGLException e) {
             throw new RuntimeException("Can not initialize graphics device.", e);

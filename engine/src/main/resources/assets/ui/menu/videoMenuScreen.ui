@@ -317,18 +317,52 @@
                                 "id": "oculusVrSupport"
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UILabel",
+                                "text": "SSAO: "
                             },
                             {
-                                "type": "UISpace",
-                                "size": [1, 13]
+                                "type": "UICheckbox",
+                                "id": "ssao"
                             },
                             {
-                                "type": "UIButton",
-                                "text": "Advanced Settings",
-                                "id": "advancedVideo",
-                                "enabled" : false
+                                "type": "UILabel",
+                                "text": "Clamp Lighting: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "clampLighting"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Bloom: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "bloom"
+                            },
+                            {
+                                "type": "UILabel",
+                                "text": "Light Shafts: "
+                            },
+                            {
+                                "type": "UICheckbox",
+                                "id": "lightShafts"
+                            },
+                            {
+                               "type": "UILabel",
+                               "text": "Vignette: "
+                            },
+                            {
+                               "type": "UICheckbox",
+                               "id": "vignette"
+                            },
+                            {
+                              "type": "UILabel",
+                              "text": "Flickering Lights: "
+                            },
+                            {
+                              "type": "UICheckbox",
+                              "id": "flickeringLight"
                             }
                         ],
                         "layoutInfo": {

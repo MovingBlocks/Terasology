@@ -245,6 +245,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
         if (config.getRendering().isInscattering()) {
             builder.append("#define INSCATTERING \n");
         }
+        // TODO A 3D wizard should take a look at this. Configurable for the moment to make better comparisons possible.
+        if (config.getRendering().isClampLighting()) {
+            builder.append("#define CLAMP_LIGHTING \n");
+        }
 
         for (RenderingDebugConfig.DebugRenderingStage stage : RenderingDebugConfig.DebugRenderingStage.values()) {
             builder.append("#define ").append(stage.getDefineName()).append(" int(").append(stage.getIndex()).append(") \n");

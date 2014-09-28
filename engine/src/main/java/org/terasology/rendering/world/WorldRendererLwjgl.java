@@ -17,6 +17,8 @@ package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.KHRDebug;
+import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
