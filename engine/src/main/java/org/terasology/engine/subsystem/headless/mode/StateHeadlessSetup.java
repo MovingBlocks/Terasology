@@ -61,6 +61,20 @@ public class StateHeadlessSetup extends StateSetup {
         }
 
         WorldGenerationConfig worldGenConfig = config.getWorldGeneration();
+
+        // If no valid default world generator set then try to find one - no option to pick one manually in headless
+        if (!worldGenConfig.getDefaultGenerator().isValid()) {
+
+            // find the first gameplay module that is available, it should have a preferred world gen
+            for (Name moduleName : config.getDefaultModSelection().listModules()) {
+                Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
+                if (moduleManager.isGameplayModule(module)) {
+                    String defaultWorldGenerator = module.getMetadata().getExtension(ModuleManager.DEFAULT_WORLD_GENERATOR_EXT, String.class);
+                    worldGenConfig.setDefaultGenerator(new SimpleUri(defaultWorldGenerator));
+                    break;
+                }
+            }
+        }
         SimpleUri worldGeneratorUri = worldGenConfig.getDefaultGenerator();
 
         gameManifest.setTitle(worldGenConfig.getWorldTitle());

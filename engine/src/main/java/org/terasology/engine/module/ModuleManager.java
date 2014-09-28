@@ -179,4 +179,9 @@ public class ModuleManager {
     public ModuleMetadataReader getModuleMetadataReader() {
         return metadataReader;
     }
+
+    public boolean isGameplayModule(Module module) {
+        Boolean isGameplay = module.getMetadata().getExtension(IS_GAMEPLAY_EXT, Boolean.class);
+        return isGameplay != null && isGameplay;
+    }
 }

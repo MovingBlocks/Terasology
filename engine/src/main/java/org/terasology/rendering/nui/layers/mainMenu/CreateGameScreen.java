@@ -126,7 +126,7 @@ public class CreateGameScreen extends CoreScreenLayer {
                     // find the first gameplay module that is available
                     for (Name moduleName : config.getDefaultModSelection().listModules()) {
                         Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-                        if (isGameplayModule(module)) {
+                        if (moduleManager.isGameplayModule(module)) {
                             set(module);
                             return selected;
                         }
@@ -330,11 +330,6 @@ public class CreateGameScreen extends CoreScreenLayer {
         return enabledModules;
     }
 
-    private boolean isGameplayModule(Module module) {
-        Boolean isGameplay = module.getMetadata().getExtension(ModuleManager.IS_GAMEPLAY_EXT, Boolean.class);
-        return isGameplay != null && isGameplay;
-    }
-
     private void setSelectedGameplayModule(Module previousModule, Module module) {
         ModuleConfig moduleConfig = config.getDefaultModSelection();
         moduleConfig.setDefaultGameplayModuleName(module.getId().toString());
@@ -354,7 +349,7 @@ public class CreateGameScreen extends CoreScreenLayer {
         for (Name moduleId : moduleManager.getRegistry().getModuleIds()) {
             Module latestVersion = moduleManager.getRegistry().getLatestModuleVersion(moduleId);
             if (!latestVersion.isOnClasspath()) {
-                if (isGameplayModule(latestVersion)) {
+                if (moduleManager.isGameplayModule(latestVersion)) {
                     gameplayModules.add(latestVersion);
                 }
             }
