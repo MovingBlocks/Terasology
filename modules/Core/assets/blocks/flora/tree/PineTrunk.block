@@ -17,6 +17,7 @@
 {
     "hardness" : 6,
     "categories" : ["wood"],
+    "sounds": "Core:wood",
     "tiles" : {
         "topBottom" : "OakTrunk",
         "sides" : "PineBark"

@@ -17,6 +17,7 @@
 package org.terasology.world.block.loader;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -42,10 +43,8 @@ import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockAppearance;
-import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.BlockUri;
+import org.terasology.world.BlockSoundsRegistry;
+import org.terasology.world.block.*;
 import org.terasology.world.block.family.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactory;
@@ -88,9 +87,14 @@ public class BlockLoader implements BlockBuilderHelper {
 
     private final WorldAtlas atlas;
     private BlockFamilyFactoryRegistry blockFamilyFactoryRegistry;
+    private final BlockSoundsRegistry soundsRegistry;
 
-    public BlockLoader(AssetManager assetManager, BlockFamilyFactoryRegistry blockFamilyFactoryRegistry, WorldAtlas atlas) {
+    public BlockLoader(BlockSoundsRegistry soundsRegistry,
+                       AssetManager assetManager,
+                       BlockFamilyFactoryRegistry blockFamilyFactoryRegistry,
+                       WorldAtlas atlas) {
         this.atlas = atlas;
+        this.soundsRegistry = soundsRegistry;
         this.assetManager = assetManager;
         parser = new JsonParser();
         gson = new GsonBuilder()
@@ -431,6 +435,19 @@ public class BlockLoader implements BlockBuilderHelper {
             block.setDisplayName(def.displayName);
         } else {
             block.setDisplayName(properCase(defaultName.toString()));
+        }
+        if (!Strings.isNullOrEmpty(def.sounds)) {
+            BlockSounds sounds = soundsRegistry.getBlockSounds(def.sounds);
+            if (sounds == null) {
+                logger.warn("Block definition {} references block sounds {}, which don't exist.",
+                    defaultName, def.sounds);
+                block.setSounds(soundsRegistry.getDefaultBlockSounds());
+            } else {
+                block.setSounds(sounds);
+            }
+        } else {
+            // Always set to default sounds, even if none are specified
+            block.setSounds(soundsRegistry.getDefaultBlockSounds());
         }
 
         block.setMass(def.mass);

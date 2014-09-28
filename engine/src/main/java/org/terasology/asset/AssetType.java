@@ -81,7 +81,8 @@ public enum AssetType {
     ATLAS("atlas", "atlas", "atlas", new AtlasLoader(), false),
     UI_SKIN("skin", "skins", "skin", new UISkinLoader(), false),
     BEHAVIOR("behavior", "behaviors", "behavior", new BehaviorTreeLoader(), false),
-    UI_ELEMENT("ui", "ui", "ui", new UILoader(), false);
+    UI_ELEMENT("ui", "ui", "ui", new UILoader(), false),
+    BLOCK_SOUNDS_DEFINITION("blocksoundsdef", "blockSounds", "blocksounds", null, false);
 
 
     private static Map<String, AssetType> typeIdLookup;

@@ -4,5 +4,6 @@
 {
     "template" : true,
     "categories" : ["soil"],
-    "hardness" : 2
+    "hardness" : 2,
+    "sounds": "Core:soil"
 }

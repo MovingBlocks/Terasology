@@ -41,12 +41,11 @@ import org.terasology.persistence.ModuleContext;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.BlockSounds;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
-import org.terasology.world.block.loader.BlockLoader;
-import org.terasology.world.block.loader.FreeformFamily;
-import org.terasology.world.block.loader.WorldAtlas;
+import org.terasology.world.block.loader.*;
 
 import java.util.Iterator;
 import java.util.List;
@@ -76,6 +75,9 @@ public class BlockManagerImpl extends BlockManager {
     private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
     private final Map<BlockUri, BlockFamily> availableFamilies = Maps.newHashMap();
 
+    /* Block Sounds */
+    private final Map<String, BlockSounds> blockSounds = Maps.newHashMap();
+
     private ReentrantLock lock = new ReentrantLock();
 
     private AtomicReference<RegisteredState> registeredBlockInfo = new AtomicReference<>(new RegisteredState());
@@ -98,7 +100,16 @@ public class BlockManagerImpl extends BlockManager {
                             BlockFamilyFactoryRegistry blockFamilyFactoryRegistry) {
         this.generateNewIds = generateNewIds;
         this.environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
-        blockLoader = new BlockLoader(CoreRegistry.get(AssetManager.class), blockFamilyFactoryRegistry, atlas);
+        BlockSoundsLoader blockSoundsLoader = new BlockSoundsLoader(new BlockSoundsFactory());
+        for (BlockSounds sounds : blockSoundsLoader.loadBlockSoundsDefinitions()) {
+            if (blockSounds.put(sounds.getUri(), sounds) != null) {
+                logger.warn("Duplicate block sounds definition with URI {}", sounds.getUri());
+            } else {
+                logger.info("Registered Block Sounds {}", sounds.getUri());
+            }
+        }
+
+        blockLoader = new BlockLoader(this, CoreRegistry.get(AssetManager.class), blockFamilyFactoryRegistry, atlas);
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         addBlockFamily(getAirFamily(), true);
         for (BlockFamily family : blockDefinitions.families) {
@@ -315,6 +326,21 @@ public class BlockManagerImpl extends BlockManager {
     @Override
     public Iterable<String> getBlockCategories() {
         return categoryLookup.keySet();
+    }
+
+    @Override
+    public BlockSounds getBlockSounds(String uri) {
+        return blockSounds.get(uri);
+    }
+
+    @Override
+    public BlockSounds getDefaultBlockSounds() {
+        BlockSounds sounds = getBlockSounds(BlockSounds.DEFAULT_ID);
+        if (sounds == null) {
+            throw new IllegalStateException("Default block sounds are missing from engine module: "
+                + BlockSounds.DEFAULT_ID);
+        }
+        return sounds;
     }
 
     @Override

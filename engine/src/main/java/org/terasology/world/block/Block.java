@@ -134,6 +134,7 @@ public final class Block {
     private byte hardness = 0x3;
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
+    private BlockSounds sounds = BlockSounds.NULL;
 
     // Special rendering flags (TODO: clean this up)
     private boolean water;
@@ -288,6 +289,16 @@ public final class Block {
         this.ice = ice;
     }
 
+    /**
+     * @return The sound set used by this block. Never null.
+     */
+    public BlockSounds getSounds() {
+        return sounds;
+    }
+
+    public void setSounds(BlockSounds sounds) {
+        this.sounds = sounds;
+    }
 
     /**
      * @return Whether this block is translucent/alpha masked
@@ -549,6 +560,8 @@ public final class Block {
     public void setPrimaryAppearance(BlockAppearance appearence) {
         this.primaryAppearance = appearence;
     }
+
+
 
     public Mesh getMesh() {
         if (mesh == null || mesh.isDisposed()) {

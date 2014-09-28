@@ -26,6 +26,8 @@
 
     "categories": ["wood"],
 
+    "sounds": "Core:wood",
+
     // Graphics
     "tiles": {
         "sides": "OakBark"

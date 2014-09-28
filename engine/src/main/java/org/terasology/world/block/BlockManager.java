@@ -17,6 +17,7 @@ package org.terasology.world.block;
 
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.naming.Name;
+import org.terasology.world.BlockSoundsRegistry;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public abstract class BlockManager {
+public abstract class BlockManager implements BlockSoundsRegistry {
 
     private static final Name AIR_ID = new Name("air");
     private static final Block AIR;

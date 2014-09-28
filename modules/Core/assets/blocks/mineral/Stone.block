@@ -20,5 +20,6 @@
 {
     "mass" : 100,
     "hardness" : 8,
-    "categories" : ["stone"]
+    "categories" : ["stone"],
+    "sounds": "Core:stone"
 }
