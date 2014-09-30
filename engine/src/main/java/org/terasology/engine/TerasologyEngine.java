@@ -39,6 +39,8 @@ import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.game.Game;
 import org.terasology.identity.CertificateGenerator;
 import org.terasology.identity.CertificatePair;
+import org.terasology.identity.PrivateIdentityCertificate;
+import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
@@ -222,7 +224,8 @@ public class TerasologyEngine implements GameEngine {
         if (!config.getDefaultModSelection().hasModule(TerasologyConstants.CORE_MODULE)) {
             config.getDefaultModSelection().addModule(TerasologyConstants.CORE_MODULE);
         }
-        if (config.getSecurity().getServerPrivateCertificate() == null) {
+
+        if (!validateServerIdentity()) {
             CertificateGenerator generator = new CertificateGenerator();
             CertificatePair serverIdentity = generator.generateSelfSigned();
             config.getSecurity().setServerCredentials(serverIdentity.getPublicCert(), serverIdentity.getPrivateCert());
@@ -230,6 +233,23 @@ public class TerasologyEngine implements GameEngine {
         }
         logger.info("Video Settings: " + config.getRendering().toString());
         CoreRegistry.putPermanently(Config.class, config);
+    }
+
+    private boolean validateServerIdentity() {
+        PrivateIdentityCertificate privateCert = config.getSecurity().getServerPrivateCertificate();
+        PublicIdentityCertificate publicCert = config.getSecurity().getServerPublicCertificate();
+
+        if (privateCert == null || publicCert == null) {
+            return false;
+        }
+
+        // Validate the signature
+        if (!publicCert.verifySelfSigned()) {
+            logger.error("Server signature is not self signed! Generating new server identity.");
+            return false;
+        }
+
+        return true;
     }
 
     @Override
