@@ -22,6 +22,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,7 +58,22 @@ public class WorldBuilder {
         return this;
     }
 
+    public WorldBuilder addPlugins() {
+        WorldGeneratorPluginLibrary pluginLibrary = CoreRegistry.get(WorldGeneratorPluginLibrary.class);
+        for (FacetProvider facetProvider : pluginLibrary.instantiateAllOfType(FacetProviderPlugin.class)) {
+            addProvider(facetProvider);
+        }
+
+        for (WorldRasterizer worldRasterizer : pluginLibrary.instantiateAllOfType(WorldRasterizerPlugin.class)) {
+            addRasterizer(worldRasterizer);
+        }
+
+        return this;
+    }
+
     public World build() {
+        // TODO: ensure the required providers are present
+
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
         return new WorldImpl(seed, providerChains, rasterizers, determineBorders(providerChains));
     }
@@ -146,5 +164,29 @@ public class WorldBuilder {
             }
         }
         return false;
+    }
+
+    public FacetedWorldConfigurator createConfigurator() {
+        FacetedWorldConfigurator worldConfigurator = new FacetedWorldConfigurator();
+        for (FacetProvider facetProvider : providersList) {
+            if (facetProvider instanceof ConfigurableFacetProvider) {
+                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
+                worldConfigurator.addProperty(configurableFacetProvider.getConfigurationName(), configurableFacetProvider.getConfiguration());
+            }
+        }
+        return worldConfigurator;
+    }
+
+    public void setConfigurator(FacetedWorldConfigurator worldConfigurator) {
+        Map<String, Component> configurationMap = worldConfigurator.getProperties();
+        for (FacetProvider facetProvider : providersList) {
+            if (facetProvider instanceof ConfigurableFacetProvider) {
+                ConfigurableFacetProvider configurableFacetProvider = (ConfigurableFacetProvider) facetProvider;
+                Component configuration = configurationMap.get(configurableFacetProvider.getConfigurationName());
+                if (configuration != null) {
+                    configurableFacetProvider.setConfiguration(configuration);
+                }
+            }
+        }
     }
 }

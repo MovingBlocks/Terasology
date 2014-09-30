@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generator;
+package org.terasology.world.generation;
 
-import com.google.common.base.Optional;
-import org.terasology.engine.SimpleUri;
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.World;
+import org.terasology.world.generator.plugin.WorldGeneratorPlugin;
 
-/**
- * @author Immortius
- */
-public interface WorldGenerator {
-    SimpleUri getUri();
-
-    void setWorldSeed(String seed);
-
-    void createChunk(CoreChunk chunk);
-
-    void initialize();
-
-    Optional<WorldConfigurator> getConfigurator();
-
-    World getWorld();
-
-    void setConfigurator(WorldConfigurator newConfigurator);
+public interface FacetProviderPlugin extends FacetProvider, WorldGeneratorPlugin {
 }

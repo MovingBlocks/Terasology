@@ -18,11 +18,9 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.TerasologyConstants;
 import org.terasology.game.GameManifest;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.generator.WorldGenerator;
-import org.terasology.world.internal.WorldInfo;
 
 /**
  * @author Martin Steiger
@@ -45,10 +43,7 @@ public class InitialiseWorldGenerator extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        WorldGenerator worldGenerator;
-        WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
-        worldGenerator = CoreRegistry.get(WorldGenerator.class);
-        worldGenerator.setWorldSeed(worldInfo.getSeed());
+        WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
         worldGenerator.initialize();
 
         return true;

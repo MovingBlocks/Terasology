@@ -15,11 +15,14 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
@@ -29,13 +32,14 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import javax.vecmath.Vector2f;
 
 /**
- * Scales the surface height closer to 0 for regions that are rivers
+ * Applies an amount of the max depth for regions that are rivers
  */
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class PerlinRiverProvider implements FacetProvider {
+public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise2D riverNoise;
+    private Configuration configuration = new Configuration();
 
     @Override
     public void setSeed(long seed) {
@@ -49,7 +53,27 @@ public class PerlinRiverProvider implements FacetProvider {
 
         float[] surfaceHeights = facet.getInternal();
         for (int i = 0; i < noise.length; ++i) {
-            surfaceHeights[i] *= TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i])) - 0.1f) + 0.25f);
+            surfaceHeights[i] += configuration.maxDepth * TeraMath.clamp(7f * (TeraMath.sqrt(Math.abs(noise[i])) - 0.1f) + 0.25f);
         }
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return "Rivers";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (Configuration) configuration;
+    }
+
+    private class Configuration implements Component {
+        @Range(min = 0, max = 64f, increment = 1f, precision = 0, description = "River Depth")
+        public float maxDepth = 16;
     }
 }

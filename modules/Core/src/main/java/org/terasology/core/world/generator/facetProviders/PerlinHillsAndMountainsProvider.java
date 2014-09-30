@@ -15,14 +15,16 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
 import org.terasology.utilities.procedural.SubSampledNoise2D;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
-import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.Updates;
@@ -38,10 +40,11 @@ import java.util.Iterator;
  */
 @Requires({@Facet(SurfaceTemperatureFacet.class), @Facet(SurfaceHumidityFacet.class)})
 @Updates(@Facet(SurfaceHeightFacet.class))
-public class PerlinHillsAndMountainsProvider implements FacetProvider {
+public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvider {
 
     private SubSampledNoise2D mountainNoise;
     private SubSampledNoise2D hillNoise;
+    private Configuration configuration = new Configuration();
 
     @Override
     public void setSeed(long seed) {
@@ -66,11 +69,34 @@ public class PerlinHillsAndMountainsProvider implements FacetProvider {
             float tempHumid = temp * humidityData.get(pos);
             Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, tempHumid - 0.35f);
             float mIntens = TeraMath.clamp(1.0f - distanceToMountainBiome.length() * 3.0f);
-            float densityMountains = Math.max(mountainData[i], 0) * mIntens;
-            float densityHills = Math.max(hillData[i] - 0.1f, 0) * (1.0f - mIntens);
+            float densityMountains = Math.max(mountainData[i], 0) * mIntens * configuration.mountainAmplitude;
+            float densityHills = Math.max(hillData[i] - 0.1f, 0) * (1.0f - mIntens) * configuration.hillAmplitude;
 
             heightData[i] = heightData[i] + 1024 * densityMountains + 128 * densityHills;
         }
     }
 
+    @Override
+    public String getConfigurationName() {
+        return "Hills and Mountains";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (Configuration) configuration;
+    }
+
+    private class Configuration implements Component {
+
+        @Range(min = 0, max = 3f, increment = 0.01f, precision = 2, description = "Mountain Amplitude")
+        public float mountainAmplitude = 1f;
+
+        @Range(min = 0, max = 2f, increment = 0.01f, precision = 2, description = "Hill Amplitude")
+        public float hillAmplitude = 1f;
+    }
 }

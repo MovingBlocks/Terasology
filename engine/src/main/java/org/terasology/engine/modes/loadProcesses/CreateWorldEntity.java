@@ -68,10 +68,14 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                     Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
                     if (comp != null) {
                         worldEntity.addComponent(comp);
+                        entry.setValue(comp);
                     } else {
                         worldEntity.addComponent(entry.getValue());
                     }
                 }
+
+                // restore the world config back to the world generator
+                worldGenerator.setConfigurator(ocf.get());
             }
 
         }

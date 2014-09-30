@@ -18,8 +18,11 @@ package org.terasology.core.world.generator.facetProviders;
 import org.terasology.core.world.Biome;
 import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.PlantFacet;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.TeraMath;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
 import org.terasology.world.generation.FacetProvider;
@@ -34,9 +37,10 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
  */
 @Produces(PlantFacet.class)
 @Requires({@Facet(SurfaceHeightFacet.class), @Facet(BiomeFacet.class), @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 1))})
-public class FloraProvider implements FacetProvider {
+public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
 
     private NoiseTable noiseTable;
+    private Configuration configuration = new Configuration();
 
     @Override
     public void setSeed(long seed) {
@@ -60,12 +64,33 @@ public class FloraProvider implements FacetProvider {
                     height = height - minY + facet.getRelativeRegion().minY();
 
                     if ((biome == Biome.FOREST || biome == Biome.PLAINS) && density.get(x, height, z) > 0
-                            && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) > 180) {
+                            && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) > configuration.density) {
                         facet.set(x, height + 1, z, true);
                     }
                 }
             }
         }
         region.setRegionFacet(PlantFacet.class, facet);
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return "Flora";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (Configuration) configuration;
+    }
+
+    private class Configuration implements Component {
+        @Range(min = 0, max = 360f, increment = 10f, precision = 0, description = "Define the tree density for flora")
+        private float density = 180f;
+
     }
 }

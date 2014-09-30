@@ -53,4 +53,9 @@ public class RemoteWorldGenerator implements WorldGenerator {
     public World getWorld() {
         return null;
     }
+
+    @Override
+    public void setConfigurator(WorldConfigurator newConfigurator) {
+
+    }
 }

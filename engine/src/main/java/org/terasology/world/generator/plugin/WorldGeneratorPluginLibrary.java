@@ -35,8 +35,10 @@ public class WorldGeneratorPluginLibrary {
 
     public WorldGeneratorPluginLibrary(ModuleEnvironment moduleEnvironment, ReflectFactory reflectFactory, CopyStrategyLibrary copyStrategyLibrary) {
         library = new DefaultClassLibrary<>(reflectFactory, copyStrategyLibrary);
-        for (Class<? extends WorldGeneratorPlugin> entry : moduleEnvironment.getSubtypesOf(WorldGeneratorPlugin.class)) {
-            library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);
+        for (Class entry : moduleEnvironment.getTypesAnnotatedWith(RegisterPlugin.class)) {
+            if (WorldGeneratorPlugin.class.isAssignableFrom(entry)) {
+                library.register(new SimpleUri(moduleEnvironment.getModuleProviding(entry), entry.getSimpleName()), entry);
+            }
         }
     }
 

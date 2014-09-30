@@ -16,13 +16,15 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.core.world.generator.facets.TreeFacet;
+import org.terasology.entitySystem.Component;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
+import org.terasology.world.generation.ConfigurableFacetProvider;
 import org.terasology.world.generation.Facet;
 import org.terasology.world.generation.FacetBorder;
-import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
@@ -38,11 +40,11 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
-public class TreeProvider implements FacetProvider {
+public class TreeProvider implements ConfigurableFacetProvider {
 
-    private static float amountOfTrees = 0.12f;
     private NoiseTable treeNoise;
     private NoiseTable treeSeedNoise;
+    private Configuration configuration = new Configuration();
 
     @Override
     public void setSeed(long seed) {
@@ -78,12 +80,33 @@ public class TreeProvider implements FacetProvider {
                         && (z > facet.getWorldRegion().minZ() && TeraMath.floorToInt(surface.getWorld(x, z - 1)) == height)
                         && (z < facet.getWorldRegion().maxZ() && TeraMath.floorToInt(surface.getWorld(x, z + 1)) == height)
                         // and if it selects a % of them
-                        && treeNoise.noise(x, z) / 256f < amountOfTrees) {
+                        && treeNoise.noise(x, z) / 256f < configuration.density) {
                     facet.setWorld(x, height + 1, z, treeSeedNoise.noise(x, z));
                 }
             }
         }
 
         region.setRegionFacet(TreeFacet.class, facet);
+    }
+
+    @Override
+    public String getConfigurationName() {
+        return "Trees";
+    }
+
+    @Override
+    public Component getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(Component configuration) {
+        this.configuration = (Configuration) configuration;
+    }
+
+    private class Configuration implements Component {
+        @Range(min = 0, max = 0.3f, increment = 0.01f, precision = 2, description = "Define the tree density for forests")
+        private float density = 0.12f;
+
     }
 }

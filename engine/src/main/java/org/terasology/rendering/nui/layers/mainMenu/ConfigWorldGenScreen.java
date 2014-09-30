@@ -16,12 +16,19 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
+import org.terasology.module.Module;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.naming.Name;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -35,8 +42,10 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A config screen for world generation
@@ -62,6 +71,15 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
+        // create a fake environment so that plugin facet parts can be loaded
+        Set<Module> selectedModules = Sets.newHashSet();
+        for (Name moduleName : config.getDefaultModSelection().listModules()) {
+            selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(moduleName));
+        }
+        ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(environment,
+                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
+
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());
         properties.clear();
@@ -69,11 +87,14 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         SimpleUri generatorUri = config.getWorldGeneration().getDefaultGenerator();
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(generatorUri);
 
-        if (info == null)
+        if (info == null) {
             return;
+        }
 
         try {
             WorldGenerator wg = worldGeneratorManager.createGenerator(info.getUri());
+            // set the world seed so that partial initialization happens and the facet system has all facet providers
+            wg.setWorldSeed("");
             if (wg.getConfigurator().isPresent()) {
                 WorldConfigurator worldConfig = wg.getConfigurator().get();
 

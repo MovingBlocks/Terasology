@@ -15,7 +15,6 @@
  */
 package org.terasology.core.world.generator.worldGenerators;
 
-import com.google.common.base.Optional;
 import org.terasology.core.world.generator.facetProviders.BiomeProvider;
 import org.terasology.core.world.generator.facetProviders.FloraProvider;
 import org.terasology.core.world.generator.facetProviders.HeightMapSurfaceHeightProvider;
@@ -28,37 +27,22 @@ import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
 import org.terasology.core.world.generator.rasterizers.SolidRasterizer;
 import org.terasology.core.world.generator.rasterizers.TreeRasterizer;
 import org.terasology.engine.SimpleUri;
-import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.World;
+import org.terasology.world.generation.BaseFacetedWorldGenerator;
 import org.terasology.world.generation.WorldBuilder;
 import org.terasology.world.generator.RegisterWorldGenerator;
-import org.terasology.world.generator.WorldConfigurator;
-import org.terasology.world.generator.WorldGenerator;
 
 /**
  * @author Immortius
  */
 @RegisterWorldGenerator(id = "heightMap", displayName = "Height Map", description = "Generates the world using a height map")
-public class HeightMapWorldGenerator implements WorldGenerator {
-
-    private final SimpleUri uri;
-    private String worldSeed;
-    private World world;
-
+public class HeightMapWorldGenerator extends BaseFacetedWorldGenerator {
     public HeightMapWorldGenerator(SimpleUri uri) {
-        this.uri = uri;
+        super(uri);
     }
 
     @Override
-    public final SimpleUri getUri() {
-        return uri;
-    }
-
-    @Override
-    public void setWorldSeed(final String seed) {
-        worldSeed = seed;
-
-        world = new WorldBuilder(worldSeed.hashCode())
+    protected WorldBuilder createWorld(long seed) {
+        return new WorldBuilder(seed)
                 .addProvider(new SeaLevelProvider())
                 .addProvider(new HeightMapSurfaceHeightProvider())
                 .addProvider(new PerlinHumidityProvider())
@@ -70,26 +54,6 @@ public class HeightMapWorldGenerator implements WorldGenerator {
                 .addRasterizer(new FloraRasterizer())
                 .addRasterizer(new TreeRasterizer())
                 .addRasterizer(new SolidRasterizer())
-                .build();
-    }
-
-    @Override
-    public void initialize() {
-        world.initialize();
-    }
-
-    @Override
-    public void createChunk(CoreChunk chunk) {
-        world.rasterizeChunk(chunk);
-    }
-
-    @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.absent();
-    }
-
-    @Override
-    public World getWorld() {
-        return world;
+                .addPlugins();
     }
 }

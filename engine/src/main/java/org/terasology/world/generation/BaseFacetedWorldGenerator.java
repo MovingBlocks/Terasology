@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,47 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.core.world.generator;
+package org.terasology.world.generation;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.nui.Color;
 import org.terasology.world.chunks.CoreChunk;
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.World;
-import org.terasology.world.generation.WorldFacet;
 import org.terasology.world.generation.facets.base.ColorSummaryFacet;
-import org.terasology.world.generator.ChunkGenerationPass;
 import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Immortius
- */
-public abstract class AbstractBaseWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractBaseWorldGenerator.class);
+public abstract class BaseFacetedWorldGenerator implements WorldGenerator, WorldGenerator2DPreview {
 
-    private String worldSeed;
-    private final List<ChunkGenerationPass> generationPasses = Lists.newArrayList();
     private final SimpleUri uri;
+    private String worldSeed;
+    private WorldBuilder worldBuilder;
+    private World world;
 
-    public AbstractBaseWorldGenerator(SimpleUri uri) {
+    public BaseFacetedWorldGenerator(SimpleUri uri) {
         this.uri = uri;
     }
-
-    public abstract void initialize();
 
     @Override
     public final SimpleUri getUri() {
@@ -63,29 +50,48 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
     @Override
     public void setWorldSeed(final String seed) {
         worldSeed = seed;
-        for (final ChunkGenerationPass generator : generationPasses) {
-            generator.setWorldSeed(seed);
-        }
+        worldBuilder = createWorld(worldSeed.hashCode());
+        // reset the world to lazy load it again later
+        world = null;
     }
 
-    protected final void register(final ChunkGenerationPass generator) {
-        registerPass(generator);
-        generationPasses.add(generator);
-    }
+    protected abstract WorldBuilder createWorld(long seed);
 
-    private void registerPass(final ChunkGenerationPass generator) {
-        generator.setWorldSeed(worldSeed);
+    @Override
+    public void initialize() {
+        getWorld().initialize();
     }
 
     @Override
-    public void createChunk(final CoreChunk chunk) {
-        for (final ChunkGenerationPass generator : generationPasses) {
-            try {
-                generator.generateChunk(chunk);
-            } catch (Throwable e) {
-                logger.error("Error during generation pass {}", generator, e);
-            }
+    public void createChunk(CoreChunk chunk) {
+        world.rasterizeChunk(chunk);
+    }
+
+    @Override
+    public Optional<WorldConfigurator> getConfigurator() {
+        FacetedWorldConfigurator worldConfigurator = worldBuilder.createConfigurator();
+        addConfiguration(worldConfigurator);
+        return Optional.of((WorldConfigurator) worldConfigurator);
+    }
+
+    protected void addConfiguration(FacetedWorldConfigurator worldConfigurator) {
+    }
+
+    @Override
+    public void setConfigurator(WorldConfigurator newConfigurator) {
+        if (newConfigurator instanceof FacetedWorldConfigurator) {
+            worldBuilder.setConfigurator((FacetedWorldConfigurator) newConfigurator);
         }
+    }
+
+
+    @Override
+    public World getWorld() {
+        // build the world as late as possible so that we can do configuration and 2d previews
+        if (world == null) {
+            world = worldBuilder.build();
+        }
+        return world;
     }
 
     @Override
@@ -109,17 +115,4 @@ public abstract class AbstractBaseWorldGenerator implements WorldGenerator, Worl
         return layerNames;
     }
 
-    @Override
-    public Optional<WorldConfigurator> getConfigurator() {
-        return Optional.absent();
-    }
-
-    @Override
-    public void setConfigurator(WorldConfigurator worldConfigurator) {
-    }
-
-    @Override
-    public World getWorld() {
-        return null;
-    }
 }
