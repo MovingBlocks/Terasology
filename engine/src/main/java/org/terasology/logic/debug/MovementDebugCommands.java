@@ -15,7 +15,11 @@
  */
 package org.terasology.logic.debug;
 
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -127,20 +131,30 @@ public class MovementDebugCommands extends BaseComponentSystem {
     @Command(shortDescription = "Restore normal speed values", runOnServer = true)
     public String restoreSpeed(EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
+
+        Asset<?> asset = Assets.get(new AssetUri("prefab:engine:player"));
+        CharacterMovementComponent moveDefault = ((PojoPrefab) asset).getComponent(CharacterMovementComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
-        if (move != null) {
-            move.jumpSpeed = 10f;
-            move.speedMultiplier = 1f;
-            move.runFactor = 1.5f;
-            move.stepHeight = 0.35f;
-            move.slopeFactor = 0.6f;
-            move.distanceBetweenFootsteps = 1f;
+        if (move != null && moveDefault != null) {
+            move.jumpSpeed = moveDefault.jumpSpeed;
+            move.speedMultiplier = moveDefault.speedMultiplier;
+            move.runFactor = moveDefault.runFactor;
+            move.stepHeight = moveDefault.stepHeight;
+            move.slopeFactor = moveDefault.slopeFactor;
+            move.distanceBetweenFootsteps = moveDefault.distanceBetweenFootsteps;
             clientComp.character.saveComponent(move);
-            
-            return "Normal speed values restored";
         }
-        
-        return "";
+
+        HealthComponent healthDefault = ((PojoPrefab) asset).getComponent(HealthComponent.class);
+        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
+        if(health != null && healthDefault != null){
+            health.fallingDamageSpeedThreshold = healthDefault.fallingDamageSpeedThreshold;
+            health.horizontalDamageSpeedThreshold = healthDefault.horizontalDamageSpeedThreshold;
+            health.excessSpeedDamageMultiplier = healthDefault.excessSpeedDamageMultiplier;
+            clientComp.character.saveComponent(health);
+        }
+
+        return "Normal speed values restored";
     }
 
     @Command(shortDescription = "Toggles the maximum slope the player can walk up", runOnServer = true)
