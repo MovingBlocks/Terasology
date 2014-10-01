@@ -280,15 +280,19 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void dispose() {
         try {
-            if (!running) {
-                disposed = true;
-                initialised = false;
-                Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-                while (iter.hasNext()) {
-                    EngineSubsystem subsystem = iter.next();
-                    subsystem.dispose();
-                }
+            /*
+             * The engine is shutdown even when running is true for so that terasology gets also properly disposed in
+             * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
+             * be closed.
+             */
+            disposed = true;
+            initialised = false;
+            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+            while (iter.hasNext()) {
+                EngineSubsystem subsystem = iter.next();
+                subsystem.dispose();
             }
+
         } catch (RuntimeException e) {
             logger.error("Uncaught exception", e);
             throw e;
