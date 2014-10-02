@@ -296,7 +296,15 @@ public class BulletPhysics implements PhysicsEngine {
             updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
             return true;
         } else {
-            newRigidBody(entity);
+            /*
+             * During the destruction of the entity it can happen that the rigged body is already destroyed while
+             * the location component changes.
+             * e.g. because another component that was attached via the LocationComponent gets removed.
+             *
+             * In such a situation it would be wrong to recreate the rigid body as it can't be updated properly after
+             * the destruction of the entity.
+             *
+             */
             return false;
         }
 
