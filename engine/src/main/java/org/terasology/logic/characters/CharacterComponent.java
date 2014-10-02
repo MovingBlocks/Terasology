@@ -19,6 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.events.InteractionStartEvent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.FieldReplicateType;
@@ -35,7 +36,20 @@ import javax.vecmath.Vector3f;
 public final class CharacterComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();
     public float eyeOffset = 0.6f;
+    /**
+     * Specifies the maximium range at which this character is able to interact with other objects.
+     * When the player leaves the range the interaction gets canceled.
+     */
     public float interactionRange = 5f;
+    /**
+     * Specifies the current interaction target. It points for example to a standard chest when the player has opened it.
+     *
+     * Important: Use {@link CharacterUtil#setInteractionTarget(EntityRef, EntityRef)}} to set this value, so that the
+     * value.
+     *
+     * This {@link InteractionStartEvent} is sent to all clients when a
+     */
+    public EntityRef interactionTarget = EntityRef.NULL;
     public float pitch;
     public float yaw;
 

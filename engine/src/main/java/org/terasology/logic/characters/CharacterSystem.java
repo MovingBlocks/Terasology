@@ -16,18 +16,17 @@
 
 package org.terasology.logic.characters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.DeathEvent;
-import org.terasology.logic.characters.events.DropItemRequest;
-import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.characters.events.*;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
@@ -52,7 +51,7 @@ import javax.vecmath.Vector3f;
  */
 @RegisterSystem
 public class CharacterSystem extends BaseComponentSystem {
-
+    private Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
     @In
     private Physics physics;
 
@@ -156,6 +155,60 @@ public class CharacterSystem extends BaseComponentSystem {
             result.getEntity().send(new ActivateEvent(character, character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
         }
     }
+
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    public void onInteractionStartRequest(InteractionStartRequest request, EntityRef instigator) {
+        EntityRef target = request.getTarget();
+        target.send(new InteractionStartEvent(instigator));
+    }
+
+
+    /**
+     *
+     * Sets interactionTarget to the specified value with the highest priority so that the field is updated when
+     * other handlers of this event run.
+     */
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_CRITICAL)
+    public void onInteractionStartEvent(InteractionStartEvent event, EntityRef target) {
+        EntityRef instigator = event.getInstigator();
+        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction start request instigator has no character component");
+            return;
+        }
+        if (characterComponent.interactionTarget.exists()) {
+            logger.error("Interaction wasn't finished at start of next interaction");
+            target.send(new InteractionEndEvent(instigator));
+        }
+
+        characterComponent.interactionTarget = target;
+        instigator.saveComponent(characterComponent);
+    }
+
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
+        EntityRef target = request.getTarget();
+        target.send(new InteractionEndEvent(instigator));
+    }
+
+    /**
+     * Sets interactionTarget to NULL with a low priorty so that all handlers of this event are finished when this event
+     * gets processed.
+     */
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_TRIVIAL)
+    public void onInteractionEndEent(InteractionEndEvent event, EntityRef target) {
+        EntityRef instigator = event.getInstigator();
+        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction end request instigator has no character component");
+            return;
+        }
+
+        characterComponent.interactionTarget = EntityRef.NULL;
+        instigator.saveComponent(characterComponent);
+    }
+
+
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {

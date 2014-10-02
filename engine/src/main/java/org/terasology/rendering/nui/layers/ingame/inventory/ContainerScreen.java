@@ -18,6 +18,7 @@ package org.terasology.rendering.nui.layers.ingame.inventory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.inventory.InventoryButton;
+import org.terasology.logic.characters.CharacterUtil;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
@@ -58,7 +59,15 @@ public class ContainerScreen extends CoreScreenLayer {
     }
 
     @Override
+    public void onClosed() {
+        super.onClosed();
+        EntityRef character = localPlayer.getCharacterEntity();
+        CharacterUtil.setInteractionTarget(character, EntityRef.NULL);
+    }
+
+    @Override
     public boolean isModal() {
         return false;
     }
+
 }
