@@ -79,7 +79,7 @@ repositories {
     mavenCentral()
     // MovingBlocks Artifactory instance for libs not readily available elsewhere plus our own libs
     maven {
-        url "http://www.movingblocks.net:8081/artifactory/repo"
+        url "http://artifactory.terasology.org:8081/artifactory/repo"
     }
 }
 
