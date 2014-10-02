@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.*;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
@@ -45,13 +46,15 @@ import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
-public class CharacterSystem extends BaseComponentSystem {
+public class CharacterSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
     private Logger logger = LoggerFactory.getLogger(CharacterSystem.class);
+
     @In
     private Physics physics;
 
@@ -220,5 +223,44 @@ public class CharacterSystem extends BaseComponentSystem {
         EntityRef pickup = pickupBuilder.createPickupFor(event.getItem(), event.getNewPosition(), 200);
         pickup.send(new ImpulseEvent(event.getImpulse()));
     }
+
+    @Override
+    public void update(float delta) {
+        Iterable<EntityRef> characterEntities = entityManager.getEntitiesWith(CharacterComponent.class, LocationComponent.class);
+        for (EntityRef characterEntity: characterEntities) {
+            CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
+            if (characterComponent == null) {
+                continue; // could have changed during events below
+            }
+            LocationComponent characterLocation = characterEntity.getComponent(LocationComponent.class);
+            if (characterLocation == null) {
+                continue; // could have changed during events below
+            }
+            EntityRef target = characterComponent.interactionTarget;
+            if (target.isActive()) {
+
+                LocationComponent targetLocation = target.getComponent(LocationComponent.class);
+                if (targetLocation == null) {
+                    continue; // could have changed during events below
+                }
+                float maxInteractionRange = characterComponent.interactionRange;
+                if (isDistanceToLarge(characterLocation, targetLocation, maxInteractionRange)) {
+                    CharacterUtil.setInteractionTarget(characterEntity, EntityRef.NULL);
+                }
+            }
+        }
+    }
+
+    private boolean isDistanceToLarge(LocationComponent characterLocation, LocationComponent targetLocation, float maxInteractionRange) {
+        float maxInteractionRangeSquared = maxInteractionRange*maxInteractionRange;
+        Vector3f positionDelta = new Vector3f();
+        positionDelta.add(characterLocation.getWorldPosition());
+        positionDelta.sub(targetLocation.getWorldPosition());
+        float interactionRangeSquared = positionDelta.lengthSquared();
+        // add a small epsilon to have rounding mistakes be in favor of the player:
+        float epsilon = 0.00001f;
+        return interactionRangeSquared > maxInteractionRangeSquared + epsilon;
+    }
+
 
 }
