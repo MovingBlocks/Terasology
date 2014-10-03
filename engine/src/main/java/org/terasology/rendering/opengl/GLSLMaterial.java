@@ -71,6 +71,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     private ShaderManager shaderManager;
     private ShaderParameters shaderParameters;
+    private boolean disposed = false;
 
     public GLSLMaterial(AssetUri uri, MaterialData data) {
         super(uri);
@@ -138,7 +139,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public final void reload(MaterialData data) {
-        dispose();
+        disposeData();
 
         shader = (GLSLShader) data.getShader();
         recompile();
@@ -179,7 +180,11 @@ public class GLSLMaterial extends BaseMaterial {
     @Override
     public void onDispose() {
         logger.debug("Disposing material {}.", getURI());
+        disposeData();
+        disposed = true;
+    }
 
+    private void disposeData() {
         TIntIntIterator it = shaderPrograms.iterator();
         while (it.hasNext()) {
             it.advance();
@@ -192,7 +197,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     @Override
     public boolean isDisposed() {
-        return shader == null;
+        return disposed;
     }
 
     @Override
