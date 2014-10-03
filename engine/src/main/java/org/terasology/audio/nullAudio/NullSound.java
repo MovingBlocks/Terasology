@@ -70,7 +70,7 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
     }
 
     @Override

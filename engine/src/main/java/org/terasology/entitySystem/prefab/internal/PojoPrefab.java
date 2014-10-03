@@ -83,7 +83,7 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
     }
 
     @Override

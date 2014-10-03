@@ -94,7 +94,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
     }
 
     @Override

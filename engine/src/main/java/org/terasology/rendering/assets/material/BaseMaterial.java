@@ -36,7 +36,7 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
 
     public abstract void reload(MaterialData data);
 
-    public abstract void dispose();
+    public abstract void onDispose();
 
     public abstract boolean isDisposed();
 

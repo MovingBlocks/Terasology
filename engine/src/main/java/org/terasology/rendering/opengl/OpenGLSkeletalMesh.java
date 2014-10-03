@@ -100,7 +100,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         if (vboIndexBuffer != 0) {
             bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;

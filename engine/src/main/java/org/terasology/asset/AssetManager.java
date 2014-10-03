@@ -415,7 +415,9 @@ public class AssetManager {
     }
 
     public void dispose(Asset<?> asset) {
-        asset.dispose();
+        if (!asset.isDisposed()) {
+            asset.dispose();
+        }
         assetCache.remove(asset.getURI());
     }
 

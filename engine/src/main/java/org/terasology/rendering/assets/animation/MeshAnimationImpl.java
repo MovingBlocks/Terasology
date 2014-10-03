@@ -77,7 +77,7 @@ public class MeshAnimationImpl extends AbstractAsset<MeshAnimationData> implemen
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
     }
 
     @Override

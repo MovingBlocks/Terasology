@@ -112,7 +112,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         // TODO: Fix this - probably failing if sound is playing
         for (int buffer : buffers) {
             if (buffer != 0) {

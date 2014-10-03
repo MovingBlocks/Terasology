@@ -41,7 +41,7 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         data = null;
     }
 

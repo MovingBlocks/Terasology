@@ -64,7 +64,7 @@ public class NullPrefab extends Prefab {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
     }
 
     @Override

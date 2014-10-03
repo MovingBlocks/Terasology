@@ -40,7 +40,7 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         data = null;
     }
 

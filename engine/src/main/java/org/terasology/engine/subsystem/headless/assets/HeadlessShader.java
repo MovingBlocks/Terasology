@@ -38,7 +38,7 @@ public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader 
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         shaderProgramBase = null;
     }
 

@@ -38,7 +38,7 @@ public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implem
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         data = null;
     }
 

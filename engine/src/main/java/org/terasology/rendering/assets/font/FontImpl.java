@@ -99,7 +99,7 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         this.data = null;
     }
 

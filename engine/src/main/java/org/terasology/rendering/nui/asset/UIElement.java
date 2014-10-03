@@ -39,7 +39,7 @@ public class UIElement extends AbstractAsset<UIData> {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         rootWidget = null;
     }
 

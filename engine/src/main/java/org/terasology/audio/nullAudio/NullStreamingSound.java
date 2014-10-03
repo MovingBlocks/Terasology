@@ -42,7 +42,7 @@ public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> 
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
 
     }
 

@@ -45,7 +45,7 @@ public class Subtexture extends AbstractAsset<SubtextureData> implements Texture
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         texture = null;
     }
 

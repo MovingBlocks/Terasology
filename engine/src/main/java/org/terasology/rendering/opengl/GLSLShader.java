@@ -133,7 +133,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         logger.debug("Disposing shader {}.", getURI());
 
         TIntIntIterator it = fragmentPrograms.iterator();

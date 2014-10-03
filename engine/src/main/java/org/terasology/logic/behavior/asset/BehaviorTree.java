@@ -73,7 +73,7 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         this.data = null;
     }
 

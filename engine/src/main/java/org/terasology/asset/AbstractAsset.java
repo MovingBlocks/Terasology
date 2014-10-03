@@ -16,6 +16,8 @@
 
 package org.terasology.asset;
 
+import org.terasology.registry.CoreRegistry;
+
 import java.util.Objects;
 
 /**
@@ -47,6 +49,16 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
         }
         return false;
     }
+
+
+
+    @Override
+    public final void dispose() {
+        onDispose();
+        CoreRegistry.get(AssetManager.class).dispose(this);
+    }
+
+    protected abstract void onDispose();
 
     @Override
     public int hashCode() {

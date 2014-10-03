@@ -177,7 +177,7 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         logger.debug("Disposing material {}.", getURI());
 
         TIntIntIterator it = shaderPrograms.iterator();

@@ -85,7 +85,7 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         if (bufferId != 0) {
             audioManager.purgeSound(this);
             alDeleteBuffers(bufferId);

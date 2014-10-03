@@ -168,7 +168,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         if (id != 0) {
             glDeleteTextures(id);
             id = 0;

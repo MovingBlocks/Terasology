@@ -50,7 +50,7 @@ public class Atlas extends AbstractAsset<AtlasData> {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         subtextures.clear();
     }
 

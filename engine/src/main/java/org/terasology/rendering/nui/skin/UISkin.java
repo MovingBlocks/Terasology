@@ -37,7 +37,7 @@ public class UISkin extends AbstractAsset<UISkinData> {
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         this.skinData = null;
     }
 

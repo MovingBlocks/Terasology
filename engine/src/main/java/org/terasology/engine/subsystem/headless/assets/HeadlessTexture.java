@@ -54,7 +54,7 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     }
 
     @Override
-    public void dispose() {
+    public void onDispose() {
         this.textureData = null;
     }
 
