@@ -48,12 +48,8 @@ public class AccessInventoryAction extends BaseComponentSystem {
 
     @ReceiveEvent(components = {AccessInventoryActionComponent.class, InventoryComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        InventoryComponent inv = entity.getComponent(InventoryComponent.class);
         EntityRef instigator = event.getInstigator();
-        if (inv != null) {
-            inv.accessors.add(instigator);
-            entity.saveComponent(inv);
-        }
+
         if (instigator.getComponent(CharacterComponent.class) != null
                 && instigator.getComponent(InventoryComponent.class) != null) {
             CharacterUtil.setInteractionTarget(instigator, entity);
