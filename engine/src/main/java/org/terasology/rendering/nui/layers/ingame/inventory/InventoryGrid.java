@@ -126,6 +126,11 @@ public class InventoryGrid extends CoreWidget {
         return targetEntity.get();
     }
 
+    /**
+     *
+     * @deprecated Use bindTargetEntity to assign a read only binding that is a getter
+     */
+    @Deprecated
     public void setTargetEntity(EntityRef val) {
         targetEntity.set(val);
     }

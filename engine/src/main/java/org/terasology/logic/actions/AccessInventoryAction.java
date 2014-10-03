@@ -70,10 +70,7 @@ public class AccessInventoryAction extends BaseComponentSystem {
         }
         ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
         if (controller != null && controller.local) {
-            ContainerScreen screen = nuiManager.pushScreen("engine:containerScreen", ContainerScreen.class);
-            if (screen != null) {
-                screen.setContainerEntity(container);
-            }
+            nuiManager.pushScreen("engine:containerScreen", ContainerScreen.class);
         }
     }
 
