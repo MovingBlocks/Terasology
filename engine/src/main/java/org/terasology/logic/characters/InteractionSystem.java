@@ -28,7 +28,9 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.characters.events.InteractionEndEvent;
+import org.terasology.logic.characters.events.InteractionEndRequest;
 import org.terasology.logic.characters.events.InteractionStartEvent;
+import org.terasology.logic.characters.events.InteractionStartRequest;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -132,6 +134,58 @@ public class InteractionSystem extends BaseComponentSystem {
             nuiManager.closeScreen(activeInteractionScreenUri);
             // do not consume the event, so that the inventory will still open
         }
+    }
+
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    public void onInteractionStartRequest(InteractionStartRequest request, EntityRef instigator) {
+        EntityRef target = request.getTarget();
+        target.send(new InteractionStartEvent(instigator));
+    }
+
+
+    /**
+     *
+     * Sets interactionTarget to the specified value with the highest priority so that the field is updated when
+     * other handlers of this event run.
+     */
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_CRITICAL)
+    public void onInteractionStartEvent(InteractionStartEvent event, EntityRef target) {
+        EntityRef instigator = event.getInstigator();
+        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction start request instigator has no character component");
+            return;
+        }
+        if (characterComponent.interactionTarget.exists()) {
+            logger.error("Interaction wasn't finished at start of next interaction");
+            target.send(new InteractionEndEvent(instigator));
+        }
+
+        characterComponent.interactionTarget = target;
+        instigator.saveComponent(characterComponent);
+    }
+
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
+        EntityRef target = request.getTarget();
+        target.send(new InteractionEndEvent(instigator));
+    }
+
+    /**
+     * Sets interactionTarget to NULL with a low priorty so that all handlers of this event are finished when this event
+     * gets processed.
+     */
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_TRIVIAL)
+    public void onInteractionEndEent(InteractionEndEvent event, EntityRef target) {
+        EntityRef instigator = event.getInstigator();
+        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction end request instigator has no character component");
+            return;
+        }
+
+        characterComponent.interactionTarget = EntityRef.NULL;
+        instigator.saveComponent(characterComponent);
     }
 
 }
