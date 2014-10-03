@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
-import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
@@ -27,13 +26,9 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.registry.In;
 import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
-import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
-import org.terasology.rendering.nui.layers.hud.HudToolbar;
-import sun.security.util.KeyUtil;
 
 import java.util.ArrayList;
 import java.util.List;
