@@ -104,7 +104,7 @@ public class TreeProvider implements ConfigurableFacetProvider {
         this.configuration = (Configuration) configuration;
     }
 
-    private class Configuration implements Component {
+    private static class Configuration implements Component {
         @Range(min = 0, max = 0.3f, increment = 0.01f, precision = 2, description = "Define the tree density for forests")
         private float density = 0.12f;
 

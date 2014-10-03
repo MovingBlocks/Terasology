@@ -72,7 +72,7 @@ public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProv
         this.configuration = (Configuration) configuration;
     }
 
-    private class Configuration implements Component {
+    private static class Configuration implements Component {
         @Range(min = 0, max = 64f, increment = 1f, precision = 0, description = "River Depth")
         public float maxDepth = 16;
     }

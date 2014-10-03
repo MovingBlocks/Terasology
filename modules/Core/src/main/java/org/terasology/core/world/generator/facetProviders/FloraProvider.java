@@ -88,7 +88,7 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
         this.configuration = (Configuration) configuration;
     }
 
-    private class Configuration implements Component {
+    private static class Configuration implements Component {
         @Range(min = 0, max = 360f, increment = 10f, precision = 0, description = "Define the tree density for flora")
         private float density = 180f;
 

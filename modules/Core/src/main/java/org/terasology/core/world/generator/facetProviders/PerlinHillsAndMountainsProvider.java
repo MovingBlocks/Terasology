@@ -91,7 +91,7 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
         this.configuration = (Configuration) configuration;
     }
 
-    private class Configuration implements Component {
+    private static class Configuration implements Component {
 
         @Range(min = 0, max = 3f, increment = 0.01f, precision = 2, description = "Mountain Amplitude")
         public float mountainAmplitude = 1f;

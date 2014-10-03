@@ -71,7 +71,7 @@ public class PerlinOceanProvider implements ConfigurableFacetProvider {
         this.configuration = (Configuration) configuration;
     }
 
-    private class Configuration implements Component {
+    private static class Configuration implements Component {
         @Range(min = 0, max = 128f, increment = 1f, precision = 0, description = "Ocean Depth")
         public float maxDepth = 32;
     }
