@@ -23,7 +23,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterUtil;
+import org.terasology.logic.characters.InteractionUtil;
 import org.terasology.logic.characters.events.InteractionEndEvent;
 import org.terasology.logic.characters.events.InteractionStartEvent;
 import org.terasology.logic.common.ActivateEvent;
@@ -56,7 +56,7 @@ public class AccessInventoryAction extends BaseComponentSystem {
 
         if (instigator.getComponent(CharacterComponent.class) != null
                 && instigator.getComponent(InventoryComponent.class) != null) {
-            CharacterUtil.setInteractionTarget(instigator, entity);
+            InteractionUtil.setInteractionTarget(instigator, entity);
         }
     }
 

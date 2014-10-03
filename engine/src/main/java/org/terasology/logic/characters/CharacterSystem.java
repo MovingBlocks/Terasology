@@ -158,7 +158,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
 
-        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
+        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
             nuiManager.closeScreen(activeInteractionScreenUri);
             return;
@@ -256,7 +256,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 }
                 float maxInteractionRange = characterComponent.interactionRange;
                 if (isDistanceToLarge(characterLocation, targetLocation, maxInteractionRange)) {
-                    CharacterUtil.setInteractionTarget(characterEntity, EntityRef.NULL);
+                    InteractionUtil.setInteractionTarget(characterEntity, EntityRef.NULL);
                 }
             }
         }

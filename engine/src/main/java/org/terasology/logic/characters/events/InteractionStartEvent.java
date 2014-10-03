@@ -18,13 +18,13 @@ package org.terasology.logic.characters.events;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.CharacterUtil;
+import org.terasology.logic.characters.InteractionUtil;
 
 /**
  *
  * Represents the start of an interaction between for example a character and a container.
  *
- * Don't send this event manually. Instead use {@link CharacterUtil#setInteractionTarget(EntityRef, EntityRef)} to do
+ * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
  * so.
  *
  * The event is sent to the target entity at all clients.

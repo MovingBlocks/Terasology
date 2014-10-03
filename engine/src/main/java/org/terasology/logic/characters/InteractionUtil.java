@@ -27,10 +27,10 @@ import org.terasology.logic.characters.events.InteractionStartRequest;
 /**
  * Utility class for entities with the {@link org.terasology.logic.characters.CharacterComponent}.
  */
-public class CharacterUtil {
-    private static final Logger logger = LoggerFactory.getLogger(CharacterUtil.class);
+public class InteractionUtil {
+    private static final Logger logger = LoggerFactory.getLogger(InteractionUtil.class);
 
-    private CharacterUtil() {
+    private InteractionUtil() {
         // Utility class: no instance required.
     }
 

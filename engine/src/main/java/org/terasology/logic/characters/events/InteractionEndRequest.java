@@ -19,12 +19,12 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.logic.characters.CharacterUtil;
+import org.terasology.logic.characters.InteractionUtil;
 
 /**
  * Request the server to announce the start of an interaction.
  *
- * Don't send this event manually. Instead use {@link CharacterUtil#setInteractionTarget(EntityRef, EntityRef)} to do
+ * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
  * so.
  *
  * The event is sent to the investigator as the own character is one of the few entity a client is

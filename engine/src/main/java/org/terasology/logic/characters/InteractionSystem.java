@@ -58,11 +58,11 @@ public class InteractionSystem extends BaseComponentSystem {
         }
 
         if (characterComponent.interactionTarget.exists()) {
-            CharacterUtil.setInteractionTarget(instigator, entity);
+            InteractionUtil.setInteractionTarget(instigator, entity);
         }
 
 
-        CharacterUtil.setInteractionTarget(instigator, entity);
+        InteractionUtil.setInteractionTarget(instigator, entity);
 
     }
 
@@ -101,15 +101,15 @@ public class InteractionSystem extends BaseComponentSystem {
      * The method listens for the event that the user closes the screen of the current interaction target.
      *
      * When it happens it updates the interactionTarget field via
-     * {@link CharacterUtil#setInteractionTarget(EntityRef,EntityRef)}.
+     * {@link InteractionUtil#setInteractionTarget(EntityRef,EntityRef)}.
      */
     @ReceiveEvent(components = {ClientComponent.class})
     public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
+        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
 
         if ((activeInteractionScreenUri != null) && (activeInteractionScreenUri.equals(event.getClosedScreenUri()))) {
-            CharacterUtil.setInteractionTarget(clientComponent.character, EntityRef.NULL);
+            InteractionUtil.setInteractionTarget(clientComponent.character, EntityRef.NULL);
         }
     }
 
@@ -127,7 +127,7 @@ public class InteractionSystem extends BaseComponentSystem {
         }
 
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
+        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
             nuiManager.closeScreen(activeInteractionScreenUri);
             // do not consume the event, so that the inventory will still open
