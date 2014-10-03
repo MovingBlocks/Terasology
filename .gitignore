@@ -33,7 +33,6 @@ facades/PC/Terasology.launch
 #Ignore OSX
 Icon
 
-
 #Ignore Windows
 ehthumbs.db
 Thumbs.db
@@ -44,6 +43,7 @@ Thumbs.db
 /screenshots/
 /logs/
 /terasology-server/
+/terasology-2ndclient/
 config.cfg
 entityDump.txt
 
