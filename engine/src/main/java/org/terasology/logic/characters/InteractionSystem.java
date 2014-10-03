@@ -17,6 +17,8 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -28,6 +30,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.ScreenLayerClosedEvent;
 
 /**
  *
@@ -78,6 +81,35 @@ public class InteractionSystem extends BaseComponentSystem {
         ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
         if (controller != null && controller.local) {
             nuiManager.closeScreen(interactionScreenComponent.screen);
+        }
+    }
+
+
+    /**
+     * The method listens for the event that the user closes the screen of the current interaction target.
+     *
+     * When it happens it updates the interactionTarget field via
+     * {@link CharacterUtil#setInteractionTarget(EntityRef,EntityRef)}.
+     */
+    @ReceiveEvent(components = {ClientComponent.class})
+    public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
+        EntityRef character = clientComponent.character;
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return;
+        }
+        EntityRef interactionTarget = characterComponent.interactionTarget;
+        if (!interactionTarget.exists()) {
+            return;
+        }
+        InteractionScreenComponent screenComponent = interactionTarget.getComponent(InteractionScreenComponent.class);
+        if (screenComponent == null) {
+            return;
+        }
+        AssetUri screenUriOfInteractionTarget = new AssetUri(AssetType.UI_ELEMENT, screenComponent.screen);
+
+        if (screenUriOfInteractionTarget.equals(event.getClosedScreenUri())) {
+            CharacterUtil.setInteractionTarget(character, EntityRef.NULL);
         }
     }
 

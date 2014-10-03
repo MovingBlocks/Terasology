@@ -71,13 +71,6 @@ public class ContainerScreen extends CoreScreenLayer {
     }
 
     @Override
-    public void onClosed() {
-        super.onClosed();
-        EntityRef character = localPlayer.getCharacterEntity();
-        CharacterUtil.setInteractionTarget(character, EntityRef.NULL);
-    }
-
-    @Override
     public boolean isModal() {
         return false;
     }

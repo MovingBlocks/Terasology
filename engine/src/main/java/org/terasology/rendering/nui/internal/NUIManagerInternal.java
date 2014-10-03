@@ -37,6 +37,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseAxisEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.network.ClientComponent;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -44,11 +45,7 @@ import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.ControlWidget;
-import org.terasology.rendering.nui.CoreScreenLayer;
-import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.UIScreenLayer;
-import org.terasology.rendering.nui.UIWidget;
+import org.terasology.rendering.nui.*;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
@@ -142,15 +139,23 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         UIScreenLayer screen = screenLookup.remove(screenUri);
         if (screen != null) {
             screens.remove(screen);
-            screen.onClosed();
+            onCloseScreen(screen, screenUri);
         }
     }
 
     @Override
     public void closeScreen(UIScreenLayer screen) {
         if (screens.remove(screen)) {
-            screen.onClosed();
-            screenLookup.inverse().remove(screen);
+            AssetUri screenUri = screenLookup.inverse().remove(screen);
+            onCloseScreen(screen, screenUri);
+        }
+    }
+
+    private void onCloseScreen(UIScreenLayer screen, AssetUri screenUri) {
+        screen.onClosed();
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        if (localPlayer != null) {
+            localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
         }
     }
 
