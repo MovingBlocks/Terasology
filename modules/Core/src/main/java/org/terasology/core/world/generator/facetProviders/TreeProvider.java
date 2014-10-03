@@ -44,7 +44,7 @@ public class TreeProvider implements ConfigurableFacetProvider {
 
     private NoiseTable treeNoise;
     private NoiseTable treeSeedNoise;
-    private Configuration configuration = new Configuration();
+    private TreeProviderConfiguration configuration = new TreeProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -101,10 +101,10 @@ public class TreeProvider implements ConfigurableFacetProvider {
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (Configuration) configuration;
+        this.configuration = (TreeProviderConfiguration) configuration;
     }
 
-    private static class Configuration implements Component {
+    private static class TreeProviderConfiguration implements Component {
         @Range(min = 0, max = 0.3f, increment = 0.01f, precision = 2, description = "Define the tree density for forests")
         private float density = 0.12f;
 

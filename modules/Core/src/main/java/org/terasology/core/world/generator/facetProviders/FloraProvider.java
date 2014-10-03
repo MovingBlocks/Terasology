@@ -40,7 +40,7 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
 
     private NoiseTable noiseTable;
-    private Configuration configuration = new Configuration();
+    private FloraProviderConfiguration configuration = new FloraProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -64,7 +64,7 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
                     height = height - minY + facet.getRelativeRegion().minY();
 
                     if ((biome == Biome.FOREST || biome == Biome.PLAINS) && density.get(x, height, z) > 0
-                            && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) > configuration.density) {
+                            && density.get(x, height + 1, z) <= 0 && noiseTable.noise(x, z) < configuration.density) {
                         facet.set(x, height + 1, z, true);
                     }
                 }
@@ -85,10 +85,10 @@ public class FloraProvider implements FacetProvider, ConfigurableFacetProvider {
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (Configuration) configuration;
+        this.configuration = (FloraProviderConfiguration) configuration;
     }
 
-    private static class Configuration implements Component {
+    private static class FloraProviderConfiguration implements Component {
         @Range(min = 0, max = 360f, increment = 10f, precision = 0, description = "Define the tree density for flora")
         private float density = 180f;
 

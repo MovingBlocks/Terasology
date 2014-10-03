@@ -38,7 +38,7 @@ public class PerlinOceanProvider implements ConfigurableFacetProvider {
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise2D oceanNoise;
-    private Configuration configuration = new Configuration();
+    private PerlinOceanConfiguration configuration = new PerlinOceanConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -68,10 +68,10 @@ public class PerlinOceanProvider implements ConfigurableFacetProvider {
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (Configuration) configuration;
+        this.configuration = (PerlinOceanConfiguration) configuration;
     }
 
-    private static class Configuration implements Component {
+    private static class PerlinOceanConfiguration implements Component {
         @Range(min = 0, max = 128f, increment = 1f, precision = 0, description = "Ocean Depth")
         public float maxDepth = 32;
     }

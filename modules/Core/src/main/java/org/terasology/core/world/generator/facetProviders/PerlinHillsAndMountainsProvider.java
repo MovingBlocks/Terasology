@@ -44,7 +44,7 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
 
     private SubSampledNoise2D mountainNoise;
     private SubSampledNoise2D hillNoise;
-    private Configuration configuration = new Configuration();
+    private PerlinHillsAndMountainsProviderConfiguration configuration = new PerlinHillsAndMountainsProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -88,10 +88,10 @@ public class PerlinHillsAndMountainsProvider implements ConfigurableFacetProvide
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (Configuration) configuration;
+        this.configuration = (PerlinHillsAndMountainsProviderConfiguration) configuration;
     }
 
-    private static class Configuration implements Component {
+    private static class PerlinHillsAndMountainsProviderConfiguration implements Component {
 
         @Range(min = 0, max = 3f, increment = 0.01f, precision = 2, description = "Mountain Amplitude")
         public float mountainAmplitude = 1f;

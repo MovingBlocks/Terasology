@@ -39,7 +39,7 @@ public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProv
     private static final int SAMPLE_RATE = 4;
 
     private SubSampledNoise2D riverNoise;
-    private Configuration configuration = new Configuration();
+    private PerlinRiverProviderConfiguration configuration = new PerlinRiverProviderConfiguration();
 
     @Override
     public void setSeed(long seed) {
@@ -69,10 +69,10 @@ public class PerlinRiverProvider implements FacetProvider, ConfigurableFacetProv
 
     @Override
     public void setConfiguration(Component configuration) {
-        this.configuration = (Configuration) configuration;
+        this.configuration = (PerlinRiverProviderConfiguration) configuration;
     }
 
-    private static class Configuration implements Component {
+    private static class PerlinRiverProviderConfiguration implements Component {
         @Range(min = 0, max = 64f, increment = 1f, precision = 0, description = "River Depth")
         public float maxDepth = 16;
     }

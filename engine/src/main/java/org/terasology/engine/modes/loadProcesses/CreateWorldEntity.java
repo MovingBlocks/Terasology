@@ -48,7 +48,26 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
         Iterator<EntityRef> worldEntityIterator = entityManager.getEntitiesWith(WorldComponent.class).iterator();
         // TODO: Move the world renderer bits elsewhere
         if (worldEntityIterator.hasNext()) {
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
+            EntityRef worldEntity = worldEntityIterator.next();
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+
+            // get the world generator config from the world entity
+            // replace the world generator values from the components in the world entity
+            WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
+            Optional<WorldConfigurator> ocf = worldGenerator.getConfigurator();
+
+            if (ocf.isPresent()) {
+                Map<String, Component> params = ocf.get().getProperties();
+                for (Map.Entry<String, Component> entry : params.entrySet()) {
+                    Class<? extends Component> clazz = entry.getValue().getClass();
+                    Component comp = worldEntity.getComponent(clazz);
+                    if (comp != null) {
+                        entry.setValue(comp);
+                    }
+                }
+                // save the world config back to the world generator
+                worldGenerator.setConfigurator(ocf.get());
+            }
         } else {
             EntityRef worldEntity = entityManager.create();
             worldEntity.addComponent(new WorldComponent());
@@ -61,8 +80,10 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
             if (ocf.isPresent()) {
                 SimpleUri generatorUri = worldGenerator.getUri();
                 Config config = CoreRegistry.get(Config.class);
-                Map<String, Component> params = ocf.get().getProperties();
 
+                // get the map of properties from the world generator.  Replace its values with values from the config set by the UI.
+                // Also set all the components to the world entity.
+                Map<String, Component> params = ocf.get().getProperties();
                 for (Map.Entry<String, Component> entry : params.entrySet()) {
                     Class<? extends Component> clazz = entry.getValue().getClass();
                     Component comp = config.getModuleConfig(generatorUri, entry.getKey(), clazz);
@@ -74,7 +95,7 @@ public class CreateWorldEntity extends SingleStepLoadProcess {
                     }
                 }
 
-                // restore the world config back to the world generator
+                // save the world config back to the world generator
                 worldGenerator.setConfigurator(ocf.get());
             }
 
