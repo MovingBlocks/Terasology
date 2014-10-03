@@ -16,11 +16,7 @@
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterUtil;
-import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -34,9 +30,6 @@ public class ContainerScreen extends CoreScreenLayer {
 
     @In
     private LocalPlayer localPlayer;
-
-    @In
-    private InventoryManager inventoryManager;
 
     private InventoryGrid containerInventory;
 
@@ -60,14 +53,6 @@ public class ContainerScreen extends CoreScreenLayer {
                 return characterComponent.interactionTarget;
             }
         });
-    }
-
-    @Override
-    public void onBindEvent(BindButtonEvent event) {
-        if (event instanceof InventoryButton && event.isDown()) {
-            getManager().closeScreen(this);
-            event.consume();
-        }
     }
 
     @Override
