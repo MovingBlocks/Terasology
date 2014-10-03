@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.characters;
+package org.terasology.logic.characters.interactions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.events.InteractionEndRequest;
-import org.terasology.logic.characters.events.InteractionStartRequest;
+import org.terasology.logic.characters.CharacterComponent;
 
 /**
  * Utility class for entities with the {@link org.terasology.logic.characters.CharacterComponent}.

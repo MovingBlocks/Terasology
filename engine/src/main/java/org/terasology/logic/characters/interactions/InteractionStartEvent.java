@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
+package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.InteractionUtil;
+import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
  *

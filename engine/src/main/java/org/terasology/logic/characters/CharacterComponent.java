@@ -19,7 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.events.InteractionStartEvent;
+import org.terasology.logic.characters.interactions.InteractionStartEvent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.FieldReplicateType;

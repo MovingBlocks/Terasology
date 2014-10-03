@@ -23,16 +23,16 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.InteractionUtil;
-import org.terasology.logic.characters.events.InteractionEndEvent;
-import org.terasology.logic.characters.events.InteractionStartEvent;
+import org.terasology.logic.characters.interactions.InteractionUtil;
+import org.terasology.logic.characters.interactions.InteractionEndEvent;
+import org.terasology.logic.characters.interactions.InteractionStartEvent;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.ingame.inventory.ContainerScreen;
-import org.terasology.logic.characters.InteractionSystem;
+import org.terasology.logic.characters.interactions.InteractionSystem;
 
 /**
  *

@@ -1,4 +1,4 @@
-package org.terasology.logic.characters;
+package org.terasology.logic.characters.interactions;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;

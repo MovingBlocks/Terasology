@@ -13,36 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
+package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
 import org.terasology.network.ServerEvent;
-import org.terasology.logic.characters.InteractionUtil;
+import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
- *
- * Requests the server to announce the start of an interaction between for example a character and a container.
+ * Request the server to announce the start of an interaction.
  *
  * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
  * so.
  *
  * The event is sent to the investigator as the own character is one of the few entity a client is
  * allowed to send events to.
- * *
- * The server sets the interactionTarget field of the character (instigator = character entity).
+ *
+ * The server handles this event by sending an InteractionEndEvent to all clients.
  *
  * @author Florian <florian@fkoeberle.de>
  */
 @ServerEvent
-public class InteractionStartRequest implements Event {
+public class InteractionEndRequest implements Event {
     private EntityRef target;
 
-    protected InteractionStartRequest() {
+    protected InteractionEndRequest() {
     }
 
-    public InteractionStartRequest(EntityRef target) {
+    public InteractionEndRequest(EntityRef target) {
         this.target = target;
     }
 

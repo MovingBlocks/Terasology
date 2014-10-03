@@ -13,38 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.characters.events;
+package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.InteractionUtil;
+import org.terasology.network.ServerEvent;
+import org.terasology.logic.characters.interactions.InteractionUtil;
+
 /**
- * Represents the start of an interaction between for example a character and a container.
+ *
+ * Requests the server to announce the start of an interaction between for example a character and a container.
  *
  * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
  * so.
  *
- * When event handler with priority low or higher runs, the  interactionTarget field of the instigator's
- * CharacterComponent will still have the old value.
+ * The event is sent to the investigator as the own character is one of the few entity a client is
+ * allowed to send events to.
+ * *
+ * The server sets the interactionTarget field of the character (instigator = character entity).
  *
  * @author Florian <florian@fkoeberle.de>
  */
-@BroadcastEvent
-public class InteractionEndEvent implements Event {
-    private EntityRef instigator;
+@ServerEvent
+public class InteractionStartRequest implements Event {
+    private EntityRef target;
 
-    protected InteractionEndEvent() {
+    protected InteractionStartRequest() {
     }
 
-    public InteractionEndEvent(EntityRef instigator) {
-        this.instigator = instigator;
+    public InteractionStartRequest(EntityRef target) {
+        this.target = target;
     }
 
     /**
-     * @return the character which started the interaction.
+     * @return the entity with which the character started interacting with.
      */
-    public EntityRef getInstigator() {
-        return instigator;
+    public EntityRef getTarget() {
+        return target;
     }
 }

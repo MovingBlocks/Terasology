@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.events.*;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
@@ -47,7 +48,6 @@ import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
-import java.util.List;
 
 /**
  * @author Immortius
