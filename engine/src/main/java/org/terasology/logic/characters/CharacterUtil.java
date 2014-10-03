@@ -18,10 +18,11 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.events.InteractionEndRequest;
 import org.terasology.logic.characters.events.InteractionStartRequest;
-import org.terasology.logic.common.ActivateEvent;
 
 /**
  * Utility class for entities with the {@link org.terasology.logic.characters.CharacterComponent}.
@@ -47,8 +48,28 @@ public class CharacterUtil {
         if (target.exists()) {
             instigator.send(new InteractionStartRequest(target));
         }
+    }
 
-
+    /**
+     *
+     * @return the active interaction screen uri of the specified character. Due to network delays
+     * it can happen that the returned dialog is already closed. The method returns null if the player
+     * has no interaction screen open.
+     */
+    public static AssetUri getActiveInteractionScreenUri(EntityRef character) {
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return null;
+        }
+        EntityRef interactionTarget = characterComponent.interactionTarget;
+        if (!interactionTarget.exists()) {
+            return null;
+        }
+        InteractionScreenComponent screenComponent = interactionTarget.getComponent(InteractionScreenComponent.class);
+        if (screenComponent == null) {
+            return null;
+        }
+        return new AssetUri(AssetType.UI_ELEMENT, screenComponent.screen);
     }
 
 }

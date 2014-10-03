@@ -52,9 +52,18 @@ public class InteractionSystem extends BaseComponentSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
         EntityRef instigator = event.getInstigator();
 
-        if (instigator.getComponent(CharacterComponent.class) != null) {
+        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return;
+        }
+
+        if (characterComponent.interactionTarget.exists()) {
             CharacterUtil.setInteractionTarget(instigator, entity);
         }
+
+
+        CharacterUtil.setInteractionTarget(instigator, entity);
+
     }
 
     @ReceiveEvent(components = {InteractionScreenComponent.class})
@@ -97,7 +106,7 @@ public class InteractionSystem extends BaseComponentSystem {
     @ReceiveEvent(components = {ClientComponent.class})
     public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri =getActiveInteractionScreenUri(character);
+        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
 
         if ((activeInteractionScreenUri != null) && (activeInteractionScreenUri.equals(event.getClosedScreenUri()))) {
             CharacterUtil.setInteractionTarget(clientComponent.character, EntityRef.NULL);
@@ -118,26 +127,11 @@ public class InteractionSystem extends BaseComponentSystem {
         }
 
         EntityRef character = clientComponent.character;
-        AssetUri activeInteractionScreenUri =getActiveInteractionScreenUri(character);
+        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
             nuiManager.closeScreen(activeInteractionScreenUri);
             // do not consume the event, so that the inventory will still open
         }
     }
 
-    private AssetUri getActiveInteractionScreenUri(EntityRef character) {
-        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        if (characterComponent == null) {
-            return null;
-        }
-        EntityRef interactionTarget = characterComponent.interactionTarget;
-        if (!interactionTarget.exists()) {
-            return null;
-        }
-        InteractionScreenComponent screenComponent = interactionTarget.getComponent(InteractionScreenComponent.class);
-        if (screenComponent == null) {
-            return null;
-        }
-        return new AssetUri(AssetType.UI_ELEMENT, screenComponent.screen);
-    }
 }

@@ -18,6 +18,7 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -43,6 +44,7 @@ import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
@@ -69,6 +71,9 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     @In
     private InventoryManager inventoryManager;
+
+    @In
+    private NUIManager nuiManager;
 
     private PickupBuilder pickupBuilder;
 
@@ -152,6 +157,12 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         Vector3f direction = characterComponent.getLookDirection();
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
+
+        AssetUri activeInteractionScreenUri = CharacterUtil.getActiveInteractionScreenUri(character);
+        if (activeInteractionScreenUri != null) {
+            nuiManager.closeScreen(activeInteractionScreenUri);
+            return;
+        }
 
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
         if (result.isHit()) {
