@@ -97,8 +97,4 @@ public class PojoPrefab extends Prefab {
         }
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

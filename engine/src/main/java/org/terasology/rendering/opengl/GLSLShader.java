@@ -158,11 +158,6 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public boolean isDisposed() {
-        return disposed;
-    }
-
-    @Override
     public void reload(ShaderData data) {
         logger.debug("Recompiling shader {}.", getURI());
 

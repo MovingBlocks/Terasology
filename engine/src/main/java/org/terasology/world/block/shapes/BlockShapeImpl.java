@@ -97,11 +97,6 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     public void onDispose() {
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
-
     public CollisionShape getCollisionShape(Rotation rot) {
         Rotation simplifiedRot = applySymmetry(rot);
         CollisionShape result = collisionShape.get(simplifiedRot);

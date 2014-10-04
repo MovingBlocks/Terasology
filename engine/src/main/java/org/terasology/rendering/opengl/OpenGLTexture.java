@@ -175,11 +175,6 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
         }
     }
 
-    @Override
-    public boolean isDisposed() {
-        return id == 0;
-    }
-
     public int getId() {
         return id;
     }

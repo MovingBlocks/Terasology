@@ -68,11 +68,6 @@ public class NullPrefab extends Prefab {
     }
 
     @Override
-    public boolean isDisposed() {
-        return false;
-    }
-
-    @Override
     public boolean hasComponent(Class<? extends Component> component) {
         return false;
     }

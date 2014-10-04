@@ -45,11 +45,6 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
-
-    @Override
     public AABB getAABB() {
         return aabb;
     }

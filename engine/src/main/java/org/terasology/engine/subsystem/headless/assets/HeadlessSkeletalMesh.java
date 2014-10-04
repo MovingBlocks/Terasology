@@ -42,10 +42,6 @@ public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implem
         data = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
 
     @Override
     public int getVertexCount() {

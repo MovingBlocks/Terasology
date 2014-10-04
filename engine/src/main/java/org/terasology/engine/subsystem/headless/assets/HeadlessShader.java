@@ -43,11 +43,6 @@ public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader 
     }
 
     @Override
-    public boolean isDisposed() {
-        return shaderProgramBase == null;
-    }
-
-    @Override
     public void recompile() {
         // do nothing
     }

@@ -50,11 +50,6 @@ public class Subtexture extends AbstractAsset<SubtextureData> implements Texture
     }
 
     @Override
-    public boolean isDisposed() {
-        return texture == null || texture.isDisposed();
-    }
-
-    @Override
     public Texture getTexture() {
         return texture;
     }

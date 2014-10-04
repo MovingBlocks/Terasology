@@ -77,11 +77,6 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
         this.data = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
-
     public RenderableNode createNode(Node node) {
         RenderableNode renderable = data.createRenderable(node);
         data.layout(renderable);

@@ -21,7 +21,9 @@ import org.terasology.registry.CoreRegistry;
 import java.util.Objects;
 
 /**
- *
+ * Base class for all Assets that ensures that they
+ * @author Immortius <immortius@gmail.com>
+ * @author Florian <florian@fkoeberle.de>
  */
 public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
 
@@ -30,6 +32,8 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     public AbstractAsset(AssetUri uri) {
         this.uri = uri;
     }
+
+    private boolean disposed;
 
     /**
      * @return This asset's identifying URI.
@@ -55,6 +59,7 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     @Override
     public final void dispose() {
         onDispose();
+        disposed = true;
         CoreRegistry.get(AssetManager.class).dispose(this);
     }
 
@@ -63,5 +68,11 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     @Override
     public int hashCode() {
         return uri.hashCode();
+    }
+
+
+    @Override
+    public final boolean isDisposed() {
+        return disposed;
     }
 }

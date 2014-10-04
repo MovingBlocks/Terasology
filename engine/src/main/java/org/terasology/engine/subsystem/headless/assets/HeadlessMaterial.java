@@ -46,11 +46,6 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
-
-    @Override
     public void recompile() {
         // Do nothing
     }

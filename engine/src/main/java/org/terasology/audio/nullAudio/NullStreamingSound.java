@@ -47,11 +47,6 @@ public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> 
     }
 
     @Override
-    public boolean isDisposed() {
-        return false;
-    }
-
-    @Override
     public void reset() {
     }
 

@@ -57,11 +57,6 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     public void onDispose() {
         this.textureData = null;
     }
-
-    @Override
-    public boolean isDisposed() {
-        return textureData == null;
-    }
     
     @Override
     public Texture getTexture() {

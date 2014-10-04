@@ -130,11 +130,6 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public boolean isDisposed() {
-        return buffers.length == 0;
-    }
-
-    @Override
     public void reset() {
         stream.reset();
     }

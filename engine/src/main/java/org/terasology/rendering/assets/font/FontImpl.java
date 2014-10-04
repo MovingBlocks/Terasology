@@ -104,11 +104,6 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
-
-    @Override
     public String toString() {
         return getURI().toString();
     }

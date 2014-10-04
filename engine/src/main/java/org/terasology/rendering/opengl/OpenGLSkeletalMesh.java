@@ -115,11 +115,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         }
     }
 
-    @Override
-    public boolean isDisposed() {
-        return vboPosNormBuffer == 0 && vboUVBuffer == 0 && vboIndexBuffer == 0;
-    }
-
     public void preRender() {
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);

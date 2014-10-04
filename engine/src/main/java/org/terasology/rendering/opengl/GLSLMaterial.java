@@ -195,10 +195,6 @@ public class GLSLMaterial extends BaseMaterial {
         shader = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return disposed;
-    }
 
     @Override
     public void setTexture(String desc, Texture texture) {

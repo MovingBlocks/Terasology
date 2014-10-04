@@ -54,11 +54,6 @@ public class Atlas extends AbstractAsset<AtlasData> {
         subtextures.clear();
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
-
     public Subtexture getSubtexture(String name) {
         return subtextures.get(new Name(name));
     }

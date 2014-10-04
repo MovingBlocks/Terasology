@@ -41,11 +41,6 @@ public class UISkin extends AbstractAsset<UISkinData> {
         this.skinData = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return skinData == null;
-    }
-
     public UIStyle getDefaultStyle() {
         return getFamily("").getBaseStyle();
     }

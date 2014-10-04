@@ -80,8 +80,4 @@ public class MeshAnimationImpl extends AbstractAsset<MeshAnimationData> implemen
     public void onDispose() {
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

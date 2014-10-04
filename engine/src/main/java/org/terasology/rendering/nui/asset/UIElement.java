@@ -43,11 +43,6 @@ public class UIElement extends AbstractAsset<UIData> {
         rootWidget = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return rootWidget == null;
-    }
-
     public UIWidget getRootWidget() {
         return rootWidget;
     }

@@ -73,8 +73,4 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
     public void onDispose() {
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

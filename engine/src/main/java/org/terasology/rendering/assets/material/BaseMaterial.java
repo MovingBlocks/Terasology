@@ -38,8 +38,6 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
 
     public abstract void onDispose();
 
-    public abstract boolean isDisposed();
-
     public abstract void recompile();
 
     public abstract void enable();

@@ -95,11 +95,6 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     }
 
     @Override
-    public boolean isDisposed() {
-        return bufferId == 0;
-    }
-
-    @Override
     public void reload(StaticSoundData data) {
         if (bufferId == 0) {
             bufferId = alGenBuffers();

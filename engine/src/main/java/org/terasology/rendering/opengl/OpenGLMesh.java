@@ -111,11 +111,6 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public boolean isDisposed() {
-        return vboVertexBuffer == 0 || vboIndexBuffer == 0;
-    }
-
-    @Override
     public AABB getAABB() {
         return aabb;
     }
