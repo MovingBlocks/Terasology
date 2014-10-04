@@ -83,11 +83,11 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
     }
 
     @Override
-    public void onReload(PrefabData data) {
+    protected void onReload(PrefabData data) {
         this.componentMap = ImmutableMap.copyOf(data.getComponents());
         this.persisted = data.isPersisted();
         this.alwaysRelevant = data.isAlwaysRelevant();

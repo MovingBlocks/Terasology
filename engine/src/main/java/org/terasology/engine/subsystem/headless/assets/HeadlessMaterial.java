@@ -36,12 +36,12 @@ public class HeadlessMaterial extends BaseMaterial {
     }
 
     @Override
-    public void onReload(MaterialData newData) {
+    protected void onReload(MaterialData newData) {
         this.data = newData;
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         data = null;
     }
 

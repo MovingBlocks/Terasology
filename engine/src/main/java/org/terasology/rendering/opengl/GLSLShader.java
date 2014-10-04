@@ -134,7 +134,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         logger.debug("Disposing shader {}.", getURI());
         disposeData();
         disposed = true;
@@ -158,7 +158,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public void onReload(ShaderData data) {
+    protected void onReload(ShaderData data) {
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();

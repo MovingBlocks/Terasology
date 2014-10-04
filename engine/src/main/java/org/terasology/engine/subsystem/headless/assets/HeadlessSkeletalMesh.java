@@ -33,12 +33,12 @@ public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implem
     }
 
     @Override
-    public void onReload(SkeletalMeshData skeletalMeshData) {
+    protected void onReload(SkeletalMeshData skeletalMeshData) {
         this.data = skeletalMeshData;
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         data = null;
     }
 

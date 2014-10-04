@@ -34,12 +34,12 @@ public class UIElement extends AbstractAsset<UIData> {
     }
 
     @Override
-    public void onReload(UIData data) {
+    protected void onReload(UIData data) {
         rootWidget = data.getRootWidget();
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         rootWidget = null;
     }
 

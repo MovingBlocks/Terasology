@@ -35,14 +35,14 @@ public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> 
     }
 
     @Override
-    public void onReload(StreamingSoundData data) {
+    protected void onReload(StreamingSoundData data) {
         channels = data.getChannels();
         sampleRate = data.getSamplingRate();
         data.dispose();
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
 
     }
 

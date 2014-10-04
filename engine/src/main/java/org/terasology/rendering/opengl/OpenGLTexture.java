@@ -75,7 +75,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     }
 
     @Override
-    public void onReload(TextureData data) {
+    protected void onReload(TextureData data) {
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
@@ -168,7 +168,7 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         if (id != 0) {
             glDeleteTextures(id);
             id = 0;

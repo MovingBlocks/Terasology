@@ -178,7 +178,7 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         logger.debug("Disposing material {}.", getURI());
         disposeData();
         disposed = true;

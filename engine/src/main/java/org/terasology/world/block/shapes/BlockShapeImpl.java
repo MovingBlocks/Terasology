@@ -75,7 +75,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     @Override
-    public void onReload(BlockShapeData data) {
+    protected void onReload(BlockShapeData data) {
         collisionShape.clear();
         displayName = data.getDisplayName();
         for (BlockPart part : BlockPart.values()) {
@@ -94,7 +94,7 @@ public class BlockShapeImpl extends AbstractAsset<BlockShapeData> implements Blo
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
     }
 
     public CollisionShape getCollisionShape(Rotation rot) {

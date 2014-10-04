@@ -34,13 +34,13 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public void onReload(MeshData meshData) {
+    protected void onReload(MeshData meshData) {
         this.data = meshData;
         this.aabb = AABB.createEncompasing(meshData.getVertices());
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         data = null;
     }
 

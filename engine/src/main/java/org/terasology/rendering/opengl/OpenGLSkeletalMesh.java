@@ -71,7 +71,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    public void onReload(SkeletalMeshData newData) {
+    protected void onReload(SkeletalMeshData newData) {
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {
@@ -100,7 +100,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         if (vboIndexBuffer != 0) {
             bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;

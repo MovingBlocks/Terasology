@@ -89,12 +89,12 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     }
 
     @Override
-    public void onReload(MeshData newData) {
+    protected void onReload(MeshData newData) {
         buildMesh(newData);
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;

@@ -44,7 +44,7 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     }
 
     @Override
-    public void onReload(TextureData data) {
+    protected void onReload(TextureData data) {
         this.textureData = data;
     }
 
@@ -54,7 +54,7 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         this.textureData = null;
     }
     

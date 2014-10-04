@@ -112,7 +112,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         // TODO: Fix this - probably failing if sound is playing
         for (int buffer : buffers) {
             if (buffer != 0) {
@@ -124,7 +124,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void onReload(StreamingSoundData data) {
+    protected void onReload(StreamingSoundData data) {
         stream = data;
         this.initializeBuffers();
     }

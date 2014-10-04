@@ -60,11 +60,11 @@ public class NullPrefab extends Prefab {
     }
 
     @Override
-    public void onReload(PrefabData data) {
+    protected void onReload(PrefabData data) {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
     }
 
     @Override

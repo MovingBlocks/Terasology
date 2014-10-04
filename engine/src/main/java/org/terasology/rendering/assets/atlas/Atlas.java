@@ -38,7 +38,7 @@ public class Atlas extends AbstractAsset<AtlasData> {
     }
 
     @Override
-    public void onReload(AtlasData data) {
+    protected void onReload(AtlasData data) {
         subtextures.clear();
         for (Map.Entry<Name, SubtextureData> entry : data.getSubtextures().entrySet()) {
             String subtextureName = getURI().getAssetName() + "." + entry.getKey();
@@ -50,7 +50,7 @@ public class Atlas extends AbstractAsset<AtlasData> {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         subtextures.clear();
     }
 

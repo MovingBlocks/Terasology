@@ -31,7 +31,7 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public void onReload(FontData fontData) {
+    protected void onReload(FontData fontData) {
         this.data = fontData;
     }
 
@@ -99,7 +99,7 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         this.data = null;
     }
 

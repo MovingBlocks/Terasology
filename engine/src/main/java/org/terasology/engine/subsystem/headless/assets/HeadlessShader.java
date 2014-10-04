@@ -33,12 +33,12 @@ public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader 
     }
 
     @Override
-    public void onReload(ShaderData data) {
+    protected void onReload(ShaderData data) {
         shaderProgramBase = data;
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         shaderProgramBase = null;
     }
 

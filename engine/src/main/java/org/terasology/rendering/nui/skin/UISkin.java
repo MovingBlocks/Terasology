@@ -32,12 +32,12 @@ public class UISkin extends AbstractAsset<UISkinData> {
     }
 
     @Override
-    public void onReload(UISkinData data) {
+    protected void onReload(UISkinData data) {
         this.skinData = data;
     }
 
     @Override
-    public void onDispose() {
+    protected void onDispose() {
         this.skinData = null;
     }
 
