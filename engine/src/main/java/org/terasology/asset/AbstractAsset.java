@@ -62,14 +62,24 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
     public final void reload(T data) {
         if (!disposed) {
             onReload(data);
+            if (disposed) {
+                logger.error("Asset {} got illegally disposed in its onReload method", getURI());
+            }
         } else {
             logger.error("Disposed asset with uri {} can't be reloaded", getURI());
         }
     }
 
+    /**
+     * Reload the specified data. The implementation of this method must not call dispose.
+     * @param data
+     */
     protected abstract void onReload(T data);
 
 
+    /**
+     * Disposes the asset. Must not be called from onReload.
+     */
     @Override
     public final void dispose() {
         onDispose();

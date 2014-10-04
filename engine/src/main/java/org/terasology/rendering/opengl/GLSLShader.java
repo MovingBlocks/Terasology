@@ -161,7 +161,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     protected void onReload(ShaderData data) {
         logger.debug("Recompiling shader {}.", getURI());
 
-        dispose();
+        onDispose();
         shaderProgramBase = data;
         parameters.clear();
         for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {
