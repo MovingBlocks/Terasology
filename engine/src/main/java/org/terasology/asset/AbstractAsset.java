@@ -82,9 +82,11 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
      */
     @Override
     public final void dispose() {
-        onDispose();
-        disposed = true;
-        CoreRegistry.get(AssetManager.class).dispose(this);
+        if (!disposed) {
+            onDispose();
+            disposed = true;
+            CoreRegistry.get(AssetManager.class).dispose(this);
+        }
     }
 
     protected abstract void onDispose();
