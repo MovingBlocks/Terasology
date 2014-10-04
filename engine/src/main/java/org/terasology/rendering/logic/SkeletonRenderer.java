@@ -235,6 +235,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneRotations.add(new Quat4f());
                 }
             }
+            skeletalMesh.mesh.setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
         }
     }

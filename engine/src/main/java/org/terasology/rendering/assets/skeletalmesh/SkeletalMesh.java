@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.skeletalmesh;
 
 import org.terasology.asset.Asset;
 
+import javax.vecmath.Vector3f;
 import java.util.Collection;
 
 /**
@@ -30,4 +31,6 @@ public interface SkeletalMesh extends Asset<SkeletalMeshData> {
     Collection<Bone> getBones();
 
     Bone getBone(String boneName);
+
+    void setScaleTranslate(float scale, Vector3f translate);
 }

@@ -15,13 +15,14 @@
  */
 package org.terasology.engine.subsystem.headless.assets;
 
-import java.util.Collection;
-
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
+
+import javax.vecmath.Vector3f;
+import java.util.Collection;
 
 public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implements SkeletalMesh {
 
@@ -60,5 +61,9 @@ public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implem
     @Override
     public Bone getBone(String boneName) {
         return data.getBone(boneName);
+    }
+
+    @Override
+    public void setScaleTranslate(float scale, Vector3f translate) {
     }
 }

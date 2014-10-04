@@ -25,6 +25,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
+import javax.vecmath.Vector3f;
 import java.util.Map;
 
 /**
@@ -45,4 +46,6 @@ public class SkeletalMeshComponent implements Component {
     public EntityRef rootBone = EntityRef.NULL;
     public float animationTime;
 
+    public float scale = 1f;
+    public Vector3f translate = new Vector3f();
 }

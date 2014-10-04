@@ -64,10 +64,19 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
 
     private GLBufferPool bufferPool;
 
+    private float scale = 1f;
+    private Vector3f translate = new Vector3f();
+
     public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
         super(uri);
         this.bufferPool = bufferPool;
         reload(data);
+    }
+
+    @Override
+    public void setScaleTranslate(float scale, Vector3f translate) {
+        this.scale = scale;
+        this.translate = translate;
     }
 
     @Override
@@ -145,9 +154,9 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(verts.size() * 6);
         for (int i = 0; i < verts.size(); ++i) {
             Vector3f vert = verts.get(i);
-            vertBuffer.put(vert.x);
-            vertBuffer.put(vert.y);
-            vertBuffer.put(vert.z);
+            vertBuffer.put(vert.x * scale + translate.x);
+            vertBuffer.put(vert.y * scale + translate.y);
+            vertBuffer.put(vert.z * scale + translate.z);
             Vector3f norm = normals.get(i);
             vertBuffer.put(norm.x);
             vertBuffer.put(norm.y);

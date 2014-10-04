@@ -37,6 +37,7 @@ import org.terasology.rendering.md5.MD5AnimationLoader;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
 import org.terasology.rendering.nui.asset.UILoader;
 import org.terasology.rendering.nui.skin.UISkinLoader;
+import org.terasology.rendering.tcn.TCNSkeletalMeshLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
@@ -74,7 +75,7 @@ public enum AssetType {
     MATERIAL("material", "materials", "mat", new MaterialLoader(), false),
     BLOCK_DEFINITION("blockdef", "blocks", "block", null, false),
     BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader(), false),
-    SKELETON_MESH("skeletalmesh", "skeletalMesh", new String[]{"md5mesh", "dae"}, new AssetLoader[]{new MD5SkeletonLoader(), new ColladaSkeletalMeshLoader()}, false),
+    SKELETON_MESH("skeletalmesh", "skeletalMesh", new String[]{"md5mesh", "dae", "tcn"}, new AssetLoader[]{new MD5SkeletonLoader(), new ColladaSkeletalMeshLoader(), new TCNSkeletalMeshLoader()}, false),
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader(), false),
     FONT("font", "fonts", "fnt", new FontLoader(), false),
     SUBTEXTURE("subtexture", new String[]{}, "", null, false),
