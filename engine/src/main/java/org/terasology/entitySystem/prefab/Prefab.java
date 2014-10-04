@@ -32,8 +32,6 @@ import java.util.List;
  */
 public abstract class Prefab extends AbstractAsset<PrefabData> implements ComponentContainer, Asset<PrefabData> {
 
-    public static final Prefab NULL = new NullPrefab();
-
     public Prefab(AssetUri uri) {
         super(uri);
     }
