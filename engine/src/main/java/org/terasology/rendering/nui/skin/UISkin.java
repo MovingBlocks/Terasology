@@ -28,11 +28,11 @@ public class UISkin extends AbstractAsset<UISkinData> {
 
     public UISkin(AssetUri uri, UISkinData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(UISkinData data) {
+    public void onReload(UISkinData data) {
         this.skinData = data;
     }
 

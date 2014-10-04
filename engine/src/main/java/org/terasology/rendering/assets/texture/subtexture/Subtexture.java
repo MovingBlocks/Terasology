@@ -34,11 +34,11 @@ public class Subtexture extends AbstractAsset<SubtextureData> implements Texture
 
     public Subtexture(AssetUri uri, SubtextureData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(SubtextureData data) {
+    public void onReload(SubtextureData data) {
         this.texture = data.getTexture();
         this.subregion = data.getRegion();
 

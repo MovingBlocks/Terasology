@@ -76,7 +76,7 @@ public class GLSLMaterial extends BaseMaterial {
     public GLSLMaterial(AssetUri uri, MaterialData data) {
         super(uri);
         shaderManager = CoreRegistry.get(ShaderManager.class);
-        reload(data);
+        onReload(data);
     }
 
     public ShaderParameters getShaderParameters() {
@@ -138,7 +138,7 @@ public class GLSLMaterial extends BaseMaterial {
     }
 
     @Override
-    public final void reload(MaterialData data) {
+    public final void onReload(MaterialData data) {
         disposeData();
 
         shader = (GLSLShader) data.getShader();

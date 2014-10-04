@@ -67,11 +67,11 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
         super(uri);
         this.bufferPool = bufferPool;
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(SkeletalMeshData newData) {
+    public void onReload(SkeletalMeshData newData) {
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {

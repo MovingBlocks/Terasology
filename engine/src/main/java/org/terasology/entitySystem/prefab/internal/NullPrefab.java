@@ -60,7 +60,7 @@ public class NullPrefab extends Prefab {
     }
 
     @Override
-    public void reload(PrefabData data) {
+    public void onReload(PrefabData data) {
     }
 
     @Override

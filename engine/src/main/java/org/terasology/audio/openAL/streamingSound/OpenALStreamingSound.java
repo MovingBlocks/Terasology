@@ -42,7 +42,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, AudioManager audioManager) {
         super(uri);
         this.audioManager = audioManager;
-        reload(data);
+        onReload(data);
     }
 
     public int[] getBuffers() {
@@ -124,7 +124,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void reload(StreamingSoundData data) {
+    public void onReload(StreamingSoundData data) {
         stream = data;
         this.initializeBuffers();
     }

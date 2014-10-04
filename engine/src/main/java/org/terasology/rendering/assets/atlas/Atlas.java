@@ -34,11 +34,11 @@ public class Atlas extends AbstractAsset<AtlasData> {
 
     public Atlas(AssetUri uri, AtlasData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(AtlasData data) {
+    public void onReload(AtlasData data) {
         subtextures.clear();
         for (Map.Entry<Name, SubtextureData> entry : data.getSubtextures().entrySet()) {
             String subtextureName = getURI().getAssetName() + "." + entry.getKey();

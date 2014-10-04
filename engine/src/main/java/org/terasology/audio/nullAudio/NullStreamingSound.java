@@ -31,11 +31,11 @@ public final class NullStreamingSound extends AbstractAsset<StreamingSoundData> 
 
     public NullStreamingSound(AssetUri uri, StreamingSoundData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(StreamingSoundData data) {
+    public void onReload(StreamingSoundData data) {
         channels = data.getChannels();
         sampleRate = data.getSamplingRate();
         data.dispose();

@@ -30,11 +30,11 @@ public class UIElement extends AbstractAsset<UIData> {
 
     public UIElement(AssetUri uri, UIData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(UIData data) {
+    public void onReload(UIData data) {
         rootWidget = data.getRootWidget();
     }
 

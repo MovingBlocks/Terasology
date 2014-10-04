@@ -30,11 +30,11 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
 
     public HeadlessMesh(AssetUri uri, MeshData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(MeshData meshData) {
+    public void onReload(MeshData meshData) {
         this.data = meshData;
         this.aabb = AABB.createEncompasing(meshData.getVertices());
     }

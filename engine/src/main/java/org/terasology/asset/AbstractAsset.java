@@ -16,6 +16,8 @@
 
 package org.terasology.asset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.Objects;
@@ -26,7 +28,7 @@ import java.util.Objects;
  * @author Florian <florian@fkoeberle.de>
  */
 public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
-
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAsset.class);
     private final AssetUri uri;
 
     public AbstractAsset(AssetUri uri) {
@@ -54,6 +56,18 @@ public abstract class AbstractAsset<T extends AssetData> implements Asset<T> {
         return false;
     }
 
+    /**
+     * Reload the specified data. The asset must not be disposed yet!
+     */
+    public final void reload(T data) {
+        if (!disposed) {
+            onReload(data);
+        } else {
+            logger.error("Disposed asset with uri {} can't be reloaded", getURI());
+        }
+    }
+
+    protected abstract void onReload(T data);
 
 
     @Override

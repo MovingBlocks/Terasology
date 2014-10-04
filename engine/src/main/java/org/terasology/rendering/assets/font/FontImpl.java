@@ -27,11 +27,11 @@ public final class FontImpl extends AbstractAsset<FontData> implements Font {
 
     public FontImpl(AssetUri uri, FontData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(FontData fontData) {
+    public void onReload(FontData fontData) {
         this.data = fontData;
     }
 

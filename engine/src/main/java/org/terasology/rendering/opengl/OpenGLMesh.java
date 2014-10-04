@@ -85,11 +85,11 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     public OpenGLMesh(AssetUri uri, MeshData data, GLBufferPool bufferPool) {
         super(uri);
         this.bufferPool = bufferPool;
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(MeshData newData) {
+    public void onReload(MeshData newData) {
         buildMesh(newData);
     }
 

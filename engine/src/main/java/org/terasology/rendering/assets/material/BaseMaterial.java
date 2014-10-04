@@ -34,7 +34,7 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
         super(uri);
     }
 
-    public abstract void reload(MaterialData data);
+    public abstract void onReload(MaterialData data);
 
     public abstract void onDispose();
 

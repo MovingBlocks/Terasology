@@ -100,7 +100,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     public GLSLShader(AssetUri uri, ShaderData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     public Set<ShaderProgramFeature> getAvailableFeatures() {
@@ -158,7 +158,7 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public void reload(ShaderData data) {
+    public void onReload(ShaderData data) {
         logger.debug("Recompiling shader {}.", getURI());
 
         dispose();

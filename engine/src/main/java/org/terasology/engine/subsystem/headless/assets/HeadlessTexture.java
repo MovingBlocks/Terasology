@@ -32,7 +32,7 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
 
     public HeadlessTexture(AssetUri uri, TextureData textureData) {
         super(uri);
-        reload(textureData);
+        onReload(textureData);
 
         // TODO: this might need to be synchronized at some point
         id = idCounter++;
@@ -44,7 +44,7 @@ public class HeadlessTexture extends AbstractAsset<TextureData> implements Textu
     }
 
     @Override
-    public void reload(TextureData data) {
+    public void onReload(TextureData data) {
         this.textureData = data;
     }
 

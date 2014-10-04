@@ -32,11 +32,11 @@ public class HeadlessMaterial extends BaseMaterial {
 
     public HeadlessMaterial(AssetUri uri, MaterialData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(MaterialData newData) {
+    public void onReload(MaterialData newData) {
         this.data = newData;
     }
 

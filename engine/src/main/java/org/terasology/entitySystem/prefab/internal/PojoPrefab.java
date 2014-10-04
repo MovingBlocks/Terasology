@@ -39,7 +39,7 @@ public class PojoPrefab extends Prefab {
 
     public PojoPrefab(AssetUri uri, PrefabData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
-    public void reload(PrefabData data) {
+    public void onReload(PrefabData data) {
         this.componentMap = ImmutableMap.copyOf(data.getComponents());
         this.persisted = data.isPersisted();
         this.alwaysRelevant = data.isAlwaysRelevant();

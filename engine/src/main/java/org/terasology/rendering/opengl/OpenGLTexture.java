@@ -71,11 +71,11 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     public OpenGLTexture(AssetUri uri, TextureData data) {
         super(uri);
 
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(TextureData data) {
+    public void onReload(TextureData data) {
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
