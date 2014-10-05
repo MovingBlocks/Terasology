@@ -17,6 +17,7 @@ package org.terasology.engine;
 
 import com.google.common.collect.Lists;
 import org.terasology.crashreporter.CrashReporter;
+import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.EngineSubsystem;
@@ -29,12 +30,17 @@ import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
 import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
+import org.terasology.game.GameManifest;
+import org.terasology.network.NetworkMode;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Main method for launching Terasology
@@ -44,6 +50,7 @@ import java.util.Collection;
  */
 public final class Terasology {
 
+    private static final String LOAD_LAST_GAME_ARG = "-loadlastgame";
     private static final String HOME_ARG = "-homedir=";
     private static final String LOCAL_ARG = "-homedir";
     private static final String HEADLESS_ARG = "-headless";
@@ -54,6 +61,7 @@ public final class Terasology {
 
     public static void main(String[] args) {
         boolean crashReportEnabled = true;
+        boolean loadLastGame = false;
         try {
             boolean isHeadless = false;
             Path homePath = null;
@@ -66,6 +74,8 @@ public final class Terasology {
                     isHeadless = true;
                 } else if (arg.equals(NO_CRASH_REPORT_ARG)) {
                     crashReportEnabled = false;
+                } else if (arg.equals(LOAD_LAST_GAME_ARG)) {
+                    loadLastGame = true;
                 }
             }
             if (homePath != null) {
@@ -81,12 +91,24 @@ public final class Terasology {
                 subsystemList = Lists.<EngineSubsystem>newArrayList(new LwjglGraphics(), new LwjglTimer(), new LwjglAudio(), new LwjglInput());
             }
 
-            TerasologyEngine engine = new TerasologyEngine(subsystemList);
+            final TerasologyEngine engine = new TerasologyEngine(subsystemList);
             try {
                 engine.init();
                 if (isHeadless) {
                     engine.run(new StateHeadlessSetup());
                 } else {
+                    if (loadLastGame) {
+                        engine.submitTask("loadGame", new Runnable() {
+                            @Override
+                            public void run() {
+                                GameManifest gameManifest = getLatestGameManifest();
+                                if (gameManifest != null) {
+                                    engine.changeState(new StateLoading(gameManifest, NetworkMode.NONE));
+                                }
+                            }
+                        });
+                    }
+
                     engine.run(new StateMainMenu());
                 }
             } finally {
@@ -118,6 +140,21 @@ public final class Terasology {
                 }
             }
         }
+    }
+
+    private static GameManifest getLatestGameManifest() {
+        GameInfo latestGame = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        for (GameInfo savedGame : savedGames) {
+            if (latestGame == null || savedGame.getTimestamp().after(latestGame.getTimestamp())) {
+                latestGame = savedGame;
+            }
+        }
+
+        if (latestGame == null)
+            return null;
+
+        return latestGame.getManifest();
     }
 
 }
