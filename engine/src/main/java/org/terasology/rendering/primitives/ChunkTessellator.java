@@ -65,12 +65,9 @@ public final class ChunkTessellator {
                 for (int y = verticalOffset; y < verticalOffset + meshHeight; y++) {
                     Biome biome = chunkView.getBiome(x, y, z);
 
-                    float biomeTemp = biome.getTemperature();
-                    float biomeHumidity = biome.getHumidity();
-
                     Block block = chunkView.getBlock(x, y, z);
                     if (block != null && !block.isInvisible()) {
-                        generateBlockVertices(chunkView, mesh, x, y, z, biomeTemp, biomeHumidity);
+                        generateBlockVertices(chunkView, mesh, x, y, z, biome);
                     }
                 }
             }
@@ -257,7 +254,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
+    private void generateBlockVertices(ChunkView view, ChunkMesh mesh, int x, int y, int z, Biome biome) {
         Block block = view.getBlock(x, y, z);
 
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
@@ -299,7 +296,7 @@ public final class ChunkTessellator {
         }
 
         if (blockAppearance.getPart(BlockPart.CENTER) != null) {
-            Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, temp, hum);
+            Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, biome);
             blockAppearance.getPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
         }
 
@@ -331,7 +328,7 @@ public final class ChunkTessellator {
             if (bottomBlock.isLiquid() || bottomBlock.isInvisible()) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
-                        Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
+                        Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), biome);
                         block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType, vertexFlag);
                     }
                 }
@@ -341,7 +338,7 @@ public final class ChunkTessellator {
 
         for (Side dir : Side.values()) {
             if (drawDir[dir.ordinal()]) {
-                Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
+                Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), biome);
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios - probably a per-side setting?
                 if (block.isGrass() && dir != Side.TOP && dir != Side.BOTTOM) {
                     blockAppearance.getPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType, ChunkVertexFlag.COLOR_MASK);

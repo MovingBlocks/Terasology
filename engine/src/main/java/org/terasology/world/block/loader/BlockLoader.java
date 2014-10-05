@@ -281,7 +281,7 @@ public class BlockLoader implements BlockBuilderHelper {
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
-        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, DefaultColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
@@ -312,7 +312,7 @@ public class BlockLoader implements BlockBuilderHelper {
     @Override
     public Block constructTransformedBlock(AssetUri blockDefUri, BlockDefinition blockDef, Rotation rotation) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
-        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, DefaultColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
@@ -351,8 +351,8 @@ public class BlockLoader implements BlockBuilderHelper {
         return result;
     }
 
-    private Map<BlockPart, Block.ColorSource> prepareColorSources(BlockDefinition blockDef) {
-        Map<BlockPart, Block.ColorSource> result = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, DefaultColorSource> prepareColorSources(BlockDefinition blockDef) {
+        Map<BlockPart, DefaultColorSource> result = Maps.newEnumMap(BlockPart.class);
         for (BlockPart part : BlockPart.values()) {
             result.put(part, blockDef.colorSource);
         }
@@ -595,7 +595,7 @@ public class BlockLoader implements BlockBuilderHelper {
         public BlockDefinition.ColorSources deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             if (json.isJsonObject()) {
                 BlockDefinition.ColorSources result = new BlockDefinition.ColorSources();
-                deserializeBlockPartMap(result.map, json.getAsJsonObject(), Block.ColorSource.class, context);
+                deserializeBlockPartMap(result.map, json.getAsJsonObject(), DefaultColorSource.class, context);
                 return result;
             }
             return null;

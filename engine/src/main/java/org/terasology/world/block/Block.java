@@ -18,7 +18,6 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -34,18 +33,15 @@ import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.utilities.collection.EnumBooleanMap;
+import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.ChunkConstants;
 
-import javax.imageio.ImageIO;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -62,44 +58,6 @@ public final class Block {
     private static final Map<BlockPart, Float> DIRECTION_LIT_LEVEL = Maps.newEnumMap(BlockPart.class);
 
     /**
-     * Different color sources for blocks.
-     */
-    public static enum ColorSource {
-        DEFAULT {
-            @Override
-            public Vector4f calcColor(float temperature, float humidity) {
-                return new Vector4f(1, 1, 1, 1);
-            }
-        },
-        COLOR_LUT {
-            @Override
-            public Vector4f calcColor(float temperature, float humidity) {
-                float prod = temperature * humidity;
-                int rgbValue = colorLut.getRGB((int) ((1.0 - temperature) * 255.0), (int) ((1.0 - prod) * 255.0));
-
-                Color c = new Color(rgbValue);
-                return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
-            }
-        },
-        FOLIAGE_LUT {
-            @Override
-            public Vector4f calcColor(float temperature, float humidity) {
-                float prod = humidity * temperature;
-                int rgbValue = foliageLut.getRGB((int) ((1.0 - temperature) * 255.0), (int) ((1.0 - prod) * 255.0));
-
-                Color c = new Color(rgbValue);
-                return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
-            }
-        };
-
-        public abstract Vector4f calcColor(float temperature, float humidity);
-    }
-
-    /* LUTs */
-    private static BufferedImage colorLut;
-    private static BufferedImage foliageLut;
-
-    /**
      * Init. the LUTs.
      */
     static {
@@ -110,13 +68,6 @@ public final class Block {
         DIRECTION_LIT_LEVEL.put(BlockPart.LEFT, 0.75f);
         DIRECTION_LIT_LEVEL.put(BlockPart.RIGHT, 0.75f);
         DIRECTION_LIT_LEVEL.put(BlockPart.CENTER, 0.8f);
-        try {
-            // TODO: Read these from asset manager
-            colorLut = ImageIO.read(ResourceLoader.getResource("assets/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("assets/textures/foliagecolor.png").openStream());
-        } catch (IOException e) {
-            logger.error("Failed to load LUTs", e);
-        }
     }
 
     private short id;
@@ -150,7 +101,7 @@ public final class Block {
     private boolean waving;
     private byte luminance;
     private Vector3f tint = new Vector3f(0, 0, 0);
-    private Map<BlockPart, ColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, BlockColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
     private Map<BlockPart, Vector4f> colorOffsets = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
@@ -188,7 +139,7 @@ public final class Block {
      */
     public Block() {
         for (BlockPart part : BlockPart.values()) {
-            colorSource.put(part, ColorSource.DEFAULT);
+            colorSource.put(part, DefaultColorSource.DEFAULT);
             colorOffsets.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         }
     }
@@ -521,17 +472,17 @@ public final class Block {
         this.mass = mass;
     }
 
-    public ColorSource getColorSource(BlockPart part) {
+    public BlockColorSource getColorSource(BlockPart part) {
         return colorSource.get(part);
     }
 
-    public void setColorSource(ColorSource colorSource) {
+    public void setColorSource(BlockColorSource colorSource) {
         for (BlockPart part : BlockPart.values()) {
             this.colorSource.put(part, colorSource);
         }
     }
 
-    public void setColorSource(BlockPart part, ColorSource value) {
+    public void setColorSource(BlockPart part, BlockColorSource value) {
         this.colorSource.put(part, value);
     }
 
@@ -595,13 +546,12 @@ public final class Block {
      * side of the block.
      *
      * @param part        The block side
-     * @param temperature The temperature
-     * @param humidity    The humidity
+     * @param biome       The block's biome
      * @return The color offset
      */
-    public Vector4f calcColorOffsetFor(BlockPart part, float temperature, float humidity) {
-        ColorSource source = getColorSource(part);
-        Vector4f color = source.calcColor(temperature, humidity);
+    public Vector4f calcColorOffsetFor(BlockPart part, Biome biome) {
+        BlockColorSource source = getColorSource(part);
+        Vector4f color = source.calcColor(biome);
 
         Vector4f colorOffset = colorOffsets.get(part);
         color.x *= colorOffset.x;

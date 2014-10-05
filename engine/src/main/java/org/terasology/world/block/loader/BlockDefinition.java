@@ -19,8 +19,8 @@ package org.terasology.world.block.loader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.module.sandbox.API;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.DefaultColorSource;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -61,7 +61,7 @@ public class BlockDefinition {
     public String tile = "";
     public Tiles tiles;
 
-    public Block.ColorSource colorSource = Block.ColorSource.DEFAULT;
+    public DefaultColorSource colorSource = DefaultColorSource.DEFAULT;
     public ColorSources colorSources;
 
     public Vector4f colorOffset = new Vector4f(1, 1, 1, 1);
@@ -86,7 +86,7 @@ public class BlockDefinition {
     }
 
     public static class ColorSources {
-        public EnumMap<BlockPart, Block.ColorSource> map = Maps.newEnumMap(BlockPart.class);
+        public EnumMap<BlockPart, DefaultColorSource> map = Maps.newEnumMap(BlockPart.class);
     }
 
     public static class ColorOffsets {

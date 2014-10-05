@@ -32,7 +32,6 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent.Particle;
-import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
@@ -47,9 +46,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.loader.WorldAtlas;
-import org.terasology.world.generation.Region;
-import org.terasology.world.generation.facets.SurfaceHumidityFacet;
-import org.terasology.world.generation.facets.SurfaceTemperatureFacet;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -291,8 +287,6 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
         Vector3i worldPos3i = new Vector3i(worldPos, 0.5f);
         Biome biome = worldProvider.getBiome(worldPos3i);
-        float temperature = biome.getTemperature();
-        float humidity = biome.getHumidity();
 
         glPushMatrix();
         glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -305,7 +299,7 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
 
             float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x,
                     worldPos.y + particle.position.y, worldPos.z + particle.position.z));
-            renderParticle(particle, particleEffect.blockType.getArchetypeBlock(), temperature, humidity, light);
+            renderParticle(particle, particleEffect.blockType.getArchetypeBlock(), biome, light);
             glPopMatrix();
         }
         glPopMatrix();
@@ -361,10 +355,10 @@ public class BlockParticleEmitterSystem extends BaseComponentSystem implements U
         glCallList(displayList);
     }
 
-    protected void renderParticle(Particle particle, Block block, float temperature, float humidity, float light) {
+    protected void renderParticle(Particle particle, Block block, Biome biome, float light) {
         Material mat = Assets.getMaterial("engine:prog.particle");
 
-        Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
+        Vector4f colorMod = block.calcColorOffsetFor(BlockPart.FRONT, biome);
         mat.setFloat4("colorOffset", particle.color.x * colorMod.x, particle.color.y * colorMod.y, particle.color.z * colorMod.z, particle.color.w * colorMod.w, true);
 
         mat.setFloat2("texOffset", particle.texOffset.x, particle.texOffset.y, true);
