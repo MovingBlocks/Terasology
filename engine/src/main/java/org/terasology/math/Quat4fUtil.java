@@ -42,6 +42,7 @@ public final class Quat4fUtil {
         quat.mul(qZ);
         quat.mul(qY);
         quat.mul(qX);
+        quat.normalize();
         return quat;
     }
 }
