@@ -30,6 +30,9 @@ public final class Quat4fUtil {
     private Quat4fUtil() {
     }
 
+    /**
+     * Creates a normalized quaternion based on rotations around x, y and z axis.
+     */
     public static Quat4f fromAngles(float rotX, float rotY, float rotZ) {
         Quat4f quat = new Quat4f();
         Quat4f qZ = new Quat4f();

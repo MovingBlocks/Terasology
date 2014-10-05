@@ -178,7 +178,10 @@ public class SkeletalMeshData implements AssetData {
         }
     }
 
-    public String toString() {
+    /**
+     * Outputs the skeletal mesh as md5mesh file
+     */
+    public String toMD5(String shader) {
         StringBuilder sb = new StringBuilder();
         sb.append("MD5Version 10\n" +
                 "commandline \"Exported from Terasology MD5SkeletonLoader\"\n" +
@@ -206,7 +209,7 @@ public class SkeletalMeshData implements AssetData {
         sb.append("}\n\n");
 
         sb.append("mesh {\n");
-        sb.append("\tshader \"alosaurustexture.png\"\n");
+        sb.append("\tshader \"" + shader + "\"\n");
         sb.append("\tnumverts ").append(uvs.size()).append("\n");
         for (int i = 0; i < uvs.size(); i++) {
             sb.append("\tvert ").append(i).append(" (").append(uvs.get(i).x).append(" ").append(uvs.get(i).y).append(") ");

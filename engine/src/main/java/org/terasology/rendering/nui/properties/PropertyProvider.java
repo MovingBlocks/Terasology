@@ -47,6 +47,20 @@ import static org.reflections.ReflectionUtils.getAllFields;
 
 /**
  * @author synopia
+ *
+ * Provides properties of a given object using annotations.
+ *
+ * Range:
+ *   * creates a slider with given min, max and precision maps to a float
+ *
+ * Checkbox:
+ *   * creates a checkbox that maps to a boolean
+ *
+ * TextField:
+ *   * creates a text box that maps to a string
+ *
+ * OneOf:
+ *   * creates a combobox that maps to a list of strings, an enum or a custom defined item provider
  */
 public class PropertyProvider<T> {
     private static final Pattern VECTOR_3F = Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");

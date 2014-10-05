@@ -47,6 +47,10 @@ public class PropertyLayout extends MigLayout {
         this.propertyComparator = comparator;
     }
 
+    /**
+     * Adds a provider for properties to this layout. All properties appears in a list that may be collapsed/expanded.
+     * Initially the list is expanded.
+     */
     public void addPropertyProvider(String groupLabel, final PropertyProvider<?> propertyProvider) {
         if (propertyProvider.getProperties().size() > 0) {
             final UIButton expand = new UIButton("", "-");

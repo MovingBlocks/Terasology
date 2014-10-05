@@ -30,6 +30,12 @@ import java.security.PrivilegedAction;
 
 /**
  * @author synopia
+ *
+ * Debug property editor. Usage:
+ *
+ * CoreRegistry.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
+ *
+ * Ingame press F1 to see the property editor. Only annotated fields will show up.
  */
 @API
 @RegisterSystem
@@ -44,7 +50,7 @@ public class DebugPropertiesSystem extends BaseComponentSystem implements Update
         DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().addHUDElement("engine:DebugProperties");
         debugProperties.setVisible(false);
         properties = debugProperties.getPropertyLayout();
-        CoreRegistry.put(DebugPropertiesSystem.class, this);
+        CoreRegistry.putPermanently(DebugPropertiesSystem.class, this);
     }
 
     public void addProperty(final String group, final Object o) {

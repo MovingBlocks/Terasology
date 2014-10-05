@@ -22,7 +22,6 @@ import gnu.trove.list.array.TIntArrayList;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.util.List;
@@ -65,14 +64,6 @@ public class SkeletalMeshDataBuilder {
         meshBuilder.setTextureMapper(textureMapper);
         meshBuilder.addBox(offset, size, u, v);
         return addMesh(bone, meshBuilder);
-    }
-
-    public SkeletalMeshDataBuilder addBoneBox(Bone parent, int index, String name, Vector3f offset, Vector3f size, Vector3f rotationPoint, Quat4f rotation, float u, float v) {
-        Bone bone = new Bone(index, name, rotationPoint, rotation);
-        if (parent != null) {
-            parent.addChild(bone);
-        }
-        return addBox(bone, offset, size, u, v);
     }
 
     public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {

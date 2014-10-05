@@ -12,15 +12,15 @@
                     "rowConstraints" : "[min]"
                 },
                 "layoutInfo" : {
-                                    "width" : 400,
-                                    "position-right" : {
-                                        "target" : "RIGHT"
-                                    },
-                                    "position-top" : {
-                                        "target" : "TOP",
-                                        "offset" : 48
-                                    }
-                                }
+                    "width" : 400,
+                    "position-right" : {
+                        "target" : "RIGHT"
+                    },
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
             }
         ]
     }
