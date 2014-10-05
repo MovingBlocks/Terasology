@@ -12,7 +12,7 @@
                     "rowConstraints" : "[min]"
                 },
                 "layoutInfo" : {
-                                    "width" : 200,
+                                    "width" : 400,
                                     "position-right" : {
                                         "target" : "RIGHT"
                                     },

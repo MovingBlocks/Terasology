@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui.layouts;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.properties.Property;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class PropertyLayout extends MigLayout {
 
-    private Comparator<? super Property<?, ?>> propertyComparator =  Ordering.allEqual();
+    private Comparator<? super Property<?, ?>> propertyComparator = PropertyOrdering.byLabel();
 
     public PropertyLayout() {
     }

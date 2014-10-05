@@ -48,7 +48,6 @@ public class DebugPropertiesSystem extends BaseComponentSystem implements Update
     }
 
     public void addProperty(final String group, final Object o) {
-        properties.clear();
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
