@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.tcn;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Lists;
 import org.eaxy.Document;
 import org.eaxy.Element;
@@ -23,6 +22,8 @@ import org.eaxy.ElementSet;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.Quat4fUtil;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
 
 import javax.vecmath.Quat4f;
@@ -35,6 +36,7 @@ import java.util.List;
 /**
  * @author synopia
  */
+@API
 public class TCN {
     private static final Logger logger = LoggerFactory.getLogger(TCN.class);
     public final List<Box> boxes = Lists.newArrayList();
@@ -167,6 +169,7 @@ public class TCN {
         return floatStrings;
     }
 
+    @API
     protected static class TCNParseException extends Exception {
 
         private static final long serialVersionUID = 1L;
@@ -177,6 +180,7 @@ public class TCN {
 
     }
 
+    @API
     public static class Box {
         private static float VERTICES[] = {
                 // Front face
@@ -229,7 +233,6 @@ public class TCN {
         public Vector3f rotation;
         public Vector3f size;
         public Vector2f textureOffset;
-        public Vector3f center;
         public float textureCoord[];
 
         public Box(String name, Vector3f offset, Vector3f position, Vector3f rotation, Vector3f size, Vector2f textureOffset) {
@@ -239,82 +242,73 @@ public class TCN {
             this.rotation = rotation;
             this.size = size;
             this.textureOffset = textureOffset;
-
-            center = new Vector3f(size);
-            center.scaleAdd(0.5f, offset);
-
-            float width = size.x;
-            float height = size.y;
-            float depth = size.z;
-            /**
-             * 0   1
-             *
-             * 3   2
-             *
-             * 0 1 2   0 2 3
-             */
-            textureCoord = new float[]{
-                    // Back
-                    2 * depth + width, depth,
-                    2 * depth + 2 * width, depth,
-                    2 * depth + 2 * width, depth + height,
-                    2 * depth + width, depth + height,
-                    // front
-                    depth + width, depth,
-                    depth + width, depth + height,
-                    depth, depth + height,
-                    depth, depth,
-                    // Bottom
-                    depth + 2 * width, 0,
-                    depth + 2 * width, depth,
-                    depth + width, depth,
-                    depth + width, 0,
-                    // Top
-                    depth, depth,
-                    depth + width, depth,
-                    depth + width, 0,
-                    depth, 0,
-                    // Right
-                    depth + width, depth,
-                    depth + width, depth + height,
-                    2 * depth + width, depth + height,
-                    2 * depth + width, depth,
-                    // Left
-                    depth, depth,
-                    0, depth,
-                    0, depth + height,
-                    depth, depth + height,
-            };
-
-            for (int i = 0; i < textureCoord.length / 2; i++) {
-                textureCoord[i * 2] = textureOffset.x + textureCoord[i * 2];
-                textureCoord[i * 2 + 1] = textureOffset.y + textureCoord[i * 2 + 1];
-            }
         }
 
-        private Vector2f getTextureCoord(int i) {
-            return new Vector2f(textureCoord[i * 2] / 128, textureCoord[i * 2 + 1] / 128);
+        private Vector2f getTextureCoord(int coord) {
+            if (textureCoord == null) {
+                float width = size.x;
+                float height = size.y;
+                float depth = size.z;
+                /**
+                 * 0   1
+                 *
+                 * 3   2
+                 *
+                 * 0 1 2   0 2 3
+                 */
+                textureCoord = new float[]{
+                        // Back
+                        2 * depth + width, depth,
+                        2 * depth + 2 * width, depth,
+                        2 * depth + 2 * width, depth + height,
+                        2 * depth + width, depth + height,
+                        // front
+                        depth + width, depth,
+                        depth + width, depth + height,
+                        depth, depth + height,
+                        depth, depth,
+                        // Bottom
+                        depth + 2 * width, 0,
+                        depth + 2 * width, depth,
+                        depth + width, depth,
+                        depth + width, 0,
+                        // Top
+                        depth, depth,
+                        depth + width, depth,
+                        depth + width, 0,
+                        depth, 0,
+                        // Right
+                        depth + width, depth,
+                        depth + width, depth + height,
+                        2 * depth + width, depth + height,
+                        2 * depth + width, depth,
+                        // Left
+                        depth, depth,
+                        0, depth,
+                        0, depth + height,
+                        depth, depth + height,
+                };
+
+                for (int i = 0; i < textureCoord.length / 2; i++) {
+                    textureCoord[i * 2] = textureOffset.x + textureCoord[i * 2];
+                    textureCoord[i * 2 + 1] = textureOffset.y + textureCoord[i * 2 + 1];
+                }
+            }
+            return new Vector2f(textureCoord[coord * 2] / 128, textureCoord[coord * 2 + 1] / 128);
         }
 
         public void addToMD5(MD5SkeletonLoader.MD5 md5) {
+            Vector3f center = new Vector3f(size);
+            center.scaleAdd(0.5f, offset);
+
             MD5SkeletonLoader.MD5Mesh mesh = md5.meshes.get(0);
             int vertId = mesh.vertexList.size();
             int weightId = mesh.weightList.size();
             int jointId = md5.joints.size();
 
-            Quat4f quat = new Quat4f();
-            Quat4f qZ = new Quat4f();
-            QuaternionUtil.setRotation(qZ, new Vector3f(0, 0, 1), rotation.z);
-            Quat4f qY = new Quat4f();
-            QuaternionUtil.setRotation(qY, new Vector3f(0, 1, 0), rotation.y);
-            Quat4f qX = new Quat4f();
-            QuaternionUtil.setRotation(qX, new Vector3f(1, 0, 0), rotation.x);
-            quat.set(1, 0, 0, 0);
-            quat.mul(qZ);
-            quat.mul(qY);
-            quat.mul(qX);
+            Quat4f quat = Quat4fUtil.fromAngles(rotation.x, rotation.y, rotation.z);
             MD5SkeletonLoader.MD5Joint joint = new MD5SkeletonLoader.MD5Joint();
-            joint.name = name + ".";
+            joint.name = name;
             joint.orientation = quat;
             joint.parent = 0;
             joint.position = new Vector3f(position.x, -position.y, -position.z);

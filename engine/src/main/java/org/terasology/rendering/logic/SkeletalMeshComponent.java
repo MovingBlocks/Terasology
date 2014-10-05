@@ -33,6 +33,7 @@ import java.util.Map;
  */
 @ForceBlockActive
 public class SkeletalMeshComponent implements Component {
+    public String controller;
     public SkeletalMesh mesh;
     public Material material;
     public MeshAnimation animation;

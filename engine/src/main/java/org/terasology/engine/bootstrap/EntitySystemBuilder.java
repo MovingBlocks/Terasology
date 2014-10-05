@@ -68,6 +68,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.assets.texture.TextureRegionAsset;
+import org.terasology.rendering.logic.MeshControllerClassLibrary;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.properties.OneOfProviderFactory;
@@ -121,6 +122,11 @@ public class EntitySystemBuilder {
         NodesClassLibrary nodesClassLibrary = new NodesClassLibrary(reflectFactory, copyStrategyLibrary);
         CoreRegistry.put(NodesClassLibrary.class, nodesClassLibrary);
         nodesClassLibrary.scan(environment);
+
+        // Skeletal Mesh Controllers
+        MeshControllerClassLibrary meshControllerClassLibrary = new MeshControllerClassLibrary(reflectFactory, copyStrategyLibrary);
+        CoreRegistry.put(MeshControllerClassLibrary.class, meshControllerClassLibrary);
+        meshControllerClassLibrary.scan(environment);
 
         registerComponents(library.getComponentLibrary(), environment);
         registerEvents(entityManager.getEventSystem(), environment);

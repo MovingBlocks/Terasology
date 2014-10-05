@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.module.Module;
+import org.terasology.module.sandbox.API;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.md5.MD5SkeletonLoader;
@@ -41,6 +42,7 @@ import java.util.zip.ZipInputStream;
 /**
  * @author synopia
  */
+@API
 public class TCNSkeletalMeshLoader extends MD5SkeletonLoader {
     @In
     private AssetManager assetManager;
@@ -68,8 +70,7 @@ public class TCNSkeletalMeshLoader extends MD5SkeletonLoader {
                 if ("model.xml".equals(entry.getName())) {
                     try {
                         tcn = TCN.parse(bais);
-                        MD5 md5 = tcn.getMD5();
-                        return buildMeshData(md5);
+                        return createMesh(tcn);
                     } catch (TCN.TCNParseException e) {
                         logger.error("Unable to parse model.xml from " + urls);
                     }
@@ -85,6 +86,11 @@ public class TCNSkeletalMeshLoader extends MD5SkeletonLoader {
             zipStream.close();
         }
         return null;
+    }
+
+    public SkeletalMeshData createMesh(TCN tcn) {
+        MD5 md5 = tcn.getMD5();
+        return buildMeshData(md5);
     }
 
     public static void main(String[] args) throws IOException, TCN.TCNParseException {
