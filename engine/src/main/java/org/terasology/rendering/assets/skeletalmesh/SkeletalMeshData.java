@@ -57,6 +57,9 @@ public class SkeletalMeshData implements AssetData {
         this.vertexStartWeights.addAll(vertexStartWeights);
         this.vertexWeightCounts.addAll(vertexWeightCounts);
         this.indices.addAll(indices);
+        for (Bone bone : bones) {
+            boneLookup.put(bone.getName(), bone);
+        }
 
         calculateNormals();
     }

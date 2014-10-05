@@ -63,50 +63,54 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
     public SkeletalMeshData load(Module module, InputStream stream, List<URL> urls, List<URL> deltas) throws IOException {
         try {
             MD5 md5 = parse(stream);
-            SkeletalMeshDataBuilder skeletonBuilder = new SkeletalMeshDataBuilder();
-            List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
-            for (int i = 0; i < md5.numJoints; ++i) {
-                MD5Joint joint = md5.joints[i];
-                Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
-                bones.add(bone);
-                if (joint.parent != -1) {
-                    bones.get(joint.parent).addChild(bone);
-                }
-                skeletonBuilder.addBone(bone);
-            }
-            if (md5.meshes.length > 0) {
-                // TODO: Support multiple mesh somehow?
-                MD5Mesh mesh = md5.meshes[0];
-                for (MD5Weight weight : mesh.weightList) {
-                    skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
-                }
-
-                List<Vector2f> uvs = Lists.newArrayList();
-                TIntList vertexStartWeight = new TIntArrayList(mesh.numVertices);
-                TIntList vertexWeightCount = new TIntArrayList(mesh.numVertices);
-                for (MD5Vertex vert : mesh.vertexList) {
-                    uvs.add(vert.uv);
-                    vertexStartWeight.add(vert.startWeight);
-                    vertexWeightCount.add(vert.countWeight);
-                }
-                skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
-                skeletonBuilder.setUvs(uvs);
-                TIntList indices = new TIntArrayList(mesh.indexList.length);
-                for (int i = 0; i < mesh.numTriangles; ++i) {
-                    indices.add(mesh.indexList[i * 3]);
-                    indices.add(mesh.indexList[i * 3 + 2]);
-                    indices.add(mesh.indexList[i * 3 + 1]);
-                }
-                skeletonBuilder.setIndices(indices);
-            }
-
-            return skeletonBuilder.build();
+            return buildMeshData(md5);
         } catch (NumberFormatException e) {
             throw new IOException("Error parsing " + module.toString(), e);
         }
     }
 
-    private MD5 parse(InputStream stream) throws IOException {
+    protected SkeletalMeshData buildMeshData(MD5 md5) {
+        SkeletalMeshDataBuilder skeletonBuilder = new SkeletalMeshDataBuilder();
+        List<Bone> bones = Lists.newArrayListWithCapacity(md5.joints.size());
+        for (int i = 0; i < md5.joints.size(); ++i) {
+            MD5Joint joint = md5.joints.get(i);
+            Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
+            bones.add(bone);
+            if (joint.parent != -1) {
+                bones.get(joint.parent).addChild(bone);
+            }
+            skeletonBuilder.addBone(bone);
+        }
+        if (md5.meshes.size() > 0) {
+            // TODO: Support multiple mesh somehow?
+            MD5Mesh mesh = md5.meshes.get(0);
+            for (MD5Weight weight : mesh.weightList) {
+                skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
+            }
+
+            List<Vector2f> uvs = Lists.newArrayList();
+            TIntList vertexStartWeight = new TIntArrayList(mesh.vertexList.size());
+            TIntList vertexWeightCount = new TIntArrayList(mesh.vertexList.size());
+            for (MD5Vertex vert : mesh.vertexList) {
+                uvs.add(vert.uv);
+                vertexStartWeight.add(vert.startWeight);
+                vertexWeightCount.add(vert.countWeight);
+            }
+            skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
+            skeletonBuilder.setUvs(uvs);
+            TIntList indices = new TIntArrayList(mesh.indexList.size());
+            for (int i = 0; i < mesh.indexList.size() / 3; ++i) {
+                indices.add(mesh.indexList.get(i * 3));
+                indices.add(mesh.indexList.get(i * 3 + 1));
+                indices.add(mesh.indexList.get(i * 3 + 2));
+            }
+            skeletonBuilder.setIndices(indices);
+        }
+
+        return skeletonBuilder.build();
+    }
+
+    protected MD5 parse(InputStream stream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
         MD5 md5 = new MD5();
         String line = MD5ParserCommon.readToLine(reader, "MD5Version ");
@@ -119,17 +123,16 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
         }
 
         line = MD5ParserCommon.readToLine(reader, "numJoints ");
-        md5.numJoints = Integer.parseInt(line.split(" ", 3)[1]);
+        int numJoints = Integer.parseInt(line.split(" ", 3)[1]);
         line = MD5ParserCommon.readToLine(reader, "numMeshes ");
-        md5.numMeshes = Integer.parseInt(line.split(" ", 3)[1]);
+        int numMeshes = Integer.parseInt(line.split(" ", 3)[1]);
 
         MD5ParserCommon.readToLine(reader, "joints {");
-        readJoints(reader, md5);
+        readJoints(reader, md5, numJoints);
 
-        md5.meshes = new MD5Mesh[md5.numMeshes];
-        for (int i = 0; i < md5.numMeshes; ++i) {
+        for (int i = 0; i < numMeshes; ++i) {
             MD5ParserCommon.readToLine(reader, "mesh {");
-            md5.meshes[i] = readMesh(reader);
+            md5.meshes.add(readMesh(reader));
         }
 
         return md5;
@@ -138,9 +141,9 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
     private MD5Mesh readMesh(BufferedReader reader) throws IOException {
         MD5Mesh mesh = new MD5Mesh();
         String line = MD5ParserCommon.readToLine(reader, "numverts ");
-        mesh.numVertices = Integer.parseInt(line.trim().split(" ", 3)[1]);
-        mesh.vertexList = new MD5Vertex[mesh.numVertices];
-        for (int i = 0; i < mesh.numVertices; ++i) {
+        int numVertices = Integer.parseInt(line.trim().split(" ", 3)[1]);
+
+        for (int i = 0; i < numVertices; ++i) {
             line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = vertPatten.matcher(line);
             if (!matcher.find()) {
@@ -151,28 +154,26 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
             vert.uv = MD5ParserCommon.readUV(matcher.group(2), matcher.group(3));
             vert.startWeight = Integer.parseInt(matcher.group(4));
             vert.countWeight = Integer.parseInt(matcher.group(5));
-            mesh.vertexList[index] = vert;
+            mesh.vertexList.add(index, vert);
         }
 
         line = MD5ParserCommon.readToLine(reader, "numtris ");
-        mesh.numTriangles = Integer.parseInt(line.trim().split(" ", 3)[1]);
-        mesh.indexList = new int[mesh.numTriangles * 3];
-        for (int i = 0; i < mesh.numTriangles; ++i) {
+        int numTriangles = Integer.parseInt(line.trim().split(" ", 3)[1]);
+        for (int i = 0; i < numTriangles; ++i) {
             line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = triPattern.matcher(line);
             if (!matcher.find()) {
                 throw new IOException("Invalid triangle line \"" + line + "\"");
             }
             int triIndex = Integer.parseInt(matcher.group(1));
-            mesh.indexList[3 * triIndex] = Integer.parseInt(matcher.group(2));
-            mesh.indexList[3 * triIndex + 1] = Integer.parseInt(matcher.group(3));
-            mesh.indexList[3 * triIndex + 2] = Integer.parseInt(matcher.group(4));
+            mesh.indexList.add(3 * triIndex, Integer.parseInt(matcher.group(2)));
+            mesh.indexList.add(3 * triIndex + 1, Integer.parseInt(matcher.group(3)));
+            mesh.indexList.add(3 * triIndex + 2, Integer.parseInt(matcher.group(4)));
         }
 
         line = MD5ParserCommon.readToLine(reader, "numweights ");
-        mesh.numWeights = Integer.parseInt(line.trim().split(" ", 3)[1]);
-        mesh.weightList = new MD5Weight[mesh.numWeights];
-        for (int i = 0; i < mesh.numWeights; ++i) {
+        int numWeights = Integer.parseInt(line.trim().split(" ", 3)[1]);
+        for (int i = 0; i < numWeights; ++i) {
             line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = weightPattern.matcher(line);
             if (!matcher.find()) {
@@ -183,14 +184,13 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
             weight.jointIndex = Integer.parseInt(matcher.group(2));
             weight.bias = Float.parseFloat(matcher.group(3));
             weight.position = MD5ParserCommon.readVector3f(matcher.group(4), matcher.group(5), matcher.group(6));
-            mesh.weightList[weightIndex] = weight;
+            mesh.weightList.add(weightIndex, weight);
         }
         return mesh;
     }
 
-    private void readJoints(BufferedReader reader, MD5 md5) throws IOException {
-        md5.joints = new MD5Joint[md5.numJoints];
-        for (int i = 0; i < md5.numJoints; ++i) {
+    private void readJoints(BufferedReader reader, MD5 md5, int numJoints) throws IOException {
+        for (int i = 0; i < numJoints; ++i) {
             String line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = jointPattern.matcher(line);
             if (!matcher.find()) {
@@ -201,46 +201,100 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMeshData> {
             joint.parent = Integer.parseInt(matcher.group(2));
             joint.position = MD5ParserCommon.readVector3fAndCorrect(matcher.group(3), matcher.group(4), matcher.group(5));
             joint.orientation = MD5ParserCommon.readQuat4f(matcher.group(6), matcher.group(7), matcher.group(8));
-            md5.joints[i] = joint;
+            md5.joints.add(i, joint);
             logger.trace("Read joint: {}", joint.name);
         }
     }
 
-    private static class MD5 {
-        int version;
-        String commandline;
-        int numJoints;
-        int numMeshes;
+    public static class MD5 {
+        public int version;
+        public String commandline;
 
-        MD5Joint[] joints;
-        MD5Mesh[] meshes;
+        public final List<MD5Joint> joints = Lists.newArrayList();
+        public final List<MD5Mesh> meshes = Lists.newArrayList();
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            MD5Mesh mesh = meshes.get(0);
+            sb.append("MD5Version 10\n" +
+                    "commandline \"Exported from Terasology MD5SkeletonLoader\"\n" +
+                    "\n");
+            sb.append("numJoints ").append(joints.size()).append("\n");
+            sb.append("numMeshes 1\n\n");
+            sb.append("joints {\n");
+            for (MD5Joint joint : joints) {
+                sb.append("\t\"").append(joint.name).append("\" ").append(joint.parent).append(" ( ");
+                sb.append(joint.position.x).append(" ");
+                sb.append(joint.position.y).append(" ");
+                sb.append(joint.position.z).append(" ) ( ");
+                Quat4f rot = new Quat4f(joint.orientation);
+                rot.normalize();
+                if (rot.w > 0) {
+                    rot.x = -rot.x;
+                    rot.y = -rot.y;
+                    rot.z = -rot.z;
+                }
+                sb.append(rot.x).append(" ");
+                sb.append(rot.y).append(" ");
+                sb.append(rot.z).append(" )\n");
+            }
+            sb.append("}\n\n");
+
+            sb.append("mesh {\n");
+            sb.append("\tshader \"alosaurustexture.png\"\n");
+            sb.append("\tnumverts ").append(mesh.vertexList.size()).append("\n");
+            int vertId = 0;
+            for (MD5Vertex vert : mesh.vertexList) {
+                sb.append("\tvert ").append(vertId).append(" (").append(vert.uv.x).append(" ").append(vert.uv.y).append(") ");
+                sb.append(vert.startWeight).append(" ").append(vert.countWeight).append("\n");
+                vertId++;
+            }
+            sb.append("\n");
+            sb.append("\tnumtris ").append(mesh.indexList.size() / 3).append("\n");
+            List<Integer> indexList = mesh.indexList;
+            for (int i = 0; i < indexList.size() / 3; i++) {
+                int i1 = indexList.get(i * 3);
+                int i2 = indexList.get(i * 3 + 1);
+                int i3 = indexList.get(i * 3 + 2);
+                sb.append("\ttri ").append(i).append(" ").append(i1).append(" ").append(i2).append(" ").append(i3).append("\n");
+            }
+            sb.append("\n");
+            sb.append("\tnumweights ").append(mesh.weightList.size()).append("\n");
+            int meshId = 0;
+            for (MD5Weight weight : mesh.weightList) {
+                sb.append("\tweight ").append(meshId).append(" ").append(weight.jointIndex).append(" ");
+                sb.append(weight.bias).append(" ( ");
+                sb.append(weight.position.x).append(" ").append(weight.position.y).append(" ").append(weight.position.z).append(")\n");
+                meshId++;
+            }
+            sb.append("}\n");
+            return sb.toString();
+        }
     }
 
-    private static class MD5Joint {
-        String name;
-        int parent;
-        Vector3f position;
-        Quat4f orientation;
+    public static class MD5Joint {
+        public String name;
+        public int parent;
+        public Vector3f position;
+        public Quat4f orientation;
     }
 
-    private static class MD5Mesh {
-        int numVertices;
-        MD5Vertex[] vertexList;
-        int numTriangles;
-        int[] indexList;
-        int numWeights;
-        MD5Weight[] weightList;
+    public static class MD5Mesh {
+        public final List<MD5Vertex> vertexList = Lists.newArrayList();
+        public List<Integer> indexList = Lists.newArrayList();
+        public List<MD5Weight> weightList = Lists.newArrayList();
     }
 
-    private static class MD5Vertex {
-        Vector2f uv;
-        int startWeight;
-        int countWeight;
+    public static class MD5Vertex {
+        public Vector2f uv;
+        public int startWeight;
+        public int countWeight;
     }
 
-    private static class MD5Weight {
-        int jointIndex;
-        float bias;
-        Vector3f position;
+    public static class MD5Weight {
+        public int jointIndex;
+        public float bias;
+        public Vector3f position;
     }
 }

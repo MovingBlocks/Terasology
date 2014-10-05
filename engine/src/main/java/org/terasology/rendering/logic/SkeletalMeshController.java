@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.logic;
 
-package org.terasology.rendering.assets.skeletalmesh;
-
-import org.terasology.asset.Asset;
-
-import javax.vecmath.Vector3f;
-import java.util.Collection;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.module.sandbox.API;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 /**
- * @author Immortius
+ * @author synopia
  */
-public interface SkeletalMesh extends Asset<SkeletalMeshData> {
+@API
+public interface SkeletalMeshController {
+    SkeletalMesh createMesh();
 
-    int getVertexCount();
-
-    Collection<Bone> getBones();
-
-    Bone getBone(String boneName);
-
-    void setScaleTranslate(float scale, Vector3f translate);
+    void update(EntityRef entity, float delta);
 }

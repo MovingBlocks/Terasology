@@ -37,7 +37,9 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.MatrixUtils;
+import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.registry.In;
+import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.material.Material;
@@ -50,6 +52,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -78,11 +81,28 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     @In
     private Config config;
 
+    @In
+    MeshControllerClassLibrary classLibrary;
+
+    private final Map<EntityRef, SkeletalMeshController> controllers = Maps.newHashMap();
+
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
     public void newSkeleton(OnActivatedComponent event, EntityRef entity) {
         SkeletalMeshComponent skeleton = entity.getComponent(SkeletalMeshComponent.class);
         if (skeleton.mesh == null) {
-            return;
+            ClassMetadata<? extends SkeletalMeshController, ?> classMetadata = classLibrary.resolve(skeleton.controller);
+            if (classMetadata != null && classMetadata.isConstructable()) {
+                SkeletalMeshController controller = classMetadata.newInstance();
+                InjectionHelper.inject(controller);
+                skeleton.mesh = controller.createMesh();
+                entity.saveComponent(skeleton);
+
+                controllers.put(entity, controller);
+            }
+
+            if (skeleton.mesh == null) {
+                return;
+            }
         }
 
         if (skeleton.boneEntities == null) {
@@ -107,6 +127,10 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
+            SkeletalMeshController controller = controllers.get(entity);
+            if (controller != null) {
+                controller.update(entity, delta);
+            }
             SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
             if (skeletalMeshComp.animation != null && skeletalMeshComp.animation.getFrameCount() > 0) {
                 skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
@@ -235,6 +259,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneRotations.add(new Quat4f());
                 }
             }
+            skeletalMesh.mesh.setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
         }
     }
