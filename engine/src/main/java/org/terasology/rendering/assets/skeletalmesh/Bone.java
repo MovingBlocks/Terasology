@@ -55,6 +55,10 @@ public class Bone {
         return objectSpacePos;
     }
 
+    public void setObjectPos(Vector3f objectSpacePos) {
+        this.objectSpacePos = objectSpacePos;
+    }
+
     public Vector3f getLocalPosition() {
         Vector3f pos = new Vector3f(objectSpacePos);
         if (parent != null) {
@@ -70,6 +74,10 @@ public class Bone {
         return rotation;
     }
 
+    public void setObjectRotation(Quat4f rotation) {
+        this.rotation = rotation;
+    }
+
     public Quat4f getLocalRotation() {
         Quat4f rot = new Quat4f(rotation);
         if (parent != null) {
@@ -82,6 +90,10 @@ public class Bone {
 
     public Bone getParent() {
         return parent;
+    }
+
+    public int getParentIndex() {
+        return parent != null ? parent.getIndex() : -1;
     }
 
     public void addChild(Bone child) {

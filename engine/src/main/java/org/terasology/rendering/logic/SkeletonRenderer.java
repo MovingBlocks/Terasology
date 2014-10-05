@@ -196,8 +196,6 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
             Vector3f worldPositionCameraSpace = new Vector3f();
             worldPositionCameraSpace.sub(worldPos, cameraPosition);
 
-            worldPos.y -= skeletalMesh.heightOffset;
-
             float worldScale = location.getWorldScale();
             matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
 
@@ -235,6 +233,7 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
                     boneRotations.add(new Quat4f());
                 }
             }
+            ((OpenGLSkeletalMesh) skeletalMesh.mesh).setScaleTranslate(skeletalMesh.scale, skeletalMesh.translate);
             ((OpenGLSkeletalMesh) skeletalMesh.mesh).render(bonePositions, boneRotations);
         }
     }

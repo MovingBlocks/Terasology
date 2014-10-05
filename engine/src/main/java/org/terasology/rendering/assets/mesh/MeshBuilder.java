@@ -18,6 +18,7 @@ package org.terasology.rendering.assets.mesh;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.module.sandbox.API;
 import org.terasology.rendering.nui.Color;
 
 import javax.vecmath.Vector2f;
@@ -29,6 +30,7 @@ import javax.vecmath.Vector3f;
 public class MeshBuilder {
     private MeshData meshData = new MeshData();
     private int vertexCount;
+    private TextureMapper textureMapper;
 
     public MeshBuilder addVertex(Vector3f v) {
         meshData.getVertices().add(v.x);
@@ -96,4 +98,74 @@ public class MeshBuilder {
     public Mesh build(AssetUri uri) {
         return Assets.generateAsset(uri, meshData, Mesh.class);
     }
+
+    public MeshBuilder addBox(Vector3f offset, Vector3f size, float u, float v) {
+        int vertexId = vertexCount;
+        textureMapper.initialize(offset, size);
+        for (int i = 0; i < VERTICES.length / 3; i++) {
+            addVertex(new Vector3f(offset.x + size.x * VERTICES[i * 3], offset.y + size.y * VERTICES[i * 3 + 1], offset.z + size.z * VERTICES[i * 3 + 2]));
+            addTexCoord(textureMapper.map(i, u, v));
+        }
+        for (int i = 0; i < INDICES.length; i++) {
+            addIndex(vertexId + INDICES[i]);
+        }
+        return this;
+    }
+
+    public void setTextureMapper(TextureMapper textureMapper) {
+        this.textureMapper = textureMapper;
+    }
+
+    @API
+    public interface TextureMapper {
+        void initialize(Vector3f offset, Vector3f size);
+
+        Vector2f map(int vertexIndex, float u, float v);
+    }
+
+    private static float VERTICES[] = {
+            // Front face
+            0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 1.0f,
+
+            // Back face
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+
+            // Top face
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 0.0f,
+
+            // Bottom face
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+
+            // Right face
+            1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 0.0f, 1.0f,
+
+            // Left face
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f
+    };
+    private static int INDICES[] = {
+            0, 1, 2, 0, 2, 3,    // front
+            4, 5, 6, 4, 6, 7,    // back
+            8, 9, 10, 8, 10, 11,   // top
+            12, 13, 14, 12, 14, 15,   // bottom
+            16, 17, 18, 16, 18, 19,   // right
+            20, 21, 22, 20, 22, 23    // left
+    };
 }

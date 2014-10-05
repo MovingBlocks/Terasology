@@ -177,4 +177,59 @@ public class SkeletalMeshData implements AssetData {
             }
         }
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MD5Version 10\n" +
+                "commandline \"Exported from Terasology MD5SkeletonLoader\"\n" +
+                "\n");
+        sb.append("numJoints ").append(bones.size()).append("\n");
+        sb.append("numMeshes 1\n\n");
+        sb.append("joints {\n");
+        for (Bone bone : bones) {
+
+            sb.append("\t\"").append(bone.getName()).append("\" ").append(bone.getParentIndex()).append(" ( ");
+            sb.append(bone.getObjectPosition().x).append(" ");
+            sb.append(bone.getObjectPosition().y).append(" ");
+            sb.append(bone.getObjectPosition().z).append(" ) ( ");
+            Quat4f rot = new Quat4f(bone.getObjectRotation());
+            rot.normalize();
+            if (rot.w > 0) {
+                rot.x = -rot.x;
+                rot.y = -rot.y;
+                rot.z = -rot.z;
+            }
+            sb.append(rot.x).append(" ");
+            sb.append(rot.y).append(" ");
+            sb.append(rot.z).append(" )\n");
+        }
+        sb.append("}\n\n");
+
+        sb.append("mesh {\n");
+        sb.append("\tshader \"alosaurustexture.png\"\n");
+        sb.append("\tnumverts ").append(uvs.size()).append("\n");
+        for (int i = 0; i < uvs.size(); i++) {
+            sb.append("\tvert ").append(i).append(" (").append(uvs.get(i).x).append(" ").append(uvs.get(i).y).append(") ");
+            sb.append(vertexStartWeights.get(i)).append(" ").append(vertexWeightCounts.get(i)).append("\n");
+        }
+        sb.append("\n");
+        sb.append("\tnumtris ").append(indices.size() / 3).append("\n");
+        for (int i = 0; i < indices.size() / 3; i++) {
+            int i1 = indices.get(i * 3);
+            int i2 = indices.get(i * 3 + 1);
+            int i3 = indices.get(i * 3 + 2);
+            sb.append("\ttri ").append(i).append(" ").append(i1).append(" ").append(i2).append(" ").append(i3).append("\n");
+        }
+        sb.append("\n");
+        sb.append("\tnumweights ").append(weights.size()).append("\n");
+        int meshId = 0;
+        for (BoneWeight weight : weights) {
+            sb.append("\tweight ").append(meshId).append(" ").append(weight.getBoneIndex()).append(" ");
+            sb.append(weight.getBias()).append(" ( ");
+            sb.append(weight.getPosition().x).append(" ").append(weight.getPosition().y).append(" ").append(weight.getPosition().z).append(")\n");
+            meshId++;
+        }
+        sb.append("}\n");
+        return sb.toString();
+    }
 }

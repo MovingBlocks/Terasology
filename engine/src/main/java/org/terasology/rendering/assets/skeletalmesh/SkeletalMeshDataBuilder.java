@@ -16,10 +16,15 @@
 package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
+import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.terasology.rendering.assets.mesh.MeshBuilder;
+import org.terasology.rendering.assets.mesh.MeshData;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -33,19 +38,75 @@ public class SkeletalMeshDataBuilder {
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
+    private MeshBuilder.TextureMapper textureMapper;
 
     public SkeletalMeshDataBuilder() {
 
     }
 
     public SkeletalMeshDataBuilder addBone(Bone bone) {
-        bones.add(bone);
+        if (!bones.contains(bone)) {
+            bones.add(bone);
+        }
         return this;
     }
 
     public SkeletalMeshDataBuilder addWeight(BoneWeight boneWeight) {
         weights.add(boneWeight);
         return this;
+    }
+
+    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshBuilder builder) {
+        return addMesh(bone, builder.getMeshData());
+    }
+
+    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
+        MeshBuilder meshBuilder = new MeshBuilder();
+        meshBuilder.setTextureMapper(textureMapper);
+        meshBuilder.addBox(offset, size, u, v);
+        return addMesh(bone, meshBuilder);
+    }
+
+    public SkeletalMeshDataBuilder addBoneBox(Bone parent, int index, String name, Vector3f offset, Vector3f size, Vector3f rotationPoint, Quat4f rotation, float u, float v) {
+        Bone bone = new Bone(index, name, rotationPoint, rotation);
+        if (parent != null) {
+            parent.addChild(bone);
+        }
+        return addBox(bone, offset, size, u, v);
+    }
+
+    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
+        TFloatList meshVertices = data.getVertices();
+        TFloatList meshNormals = data.getNormals();
+        TIntList meshIndices = data.getIndices();
+        TFloatList texCoord0 = data.getTexCoord0();
+        TFloatList texCoord1 = data.getTexCoord1();
+        int weightsStart = weights.size();
+        int indicesStart = indices.size();
+        addBone(bone);
+        for (int i = 0; i < meshVertices.size() / 3; i++) {
+            float x = meshVertices.get(i * 3);
+            float y = meshVertices.get(i * 3 + 1);
+            float z = meshVertices.get(i * 3 + 2);
+//            float nx = meshNormals.get(i * 3);
+//            float ny = meshNormals.get(i * 3+1);
+//            float nz = meshNormals.get(i * 3+2);
+            BoneWeight weight = new BoneWeight(new Vector3f(x, y, z), 1, bone.getIndex());
+//            weight.setNormal(new Vector3f(nx,ny,nz));
+            addWeight(weight);
+            vertexStartWeights.add(weightsStart + i);
+            vertexWeightCounts.add(1);
+            uvs.add(new Vector2f(texCoord0.get(i * 2), texCoord0.get(i * 2 + 1)));
+        }
+
+        for (int i = 0; i < meshIndices.size(); i++) {
+            indices.add(meshIndices.get(i) + weightsStart);
+        }
+        return this;
+    }
+
+    public void setTextureMapper(MeshBuilder.TextureMapper textureMapper) {
+        this.textureMapper = textureMapper;
     }
 
     public void setVertexWeights(TIntList vertexStartWeight, TIntList vertexWeightCount) {
@@ -83,6 +144,4 @@ public class SkeletalMeshDataBuilder {
 
         return new SkeletalMeshData(bones, weights, uvs, vertexStartWeights, vertexWeightCounts, indices);
     }
-
-
 }
