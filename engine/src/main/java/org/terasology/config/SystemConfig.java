@@ -23,7 +23,7 @@ public class SystemConfig {
     private long dayNightLengthInMs = 1800000;
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
-    private int secondsBetweenAutoSave = 20;
+    private int secondsBetweenAutoSave = 5;
     private boolean autoSaveEnabled = true;
     private boolean debugEnabled;
     private boolean monitoringEnabled;
