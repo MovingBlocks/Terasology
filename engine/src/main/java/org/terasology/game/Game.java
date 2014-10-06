@@ -69,6 +69,10 @@ public class Game {
     }
 
     public void save() {
+        save(true);
+    }
+
+    public void save(boolean flushAndShutdownStorageManager) {
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
         for (ComponentSystem sys : componentSystemManager.iterateAll()) {
             sys.preSave();
@@ -110,13 +114,14 @@ public class Game {
             } catch (IOException e) {
                 logger.error("Failed to save world manifest", e);
             }
-
-            try {
-                storageManager.flush();
-            } catch (IOException e) {
-                logger.error("Failed to save game", e);
+            if (flushAndShutdownStorageManager) {
+                try {
+                    storageManager.flush();
+                } catch (IOException e) {
+                    logger.error("Failed to save game", e);
+                }
+                storageManager.shutdown();
             }
-            storageManager.shutdown();
         }
 
         terasologyEngine.restartThreads();

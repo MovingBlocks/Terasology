@@ -483,6 +483,23 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
+    public void saveChunks() {
+        pipeline.shutdown();
+        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
+        lightMerger.shutdown();
+
+        for (Chunk chunk : nearCache.values()) {
+            ChunkStore store = storageManager.createChunkStoreForSave(chunk);
+            store.storeAllEntities();
+            store.save(false);
+        }
+
+        pipeline.restart();
+        unloadRequestTaskMaster.restart();
+        lightMerger.restart();;
+    }
+
+    @Override
     public void dispose() {
         pipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);

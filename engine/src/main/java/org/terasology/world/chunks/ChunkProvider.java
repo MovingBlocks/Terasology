@@ -122,6 +122,8 @@ public interface ChunkProvider {
      */
     Chunk getChunk(Vector3i chunkPos);
 
+    void saveChunks();
+
     /**
      * Disposes the chunk provider, cleaning up all chunks and other assets it is using
      */

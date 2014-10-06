@@ -37,8 +37,13 @@ import org.terasology.logic.console.Console;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.events.DisconnectedEvent;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
@@ -47,7 +52,9 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.ChunkProvider;
 
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -69,9 +76,15 @@ public class StateIngame implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
+    private Config config;
 
     /* GAME LOOP */
     private boolean pauseGame;
+    /**
+     * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
+     */
+    private Long nextAutoSave;
+    private StorageManager storageManager;
 
     public StateIngame() {
     }
@@ -86,6 +99,8 @@ public class StateIngame implements GameState {
         inputSystem = CoreRegistry.get(InputSystem.class);
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
+        config = CoreRegistry.get(Config.class);
+        storageManager = CoreRegistry.get(StorageManager.class);
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
@@ -147,6 +162,7 @@ public class StateIngame implements GameState {
 
     @Override
     public void update(float delta) {
+
         eventSystem.process();
 
         for (UpdateSubscriberSystem system : componentSystemManager.iterateUpdateSubscribers()) {
@@ -157,6 +173,34 @@ public class StateIngame implements GameState {
 
         if (worldRenderer != null && shouldUpdateWorld()) {
             worldRenderer.update(delta);
+        }
+
+        if (isSavingNecessaryAndPossible()) {
+            logger.info("Auto saving...");
+            PerformanceMonitor.startActivity("Auto Saving");
+            CoreRegistry.get(Game.class).save(false);
+            /*
+             * Saving without shutting down the threads of the storage manger is important, as otherwise the chunks don't get saved
+             * TODO maybe reorder? and makit just not shutdown
+             */
+            CoreRegistry.get(ChunkProvider.class).saveChunks();
+            for (Client client : networkSystem.getPlayers()) {
+                PlayerStore playerStore = storageManager.createPlayerStoreForSave(client.getId());
+                EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
+                if (character.exists()) {
+                    playerStore.setCharacter(character);
+                }
+                playerStore.save(false);
+            }
+            try {
+                storageManager.flush();
+                logger.info("Auto complete");
+            } catch (IOException e) {
+                logger.info("Auto save failed");
+            }
+            // TODO refactor: Game#save also flushes the storage manager
+            scheduleNextAutoSave();
+            PerformanceMonitor.endActivity();
         }
 
         updateUserInterface(delta);
@@ -224,6 +268,34 @@ public class StateIngame implements GameState {
 
     public boolean isGamePaused() {
         return pauseGame;
+    }
+
+
+    private boolean isSavingNecessaryAndPossible() {
+        if (!config.getSystem().isAutoSaveEnabled()) {
+            return false;
+        }
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        boolean isAuthority = networkSystem.getMode().isAuthority();
+        if (!isAuthority ) {
+            return false;
+        }
+        long currentTime = System.currentTimeMillis();
+        if (nextAutoSave == null) {
+            scheduleNextAutoSave();
+            return false;
+        }
+        if (currentTime >= nextAutoSave) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private void scheduleNextAutoSave() {
+        long msBetweenAutoSave = config.getSystem().getSecondsBetweenAutoSave() * 1000;
+        nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 
 }

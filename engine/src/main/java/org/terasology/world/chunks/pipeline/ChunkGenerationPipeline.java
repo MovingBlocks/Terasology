@@ -47,4 +47,8 @@ public class ChunkGenerationPipeline {
         chunkGenerator.shutdown(new ShutdownChunkTask(), false);
     }
 
+    public void restart() {
+        chunkGenerator.restart();
+    }
+
 }

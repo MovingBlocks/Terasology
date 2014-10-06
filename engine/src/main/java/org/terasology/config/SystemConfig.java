@@ -23,7 +23,8 @@ public class SystemConfig {
     private long dayNightLengthInMs = 1800000;
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
-
+    private int secondsBetweenAutoSave = 20;
+    private boolean autoSaveEnabled = true;
     private boolean debugEnabled;
     private boolean monitoringEnabled;
 
@@ -49,6 +50,22 @@ public class SystemConfig {
 
     public void setVerticalChunkMeshSegments(int verticalChunkMeshSegments) {
         this.verticalChunkMeshSegments = verticalChunkMeshSegments;
+    }
+
+    public int getSecondsBetweenAutoSave() {
+        return secondsBetweenAutoSave;
+    }
+
+    public void setSecondsBetweenAutoSave(int secondsBetweenAutoSave) {
+        this.secondsBetweenAutoSave = secondsBetweenAutoSave;
+    }
+
+    public boolean isAutoSaveEnabled() {
+        return autoSaveEnabled;
+    }
+
+    public void setAutoSaveEnabled(boolean autoSaveEnabled) {
+        this.autoSaveEnabled = autoSaveEnabled;
     }
 
     public boolean isDebugEnabled() {

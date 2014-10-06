@@ -231,6 +231,11 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
+        public void saveChunks() {
+
+        }
+
+        @Override
         public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
 
         }
