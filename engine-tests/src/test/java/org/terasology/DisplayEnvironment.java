@@ -85,7 +85,7 @@ public class DisplayEnvironment extends HeadlessEnvironment {
         LWJGLHelper.initNativeLibs();
 
         try {
-            Display.setDisplayMode(new DisplayMode(0, 0));
+            Display.setDisplayMode(new DisplayMode(1, 1));
             Display.create(CoreRegistry.get(Config.class).getRendering().getPixelFormat());
         } catch (LWJGLException e) {
             throw new IllegalStateException(e);
