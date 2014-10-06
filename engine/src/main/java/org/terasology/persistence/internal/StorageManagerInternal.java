@@ -32,7 +32,6 @@ import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
 import org.terasology.math.Vector3i;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.GlobalStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
@@ -142,12 +141,16 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public GlobalStore createGlobalStoreForSave() {
-        GlobalStoreSaver newGlobalStore = new GlobalStoreSaver(entityManager, prefabSerializer);
+    public void createGlobalStoreForSave() {
+        GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
         for (StoreMetadata table : storeMetadata.values()) {
-            newGlobalStore.addStoreMetadata(table);
+            globalStoreSaver.addStoreMetadata(table);
         }
-        return new GlobalStoreInternal(newGlobalStore, this);
+        for (EntityRef entity : entityManager.getAllEntities()) {
+            globalStoreSaver.store(entity);
+
+        }
+        this.globalStore = globalStoreSaver.save();
     }
 
     @Override
@@ -166,17 +169,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-    public void store(EntityData.GlobalStore globalStoreData) {
-        this.globalStore = globalStoreData;
-    }
 
     private void flushGlobalStore() throws IOException {
         if (globalStore == null) {
-            GlobalStore store = createGlobalStoreForSave();
-            for (EntityRef entity : entityManager.getAllEntities()) {
-                store.store(entity);
-            }
-            store.save();
+            createGlobalStoreForSave();
         }
         try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(PathManager.getInstance().getCurrentSavePath().resolve(GLOBAL_ENTITY_STORE)))) {
             globalStore.writeTo(out);

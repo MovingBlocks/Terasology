@@ -201,9 +201,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     public void globalEntitiesStoredAndRestored() throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
         int entityId = entity.getId();
-        GlobalStore globalStore = esm.createGlobalStoreForSave();
-        globalStore.store(entity);
-        globalStore.save();
+        esm.createGlobalStoreForSave();
 
         esm.flush();
 
@@ -224,9 +222,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
         store.setCharacter(character);
         store.save();
-        GlobalStore globalStore = esm.createGlobalStoreForSave();
-        globalStore.store(someEntity);
-        globalStore.save();
+        esm.createGlobalStoreForSave();
 
         esm.flush();
 
@@ -264,7 +260,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkStore chunkStore = esm.createChunkStoreForSave(chunk);
         chunkStore.save();
-        esm.createGlobalStoreForSave().save();
+        esm.createGlobalStoreForSave();
         esm.flush();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());

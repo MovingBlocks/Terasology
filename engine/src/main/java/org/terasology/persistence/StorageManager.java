@@ -32,7 +32,7 @@ public interface StorageManager {
     /**
      * @return A new global store ready for saving into
      */
-    GlobalStore createGlobalStoreForSave();
+    void createGlobalStoreForSave();
 
     /**
      * Loads the global store, restoring the entity manager's state and all global entities
