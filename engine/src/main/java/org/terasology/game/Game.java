@@ -81,45 +81,14 @@ public class Game {
 
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
-            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-            BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-
-            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
-            for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
-                gameManifest.addModule(module.getId(), module.getVersion());
-            }
-
-            List<String> registeredBlockFamilies = Lists.newArrayList();
-            for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
-                registeredBlockFamilies.add(family.getURI().toString());
-            }
-            gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
-            gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-            List<Biome> biomes = biomeManager.getBiomes();
-            Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
-            for (Biome biome : biomes) {
-                short shortId = biomeManager.getBiomeShortId(biome);
-                String id = biomeManager.getBiomeId(biome);
-                biomeIdMap.put(id, shortId);
-            }
-            gameManifest.setBiomeIdMap(biomeIdMap);
-
-            gameManifest.addWorld(worldProvider.getWorldInfo());
-
+            GameManifest gameManifest = createGameManifest();
+            saveGameManifest(gameManifest);
             try {
-                GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
+                storageManager.flush();
             } catch (IOException e) {
-                logger.error("Failed to save world manifest", e);
+                logger.error("Failed to save game", e);
             }
-            if (flushAndShutdownStorageManager) {
-                try {
-                    storageManager.flush();
-                } catch (IOException e) {
-                    logger.error("Failed to save game", e);
-                }
-                storageManager.shutdown();
-            }
+            storageManager.shutdown();
         }
 
         terasologyEngine.restartThreads();
@@ -129,5 +98,41 @@ public class Game {
         }
 
 
+    }
+
+    public void saveGameManifest(GameManifest gameManifest) {
+        try {
+            GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
+        } catch (IOException e) {
+            logger.error("Failed to save world manifest", e);
+        }
+    }
+
+    public GameManifest createGameManifest() {
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
+        BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+
+        GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
+        for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
+            gameManifest.addModule(module.getId(), module.getVersion());
+        }
+
+        List<String> registeredBlockFamilies = Lists.newArrayList();
+        for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
+            registeredBlockFamilies.add(family.getURI().toString());
+        }
+        gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
+        gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
+        List<Biome> biomes = biomeManager.getBiomes();
+        Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
+        for (Biome biome : biomes) {
+            short shortId = biomeManager.getBiomeShortId(biome);
+            String id = biomeManager.getBiomeId(biome);
+            biomeIdMap.put(id, shortId);
+        }
+        gameManifest.setBiomeIdMap(biomeIdMap);
+        gameManifest.addWorld(worldProvider.getWorldInfo());
+        return gameManifest;
     }
 }
