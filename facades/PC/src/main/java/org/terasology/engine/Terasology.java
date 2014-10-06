@@ -24,6 +24,7 @@ import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
 import org.terasology.engine.subsystem.headless.HeadlessInput;
 import org.terasology.engine.subsystem.headless.HeadlessTimer;
+import org.terasology.engine.subsystem.headless.mode.HeadlessStateChangeListener;
 import org.terasology.engine.subsystem.headless.mode.StateHeadlessSetup;
 import org.terasology.engine.subsystem.lwjgl.LwjglAudio;
 import org.terasology.engine.subsystem.lwjgl.LwjglGraphics;
@@ -85,6 +86,7 @@ public final class Terasology {
             try {
                 engine.init();
                 if (isHeadless) {
+                    engine.subscribeToStateChange(new HeadlessStateChangeListener());
                     engine.run(new StateHeadlessSetup());
                 } else {
                     engine.run(new StateMainMenu());
