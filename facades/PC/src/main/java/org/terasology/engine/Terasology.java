@@ -153,8 +153,9 @@ public final class Terasology {
             }
         }
 
-        if (latestGame == null)
+        if (latestGame == null) {
             return null;
+        }
 
         return latestGame.getManifest();
     }
