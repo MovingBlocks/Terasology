@@ -190,12 +190,10 @@ public class NetworkEntitySerializer {
         for (ReplicatedFieldMetadata field : componentMetadata.getFields()) {
             if (fieldCheck.shouldSerializeField(field, component, componentInitial)) {
                 PersistedData fieldValue = serializer.serialize(field, component, serializationContext);
-                if (!fieldValue.isNull()) {
-                    entityFieldIds.write(field.getId());
+                entityFieldIds.write(field.getId());
 
-                    entityData.addFieldValue(((ProtobufPersistedData) fieldValue).getValue());
-                    fieldCount++;
-                }
+                entityData.addFieldValue(((ProtobufPersistedData) fieldValue).getValue());
+                fieldCount++;
             }
         }
 
