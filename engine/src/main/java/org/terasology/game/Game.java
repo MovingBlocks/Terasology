@@ -85,10 +85,8 @@ public class Game {
             BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
             WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
-            ModuleConfig moduleConfig = new ModuleConfig();
             GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
             for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
-                moduleConfig.addModule(module.getId());
                 gameManifest.addModule(module.getId(), module.getVersion());
             }
 
