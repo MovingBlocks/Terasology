@@ -23,6 +23,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
+import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
@@ -74,7 +75,11 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         // create a fake environment so that plugin facet parts can be loaded
         Set<Module> selectedModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
-            selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(moduleName));
+            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
+            selectedModules.add(module);
+            for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+                selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
+            }
         }
         ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
         CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(environment,
