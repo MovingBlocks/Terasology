@@ -66,7 +66,8 @@ public class DebugControlSystem extends BaseComponentSystem {
     private NUIManager nuiManager;
 
     private DebugOverlay overlay;
-    private boolean grabbed = true;
+
+    private boolean mouseGrabbed = true;
 
     @Override
     public void initialise() {
@@ -169,10 +170,10 @@ public class DebugControlSystem extends BaseComponentSystem {
 
         switch (event.getKey().getId()) {
             case Keyboard.KeyId.F1:
-                grabbed = !grabbed;
+                mouseGrabbed = !mouseGrabbed;
                 DebugProperties debugProperties = (DebugProperties) nuiManager.getHUD().getHUDElement("engine:DebugProperties");
-                debugProperties.setVisible(!grabbed);
-                Mouse.setGrabbed(grabbed);
+                debugProperties.setVisible(!mouseGrabbed);
+                Mouse.setGrabbed(mouseGrabbed);
                 event.consume();
                 break;
             case Keyboard.KeyId.F3:
@@ -191,14 +192,14 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = CharacterComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        if (!grabbed) {
+        if (!mouseGrabbed) {
             event.consume();
         }
     }
 
     @ReceiveEvent(components = CharacterComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        if (!grabbed) {
+        if (!mouseGrabbed) {
             event.consume();
         }
     }

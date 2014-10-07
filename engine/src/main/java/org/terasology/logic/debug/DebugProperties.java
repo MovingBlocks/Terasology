@@ -21,6 +21,11 @@ import org.terasology.rendering.nui.layouts.ColumnLayout;
 import org.terasology.rendering.nui.layouts.PropertyLayout;
 
 /**
+ * Simple NUI HUD widget, that comes up when pressing F1 ingame. Shows a property layout panel with all registered
+ * Objects.
+ *
+ * See DebugPropertySystem#addProperty
+ *
  * @author synopia
  */
 public class DebugProperties extends CoreHudWidget implements ControlWidget {

@@ -68,22 +68,17 @@ public class SkeletalMeshDataBuilder {
 
     public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
         TFloatList meshVertices = data.getVertices();
-        TFloatList meshNormals = data.getNormals();
         TIntList meshIndices = data.getIndices();
         TFloatList texCoord0 = data.getTexCoord0();
-        TFloatList texCoord1 = data.getTexCoord1();
         int weightsStart = weights.size();
-        int indicesStart = indices.size();
         addBone(bone);
         for (int i = 0; i < meshVertices.size() / 3; i++) {
             float x = meshVertices.get(i * 3);
             float y = meshVertices.get(i * 3 + 1);
             float z = meshVertices.get(i * 3 + 2);
-//            float nx = meshNormals.get(i * 3);
-//            float ny = meshNormals.get(i * 3+1);
-//            float nz = meshNormals.get(i * 3+2);
             BoneWeight weight = new BoneWeight(new Vector3f(x, y, z), 1, bone.getIndex());
-//            weight.setNormal(new Vector3f(nx,ny,nz));
+            // TODO Meshes may contain normal vectors and we may copy them to the weight here
+            //   - but they are recalculated later on in either case. needs some rework
             addWeight(weight);
             vertexStartWeights.add(weightsStart + i);
             vertexWeightCounts.add(1);

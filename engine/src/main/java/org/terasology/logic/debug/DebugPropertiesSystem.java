@@ -16,6 +16,7 @@
 package org.terasology.logic.debug;
 
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.module.sandbox.API;
@@ -38,8 +39,8 @@ import java.security.PrivilegedAction;
  * Ingame press F1 to see the property editor. Only annotated fields will show up.
  */
 @API
-@RegisterSystem
-public class DebugPropertiesSystem extends BaseComponentSystem implements UpdateSubscriberSystem {
+@RegisterSystem(RegisterMode.CLIENT)
+public class DebugPropertiesSystem extends BaseComponentSystem {
     @In
     NUIManager nuiManager;
 
@@ -57,14 +58,9 @@ public class DebugPropertiesSystem extends BaseComponentSystem implements Update
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
-                properties.addPropertyProvider(group, new PropertyProvider<>(o));
+                properties.addPropertyProvider(group, new PropertyProvider<Object>(o));
                 return null;
             }
         });
-    }
-
-    @Override
-    public void update(float delta) {
-
     }
 }
