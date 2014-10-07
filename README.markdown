@@ -51,6 +51,7 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [F1] - Toggle window focus
 * [F3] - Toggle debug mode and information
 * [F5] - Show behavior tree editor
+* [F12] - Take screenshot (goes to /screenshots in game data dir)
 
 Debug Features
 --------
