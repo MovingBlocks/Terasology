@@ -60,6 +60,7 @@ pmd {
 }
 
 findbugs {
+    toolVersion = "3.0.0"
     ignoreFailures = true
     // This works as a solo module build in Jenkins as the config dir is copied in as part of the engine harness
     excludeFilter = new File(rootDir, "config/findbugs/findbugs-exclude.xml")
