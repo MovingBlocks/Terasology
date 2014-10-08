@@ -29,7 +29,7 @@ import org.terasology.logic.characters.interactions.InteractionUtil;
  *
  * The event is sent to the target entity at all clients.
  *
- * When event handler with priority high or lower runs, the  interactionTarget field of the instigator's
+ * When event handler runs, the  interactionTarget field of the instigator's
  * CharacterComponent will already be updated to the new value.
  *
  * @author Florian <florian@fkoeberle.de>

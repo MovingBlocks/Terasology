@@ -49,6 +49,7 @@ public final class CharacterComponent implements Component {
      *
      * This {@link InteractionStartEvent} is sent to all clients when a
      */
+    @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
     public EntityRef interactionTarget = EntityRef.NULL;
     public float pitch;
     public float yaw;

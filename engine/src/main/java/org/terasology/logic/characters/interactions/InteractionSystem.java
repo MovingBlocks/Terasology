@@ -135,18 +135,7 @@ public class InteractionSystem extends BaseComponentSystem {
     @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
     public void onInteractionStartRequest(InteractionStartRequest request, EntityRef instigator) {
         EntityRef target = request.getTarget();
-        target.send(new InteractionStartEvent(instigator));
-    }
 
-
-    /**
-     *
-     * Sets interactionTarget to the specified value with the highest priority so that the field is updated when
-     * other handlers of this event run.
-     */
-    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_CRITICAL)
-    public void onInteractionStartEvent(InteractionStartEvent event, EntityRef target) {
-        EntityRef instigator = event.getInstigator();
         CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
             logger.error("Interaction start request instigator has no character component");
@@ -159,21 +148,15 @@ public class InteractionSystem extends BaseComponentSystem {
 
         characterComponent.interactionTarget = target;
         instigator.saveComponent(characterComponent);
+
+        target.send(new InteractionStartEvent(instigator));
     }
+
 
     @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
     public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
         EntityRef target = request.getTarget();
-        target.send(new InteractionEndEvent(instigator));
-    }
 
-    /**
-     * Sets interactionTarget to NULL with a low priorty so that all handlers of this event are finished when this event
-     * gets processed.
-     */
-    @ReceiveEvent(components = {}, netFilter = RegisterMode.ALWAYS, priority = EventPriority.PRIORITY_TRIVIAL)
-    public void onInteractionEndEent(InteractionEndEvent event, EntityRef target) {
-        EntityRef instigator = event.getInstigator();
         CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
             logger.error("Interaction end request instigator has no character component");
@@ -182,6 +165,8 @@ public class InteractionSystem extends BaseComponentSystem {
 
         characterComponent.interactionTarget = EntityRef.NULL;
         instigator.saveComponent(characterComponent);
+
+        target.send(new InteractionEndEvent(instigator));
     }
 
 }
