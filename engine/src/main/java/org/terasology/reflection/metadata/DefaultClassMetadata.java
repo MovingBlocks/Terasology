@@ -41,7 +41,7 @@ public class DefaultClassMetadata<T> extends ClassMetadata<T, FieldMetadata<T, ?
      * @throws NoSuchMethodException If the class has no default constructor
      */
     public DefaultClassMetadata(SimpleUri uri, Class<T> type, ReflectFactory factory, CopyStrategyLibrary copyStrategyLibrary) throws NoSuchMethodException {
-        super(uri, type, factory, copyStrategyLibrary, Predicates.alwaysTrue());
+        super(uri, type, factory, copyStrategyLibrary, Predicates.<Field>alwaysTrue());
     }
 
     @Override
