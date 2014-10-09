@@ -17,11 +17,13 @@ package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Vector3f;
 
 /**
  * @author Florian <florian@fkoeberle.de>
+ * @author Immortius <immortius@gmail.com>
  */
 public class ActivationPredicted implements Event {
 
@@ -66,5 +68,22 @@ public class ActivationPredicted implements Event {
 
     public Vector3f getHitNormal() {
         return hitNormal;
+    }
+
+
+    public Vector3f getTargetLocation() {
+        LocationComponent loc = target.getComponent(LocationComponent.class);
+        if (loc != null) {
+            return loc.getWorldPosition();
+        }
+        return null;
+    }
+
+    public Vector3f getInstigatorLocation() {
+        LocationComponent loc = instigator.getComponent(LocationComponent.class);
+        if (loc != null) {
+            return loc.getWorldPosition();
+        }
+        return new Vector3f();
     }
 }

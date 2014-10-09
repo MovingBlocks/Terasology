@@ -22,7 +22,10 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
@@ -31,6 +34,7 @@ import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Florian <florian@fkoeberle.de>
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction extends BaseComponentSystem {
@@ -40,8 +44,35 @@ public class PlaySoundAction extends BaseComponentSystem {
     @In
     private AudioManager audioManager;
 
+    @In
+    private LocalPlayer localPlayer;
+
+    @ReceiveEvent(components = {PlaySoundActionComponent.class})
+    public void onActivationPredicted(ActivationPredicted event, EntityRef entity) {
+        PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
+        StaticSound sound = random.nextItem(playSound.sounds);
+        if (sound != null) {
+            Vector3f pos = null;
+            switch (playSound.relativeTo) {
+                case Target:
+                    pos = event.getTargetLocation();
+                    break;
+                default:
+                    pos = event.getInstigatorLocation();
+                    break;
+            }
+            if (pos == null) {
+                pos = event.getOrigin();
+            }
+            audioManager.playSound(sound, pos, playSound.volume, AudioManager.PRIORITY_NORMAL);
+        }
+    }
+
     @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
+        if (event.getInstigator().equals(localPlayer.getCharacterEntity())) {
+            return; // owner has heard sound from prediction
+        }
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         StaticSound sound = random.nextItem(playSound.sounds);
         if (sound != null) {
