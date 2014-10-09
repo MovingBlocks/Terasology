@@ -1,0 +1,27 @@
+{
+    "type": "DebugProperties",
+    "skin": "HUD",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type" : "ScrollableArea",
+                "content" : {
+                    "type" : "propertyLayout",
+                    "id" : "properties",
+                    "rowConstraints" : "[min]"
+                },
+                "layoutInfo" : {
+                    "width" : 400,
+                    "position-right" : {
+                        "target" : "RIGHT"
+                    },
+                    "position-top" : {
+                        "target" : "TOP",
+                        "offset" : 48
+                    }
+                }
+            }
+        ]
+    }
+}

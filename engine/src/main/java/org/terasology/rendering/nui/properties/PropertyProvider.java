@@ -18,7 +18,6 @@ package org.terasology.rendering.nui.properties;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import org.terasology.engine.SimpleUri;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -35,7 +34,6 @@ import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 
 import javax.vecmath.Vector3f;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -49,6 +47,20 @@ import static org.reflections.ReflectionUtils.getAllFields;
 
 /**
  * @author synopia
+ *
+ * Provides properties of a given object using annotations.
+ *
+ * Range:
+ *   * creates a slider with given min, max and precision maps to a float
+ *
+ * Checkbox:
+ *   * creates a checkbox that maps to a boolean
+ *
+ * TextField:
+ *   * creates a text box that maps to a string
+ *
+ * OneOf:
+ *   * creates a combobox that maps to a list of strings, an enum or a custom defined item provider
  */
 public class PropertyProvider<T> {
     private static final Pattern VECTOR_3F = Pattern.compile("\\((\\d*\\.?\\d), (\\d*\\.?\\d), (\\d*\\.?\\d)\\)");
@@ -68,6 +80,7 @@ public class PropertyProvider<T> {
         try {
             this.target = target;
             Class<?> type = target.getClass();
+
             ReflectFactory reflectFactory = CoreRegistry.get(ReflectFactory.class);
             CopyStrategyLibrary copyStrategies = new CopyStrategyLibrary(reflectFactory);
             ClassMetadata<?, ?> classMetadata = new DefaultClassMetadata<>(new SimpleUri(), type, reflectFactory, copyStrategies);

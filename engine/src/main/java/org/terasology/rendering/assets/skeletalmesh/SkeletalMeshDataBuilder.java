@@ -16,10 +16,14 @@
 package org.terasology.rendering.assets.skeletalmesh;
 
 import com.google.common.collect.Lists;
+import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.terasology.rendering.assets.mesh.MeshBuilder;
+import org.terasology.rendering.assets.mesh.MeshData;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -33,19 +37,62 @@ public class SkeletalMeshDataBuilder {
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
+    private MeshBuilder.TextureMapper textureMapper;
 
     public SkeletalMeshDataBuilder() {
 
     }
 
     public SkeletalMeshDataBuilder addBone(Bone bone) {
-        bones.add(bone);
+        if (!bones.contains(bone)) {
+            bones.add(bone);
+        }
         return this;
     }
 
     public SkeletalMeshDataBuilder addWeight(BoneWeight boneWeight) {
         weights.add(boneWeight);
         return this;
+    }
+
+    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshBuilder builder) {
+        return addMesh(bone, builder.getMeshData());
+    }
+
+    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
+        MeshBuilder meshBuilder = new MeshBuilder();
+        meshBuilder.setTextureMapper(textureMapper);
+        meshBuilder.addBox(offset, size, u, v);
+        return addMesh(bone, meshBuilder);
+    }
+
+    public SkeletalMeshDataBuilder addMesh(Bone bone, MeshData data) {
+        TFloatList meshVertices = data.getVertices();
+        TIntList meshIndices = data.getIndices();
+        TFloatList texCoord0 = data.getTexCoord0();
+        int weightsStart = weights.size();
+        addBone(bone);
+        for (int i = 0; i < meshVertices.size() / 3; i++) {
+            float x = meshVertices.get(i * 3);
+            float y = meshVertices.get(i * 3 + 1);
+            float z = meshVertices.get(i * 3 + 2);
+            BoneWeight weight = new BoneWeight(new Vector3f(x, y, z), 1, bone.getIndex());
+            // TODO Meshes may contain normal vectors and we may copy them to the weight here
+            //   - but they are recalculated later on in either case. needs some rework
+            addWeight(weight);
+            vertexStartWeights.add(weightsStart + i);
+            vertexWeightCounts.add(1);
+            uvs.add(new Vector2f(texCoord0.get(i * 2), texCoord0.get(i * 2 + 1)));
+        }
+
+        for (int i = 0; i < meshIndices.size(); i++) {
+            indices.add(meshIndices.get(i) + weightsStart);
+        }
+        return this;
+    }
+
+    public void setTextureMapper(MeshBuilder.TextureMapper textureMapper) {
+        this.textureMapper = textureMapper;
     }
 
     public void setVertexWeights(TIntList vertexStartWeight, TIntList vertexWeightCount) {
@@ -83,6 +130,4 @@ public class SkeletalMeshDataBuilder {
 
         return new SkeletalMeshData(bones, weights, uvs, vertexStartWeights, vertexWeightCounts, indices);
     }
-
-
 }

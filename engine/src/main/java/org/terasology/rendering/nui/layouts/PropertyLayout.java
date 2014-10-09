@@ -15,27 +15,26 @@
  */
 package org.terasology.rendering.nui.layouts;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.layouts.miglayout.MigLayout;
 import org.terasology.rendering.nui.properties.Property;
+import org.terasology.rendering.nui.properties.PropertyOrdering;
 import org.terasology.rendering.nui.properties.PropertyProvider;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UILabel;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by synopia on 03.01.14.
  */
 public class PropertyLayout extends MigLayout {
 
-    private Comparator<? super Property<?, ?>> propertyComparator =  Ordering.allEqual();
+    private Comparator<? super Property<?, ?>> propertyComparator = PropertyOrdering.byLabel();
 
     public PropertyLayout() {
     }
@@ -48,10 +47,14 @@ public class PropertyLayout extends MigLayout {
         this.propertyComparator = comparator;
     }
 
+    /**
+     * Adds a provider for properties to this layout. All properties appears in a list that may be collapsed/expanded.
+     * Initially the list is expanded.
+     */
     public void addPropertyProvider(String groupLabel, final PropertyProvider<?> propertyProvider) {
         if (propertyProvider.getProperties().size() > 0) {
-            final UIButton expand = new UIButton("", "+");
-            expand.setTooltip("Click to expand");
+            final UIButton expand = new UIButton("", "-");
+            expand.setTooltip("Click to collapse");
             final UILabel headline = new UILabel(groupLabel);
             final MigLayout layout = new MigLayout();
             layout.setColConstraints("[min][fill]");
@@ -68,25 +71,31 @@ public class PropertyLayout extends MigLayout {
                         button.setText("+");
                         button.setTooltip("Click to expand");
                     } else {
-                        List<Property<?, ?>> props = Lists.newArrayList(propertyProvider.getProperties());
-                        Collections.sort(props, propertyComparator);
-                        for (Property<?, ?> property : props) {
-                            UILabel label = property.getLabel();
-                            UIWidget editor = property.getEditor();
-                            editor.setTooltip(property.getDescription());
-
-                            layout.addWidget(label, new CCHint("newline"));
-                            layout.addWidget(editor, new CCHint());
-                        }
-                        invalidate();
+                        expand(propertyProvider, layout);
                         button.setText("-");
-                        button.setTooltip("Click to contract");
+                        button.setTooltip("Click to collapse");
                     }
                 }
             });
             addWidget(expand, new CCHint("newline, w 45!, h 22!"));
             addWidget(headline, new CCHint());
             addWidget(layout, new CCHint("newline, spanx 2"));
+
+            expand(propertyProvider, layout);
         }
+    }
+
+    private void expand(PropertyProvider<?> propertyProvider, MigLayout layout) {
+        List<Property<?, ?>> props = Lists.newArrayList(propertyProvider.getProperties());
+        Collections.sort(props, propertyComparator);
+        for (Property<?, ?> property : props) {
+            UILabel label = property.getLabel();
+            UIWidget editor = property.getEditor();
+            editor.setTooltip(property.getDescription());
+
+            layout.addWidget(label, new CCHint("newline"));
+            layout.addWidget(editor, new CCHint());
+        }
+        invalidate();
     }
 }
