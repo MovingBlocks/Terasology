@@ -86,6 +86,8 @@ public class ModuleManager {
 
     private void setupSandbox() {
         moduleSecurityManager = new ModuleSecurityManager();
+        // TODO: This one org.terasology entry is a hack and needs a proper fix
+        moduleSecurityManager.addAPIPackage("org.terasology.world.biomes");
         moduleSecurityManager.addAPIPackage("java.lang");
         moduleSecurityManager.addAPIPackage("java.lang.ref");
         moduleSecurityManager.addAPIPackage("java.math");
