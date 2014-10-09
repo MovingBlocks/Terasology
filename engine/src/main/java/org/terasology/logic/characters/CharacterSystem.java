@@ -150,24 +150,57 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
-    public void onFrob(FrobRequest event, EntityRef character) {
+    public void onActivationRequest(ActivationRequest event, EntityRef character) {
+        if (isPredictionOfEventCorrect(character, event)) {
+            event.getTarget().send(new ActivateEvent(event));
+        } else {
+            // TODO character.send(ActivationRequestDenied());
+        }
+    }
+
+    private boolean vectorsAreAboutEqual(Vector3f v1, Vector3f v2) {
+        Vector3f delta = new Vector3f();
+        delta.add(v1);
+        delta.sub(v2);
+        float epsilon = 0.0001f;
+        float deltaSquared = delta.lengthSquared();
+        return deltaSquared < epsilon;
+    }
+
+    private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
         LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         Vector3f direction = characterComponent.getLookDirection();
+        if (!(vectorsAreAboutEqual(event.getDirection(), direction))) {
+            logger.error("Direction at client {} was different than direction at server {}", event.getDirection(), direction);
+        }
+        // Assume the exact same value in case there are rounding mistakes:
+        direction = event.getDirection();
+
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
-
-        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
-        if (activeInteractionScreenUri != null) {
-            nuiManager.closeScreen(activeInteractionScreenUri);
-            return;
+        if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
+            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}", character.getComponent(CharacterComponent.class).controller, event.getOrigin(), originPos);
+            return false;
         }
 
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-        if (result.isHit()) {
-            result.getEntity().send(new ActivateEvent(character, character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
+        boolean predictionCorrect = true;
+        if (!result.isHit()) {
+            return false;
         }
+        EntityRef hitEntity = result.getEntity();
+        if (!hitEntity.equals(event.getTarget())) {
+            return false;
+        }
+
+        if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+            return false;
+        }
+
+        return true;
     }
+
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onDropItemRequest(DropItemRequest event, EntityRef character) {

@@ -17,6 +17,7 @@ package org.terasology.logic.common;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
+import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Vector3f;
@@ -48,6 +49,15 @@ public class ActivateEvent extends AbstractConsumableEvent {
         this.hitPosition = hitPosition;
         this.hitNormal = hitNormal;
         this.origin = origin;
+    }
+
+    public ActivateEvent(ActivationRequest event) {
+        this.instigator = event.getInstigator();
+        this.target = event.getTarget();
+        this.direction = event.getDirection();
+        this.hitPosition = event.getHitPosition();
+        this.hitNormal = event.getHitNormal();
+        this.origin = event.getOrigin();
     }
 
     public EntityRef getInstigator() {

@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -37,19 +38,26 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.FrobRequest;
+import org.terasology.logic.characters.events.ActivationPredicted;
+import org.terasology.logic.characters.events.ActivationRequest;
+import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -74,6 +82,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Camera playerCamera;
 
     @In
+    private Physics physics;
+
+    @In
     private Config config;
     private float bobFactor;
     private float lastStepDelta;
@@ -84,6 +95,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private boolean jump;
     private float lookPitch;
     private float lookYaw;
+
+    @In
+    private NUIManager nuiManager;
+
+    // TODO use same as CharacterSystem?
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
@@ -268,13 +285,29 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onFrobRequest(FrobButton event, EntityRef entity) {
+    public void onFrobRequest(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
             return;
         }
 
-        entity.send(new FrobRequest());
-        event.consume();
+        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
+        if (activeInteractionScreenUri != null) {
+            nuiManager.closeScreen(activeInteractionScreenUri);
+            return;
+        }
+
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
+
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        if (result.isHit()) {
+            result.getEntity().send(new ActivationPredicted(result.getEntity(), character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
+            character.send(new ActivationRequest(result.getEntity(), character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
+            event.consume();
+        }
     }
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
