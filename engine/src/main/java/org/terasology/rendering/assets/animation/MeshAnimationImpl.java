@@ -29,7 +29,7 @@ public class MeshAnimationImpl extends AbstractAsset<MeshAnimationData> implemen
 
     public MeshAnimationImpl(AssetUri uri, MeshAnimationData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
@@ -72,16 +72,12 @@ public class MeshAnimationImpl extends AbstractAsset<MeshAnimationData> implemen
     }
 
     @Override
-    public void reload(MeshAnimationData newData) {
+    protected void onReload(MeshAnimationData newData) {
         this.data = newData;
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

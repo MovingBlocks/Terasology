@@ -398,24 +398,20 @@ public class AssetManager {
                 dispose.add(asset);
             }
         }
-        assetCache.clear();
-
-        for (Asset<?> asset : keepAndReload) {
-            assetCache.put(asset.getURI(), asset);
-        }
 
         for (Asset<?> asset : keepAndReload) {
             reload(asset);
         }
 
         for (Asset<?> asset : dispose) {
-            logger.debug("Disposing {}", asset.getURI());
-            asset.dispose();
+            dispose(asset);
         }
     }
 
     public void dispose(Asset<?> asset) {
-        asset.dispose();
+        if (!asset.isDisposed()) {
+            asset.dispose();
+        }
         assetCache.remove(asset.getURI());
     }
 
@@ -453,8 +449,7 @@ public class AssetManager {
                         AssetData data = loadAssetData(override, true);
                         asset.reload((D) data);
                     } else {
-                        asset.dispose();
-                        assetCache.remove(override);
+                        dispose(asset);
                     }
                 }
             }

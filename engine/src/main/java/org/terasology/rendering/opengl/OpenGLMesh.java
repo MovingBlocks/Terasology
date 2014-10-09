@@ -85,16 +85,16 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
     public OpenGLMesh(AssetUri uri, MeshData data, GLBufferPool bufferPool) {
         super(uri);
         this.bufferPool = bufferPool;
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(MeshData newData) {
+    protected void onReload(MeshData newData) {
         buildMesh(newData);
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         hasTexCoord0 = false;
         hasTexCoord1 = false;
         hasColor = false;
@@ -108,11 +108,6 @@ public class OpenGLMesh extends AbstractAsset<MeshData> implements Mesh {
             bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;
         }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return vboVertexBuffer == 0 || vboIndexBuffer == 0;
     }
 
     @Override

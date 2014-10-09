@@ -71,11 +71,11 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     public OpenGLTexture(AssetUri uri, TextureData data) {
         super(uri);
 
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(TextureData data) {
+    protected void onReload(TextureData data) {
         this.width = data.getWidth();
         this.height = data.getHeight();
         this.depth = data.getDepth();
@@ -168,16 +168,11 @@ public class OpenGLTexture extends AbstractAsset<TextureData> implements Texture
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         if (id != 0) {
             glDeleteTextures(id);
             id = 0;
         }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return id == 0;
     }
 
     public int getId() {

@@ -29,22 +29,17 @@ public class HeadlessShader extends AbstractAsset<ShaderData> implements Shader 
 
     public HeadlessShader(AssetUri uri, ShaderData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(ShaderData data) {
+    protected void onReload(ShaderData data) {
         shaderProgramBase = data;
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         shaderProgramBase = null;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return shaderProgramBase == null;
     }
 
     @Override

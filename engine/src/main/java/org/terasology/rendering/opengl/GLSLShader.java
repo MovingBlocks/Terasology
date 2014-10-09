@@ -96,10 +96,11 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
 
     private ShaderData shaderProgramBase;
     private Map<String, ShaderParameterMetadata> parameters = Maps.newHashMap();
+    private boolean disposed = false;
 
     public GLSLShader(AssetUri uri, ShaderData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     public Set<ShaderProgramFeature> getAvailableFeatures() {
@@ -133,9 +134,13 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         logger.debug("Disposing shader {}.", getURI());
+        disposeData();
+        disposed = true;
+    }
 
+    private void disposeData() {
         TIntIntIterator it = fragmentPrograms.iterator();
         while (it.hasNext()) {
             it.advance();
@@ -153,15 +158,10 @@ public class GLSLShader extends AbstractAsset<ShaderData> implements Shader {
     }
 
     @Override
-    public boolean isDisposed() {
-        return shaderProgramBase == null;
-    }
-
-    @Override
-    public void reload(ShaderData data) {
+    protected void onReload(ShaderData data) {
         logger.debug("Recompiling shader {}.", getURI());
 
-        dispose();
+        onDispose();
         shaderProgramBase = data;
         parameters.clear();
         for (ShaderParameterMetadata metadata : shaderProgramBase.getParameterMetadata()) {

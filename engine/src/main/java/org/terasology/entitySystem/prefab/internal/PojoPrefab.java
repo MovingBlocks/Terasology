@@ -39,7 +39,7 @@ public class PojoPrefab extends Prefab {
 
     public PojoPrefab(AssetUri uri, PrefabData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
@@ -83,11 +83,11 @@ public class PojoPrefab extends Prefab {
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
     }
 
     @Override
-    public void reload(PrefabData data) {
+    protected void onReload(PrefabData data) {
         this.componentMap = ImmutableMap.copyOf(data.getComponents());
         this.persisted = data.isPersisted();
         this.alwaysRelevant = data.isAlwaysRelevant();
@@ -97,8 +97,4 @@ public class PojoPrefab extends Prefab {
         }
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

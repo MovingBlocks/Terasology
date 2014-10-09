@@ -43,7 +43,7 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     public OpenALSound(AssetUri uri, StaticSoundData data, OpenALManager audioManager) {
         super(uri);
         this.audioManager = audioManager;
-        reload(data);
+        onReload(data);
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         if (bufferId != 0) {
             audioManager.purgeSound(this);
             alDeleteBuffers(bufferId);
@@ -95,12 +95,7 @@ public final class OpenALSound extends AbstractAsset<StaticSoundData> implements
     }
 
     @Override
-    public boolean isDisposed() {
-        return bufferId == 0;
-    }
-
-    @Override
-    public void reload(StaticSoundData data) {
+    protected void onReload(StaticSoundData data) {
         if (bufferId == 0) {
             bufferId = alGenBuffers();
         } else {

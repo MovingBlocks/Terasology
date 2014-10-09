@@ -68,18 +68,13 @@ public class BehaviorTree extends AbstractAsset<BehaviorTreeData> {
     }
 
     @Override
-    public void reload(BehaviorTreeData newData) {
+    protected void onReload(BehaviorTreeData newData) {
         this.data = newData;
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         this.data = null;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return data == null;
     }
 
     public RenderableNode createNode(Node node) {

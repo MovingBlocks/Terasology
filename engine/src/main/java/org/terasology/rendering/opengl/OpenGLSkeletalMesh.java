@@ -67,11 +67,11 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     public OpenGLSkeletalMesh(AssetUri uri, SkeletalMeshData data, GLBufferPool bufferPool) {
         super(uri);
         this.bufferPool = bufferPool;
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(SkeletalMeshData newData) {
+    protected void onReload(SkeletalMeshData newData) {
         this.data = newData;
 
         if (vboPosNormBuffer == 0) {
@@ -100,7 +100,7 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         if (vboIndexBuffer != 0) {
             bufferPool.dispose(vboIndexBuffer);
             vboIndexBuffer = 0;
@@ -113,11 +113,6 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
             bufferPool.dispose(vboUVBuffer);
             vboUVBuffer = 0;
         }
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return vboPosNormBuffer == 0 && vboUVBuffer == 0 && vboIndexBuffer == 0;
     }
 
     public void preRender() {

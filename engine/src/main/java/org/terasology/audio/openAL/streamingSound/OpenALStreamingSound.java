@@ -42,7 +42,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, AudioManager audioManager) {
         super(uri);
         this.audioManager = audioManager;
-        reload(data);
+        onReload(data);
     }
 
     public int[] getBuffers() {
@@ -112,7 +112,7 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         // TODO: Fix this - probably failing if sound is playing
         for (int buffer : buffers) {
             if (buffer != 0) {
@@ -124,14 +124,9 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     }
 
     @Override
-    public void reload(StreamingSoundData data) {
+    protected void onReload(StreamingSoundData data) {
         stream = data;
         this.initializeBuffers();
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return buffers.length == 0;
     }
 
     @Override

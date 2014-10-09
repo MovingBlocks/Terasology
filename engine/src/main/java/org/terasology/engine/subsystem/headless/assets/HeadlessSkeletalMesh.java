@@ -29,23 +29,19 @@ public class HeadlessSkeletalMesh extends AbstractAsset<SkeletalMeshData> implem
 
     public HeadlessSkeletalMesh(AssetUri uri, SkeletalMeshData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(SkeletalMeshData skeletalMeshData) {
+    protected void onReload(SkeletalMeshData skeletalMeshData) {
         this.data = skeletalMeshData;
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         data = null;
     }
 
-    @Override
-    public boolean isDisposed() {
-        return data == null;
-    }
 
     @Override
     public int getVertexCount() {

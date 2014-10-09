@@ -30,23 +30,18 @@ public class HeadlessMesh extends AbstractAsset<MeshData> implements Mesh {
 
     public HeadlessMesh(AssetUri uri, MeshData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(MeshData meshData) {
+    protected void onReload(MeshData meshData) {
         this.data = meshData;
         this.aabb = AABB.createEncompasing(meshData.getVertices());
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         data = null;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return data == null;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
 
     public NullSound(AssetUri uri, StaticSoundData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
@@ -63,18 +63,14 @@ public class NullSound extends AbstractAsset<StaticSoundData> implements StaticS
     }
 
     @Override
-    public void reload(StaticSoundData data) {
+    protected void onReload(StaticSoundData data) {
         this.channels = data.getChannels();
         this.sampleRate = data.getSampleRate();
         this.length = data.getData().limit() / getChannels() / (data.getBufferBits() / 8) / getSamplingRate();
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
     }
 
-    @Override
-    public boolean isDisposed() {
-        return false;
-    }
 }

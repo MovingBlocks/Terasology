@@ -28,22 +28,17 @@ public class UISkin extends AbstractAsset<UISkinData> {
 
     public UISkin(AssetUri uri, UISkinData data) {
         super(uri);
-        reload(data);
+        onReload(data);
     }
 
     @Override
-    public void reload(UISkinData data) {
+    protected void onReload(UISkinData data) {
         this.skinData = data;
     }
 
     @Override
-    public void dispose() {
+    protected void onDispose() {
         this.skinData = null;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return skinData == null;
     }
 
     public UIStyle getDefaultStyle() {
