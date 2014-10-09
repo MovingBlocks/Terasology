@@ -6,7 +6,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 /**
  * Entities with this component will show an UI during interactions.
  *
- * Iteractions can be started and stopped by calling {@link org.terasology.logic.characters.CharacterUtil#setInteractionTarget(EntityRef, EntityRef)}
+ * Iteractions can be started and stopped by calling {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)}
  *
  * @author Florian <florian@fkoeberle.de>
  */

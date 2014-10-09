@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.interactions.InteractionStartEvent;
+import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.FieldReplicateType;
@@ -42,15 +43,16 @@ public final class CharacterComponent implements Component {
      */
     public float interactionRange = 5f;
     /**
-     * Specifies the current interaction target. It points for example to a standard chest when the player has opened it.
+     * authorizedInteractionTarget
      *
-     * Important: Use {@link CharacterUtil#setInteractionTarget(EntityRef, EntityRef)}} to set this value, so that the
+     * Important: Use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)}} to set this value, so that the
      * value.
      *
      * This {@link InteractionStartEvent} is sent to all clients when a
      */
     @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
     public EntityRef interactionTarget = EntityRef.NULL;
+
     public float pitch;
     public float yaw;
 
