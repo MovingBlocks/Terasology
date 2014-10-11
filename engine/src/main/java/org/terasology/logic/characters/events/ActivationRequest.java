@@ -43,7 +43,7 @@ public class ActivationRequest extends NetworkEvent {
     private Vector3f direction;
     private Vector3f hitPosition;
     private Vector3f hitNormal;
-    private int actiationId;
+    private int activationId;
 
     public ActivationRequest() {
     }
@@ -60,7 +60,7 @@ public class ActivationRequest extends NetworkEvent {
         this.hitPosition = hitPosition;
         this.hitNormal = hitNormal;
         this.origin = origin;
-        this.actiationId = activationId;
+        this.activationId = activationId;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ActivationRequest extends NetworkEvent {
      *
      * @return a number that can be used to distinguish multiple activations from the same player.
      */
-    public int getActiationId() {
-        return actiationId;
+    public int getActivationId() {
+        return activationId;
     }
 }

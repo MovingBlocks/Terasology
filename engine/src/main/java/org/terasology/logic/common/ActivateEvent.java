@@ -53,7 +53,7 @@ public class ActivateEvent extends AbstractConsumableEvent {
         this.hitPosition = event.getHitPosition();
         this.hitNormal = event.getHitNormal();
         this.origin = event.getOrigin();
-        this.activationId = event.getActiationId();
+        this.activationId = event.getActivationId();
     }
 
     public EntityRef getInstigator() {

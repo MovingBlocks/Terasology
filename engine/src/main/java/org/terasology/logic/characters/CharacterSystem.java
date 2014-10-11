@@ -136,7 +136,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 event.getTarget().send(new ActivateEvent(event));
             }
         } else {
-            // TODO character.send(ActivationRequestDenied());
+            character.send(new ActivationRequestDenied(event.getActivationId()));
         }
     }
 

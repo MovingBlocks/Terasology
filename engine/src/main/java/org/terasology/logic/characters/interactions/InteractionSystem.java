@@ -28,6 +28,7 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.ActivationPredicted;
+import org.terasology.logic.characters.events.ActivationRequestDenied;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -83,6 +84,11 @@ public class InteractionSystem extends BaseComponentSystem {
             character.saveComponent(characterComponent);
             target.send(new InteractionStartPredicted(character));
         }
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class}, netFilter = RegisterMode.AUTHORITY)
+    public void onActivationRequestDenied(ActivationRequestDenied event, EntityRef character) {
+        character.send(new InteractionEndEvent(event.getActivationId()));
     }
 
     @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
