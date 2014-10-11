@@ -130,7 +130,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
+    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivationRequest(ActivationRequest event, EntityRef character) {
         if (isPredictionOfEventCorrect(character, event)) {
             if (event.getUsedItem().exists()) {
