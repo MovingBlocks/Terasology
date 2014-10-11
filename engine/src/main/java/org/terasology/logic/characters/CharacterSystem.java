@@ -32,11 +32,14 @@ import org.terasology.logic.characters.events.*;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.*;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -149,6 +152,26 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         return deltaSquared < epsilon;
     }
 
+    private String getPlayerNameFromCharacter(EntityRef character) {
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return "?";
+        }
+        EntityRef controller = characterComponent.controller;
+
+        ClientComponent clientComponent =  controller.getComponent(ClientComponent.class);
+        if (characterComponent == null) {
+            return "?";
+        }
+        EntityRef clientInfo = clientComponent.clientInfo;
+
+        DisplayNameComponent displayNameComponent = clientInfo.getComponent(DisplayNameComponent.class);
+        if (displayNameComponent == null) {
+            return "?";
+        }
+        return displayNameComponent.name;
+    }
+
     private boolean isPredictionOfEventCorrect(EntityRef character, ActivationRequest event) {
         LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
@@ -162,50 +185,61 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
-            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}", character.getComponent(CharacterComponent.class).controller, event.getOrigin(), originPos);
+            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}", getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
             return false;
         }
 
         if (event.isItemUsage()) {
             if (!event.getUsedItem().exists()) {
+                logger.info("Denied activation attempt by {} since the used item does not exist on the authority", getPlayerNameFromCharacter(character));
                 return false;
             }
             if (!networkSystem.getOwnerEntity(event.getUsedItem()).equals(networkSystem.getOwnerEntity(character))) {
+                logger.info("Denied activation attempt by {} since it does not own the item at the authority", getPlayerNameFromCharacter(character));
                 return false;
             }
         } else {
             // check for cheats so that data can later be trusted:
             if (event.getUsedItem().exists()) {
+                logger.info("Denied activation attempt by {} since it is not properly marked as item usage", getPlayerNameFromCharacter(character));
                 return false;
             }
         }
 
         if (event.isEventWithTarget()) {
             if (!event.getTarget().exists()) {
+                logger.info("Denied activation attempt by {} since the target does not exist on the authority", getPlayerNameFromCharacter(character));
                 return false; // can happen if target existed on client
             }
 
             HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
             if (!result.isHit()) {
+                logger.info("Denied activation attempt by {} since at the authority there was nothing to activate at that place", getPlayerNameFromCharacter(character));
                 return false;
             }
             EntityRef hitEntity = result.getEntity();
             if (!hitEntity.equals(event.getTarget())) {
+                /**
+                 * Tip for debugging this issue: Obtain the network id of hit entity and search it in both client and
+                 * server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
+                 * hit test.
+                 */
+                logger.info("Denied activation attempt by {} since at the authority another entity would have been activated", getPlayerNameFromCharacter(character));
                 return false;
             }
 
             if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+                logger.info("Denied activation attempt by {} since at the authority the object got hit at a differnt position", getPlayerNameFromCharacter(character));
                 return false;
             }
         } else {
             // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
             if (event.getTarget().exists()) {
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a target", getPlayerNameFromCharacter(character));
                 return false;
             }
             if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
-                return false;
-            }
-            if (!event.getHitPosition().equals(new Vector3f())) {
+                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit postion", getPlayerNameFromCharacter(character));
                 return false;
             }
         }
