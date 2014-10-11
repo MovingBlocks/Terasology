@@ -19,6 +19,7 @@ package org.terasology.logic.characters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -26,6 +27,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.logic.characters.events.*;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.interactions.InteractionUtil;
@@ -33,9 +35,7 @@ import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.logic.inventory.PickupBuilder;
+import org.terasology.logic.inventory.*;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
@@ -74,9 +74,11 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @In
     private NUIManager nuiManager;
 
+
     private PickupBuilder pickupBuilder;
 
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+
 
     @Override
     public void initialise() {
@@ -91,30 +93,6 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         //entity.removeComponent(CharacterComponent.class);
         //entity.removeComponent(CharacterMovementComponent.class);
         entity.destroy();
-    }
-
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
-    public void onUseItem(UseItemRequest event, EntityRef character) {
-
-        if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
-            return;
-        }
-
-        LocationComponent location = character.getComponent(LocationComponent.class);
-        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
-        Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
-
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-
-        if (result.isHit()) {
-            event.getItem().send(new ActivateEvent(result.getEntity(), character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
-        } else {
-            originPos.y += characterComponent.eyeOffset;
-            event.getItem().send(new ActivateEvent(character, originPos, direction));
-        }
-
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
@@ -152,7 +130,11 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onActivationRequest(ActivationRequest event, EntityRef character) {
         if (isPredictionOfEventCorrect(character, event)) {
-            event.getTarget().send(new ActivateEvent(event));
+            if (event.getUsedItem().exists()) {
+                event.getUsedItem().send(new ActivateEvent(event));
+            } else {
+                event.getTarget().send(new ActivateEvent(event));
+            }
         } else {
             // TODO character.send(ActivationRequestDenied());
         }
@@ -184,20 +166,49 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return false;
         }
 
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-        boolean predictionCorrect = true;
-        if (!result.isHit()) {
-            return false;
-        }
-        EntityRef hitEntity = result.getEntity();
-        if (!hitEntity.equals(event.getTarget())) {
-            return false;
+        if (event.isItemUsage()) {
+            if (!event.getUsedItem().exists()) {
+                return false;
+            }
+            if (!networkSystem.getOwnerEntity(event.getUsedItem()).equals(networkSystem.getOwnerEntity(character))) {
+                return false;
+            }
+        } else {
+            // check for cheats so that data can later be trusted:
+            if (event.getUsedItem().exists()) {
+                return false;
+            }
         }
 
-        if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
-            return false;
-        }
+        if (event.isEventWithTarget()) {
+            if (!event.getTarget().exists()) {
+                return false; // can happen if target existed on client
+            }
 
+            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+            if (!result.isHit()) {
+                return false;
+            }
+            EntityRef hitEntity = result.getEntity();
+            if (!hitEntity.equals(event.getTarget())) {
+                return false;
+            }
+
+            if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
+                return false;
+            }
+        } else {
+            // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
+            if (event.getTarget().exists()) {
+                return false;
+            }
+            if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
+                return false;
+            }
+            if (!event.getHitPosition().equals(new Vector3f())) {
+                return false;
+            }
+        }
         return true;
     }
 

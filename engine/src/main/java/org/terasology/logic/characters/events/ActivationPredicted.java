@@ -37,7 +37,7 @@ public class ActivationPredicted implements Event {
     public ActivationPredicted() {
     }
 
-    public ActivationPredicted(EntityRef target, EntityRef instigator, Vector3f origin, Vector3f direction, Vector3f hitPosition, Vector3f hitNormal) {
+    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction, Vector3f hitPosition, Vector3f hitNormal) {
         this.instigator = instigator;
         this.target = target;
         this.direction = direction;

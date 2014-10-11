@@ -28,6 +28,16 @@ import javax.vecmath.Vector3f;
 @ServerEvent(lagCompensate = true)
 public class ActivationRequest extends NetworkEvent {
     private EntityRef instigator;
+    /**
+     * The field is used to preserve the fact that an item got used, even when the item is no more at the target server.
+     */
+    private boolean itemUsage;
+    private EntityRef usedItem;
+    /**
+     * The field is used to preserve the fact if a target got hit on the client, even when the hit target entity does
+     * not exist at the target server.
+     */
+    private boolean eventWithTarget;
     private EntityRef target;
     private Vector3f origin;
     private Vector3f direction;
@@ -37,8 +47,13 @@ public class ActivationRequest extends NetworkEvent {
     public ActivationRequest() {
     }
 
-    public ActivationRequest(EntityRef target, EntityRef instigator, Vector3f origin, Vector3f direction, Vector3f hitPosition, Vector3f hitNormal) {
+    public ActivationRequest(EntityRef instigator, boolean itemUsage, EntityRef usedItem,
+                             boolean eventWithTarget, EntityRef target, Vector3f origin, Vector3f direction,
+                             Vector3f hitPosition, Vector3f hitNormal) {
         this.instigator = instigator;
+        this.itemUsage = itemUsage;
+        this.usedItem = usedItem;
+        this.eventWithTarget = eventWithTarget;
         this.target = target;
         this.direction = direction;
         this.hitPosition = hitPosition;
@@ -49,6 +64,18 @@ public class ActivationRequest extends NetworkEvent {
     @Override
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public boolean isItemUsage() {
+        return itemUsage;
+    }
+
+    public EntityRef getUsedItem() {
+        return usedItem;
+    }
+
+    public boolean isEventWithTarget() {
+        return eventWithTarget;
     }
 
     public EntityRef getTarget() {

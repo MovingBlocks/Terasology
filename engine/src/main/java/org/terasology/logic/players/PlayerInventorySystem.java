@@ -26,12 +26,10 @@ import org.terasology.input.binds.inventory.DropItemButton;
 import org.terasology.input.binds.inventory.ToolbarNextButton;
 import org.terasology.input.binds.inventory.ToolbarPrevButton;
 import org.terasology.input.binds.inventory.ToolbarSlotButton;
-import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.DropItemRequest;
-import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.event.SelectItemRequest;
@@ -103,23 +101,6 @@ public class PlayerInventorySystem extends BaseComponentSystem {
         event.consume();
     }
 
-    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
-    public void onUseItemButton(UseItemButton event, EntityRef entity) {
-        if (!event.isDown() || time.getGameTimeInMs() - lastInteraction < 200) {
-            return;
-        }
-
-        CharacterComponent character = entity.getComponent(CharacterComponent.class);
-
-        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, character.selectedItem);
-
-        entity.send(new UseItemRequest(selectedItemEntity));
-
-        lastInteraction = time.getGameTimeInMs();
-        character.handAnimation = 0.5f;
-        entity.saveComponent(character);
-        event.consume();
-    }
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onAttackRequest(AttackButton event, EntityRef entity) {
