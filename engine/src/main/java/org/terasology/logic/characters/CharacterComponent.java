@@ -19,8 +19,8 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.interactions.InteractionEndPredicted;
 import org.terasology.logic.characters.interactions.InteractionStartPredicted;
-import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.FieldReplicateType;
@@ -45,24 +45,37 @@ public final class CharacterComponent implements Component {
     /**
      * The current interaction target of a character which has been authorized by the authority (e.g. the server).
      *
-     * Modules should not modify this field directly. Instead they should use
-     * {@link InteractionUtil#cancelInteraction(EntityRef)}}
-     *
-     *
-     * Important: Use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)}} to set this value, so that the
-     * value.
-     *
-     * This {@link InteractionStartPredicted} is sent to all clients when a
+     * Modules should not modify this field directly.
      */
     public EntityRef authorizedInteractionTarget = EntityRef.NULL;
+    /**
+     * This field is only set for clients (including clients that are servers).
+     *
+     * It contains the number of the activationId that caused the interaction start.
+     *
+     * The field is used to tell the client which interaction got canceled. Thus if the client has started another
+     * interaction when it receives the old cancel, it won't wrongly cancel the new interaction.
+     */
+    public int authorizedInteractionId;
 
     /**
      * This field is only set for clients (including clients that are servers). The clients set it
      * best to their knowledge.
      *
-     * {@link InteractionStartPredicted} event will be sent.
+     * The events {@link InteractionStartPredicted} and {@link InteractionEndPredicted} inform about changes of this
+     * field.
      */
     public EntityRef predictedInteractionTarget = EntityRef.NULL;
+
+    /**
+     * This field is only set for clients (including clients that are servers).
+     *
+     * It contains the number of the activationId that caused the interaction start.
+     *
+     * The field is used to determine if a incoming interaction cancel is for the current interaction or not.
+     */
+    public int predictedInteractionId;
+
 
     public float pitch;
     public float yaw;

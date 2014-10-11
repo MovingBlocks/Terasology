@@ -67,13 +67,14 @@ public class InteractionUtil {
             logger.error("Interaction end request instigator has no character component");
             return;
         }
+        int oldInteractionId = characterComponent.authorizedInteractionId;
         EntityRef oldTarget = characterComponent.authorizedInteractionTarget;
         if (oldTarget.exists()) {
             characterComponent.authorizedInteractionTarget =EntityRef.NULL;
             character.saveComponent(characterComponent);
         }
 
-        oldTarget.send(new InteractionEndEvent(character));
+        character.send(new InteractionEndEvent(oldInteractionId));
     }
 
     /**

@@ -33,17 +33,20 @@ public class ActivationPredicted implements Event {
     private Vector3f direction;
     private Vector3f hitPosition;
     private Vector3f hitNormal;
+    private int activationId;
 
     public ActivationPredicted() {
     }
 
-    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction, Vector3f hitPosition, Vector3f hitNormal) {
+    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction,
+                               Vector3f hitPosition, Vector3f hitNormal, int activationId) {
         this.instigator = instigator;
         this.target = target;
         this.direction = direction;
         this.hitPosition = hitPosition;
         this.hitNormal = hitNormal;
         this.origin = origin;
+        this.activationId = activationId;
     }
 
     public EntityRef getInstigator() {
@@ -70,6 +73,9 @@ public class ActivationPredicted implements Event {
         return hitNormal;
     }
 
+    public int getActivationId() {
+        return activationId;
+    }
 
     public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);

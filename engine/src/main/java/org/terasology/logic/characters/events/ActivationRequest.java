@@ -43,13 +43,14 @@ public class ActivationRequest extends NetworkEvent {
     private Vector3f direction;
     private Vector3f hitPosition;
     private Vector3f hitNormal;
+    private int actiationId;
 
     public ActivationRequest() {
     }
 
     public ActivationRequest(EntityRef instigator, boolean itemUsage, EntityRef usedItem,
                              boolean eventWithTarget, EntityRef target, Vector3f origin, Vector3f direction,
-                             Vector3f hitPosition, Vector3f hitNormal) {
+                             Vector3f hitPosition, Vector3f hitNormal, int activationId) {
         this.instigator = instigator;
         this.itemUsage = itemUsage;
         this.usedItem = usedItem;
@@ -59,6 +60,7 @@ public class ActivationRequest extends NetworkEvent {
         this.hitPosition = hitPosition;
         this.hitNormal = hitNormal;
         this.origin = origin;
+        this.actiationId = activationId;
     }
 
     @Override
@@ -96,5 +98,13 @@ public class ActivationRequest extends NetworkEvent {
 
     public Vector3f getHitNormal() {
         return hitNormal;
+    }
+
+    /**
+     *
+     * @return a number that can be used to distinguish multiple activations from the same player.
+     */
+    public int getActiationId() {
+        return actiationId;
     }
 }

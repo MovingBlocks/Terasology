@@ -19,32 +19,29 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
+import org.terasology.network.OwnerEvent;
+
 /**
- * Represents the start of an interaction between for example a character and a container.
+ * Represents the end of an interaction between for example a character and a container.
  *
- * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
- * so.
+ * The event is sent via the character.
  *
- * When event handler with priority low or higher runs, the  interactionTarget field of the instigator's
- * CharacterComponent will still have the old value.
+ * The event is sent by the server to the owner of the character..
  *
  * @author Florian <florian@fkoeberle.de>
  */
-@BroadcastEvent
+@OwnerEvent
 public class InteractionEndEvent implements Event {
-    private EntityRef instigator;
+    private int interactionId;
 
     protected InteractionEndEvent() {
     }
 
-    public InteractionEndEvent(EntityRef instigator) {
-        this.instigator = instigator;
+    public InteractionEndEvent(int interactionId) {
+        this.interactionId = interactionId;
     }
 
-    /**
-     * @return the character which started the interaction.
-     */
-    public EntityRef getInstigator() {
-        return instigator;
+    public int getInteractionId() {
+        return interactionId;
     }
 }

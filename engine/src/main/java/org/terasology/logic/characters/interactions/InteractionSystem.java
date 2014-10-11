@@ -58,10 +58,11 @@ public class InteractionSystem extends BaseComponentSystem {
         }
         if (characterComponent.authorizedInteractionTarget.exists()) {
             logger.error("Interaction wasn't finished at start of next interaction");
-            target.send(new InteractionEndEvent(instigator));
+            instigator.send(new InteractionEndEvent(characterComponent.authorizedInteractionId));
         }
 
         characterComponent.authorizedInteractionTarget = target;
+        characterComponent.authorizedInteractionId = event.getActivationId();
         instigator.saveComponent(characterComponent);
 
     }
@@ -78,6 +79,7 @@ public class InteractionSystem extends BaseComponentSystem {
         }
         if (target.exists()) {
             characterComponent.predictedInteractionTarget = target;
+            characterComponent.predictedInteractionId = event.getActivationId();
             character.saveComponent(characterComponent);
             target.send(new InteractionStartPredicted(character));
         }
@@ -88,10 +90,11 @@ public class InteractionSystem extends BaseComponentSystem {
         InteractionUtil.cancelInteractionAsServer(instigator);
     }
 
-    @ReceiveEvent(components = {InteractionTargetComponent.class})
-    public void onInteractionEnd(InteractionEndEvent event, EntityRef container) {
-        EntityRef investigator = event.getInstigator();
-        InteractionUtil.cancelInteractionAsClient(investigator, false);
+    @ReceiveEvent(components = {CharacterComponent.class})
+    public void onInteractionEnd(InteractionEndEvent event, EntityRef character, CharacterComponent characterComponent) {
+        if (event.getInteractionId() == characterComponent.predictedInteractionId) {
+            InteractionUtil.cancelInteractionAsClient(character, false);
+        }
     }
 
     @ReceiveEvent(components = {InteractionTargetComponent.class, InteractionScreenComponent.class})

@@ -114,6 +114,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
+    private int nextActivationId = 0;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -322,21 +323,21 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
         boolean itemUsage = usedItem.exists();
-
+        int activationId = nextActivationId++;
         HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
         boolean eventWithTarget = result.isHit();
         if (eventWithTarget) {
             EntityRef activatedObject = usedItem.exists() ? usedItem : result.getEntity();
             activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
-                    result.getHitPoint(), result.getHitNormal()));
+                    result.getHitPoint(), result.getHitNormal(), activationId));
             character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, result.getEntity(),
-                    originPos, direction, result.getHitPoint(), result.getHitNormal()));
+                    originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
             return true;
         } else if (itemUsage) {
             usedItem.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f()));
+                    originPos, new Vector3f(), activationId));
             character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f()));
+                    originPos, direction, originPos, new Vector3f(), activationId));
             return true;
         }
         return false;
