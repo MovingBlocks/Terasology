@@ -17,38 +17,36 @@ package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.ServerEvent;
+import org.terasology.network.BroadcastEvent;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
  *
- * Requests the server to announce the start of an interaction between for example a character and a container.
+ * Sent to the client by itself at the start of an interaction between a character and a target.
  *
- * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
- * so.
+ * THe event is sent to the target entity.
  *
- * The event is sent to the investigator as the own character is one of the few entity a client is
- * allowed to send events to.
- * *
- * The server sets the interactionTarget field of the character (instigator = character entity).
+ * This event is not intended to be sent by modules.
+ *
+ * When event handler runs, the  predictedInteractionTarget field of the instigator's
+ * CharacterComponent will already be updated to the new value.
  *
  * @author Florian <florian@fkoeberle.de>
  */
-@ServerEvent
-public class InteractionStartRequest implements Event {
-    private EntityRef target;
+public class InteractionStartPredicted implements Event {
+    private EntityRef instigator;
 
-    protected InteractionStartRequest() {
+    protected InteractionStartPredicted() {
     }
 
-    public InteractionStartRequest(EntityRef target) {
-        this.target = target;
+    public InteractionStartPredicted(EntityRef instigator) {
+        this.instigator = instigator;
     }
 
     /**
-     * @return the entity with which the character started interacting with.
+     * @return he character which started the interaction.
      */
-    public EntityRef getTarget() {
-        return target;
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

@@ -38,7 +38,8 @@
   "PlaySoundAction" : {
     sounds = "engine:click"
   },
-  "interactionScreen": {
+  "InteractionTarget": {},
+  "InteractionScreen": {
     "screen": "engine:containerScreen"
   },
   "Network" : {

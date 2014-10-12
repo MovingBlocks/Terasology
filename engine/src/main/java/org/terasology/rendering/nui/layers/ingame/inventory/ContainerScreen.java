@@ -50,7 +50,7 @@ public class ContainerScreen extends CoreScreenLayer {
             public EntityRef get() {
                 EntityRef characterEntity = localPlayer.getCharacterEntity();
                 CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
-                return characterComponent.interactionTarget;
+                return characterComponent.predictedInteractionTarget;
             }
         });
     }

@@ -301,7 +301,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
-            nuiManager.closeScreen(activeInteractionScreenUri);
+            InteractionUtil.cancelInteractionAsClient(character);
             return;
         }
         boolean activeRequestSent = activateTargetOrItem(character, EntityRef.NULL);

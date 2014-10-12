@@ -236,7 +236,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             if (characterLocation == null) {
                 continue; // could have changed during events below
             }
-            EntityRef target = characterComponent.interactionTarget;
+            EntityRef target = characterComponent.authorizedInteractionTarget;
             if (target.isActive()) {
 
                 LocationComponent targetLocation = target.getComponent(LocationComponent.class);
@@ -245,7 +245,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                 }
                 float maxInteractionRange = characterComponent.interactionRange;
                 if (isDistanceToLarge(characterLocation, targetLocation, maxInteractionRange)) {
-                    InteractionUtil.setInteractionTarget(characterEntity, EntityRef.NULL);
+                    InteractionUtil.cancelInteractionAsServer(characterEntity);
                 }
             }
         }

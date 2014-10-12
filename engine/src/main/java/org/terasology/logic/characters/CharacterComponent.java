@@ -19,7 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.interactions.InteractionStartEvent;
+import org.terasology.logic.characters.interactions.InteractionStartPredicted;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
@@ -43,15 +43,26 @@ public final class CharacterComponent implements Component {
      */
     public float interactionRange = 5f;
     /**
-     * authorizedInteractionTarget
+     * The current interaction target of a character which has been authorized by the authority (e.g. the server).
+     *
+     * Modules should not modify this field directly. Instead they should use
+     * {@link InteractionUtil#cancelInteraction(EntityRef)}}
+     *
      *
      * Important: Use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)}} to set this value, so that the
      * value.
      *
-     * This {@link InteractionStartEvent} is sent to all clients when a
+     * This {@link InteractionStartPredicted} is sent to all clients when a
      */
-    @Replicate(FieldReplicateType.SERVER_TO_CLIENT)
-    public EntityRef interactionTarget = EntityRef.NULL;
+    public EntityRef authorizedInteractionTarget = EntityRef.NULL;
+
+    /**
+     * This field is only set for clients (including clients that are servers). The clients set it
+     * best to their knowledge.
+     *
+     * {@link InteractionStartPredicted} event will be sent.
+     */
+    public EntityRef predictedInteractionTarget = EntityRef.NULL;
 
     public float pitch;
     public float yaw;

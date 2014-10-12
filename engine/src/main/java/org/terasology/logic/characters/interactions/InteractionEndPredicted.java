@@ -1,11 +1,11 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,36 +17,33 @@ package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.network.BroadcastEvent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
  *
- * Represents the start of an interaction between for example a character and a container.
+ * Sent to the client by itself at the end of an interaction between a character and a target.
  *
- * Don't send this event manually. Instead use {@link InteractionUtil#setInteractionTarget(EntityRef, EntityRef)} to do
- * so.
+ * THe event is sent to the target entity.
  *
- * The event is sent to the target entity at all clients.
+ * This event should not be sent manually by modules: Modules that want to end an interaction should use the utility
+ * class {@link InteractionUtil} to do so.
  *
- * When event handler runs, the  interactionTarget field of the instigator's
+ * When event handler runs, the  predictedInteractionTarget field of the instigator's
  * CharacterComponent will already be updated to the new value.
  *
  * @author Florian <florian@fkoeberle.de>
  */
-@BroadcastEvent
-public class InteractionStartEvent implements Event {
+public class InteractionEndPredicted implements Event {
     private EntityRef instigator;
 
-    protected InteractionStartEvent() {
+    protected InteractionEndPredicted() {
     }
 
-    public InteractionStartEvent(EntityRef instigator) {
+    public InteractionEndPredicted(EntityRef instigator) {
         this.instigator = instigator;
     }
 
     /**
-     * @return he character which started the interaction.
+     * @return the character which stopped the interaction.
      */
     public EntityRef getInstigator() {
         return instigator;

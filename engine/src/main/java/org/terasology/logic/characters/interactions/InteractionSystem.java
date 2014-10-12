@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -46,31 +47,67 @@ public class InteractionSystem extends BaseComponentSystem {
     @In
     private NUIManager nuiManager;
 
-    @ReceiveEvent(components = {InteractionScreenComponent.class}, netFilter = RegisterMode.AUTHORITY)
-    public void onActivate(ActivateEvent event, EntityRef entity) {
+    @ReceiveEvent(components = {InteractionTargetComponent.class}, netFilter = RegisterMode.AUTHORITY)
+    public void onActivate(ActivateEvent event, EntityRef target) {
         EntityRef instigator = event.getInstigator();
 
         CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
+            logger.error("Interaction start request instigator has no character component");
             return;
         }
-
-        if (characterComponent.interactionTarget.exists()) {
-            InteractionUtil.setInteractionTarget(instigator, entity);
+        if (characterComponent.authorizedInteractionTarget.exists()) {
+            logger.error("Interaction wasn't finished at start of next interaction");
+            target.send(new InteractionEndEvent(instigator));
         }
 
-
-        InteractionUtil.setInteractionTarget(instigator, entity);
+        characterComponent.authorizedInteractionTarget = target;
+        instigator.saveComponent(characterComponent);
 
     }
 
+    @ReceiveEvent(components = {InteractionTargetComponent.class})
+    public void onActivationPredicted(ActivationPredicted event, EntityRef target) {
+        EntityRef character = event.getInstigator();
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            return;
+        }
+        if (characterComponent.predictedInteractionTarget.exists()) {
+            InteractionUtil.cancelInteractionAsClient(character);
+        }
+        if (target.exists()) {
+            characterComponent.predictedInteractionTarget = target;
+            character.saveComponent(characterComponent);
+            target.send(new InteractionStartPredicted(character));
+        }
+    }
+
+    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
+    public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
+        InteractionUtil.cancelInteractionAsServer(instigator);
+    }
+
+    @ReceiveEvent(components = {InteractionTargetComponent.class})
+    public void onInteractionEnd(InteractionEndEvent event, EntityRef container) {
+        EntityRef investigator = event.getInstigator();
+        InteractionUtil.cancelInteractionAsClient(investigator, false);
+    }
+
+    @ReceiveEvent(components = {InteractionTargetComponent.class, InteractionScreenComponent.class})
+    public void onInteractionEndPredicted(InteractionEndPredicted event, EntityRef target,
+                                          InteractionScreenComponent screenComponent) {
+        nuiManager.closeScreen(screenComponent.screen);
+    }
+
+
     @ReceiveEvent(components = {InteractionScreenComponent.class})
-    public void onInteractionStart(InteractionStartEvent event, EntityRef container,
+    public void onInteractionStartPredicted(InteractionStartPredicted event, EntityRef container,
                                    InteractionScreenComponent interactionScreenComponent) {
         EntityRef investigator = event.getInstigator();
         CharacterComponent characterComponent = investigator.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
-            logger.error("Interaction started by entity without character component");
+            logger.error("Interaction start predicted for entity without character component");
             return;
         }
         ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
@@ -79,27 +116,10 @@ public class InteractionSystem extends BaseComponentSystem {
         }
     }
 
-    @ReceiveEvent(components = {InteractionScreenComponent.class})
-    public void onInteractionEnd(InteractionEndEvent event, EntityRef container,
-                                 InteractionScreenComponent interactionScreenComponent) {
-        EntityRef investigator = event.getInstigator();
-        CharacterComponent characterComponent = investigator.getComponent(CharacterComponent.class);
-        if (characterComponent == null) {
-            logger.error("Interaction started by entity without character component");
-            return;
-        }
-        ClientComponent controller = characterComponent.controller.getComponent(ClientComponent.class);
-        if (controller != null && controller.local) {
-            nuiManager.closeScreen(interactionScreenComponent.screen);
-        }
-    }
-
-
     /**
      * The method listens for the event that the user closes the screen of the current interaction target.
      *
-     * When it happens it updates the interactionTarget field via
-     * {@link InteractionUtil#setInteractionTarget(EntityRef,EntityRef)}.
+     * When it happens then it cancels the interaction.
      */
     @ReceiveEvent(components = {ClientComponent.class})
     public void onScreenLayerClosed(ScreenLayerClosedEvent event, EntityRef container, ClientComponent clientComponent) {
@@ -107,7 +127,7 @@ public class InteractionSystem extends BaseComponentSystem {
         AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
 
         if ((activeInteractionScreenUri != null) && (activeInteractionScreenUri.equals(event.getClosedScreenUri()))) {
-            InteractionUtil.setInteractionTarget(clientComponent.character, EntityRef.NULL);
+            InteractionUtil.cancelInteractionAsClient(clientComponent.character);
         }
     }
 
@@ -127,46 +147,9 @@ public class InteractionSystem extends BaseComponentSystem {
         EntityRef character = clientComponent.character;
         AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
         if (activeInteractionScreenUri != null) {
-            nuiManager.closeScreen(activeInteractionScreenUri);
+            InteractionUtil.cancelInteractionAsClient(character);
             // do not consume the event, so that the inventory will still open
         }
-    }
-
-    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
-    public void onInteractionStartRequest(InteractionStartRequest request, EntityRef instigator) {
-        EntityRef target = request.getTarget();
-
-        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
-        if (characterComponent == null) {
-            logger.error("Interaction start request instigator has no character component");
-            return;
-        }
-        if (characterComponent.interactionTarget.exists()) {
-            logger.error("Interaction wasn't finished at start of next interaction");
-            target.send(new InteractionEndEvent(instigator));
-        }
-
-        characterComponent.interactionTarget = target;
-        instigator.saveComponent(characterComponent);
-
-        target.send(new InteractionStartEvent(instigator));
-    }
-
-
-    @ReceiveEvent(components = {}, netFilter = RegisterMode.AUTHORITY)
-    public void onInteractionEndRequest(InteractionEndRequest request, EntityRef instigator) {
-        EntityRef target = request.getTarget();
-
-        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
-        if (characterComponent == null) {
-            logger.error("Interaction end request instigator has no character component");
-            return;
-        }
-
-        characterComponent.interactionTarget = EntityRef.NULL;
-        instigator.saveComponent(characterComponent);
-
-        target.send(new InteractionEndEvent(instigator));
     }
 
 }

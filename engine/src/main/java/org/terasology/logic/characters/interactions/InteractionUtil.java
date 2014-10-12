@@ -34,33 +34,60 @@ public class InteractionUtil {
     }
 
 
-    public static void setInteractionTarget(EntityRef instigator, EntityRef target) {
-        CharacterComponent characterComponent = instigator.getComponent(CharacterComponent.class);
+    /**
+     * This method can be used by clients to request the cancelation of an interaction.
+     * The client will update it's
+     */
+    public static void cancelInteractionAsClient(EntityRef character) {
+        cancelInteractionAsClient(character, true);
+    }
+
+    static void cancelInteractionAsClient(EntityRef character, boolean notifyServer) {
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
             logger.error("Interaction instigator has no character component");
             return;
         }
-        EntityRef oldTarget = characterComponent.interactionTarget;
+
+        EntityRef oldTarget = characterComponent.predictedInteractionTarget;
         if (oldTarget.exists()) {
-            instigator.send(new InteractionEndRequest(oldTarget));
+            characterComponent.predictedInteractionTarget = EntityRef.NULL;
+            character.saveComponent(characterComponent);
+            oldTarget.send(new InteractionEndPredicted(character));
+            if (notifyServer) {
+                character.send(new InteractionEndRequest());
+            }
         }
-        if (target.exists()) {
-            instigator.send(new InteractionStartRequest(target));
+    }
+
+
+    public static void cancelInteractionAsServer(EntityRef character) {
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Interaction end request instigator has no character component");
+            return;
         }
+        EntityRef oldTarget = characterComponent.authorizedInteractionTarget;
+        if (oldTarget.exists()) {
+            characterComponent.authorizedInteractionTarget =EntityRef.NULL;
+            character.saveComponent(characterComponent);
+        }
+
+        oldTarget.send(new InteractionEndEvent(character));
     }
 
     /**
      *
-     * @return the active interaction screen uri of the specified character. Due to network delays
-     * it can happen that the returned dialog is already closed. The method returns null if the player
-     * has no interaction screen open.
+     * @return the active interaction screen uri of the specified character.
+     * The method returns null if the player has no interaction screen open.
+     * The method is only intended to be called for the own character.
      */
     public static AssetUri getActiveInteractionScreenUri(EntityRef character) {
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
         if (characterComponent == null) {
             return null;
         }
-        EntityRef interactionTarget = characterComponent.interactionTarget;
+        EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
         if (!interactionTarget.exists()) {
             return null;
         }

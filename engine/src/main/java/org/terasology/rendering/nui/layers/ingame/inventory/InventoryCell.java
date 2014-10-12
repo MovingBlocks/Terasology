@@ -148,7 +148,7 @@ public class InventoryCell extends ItemCell {
         }
         int totalSlotCount = playerInventory.itemSlots.size();
 
-        EntityRef interactionTarget = characterComponent.interactionTarget;
+        EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
         InventoryComponent interactionTargetInventory = interactionTarget.getComponent(InventoryComponent.class);
 
 
