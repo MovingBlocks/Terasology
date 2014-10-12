@@ -18,11 +18,13 @@ package org.terasology.world.block.regions;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Region3i;
+import org.terasology.network.Replicate;
 
 /**
  * @author Immortius
  */
 public class BlockRegionComponent implements Component {
+    @Replicate
     public Region3i region = Region3i.EMPTY;
     public boolean overrideBlockEntities = true;
 
