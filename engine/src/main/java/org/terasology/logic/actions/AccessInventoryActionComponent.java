@@ -16,11 +16,15 @@
 package org.terasology.logic.actions;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.logic.characters.InteractionScreenComponent;
 
 /**
  * When activated, gives the instigator access to the inventory of the entity.
  *
  * @author Immortius <immortius@gmail.com>
+ *
+ * @deprecated Got replaced by {@link InteractionScreenComponent}.
  */
+@Deprecated
 public class AccessInventoryActionComponent implements Component {
 }

@@ -38,7 +38,9 @@
   "PlaySoundAction" : {
     sounds = "engine:click"
   },
-  "AccessInventoryAction": {},
+  "interactionScreen": {
+    "screen": "engine:containerScreen"
+  },
   "Network" : {
   }
 }

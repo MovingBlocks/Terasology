@@ -46,14 +46,20 @@ public class ContainerScreen extends CoreScreenLayer {
         inventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
             @Override
             public EntityRef get() {
-                EntityRef characterEntity = localPlayer.getCharacterEntity();
-                CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
-                return characterComponent.interactionTarget;
+                return localPlayer.getCharacterEntity();
             }
         });
         inventory.setCellOffset(10);
 
         containerInventory = find("container", InventoryGrid.class);
+        containerInventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
+            @Override
+            public EntityRef get() {
+                EntityRef characterEntity = localPlayer.getCharacterEntity();
+                CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
+                return characterComponent.interactionTarget;
+            }
+        });
     }
 
     @Override
