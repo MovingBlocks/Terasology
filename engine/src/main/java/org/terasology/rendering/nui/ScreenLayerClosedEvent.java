@@ -17,6 +17,7 @@ package org.terasology.rendering.nui;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 import org.terasology.network.OwnerEvent;
 
 /**
@@ -25,6 +26,7 @@ import org.terasology.network.OwnerEvent;
  * @author Florian <florian@fkoeberle.de>
  */
 @OwnerEvent
+@API
 public class ScreenLayerClosedEvent implements Event {
     private AssetUri closedScreenUri;
 

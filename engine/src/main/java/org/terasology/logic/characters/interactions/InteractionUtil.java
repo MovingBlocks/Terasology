@@ -22,10 +22,12 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.module.sandbox.API;
 
 /**
  * Utility class for entities with the {@link org.terasology.logic.characters.CharacterComponent}.
  */
+@API
 public class InteractionUtil {
     private static final Logger logger = LoggerFactory.getLogger(InteractionUtil.class);
 
