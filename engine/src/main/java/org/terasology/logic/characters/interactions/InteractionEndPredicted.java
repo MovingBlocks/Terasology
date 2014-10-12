@@ -17,6 +17,7 @@ package org.terasology.logic.characters.interactions;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.module.sandbox.API;
 
 /**
  *
@@ -32,6 +33,7 @@ import org.terasology.entitySystem.event.Event;
  *
  * @author Florian <florian@fkoeberle.de>
  */
+@API
 public class InteractionEndPredicted implements Event {
     private EntityRef instigator;
 
