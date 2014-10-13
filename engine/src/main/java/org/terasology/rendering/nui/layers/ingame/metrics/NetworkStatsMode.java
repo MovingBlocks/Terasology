@@ -25,39 +25,41 @@ import org.terasology.registry.CoreRegistry;
  * @author Immortius
  */
 final class NetworkStatsMode extends MetricsMode {
-    private long lastSecond;
+    private long lastTime;
     private Time time;
     private NetworkSystem networkSystem;
+    private String lastMetric;
 
 
     public NetworkStatsMode() {
         super("Network");
+        lastMetric = getName();
         time = CoreRegistry.get(Time.class);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
     }
 
     @Override
     public String getMetrics() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(getName());
-        builder.append("\n");
+        // only update the metric a minimum once a second, cache the result
         long currentTime = time.getGameTimeInMs();
-        long currentSecond = currentTime / 1000;
-        if (currentSecond - lastSecond > 1) {
-            networkSystem.getIncomingBytesDelta();
-            networkSystem.getIncomingMessagesDelta();
-            builder.append("In Msg: 0\n");
-            builder.append("In Bytes: 0\n");
-            builder.append("Out Msg: 0\n");
-            builder.append("Out Bytes: 0\n");
-        } else if (currentSecond - lastSecond == 1) {
+        long timeDifference = currentTime - lastTime;
+        if (timeDifference >= 1000) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(getName());
+            builder.append("\n");
+            builder.append(String.format("Elapsed: %dms%n", timeDifference));
             builder.append(String.format("In Msg: %d%n", networkSystem.getIncomingMessagesDelta()));
             builder.append(String.format("In Bytes: %d%n", networkSystem.getIncomingBytesDelta()));
             builder.append(String.format("Out Msg: %d%n", networkSystem.getOutgoingMessagesDelta()));
             builder.append(String.format("Out Bytes: %d%n", networkSystem.getOutgoingBytesDelta()));
+            if (lastTime != 0) {
+                // ignore the first update as it will not have useful data
+                lastMetric = builder.toString();
+            }
+            lastTime = currentTime;
+
         }
-        lastSecond = currentSecond;
-        return builder.toString();
+        return lastMetric;
     }
 
     @Override
