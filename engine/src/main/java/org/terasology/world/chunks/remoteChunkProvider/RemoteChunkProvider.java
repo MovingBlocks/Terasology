@@ -165,6 +165,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     @Override
     public void dispose() {
         ChunkMonitor.fireChunkProviderDisposed(this);
+        pipeline.shutdown();
+        lightMerger.shutdown();
     }
 
     @Override
