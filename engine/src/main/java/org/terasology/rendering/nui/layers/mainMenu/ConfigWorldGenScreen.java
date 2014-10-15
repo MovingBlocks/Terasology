@@ -16,20 +16,11 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.SimpleUri;
-import org.terasology.engine.module.ModuleManager;
 import org.terasology.entitySystem.Component;
-import org.terasology.module.DependencyInfo;
-import org.terasology.module.Module;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.naming.Name;
-import org.terasology.reflection.copy.CopyStrategyLibrary;
-import org.terasology.reflection.reflect.ReflectFactory;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.UIWidget;
@@ -46,7 +37,6 @@ import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A config screen for world generation
@@ -56,9 +46,6 @@ import java.util.Set;
 public class ConfigWorldGenScreen extends CoreScreenLayer {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigWorldGenScreen.class);
-
-    @In
-    private ModuleManager moduleManager;
 
     @In
     private WorldGeneratorManager worldGeneratorManager;
@@ -72,18 +59,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        // create a fake environment so that plugin facet parts can be loaded
-        Set<Module> selectedModules = Sets.newHashSet();
-        for (Name moduleName : config.getDefaultModSelection().listModules()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-            selectedModules.add(module);
-            for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
-            }
-        }
-        ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(environment,
-                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
+        WorldGeneratorPluginLibrary.setupTempEnvironmentForPlugins();
 
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());
