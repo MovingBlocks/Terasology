@@ -128,7 +128,7 @@ public class MeshBuilder {
         Vector2f map(int vertexIndex, float u, float v);
     }
 
-    private static float VERTICES[] = {
+    private static final float VERTICES[] = {
             // Front face
             0.0f, 0.0f, 1.0f,
             1.0f, 0.0f, 1.0f,
@@ -165,7 +165,8 @@ public class MeshBuilder {
             0.0f, 1.0f, 1.0f,
             0.0f, 1.0f, 0.0f
     };
-    private static int INDICES[] = {
+
+    private static final int INDICES[] = {
             0, 1, 2, 0, 2, 3,    // front
             4, 5, 6, 4, 6, 7,    // back
             8, 9, 10, 8, 10, 11,   // top

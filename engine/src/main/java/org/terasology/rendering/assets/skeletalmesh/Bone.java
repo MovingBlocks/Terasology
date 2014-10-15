@@ -55,8 +55,8 @@ public class Bone {
         return objectSpacePos;
     }
 
-    public void setObjectPos(Vector3f objectSpacePos) {
-        this.objectSpacePos = objectSpacePos;
+    public void setObjectPos(Vector3f newObjectSpacePos) {
+        this.objectSpacePos = newObjectSpacePos;
     }
 
     public Vector3f getLocalPosition() {
@@ -74,8 +74,8 @@ public class Bone {
         return rotation;
     }
 
-    public void setObjectRotation(Quat4f rotation) {
-        this.rotation = rotation;
+    public void setObjectRotation(Quat4f newRotation) {
+        this.rotation = newRotation;
     }
 
     public Quat4f getLocalRotation() {
