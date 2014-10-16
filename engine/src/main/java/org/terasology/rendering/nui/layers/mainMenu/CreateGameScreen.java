@@ -321,9 +321,13 @@ public class CreateGameScreen extends CoreScreenLayer {
         Set<Name> enabledModules = Sets.newHashSet();
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-            enabledModules.add(moduleName);
-            for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                enabledModules.add(dependencyInfo.getId());
+            if (module != null) {
+                enabledModules.add(moduleName);
+	            if (module != null) {
+					for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+		                enabledModules.add(dependencyInfo.getId());
+		            }
+	            }
             }
         }
 
