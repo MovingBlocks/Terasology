@@ -250,6 +250,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         ownerLookup.clear();
         ownedLookup.clear();
         ownershipHelper = null;
+        storageManager = null;
         logger.info("Network shutdown");
     }
 
