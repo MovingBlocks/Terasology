@@ -145,6 +145,10 @@ public abstract class AbstractWidget implements UIWidget {
         this.visible = bind;
     }
 
+	public void clearVisibleBinding() {
+		this.visible = new DefaultBinding<>(true);
+	}
+
     @Override
     public void onGainFocus() {
         focused = true;

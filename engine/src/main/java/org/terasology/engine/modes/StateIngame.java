@@ -103,7 +103,6 @@ public class StateIngame implements GameState {
                 return !CoreRegistry.get(Config.class).getRendering().getDebug().isHudHidden();
             }
         });
-
     }
 
     @Override
@@ -139,7 +138,11 @@ public class StateIngame implements GameState {
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
-
+		/*
+		 * Clear the binding as otherwise the complete ingame state would be
+		 * referenced.
+		 */
+		nuiManager.getHUD().clearVisibleBinding();
     }
 
     @Override
