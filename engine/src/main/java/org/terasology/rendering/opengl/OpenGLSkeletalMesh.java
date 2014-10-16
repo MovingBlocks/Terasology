@@ -73,9 +73,9 @@ public class OpenGLSkeletalMesh extends AbstractAsset<SkeletalMeshData> implemen
         onReload(data);
     }
 
-    public void setScaleTranslate(Vector3f scale, Vector3f translate) {
-        this.scale = scale;
-        this.translate = translate;
+    public void setScaleTranslate(Vector3f newScale, Vector3f newTranslate) {
+        this.scale = newScale;
+        this.translate = newTranslate;
     }
 
     @Override

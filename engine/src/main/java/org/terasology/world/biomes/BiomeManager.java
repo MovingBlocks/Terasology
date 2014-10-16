@@ -73,8 +73,9 @@ public class BiomeManager implements BiomeRegistry {
         registerBiome(UnknownBiome.INSTANCE);
 
         for (Map.Entry<String, Short> entry : knownBiomeIdMap.entrySet()) {
-            if (entry.getKey().equals(getUnknownBiome().getId()))
+            if (entry.getKey().equals(getUnknownBiome().getId())) {
                 continue; // The unknown biome is handled internally
+            }
 
             Biome biome = biomeIdMap.get(entry.getKey());
             if (biome == null) {
