@@ -158,6 +158,7 @@ public class BulletPhysics implements PhysicsEngine {
     public void dispose() {
         discreteDynamicsWorld.destroy();
         wrapper.dispose();
+        liquidWrapper.dispose();
     }
 
     @Override
