@@ -167,6 +167,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                     image.setVisible(true);
                 } catch (Exception ex) {
                     image.setVisible(false);
+                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
                 }
                 currentSettings = newSettings;
             }
