@@ -72,20 +72,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        // create a fake environment so that plugin facet parts can be loaded
-        Set<Module> selectedModules = Sets.newHashSet();
-        for (Name moduleName : config.getDefaultModSelection().listModules()) {
-            Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-            if (module != null) {
-                selectedModules.add(module);
-                for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-                    selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
-                }
-            }
-        }
-        ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(environment,
-                CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
+        WorldGeneratorPluginLibrary.setupTempEnvironmentForPlugins();
 
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());

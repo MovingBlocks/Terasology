@@ -34,18 +34,20 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
-import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -75,7 +77,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private PreviewSettings currentSettings;
 
     @Override
-    public void initialise() {
+    public void onOpened() {
+        super.onOpened();
+
+        WorldGeneratorPluginLibrary.setupTempEnvironmentForPlugins();
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
 
         try {
@@ -87,11 +92,16 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             } else {
                 logger.info(info.getUri().toString() + " does not support a 2d preview");
             }
-        } catch (UnresolvedWorldGeneratorException e) {
+        } catch (Exception e) {
             // if errors happen, don't enable this feature
+            seedBinding = new SeedBinding();
+            previewGenerator = null;
             logger.error("Unable to load world generator: " + info.getUri().toString() + " for a 2d preview");
         }
+    }
 
+    @Override
+    public void initialise() {
         zoomSlider = find("zoomSlider", UISlider.class);
         if (zoomSlider != null) {
             zoomSlider.setMinimum(1.0f);
@@ -105,13 +115,36 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (seed != null) {
             seed.bindText(seedBinding);
         }
-        if (previewGenerator != null) {
-            layerDropdown = find("display", UIDropdown.class);
-            layerDropdown.setOptions(Lists.newArrayList(previewGenerator.getLayers()));
-            if (!layerDropdown.getOptions().isEmpty()) {
-                layerDropdown.setSelection(layerDropdown.getOptions().get(0));
+
+        layerDropdown = find("display", UIDropdown.class);
+        layerDropdown.bindOptions(new ReadOnlyBinding<List<String>>() {
+            @Override
+            public List<String> get() {
+                if (previewGenerator != null) {
+                    return Lists.newArrayList(previewGenerator.getLayers());
+                } else {
+                    return Lists.newArrayList();
+                }
             }
-        }
+        });
+        layerDropdown.bindSelection(new Binding<String>() {
+            String selection;
+
+            @Override
+            public String get() {
+                if (selection == null && layerDropdown.getOptions().size() > 0) {
+                    // select the first one in the list
+                    selection = layerDropdown.getOptions().get(0);
+                }
+                return selection;
+            }
+
+            @Override
+            public void set(String value) {
+                selection = value;
+            }
+        });
+
 
         WidgetUtil.trySubscribe(this, "close", new ActivateEventListener() {
             @Override
@@ -127,9 +160,15 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (previewGenerator != null) {
             PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
-                Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
                 UIImage image = find("preview", UIImage.class);
-                image.setImage(tex);
+                try {
+                    Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
+                    image.setImage(tex);
+                    image.setVisible(true);
+                } catch (Exception ex) {
+                    image.setVisible(false);
+                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
+                }
                 currentSettings = newSettings;
             }
         }
