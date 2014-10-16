@@ -323,11 +323,11 @@ public class CreateGameScreen extends CoreScreenLayer {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
                 enabledModules.add(moduleName);
-	            if (module != null) {
-					for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-		                enabledModules.add(dependencyInfo.getId());
-		            }
-	            }
+                if (module != null) {
+                    for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+                        enabledModules.add(dependencyInfo.getId());
+                    }
+                }
             }
         }
 

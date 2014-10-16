@@ -77,10 +77,10 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
         for (Name moduleName : config.getDefaultModSelection().listModules()) {
             Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
             if (module != null) {
-	            selectedModules.add(module);
-	            for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
-	                selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
-	            }
+                selectedModules.add(module);
+                for (DependencyInfo dependencyInfo : module.getMetadata().getDependencies()) {
+                    selectedModules.add(moduleManager.getRegistry().getLatestModuleVersion(dependencyInfo.getId()));
+                }
             }
         }
         ModuleEnvironment environment = moduleManager.loadEnvironment(selectedModules, false);
