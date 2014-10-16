@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.common;
+package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.logic.characters.events.ActivationRequest;
+import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.location.LocationComponent;
 
 import javax.vecmath.Vector3f;
 
 /**
+ * @author Florian <florian@fkoeberle.de>
  * @author Immortius <immortius@gmail.com>
  */
-// TODO: This should not be consumable. Instead have a consumable BeforeActivate event to allow cancellation
-public class ActivateEvent extends AbstractConsumableEvent {
+public class ActivationPredicted implements Event {
+
     private EntityRef instigator;
     private EntityRef target;
     private Vector3f origin;
@@ -35,8 +35,11 @@ public class ActivateEvent extends AbstractConsumableEvent {
     private Vector3f hitNormal;
     private int activationId;
 
-    public ActivateEvent(EntityRef target, EntityRef instigator, Vector3f origin, Vector3f direction,
-                         Vector3f hitPosition, Vector3f hitNormal, int activationId) {
+    public ActivationPredicted() {
+    }
+
+    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction,
+                               Vector3f hitPosition, Vector3f hitNormal, int activationId) {
         this.instigator = instigator;
         this.target = target;
         this.direction = direction;
@@ -44,16 +47,6 @@ public class ActivateEvent extends AbstractConsumableEvent {
         this.hitNormal = hitNormal;
         this.origin = origin;
         this.activationId = activationId;
-    }
-
-    public ActivateEvent(ActivationRequest event) {
-        this.instigator = event.getInstigator();
-        this.target = event.getTarget();
-        this.direction = event.getDirection();
-        this.hitPosition = event.getHitPosition();
-        this.hitNormal = event.getHitNormal();
-        this.origin = event.getOrigin();
-        this.activationId = event.getActivationId();
     }
 
     public EntityRef getInstigator() {

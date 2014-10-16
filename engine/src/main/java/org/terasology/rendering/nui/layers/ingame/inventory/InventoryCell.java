@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.Keyboard;
@@ -37,7 +40,7 @@ import java.util.List;
  * Adds interaction between an inventory slot and the player
  */
 public class InventoryCell extends ItemCell {
-
+    private static final Logger logger = LoggerFactory.getLogger(InventoryCell.class);
     @LayoutConfig
     private Binding<Integer> targetSlot = new DefaultBinding<Integer>(0);
 
@@ -135,32 +138,52 @@ public class InventoryCell extends ItemCell {
         int fromSlot = getTargetSlot();
         EntityRef playerEntity= localPlayer.getCharacterEntity();
         InventoryComponent playerInventory = playerEntity.getComponent(InventoryComponent.class);
-        int totalSlotCount = playerInventory.itemSlots.size();
         if (playerInventory == null) {
             return;
         }
+        CharacterComponent characterComponent = playerEntity.getComponent(CharacterComponent.class);
+        if (characterComponent == null) {
+            logger.error("Character entity of player had no character component");
+            return;
+        }
+        int totalSlotCount = playerInventory.itemSlots.size();
 
+        EntityRef interactionTarget = characterComponent.predictedInteractionTarget;
+        InventoryComponent interactionTargetInventory = interactionTarget.getComponent(InventoryComponent.class);
+
+
+        EntityRef targetEntity;
         List<Integer> toSlots = new ArrayList<>(totalSlotCount);
         if (fromEntity.equals(playerEntity)) {
+
+        if (interactionTarget.exists() && interactionTargetInventory != null) {
+            targetEntity = interactionTarget;
+            toSlots = numbersBetween(0, interactionTargetInventory.itemSlots.size());
+        } else {
+            targetEntity = playerEntity;
             int hudSlotCount = 10; // TODO use a constant once there is one
-            boolean fromHud =  (fromSlot < hudSlotCount);
+            boolean fromHud = (fromSlot < hudSlotCount);
             boolean toHud = !fromHud;
             if (toHud) {
-                for (int slot = 0; slot < hudSlotCount; slot++) {
-                    toSlots.add(slot);
-                }
+                toSlots = numbersBetween(0, hudSlotCount);
             } else {
-                for (int slot = hudSlotCount; slot < totalSlotCount; slot++) {
-                    toSlots.add(slot);
-                }
-            }
-        } else {
-            for (int slot = 0; slot < totalSlotCount; slot++) {
-                toSlots.add(slot);
+                toSlots = numbersBetween(hudSlotCount, totalSlotCount);
             }
         }
+        } else {
+            targetEntity = playerEntity;
+            toSlots = numbersBetween(0, totalSlotCount);
+        }
 
-        inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, playerEntity, toSlots);
+        inventoryManager.moveItemToSlots(getTransferEntity(), fromEntity, fromSlot, targetEntity, toSlots);
+    }
+
+    private List<Integer> numbersBetween(int start, int exclusiveEnd) {
+        List<Integer> numbers = new ArrayList<>();
+        for (int number = start; number < exclusiveEnd; number++) {
+            numbers.add(number);
+        }
+        return numbers;
     }
 
 

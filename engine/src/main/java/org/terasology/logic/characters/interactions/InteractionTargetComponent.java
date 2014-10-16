@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.characters.interactions;
 
-package org.terasology.logic.characters.events;
-
-import org.terasology.network.NetworkEvent;
-import org.terasology.network.ServerEvent;
+import org.terasology.entitySystem.Component;
 
 /**
- * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
-@ServerEvent(lagCompensate = true)
-public class FrobRequest extends NetworkEvent {
-
-    public FrobRequest() {
-    }
+public class InteractionTargetComponent implements Component {
 }

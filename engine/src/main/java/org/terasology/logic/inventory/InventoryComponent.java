@@ -36,7 +36,6 @@ import java.util.List;
 public final class InventoryComponent implements Component, ReplicationCheck {
 
     public boolean privateToOwner = true;
-    public List<EntityRef> accessors = Lists.newArrayList();
 
     @Replicate
     @Owns

@@ -15,14 +15,17 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.binds.inventory.InventoryButton;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 public class InventoryScreen extends CoreScreenLayer {
 
@@ -32,7 +35,12 @@ public class InventoryScreen extends CoreScreenLayer {
     @Override
     public void initialise() {
         InventoryGrid inventory = find("inventory", InventoryGrid.class);
-        inventory.setTargetEntity(localPlayer.getCharacterEntity());
+        inventory.bindTargetEntity(new ReadOnlyBinding<EntityRef>() {
+            @Override
+            public EntityRef get() {
+                return localPlayer.getCharacterEntity();
+            }
+        });
         inventory.setCellOffset(10);
     }
 

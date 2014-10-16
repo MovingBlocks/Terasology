@@ -13,21 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.common;
+
+package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.logic.characters.events.ActivationRequest;
-import org.terasology.logic.location.LocationComponent;
+import org.terasology.network.NetworkEvent;
+import org.terasology.network.ServerEvent;
 
 import javax.vecmath.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Florian <florian@fkoeberle.de>
  */
-// TODO: This should not be consumable. Instead have a consumable BeforeActivate event to allow cancellation
-public class ActivateEvent extends AbstractConsumableEvent {
+@ServerEvent(lagCompensate = true)
+public class ActivationRequest extends NetworkEvent {
     private EntityRef instigator;
+    /**
+     * The field is used to preserve the fact that an item got used, even when the item is no more at the target server.
+     */
+    private boolean itemUsage;
+    private EntityRef usedItem;
+    /**
+     * The field is used to preserve the fact if a target got hit on the client, even when the hit target entity does
+     * not exist at the target server.
+     */
+    private boolean eventWithTarget;
     private EntityRef target;
     private Vector3f origin;
     private Vector3f direction;
@@ -35,9 +45,16 @@ public class ActivateEvent extends AbstractConsumableEvent {
     private Vector3f hitNormal;
     private int activationId;
 
-    public ActivateEvent(EntityRef target, EntityRef instigator, Vector3f origin, Vector3f direction,
-                         Vector3f hitPosition, Vector3f hitNormal, int activationId) {
+    public ActivationRequest() {
+    }
+
+    public ActivationRequest(EntityRef instigator, boolean itemUsage, EntityRef usedItem,
+                             boolean eventWithTarget, EntityRef target, Vector3f origin, Vector3f direction,
+                             Vector3f hitPosition, Vector3f hitNormal, int activationId) {
         this.instigator = instigator;
+        this.itemUsage = itemUsage;
+        this.usedItem = usedItem;
+        this.eventWithTarget = eventWithTarget;
         this.target = target;
         this.direction = direction;
         this.hitPosition = hitPosition;
@@ -46,18 +63,21 @@ public class ActivateEvent extends AbstractConsumableEvent {
         this.activationId = activationId;
     }
 
-    public ActivateEvent(ActivationRequest event) {
-        this.instigator = event.getInstigator();
-        this.target = event.getTarget();
-        this.direction = event.getDirection();
-        this.hitPosition = event.getHitPosition();
-        this.hitNormal = event.getHitNormal();
-        this.origin = event.getOrigin();
-        this.activationId = event.getActivationId();
-    }
-
+    @Override
     public EntityRef getInstigator() {
         return instigator;
+    }
+
+    public boolean isItemUsage() {
+        return itemUsage;
+    }
+
+    public EntityRef getUsedItem() {
+        return usedItem;
+    }
+
+    public boolean isEventWithTarget() {
+        return eventWithTarget;
     }
 
     public EntityRef getTarget() {
@@ -80,23 +100,11 @@ public class ActivateEvent extends AbstractConsumableEvent {
         return hitNormal;
     }
 
+    /**
+     *
+     * @return a number that can be used to distinguish multiple activations from the same player.
+     */
     public int getActivationId() {
         return activationId;
-    }
-
-    public Vector3f getTargetLocation() {
-        LocationComponent loc = target.getComponent(LocationComponent.class);
-        if (loc != null) {
-            return loc.getWorldPosition();
-        }
-        return null;
-    }
-
-    public Vector3f getInstigatorLocation() {
-        LocationComponent loc = instigator.getComponent(LocationComponent.class);
-        if (loc != null) {
-            return loc.getWorldPosition();
-        }
-        return new Vector3f();
     }
 }

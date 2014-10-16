@@ -16,7 +16,9 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -25,6 +27,7 @@ import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
+import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.ForwardsMovementAxis;
 import org.terasology.input.binds.movement.JumpButton;
 import org.terasology.input.binds.movement.RunButton;
@@ -37,19 +40,28 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.FrobRequest;
+import org.terasology.logic.characters.events.ActivationPredicted;
+import org.terasology.logic.characters.events.ActivationRequest;
+import org.terasology.logic.characters.interactions.InteractionUtil;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -74,6 +86,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private Camera playerCamera;
 
     @In
+    private Physics physics;
+
+    @In
     private Config config;
     private float bobFactor;
     private float lastStepDelta;
@@ -85,9 +100,21 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private float lookPitch;
     private float lookYaw;
 
+    @In
+    private Time time;
+
+    @In
+    private NUIManager nuiManager;
+
+    private long lastItemUse;
+
+    // TODO use same as CharacterSystem?
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
+    private int nextActivationId = 0;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -268,14 +295,73 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
 
     @ReceiveEvent(components = {CharacterComponent.class})
-    public void onFrobRequest(FrobButton event, EntityRef entity) {
+    public void onFrobButton(FrobButton event, EntityRef character) {
         if (event.getState() != ButtonState.DOWN) {
             return;
         }
 
-        entity.send(new FrobRequest());
+        AssetUri activeInteractionScreenUri = InteractionUtil.getActiveInteractionScreenUri(character);
+        if (activeInteractionScreenUri != null) {
+            InteractionUtil.cancelInteractionAsClient(character);
+            return;
+        }
+        boolean activeRequestSent = activateTargetOrItem(character, EntityRef.NULL);
+        if (activeRequestSent) {
+            event.consume();
+        }
+    }
+
+    /**
+     *
+     * @param usedItem if it does not exist it is not an item usage.
+     * @return true if an activation request got sent. Returns always true if usedItem exists.
+     */
+    private boolean activateTargetOrItem(EntityRef character, EntityRef usedItem) {
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
+        boolean itemUsage = usedItem.exists();
+        int activationId = nextActivationId++;
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        boolean eventWithTarget = result.isHit();
+        if (eventWithTarget) {
+            EntityRef activatedObject = usedItem.exists() ? usedItem : result.getEntity();
+            activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
+                    result.getHitPoint(), result.getHitNormal(), activationId));
+            character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, result.getEntity(),
+                    originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
+            return true;
+        } else if (itemUsage) {
+            usedItem.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
+                    originPos, new Vector3f(), activationId));
+            character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, EntityRef.NULL,
+                    originPos, direction, originPos, new Vector3f(), activationId));
+            return true;
+        }
+        return false;
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
+    public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterComponent characterComponent) {
+        if (!event.isDown() || time.getGameTimeInMs() - lastItemUse < 200) {
+            return;
+        }
+
+        EntityRef selectedItemEntity = InventoryUtils.getItemAt(entity, characterComponent.selectedItem);
+        if (!selectedItemEntity.exists()) {
+            return;
+        }
+
+        activateTargetOrItem(entity, selectedItemEntity);
+
+        lastItemUse = time.getGameTimeInMs();
+        characterComponent.handAnimation = 0.5f;
+        entity.saveComponent(characterComponent);
         event.consume();
     }
+
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
         return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
