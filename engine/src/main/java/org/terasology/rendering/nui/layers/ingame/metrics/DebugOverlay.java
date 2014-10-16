@@ -111,8 +111,8 @@ public class DebugOverlay extends CoreScreenLayer {
                     Vector3f pos = localPlayer.getPosition();
                     CharacterComponent character = localPlayer.getCharacterEntity().getComponent(CharacterComponent.class);
                     float yaw = (character != null) ? character.yaw : 0;
-                    Vector3i chunkPos = TeraMath.calcChunkPos((int)pos.x, (int)pos.y, (int)pos.z);
-                    return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Yaw %.2f", pos.x, pos.y, pos.z,chunkPos.x, chunkPos.y, chunkPos.z, yaw);
+                    Vector3i chunkPos = TeraMath.calcChunkPos((int) pos.x, (int) pos.y, (int) pos.z);
+                    return String.format(Locale.US, "Pos (%.2f, %.2f, %.2f), Chunk (%d, %d, %d), Yaw %.2f", pos.x, pos.y, pos.z, chunkPos.x, chunkPos.y, chunkPos.z, yaw);
                 }
             });
         }
@@ -122,9 +122,12 @@ public class DebugOverlay extends CoreScreenLayer {
             debugLine4.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
+                    String biomeId = "unavailable";
                     Vector3i blockPos = new Vector3i(localPlayer.getPosition());
-                    Biome biome = worldProvider.getBiome(blockPos);
-                    String biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
+                    if (worldProvider.isBlockRelevant(blockPos)) {
+                        Biome biome = worldProvider.getBiome(blockPos);
+                        biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
+                    }
                     return String.format("total vus: %s | worldTime: %.2f | biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
                             worldProvider.getTime().getDays(),
