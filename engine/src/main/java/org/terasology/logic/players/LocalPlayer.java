@@ -19,10 +19,19 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.events.ActivationPredicted;
+import org.terasology.logic.characters.events.ActivationRequest;
+import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.network.ClientComponent;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.Physics;
+import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.registry.CoreRegistry;
+import sun.rmi.server.Activation;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -33,6 +42,10 @@ import javax.vecmath.Vector3f;
 public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
+    private int nextActivationId = 0;
+
+    // TODO use same as CharacterSystem?
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     public LocalPlayer() {
     }
@@ -119,6 +132,69 @@ public class LocalPlayer {
             return new Vector3f(movement.getVelocity());
         }
         return new Vector3f();
+    }
+
+
+    /**
+     * Can be used by modules to trigger the activation of a player owned entity like an item.
+     *
+     * The method has been made for the usage on the client. It triggers a {@link ActivationPredicted} event
+     * on the client and a {@link ActivationRequest} event on the server which will lead to a {@link ActivateEvent}
+     * on the server.
+     *
+     * @param usedOwnedEntity an entity owned by the player like an item.
+     *
+     */
+    public void activateOwnedEntityAsClient(EntityRef usedOwnedEntity) {
+        if (!usedOwnedEntity.exists()) {
+            return;
+        }
+        activateTargetOrOwnedEntity(usedOwnedEntity);
+    }
+
+    /**
+     * Tries to activate the target the player is pointing at.
+     *
+     * This method is indented to be used on the client.
+     *
+     * @return true if a target got activated.
+     */
+    public boolean activateTargetAsClient() {
+        return activateTargetOrOwnedEntity(EntityRef.NULL);
+    }
+
+    /**
+     *
+     * @param usedOwnedEntity if it does not exist it is not an item usage.
+     * @return true if an activation request got sent. Returns always true if usedItem exists.
+     */
+    private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
+        EntityRef character = getCharacterEntity();
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
+        boolean ownedEntityUsage = usedOwnedEntity.exists();
+        int activationId = nextActivationId++;
+        Physics physics = CoreRegistry.get(Physics.class);
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        boolean eventWithTarget = result.isHit();
+        if (eventWithTarget) {
+            EntityRef activatedObject = usedOwnedEntity.exists() ? usedOwnedEntity : result.getEntity();
+            activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
+                    result.getHitPoint(), result.getHitNormal(), activationId));
+            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, result.getEntity(),
+                    originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
+            return true;
+        } else if (ownedEntityUsage) {
+            usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
+                    originPos, new Vector3f(), activationId));
+            character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, EntityRef.NULL,
+                    originPos, direction, originPos, new Vector3f(), activationId));
+            return true;
+        }
+        return false;
     }
 
 

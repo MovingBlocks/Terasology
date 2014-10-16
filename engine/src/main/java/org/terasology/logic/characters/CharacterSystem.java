@@ -18,8 +18,6 @@ package org.terasology.logic.characters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.asset.AssetUri;
-import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -27,7 +25,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.logic.characters.events.*;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.interactions.InteractionUtil;
@@ -39,7 +36,6 @@ import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.inventory.*;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -133,8 +129,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class}, netFilter = RegisterMode.AUTHORITY)
     public void onActivationRequest(ActivationRequest event, EntityRef character) {
         if (isPredictionOfEventCorrect(character, event)) {
-            if (event.getUsedItem().exists()) {
-                event.getUsedItem().send(new ActivateEvent(event));
+            if (event.getUsedOwnedEntity().exists()) {
+                event.getUsedOwnedEntity().send(new ActivateEvent(event));
             } else {
                 event.getTarget().send(new ActivateEvent(event));
             }
@@ -189,19 +185,19 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
             return false;
         }
 
-        if (event.isItemUsage()) {
-            if (!event.getUsedItem().exists()) {
-                logger.info("Denied activation attempt by {} since the used item does not exist on the authority", getPlayerNameFromCharacter(character));
+        if (event.isOwnedEntityUsage()) {
+            if (!event.getUsedOwnedEntity().exists()) {
+                logger.info("Denied activation attempt by {} since the used entity does not exist on the authority", getPlayerNameFromCharacter(character));
                 return false;
             }
-            if (!networkSystem.getOwnerEntity(event.getUsedItem()).equals(networkSystem.getOwnerEntity(character))) {
-                logger.info("Denied activation attempt by {} since it does not own the item at the authority", getPlayerNameFromCharacter(character));
+            if (!networkSystem.getOwnerEntity(event.getUsedOwnedEntity()).equals(networkSystem.getOwnerEntity(character))) {
+                logger.info("Denied activation attempt by {} since it does not own the entity at the authority", getPlayerNameFromCharacter(character));
                 return false;
             }
         } else {
             // check for cheats so that data can later be trusted:
-            if (event.getUsedItem().exists()) {
-                logger.info("Denied activation attempt by {} since it is not properly marked as item usage", getPlayerNameFromCharacter(character));
+            if (event.getUsedOwnedEntity().exists()) {
+                logger.info("Denied activation attempt by {} since it is not properly marked as owned entity usage", getPlayerNameFromCharacter(character));
                 return false;
             }
         }

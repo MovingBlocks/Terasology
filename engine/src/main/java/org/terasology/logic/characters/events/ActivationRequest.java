@@ -31,8 +31,8 @@ public class ActivationRequest extends NetworkEvent {
     /**
      * The field is used to preserve the fact that an item got used, even when the item is no more at the target server.
      */
-    private boolean itemUsage;
-    private EntityRef usedItem;
+    private boolean ownedEntityUsage;
+    private EntityRef usedOwnedEntity;
     /**
      * The field is used to preserve the fact if a target got hit on the client, even when the hit target entity does
      * not exist at the target server.
@@ -48,12 +48,12 @@ public class ActivationRequest extends NetworkEvent {
     public ActivationRequest() {
     }
 
-    public ActivationRequest(EntityRef instigator, boolean itemUsage, EntityRef usedItem,
+    public ActivationRequest(EntityRef instigator, boolean ownedEntityUsage, EntityRef usedOwnedEntity,
                              boolean eventWithTarget, EntityRef target, Vector3f origin, Vector3f direction,
                              Vector3f hitPosition, Vector3f hitNormal, int activationId) {
         this.instigator = instigator;
-        this.itemUsage = itemUsage;
-        this.usedItem = usedItem;
+        this.ownedEntityUsage = ownedEntityUsage;
+        this.usedOwnedEntity = usedOwnedEntity;
         this.eventWithTarget = eventWithTarget;
         this.target = target;
         this.direction = direction;
@@ -68,12 +68,12 @@ public class ActivationRequest extends NetworkEvent {
         return instigator;
     }
 
-    public boolean isItemUsage() {
-        return itemUsage;
+    public boolean isOwnedEntityUsage() {
+        return ownedEntityUsage;
     }
 
-    public EntityRef getUsedItem() {
-        return usedItem;
+    public EntityRef getUsedOwnedEntity() {
+        return usedOwnedEntity;
     }
 
     public boolean isEventWithTarget() {
