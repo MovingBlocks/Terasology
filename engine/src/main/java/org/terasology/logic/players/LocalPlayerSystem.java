@@ -108,13 +108,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private long lastItemUse;
 
-    // TODO use same as CharacterSystem?
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
-
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
-    private int nextActivationId = 0;
 
     public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
@@ -305,43 +301,12 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             InteractionUtil.cancelInteractionAsClient(character);
             return;
         }
-        boolean activeRequestSent = activateTargetOrItem(character, EntityRef.NULL);
+        boolean activeRequestSent = localPlayer.activateTargetAsClient();
         if (activeRequestSent) {
             event.consume();
         }
     }
 
-    /**
-     *
-     * @param usedItem if it does not exist it is not an item usage.
-     * @return true if an activation request got sent. Returns always true if usedItem exists.
-     */
-    private boolean activateTargetOrItem(EntityRef character, EntityRef usedItem) {
-        LocationComponent location = character.getComponent(LocationComponent.class);
-        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = characterComponent.getLookDirection();
-        Vector3f originPos = location.getWorldPosition();
-        originPos.y += characterComponent.eyeOffset;
-        boolean itemUsage = usedItem.exists();
-        int activationId = nextActivationId++;
-        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-        boolean eventWithTarget = result.isHit();
-        if (eventWithTarget) {
-            EntityRef activatedObject = usedItem.exists() ? usedItem : result.getEntity();
-            activatedObject.send(new ActivationPredicted(character, result.getEntity(), originPos, direction,
-                    result.getHitPoint(), result.getHitNormal(), activationId));
-            character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, result.getEntity(),
-                    originPos, direction, result.getHitPoint(), result.getHitNormal(), activationId));
-            return true;
-        } else if (itemUsage) {
-            usedItem.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f(), activationId));
-            character.send(new ActivationRequest(character, itemUsage, usedItem, eventWithTarget, EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f(), activationId));
-            return true;
-        }
-        return false;
-    }
 
     @ReceiveEvent(components = {CharacterComponent.class, InventoryComponent.class})
     public void onUseItemButton(UseItemButton event, EntityRef entity, CharacterComponent characterComponent) {
@@ -354,7 +319,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
             return;
         }
 
-        activateTargetOrItem(entity, selectedItemEntity);
+        localPlayer.activateOwnedEntityAsClient(selectedItemEntity);
 
         lastItemUse = time.getGameTimeInMs();
         characterComponent.handAnimation = 0.5f;
