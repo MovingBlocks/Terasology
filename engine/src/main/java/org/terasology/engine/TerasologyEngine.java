@@ -19,6 +19,7 @@ package org.terasology.engine;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetFactory;
@@ -166,6 +167,7 @@ public class TerasologyEngine implements GameEngine {
             initialised = true;
         } catch (RuntimeException e) {
             logger.error("Failed to initialise Terasology", e);
+            cleanup();
             throw e;
         }
 
@@ -511,14 +513,17 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    @Override
     public boolean isHibernationAllowed() {
         return hibernationAllowed && currentState.isHibernationAllowed();
     }
 
+    @Override
     public void setHibernationAllowed(boolean allowed) {
         this.hibernationAllowed = allowed;
     }
 
+    @Override
     public boolean hasFocus() {
         DisplayDevice display = CoreRegistry.get(DisplayDevice.class);
         return gameFocused && display.isActive();
@@ -529,6 +534,7 @@ public class TerasologyEngine implements GameEngine {
         return gameFocused;
     }
 
+    @Override
     public void setFocus(boolean focused) {
         gameFocused = focused;
     }

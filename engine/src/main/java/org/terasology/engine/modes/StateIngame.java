@@ -138,11 +138,11 @@ public class StateIngame implements GameState {
         CoreRegistry.clear();
         BlockManager.getAir().setEntity(EntityRef.NULL);
         GameThread.clearWaitingProcesses();
-		/*
-		 * Clear the binding as otherwise the complete ingame state would be
-		 * referenced.
-		 */
-		nuiManager.getHUD().clearVisibleBinding();
+        /*
+         * Clear the binding as otherwise the complete ingame state would be
+         * referenced.
+         */
+        nuiManager.getHUD().clearVisibleBinding();
     }
 
     @Override

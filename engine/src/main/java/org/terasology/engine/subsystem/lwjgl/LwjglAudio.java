@@ -32,7 +32,7 @@ import org.terasology.registry.CoreRegistry;
 public class LwjglAudio extends BaseLwjglSubsystem {
 
     private static final Logger logger = LoggerFactory.getLogger(LwjglAudio.class);
-    
+
     private AudioManager audioManager;
 
     @Override
@@ -60,7 +60,9 @@ public class LwjglAudio extends BaseLwjglSubsystem {
 
     @Override
     public void dispose() {
-        audioManager.dispose();
+        if (audioManager != null) {
+            audioManager.dispose();
+        }
     }
 
     private void initOpenAL(Config config) {

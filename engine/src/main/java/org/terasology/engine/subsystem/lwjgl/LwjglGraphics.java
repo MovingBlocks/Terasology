@@ -124,7 +124,7 @@ public class LwjglGraphics extends BaseLwjglSubsystem {
 
     @Override
     public void shutdown(Config config) {
-        if (!Display.isFullscreen() && Display.isVisible()) {
+        if (Display.isCreated() && !Display.isFullscreen() && Display.isVisible()) {
             config.getRendering().setWindowPosX(Display.getX());
             config.getRendering().setWindowPosY(Display.getY());
         }

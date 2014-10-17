@@ -133,6 +133,7 @@ public abstract class AbstractWidget implements UIWidget {
         }
     }
 
+    @Override
     public boolean isVisible() {
         return visible.get();
     }
@@ -145,9 +146,9 @@ public abstract class AbstractWidget implements UIWidget {
         this.visible = bind;
     }
 
-	public void clearVisibleBinding() {
-		this.visible = new DefaultBinding<>(true);
-	}
+    public void clearVisibleBinding() {
+        this.visible = new DefaultBinding<>(true);
+    }
 
     @Override
     public void onGainFocus() {

@@ -21,7 +21,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
-import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
@@ -31,7 +30,6 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
-import sun.rmi.server.Activation;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -42,7 +40,7 @@ import javax.vecmath.Vector3f;
 public class LocalPlayer {
 
     private EntityRef clientEntity = EntityRef.NULL;
-    private int nextActivationId = 0;
+    private int nextActivationId;
 
     // TODO use same as CharacterSystem?
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
