@@ -73,6 +73,7 @@ public final class Terasology {
                     homePath = Paths.get("");
                 } else if (arg.equals(HEADLESS_ARG)) {
                     isHeadless = true;
+                    crashReportEnabled = false;
                 } else if (arg.equals(NO_CRASH_REPORT_ARG)) {
                     crashReportEnabled = false;
                 } else if (arg.equals(LOAD_LAST_GAME_ARG)) {
