@@ -272,8 +272,8 @@ public class TerasologyEngine implements GameEngine {
             logger.error("Uncaught exception, attempting clean game shutdown", e);
             try {
                 cleanup();
-            } catch (RuntimeException innerE) {
-                logger.error("Clean game shutdown after an uncaught exception failed", innerE);
+            } catch (Throwable t) {
+                logger.error("Clean game shutdown after an uncaught exception failed", t);
                 logger.error("Rethrowing original exception");
             }
             throw e;
@@ -287,24 +287,24 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void dispose() {
-        try {
-            /*
-             * The engine is shutdown even when running is true for so that terasology gets also properly disposed in
-             * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
-             * be closed.
-             */
-            disposed = true;
-            initialised = false;
-            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-            while (iter.hasNext()) {
-                EngineSubsystem subsystem = iter.next();
-                subsystem.dispose();
-            }
 
-        } catch (RuntimeException e) {
-            logger.error("Uncaught exception", e);
-            throw e;
+        /*
+         * The engine is shutdown even when running is true for so that terasology gets also properly disposed in
+         * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
+         * be closed.
+         */
+        disposed = true;
+        initialised = false;
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+        while (iter.hasNext()) {
+            EngineSubsystem subsystem = iter.next();
+            try {
+                subsystem.dispose();
+            } catch (Throwable t) {
+                logger.error("Unable to dispose subsystem {}", subsystem, t);
+            }
         }
+
     }
 
     @Override
@@ -390,19 +390,24 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
 
-        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-        while (iter.hasNext()) {
-            EngineSubsystem subsystem = iter.next();
-            subsystem.shutdown(config);
+        try {
+            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+            while (iter.hasNext()) {
+                EngineSubsystem subsystem = iter.next();
+                subsystem.shutdown(config);
+            }
+
+            config.save();
+            if (currentState != null) {
+                currentState.dispose();
+                currentState = null;
+            }
+        } finally {
+            // Even if a graceful shutdown of the subsystems fails,
+            // the thread pool has to be shut down
+            stopThreads();
         }
 
-        config.save();
-        if (currentState != null) {
-            currentState.dispose();
-            currentState = null;
-        }
-
-        stopThreads();
     }
 
     public void stopThreads() {

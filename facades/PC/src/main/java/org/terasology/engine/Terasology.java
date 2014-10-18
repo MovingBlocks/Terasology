@@ -114,13 +114,7 @@ public final class Terasology {
                     engine.run(new StateMainMenu());
                 }
             } finally {
-                try {
-                    engine.dispose();
-                } catch (Exception e) {
-                    // Just log this one to System.err because we don't want it 
-                    // to replace the one that came first (thrown above).
-                    e.printStackTrace();
-                }
+                engine.dispose();
             }
         } catch (RuntimeException | IOException e) {
 

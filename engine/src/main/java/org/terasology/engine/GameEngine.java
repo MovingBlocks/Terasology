@@ -44,6 +44,7 @@ public interface GameEngine {
 
     /**
      * Cleans up the engine. Can only be called after shutdown.
+     * This method should not throw exceptions.
      */
     void dispose();
 
