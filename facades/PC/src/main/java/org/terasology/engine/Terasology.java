@@ -122,7 +122,7 @@ public final class Terasology {
                     e.printStackTrace();
                 }
             }
-        } catch (RuntimeException | IOException e) {
+        } catch (Throwable t) {
 
             if (!GraphicsEnvironment.isHeadless()) {
                 Path logPath = Paths.get(".");
@@ -138,10 +138,13 @@ public final class Terasology {
                 if (crashReportEnabled) {
                     Path logFile = logPath.resolve("Terasology.log");
 
-                    CrashReporter.report(e, logFile);
+                    CrashReporter.report(t, logFile);
                 }
             }
+            // Quits ths VM, to prevent invisible crashed games in the background to sum up and eat resources:
+            System.exit(1);
         }
+        System.exit(0);
     }
 
     private static GameManifest getLatestGameManifest() {
