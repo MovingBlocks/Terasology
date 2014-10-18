@@ -44,6 +44,7 @@ import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
@@ -54,7 +55,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a module
@@ -76,6 +81,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
     @In
     private WorldRenderer worldRenderer;
+
+    @In
+    private WorldProvider worldProvider;
 
     private SetMultimap<Material, EntityRef> opaqueMesh = HashMultimap.create();
     private SetMultimap<Material, EntityRef> translucentMesh = HashMultimap.create();
@@ -242,7 +250,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                 LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                if (location == null || meshComp.mesh == null) {
+                if (location == null || meshComp.mesh == null || !worldProvider.isBlockRelevant(location.getWorldPosition())) {
                     continue;
                 }
                 if (meshComp.mesh.isDisposed()) {

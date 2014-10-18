@@ -17,7 +17,6 @@ package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
-
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -56,6 +55,7 @@ import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkinData;
@@ -66,7 +66,6 @@ import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
@@ -109,6 +108,21 @@ public class CoreCommands extends BaseComponentSystem {
             return "Unable to resolve skin '" + skin + "'";
         }
     }
+
+    @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
+    public String reloadUI(@CommandParam("ui") String ui) {
+        CoreRegistry.get(NUIManager.class).clear();
+
+        AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
+        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
+        if (uiData != null) {
+            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+            return "Success";
+        } else {
+            return "Unable to resolve ui '" + ui + "'";
+        }
+    }
+
 
     @Command(shortDescription = "Reloads a shader")
     public String reloadShader(@CommandParam("shader") String shader) {
