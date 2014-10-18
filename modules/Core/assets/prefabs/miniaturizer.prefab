@@ -5,10 +5,10 @@
     },
     "Item" : {
         "icon" : "engine:items.scissors",
-		"usage" : "ON_BLOCK"
+        "usage" : "ON_BLOCK"
     },
-  	"PlaySoundAction" : {
-    	sounds = "engine:click"
-  	},
+    "PlaySoundAction": {
+        "sounds" : "engine:click"
+    },
     "Miniaturizer" : {}
 }

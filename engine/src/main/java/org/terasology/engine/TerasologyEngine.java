@@ -269,7 +269,13 @@ public class TerasologyEngine implements GameEngine {
 
             cleanup();
         } catch (RuntimeException e) {
-            logger.error("Uncaught exception", e);
+            logger.error("Uncaught exception, attempting clean game shutdown", e);
+            try {
+                cleanup();
+            } catch (RuntimeException innerE) {
+                logger.error("Clean game shutdown after an uncaught exception failed", innerE);
+                logger.error("Rethrowing original exception");
+            }
             throw e;
         }
     }
