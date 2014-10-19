@@ -129,4 +129,11 @@ public final class TaskMaster<T extends Task> {
             running = true;
         }
     }
+
+    /**
+     * Cancels all tasks that haven't been started yet.
+     */
+    public void clearQueue() {
+        taskQueue.clear();
+    }
 }

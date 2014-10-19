@@ -216,7 +216,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
         initTimeEvents();
     }
 

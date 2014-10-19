@@ -16,8 +16,6 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.io.IOException;
 
@@ -30,22 +28,9 @@ import java.io.IOException;
 public interface StorageManager {
 
     /**
-     * @return A new global store ready for saving into
-     */
-    void createGlobalStoreForSave();
-
-    /**
      * Loads the global store, restoring the entity manager's state and all global entities
      */
     void loadGlobalStore() throws IOException;
-
-    /**
-     * Creates an empty player store for saving
-     *
-     * @param playerId
-     * @return The new player store
-     */
-    PlayerStore createPlayerStoreForSave(String playerId);
 
     /**
      * Loads a saved player store
@@ -55,13 +40,7 @@ public interface StorageManager {
      */
     PlayerStore loadPlayerStore(String playerId);
 
-    /**
-     * Creates an empty chunk store for saving
-     *
-     * @param chunk The chunk to be saved
-     * @return The new chunk store
-     */
-    ChunkStore createChunkStoreForSave(Chunk chunk);
+    void startSaving();
 
     /**
      * Loads a saved chunk store
@@ -70,9 +49,7 @@ public interface StorageManager {
      */
     ChunkStore loadChunkStore(Vector3i chunkPos);
 
-    void flush() throws IOException;
+    void finishSavingAndShutdown();
 
-    void shutdown();
-
-    void purgeChunks();
+    void onPlayerDisconnect(String id);
 }

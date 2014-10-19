@@ -245,9 +245,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     @ReceiveEvent(components = ClientComponent.class)
     public void onDisconnect(DisconnectedEvent event, EntityRef entity) {
         EntityRef character = entity.getComponent(ClientComponent.class).character;
-        if (character.exists()) {
-            event.getPlayerStore().setCharacter(character);
-        }
         removeRelevanceEntity(entity);
     }
 

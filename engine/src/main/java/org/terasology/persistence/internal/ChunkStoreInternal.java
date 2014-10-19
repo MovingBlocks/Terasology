@@ -42,7 +42,6 @@ final class ChunkStoreInternal implements ChunkStore {
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
     private TIntSet externalRefs;
-    private List<EntityRef> entitiesToStore = Lists.newArrayList();
 
     public ChunkStoreInternal(Chunk chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
         this.chunk = chunk;
@@ -73,59 +72,7 @@ final class ChunkStoreInternal implements ChunkStore {
     }
 
     @Override
-    public void save() {
-        save(true);
-    }
-
-    @Override
-    public void save(boolean deactivateEntities) {
-        EntityStorer storer = new EntityStorer(entityManager);
-        for (EntityRef entityRef : entitiesToStore) {
-            storer.store(entityRef, deactivateEntities);
-        }
-        entityStore = storer.finaliseStore();
-        externalRefs = storer.getExternalReferences();
-        storageManager.store(this, externalRefs);
-        entitiesToStore.clear();
-    }
-
-    @Override
-    public void store(EntityRef entity) {
-        entitiesToStore.add(entity);
-    }
-
-    @Override
-    public void storeAllEntities() {
-        AABB aabb = chunk.getAABB();
-        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
-            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
-                    if (aabb.contains(loc.getWorldPosition())) {
-                        if (entity.isPersistent()) {
-                            store(entity);
-                        } else {
-                            entity.destroy();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
     public void restoreEntities() {
         new EntityRestorer(entityManager).restore(entityStore, externalRefs);
-    }
-
-    public EntityData.ChunkStore getStore() {
-        chunk.lock();
-        try {
-            EntityData.ChunkStore.Builder encoded = chunk.encode();
-            encoded.setStore(entityStore);
-            return encoded.build();
-        } finally {
-            chunk.unlock();
-        }
     }
 }

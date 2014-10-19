@@ -37,12 +37,8 @@ import org.terasology.logic.console.Console;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.events.DisconnectedEvent;
-import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
@@ -52,9 +48,7 @@ import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.BlockManager;
-import org.terasology.world.chunks.ChunkProvider;
 
-import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -128,6 +122,10 @@ public class StateIngame implements GameState {
         }
 
         boolean save = networkSystem.getMode().isAuthority();
+        if (save) {
+            storageManager.startSaving();
+        }
+
         networkSystem.shutdown();
         // TODO: Shutdown background threads
         eventSystem.process();
@@ -140,13 +138,11 @@ public class StateIngame implements GameState {
         }
         componentSystemManager.shutdown();
 
-        if (save) {
-            CoreRegistry.get(Game.class).save();
-        }
-
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
+
+        storageManager.finishSavingAndShutdown();
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
         CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
@@ -176,35 +172,18 @@ public class StateIngame implements GameState {
         }
 
         if (isSavingNecessaryAndPossible()) {
-            logger.info("Auto saving...");
+            logger.info("Auto save - Creating game snapshot");
             PerformanceMonitor.startActivity("Auto Saving");
-            CoreRegistry.get(Game.class).save(false);
-            /*
-             * Saving without shutting down the threads of the storage manger is important, as otherwise the chunks don't get saved
-             * TODO maybe reorder? and makit just not shutdown
-             */
-            CoreRegistry.get(ChunkProvider.class).saveChunks();
-            for (Client client : networkSystem.getPlayers()) {
-                PlayerStore playerStore = storageManager.createPlayerStoreForSave(client.getId());
-                EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
-                if (character.exists()) {
-                    playerStore.setCharacter(character);
-                }
-                playerStore.save(false);
-            }
-            try {
-                storageManager.flush();
-                logger.info("Auto complete");
-            } catch (IOException e) {
-                logger.info("Auto save failed");
-            }
-            // TODO refactor: Game#save also flushes the storage manager
+            storageManager.startSaving();
             scheduleNextAutoSave();
             PerformanceMonitor.endActivity();
+            logger.info("Auto save - Snapshot created: Writing phase starts");
         }
 
         updateUserInterface(delta);
     }
+
+
 
     @Override
     public void handleInput(float delta) {

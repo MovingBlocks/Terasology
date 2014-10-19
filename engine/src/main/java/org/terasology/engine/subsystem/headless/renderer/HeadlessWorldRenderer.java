@@ -71,7 +71,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(noCamera);
         config = CoreRegistry.get(Config.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
     }
 
     @Override

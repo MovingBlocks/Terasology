@@ -16,22 +16,23 @@
 package org.terasology.world;
 
 import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
+import org.terasology.persistence.StorageManager;
+import org.terasology.registry.In;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius
  */
+@RegisterSystem
 public class WorldCommands extends BaseComponentSystem {
 
-    private ChunkProvider chunkProvider;
+    @In
+    private StorageManager storageManager;
 
-    public WorldCommands(ChunkProvider chunkProvider) {
-        this.chunkProvider = chunkProvider;
-    }
-
-    @Command(shortDescription = "Purges all generated chunks which triggers re-generation")
-    public void purgeWorld() {
-        chunkProvider.purgeChunks();
+    @Command(shortDescription = "Triggers the creation of a save game")
+    public void save() {
+        storageManager.startSaving();
     }
 }
