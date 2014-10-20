@@ -54,6 +54,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
 import java.io.BufferedInputStream;
@@ -202,22 +203,15 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
         Vector3i chunkPosition = chunk.getPosition();
 
-        EntityData.ChunkStore chunkStore;
-        chunk.lock();
-        try {
-            EntityData.ChunkStore.Builder encoded = chunk.encode();
-            encoded.setStore(entityStore);
-            chunkStore = encoded.build();
-        } finally {
-            chunk.unlock();
-        }
-
+        ChunkImpl chunkImpl = (ChunkImpl) chunk;
+        chunkImpl.createSnapshot();
+        CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(entityStore, chunkImpl);
+        saveTransactionBuilder.addCompressedChunkBuilder(chunkPosition, compressedChunkBuilder);
 
         if (externalRefs.size() > 0) {
             StoreMetadata metadata = new StoreMetadata(new ChunkStoreId(chunkPosition), externalRefs);
             indexStoreMetadata(metadata);
         }
-        saveTransactionBuilder.addChunkStore(chunkPosition, chunkStore);
     }
 
     private List<EntityRef> getEntitiesOfChunk(Chunk chunk) {

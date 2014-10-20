@@ -28,7 +28,7 @@ import java.util.Map;
  */
 class SaveTransactionBuilder {
     private Map<String, EntityData.PlayerStore> playerStores = Maps.newHashMap();
-    private Map<Vector3i, EntityData.ChunkStore> chunkStores = Maps.newHashMap();
+    private Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilders = Maps.newHashMap();
     private EntityData.GlobalStore globalStore;
     private final boolean storeChunksInZips;
     private final StoragePathProvider storagePathProvider;
@@ -47,12 +47,12 @@ class SaveTransactionBuilder {
         this.globalStore = globalStore;
     }
 
-    public void addChunkStore(final Vector3i chunkPosition, final EntityData.ChunkStore store) {
-        chunkStores.put(chunkPosition, store);
+    public void addCompressedChunkBuilder(final Vector3i chunkPosition, final CompressedChunkBuilder b) {
+        compressedChunkBuilders.put(chunkPosition, b);
     }
 
     public SaveTransaction build() {
-        return new SaveTransaction(playerStores, globalStore, chunkStores, gameManifest, storeChunksInZips, storagePathProvider);
+        return new SaveTransaction(playerStores, globalStore, compressedChunkBuilders, gameManifest, storeChunksInZips, storagePathProvider);
     }
 
     public void setGameManifest(GameManifest gameManifest) {

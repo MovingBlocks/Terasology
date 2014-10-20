@@ -26,14 +26,12 @@ import org.terasology.protobuf.EntityData;
 import org.terasology.utilities.concurrency.AbstractTask;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
@@ -51,7 +49,7 @@ public class SaveTransaction extends AbstractTask {
 
     // Unprocessed data to save:
     private final Map<String, EntityData.PlayerStore> playerStores;
-    private final Map<Vector3i, EntityData.ChunkStore> chunkStores;
+    private final Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilders;
     private final EntityData.GlobalStore globalStore;
 
     // Save parameters:
@@ -62,10 +60,10 @@ public class SaveTransaction extends AbstractTask {
 
 
     public SaveTransaction(Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
-                           Map<Vector3i, EntityData.ChunkStore> chunkStores, GameManifest gameManifest,
+                           Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilder, GameManifest gameManifest,
                            boolean storeChunksInZips, StoragePathProvider storagePathProvider) {
         this.playerStores = playerStores;
-        this.chunkStores = chunkStores;
+        this.compressedChunkBuilders = compressedChunkBuilder;
         this.globalStore = globalStore;
         this.gameManifest = gameManifest;
         this.storeChunksInZips = storeChunksInZips;
@@ -128,8 +126,8 @@ public class SaveTransaction extends AbstractTask {
         Files.createDirectories(chunksPath);
         if (storeChunksInZips) {
             Map<Vector3i, FileSystem> newChunkZips = Maps.newHashMap();
-            for (Map.Entry<Vector3i, EntityData.ChunkStore> chunkStoreEntry : chunkStores.entrySet()) {
-                Vector3i chunkPos = chunkStoreEntry.getKey();
+            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : compressedChunkBuilders.entrySet()) {
+                Vector3i chunkPos = entry.getKey();
                 Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
                 FileSystem zip = newChunkZips.get(chunkZipPos);
                 if (zip == null) {
@@ -139,7 +137,8 @@ public class SaveTransaction extends AbstractTask {
                     newChunkZips.put(chunkZipPos, zip);
                 }
                 Path chunkPath = zip.getPath(storagePathProvider.getChunkFilename(chunkPos));
-                byte[] compressedChunk = compressChunkStore(chunkStoreEntry.getValue());
+                CompressedChunkBuilder compressedChunkBuilder = entry.getValue();
+                byte[] compressedChunk = compressedChunkBuilder.buildEncodedChunk();
                 try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     bos.write(compressedChunk);
                 }
@@ -171,11 +170,11 @@ public class SaveTransaction extends AbstractTask {
                 Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } else {
-            for (Map.Entry<Vector3i, EntityData.ChunkStore> chunkStoreEntry : chunkStores.entrySet()) {
-                byte[] compressedChunk = compressChunkStore(chunkStoreEntry.getValue());
-                Vector3i chunkPos = chunkStoreEntry.getKey();
+            for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : compressedChunkBuilders.entrySet()) {
+                Vector3i chunkPos = entry.getKey();
+                CompressedChunkBuilder compressedChunkBuilder = entry.getValue();
+                byte[] compressedChunk = compressedChunkBuilder.buildEncodedChunk();
                 Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
-
                 try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     out.write(compressedChunk);
                 }
@@ -184,17 +183,6 @@ public class SaveTransaction extends AbstractTask {
     }
 
 
-
-    private byte[] compressChunkStore(EntityData.ChunkStore store) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (GZIPOutputStream gzipOut = new GZIPOutputStream(baos)) {
-            store.writeTo(gzipOut);
-        } catch(IOException e) {
-            // as no real IO is involved this should not happen
-            throw new RuntimeException(e);
-        }
-        return baos.toByteArray();
-    }
 
     /**
      *
