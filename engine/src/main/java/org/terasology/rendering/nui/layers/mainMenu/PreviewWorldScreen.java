@@ -16,6 +16,7 @@
 package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -25,6 +26,7 @@ import org.terasology.config.Config;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
@@ -44,6 +46,7 @@ import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.WorldGenerator2DPreview;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.nio.ByteBuffer;
@@ -80,7 +83,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        WorldGeneratorPluginLibrary.setupTempEnvironmentForPlugins();
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
         WorldGeneratorInfo info = worldGeneratorManager.getWorldGeneratorInfo(config.getWorldGeneration().getDefaultGenerator());
 
         try {

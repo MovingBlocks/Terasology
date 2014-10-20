@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -43,6 +44,7 @@ import org.terasology.world.generator.WorldConfigurator;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.TempWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 
 import java.util.Map;
@@ -72,7 +74,7 @@ public class ConfigWorldGenScreen extends CoreScreenLayer {
     public void onOpened() {
         super.onOpened();
 
-        WorldGeneratorPluginLibrary.setupTempEnvironmentForPlugins();
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new TempWorldGeneratorPluginLibrary());
 
         PropertyLayout properties = find("properties", PropertyLayout.class);
         properties.setOrdering(PropertyOrdering.byLabel());

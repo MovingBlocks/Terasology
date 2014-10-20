@@ -46,6 +46,7 @@ import org.terasology.world.chunks.localChunkProvider.RelevanceSystem;
 import org.terasology.world.generator.UnresolvedWorldGeneratorException;
 import org.terasology.world.generator.WorldGenerator;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
+import org.terasology.world.generator.plugin.DefaultWorldGeneratorPluginLibrary;
 import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldInfo;
@@ -73,7 +74,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new WorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
                 CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
 
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
