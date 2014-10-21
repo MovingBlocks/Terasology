@@ -17,12 +17,15 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
@@ -37,10 +40,13 @@ import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
+import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.*;
+import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
@@ -77,7 +83,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
 
-    private final TaskMaster<Task> saveThreadManger;
+    private final TaskMaster<Task> saveThreadManager;
 
     private ModuleEnvironment environment;
     private EngineEntityManager entityManager;
@@ -86,11 +92,16 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private TIntObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TIntObjectHashMap<>();
     private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
 
-    private Map<Vector3i, ChunkStoreInternal> pendingProcessingChunkStore = Maps.newConcurrentMap();
-
     private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
-    private LinkedList<SaveTransaction> saveTransactions = Lists.newLinkedList();
+    private SaveTransaction saveTransaction;
+    private Config config;
+
+    /**
+     * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
+     */
+    private Long nextAutoSave;
+    private boolean saveRequested;
 
     public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
         this(environment, entityManager, true);
@@ -103,30 +114,30 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
         this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
-        this.saveThreadManger = TaskMaster.createFIFOTaskMaster("Saving", 1);
+        this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
+        this.config = CoreRegistry.get(Config.class);
+
     }
 
     @Override
     public void finishSavingAndShutdown() {
-        startSaving();
-        saveThreadManger.shutdown(new ShutdownTask(), true);
-        checkAndRemoveCompletedSaveTransactions();
+        saveThreadManager.shutdown(new ShutdownTask(), true);
+        checkSaveTransactionAndClearVariableIfDone();
     }
 
-    private void checkAndRemoveCompletedSaveTransactions() {
-        Iterator<SaveTransaction> saveTransactionIterator = saveTransactions.iterator();
-        while (saveTransactionIterator.hasNext()) {
-            SaveTransaction saveTransaction = saveTransactionIterator.next();
+    private void checkSaveTransactionAndClearVariableIfDone() {
+        if (saveTransaction != null) {
             SaveTransactionResult result = saveTransaction.getResult();
             if (result != null) {
                 Throwable t = saveTransaction.getResult().getCatchedThrowable();
                 if (t != null) {
                     throw new RuntimeException("Saving failed", t);
                 }
-                saveTransactionIterator.remove();
+                saveTransaction = null;
             }
         }
     }
+
 
     @Override
     public void onPlayerDisconnect(String id) {
@@ -237,21 +248,22 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
 
     @Override
-    public void startSaving() {
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
-            sys.preSave();
-        }
+    public void requestSaving() {
+        this.saveRequested = true;
+    }
 
-        checkAndRemoveCompletedSaveTransactions();
-        saveThreadManger.clearQueue();
-        SaveTransaction saveTransaction = createSaveTransaction();
-        saveThreadManger.offer(saveTransaction);
-        saveTransactions.add(saveTransaction);
+    @Override
+    public void waitForCompletionOfPreviousSaveAndStartSaving() {
+        waitForCompletionOfPreviousSave();
+        startSaving();
+    }
 
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
-            sys.postSave();
+    private void waitForCompletionOfPreviousSave() {
+        if (saveTransaction != null && saveTransaction.getResult() == null) {
+            saveThreadManager.shutdown(new ShutdownTask(), true);
+            saveThreadManager.restart();
         }
+        checkSaveTransactionAndClearVariableIfDone();
     }
 
     private SaveTransaction createSaveTransaction() {
@@ -425,4 +437,75 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         saveTransactionBuilder.setGameManifest(gameManifest);
     }
 
+    @Override
+    public void update() {
+        if (!isRunModeAllowSaving()) {
+            return;
+        }
+        if (isSaving()) {
+            return;
+        }
+
+        checkSaveTransactionAndClearVariableIfDone();
+        if (saveRequested || isAutoSavingWantedAndPossible()) {
+            startSaving();
+        }
+    }
+
+    private boolean isRunModeAllowSaving() {
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        return networkSystem.getMode().isAuthority();
+    }
+
+    private void startSaving() {
+        logger.info("Saving - Creating game snapshot");
+        PerformanceMonitor.startActivity("Auto Saving");
+        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.preSave();
+        }
+
+        saveRequested = false;
+        saveTransaction = createSaveTransaction();
+        saveThreadManager.offer(saveTransaction);
+
+        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
+            sys.postSave();
+        }
+        scheduleNextAutoSave();
+        PerformanceMonitor.endActivity();
+        logger.info("Saving - Snapshot created: Writing phase starts");
+    }
+
+
+    private boolean isAutoSavingWantedAndPossible() {
+        if (!config.getSystem().isAutoSaveEnabled()) {
+            return false;
+        }
+
+        if (saveRequested) {
+            return true;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        if (nextAutoSave == null) {
+            scheduleNextAutoSave();
+            return false;
+        }
+        if (currentTime >= nextAutoSave) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private void scheduleNextAutoSave() {
+        long msBetweenAutoSave = config.getSystem().getSecondsBetweenAutoSave() * 1000;
+        nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
+    }
+
+    public boolean isSaving() {
+        return saveTransaction != null && saveTransaction.getResult() == null;
+    }
 }

@@ -40,7 +40,9 @@ public interface StorageManager {
      */
     PlayerStore loadPlayerStore(String playerId);
 
-    void startSaving();
+    void requestSaving();
+
+    void waitForCompletionOfPreviousSaveAndStartSaving();
 
     /**
      * Loads a saved chunk store
@@ -52,4 +54,6 @@ public interface StorageManager {
     void finishSavingAndShutdown();
 
     void onPlayerDisconnect(String id);
+
+    void update();
 }

@@ -20,7 +20,6 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Command;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.In;
-import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius
@@ -33,6 +32,6 @@ public class WorldCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Triggers the creation of a save game")
     public void save() {
-        storageManager.startSaving();
+        storageManager.requestSaving();
     }
 }

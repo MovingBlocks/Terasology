@@ -30,7 +30,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -70,14 +69,11 @@ public class StateIngame implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
-    private Config config;
+    ;
 
     /* GAME LOOP */
     private boolean pauseGame;
-    /**
-     * Time of the next save in the format that {@link System#currentTimeMillis()} returns.
-     */
-    private Long nextAutoSave;
+
     private StorageManager storageManager;
 
     public StateIngame() {
@@ -93,7 +89,6 @@ public class StateIngame implements GameState {
         inputSystem = CoreRegistry.get(InputSystem.class);
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
-        config = CoreRegistry.get(Config.class);
         storageManager = CoreRegistry.get(StorageManager.class);
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
@@ -123,7 +118,7 @@ public class StateIngame implements GameState {
 
         boolean save = networkSystem.getMode().isAuthority();
         if (save) {
-            storageManager.startSaving();
+            storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
         }
 
         networkSystem.shutdown();
@@ -171,14 +166,8 @@ public class StateIngame implements GameState {
             worldRenderer.update(delta);
         }
 
-        if (isSavingNecessaryAndPossible()) {
-            logger.info("Auto save - Creating game snapshot");
-            PerformanceMonitor.startActivity("Auto Saving");
-            storageManager.startSaving();
-            scheduleNextAutoSave();
-            PerformanceMonitor.endActivity();
-            logger.info("Auto save - Snapshot created: Writing phase starts");
-        }
+        storageManager.update();
+
 
         updateUserInterface(delta);
     }
@@ -247,34 +236,6 @@ public class StateIngame implements GameState {
 
     public boolean isGamePaused() {
         return pauseGame;
-    }
-
-
-    private boolean isSavingNecessaryAndPossible() {
-        if (!config.getSystem().isAutoSaveEnabled()) {
-            return false;
-        }
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        boolean isAuthority = networkSystem.getMode().isAuthority();
-        if (!isAuthority ) {
-            return false;
-        }
-        long currentTime = System.currentTimeMillis();
-        if (nextAutoSave == null) {
-            scheduleNextAutoSave();
-            return false;
-        }
-        if (currentTime >= nextAutoSave) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    private void scheduleNextAutoSave() {
-        long msBetweenAutoSave = config.getSystem().getSecondsBetweenAutoSave() * 1000;
-        nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 
 }
