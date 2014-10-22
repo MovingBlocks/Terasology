@@ -183,8 +183,14 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             if (worldProvider.isBlockRelevant(pos)) {
                 spawnPlayer(entity, getSafeSpawnPosition());
             } else {
+                // Move the player (before it's spawned) to the spawn-position to make sure the relevance
+                // loads the chunk at some point
+                Vector3f spawnPosition = getSafeSpawnPosition().toVector3f();
+                loc.setWorldPosition(spawnPosition);
+                entity.saveComponent(loc);
+                
                 SpawningClientInfo spawningClientInfo = new SpawningClientInfo(entity,
-                        getSafeSpawnPosition().toVector3f());
+                        spawnPosition);
                 clientsPreparingToSpawn.add(spawningClientInfo);
             }
         }
