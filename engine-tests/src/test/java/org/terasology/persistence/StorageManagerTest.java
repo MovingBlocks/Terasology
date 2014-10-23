@@ -134,6 +134,16 @@ public class StorageManagerTest {
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         
         CoreRegistry.put(ChunkProvider.class, mock(ChunkProvider.class));
+
+        Game game = mock(Game.class);
+        when(game.getTime()).thenReturn(mock(EngineTime.class));
+        CoreRegistry.put(Game.class, game);
+        BiomeManager biomeManager = mock(BiomeManager.class);
+        when(biomeManager.getBiomes()).thenReturn(Collections.<Biome> emptyList());
+        CoreRegistry.put(BiomeManager.class, biomeManager);
+        WorldProvider worldProvider = mock(WorldProvider.class);
+        when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
+        CoreRegistry.put(WorldProvider.class, worldProvider);
     }
 
     @Test
@@ -233,22 +243,9 @@ public class StorageManagerTest {
     }
 
     
-    private void registerMocksForSaving() {
-        Game game = mock(Game.class);
-        when(game.getTime()).thenReturn(mock(EngineTime.class));
-        CoreRegistry.put(Game.class, game);
-        BiomeManager biomeManager = mock(BiomeManager.class);
-        when(biomeManager.getBiomes()).thenReturn(Collections.<Biome> emptyList());
-        CoreRegistry.put(BiomeManager.class, biomeManager);
-        WorldProvider worldProvider = mock(WorldProvider.class);
-        when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
-        CoreRegistry.put(WorldProvider.class, worldProvider);
-    }
 
     @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
-        registerMocksForSaving();
-
         EntityRef entity = entityManager.create(new StringComponent("Test"));
         int entityId = entity.getId();
 
@@ -291,7 +288,6 @@ public class StorageManagerTest {
 
     @Test
     public void storeAndRestoreChunkStore() {
-        registerMocksForSaving();
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
@@ -310,7 +306,6 @@ public class StorageManagerTest {
 
     @Test
     public void chunkSurvivesStorageSaveAndRestore() throws Exception {
-        registerMocksForSaving();
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
@@ -339,7 +334,6 @@ public class StorageManagerTest {
 
     @Test
     public void entitySurvivesStorageInChunkStore() throws Exception {
-        registerMocksForSaving();
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
