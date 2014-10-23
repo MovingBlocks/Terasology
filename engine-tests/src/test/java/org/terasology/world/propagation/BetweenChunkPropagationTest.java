@@ -44,6 +44,7 @@ import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -231,8 +232,8 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void saveChunks() {
-
+        public Collection<Chunk> getAllChunks() {
+            return this.chunks.values();
         }
 
         @Override
@@ -286,8 +287,14 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         }
 
         @Override
-        public void purgeChunks() {
+        public void restart() {
+
+        }
+
+        @Override
+        public void shutdown() {
 
         }
     }
+
 }
