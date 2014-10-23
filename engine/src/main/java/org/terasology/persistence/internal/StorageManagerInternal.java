@@ -499,6 +499,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
+    /**
+     * For tests only
+     * 
+     */
+    public void setStoreChunksInZips(boolean storeChunksInZips) {
+        this.storeChunksInZips = storeChunksInZips;
+    }
 
     private void scheduleNextAutoSave() {
         long msBetweenAutoSave = config.getSystem().getSecondsBetweenAutoSave() * 1000;
@@ -508,4 +515,5 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     public boolean isSaving() {
         return saveTransaction != null && saveTransaction.getResult() == null;
     }
+
 }

@@ -21,13 +21,18 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.asset.AssetManager;
 import org.terasology.config.Config;
+import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.EngineTime;
+import org.terasology.engine.Time;
 import org.terasology.engine.bootstrap.EntitySystemBuilder;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -37,8 +42,10 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
+import org.terasology.network.Client;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -76,7 +83,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Immortius
  */
-public class StorageManagerTest extends TerasologyTestingEnvironment {
+public class StorageManagerTest {
 
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
@@ -86,13 +93,16 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
     private StorageManagerInternal esm;
     private EngineEntityManager entityManager;
     private Block testBlock;
+    private Block testBlock2;
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
     public void setup() throws Exception {
-        super.setup();
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
-        PathManager.getInstance().useOverrideHomePath(vfs.getPath(""));
+        PathManager.getInstance().useOverrideHomePath(temporaryFolder.getRoot().toPath());
         PathManager.getInstance().setCurrentSaveTitle("testSave");
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
@@ -100,17 +110,30 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         moduleManager = ModuleManagerFactory.create();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
+        // TODO return list to verify it gets saved properly
+        when(networkSystem.getPlayers()).thenReturn(Collections.<Client> emptyList());
+        CoreRegistry.put(ModuleManager.class, moduleManager);
+        CoreRegistry.put(Config.class, new Config());
+        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        CoreRegistry.put(NetworkSystem.class, networkSystem);
+
         entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
 
         BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
+        testBlock.setId((short) 1);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock"), testBlock), true);
+        testBlock2 = new Block();
+        testBlock2.setId((short) 2);
+        blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
 
         esm = new StorageManagerInternal(moduleManager.getEnvironment(), entityManager, false);
+        CoreRegistry.put(StorageManager.class, esm);
 
-        CoreRegistry.put(Config.class, new Config());
-        CoreRegistry.put(ModuleManager.class, moduleManager);
-        CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
+        ComponentSystemManager componentSystemManager = new ComponentSystemManager();
+        CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
+        
+        CoreRegistry.put(ChunkProvider.class, mock(ChunkProvider.class));
     }
 
     @Test
@@ -211,7 +234,6 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
     
     private void registerMocksForSaving() {
-        CoreRegistry.put(ChunkProvider.class, mock(ChunkProvider.class));
         Game game = mock(Game.class);
         when(game.getTime()).thenReturn(mock(EngineTime.class));
         CoreRegistry.put(Game.class, game);
@@ -291,15 +313,20 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         registerMocksForSaving();
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
+        chunk.setBlock(0, 4, 2, testBlock2);
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
+        when(chunkProvider.getChunk(Mockito.any(Vector3i.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
+        boolean storeChunkInZips = true;
 
+        esm.setStoreChunksInZips(storeChunkInZips);
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager,
+                storeChunkInZips);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
@@ -307,6 +334,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
         assertEquals(CHUNK_POS, restored.getChunkPosition());
         assertNotNull(restored.getChunk());
         assertEquals(testBlock, restored.getChunk().getBlock(0, 0, 0));
+        assertEquals(testBlock2, restored.getChunk().getBlock(0, 4, 2));
     }
 
     @Test
