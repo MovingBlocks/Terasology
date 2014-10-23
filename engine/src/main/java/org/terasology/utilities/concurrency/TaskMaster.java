@@ -64,6 +64,10 @@ public final class TaskMaster<T extends Task> {
         return new TaskMaster<>(name, threads, new PriorityBlockingQueue<T>(queueSize, comparator));
     }
 
+    public static <T extends Task> TaskMaster<T> createDynamicPriorityTaskMaster(String name, int threads, Comparator<T> comparator) {
+        return new TaskMaster<>(name, threads, new DynamicPriorityBlockingQueue<T>(comparator));
+    }
+
     /**
      * Offers a task to this task master. This does not block, but may fail if the queue is full.
      *
