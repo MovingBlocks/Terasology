@@ -77,12 +77,22 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         }
     }
 
-    @Override
+    public T poll() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return dequeue();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public T take() throws InterruptedException {
+        final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         T result;
         try {
-            while ( (result = extract()) == null)
+            while ( (result = dequeue()) == null)
                 notEmpty.await();
         } finally {
             lock.unlock();
@@ -90,14 +100,13 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         return result;
     }
 
-    @Override
     public T poll(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
         final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         T result;
         try {
-            while ( (result = extract()) == null && nanos > 0)
+            while ( (result = dequeue()) == null && nanos > 0)
                 nanos = notEmpty.awaitNanos(nanos);
         } finally {
             lock.unlock();
@@ -105,7 +114,20 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         return result;
     }
 
-    private T extract() {
+    public T peek() {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return elements.size() == 0 ? null : elements.get(0);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private T dequeue() {
+        if (elements.size() == 0) {
+            return null;
+        }
         T smallest = elements.get(0);
         ListIterator<T> iterator = elements.listIterator();
         while (iterator.hasNext()) {
@@ -151,32 +173,6 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         } finally {
             lock.unlock();
         }
-    }
-
-    @Override
-    public T poll() {
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-        T result;
-        try {
-            result = extract();
-        } finally {
-            lock.unlock();
-        }
-        return result;
-    }
-
-    @Override
-    public T peek() {
-        final ReentrantLock lock = this.lock;
-        lock.lock();
-        T result;
-        try {
-            result = elements.size() > 0 ? elements.get(0) : null;
-        } finally {
-            lock.unlock();
-        }
-        return result;
     }
 
     @Override

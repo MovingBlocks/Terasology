@@ -32,7 +32,7 @@ public class ChunkGenerationPipeline {
     private TaskMaster<ChunkTask> chunkGenerator;
 
     public ChunkGenerationPipeline(Comparator<ChunkTask> taskComparator) {
-        chunkGenerator = TaskMaster.createPriorityTaskMaster("Chunk-Generator", NUM_TASK_THREADS, 128, taskComparator);
+        chunkGenerator = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Generator", NUM_TASK_THREADS, taskComparator);
     }
 
     public void doTask(ChunkTask task) {
