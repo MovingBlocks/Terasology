@@ -16,6 +16,8 @@
 package org.terasology.utilities.concurrency;
 
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.AbstractQueue;
 import java.util.Collection;
@@ -128,7 +130,7 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         if (elements.size() == 0) {
             return null;
         }
-        T smallest = elements.get(0);
+        T smallest = elements.remove(0);
         ListIterator<T> iterator = elements.listIterator();
         while (iterator.hasNext()) {
             T next = iterator.next();
