@@ -43,12 +43,15 @@ import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.internal.LocalClient;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.Color;
 import org.terasology.testUtil.ModuleManagerFactory;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
@@ -82,6 +85,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 public class StorageManagerTest {
 
@@ -94,6 +98,7 @@ public class StorageManagerTest {
     private EngineEntityManager entityManager;
     private Block testBlock;
     private Block testBlock2;
+    private EntityRef character;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -110,14 +115,19 @@ public class StorageManagerTest {
         moduleManager = ModuleManagerFactory.create();
         networkSystem = mock(NetworkSystem.class);
         when(networkSystem.getMode()).thenReturn(NetworkMode.NONE);
-        // TODO return list to verify it gets saved properly
-        when(networkSystem.getPlayers()).thenReturn(Collections.<Client> emptyList());
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(Config.class, new Config());
         CoreRegistry.put(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
         CoreRegistry.put(NetworkSystem.class, networkSystem);
 
-        entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
+        entityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem,
+                new ReflectionReflectFactory());
+
+        this.character = entityManager.create();
+        EntityRef character = this.character;
+        Client client = createClientMock(PLAYER_ID, character);
+
+        when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
 
         BlockManagerImpl blockManager = CoreRegistry.put(BlockManager.class, new BlockManagerImpl(mock(WorldAtlas.class), new DefaultBlockFamilyFactoryRegistry()));
         testBlock = new Block();
@@ -144,6 +154,25 @@ public class StorageManagerTest {
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         CoreRegistry.put(WorldProvider.class, worldProvider);
+
+
+
+    }
+
+    private Client createClientMock(String clientId, EntityRef character) {
+        EntityRef clientEntity = createClientEntity(character);
+        Client client = mock(Client.class);
+        when(client.getEntity()).thenReturn(clientEntity);
+        when(client.getId()).thenReturn(clientId);
+        return client;
+    }
+
+    private EntityRef createClientEntity(EntityRef character) {
+        ClientComponent clientComponent = new ClientComponent();
+        clientComponent.local = true;
+        clientComponent.character = character;
+        EntityRef clientEntity = entityManager.create(clientComponent);
+        return clientEntity;
     }
 
     @Test
@@ -156,9 +185,13 @@ public class StorageManagerTest {
     }
 
     @Test
-    public void storeAndRestorePlayerStore() {
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.save();
+    public void storeAndRestoreOfPlayerWithoutCharacter() {
+        // remove character from player:
+        character.destroy();
+
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
+
         PlayerStore restoredStore = esm.loadPlayerStore(PLAYER_ID);
         assertNotNull(restoredStore);
         assertFalse(restoredStore.hasCharacter());
@@ -168,24 +201,19 @@ public class StorageManagerTest {
     @Test
     public void playerRelevanceLocationSurvivesStorage() {
         Vector3f loc = new Vector3f(1, 2, 3);
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setRelevanceLocation(loc);
-        assertEquals(loc, store.getRelevanceLocation());
-        store.save();
+        character.addComponent(new LocationComponent(loc));
+
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
 
         PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
         assertEquals(loc, restored.getRelevanceLocation());
     }
 
     @Test
-    public void addCharacterSurvivesStorage() {
-        EntityRef character = entityManager.create();
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        assertFalse(store.hasCharacter());
-        store.setCharacter(character);
-        assertTrue(store.hasCharacter());
-        assertEquals(character, store.getCharacter());
-        store.save();
+    public void characterSurvivesStorage() {
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
 
         PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
         restored.restoreEntities();
@@ -194,30 +222,12 @@ public class StorageManagerTest {
     }
 
     @Test
-    public void relevanceLocationSetToCharacterLocation() {
-        Vector3f loc = new Vector3f(1, 2, 3);
-        EntityRef character = entityManager.create(new LocationComponent(loc));
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        assertEquals(loc, store.getRelevanceLocation());
-    }
-
-    @Test
-    public void characterEntityDeactivatedWhileStored() {
-        EntityRef character = entityManager.create();
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        store.save();
-        assertFalse(character.isActive());
-    }
-
-    @Test
     public void referenceCorrectlyInvalidatedWhileStored() {
         EntityRef someEntity = entityManager.create();
-        EntityRef character = entityManager.create(new EntityRefComponent(someEntity));
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        store.save();
+        character.addComponent(new EntityRefComponent(someEntity));
+
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
 
         someEntity.destroy();
         entityManager.create(); // This causes the destroyed entity's id to be reused
@@ -226,22 +236,6 @@ public class StorageManagerTest {
         restored.restoreEntities();
         assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
     }
-
-    @Test
-    public void canSaveAndRestoreStorage() throws Exception {
-        EntityRef character = entityManager.create();
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        store.save();
-
-        esm.flush();
-
-        EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager);
-        newSM.loadGlobalStore();
-        assertNotNull(newSM.loadPlayerStore(PLAYER_ID));
-    }
-
     
 
     @Test
@@ -264,13 +258,10 @@ public class StorageManagerTest {
     @Test
     public void referenceRemainsValidOverStorageRestoral() throws Exception {
         EntityRef someEntity = entityManager.create();
-        EntityRef character = entityManager.create(new EntityRefComponent(someEntity));
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        store.save();
-        esm.createGlobalStoreForSave();
+        character.addComponent(new EntityRefComponent(someEntity));
 
-        esm.flush();
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
@@ -362,14 +353,11 @@ public class StorageManagerTest {
         assertTrue(ref.isActive());
     }
 
+
     @Test
     public void canSavePlayerWithoutUnloading() throws Exception {
-        EntityRef character = entityManager.create();
-        PlayerStore store = esm.createPlayerStoreForSave(PLAYER_ID);
-        store.setCharacter(character);
-        store.save(false);
-
-        esm.flush();
+        esm.waitForCompletionOfPreviousSaveAndStartSaving();
+        esm.finishSavingAndShutdown();
 
         assertTrue(character.isActive());
     }
