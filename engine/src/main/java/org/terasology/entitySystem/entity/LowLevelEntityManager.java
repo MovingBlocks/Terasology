@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius

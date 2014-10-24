@@ -23,28 +23,43 @@ import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * Provides an easy to get a compressed version of a chunk from a chunk snapshot taken previously.
+ * Provides an easy to get a compressed version of a chunk. Either the chunk most have a snapshot of it's state
+ * or it must be an unloaded chunk which no longer changes.
+ *
  * @author Florian <florian@fkoeberle.de>
  */
 public class CompressedChunkBuilder {
     private EntityData.EntityStore entityStore;
-    private ChunkImpl chunkWithSnapshot;
+    private ChunkImpl chunk;
+    private boolean viaSnapshot;
+    private byte[] result;
 
     /**
      *
      * @param entityStore encoded entities to be stored.
-     * @param chunkWithSnapshot chunk for which {@link ChunkImpl#createSnapshot()} has been called.
+     * @param chunk chunk for which {@link ChunkImpl#createSnapshot()} has been called.
+     *  @param viaSnapshot specifies if the previously taken snapshot will be encoded or if
      */
-    public CompressedChunkBuilder(EntityData.EntityStore entityStore, ChunkImpl chunkWithSnapshot) {
+    public CompressedChunkBuilder(EntityData.EntityStore entityStore, ChunkImpl chunk, boolean viaSnapshot) {
         this.entityStore = entityStore;
-        this.chunkWithSnapshot = chunkWithSnapshot;
+        this.chunk = chunk;
+        this.viaSnapshot = viaSnapshot;
     }
 
-    public byte[] buildEncodedChunk() {
-        EntityData.ChunkStore.Builder encoded = chunkWithSnapshot.encodeAndReleaseSnapshot();
-        encoded.setStore(entityStore);
-        EntityData.ChunkStore store = encoded.build();
-        return compressChunkStore(store);
+    public synchronized byte[] buildEncodedChunk() {
+        if (result == null) {
+
+            EntityData.ChunkStore.Builder encoded;
+            if (viaSnapshot) {
+                encoded = chunk.encodeAndReleaseSnapshot();
+            } else {
+                encoded = chunk.encode();
+            }
+            encoded.setStore(entityStore);
+            EntityData.ChunkStore store = encoded.build();
+            result = compressChunkStore(store);
+        }
+        return result;
     }
 
     private byte[] compressChunkStore(EntityData.ChunkStore store) {

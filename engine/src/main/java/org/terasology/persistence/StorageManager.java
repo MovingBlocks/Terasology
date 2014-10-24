@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
 
@@ -56,4 +57,10 @@ public interface StorageManager {
     void onPlayerDisconnect(String id);
 
     void update();
+
+    /**
+     * Must be called from the main thread when a chunk got unloaded. The entities must not be disposed yet.
+     * @param chunk
+     */
+    void onChunkUnload(Chunk chunk);
 }

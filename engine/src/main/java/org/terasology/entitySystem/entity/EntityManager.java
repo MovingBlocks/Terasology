@@ -20,6 +20,7 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -161,4 +162,6 @@ public interface EntityManager {
      * @return A count of currently active entities
      */
     int getActiveEntityCount();
+
+    Iterable<EntityRef> getEntitiesOfChunk(Chunk chunk);
 }

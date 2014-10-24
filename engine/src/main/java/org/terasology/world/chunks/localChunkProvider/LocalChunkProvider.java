@@ -27,6 +27,7 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -51,7 +52,6 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -80,6 +80,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
 
     private StorageManager storageManager;
+    private final EntityManager entityManager;
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
@@ -103,9 +104,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
 
-    public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
+    public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator) {
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
+        this.entityManager = entityManager;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
@@ -333,9 +335,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     private void checkForUnload() {
-        if (true) {
-            return; // FIXME
-        }
         PerformanceMonitor.startActivity("Unloading irrelevant chunks");
         int unloaded = 0;
         logger.debug("Compacting cache");
@@ -375,8 +374,12 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     for (ChunkRelevanceRegion region : regions.values()) {
                         region.chunkUnloaded(pos);
                     }
-                    // FIXME storageManager.createChunkStoreForSave(chunk);
-
+                    storageManager.onChunkUnload(chunk);
+                    for (EntityRef entityRef : entityManager.getEntitiesOfChunk(chunk)) {
+                        if (!entityRef.isAlwaysRelevant()) {
+                            entityRef.destroy();
+                        }
+                    }
                     chunk.dispose();
                     try {
                         unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
@@ -487,7 +490,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     public void restart() {
         pipeline.restart();
         unloadRequestTaskMaster.restart();
-        lightMerger.restart();;
+        lightMerger.restart();
     }
 
     @Override

@@ -36,7 +36,6 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -72,15 +71,14 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.zip.GZIPInputStream;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 public final class StorageManagerInternal implements StorageManager, EntityDestroySubscriber {
-
-    private static final int BACKGROUND_THREADS = 4;
-
     private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -102,6 +100,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
      */
     private Long nextAutoSave;
     private boolean saveRequested;
+    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
 
     public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
         this(environment, entityManager, true);
@@ -122,10 +122,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     @Override
     public void finishSavingAndShutdown() {
         saveThreadManager.shutdown(new ShutdownTask(), true);
-        checkSaveTransactionAndClearVariableIfDone();
+        checkSaveTransactionAndClearUpIfItIsDone();
     }
 
-    private void checkSaveTransactionAndClearVariableIfDone() {
+    private void checkSaveTransactionAndClearUpIfItIsDone() {
         if (saveTransaction != null) {
             SaveTransactionResult result = saveTransaction.getResult();
             if (result != null) {
@@ -135,6 +135,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 }
                 saveTransaction = null;
             }
+            unloadedAndSavingChunkMap.clear();
         }
     }
 
@@ -197,17 +198,44 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     private void createChunkStoresForSave(SaveTransactionBuilder saveTransactionBuilder, ChunkProvider chunkProvider) {
+        unloadedAndSavingChunkMap.clear();
+        /**
+         * New entries might be added concurrently. By using putAll + clear to transfer entries we might loose new
+         * ones added in between putAll and clear. Bz iterating we can make sure that all entires removed
+         * from unloadedAndUnsavedChunkMap get added to unloadedAndSavingChunkMap.
+         */
+        Iterator<Map.Entry<Vector3i, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
+        while(unsavedEntryIterator.hasNext()) {
+            Map.Entry<Vector3i, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
+            unloadedAndSavingChunkMap.put(entry.getKey(), entry.getValue());
+            unsavedEntryIterator.remove();
+        }
+
+
         for (Chunk chunk : chunkProvider.getAllChunks()) {
-            createChunkStoreForSave(chunk, saveTransactionBuilder);
+            // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
+            unloadedAndSavingChunkMap.remove(chunk.getPosition());
+            saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), createCompressedChunkBuilder(chunk, true));
+        }
+
+        for (Map.Entry<Vector3i, CompressedChunkBuilder> entry: unloadedAndSavingChunkMap.entrySet()) {
+            saveTransactionBuilder.addCompressedChunkBuilder(entry.getKey(), entry.getValue());
         }
     }
 
-    private void createChunkStoreForSave(Chunk chunk, SaveTransactionBuilder saveTransactionBuilder) {
-        List<EntityRef> entitiesToStore = getEntitiesOfChunk(chunk);
-
+    /**
+     *This method should only be called by the main thread.
+     *
+     * @param viaSnapshot specifies if a snapshot of the chunk data will be created. Only the main thread may set this
+     *                    to true for saving. If it is false the chunk data will be saved directly. The value false
+     *                    requires the chunk to be no longer in use like after unloading.
+     */
+    private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk, boolean viaSnapshot) {
         EntityStorer storer = new EntityStorer(entityManager);
-        for (EntityRef entityRef : entitiesToStore) {
-            storer.store(entityRef, false);
+        for (EntityRef entityRef : entityManager.getEntitiesOfChunk(chunk)) {
+            if (entityRef.isPersistent()) {
+                storer.store(entityRef, false);
+            }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
         TIntSet externalRefs = storer.getExternalReferences();
@@ -215,36 +243,21 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         Vector3i chunkPosition = chunk.getPosition();
 
         ChunkImpl chunkImpl = (ChunkImpl) chunk;
-        chunkImpl.createSnapshot();
-        CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(entityStore, chunkImpl);
-        saveTransactionBuilder.addCompressedChunkBuilder(chunkPosition, compressedChunkBuilder);
+        if (viaSnapshot) {
+            chunkImpl.createSnapshot();
+        }
+        CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
 
         if (externalRefs.size() > 0) {
             StoreMetadata metadata = new StoreMetadata(new ChunkStoreId(chunkPosition), externalRefs);
             indexStoreMetadata(metadata);
         }
+
+        return compressedChunkBuilder;
+
+
     }
 
-    private List<EntityRef> getEntitiesOfChunk(Chunk chunk) {
-        List<EntityRef> entitiesToStore = Lists.newArrayList();
-
-        AABB aabb = chunk.getAABB();
-        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
-            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
-                    if (aabb.contains(loc.getWorldPosition())) {
-                        if (entity.isPersistent()) {
-                            entitiesToStore.add(entity);
-                        } else {
-                            entity.destroy();
-                        }
-                    }
-                }
-            }
-        }
-        return entitiesToStore;
-    }
 
 
     @Override
@@ -263,7 +276,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             saveThreadManager.shutdown(new ShutdownTask(), true);
             saveThreadManager.restart();
         }
-        checkSaveTransactionAndClearVariableIfDone();
+        checkSaveTransactionAndClearUpIfItIsDone();
     }
 
     private SaveTransaction createSaveTransaction() {
@@ -272,7 +285,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-
 
         chunkProvider.shutdown();
         createChunkStoresForSave(saveTransactionBuilder, chunkProvider);
@@ -329,22 +341,40 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         saveTransactionBuilder.addPlayerStore(playerId, playerEntityStore.build());
     }
 
-
     @Override
-    public ChunkStore loadChunkStore(Vector3i chunkPos) {
-        byte[] chunkData = null;
+    public void onChunkUnload(Chunk chunk) {
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, false));
+    }
+
+
+    private byte[] loadCompressedChunk(Vector3i chunkPos) {
+        CompressedChunkBuilder disposedUnsavedChunk = unloadedAndUnsavedChunkMap.get(chunkPos);
+        if (disposedUnsavedChunk != null) {
+            return disposedUnsavedChunk.buildEncodedChunk();
+        }
+        CompressedChunkBuilder disposedSavingChunk = unloadedAndSavingChunkMap.get(chunkPos);
+        if (disposedSavingChunk != null) {
+            return disposedSavingChunk.buildEncodedChunk();
+        }
+
         if (storeChunksInZips) {
-            chunkData = loadChunkZip(chunkPos);
+            return loadChunkZip(chunkPos);
         } else {
             Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
             if (Files.isRegularFile(chunkPath)) {
                 try {
-                    chunkData = Files.readAllBytes(chunkPath);
+                    return Files.readAllBytes(chunkPath);
                 } catch (IOException e) {
                     logger.error("Failed to load chunk {}", chunkPos, e);
                 }
             }
         }
+        return null;
+    }
+
+    @Override
+    public ChunkStore loadChunkStore(Vector3i chunkPos) {
+        byte[] chunkData = loadCompressedChunk(chunkPos);
         ChunkStore store = null;
         if (chunkData != null) {
             TIntSet validRefs = null;
@@ -446,8 +476,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             return;
         }
 
-        checkSaveTransactionAndClearVariableIfDone();
-        if (saveRequested || isAutoSavingWantedAndPossible()) {
+        checkSaveTransactionAndClearUpIfItIsDone();
+        if (saveRequested || isSavingNecessary()) {
             startSaving();
         }
     }
@@ -478,12 +508,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
 
-    private boolean isAutoSavingWantedAndPossible() {
-        if (!config.getSystem().isAutoSaveEnabled()) {
-            return false;
-        }
-
-        if (saveRequested) {
+    private boolean isSavingNecessary() {
+        if (unloadedAndUnsavedChunkMap.size() >= config.getSystem().getMaxUnloadedChunksTillSave()) {
             return true;
         }
 
@@ -508,7 +534,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     private void scheduleNextAutoSave() {
-        long msBetweenAutoSave = config.getSystem().getSecondsBetweenAutoSave() * 1000;
+        long msBetweenAutoSave = config.getSystem().getMaxSecondsBetweenSaves() * 1000;
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 

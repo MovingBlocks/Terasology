@@ -45,7 +45,10 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
+import org.terasology.network.ClientComponent;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -713,6 +716,24 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             return list;
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public Iterable<EntityRef> getEntitiesOfChunk(Chunk chunk) {
+        List<EntityRef> entitiesToStore = Lists.newArrayList();
+
+        AABB aabb = chunk.getAABB();
+        for (EntityRef entity : getEntitiesWith(LocationComponent.class)) {
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    if (aabb.contains(loc.getWorldPosition())) {
+                        entitiesToStore.add(entity);
+                    }
+                }
+            }
+        }
+        return entitiesToStore;
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {

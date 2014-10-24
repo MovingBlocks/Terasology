@@ -17,12 +17,16 @@ package org.terasology.world.chunks.internal;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.network.ClientComponent;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -42,6 +46,7 @@ import org.terasology.world.liquid.LiquidData;
 
 import javax.vecmath.Vector3f;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
