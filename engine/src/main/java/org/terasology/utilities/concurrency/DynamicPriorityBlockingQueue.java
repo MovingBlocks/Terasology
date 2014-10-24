@@ -32,8 +32,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements BlockingQueue<T> {
-    private Comparator<T> comparator;
-    private List<T> elements = Lists.newLinkedList();
+    private final Comparator<T> comparator;
+    private final List<T> elements = Lists.newLinkedList();
 
     /**
      * Lock used for all public operations
@@ -80,7 +80,6 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
     }
 
     public T poll() {
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             return dequeue();
@@ -90,12 +89,12 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
     }
 
     public T take() throws InterruptedException {
-        final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         T result;
         try {
-            while ( (result = dequeue()) == null)
+            while ((result = dequeue()) == null) {
                 notEmpty.await();
+            }
         } finally {
             lock.unlock();
         }
@@ -104,12 +103,12 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
 
     public T poll(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
-        final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         T result;
         try {
-            while ( (result = dequeue()) == null && nanos > 0)
+            while ((result = dequeue()) == null && nanos > 0) {
                 nanos = notEmpty.awaitNanos(nanos);
+            }
         } finally {
             lock.unlock();
         }
@@ -117,7 +116,6 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
     }
 
     public T peek() {
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             return elements.size() == 0 ? null : elements.get(0);
@@ -134,7 +132,7 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         ListIterator<T> iterator = elements.listIterator();
         while (iterator.hasNext()) {
             T next = iterator.next();
-            if (comparator.compare(smallest, next)>0) {
+            if (comparator.compare(smallest, next) > 0) {
                 iterator.set(smallest);
                 smallest = next;
             }
@@ -179,7 +177,6 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
 
     @Override
     public int size() {
-        final ReentrantLock lock = this.lock;
         lock.lock();
         try {
             return elements.size();
