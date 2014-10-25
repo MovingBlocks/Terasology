@@ -63,4 +63,6 @@ public interface StorageManager {
      * @param chunk
      */
     void onChunkUnload(Chunk chunk);
+
+    void checkAndRepairSaveIfNecessary() throws IOException;
 }

@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.game.GameManifest;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
@@ -57,6 +56,7 @@ public class SaveTransaction extends AbstractTask {
 
     // utility classes for saving:
     private final StoragePathProvider storagePathProvider;
+    private final SaveTransactionHelper saveTransactionHelper;
 
 
     public SaveTransaction(Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
@@ -68,6 +68,7 @@ public class SaveTransaction extends AbstractTask {
         this.gameManifest = gameManifest;
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
+        this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
     }
 
 
@@ -78,10 +79,18 @@ public class SaveTransaction extends AbstractTask {
 
     public void run() {
         try {
+            if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
+                // should not happen, as initialization should clean it up
+                throw new IOException("Save rand while there were unmerged changes");
+            }
+            saveTransactionHelper.cleanupSaveTransactionDirectory();
+            createSaveTransactionDirectory();
             writePlayerStores();
             writeGlobalStore();
             writeChunkStores();
             saveGameManifest();
+            perpareChangesForMerge();
+            saveTransactionHelper.mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
         } catch (Throwable t) {
@@ -90,11 +99,28 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+    private void createSaveTransactionDirectory() throws IOException {
+        Path directory = storagePathProvider.getUnfinishedSaveTransactionPath();
+        Files.createDirectories(directory);
+    }
+
+    private void perpareChangesForMerge() throws IOException {
+        Path directoryForUnfinishedFiles = storagePathProvider.getUnfinishedSaveTransactionPath();
+        Path directoryForFinishedFiles = storagePathProvider.getUnmergedChangesPath();
+
+        try {
+            Files.move(directoryForUnfinishedFiles, directoryForFinishedFiles, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            logger.warn("Atomic rename of merge folder was not possible, doing it non atomically...");
+            Files.move(directoryForUnfinishedFiles, directoryForFinishedFiles);
+        }
+    }
+
 
     private void writePlayerStores() throws IOException {
-        Files.createDirectories(storagePathProvider.getPlayersPath());
+        Files.createDirectories(storagePathProvider.getPlayersTempPath());
         for (Map.Entry<String, EntityData.PlayerStore> playerStoreEntry : playerStores.entrySet()) {
-            Path playerFile = storagePathProvider.getPlayerFilePath(playerStoreEntry.getKey());
+            Path playerFile = storagePathProvider.getPlayerFileTempPath(playerStoreEntry.getKey());
             try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(playerFile))) {
                 playerStoreEntry.getValue().writeTo(out);
             }
@@ -102,7 +128,7 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void writeGlobalStore() throws IOException {
-        Path path = storagePathProvider.getGlobalEntityStorePath();
+        Path path = storagePathProvider.getGlobalEntityStoreTempPath();
         try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
             globalStore.writeTo(out);
         }
@@ -122,7 +148,7 @@ public class SaveTransaction extends AbstractTask {
             return;
         }
 
-        Path chunksPath =  storagePathProvider.getWorldPath();
+        Path chunksPath =  storagePathProvider.getWorldTempPath();
         Files.createDirectories(chunksPath);
         if (storeChunksInZips) {
             Map<Vector3i, FileSystem> newChunkZips = Maps.newHashMap();
@@ -131,7 +157,7 @@ public class SaveTransaction extends AbstractTask {
                 Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
                 FileSystem zip = newChunkZips.get(chunkZipPos);
                 if (zip == null) {
-                    Path targetPath = storagePathProvider.getChunkZipTempFilePath(chunkZipPos);
+                    Path targetPath = storagePathProvider.getChunkZipTempPath(chunkZipPos);
                     Files.deleteIfExists(targetPath);
                     zip = zipProvider.newFileSystem(targetPath, CREATE_ZIP_OPTIONS);
                     newChunkZips.put(chunkZipPos, zip);
@@ -143,10 +169,10 @@ public class SaveTransaction extends AbstractTask {
                     bos.write(compressedChunk);
                 }
             }
-            // Copy existing, unmodified content into the zips, close them, replace previous.
+            // Copy existing, unmodified content into the zips and close them
             for (Map.Entry<Vector3i, FileSystem> chunkZipEntry : newChunkZips.entrySet()) {
                 Vector3i chunkZipPos = chunkZipEntry.getKey();
-                Path oldChunkZipPath =storagePathProvider.getChunkZipPath(chunkZipPos);
+                Path oldChunkZipPath = storagePathProvider.getChunkZipPath(chunkZipPos);
                 final FileSystem zip = chunkZipEntry.getValue();
                 if (Files.isRegularFile(oldChunkZipPath)) {
                     try (FileSystem oldZip = FileSystems.newFileSystem(oldChunkZipPath, null)) {
@@ -165,16 +191,13 @@ public class SaveTransaction extends AbstractTask {
                     }
                 }
                 zip.close();
-                Path sourcePath = storagePathProvider.getChunkZipTempFilePath(chunkZipPos);
-                Path targetPath = oldChunkZipPath;
-                Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } else {
             for (Map.Entry<Vector3i, CompressedChunkBuilder> entry : compressedChunkBuilders.entrySet()) {
                 Vector3i chunkPos = entry.getKey();
                 CompressedChunkBuilder compressedChunkBuilder = entry.getValue();
                 byte[] compressedChunk = compressedChunkBuilder.buildEncodedChunk();
-                Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
+                Path chunkPath = storagePathProvider.getChunkTempPath(chunkPos);
                 try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(chunkPath))) {
                     out.write(compressedChunk);
                 }
@@ -195,7 +218,7 @@ public class SaveTransaction extends AbstractTask {
 
     private void saveGameManifest() {
         try {
-            Path path = PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME);
+            Path path = storagePathProvider.getGameManifestTempPath();
             GameManifest.save(path, gameManifest);
         } catch (IOException e) {
             logger.error("Failed to save world manifest", e);

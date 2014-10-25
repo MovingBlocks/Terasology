@@ -92,6 +92,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
+    private final SaveTransactionHelper saveTransactionHelper;
     private SaveTransaction saveTransaction;
     private Config config;
 
@@ -114,6 +115,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
         this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
+        this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
 
@@ -541,6 +543,14 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     public boolean isSaving() {
         return saveTransaction != null && saveTransaction.getResult() == null;
+    }
+
+    @Override
+    public void checkAndRepairSaveIfNecessary() throws IOException {
+        saveTransactionHelper.cleanupSaveTransactionDirectory();
+        if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
+            saveTransactionHelper.mergeChanges();
+        }
     }
 
 }

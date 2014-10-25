@@ -52,7 +52,8 @@ class SaveTransactionBuilder {
     }
 
     public SaveTransaction build() {
-        return new SaveTransaction(playerStores, globalStore, compressedChunkBuilders, gameManifest, storeChunksInZips, storagePathProvider);
+        return new SaveTransaction(playerStores, globalStore, compressedChunkBuilders, gameManifest, storeChunksInZips,
+                storagePathProvider);
     }
 
     public void setGameManifest(GameManifest gameManifest) {
