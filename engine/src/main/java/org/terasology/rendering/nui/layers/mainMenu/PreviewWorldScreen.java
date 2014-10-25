@@ -38,6 +38,7 @@ import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
 import org.terasology.rendering.nui.widgets.UISlider;
@@ -76,6 +77,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     private SeedBinding seedBinding = new SeedBinding();
 
     private UISlider zoomSlider;
+    private UIButton applyButton;
     private UIDropdown<String> layerDropdown;
     private PreviewSettings currentSettings;
 
@@ -112,6 +114,17 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             zoomSlider.setIncrement(1.0f);
             zoomSlider.setValue(10f);
             zoomSlider.setPrecision(0);
+        }
+
+        applyButton = find("apply", UIButton.class);
+        if (applyButton != null) {
+            applyButton.setEnabled(false);
+            applyButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget widget) {
+                    updatePreview();
+                }
+            });
         }
 
         UIText seed = find("seed", UIText.class);
@@ -163,16 +176,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (previewGenerator != null) {
             PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
-                UIImage image = find("preview", UIImage.class);
-                try {
-                    Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
-                    image.setImage(tex);
-                    image.setVisible(true);
-                } catch (Exception ex) {
-                    image.setVisible(false);
-                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
-                }
+                boolean firstTime = currentSettings == null;
                 currentSettings = newSettings;
+                if(applyButton != null && !firstTime) {
+                    applyButton.setEnabled(true);
+                } else {
+                    updatePreview();
+                }
             }
         }
     }
@@ -192,6 +202,22 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     public void setSeed(String val) {
         seedBinding.set(val);
+    }
+
+    private void updatePreview() {
+        if (applyButton != null) {
+            applyButton.setEnabled(false);
+        }
+
+        UIImage image = find("preview", UIImage.class);
+        try {
+            Texture tex = createTexture(imageSize, imageSize, currentSettings.zoom, currentSettings.layer);
+            image.setImage(tex);
+            image.setVisible(true);
+        } catch (Exception ex) {
+            image.setVisible(false);
+            logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
+        }
     }
 
     private Texture createTexture(int width, int height, int scale, String layerName) {
