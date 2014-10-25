@@ -286,13 +286,12 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        chunkProvider.shutdown();
         createChunkStoresForSave(saveTransactionBuilder, chunkProvider);
         createPlayerStoresForSave(saveTransactionBuilder, networkSystem);
         createGlobalStoreForSave(saveTransactionBuilder);
         createGameManifest(saveTransactionBuilder);
-        chunkProvider.restart();
-        // TODO check if more threads need to be stopped:  e.g. network and common engine threads
+        // TODO check if threads need to be stopped:  e.g. network and common engine threads
+        // chunk related threads should not be a problem except for performance
 
 
         return saveTransactionBuilder.build();
