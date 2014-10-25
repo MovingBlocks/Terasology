@@ -213,9 +213,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
 
         for (Chunk chunk : chunkProvider.getAllChunks()) {
-            // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
-            unloadedAndSavingChunkMap.remove(chunk.getPosition());
-            saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), createCompressedChunkBuilder(chunk, true));
+            if (chunk.isReady()) {
+                // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
+                unloadedAndSavingChunkMap.remove(chunk.getPosition());
+                saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), createCompressedChunkBuilder(chunk, true));
+            }
         }
 
         for (Map.Entry<Vector3i, CompressedChunkBuilder> entry: unloadedAndSavingChunkMap.entrySet()) {
