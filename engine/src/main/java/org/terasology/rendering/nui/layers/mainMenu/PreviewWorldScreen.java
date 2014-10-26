@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
@@ -53,6 +55,7 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * @author Immortius
@@ -178,7 +181,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
                 boolean firstTime = currentSettings == null;
                 currentSettings = newSettings;
-                if(applyButton != null && !firstTime) {
+                if (applyButton != null && !firstTime) {
                     applyButton.setEnabled(true);
                 } else {
                     updatePreview();
@@ -205,26 +208,58 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        if (applyButton != null) {
-            applyButton.setEnabled(false);
-        }
+        final UIImage image = find("preview", UIImage.class);
 
-        UIImage image = find("preview", UIImage.class);
-        try {
-            Texture tex = createTexture(imageSize, imageSize, currentSettings.zoom, currentSettings.layer);
-            image.setImage(tex);
-            image.setVisible(true);
-        } catch (Exception ex) {
-            image.setVisible(false);
-            logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
-        }
+        image.setVisible(false);
+
+        Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
+            @Override
+            public ByteBufferResult call() throws InterruptedException {
+                try {
+                    ByteBuffer buf = createByteBuffer(imageSize, imageSize, currentSettings.zoom, currentSettings.layer);
+                    return new ByteBufferResult(true, buf, null);
+                } catch (InterruptedException e) {
+                    throw e;
+                } catch (Exception ex) {
+                    return new ByteBufferResult(false, null, ex);
+                }
+            }
+        };
+
+        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Updating Preview", "Please wait ...");
+        popup.onSuccess(new Function<ByteBufferResult, Void>() {
+            @Override
+            public Void apply(ByteBufferResult byteBufferResult) {
+                if (byteBufferResult.success) {
+                    image.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
+                    image.setVisible(true);
+                    if (applyButton != null) {
+                        applyButton.setEnabled(false);
+                    }
+                } else {
+                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
+                }
+                return null;
+            }
+        });
+
+        popup.startOperation(operation, true);
     }
 
-    private Texture createTexture(int width, int height, int scale, String layerName) {
+    private Texture createTexture(int width, int height, ByteBuffer buf) {
+        ByteBuffer[] data = new ByteBuffer[]{buf};
+        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
+        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+
+        return Assets.generateAsset(uri, texData, Texture.class);
+    }
+
+    private ByteBuffer createByteBuffer(int width, int height, int scale, String layerName) throws InterruptedException {
         int size = 4 * width * height;
         final int offX = -width / 2;
         final int offY = -height / 2;
-
         ByteBuffer buf = ByteBuffer.allocateDirect(size);
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
@@ -234,14 +269,12 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 Color c = previewGenerator.get(layerName, area);
                 c.addToBuffer(buf);
             }
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
         }
         buf.flip();
-
-        ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-
-        return Assets.generateAsset(uri, texData, Texture.class);
+        return buf;
     }
 
     private static class SeedBinding implements Binding<String> {
@@ -308,6 +341,17 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
+    private static class ByteBufferResult {
+        public boolean success;
+        public ByteBuffer buf;
+        public Exception exception;
+
+        private ByteBufferResult(boolean success, ByteBuffer buf, Exception exception) {
+            this.success = success;
+            this.buf = buf;
+            this.exception = exception;
+        }
+    }
 }
 
 
