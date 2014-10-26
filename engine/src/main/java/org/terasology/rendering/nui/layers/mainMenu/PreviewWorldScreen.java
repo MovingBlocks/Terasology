@@ -221,11 +221,22 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         previewImage.setVisible(false);
         errorLabel.setVisible(false);
 
+        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Updating Preview", "Please wait ...");
+
+        final ByteBufferProgressListener progressListener = new ByteBufferProgressListener() {
+            @Override
+            public void onProgress(float progress) {
+                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+            }
+        };
+
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
             public ByteBufferResult call() throws InterruptedException {
                 try {
-                    ByteBuffer buf = createByteBuffer(imageSize, imageSize, currentSettings.zoom, currentSettings.layer);
+                    ByteBuffer buf = createByteBuffer(imageSize, imageSize, currentSettings.zoom, currentSettings.layer, progressListener);
                     return new ByteBufferResult(true, buf, null);
                 } catch (InterruptedException e) {
                     throw e;
@@ -235,9 +246,6 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
         };
 
-        final NUIManager manager = CoreRegistry.get(NUIManager.class);
-        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
-        popup.setMessage("Updating Preview", "Please wait ...");
         popup.onSuccess(new Function<ByteBufferResult, Void>() {
             @Override
             public Void apply(ByteBufferResult byteBufferResult) {
@@ -267,7 +275,7 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         return Assets.generateAsset(uri, texData, Texture.class);
     }
 
-    private ByteBuffer createByteBuffer(int width, int height, int scale, String layerName) throws InterruptedException {
+    private ByteBuffer createByteBuffer(int width, int height, int scale, String layerName, ByteBufferProgressListener progressListener) throws InterruptedException {
         int size = 4 * width * height;
         final int offX = -width / 2;
         final int offY = -height / 2;
@@ -282,6 +290,9 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             }
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
+            }
+            if (progressListener != null) {
+                progressListener.onProgress((float) y / height);
             }
         }
         buf.flip();
@@ -362,6 +373,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             this.buf = buf;
             this.exception = exception;
         }
+    }
+
+    private interface ByteBufferProgressListener {
+        void onProgress(float percent);
     }
 }
 
