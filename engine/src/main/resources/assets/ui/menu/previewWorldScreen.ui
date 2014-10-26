@@ -163,7 +163,21 @@
                                         "offset": 8
                                     }
                                 }
-                            }
+                            },
+                            {
+                                "type" : "UILabel",
+                                "id" : "error",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "use-content-width" : true,
+                                    "position-horizontal-center" : {},
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget": "apply",
+                                        "offset": 8
+                                    }
+                                }
+                            },
                         ]
                     }
                 ]

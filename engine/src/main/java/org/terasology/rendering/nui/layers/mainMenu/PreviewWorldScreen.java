@@ -43,6 +43,7 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.WorldGenerator;
@@ -79,6 +80,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private SeedBinding seedBinding = new SeedBinding();
 
+    private UILabel errorLabel;
+    private UIImage previewImage;
     private UISlider zoomSlider;
     private UIButton applyButton;
     private UIDropdown<String> layerDropdown;
@@ -129,6 +132,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 }
             });
         }
+
+        errorLabel = find("error", UILabel.class);
+        if (errorLabel != null) {
+            errorLabel.setVisible(false);
+        }
+
+        previewImage = find("preview", UIImage.class);
 
         UIText seed = find("seed", UIText.class);
         if (seed != null) {
@@ -208,9 +218,8 @@ public class PreviewWorldScreen extends CoreScreenLayer {
     }
 
     private void updatePreview() {
-        final UIImage image = find("preview", UIImage.class);
-
-        image.setVisible(false);
+        previewImage.setVisible(false);
+        errorLabel.setVisible(false);
 
         Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
             @Override
@@ -233,13 +242,15 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             @Override
             public Void apply(ByteBufferResult byteBufferResult) {
                 if (byteBufferResult.success) {
-                    image.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
-                    image.setVisible(true);
+                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
+                    previewImage.setVisible(true);
                     if (applyButton != null) {
                         applyButton.setEnabled(false);
                     }
                 } else {
-                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
+                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
+                    errorLabel.setVisible(true);
+                    logger.error("Error generating a 2d preview for " + layerDropdown.getSelection(), byteBufferResult.exception);
                 }
                 return null;
             }
