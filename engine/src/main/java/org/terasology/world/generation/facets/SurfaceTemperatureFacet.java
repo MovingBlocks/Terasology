@@ -45,6 +45,9 @@ public class SurfaceTemperatureFacet extends BaseFieldFacet2D implements ColorSu
             }
         }
         float average = total / (values.length / sampleRate);
+        if (average > 1.0f) {
+            average = 1.0f;
+        }
         return new Color(TeraMath.clamp(average, 0, 255), TeraMath.clamp(average * 0.2f, 0, 255), TeraMath.clamp(average * 0.2f));
     }
 }

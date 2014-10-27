@@ -45,7 +45,9 @@ public class SurfaceHumidityFacet extends BaseFieldFacet2D implements ColorSumma
             }
         }
         float average = total / (values.length / sampleRate);
-
+        if (average > 1.0f) {
+            average = 1.0f;
+        }
         return new Color(TeraMath.clamp(average * 0.2f, 0, 255), TeraMath.clamp(average * 0.2f), TeraMath.clamp(average, 0, 255));
     }
 }
