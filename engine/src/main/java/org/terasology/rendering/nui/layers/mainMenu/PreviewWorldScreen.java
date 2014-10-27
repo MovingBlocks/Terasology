@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.nui.layers.mainMenu;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -32,14 +33,17 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
+import org.terasology.rendering.nui.widgets.UIButton;
 import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UIImage;
+import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UIText;
 import org.terasology.world.generator.WorldGenerator;
@@ -52,6 +56,7 @@ import org.terasology.world.generator.plugin.WorldGeneratorPluginLibrary;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 /**
  * @author Immortius
@@ -75,7 +80,10 @@ public class PreviewWorldScreen extends CoreScreenLayer {
 
     private SeedBinding seedBinding = new SeedBinding();
 
+    private UILabel errorLabel;
+    private UIImage previewImage;
     private UISlider zoomSlider;
+    private UIButton applyButton;
     private UIDropdown<String> layerDropdown;
     private PreviewSettings currentSettings;
 
@@ -113,6 +121,24 @@ public class PreviewWorldScreen extends CoreScreenLayer {
             zoomSlider.setValue(10f);
             zoomSlider.setPrecision(0);
         }
+
+        applyButton = find("apply", UIButton.class);
+        if (applyButton != null) {
+            applyButton.setEnabled(false);
+            applyButton.subscribe(new ActivateEventListener() {
+                @Override
+                public void onActivated(UIWidget widget) {
+                    updatePreview();
+                }
+            });
+        }
+
+        errorLabel = find("error", UILabel.class);
+        if (errorLabel != null) {
+            errorLabel.setVisible(false);
+        }
+
+        previewImage = find("preview", UIImage.class);
 
         UIText seed = find("seed", UIText.class);
         if (seed != null) {
@@ -163,16 +189,13 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         if (previewGenerator != null) {
             PreviewSettings newSettings = new PreviewSettings(layerDropdown.getSelection(), TeraMath.floorToInt(zoomSlider.getValue()), seedBinding.get());
             if (currentSettings == null || !currentSettings.equals(newSettings)) {
-                UIImage image = find("preview", UIImage.class);
-                try {
-                    Texture tex = createTexture(imageSize, imageSize, newSettings.zoom, newSettings.layer);
-                    image.setImage(tex);
-                    image.setVisible(true);
-                } catch (Exception ex) {
-                    image.setVisible(false);
-                    logger.info("Error generating a 2d preview for " + layerDropdown.getSelection());
-                }
+                boolean firstTime = currentSettings == null;
                 currentSettings = newSettings;
+                if (applyButton != null && !firstTime) {
+                    applyButton.setEnabled(true);
+                } else {
+                    updatePreview();
+                }
             }
         }
     }
@@ -194,11 +217,68 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         seedBinding.set(val);
     }
 
-    private Texture createTexture(int width, int height, int scale, String layerName) {
+    private void updatePreview() {
+        previewImage.setVisible(false);
+        errorLabel.setVisible(false);
+
+        final NUIManager manager = CoreRegistry.get(NUIManager.class);
+        final WaitPopup<ByteBufferResult> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
+        popup.setMessage("Updating Preview", "Please wait ...");
+
+        final ByteBufferProgressListener progressListener = new ByteBufferProgressListener() {
+            @Override
+            public void onProgress(float progress) {
+                popup.setMessage("Updating Preview", String.format("Please wait ... %d%%", (int) (progress * 100f)));
+            }
+        };
+
+        Callable<ByteBufferResult> operation = new Callable<ByteBufferResult>() {
+            @Override
+            public ByteBufferResult call() throws InterruptedException {
+                try {
+                    ByteBuffer buf = createByteBuffer(imageSize, imageSize, currentSettings.zoom, currentSettings.layer, progressListener);
+                    return new ByteBufferResult(true, buf, null);
+                } catch (InterruptedException e) {
+                    throw e;
+                } catch (Exception ex) {
+                    return new ByteBufferResult(false, null, ex);
+                }
+            }
+        };
+
+        popup.onSuccess(new Function<ByteBufferResult, Void>() {
+            @Override
+            public Void apply(ByteBufferResult byteBufferResult) {
+                if (byteBufferResult.success) {
+                    previewImage.setImage(createTexture(imageSize, imageSize, byteBufferResult.buf));
+                    previewImage.setVisible(true);
+                    if (applyButton != null) {
+                        applyButton.setEnabled(false);
+                    }
+                } else {
+                    errorLabel.setText("Sorry: could not generate 2d preview :-(");
+                    errorLabel.setVisible(true);
+                    logger.error("Error generating a 2d preview for " + layerDropdown.getSelection(), byteBufferResult.exception);
+                }
+                return null;
+            }
+        });
+
+        popup.startOperation(operation, true);
+    }
+
+    private Texture createTexture(int width, int height, ByteBuffer buf) {
+        ByteBuffer[] data = new ByteBuffer[]{buf};
+        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
+        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
+
+        return Assets.generateAsset(uri, texData, Texture.class);
+    }
+
+    private ByteBuffer createByteBuffer(int width, int height, int scale, String layerName, ByteBufferProgressListener progressListener) throws InterruptedException {
         int size = 4 * width * height;
         final int offX = -width / 2;
         final int offY = -height / 2;
-
         ByteBuffer buf = ByteBuffer.allocateDirect(size);
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
@@ -208,14 +288,15 @@ public class PreviewWorldScreen extends CoreScreenLayer {
                 Color c = previewGenerator.get(layerName, area);
                 c.addToBuffer(buf);
             }
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            if (progressListener != null) {
+                progressListener.onProgress((float) y / height);
+            }
         }
         buf.flip();
-
-        ByteBuffer[] data = new ByteBuffer[]{buf};
-        AssetUri uri = new AssetUri(AssetType.TEXTURE, "engine:terrainPreview");
-        TextureData texData = new TextureData(width, height, data, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);
-
-        return Assets.generateAsset(uri, texData, Texture.class);
+        return buf;
     }
 
     private static class SeedBinding implements Binding<String> {
@@ -282,6 +363,21 @@ public class PreviewWorldScreen extends CoreScreenLayer {
         }
     }
 
+    private static class ByteBufferResult {
+        public boolean success;
+        public ByteBuffer buf;
+        public Exception exception;
+
+        private ByteBufferResult(boolean success, ByteBuffer buf, Exception exception) {
+            this.success = success;
+            this.buf = buf;
+            this.exception = exception;
+        }
+    }
+
+    private interface ByteBufferProgressListener {
+        void onProgress(float percent);
+    }
 }
 
 

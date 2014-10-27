@@ -16,14 +16,11 @@
 package org.terasology.utilities.concurrency;
 
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.BlockingQueue;
@@ -32,8 +29,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements BlockingQueue<T> {
-    private final Comparator<T> comparator;
-    private final List<T> elements = Lists.newLinkedList();
+    private Comparator<T> comparator;
+    private List<T> elements = Lists.newLinkedList();
 
     /**
      * Lock used for all public operations
@@ -79,6 +76,7 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         }
     }
 
+    @Override
     public T poll() {
         lock.lock();
         try {
@@ -88,33 +86,38 @@ public class DynamicPriorityBlockingQueue<T> extends AbstractQueue<T> implements
         }
     }
 
+    @Override
     public T take() throws InterruptedException {
         lock.lockInterruptibly();
-        T result;
         try {
-            while ((result = dequeue()) == null) {
+            T result = dequeue();
+            while (result == null) {
                 notEmpty.await();
+                result = dequeue();
             }
+            return result;
         } finally {
             lock.unlock();
         }
-        return result;
     }
 
+    @Override
     public T poll(long timeout, TimeUnit unit) throws InterruptedException {
         long nanos = unit.toNanos(timeout);
         lock.lockInterruptibly();
-        T result;
         try {
-            while ((result = dequeue()) == null && nanos > 0) {
+            T result = dequeue();
+            while (result == null && nanos > 0) {
                 nanos = notEmpty.awaitNanos(nanos);
+                result = dequeue();
             }
+            return result;
         } finally {
             lock.unlock();
         }
-        return result;
     }
 
+    @Override
     public T peek() {
         lock.lock();
         try {

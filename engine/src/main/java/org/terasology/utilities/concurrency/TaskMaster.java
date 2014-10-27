@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Comparator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -99,16 +101,22 @@ public final class TaskMaster<T extends Task> {
                 logger.error("Failed to enqueue shutdown request", e);
             }
         }
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
-                logger.warn("Timed out awaiting thread termination");
-                executorService.shutdownNow();
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
+            public Object run() {
+                executorService.shutdown();
+                try {
+                    if (!executorService.awaitTermination(20, TimeUnit.SECONDS)) {
+                        logger.warn("Timed out awaiting thread termination");
+                        executorService.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupted awaiting chunk thread termination");
+                    executorService.shutdownNow();
+                }
+                return null;
             }
-        } catch (InterruptedException e) {
-            logger.warn("Interrupted awaiting chunk thread termination");
-            executorService.shutdownNow();
-        }
+        });
         running = false;
     }
 

@@ -149,7 +149,35 @@
                                         "widget" : "displayLabel"
                                     }
                                 }
-                            }
+                            },
+                            {
+                                "type" : "UIButton",
+                                "text" : "Apply",
+                                "id" : "apply",
+                                "layoutInfo" : {
+                                    "width" : 128,
+                                    "height" : 32,
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget": "display",
+                                        "offset": 8
+                                    }
+                                }
+                            },
+                            {
+                                "type" : "UILabel",
+                                "id" : "error",
+                                "layoutInfo" : {
+                                    "use-content-height" : true,
+                                    "use-content-width" : true,
+                                    "position-horizontal-center" : {},
+                                    "position-top" : {
+                                        "target" : "BOTTOM",
+                                        "widget": "apply",
+                                        "offset": 8
+                                    }
+                                }
+                            },
                         ]
                     }
                 ]
