@@ -214,7 +214,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
         CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
-        initTimeEvents();
     }
 
 
@@ -291,105 +290,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         result.z -= cameraPos.z;
 
         return result.lengthSquared();
-    }
-
-    private Vector3f getPlayerPosition() {
-        if (player != null) {
-            return player.getPosition();
-        }
-        return new Vector3f();
-    }
-
-    /**
-     * Creates the world time events to play the game's soundtrack at specific times.
-     */
-    public void initTimeEvents() {
-        final AudioManager audioManager = CoreRegistry.get(AudioManager.class);
-
-        // SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.1, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heaven"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
-                }
-            }
-        });
-
-        // AFTERNOON
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.25, true) {
-            @Override
-            public void run() {
-                //TODO get beter tck instead afternoon
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
-                }
-            }
-        });
-
-        // SUNSET
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.4, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunset"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.6, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.75, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
-                }
-            }
-        });
-
-        // BEFORE SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.9, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heroes"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Resurface"));
-                }
-            }
-        });
     }
 
     /**
