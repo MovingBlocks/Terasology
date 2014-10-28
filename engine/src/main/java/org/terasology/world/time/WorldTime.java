@@ -24,14 +24,10 @@ public interface WorldTime extends ComponentSystem {
 
     long DAY_LENGTH = 1000 * 60 * 60 * 24;
 
-    long DAYS_TO_MS = (DAY_LENGTH);
-    float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
-
-    long DAWN_TIME = 0;
-    long MIDDAY_TIME = DAY_LENGTH / 4;
-    long DUSK_TIME = DAY_LENGTH / 2;
-    long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
-
+    /**
+     * The number of timer tick events per day
+     */
+    long TICKS_PER_DAY = 100;
 
     /**
      * @return World time in milliseconds.

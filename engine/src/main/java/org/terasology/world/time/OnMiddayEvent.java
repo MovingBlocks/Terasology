@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,22 +16,13 @@
 package org.terasology.world.time;
 
 /**
- * A timer event that represents a (world-based) time instant
+ * Sent to a world in the middle of daytime
+ *
  * @author Immortius
- * @author Martin Steiger
  */
-public class WorldTimeEvent extends TimeEventBase {
+public class OnMiddayEvent extends TimeEventBase {
 
-    public WorldTimeEvent(long worldTimeMS) {
+    public OnMiddayEvent(long worldTimeMS) {
         super(worldTimeMS);
-    }
-
-    public boolean matchesDaily(float fraction) {
-        return Math.abs(getDayTime() - fraction) < 0.5f / WorldTime.TICKS_PER_DAY;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("WorldTimeEvent [%s ms -> %.2f days]", getWorldTimeInMs(), getWorldTime());
     }
 }

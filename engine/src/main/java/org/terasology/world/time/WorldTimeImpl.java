@@ -23,6 +23,9 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 
+import com.google.common.math.LongMath;
+
+import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -30,9 +33,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 
+    private static final long DAWN_TIME = DAY_LENGTH;
+    private static final long MIDDAY_TIME = DAY_LENGTH / 4;
+    private static final long DUSK_TIME = DAY_LENGTH / 2;
+    private static final long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
+
     private static final float WORLD_TIME_MULTIPLIER = 48f;
 
-    private static final long TICK_RATE = DAYS_TO_MS / 100;
+    private static final long TICK_RATE = DAY_LENGTH / TICKS_PER_DAY;
 
     private AtomicLong worldTime = new AtomicLong(0);
 
@@ -54,7 +62,7 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
     @Override
     public float getDays() {
-        return MS_TO_DAYS * worldTime.get();
+        return worldTime.get() / (float) DAY_LENGTH;
     }
 
     @Override
@@ -70,7 +78,7 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
     @Override
     public void setDays(float timeInDays) {
-        setMilliseconds((long) ((double) timeInDays * DAYS_TO_MS));
+        setMilliseconds((long) ((double) timeInDays * DAY_LENGTH));
     }
 
     @Override
@@ -80,6 +88,8 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
             deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
             long startTime = worldTime.getAndAdd(deltaMs);
             long endTime = startTime + deltaMs;
+            long timeInDay = LongMath.mod(startTime, DAY_LENGTH);
+            long day = LongMath.divide(startTime, DAY_LENGTH, RoundingMode.FLOOR);
 
             long startTick = startTime / TICK_RATE;
             long endTick = (endTime) / TICK_RATE;
@@ -87,6 +97,26 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
             if (startTick != endTick) {
                 long tick = endTime - endTime % TICK_RATE;
                 getWorldEntity().send(new WorldTimeEvent(tick));
+            }
+
+            if (timeInDay < MIDDAY_TIME && timeInDay + deltaMs >= MIDDAY_TIME) {
+                long tick = day * DAY_LENGTH + MIDDAY_TIME;
+                getWorldEntity().send(new OnMiddayEvent(tick));
+            }
+
+            if (timeInDay < DUSK_TIME && timeInDay + deltaMs >= DUSK_TIME) {
+                long tick = day * DAY_LENGTH + DUSK_TIME;
+                getWorldEntity().send(new OnDuskEvent(tick));
+            }
+
+            if (timeInDay < MIDNIGHT_TIME && timeInDay + deltaMs >= MIDNIGHT_TIME) {
+                long tick = day * DAY_LENGTH + MIDNIGHT_TIME;
+                getWorldEntity().send(new OnMidnightEvent(tick));
+            }
+
+            if (timeInDay < DAWN_TIME && timeInDay + deltaMs >= DAWN_TIME) {
+                long tick = day * DAY_LENGTH + DAWN_TIME;
+                getWorldEntity().send(new OnDawnEvent(tick));
             }
         }
     }
