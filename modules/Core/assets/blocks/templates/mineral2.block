@@ -3,8 +3,8 @@
  */
 {
     "template" : true,
-    "categories" : ["mineral"],
-    "hardness" : 18,
+    "categories" : ["mineral","mineral2"],
+    "hardness" : 180,
     "mass" : 100,
     "sounds": "Core:stone"
 }

@@ -19,6 +19,7 @@
  */
 {
     "template" : true,
+    "categories" : ["mineral"],
     "attachmentAllowed" : false,
     "hardness" : 1,
     "colorSource" : "foliage_lut",

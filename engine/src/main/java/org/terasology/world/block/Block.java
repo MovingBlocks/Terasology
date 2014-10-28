@@ -82,7 +82,7 @@ public final class Block {
     private boolean liquid;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed;
-    private byte hardness = 0x3;
+    private int hardness = 0x3;
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private BlockSounds sounds = BlockSounds.NULL;
@@ -422,11 +422,11 @@ public final class Block {
     /**
      * @return How much damage it takes to destroy the block
      */
-    public byte getHardness() {
+    public int getHardness() {
         return hardness;
     }
 
-    public void setHardness(byte hardness) {
+    public void setHardness(int hardness) {
         this.hardness = hardness;
     }
 
@@ -513,7 +513,6 @@ public final class Block {
     }
 
 
-
     public Mesh getMesh() {
         if (mesh == null || mesh.isDisposed()) {
             generateMesh();
@@ -545,8 +544,8 @@ public final class Block {
      * Calculates the color offset for a given block type and a specific
      * side of the block.
      *
-     * @param part        The block side
-     * @param biome       The block's biome
+     * @param part  The block side
+     * @param biome The block's biome
      * @return The color offset
      */
     public Vector4f calcColorOffsetFor(BlockPart part, Biome biome) {

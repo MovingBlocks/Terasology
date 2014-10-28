@@ -18,8 +18,7 @@
  * Brick is Brick
  */
 {
-"mass" : 128,
-"categories" : ["stone"],
-"hardness" : 4,
-"displayName": "Brick"
+
+    "basedOn" : "core:rock",
+    "displayName": "Brick"
 }

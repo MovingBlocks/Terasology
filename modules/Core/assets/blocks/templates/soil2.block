@@ -3,8 +3,8 @@
  */
 {
     "template" : true,
-    "categories" : ["soil"],
-    "hardness" : 9,
+    "categories" : ["soil","soil2"],
+    "hardness" : 90,
     "mass" : 32,
     "sounds": "Core:soil"
 }

@@ -3,8 +3,8 @@
  */
 {
     "template" : true,
-    "categories" : ["mineral"],
-    "hardness" : 18,
-    "mass" : 100,
-    "sounds": "Core:stone"
+    "categories" : ["wood"],
+    "hardness" : 12,
+    "mass" : 50,
+    "sounds": "Core:wood"
 }
