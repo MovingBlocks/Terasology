@@ -137,7 +137,9 @@ public class StateIngame implements GameState {
 
         entityManager.clear();
 
-        storageManager.finishSavingAndShutdown();
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
         CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
@@ -165,8 +167,9 @@ public class StateIngame implements GameState {
         if (worldRenderer != null && shouldUpdateWorld()) {
             worldRenderer.update(delta);
         }
-
-        storageManager.update();
+        if (storageManager != null) {
+            storageManager.update();
+        }
 
 
         updateUserInterface(delta);
