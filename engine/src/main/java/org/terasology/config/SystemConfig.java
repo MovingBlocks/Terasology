@@ -26,7 +26,6 @@ public class SystemConfig {
 
     private boolean debugEnabled;
     private boolean monitoringEnabled;
-    private boolean reflectionsCacheEnabled;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -60,14 +59,6 @@ public class SystemConfig {
         this.debugEnabled = debugEnabled;
     }
 
-    public boolean isReflectionsCacheEnabled() {
-        return reflectionsCacheEnabled;
-    }
-
-    public void setReflectionsCacheEnabled(boolean reflectionsCacheEnabled) {
-        this.reflectionsCacheEnabled = reflectionsCacheEnabled;
-    }
-    
     public boolean isMonitoringEnabled() {
         return monitoringEnabled;
     }
