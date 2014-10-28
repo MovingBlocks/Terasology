@@ -21,6 +21,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.sources.ArchiveSource;
@@ -42,7 +43,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -623,20 +623,6 @@ public class AssetManager {
             } else {
                 next = null;
             }
-        }
-    }
-
-    private static final class PrivilegedOpenStream implements PrivilegedExceptionAction<InputStream> {
-
-        private URL url;
-
-        private PrivilegedOpenStream(URL url) {
-            this.url = url;
-        }
-
-        @Override
-        public InputStream run() throws Exception {
-            return url.openStream();
         }
     }
 }

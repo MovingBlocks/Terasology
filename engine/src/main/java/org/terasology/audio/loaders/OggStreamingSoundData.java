@@ -18,11 +18,14 @@ package org.terasology.audio.loaders;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.PrivilegedOpenStream;
 import org.terasology.audio.StreamingSoundData;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 
 /**
  *
@@ -31,12 +34,17 @@ public class OggStreamingSoundData implements StreamingSoundData {
 
     private static Logger logger = LoggerFactory.getLogger(OggStreamingSoundData.class);
 
-    private URL url;
+    private final URL url;
     private OggReader reader;
 
     public OggStreamingSoundData(URL url) throws IOException {
         this.url = url;
-        reader = new OggReader(url.openStream());
+        try {
+            PrivilegedOpenStream action = new PrivilegedOpenStream(url);
+            reader = new OggReader(AccessController.doPrivileged(action));
+        } catch (PrivilegedActionException e) {
+            throw new IOException("Could not open stream at " + url, e);
+        }
     }
 
     @Override
@@ -71,8 +79,9 @@ public class OggStreamingSoundData implements StreamingSoundData {
             dispose();
         }
         try {
-            reader = new OggReader(url.openStream());
-        } catch (IOException e) {
+            PrivilegedOpenStream action = new PrivilegedOpenStream(url);
+            reader = new OggReader(AccessController.doPrivileged(action));
+        } catch (PrivilegedActionException e) {
             throw new RuntimeException("Failed to reset ogg stream from " + url, e);
         }
     }
