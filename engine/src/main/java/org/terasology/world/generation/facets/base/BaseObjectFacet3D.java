@@ -22,8 +22,11 @@ import org.terasology.world.generation.Border3D;
 
 import java.lang.reflect.Array;
 
+/**
+ * Base class for storing objects of the specified type in a 3D grid for a facet.
+ * @param <T> Type of objects stored.
+ */
 public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements ObjectFacet3D<T> {
-
     private T[] data;
 
     public BaseObjectFacet3D(Region3i targetRegion, Border3D border, Class<T> objectType) {
