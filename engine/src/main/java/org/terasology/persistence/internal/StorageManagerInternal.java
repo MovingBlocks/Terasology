@@ -103,6 +103,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private boolean saveRequested;
     private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndUnsavedChunkMap = Maps.newConcurrentMap();
     private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
+    private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
+    private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
     public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
         this(environment, entityManager, true);
@@ -141,12 +143,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-
-    @Override
-    public void onPlayerDisconnect(String id) {
-        // TODO handle player disconnect. Maybe a new player manager would make sense?
-    }
-
     private void createGlobalStoreForSave(SaveTransactionBuilder saveTransaction) {
         GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
         for (StoreMetadata table : storeMetadata.values()) {
@@ -162,7 +158,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     @Override
     public void loadGlobalStore() throws IOException {
-
         Path globalDataFile = storagePathProvider.getGlobalEntityStorePath();
         if (Files.isRegularFile(globalDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
@@ -177,17 +172,36 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
+
     @Override
-    public PlayerStore loadPlayerStore(String playerId) {
-        EntityData.PlayerStore store = null;
+    public void onPlayerDisconnect(Client client) {
+        EntityData.PlayerStore playerStore = createPlayerStore(client);
+        unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
+    }
+
+    private EntityData.PlayerStore loadPlayerStoreData(String playerId) {
+        EntityData.PlayerStore  disposedUnsavedPlayer = unloadedAndUnsavedPlayerMap.get(playerId);
+        if (disposedUnsavedPlayer != null) {
+            return disposedUnsavedPlayer;
+        }
+        EntityData.PlayerStore  disposedSavingPlayer = unloadedAndSavingPlayerMap.get(playerId);
+        if (disposedSavingPlayer != null) {
+            return disposedSavingPlayer;
+        }
         Path storePath = storagePathProvider.getPlayerFilePath(playerId);
         if (Files.isRegularFile(storePath)) {
             try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(storePath))) {
-                store = EntityData.PlayerStore.parseFrom(inputStream);
+                return EntityData.PlayerStore.parseFrom(inputStream);
             } catch (IOException e) {
                 logger.error("Failed to load player data for {}", playerId, e);
             }
         }
+        return null;
+    }
+
+    @Override
+    public PlayerStore loadPlayerStore(String playerId) {
+        EntityData.PlayerStore store = loadPlayerStoreData(playerId);
         if (store != null) {
             TIntSet validRefs = null;
             StoreMetadata table = storeMetadata.get(new PlayerStoreId(playerId));
@@ -304,12 +318,31 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
 
     private void createPlayerStoresForSave(SaveTransactionBuilder saveTransactionBuilder, NetworkSystem networkSystem) {
+        unloadedAndSavingPlayerMap.clear();
+        /**
+         * New entries might be added concurrently. By using putAll + clear to transfer entries we might loose new
+         * ones added in between putAll and clear. By iterating we can make sure that all entities removed
+         * from unloadedAndUnsavedPlayerMap get added to unloadedAndSavingPlayerMap.
+         */
+        Iterator<Map.Entry<String, EntityData.PlayerStore>> unsavedEntryIterator = unloadedAndUnsavedPlayerMap.entrySet().iterator();
+        while(unsavedEntryIterator.hasNext()) {
+            Map.Entry<String, EntityData.PlayerStore> entry = unsavedEntryIterator.next();
+            unloadedAndSavingPlayerMap.put(entry.getKey(), entry.getValue());
+            unsavedEntryIterator.remove();
+        }
+
         for (Client client : networkSystem.getPlayers()) {
-            addPlayer(saveTransactionBuilder, client);
+            // If there is a newer undisposed version of the player,we don't need to save the disposed version:
+            unloadedAndSavingPlayerMap.remove(client.getId());
+            saveTransactionBuilder.addPlayerStore(client.getId(), createPlayerStore(client));
+        }
+
+        for (Map.Entry<String, EntityData.PlayerStore> entry: unloadedAndSavingPlayerMap.entrySet()) {
+            saveTransactionBuilder.addPlayerStore(entry.getKey(), entry.getValue());
         }
     }
 
-    private void addPlayer(SaveTransactionBuilder saveTransactionBuilder, Client client) {
+    private EntityData.PlayerStore createPlayerStore(Client client) {
         String playerId = client.getId();
         PlayerStore playerStore = new PlayerStoreInternal(playerId, this, entityManager);
         EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
@@ -341,7 +374,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             StoreMetadata metadata = new StoreMetadata(new PlayerStoreId(playerId), externalReference);
              indexStoreMetadata(metadata);
         }
-        saveTransactionBuilder.addPlayerStore(playerId, playerEntityStore.build());
+        return playerEntityStore.build();
     }
 
     @Override

@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import org.terasology.math.Vector3i;
+import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public interface StorageManager {
 
     void finishSavingAndShutdown();
 
-    void onPlayerDisconnect(String id);
+    void onPlayerDisconnect(Client client);
 
     void update();
 
