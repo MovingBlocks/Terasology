@@ -22,7 +22,16 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface WorldTime extends ComponentSystem {
 
-    int DAY_LENGTH = 1000 * 60 * 60 * 24;
+    long DAY_LENGTH = 1000 * 60 * 60 * 24;
+
+    long DAYS_TO_MS = (DAY_LENGTH);
+    float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
+
+    long DAWN_TIME = 0;
+    long MIDDAY_TIME = DAY_LENGTH / 4;
+    long DUSK_TIME = DAY_LENGTH / 2;
+    long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
+
 
     /**
      * @return World time in milliseconds.

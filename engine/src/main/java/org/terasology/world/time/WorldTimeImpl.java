@@ -29,14 +29,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Immortius
  */
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
-    public static final long DAYS_TO_MS = (DAY_LENGTH);
-    public static final float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
 
-    public static final long DAWN_TIME = DAY_LENGTH;
-    public static final long MIDDAY_TIME = DAY_LENGTH / 4;
-    public static final long DUSK_TIME = DAY_LENGTH / 2;
-    public static final long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
     private static final float WORLD_TIME_MULTIPLIER = 48f;
+
+    private static final long TICK_RATE = DAYS_TO_MS / 100;
 
     private AtomicLong worldTime = new AtomicLong(0);
 
@@ -84,26 +80,13 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
             deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
             long startTime = worldTime.getAndAdd(deltaMs);
             long endTime = startTime + deltaMs;
-            long timeInDay = startTime % DAY_LENGTH;
-            if (timeInDay < 0) {
-                timeInDay = DAY_LENGTH + timeInDay;
-            }
-            if (timeInDay < MIDDAY_TIME) {
-                if (timeInDay + deltaMs >= MIDDAY_TIME) {
-                    getWorldEntity().send(new OnMiddayEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < DUSK_TIME) {
-                if (timeInDay + deltaMs >= DUSK_TIME) {
-                    getWorldEntity().send(new OnDuskEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < MIDNIGHT_TIME) {
-                if (timeInDay + deltaMs >= MIDNIGHT_TIME) {
-                    getWorldEntity().send(new OnMidnightEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < DAWN_TIME) {
-                if (timeInDay + deltaMs >= DAWN_TIME) {
-                    getWorldEntity().send(new OnDawnEvent(MS_TO_DAYS * endTime, endTime));
-                }
+
+            long startTick = startTime / TICK_RATE;
+            long endTick = (endTime) / TICK_RATE;
+
+            if (startTick != endTick) {
+                long tick = endTime - endTime % TICK_RATE;
+                getWorldEntity().send(new WorldTimeEvent(tick));
             }
         }
     }
