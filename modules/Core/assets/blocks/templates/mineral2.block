@@ -1,6 +1,3 @@
-/**
- * A templates for minerals which sets the block category and hardness value appropriate for minerals.
- */
 {
     "template" : true,
     "categories" : ["mineral","mineral2"],

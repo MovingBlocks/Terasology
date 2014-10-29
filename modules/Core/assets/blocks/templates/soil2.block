@@ -1,6 +1,3 @@
-/**
- * Soils are just easily broken, dirt-like blocks.
- */
 {
     "template" : true,
     "categories" : ["soil","soil2"],

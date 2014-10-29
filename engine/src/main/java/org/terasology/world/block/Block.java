@@ -82,7 +82,7 @@ public final class Block {
     private boolean liquid;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed;
-    private int hardness = 0x3;
+    private int hardness = 3;
     private boolean supportRequired;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private BlockSounds sounds = BlockSounds.NULL;
