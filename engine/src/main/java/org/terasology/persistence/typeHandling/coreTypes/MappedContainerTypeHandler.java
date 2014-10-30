@@ -55,10 +55,12 @@ public class MappedContainerTypeHandler<T> extends SimpleTypeHandler<T> {
         Map<String, PersistedData> mappedData = Maps.newLinkedHashMap();
         for (Map.Entry<FieldMetadata<T, ?>, TypeHandler<?>> entry : mappedFields.entrySet()) {
             Object val = entry.getKey().getValue(value);
-            TypeHandler handler = entry.getValue();
-            PersistedData fieldValue = handler.serialize(val, context);
-            if (fieldValue != null) {
-                mappedData.put(entry.getKey().getName(), fieldValue);
+            if (val != null) {
+                TypeHandler handler = entry.getValue();
+                PersistedData fieldValue = handler.serialize(val, context);
+                if (fieldValue != null) {
+                    mappedData.put(entry.getKey().getName(), fieldValue);
+                }
             }
         }
         return context.create(mappedData);
