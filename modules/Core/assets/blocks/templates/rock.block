@@ -1,0 +1,7 @@
+{
+    "template" : true,
+    "categories" : ["rock"],
+    "hardness" : 12,
+    "mass" : 100,
+    "sounds": "Core:stone"
+}

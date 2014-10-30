@@ -69,6 +69,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private static final Logger logger = LoggerFactory.getLogger(EntityAwareWorldProvider.class);
     private static final Set<Class<? extends Component>> COMMON_BLOCK_COMPONENTS =
             ImmutableSet.of(NetworkComponent.class, BlockComponent.class, LocationComponent.class, HealthComponent.class);
+    private static final float BLOCK_REGEN_SECONDS = 4.0f;
 
     private EngineEntityManager entityManager;
 
@@ -267,7 +268,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
         HealthComponent health = blockEntity.getComponent(HealthComponent.class);
         if (health == null && type.isDestructible()) {
-            blockEntity.addComponent(new HealthComponent(type.getHardness(), 2.0f, 1.0f));
+            blockEntity.addComponent(new HealthComponent(type.getHardness(), type.getHardness() / BLOCK_REGEN_SECONDS, 1.0f));
         } else if (health != null && !type.isDestructible()) {
             blockEntity.removeComponent(HealthComponent.class);
         } else if (health != null && type.isDestructible()) {
@@ -315,7 +316,8 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         builder.addComponent(new LocationComponent(blockPosition.toVector3f()));
         builder.addComponent(new BlockComponent(block, blockPosition));
         if (block.isDestructible() && !builder.hasComponent(HealthComponent.class)) {
-            builder.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+            // Block regen should always take the same amount of time,  regardless of its hardness 
+            builder.addComponent(new HealthComponent(block.getHardness(), block.getHardness() / BLOCK_REGEN_SECONDS, 1.0f));
         }
         boolean isTemporary = isTemporaryBlock(builder, block);
         if (!isTemporary && !builder.hasComponent(NetworkComponent.class)) {
