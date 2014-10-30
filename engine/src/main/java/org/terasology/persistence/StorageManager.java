@@ -57,16 +57,18 @@ public interface StorageManager {
 
     void finishSavingAndShutdown();
 
-    void onPlayerDisconnect(Client client);
+    /**
+     * Deactivates the player and stores it at the next possible time.
+     * @param client
+     */
+    void deactivatePlayer(Client client);
 
     void update();
 
     /**
-     * Must be called from the main thread when a chunk got unloaded. The entities must not be disposed yet.
-     * @param chunk
-     * @param entitiesOfChunk
+     * Deactivates the entities in the chunk and store the chunk a the next possible time.
      */
-    void onChunkUnload(Chunk chunk, Collection<EntityRef> entitiesOfChunk);
+    void deactivateChunk(Chunk chunk);
 
     void checkAndRepairSaveIfNecessary() throws IOException;
 }

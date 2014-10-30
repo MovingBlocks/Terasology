@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
@@ -178,9 +179,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
 
     @Override
-    public void onPlayerDisconnect(Client client) {
+    public void deactivatePlayer(Client client) {
         EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
-        EntityData.PlayerStore playerStore = createPlayerStore(client, character);
+        EntityData.PlayerStore playerStore = createPlayerStore(client, character, true);
         unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
     }
 
@@ -250,7 +251,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 }
                 unsavedEntities.removeAll(entitiesToStore);
                 CompressedChunkBuilder compressedChunkBuilder = createCompressedChunkBuilder(chunk,
-                        entitiesToStore, true);
+                        entitiesToStore, false);
                 saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), compressedChunkBuilder);
             }
         }
@@ -289,12 +290,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
      *This method should only be called by the main thread.
      *
      * @param entitiesToSave all persistent entities within the given chunk
-     * @param viaSnapshot specifies if a snapshot of the chunk data will be created. Only the main thread may set this
-     *                    to true for saving. If it is false the chunk data will be saved directly. The value false
+     * @param deactivate if true the entities of the chunk will be deaktivated and the chunk data will be used directly.
+     *                 If deactivate is false then the entities won't be touched and a chunk will be but in
+     *                 snapshot mode so that concurrent modifcations (and possibly future unload) is possible.
      */
     private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk,
                                                                 Collection<EntityRef> entitiesToSave,
-                                                                boolean viaSnapshot) {
+                                                                boolean deactivate) {
         EntityStorer storer = new EntityStorer(entityManager);
         for (EntityRef entityRef : entitiesToSave) {
             if (entityRef.isPersistent()) {
@@ -307,6 +309,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         Vector3i chunkPosition = chunk.getPosition();
 
         ChunkImpl chunkImpl = (ChunkImpl) chunk;
+        boolean viaSnapshot = !deactivate;
         if (viaSnapshot) {
             chunkImpl.createSnapshot();
         }
@@ -394,7 +397,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             unloadedAndSavingPlayerMap.remove(client.getId());
             EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
             unsavedEntities.remove(character);
-            saveTransactionBuilder.addPlayerStore(client.getId(), createPlayerStore(client, character));
+            saveTransactionBuilder.addPlayerStore(client.getId(), createPlayerStore(client, character, false));
         }
 
         for (Map.Entry<String, EntityData.PlayerStore> entry: unloadedAndSavingPlayerMap.entrySet()) {
@@ -402,7 +405,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-    private EntityData.PlayerStore createPlayerStore(Client client, EntityRef character) {
+    private EntityData.PlayerStore createPlayerStore(Client client, EntityRef character, boolean deactivate) {
         String playerId = client.getId();
         PlayerStore playerStore = new PlayerStoreInternal(playerId, this, entityManager);
         if (character.exists()) {
@@ -424,7 +427,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         playerEntityStore.setCharacterPosZ(relevanceLocation.z);
         playerEntityStore.setHasCharacter(hasCharacter);
         EntityStorer storer = new EntityStorer(entityManager);
-        storer.store(character, PlayerStoreInternal.CHARACTER, false);
+        storer.store(character, PlayerStoreInternal.CHARACTER, deactivate);
         playerEntityStore.setStore(storer.finaliseStore());
 
 
@@ -436,9 +439,28 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return playerEntityStore.build();
     }
 
+
+    private Collection<EntityRef> getEntitiesOfChunk(Chunk chunk) {
+        List<EntityRef> entitiesToStore = Lists.newArrayList();
+
+        AABB aabb = chunk.getAABB();
+        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    if (aabb.contains(loc.getWorldPosition())) {
+                        entitiesToStore.add(entity);
+                    }
+                }
+            }
+        }
+        return entitiesToStore;
+    }
+
     @Override
-    public void onChunkUnload(Chunk chunk, Collection<EntityRef> entitiesOfChunk) {
-        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, entitiesOfChunk, false));
+    public void deactivateChunk(Chunk chunk) {
+        Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, entitiesOfChunk, true));
     }
 
 

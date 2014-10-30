@@ -721,7 +721,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
         logger.info("Client disconnected: " + client.getName());
-        storageManager.onPlayerDisconnect(client);
+        storageManager.deactivatePlayer(client);
         client.getEntity().send(new DisconnectedEvent());
         client.disconnect();
     }
