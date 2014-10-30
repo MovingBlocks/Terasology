@@ -29,11 +29,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.network.ClientComponent;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
@@ -374,11 +377,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     for (ChunkRelevanceRegion region : regions.values()) {
                         region.chunkUnloaded(pos);
                     }
-                    storageManager.onChunkUnload(chunk);
-                    for (EntityRef entityRef : entityManager.getEntitiesOfChunk(chunk)) {
-                        if (!entityRef.isAlwaysRelevant()) {
-                            entityRef.destroy();
-                        }
+                    Collection<EntityRef> entitiesOfChunk = getEntitiesOfChunk(chunk);
+                    storageManager.onChunkUnload(chunk, entitiesOfChunk);
+                    for (EntityRef entityRef : entitiesOfChunk) {
+                        entityRef.destroy();
                     }
                     chunk.dispose();
                     try {
@@ -396,6 +398,23 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             }
         }
         PerformanceMonitor.endActivity();
+    }
+
+    private Collection<EntityRef> getEntitiesOfChunk(Chunk chunk) {
+        List<EntityRef> entitiesToStore = Lists.newArrayList();
+
+        AABB aabb = chunk.getAABB();
+        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    if (aabb.contains(loc.getWorldPosition())) {
+                        entitiesToStore.add(entity);
+                    }
+                }
+            }
+        }
+        return entitiesToStore;
     }
 
     private void updateRelevance() {

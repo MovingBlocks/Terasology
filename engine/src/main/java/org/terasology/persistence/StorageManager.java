@@ -15,11 +15,13 @@
  */
 package org.terasology.persistence;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
@@ -62,8 +64,9 @@ public interface StorageManager {
     /**
      * Must be called from the main thread when a chunk got unloaded. The entities must not be disposed yet.
      * @param chunk
+     * @param entitiesOfChunk
      */
-    void onChunkUnload(Chunk chunk);
+    void onChunkUnload(Chunk chunk, Collection<EntityRef> entitiesOfChunk);
 
     void checkAndRepairSaveIfNecessary() throws IOException;
 }

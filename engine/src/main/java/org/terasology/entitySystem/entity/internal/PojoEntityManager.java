@@ -718,24 +718,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         return Collections.emptyList();
     }
 
-    @Override
-    public Iterable<EntityRef> getEntitiesOfChunk(Chunk chunk) {
-        List<EntityRef> entitiesToStore = Lists.newArrayList();
-
-        AABB aabb = chunk.getAABB();
-        for (EntityRef entity : getEntitiesWith(LocationComponent.class)) {
-            if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
-                    if (aabb.contains(loc.getWorldPosition())) {
-                        entitiesToStore.add(entity);
-                    }
-                }
-            }
-        }
-        return entitiesToStore;
-    }
-
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
         private EntityRef key;
         private T value;

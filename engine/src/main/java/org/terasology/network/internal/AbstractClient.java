@@ -18,6 +18,7 @@ package org.terasology.network.internal;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
@@ -44,6 +45,7 @@ public abstract class AbstractClient implements Client {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         if (clientComp != null) {
             clientComp.clientInfo.destroy();
+            clientComp.character.destroy();
         }
         clientEntity.destroy();
     }

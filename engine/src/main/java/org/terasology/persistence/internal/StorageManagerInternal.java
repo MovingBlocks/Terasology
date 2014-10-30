@@ -36,6 +36,7 @@ import org.terasology.entitySystem.systems.ComponentSystem;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
@@ -143,14 +144,17 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-    private void createGlobalStoreForSave(SaveTransactionBuilder saveTransaction) {
+    /**
+     *
+     * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
+     */
+    private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder saveTransaction, Set<EntityRef> unsavedEntities) {
         GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
         for (StoreMetadata table : storeMetadata.values()) {
             globalStoreSaver.addStoreMetadata(table);
         }
-        for (EntityRef entity : entityManager.getAllEntities()) {
+        for (EntityRef entity : unsavedEntities) {
             globalStoreSaver.store(entity);
-
         }
         EntityData.GlobalStore globalStore = globalStoreSaver.save();
         saveTransaction.addGlobalStore(globalStore);
@@ -175,7 +179,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     @Override
     public void onPlayerDisconnect(Client client) {
-        EntityData.PlayerStore playerStore = createPlayerStore(client);
+        EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
+        EntityData.PlayerStore playerStore = createPlayerStore(client, character);
         unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
     }
 
@@ -213,7 +218,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return new PlayerStoreInternal(playerId, this, entityManager);
     }
 
-    private void createChunkStoresForSave(SaveTransactionBuilder saveTransactionBuilder, ChunkProvider chunkProvider) {
+    /**
+     *
+     * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
+     *                        This method removes entities it saves.
+     */
+    private void addChunksToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder, ChunkProvider chunkProvider,
+                                            Set<EntityRef> unsavedEntities) {
         unloadedAndSavingChunkMap.clear();
         /**
          * New entries might be added concurrently. By using putAll + clear to transfer entries we might loose new
@@ -227,12 +238,20 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             unsavedEntryIterator.remove();
         }
 
+        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = createChunkPosToUnsavedEntitiesMap();
 
         for (Chunk chunk : chunkProvider.getAllChunks()) {
             if (chunk.isReady()) {
                 // If there is a newer undisposed version of the chunk,we don't need to save the disposed version:
                 unloadedAndSavingChunkMap.remove(chunk.getPosition());
-                saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), createCompressedChunkBuilder(chunk, true));
+                Collection<EntityRef> entitiesToStore = chunkPosToEntitiesMap.get(chunk.getPosition());
+                if (entitiesToStore == null) {
+                    entitiesToStore = Collections.EMPTY_SET;
+                }
+                unsavedEntities.removeAll(entitiesToStore);
+                CompressedChunkBuilder compressedChunkBuilder = createCompressedChunkBuilder(chunk,
+                        entitiesToStore, true);
+                saveTransactionBuilder.addCompressedChunkBuilder(chunk.getPosition(), compressedChunkBuilder);
             }
         }
 
@@ -241,16 +260,43 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
+    private Map<Vector3i, Collection<EntityRef>> createChunkPosToUnsavedEntitiesMap() {
+        Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = Maps.newHashMap();
+        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+            /*
+             * Note: Entities with owners get saved with the owner. Entities that are always relevant don't get stored
+             * in chunk as the chunk is not always loaded
+             */
+            if (entity.isPersistent() && !entity.getOwner().exists() && !entity.hasComponent(ClientComponent.class)
+                    && !entity.isAlwaysRelevant()) {
+                LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+                if (locationComponent != null) {
+                    Vector3f loc = locationComponent.getWorldPosition();
+                    Vector3i chunkPos = TeraMath.calcChunkPos((int) loc.x, (int) loc.y, (int) loc.z);
+                    Collection<EntityRef> collection = chunkPosToEntitiesMap.get(chunkPos);
+                    if (collection == null) {
+                        collection = Lists.newArrayList();
+                        chunkPosToEntitiesMap.put(chunkPos, collection);
+                    }
+                    collection.add(entity);
+                }
+            }
+        }
+        return chunkPosToEntitiesMap;
+    }
+
     /**
      *This method should only be called by the main thread.
      *
+     * @param entitiesToSave all persistent entities within the given chunk
      * @param viaSnapshot specifies if a snapshot of the chunk data will be created. Only the main thread may set this
      *                    to true for saving. If it is false the chunk data will be saved directly. The value false
-     *                    requires the chunk to be no longer in use like after unloading.
      */
-    private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk, boolean viaSnapshot) {
+    private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk,
+                                                                Collection<EntityRef> entitiesToSave,
+                                                                boolean viaSnapshot) {
         EntityStorer storer = new EntityStorer(entityManager);
-        for (EntityRef entityRef : entityManager.getEntitiesOfChunk(chunk)) {
+        for (EntityRef entityRef : entitiesToSave) {
             if (entityRef.isPersistent()) {
                 storer.store(entityRef, false);
             }
@@ -304,20 +350,32 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
         NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-        createChunkStoresForSave(saveTransactionBuilder, chunkProvider);
-        createPlayerStoresForSave(saveTransactionBuilder, networkSystem);
-        createGlobalStoreForSave(saveTransactionBuilder);
-        createGameManifest(saveTransactionBuilder);
-        // TODO check if threads need to be stopped:  e.g. network and common engine threads
-        // chunk related threads should not be a problem except for performance
+        /**
+         * Currently loaded persistent entities without owner that have not been saved yet.
+         */
+        Set<EntityRef> unsavedEntities = new HashSet<>();
+        for (EntityRef entity: entityManager.getAllEntities()) {
+            if (entity.isPersistent() && !entity.getOwner().exists()) {
+                unsavedEntities.add(entity);
+            }
+        }
 
+        addChunksToSaveTransaction(saveTransactionBuilder, chunkProvider, unsavedEntities);
+        addPlayersToSaveTransaction(saveTransactionBuilder, networkSystem, unsavedEntities);
+        addGlobalStoreToSaveTransaction(saveTransactionBuilder, unsavedEntities);
+        addGameManifestToSaveTransaction(saveTransactionBuilder);
 
         return saveTransactionBuilder.build();
     }
 
 
-
-    private void createPlayerStoresForSave(SaveTransactionBuilder saveTransactionBuilder, NetworkSystem networkSystem) {
+    /**
+     *
+     * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
+     *                        This method removes entities it saves.
+     */
+    private void addPlayersToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder, NetworkSystem networkSystem,
+                                             Set<EntityRef> unsavedEntities) {
         unloadedAndSavingPlayerMap.clear();
         /**
          * New entries might be added concurrently. By using putAll + clear to transfer entries we might loose new
@@ -334,7 +392,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         for (Client client : networkSystem.getPlayers()) {
             // If there is a newer undisposed version of the player,we don't need to save the disposed version:
             unloadedAndSavingPlayerMap.remove(client.getId());
-            saveTransactionBuilder.addPlayerStore(client.getId(), createPlayerStore(client));
+            EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
+            unsavedEntities.remove(character);
+            saveTransactionBuilder.addPlayerStore(client.getId(), createPlayerStore(client, character));
         }
 
         for (Map.Entry<String, EntityData.PlayerStore> entry: unloadedAndSavingPlayerMap.entrySet()) {
@@ -342,10 +402,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-    private EntityData.PlayerStore createPlayerStore(Client client) {
+    private EntityData.PlayerStore createPlayerStore(Client client, EntityRef character) {
         String playerId = client.getId();
         PlayerStore playerStore = new PlayerStoreInternal(playerId, this, entityManager);
-        EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
         if (character.exists()) {
             playerStore.setCharacter(character);
         }
@@ -378,8 +437,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public void onChunkUnload(Chunk chunk) {
-        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, false));
+    public void onChunkUnload(Chunk chunk, Collection<EntityRef> entitiesOfChunk) {
+        unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, entitiesOfChunk, false));
     }
 
 
@@ -474,7 +533,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         }
     }
 
-    private void createGameManifest(SaveTransactionBuilder saveTransactionBuilder) {
+    private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {
         BlockManager blockManager = CoreRegistry.get(BlockManager.class);
         BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);

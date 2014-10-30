@@ -162,6 +162,4 @@ public interface EntityManager {
      * @return A count of currently active entities
      */
     int getActiveEntityCount();
-
-    Iterable<EntityRef> getEntitiesOfChunk(Chunk chunk);
 }
