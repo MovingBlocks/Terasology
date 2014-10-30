@@ -25,7 +25,6 @@ import org.terasology.asset.AssetLoader;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
 
-import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
@@ -52,7 +51,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
         List<Vector3f> rawVertices = Lists.newArrayList();
         List<Vector3f> rawNormals = Lists.newArrayList();
         List<Vector2f> rawTexCoords = Lists.newArrayList();
-        List<Tuple3i[]> rawIndices = Lists.newArrayList();
+        List<Vector3i[]> rawIndices = Lists.newArrayList();
 
         // Gather data
         readMeshData(reader, rawVertices, rawNormals, rawTexCoords, rawIndices);
@@ -77,15 +76,15 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
         return data;
     }
 
-    private MeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
+    private MeshData processData(List<Vector3f> rawVertices, List<Vector3f> rawNormals, List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
         MeshData result = new MeshData();
         TFloatList vertices = result.getVertices();
         TFloatList texCoord0 = result.getTexCoord0();
         TFloatList normals = result.getNormals();
         TIntList indices = result.getIndices();
         int vertCount = 0;
-        for (Tuple3i[] face : rawIndices) {
-            for (Tuple3i indexSet : face) {
+        for (Vector3i[] face : rawIndices) {
+            for (Vector3i indexSet : face) {
                 if (indexSet.x > rawVertices.size()) {
                     throw new IOException("Vertex index out of range: " + indexSet.x);
                 }
@@ -125,7 +124,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
     }
 
     private void readMeshData(BufferedReader reader, List<Vector3f> rawVertices, List<Vector3f> rawNormals,
-                              List<Vector2f> rawTexCoords, List<Tuple3i[]> rawIndices) throws IOException {
+                              List<Vector2f> rawTexCoords, List<Vector3i[]> rawIndices) throws IOException {
         String line = null;
         int lineNum = 0;
         try {
@@ -194,7 +193,7 @@ public class ObjMeshLoader implements AssetLoader<MeshData> {
                     // Face (polygon)
                     case "f": {
                         String[] elements = prefixSplit[1].trim().split("\\s+");
-                        Tuple3i[] result = new Tuple3i[elements.length];
+                        Vector3i[] result = new Vector3i[elements.length];
                         for (int i = 0; i < elements.length; ++i) {
                             String[] parts = elements[i].split("/", 4);
                             if (parts.length > 3) {

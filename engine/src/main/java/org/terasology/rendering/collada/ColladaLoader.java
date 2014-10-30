@@ -54,14 +54,14 @@ import com.google.common.collect.Lists;
 
 /**
  * Importer for Collada data exchange model files.
- * 
- * The development of this loader was greatly influenced by 
+ *
+ * The development of this loader was greatly influenced by
  * http://www.wazim.com/Collada_Tutorial_1.htm
  *
  * TODO: Consider documenting this class similar to what has been done at this web page:
- * 
+ *
  * http://docs.garagegames.com/torque-3d/official/content/documentation/Artist%20Guide/Formats/ColladaLoader.html
- * 
+ *
  * @author mkienenb@gmail.com
  */
 
@@ -369,13 +369,13 @@ public class ColladaLoader {
         }
 
         // Now if you have come this far, you should be able to read the geometry data,
-        // as well as the skeleton and skinning data from COLLADA documents. And you should be able to draw 
+        // as well as the skeleton and skinning data from COLLADA documents. And you should be able to draw
         // the model in raw triangles, as well as draw the skeleton. Although I haven't discussed how you
         // can accumulate the world matrices for each joint and then draw in world coordinates for debugging
-        // purposes but I think I gave a hint that we have to multiply parent joint's world matrix with current 
+        // purposes but I think I gave a hint that we have to multiply parent joint's world matrix with current
         // joint's Joint matrix and save the result in current joint's world matrix. We have to start this
         // process from the root bone. So that we don't have dirty world matrices from parents, and the root
-        // Joint's world matrix becomes the Joint matrix, since root don't have any parent. If you are also 
+        // Joint's world matrix becomes the Joint matrix, since root don't have any parent. If you are also
         // reading the COLLADA specification version 1.5 you can find the skinning equation so you should also
         // be able to put the model in bind shape. How can we animate this model is still not covered and will
         // be covered in the following sections.
@@ -392,11 +392,11 @@ public class ColladaLoader {
 
         SkeletalMesh
 
-        
+
         // This part may not be required if we can implement SkeletalMeshData methods without it
 
         //////////////
-        
+
         public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights,
            List<Vector2f> uvs,
            TIntList vertexStartWeights, TIntList vertexWeightCounts,
@@ -494,8 +494,7 @@ public class ColladaLoader {
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
             Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Vector3f translationVector = new Vector3f();
-            matrix4f.get(translationVector);
+            Vector3f translationVector = matrix4f.getTranslation();
             translationVectorArray[i] = translationVector;
         }
 

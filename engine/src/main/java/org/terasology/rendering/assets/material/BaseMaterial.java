@@ -23,9 +23,9 @@ import org.terasology.rendering.cameras.Camera;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Tuple2f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Tuple4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {
@@ -98,12 +98,12 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat2(String name, Tuple2f value) {
+    public void setFloat2(String name, Vector2f value) {
         setFloat2(name, value.x, value.y);
     }
 
     @Override
-    public void setFloat2(String name, Tuple2f value, boolean currentOnly) {
+    public void setFloat2(String name, Vector2f value, boolean currentOnly) {
         setFloat2(name, value.x, value.y, currentOnly);
     }
 
@@ -118,11 +118,11 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat3(String name, Tuple3f value) {
+    public void setFloat3(String name, Vector3f value) {
         setFloat3(name, value.x, value.y, value.z);
     }
 
-    public void setFloat3(String name, Tuple3f value, boolean currentOnly) {
+    public void setFloat3(String name, Vector3f value, boolean currentOnly) {
         setFloat3(name, value.x, value.y, value.z, currentOnly);
     }
 
@@ -137,12 +137,12 @@ public abstract class BaseMaterial extends AbstractAsset<MaterialData> implement
     }
 
     @Override
-    public void setFloat4(String name, Tuple4f value) {
+    public void setFloat4(String name, Vector4f value) {
         setFloat4(name, value.x, value.y, value.z, value.w);
     }
 
     @Override
-    public void setFloat4(String name, Tuple4f value, boolean currentOnly) {
+    public void setFloat4(String name, Vector4f value, boolean currentOnly) {
         setFloat4(name, value.x, value.y, value.z, value.w, currentOnly);
     }
 

@@ -17,7 +17,7 @@ package org.terasology.logic.location;
 
 import org.terasology.entitySystem.entity.EntityRef;
 
-import javax.vecmath.Tuple3f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector3f;
 import java.util.Comparator;
 
@@ -107,7 +107,7 @@ public class DistanceComparator implements Comparator<EntityRef> {
      *
      * @param newOrigin the new location to calculate distances from.
      */
-    public void setOrigin(Tuple3f newOrigin) {
+    public void setOrigin(Vector3f newOrigin) {
         origin.set(newOrigin);
     }
 

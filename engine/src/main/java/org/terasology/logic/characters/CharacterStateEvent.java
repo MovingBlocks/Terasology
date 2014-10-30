@@ -24,6 +24,8 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 
+import javax.vecmath.BaseQuat4f;
+import javax.vecmath.BaseVector3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -191,10 +193,8 @@ public class CharacterStateEvent extends NetworkEvent {
 
     public static void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
-        Vector3f newPos = new Vector3f();
-        newPos.interpolate(a.getPosition(), b.getPosition(), t);
-        Quat4f newRot = new Quat4f();
-        newRot.interpolate(a.getRotation(), b.getRotation(), t);
+        Vector3f newPos = BaseVector3f.lerp(a.getPosition(), b.getPosition(), t);
+        Quat4f newRot = BaseQuat4f.interpolate(a.getRotation(), b.getRotation(), t);
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(newPos);
         location.setWorldRotation(newRot);

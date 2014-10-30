@@ -129,9 +129,9 @@ public class BulletPhysics implements PhysicsEngine {
         liquidWrapper = new PhysicsLiquidWrapper(world);
         VoxelWorldShape liquidShape = new VoxelWorldShape(liquidWrapper);
 
-        Matrix3f rot = new Matrix3f();
+        Matrix4f rot = new Matrix4f();
         rot.setIdentity();
-        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
+        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(rot));
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
         rigidBody.rb.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
@@ -811,7 +811,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         private final Transform temp = new Transform();
 
-        //If a class can figure out that its Collider is a BulletCollider, it 
+        //If a class can figure out that its Collider is a BulletCollider, it
         //is allowed to gain direct access to the bullet body:
         private final PairCachingGhostObject collider;
 

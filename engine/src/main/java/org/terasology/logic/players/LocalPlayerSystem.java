@@ -258,8 +258,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
-        Vector3f cameraPosition = new Vector3f();
-        cameraPosition.add(new Vector3f(position), new Vector3f(0, characterComponent.eyeOffset, 0));
+        Vector3f cameraPosition = new Vector3f(position);
+        cameraPosition.add(0, characterComponent.eyeOffset, 0);
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = Direction.FORWARD.getVector3f();

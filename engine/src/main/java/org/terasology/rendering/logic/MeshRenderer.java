@@ -229,9 +229,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
 
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
-        Matrix4f matrixWorldSpace = new Matrix4f();
         Transform transWorldSpace = new Transform();
-        Matrix4f matrixCameraSpace = new Matrix4f();
 
         FloatBuffer tempMatrixBuffer44 = BufferUtils.createFloatBuffer(16);
         FloatBuffer tempMatrixBuffer33 = BufferUtils.createFloatBuffer(12);
@@ -262,12 +260,12 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 location.getWorldPosition(worldPos);
                 float worldScale = location.getWorldScale();
 
-                matrixWorldSpace.set(worldRot, worldPos, worldScale);
+                Matrix4f matrixWorldSpace = new Matrix4f(worldRot, worldPos, worldScale);
                 transWorldSpace.set(matrixWorldSpace);
 
                 Vector3f worldPositionCameraSpace = new Vector3f();
                 worldPositionCameraSpace.sub(worldPos, cameraPosition);
-                matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
+                Matrix4f matrixCameraSpace = new Matrix4f(worldRot, worldPositionCameraSpace, worldScale);
 
                 AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
                 if (worldRenderer.isAABBVisible(aabb)) {

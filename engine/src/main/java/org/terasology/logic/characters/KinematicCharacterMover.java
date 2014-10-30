@@ -134,7 +134,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!oldPosition.equals(newPosition)) {
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
-            Vector3i currentPosition = oldPosition.clone();
+            Vector3i currentPosition = new Vector3i(oldPosition);
             for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
                 oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
                 currentPosition.add(0, 1, 0);
@@ -142,7 +142,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
             // get the new position's blocks
             Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
-            currentPosition = newPosition.clone();
+            currentPosition = new Vector3i(newPosition);
             for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
                 newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
                 currentPosition.add(0, 1, 0);
@@ -262,8 +262,8 @@ public class KinematicCharacterMover implements CharacterMover {
             reflectDir.normalize();
             Vector3f perpendicularDir = Vector3fUtil.getPerpendicularComponent(reflectDir, hitNormal, new Vector3f());
             if (normalMag != 0.0f) {
-                Vector3f perpComponent = new Vector3f();
-                perpComponent.scale(normalMag * movementLength, perpendicularDir);
+                Vector3f perpComponent = new Vector3f(perpendicularDir);
+                perpComponent.scale(normalMag * movementLength);
                 direction.set(perpComponent);
             }
         }
@@ -363,7 +363,8 @@ public class KinematicCharacterMover implements CharacterMover {
                         }
                         normalizedDir.set(expectedMove);
                         expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
-                        targetPos.add(position, expectedMove);
+                        targetPos.set(position);
+                        targetPos.add(expectedMove);
                     } else {
                         hit = true;
                         break;

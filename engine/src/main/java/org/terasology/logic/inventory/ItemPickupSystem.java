@@ -72,7 +72,9 @@ public class ItemPickupSystem extends BaseComponentSystem {
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
             Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new Vector3f());
             extents.scale(2.0f);
-            extents.clampMin(0.5f);
+            extents.x = Math.max(extents.x, 0.5f);
+            extents.y = Math.max(extents.y, 0.5f);
+            extents.z = Math.max(extents.z, 0.5f);
             builder.getComponent(BoxShapeComponent.class).extents.set(extents);
         }
         if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
