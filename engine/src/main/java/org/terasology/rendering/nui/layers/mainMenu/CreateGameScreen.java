@@ -126,7 +126,9 @@ public class CreateGameScreen extends CoreScreenLayer {
                     // find the first gameplay module that is available
                     for (Name moduleName : config.getDefaultModSelection().listModules()) {
                         Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-                        if (moduleManager.isGameplayModule(module)) {
+
+                        // module is null if it is no longer present
+                        if (module != null && moduleManager.isGameplayModule(module)) {
                             set(module);
                             return selected;
                         }
