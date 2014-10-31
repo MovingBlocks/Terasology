@@ -37,7 +37,7 @@ public class WorldTimeEvent extends TimeEventBase {
         long fracInMs = DoubleMath.roundToLong(fraction * WorldTime.DAY_LENGTH, RoundingMode.HALF_UP);
         long diff = getDayTimeInMs() - fracInMs;
 
-        return 2 * diff < WorldTime.TICK_RATE && 2 * diff >= -WorldTime.TICK_RATE;
+        return 2 * diff < WorldTime.TICK_EVENT_RATE && 2 * diff >= -WorldTime.TICK_EVENT_RATE;
     }
 
     @Override

@@ -87,11 +87,11 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
             long timeInDay = LongMath.mod(startTime, DAY_LENGTH);
             long day = LongMath.divide(startTime, DAY_LENGTH, RoundingMode.FLOOR);
 
-            long startTick = startTime / TICK_RATE;
-            long endTick = (endTime) / TICK_RATE;
+            long startTick = startTime / TICK_EVENT_RATE;
+            long endTick = (endTime) / TICK_EVENT_RATE;
 
             if (startTick != endTick) {
-                long tick = endTime - endTime % TICK_RATE;
+                long tick = endTime - endTime % TICK_EVENT_RATE;
                 getWorldEntity().send(new WorldTimeEvent(tick));
             }
 

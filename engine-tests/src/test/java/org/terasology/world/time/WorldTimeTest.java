@@ -34,8 +34,8 @@ public class WorldTimeTest {
 
         long days = 3;
 
-        for (int tick = 0; tick < WorldTime.TICKS_PER_DAY * days; tick++) {
-            WorldTimeEvent event = new WorldTimeEvent(tick * WorldTime.TICK_RATE);
+        for (int tick = 0; tick < WorldTime.TICK_EVENTS_PER_DAY * days; tick++) {
+            WorldTimeEvent event = new WorldTimeEvent(tick * WorldTime.TICK_EVENT_RATE);
 
             for (int i = 0; i < fracs.length; i++) {
                 if (event.matchesDaily(fracs[i])) {
