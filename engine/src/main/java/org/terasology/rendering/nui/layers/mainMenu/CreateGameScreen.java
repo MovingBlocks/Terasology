@@ -271,8 +271,9 @@ public class CreateGameScreen extends CoreScreenLayer {
                         gameManifest.addModule(module.getId(), module.getVersion());
                     }
 
+                    float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
                     WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                            (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
+                            (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                     gameManifest.addWorld(worldInfo);
 
                     gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));
