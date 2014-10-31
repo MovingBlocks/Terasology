@@ -34,13 +34,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
 
     private static final long DAWN_TIME = DAY_LENGTH;
-    private static final long MIDDAY_TIME = DAY_LENGTH / 4;
     private static final long DUSK_TIME = DAY_LENGTH / 2;
-    private static final long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
 
     private static final float WORLD_TIME_MULTIPLIER = 48f;
-
-    private static final long TICK_RATE = DAY_LENGTH / TICKS_PER_DAY;
 
     private AtomicLong worldTime = new AtomicLong(0);
 
