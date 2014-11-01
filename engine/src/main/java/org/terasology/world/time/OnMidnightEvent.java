@@ -20,9 +20,9 @@ package org.terasology.world.time;
  *
  * @author Immortius
  */
-public class OnMidnightEvent extends WorldTimeEvent {
+public class OnMidnightEvent extends TimeEventBase {
 
-    public OnMidnightEvent(float worldTime, long worldTimeMS) {
-        super(worldTime, worldTimeMS);
+    public OnMidnightEvent(long worldTimeMS) {
+        super(worldTimeMS);
     }
 }

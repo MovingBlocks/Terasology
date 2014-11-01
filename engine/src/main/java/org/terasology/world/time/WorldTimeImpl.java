@@ -23,19 +23,19 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.In;
 import org.terasology.world.WorldComponent;
 
+import com.google.common.math.LongMath;
+
+import java.math.RoundingMode;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Immortius
  */
 public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, UpdateSubscriberSystem {
-    public static final long DAYS_TO_MS = (DAY_LENGTH);
-    public static final float MS_TO_DAYS = 1.f / (DAYS_TO_MS);
 
-    public static final long DAWN_TIME = DAY_LENGTH;
-    public static final long MIDDAY_TIME = DAY_LENGTH / 4;
-    public static final long DUSK_TIME = DAY_LENGTH / 2;
-    public static final long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
+    private static final long DAWN_TIME = DAY_LENGTH;
+    private static final long DUSK_TIME = DAY_LENGTH / 2;
+
     private static final float WORLD_TIME_MULTIPLIER = 48f;
 
     private AtomicLong worldTime = new AtomicLong(0);
@@ -58,7 +58,7 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
     @Override
     public float getDays() {
-        return MS_TO_DAYS * worldTime.get();
+        return worldTime.get() / (float) DAY_LENGTH;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
 
     @Override
     public void setDays(float timeInDays) {
-        setMilliseconds((long) ((double) timeInDays * DAYS_TO_MS));
+        setMilliseconds((long) ((double) timeInDays * DAY_LENGTH));
     }
 
     @Override
@@ -84,26 +84,35 @@ public class WorldTimeImpl extends BaseComponentSystem implements WorldTime, Upd
             deltaMs = (long) (deltaMs * WORLD_TIME_MULTIPLIER);
             long startTime = worldTime.getAndAdd(deltaMs);
             long endTime = startTime + deltaMs;
-            long timeInDay = startTime % DAY_LENGTH;
-            if (timeInDay < 0) {
-                timeInDay = DAY_LENGTH + timeInDay;
+            long timeInDay = LongMath.mod(startTime, DAY_LENGTH);
+            long day = LongMath.divide(startTime, DAY_LENGTH, RoundingMode.FLOOR);
+
+            long startTick = startTime / TICK_EVENT_RATE;
+            long endTick = (endTime) / TICK_EVENT_RATE;
+
+            if (startTick != endTick) {
+                long tick = endTime - endTime % TICK_EVENT_RATE;
+                getWorldEntity().send(new WorldTimeEvent(tick));
             }
-            if (timeInDay < MIDDAY_TIME) {
-                if (timeInDay + deltaMs >= MIDDAY_TIME) {
-                    getWorldEntity().send(new OnMiddayEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < DUSK_TIME) {
-                if (timeInDay + deltaMs >= DUSK_TIME) {
-                    getWorldEntity().send(new OnDuskEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < MIDNIGHT_TIME) {
-                if (timeInDay + deltaMs >= MIDNIGHT_TIME) {
-                    getWorldEntity().send(new OnMidnightEvent(MS_TO_DAYS * endTime, endTime));
-                }
-            } else if (timeInDay < DAWN_TIME) {
-                if (timeInDay + deltaMs >= DAWN_TIME) {
-                    getWorldEntity().send(new OnDawnEvent(MS_TO_DAYS * endTime, endTime));
-                }
+
+            if (timeInDay < MIDDAY_TIME && timeInDay + deltaMs >= MIDDAY_TIME) {
+                long tick = day * DAY_LENGTH + MIDDAY_TIME;
+                getWorldEntity().send(new OnMiddayEvent(tick));
+            }
+
+            if (timeInDay < DUSK_TIME && timeInDay + deltaMs >= DUSK_TIME) {
+                long tick = day * DAY_LENGTH + DUSK_TIME;
+                getWorldEntity().send(new OnDuskEvent(tick));
+            }
+
+            if (timeInDay < MIDNIGHT_TIME && timeInDay + deltaMs >= MIDNIGHT_TIME) {
+                long tick = day * DAY_LENGTH + MIDNIGHT_TIME;
+                getWorldEntity().send(new OnMidnightEvent(tick));
+            }
+
+            if (timeInDay < DAWN_TIME && timeInDay + deltaMs >= DAWN_TIME) {
+                long tick = day * DAY_LENGTH + DAWN_TIME;
+                getWorldEntity().send(new OnDawnEvent(tick));
             }
         }
     }
