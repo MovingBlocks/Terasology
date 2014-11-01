@@ -19,9 +19,6 @@
  * But maybe we'll do something else since ideally we'll have mini-blocks drop from Stone...
  */
 {
-"mass" : 96,
-"hardness" : 6,
-"categories" : ["stone"],
-"displayName": "Cobble Stone",
-"sounds": "Core:stone"
+    "basedOn" : "core:rock",
+    "displayName": "Cobble Stone"
 }

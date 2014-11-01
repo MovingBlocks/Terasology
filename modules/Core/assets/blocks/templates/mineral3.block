@@ -1,0 +1,7 @@
+{
+    "template" : true,
+    "categories" : ["mineral","mineral2","mineral3"],
+    "hardness" : 1800,
+    "mass" : 100,
+    "sounds": "Core:stone"
+}

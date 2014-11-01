@@ -13,32 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.generation;
+package org.terasology.world.generation.facets.base;
 
-import org.terasology.math.Region3i;
-import org.terasology.world.chunks.CoreChunk;
-
-import java.util.Map;
-import java.util.Set;
+import org.terasology.math.Vector3i;
+import org.terasology.world.generation.WorldFacet3D;
 
 /**
  * @author Immortius
  */
-public interface World {
+public interface ObjectFacet3D<T> extends WorldFacet3D {
 
-    Region getWorldData(Region3i region);
+    T get(int x, int y, int z);
 
-    void rasterizeChunk(CoreChunk chunk);
+    T get(Vector3i pos);
 
-    /**
-     * @return a <b>new</b> set containing all facet classes
-     */
-    Set<Class<? extends WorldFacet>> getAllFacets();
+    T getWorld(int x, int y, int z);
 
-    /**
-     * @return a <b>new</b> set containing all named facets
-     */
-    Map<String, Class<? extends WorldFacet>> getNamedFacets();
+    T getWorld(Vector3i pos);
 
-    void initialize();
+    T[] getInternal();
+
+    void set(int x, int y, int z, T value);
+
+    void set(Vector3i pos, T value);
+
+    void setWorld(int x, int y, int z, T value);
+
+    void setWorld(Vector3i pos, T value);
+
+    void set(T[] data);
 }

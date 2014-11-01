@@ -15,6 +15,11 @@
  */
 package org.terasology.world.time;
 
+import java.math.RoundingMode;
+
+import com.google.common.base.Preconditions;
+import com.google.common.math.DoubleMath;
+
 /**
  * A timer event that represents a (world-based) time instant
  * @author Immortius
@@ -27,7 +32,12 @@ public class WorldTimeEvent extends TimeEventBase {
     }
 
     public boolean matchesDaily(float fraction) {
-        return Math.abs(getDayTime() - fraction) < 0.5f / WorldTime.TICKS_PER_DAY;
+        Preconditions.checkArgument(fraction >= 0 && fraction <= 1, "fraction must be in [0..1]");
+
+        long fracInMs = DoubleMath.roundToLong(fraction * WorldTime.DAY_LENGTH, RoundingMode.HALF_UP);
+        long diff = getDayTimeInMs() - fracInMs;
+
+        return 2 * diff < WorldTime.TICK_EVENT_RATE && 2 * diff >= -WorldTime.TICK_EVENT_RATE;
     }
 
     @Override
