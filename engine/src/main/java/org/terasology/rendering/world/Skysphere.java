@@ -81,7 +81,8 @@ public class Skysphere {
     }
 
     public void update() {
-        sunPosAngle = (float) java.lang.Math.toRadians(360.0 * parentWorldRenderer.getWorldProvider().getTime().getDays() - 90.0);
+        float day = parentWorldRenderer.getWorldProvider().getTime().getDays();
+        sunPosAngle = (float) (day * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.
     }
 
     private void drawSkysphere() {

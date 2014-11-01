@@ -121,9 +121,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
         CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
 
-        // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
-        worldProvider.getTime().setMilliseconds(worldInfo.getTime());
-
         return true;
     }
 
