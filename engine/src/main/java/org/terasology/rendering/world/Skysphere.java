@@ -20,8 +20,10 @@ import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.world.sun.CelestialSystem;
 
 import javax.vecmath.Vector3f;
 
@@ -48,12 +50,11 @@ public class Skysphere {
     private float colorExp = 0.01f;
     @EditorRange(min = 2.0f, max = 32.0f)
     private float turbidity = 9.0f;
-    private float sunPosAngle = 0.1f;
 
-    private final WorldRenderer parentWorldRenderer;
+    private final CelestialSystem celSystem;
 
-    public Skysphere(WorldRenderer parent) {
-        parentWorldRenderer = parent;
+    public Skysphere() {
+        celSystem = CoreRegistry.get(CelestialSystem.class);
     }
 
     public void render(Camera camera) {
@@ -80,11 +81,6 @@ public class Skysphere {
         glDepthMask(true);
     }
 
-    public void update() {
-        float day = parentWorldRenderer.getWorldProvider().getTime().getDays();
-        sunPosAngle = (float) (day * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.
-    }
-
     private void drawSkysphere() {
         if (displayListSphere == -1) {
             displayListSphere = glGenLists(1);
@@ -103,11 +99,11 @@ public class Skysphere {
     }
 
     public float getSunPosAngle() {
-        return sunPosAngle;
+        return celSystem.getSunPosAngle();
     }
 
     public float getDaylight() {
-        float angle = (float) java.lang.Math.toDegrees(TeraMath.clamp(java.lang.Math.cos(sunPosAngle)));
+        float angle = (float) Math.toDegrees(TeraMath.clamp(Math.cos(getSunPosAngle())));
         float daylight = 1.0f;
 
         if (angle < 24.0f) {
@@ -139,7 +135,7 @@ public class Skysphere {
 
     public Vector3f getSunDirection(boolean moonlightFlip) {
         float sunAngle = getSunPosAngle() + 0.0001f;
-        Vector3f sunDirection = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
+        Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
 
         // Moonlight flip
         if (moonlightFlip && sunDirection.y < 0.0f) {

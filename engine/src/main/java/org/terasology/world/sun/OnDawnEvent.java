@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.time;
+package org.terasology.world.sun;
+
+import org.terasology.world.time.TimeEventBase;
 
 /**
- * Sent to a world in the middle of daytime
+ * Sent to a world on dawn (beginning of a new day)
  *
  * @author Immortius
  */
-public class OnMiddayEvent extends TimeEventBase {
+public class OnDawnEvent extends TimeEventBase {
 
-    public OnMiddayEvent(long worldTimeMS) {
+    public OnDawnEvent(long worldTimeMS) {
         super(worldTimeMS);
     }
 }
