@@ -26,6 +26,7 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
@@ -37,6 +38,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -194,9 +196,20 @@ public class KinematicCharacterMover implements CharacterMover {
             sides[3].z -= factor * movementComp.radius;
             sides[4].y -= movementComp.height;
             for (Vector3f side : sides) {
-                if (worldProvider.getBlock(side).isClimbable()) {
-                    //If any of our sides are near a climbable block, climb!
-                    newClimbing = true;
+                Block block = worldProvider.getBlock(side);
+                if (block.isClimbable()) {
+                    //If any of our sides are near a climbable block, check if we are near to the side and climb!
+
+                    Vector3i climbBlockPos = new Vector3i(side, 0.5f);
+                    Vector3i dir = block.getDirection().getVector3i();
+
+                    if (dir.x != 0 && Math.abs(state.getPosition().x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
+                        newClimbing = true;
+                        state.setClimbDirection(block.getDirection());
+                    } else if (dir.z != 0 && Math.abs(state.getPosition().z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
+                        newClimbing = true;
+                        state.setClimbDirection(block.getDirection());
+                    }
                     break;
                 }
             }
@@ -517,6 +530,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state,
                       CharacterMoveInputEvent input, EntityRef entity) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
+
         float lengthSquared = desiredVelocity.lengthSquared();
 
         // If the length of desired movement is > 1, normalise it to prevent movement being faster than allowed.
@@ -541,6 +555,11 @@ public class KinematicCharacterMover implements CharacterMover {
             }
         }
         desiredVelocity.scale(maxSpeed);
+
+        if (movementComp.mode == MovementMode.CLIMBING) {
+            climb(state, input, desiredVelocity);
+        }
+
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
@@ -559,7 +578,8 @@ public class KinematicCharacterMover implements CharacterMover {
         Vector3f moveDelta = new Vector3f(endVelocity);
         moveDelta.scale(input.getDelta());
         CharacterCollider collider = movementComp.mode.useCollision ? physics.getCharacterCollider(entity) : null;
-        MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
+        MoveResult moveResult = move(state.getPosition(), moveDelta,
+                (state.getMode() != MovementMode.CLIMBING && state.isGrounded() && movementComp.mode.canBeGrounded) ? movementComp.stepHeight : 0,
                 movementComp.slopeFactor, collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
@@ -613,6 +633,60 @@ public class KinematicCharacterMover implements CharacterMover {
                             break;
                     }
                 }
+            }
+        }
+    }
+
+    private void climb(final CharacterStateEvent state, CharacterMoveInputEvent input, Vector3f desiredVelocity) {
+        if (state.getClimbDirection() == null) {
+            return;
+        }
+        Quat4f rotation = new Quat4f();
+        Vector3f tmp;
+
+        Side climbSide = state.getClimbDirection();
+        Vector3i climbDir3i = climbSide.getVector3i();
+        Vector3f climbDir3f = climbDir3i.toVector3f();
+
+        QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        tmp = new Vector3f(0.0f, 0.0f, -1.0f);
+        QuaternionUtil.quatRotate(rotation, tmp, tmp);
+        float angleToClimbDirection = tmp.angle(climbDir3f);
+
+        boolean clearMovementToDirection = !state.isGrounded();
+
+        // facing the ladder or looking down or up
+        if (angleToClimbDirection < Math.PI / 4.0 || Math.abs(input.getPitch()) > 60f) {
+            float pitchAmount = state.isGrounded() ? 45f : 90f;
+            float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
+            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+
+        // looking sidewards from ladder
+        } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
+            tmp = new Vector3f();
+            QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
+            float leftOrRight = tmp.x;
+            float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
+            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+                TeraMath.DEG_TO_RAD * 90f * plusOrMinus
+            );
+            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+
+        // facing away from ladder
+        } else {
+            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
+            clearMovementToDirection = false;
+        }
+
+        // clear out movement towards or away from the ladder
+        if (clearMovementToDirection) {
+            if (climbDir3i.x != 0) {
+                desiredVelocity.x = 0f;
+            }
+            if (climbDir3i.z != 0) {
+                desiredVelocity.z = 0f;
             }
         }
     }

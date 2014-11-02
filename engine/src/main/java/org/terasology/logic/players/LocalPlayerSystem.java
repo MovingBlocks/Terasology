@@ -148,10 +148,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 break;
             case CLIMBING:
-                float pitch = characterComponent.pitch > 0 ? 60f : -60f;
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * pitch, 0);
-                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
-                relMove.y += relativeMovement.y;
+                // Rotation is applied in KinematicCharacterMover
                 break;
             default:
                 QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
