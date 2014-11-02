@@ -53,6 +53,7 @@ import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;
 import org.terasology.world.internal.WorldProviderWrapper;
 import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.BasicCelestialModel;
 import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
@@ -114,7 +115,7 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
 
-        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem();
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
         CoreRegistry.put(CelestialSystem.class, celestialSystem);
         CoreRegistry.get(ComponentSystemManager.class).register(celestialSystem);
 

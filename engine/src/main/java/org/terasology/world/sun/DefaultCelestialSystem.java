@@ -18,49 +18,96 @@ package org.terasology.world.sun;
 
 import static org.terasology.world.time.WorldTime.DAY_LENGTH;
 
+import java.math.RoundingMode;
+
+import org.terasology.entitySystem.entity.EntityManager;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
+import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.WorldComponent;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.time.WorldTime;
+
+import com.google.common.math.LongMath;
+
 /**
- * A simple implementations of {@link CelestialSystem} with constant daily events
+ * A base class that fires events at
+ * different times of the day.
  * @author Martin Steiger
  */
-public class DefaultCelestialSystem extends BaseCelestialSystem {
+public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 
-    private static final long DAWN_TIME = DAY_LENGTH / 4;
-    private static final long MIDDAY_TIME = DAY_LENGTH / 2;
-    private static final long DUSK_TIME = 3 * DAY_LENGTH / 4;
-    private static final long MIDNIGHT_TIME = DAY_LENGTH;
+    private final WorldTime worldTime;
 
-    private float sunPosAngle;
+    private long lastUpdate;
+
+    private final CelestialModel model;
+
+    public DefaultCelestialSystem(CelestialModel model) {
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        worldTime = worldProvider.getTime();
+        lastUpdate = worldTime.getMilliseconds();
+        this.model = model;
+    }
 
     @Override
     public void update(float delta) {
-        super.update(delta);
-
-        float days = getWorldTime().getDays();
-        sunPosAngle = (float) (days * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.
+        fireEvents();
     }
 
     @Override
     public float getSunPosAngle() {
+        float days = getWorldTime().getDays();
+        float sunPosAngle = model.getSunPosAngle(days);
         return sunPosAngle;
     }
 
-    @Override
-    public long getDawn(long day) {
-        return DAWN_TIME;
+    protected void fireEvents() {
+        long startTime = worldTime.getMilliseconds();
+        long delta = startTime - lastUpdate;
+        if (delta > 0) {
+            long timeInDay = LongMath.mod(startTime, DAY_LENGTH);
+            long day = LongMath.divide(startTime, DAY_LENGTH, RoundingMode.FLOOR);
+
+            long dawn = model.getDawn(day);
+            long midday = model.getMidday(day);
+            long dusk = model.getDusk(day);
+            long midnight = model.getMidnight(day);
+
+            if (timeInDay - delta < midday && timeInDay >= midday) {
+                long tick = day * DAY_LENGTH + midday;
+                getWorldEntity().send(new OnMiddayEvent(tick));
+            }
+
+            if (timeInDay - delta < dusk && timeInDay >= dusk) {
+                long tick = day * DAY_LENGTH + dusk;
+                getWorldEntity().send(new OnDuskEvent(tick));
+            }
+
+            if (timeInDay - delta < midnight && timeInDay >= midnight) {
+                long tick = day * DAY_LENGTH + midnight;
+                getWorldEntity().send(new OnMidnightEvent(tick));
+            }
+
+            if (timeInDay - delta < dawn && timeInDay >= dawn) {
+                long tick = day * DAY_LENGTH + dawn;
+                getWorldEntity().send(new OnDawnEvent(tick));
+            }
+        }
+
+        lastUpdate = startTime;
     }
 
-    @Override
-    public long getMidday(long day) {
-        return MIDDAY_TIME;
+    protected WorldTime getWorldTime() {
+        return worldTime;
     }
 
-    @Override
-    public long getDusk(long day) {
-        return DUSK_TIME;
-    }
-
-    @Override
-    public long getMidnight(long day) {
-        return MIDNIGHT_TIME;
+    protected EntityRef getWorldEntity() {
+        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
+            return entity;
+        }
+        return EntityRef.NULL;
     }
 }

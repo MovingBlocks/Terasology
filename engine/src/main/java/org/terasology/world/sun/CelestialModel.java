@@ -17,13 +17,37 @@
 package org.terasology.world.sun;
 
 /**
- * An interface for celestial systems (with only one sun)
+ * Describes the movement of celestial bodies.
  * @author Martin Steiger
  */
-public interface CelestialSystem {
+public interface CelestialModel {
 
     /**
      * @return angle of the sun in radians
      */
-    float getSunPosAngle();
+    float getSunPosAngle(float days);
+
+    /**
+     * @param day the day
+     * @return offset in milli-secs.
+     */
+    long getDawn(long day);
+
+    /**
+     * @param day the day
+     * @return offset in milli-secs.
+     */
+    long getMidday(long day);
+
+    /**
+     * @param day the day
+     * @return offset in milli-secs.
+     */
+    long getDusk(long day);
+
+    /**
+     * @param day the day
+     * @return offset in milli-secs.
+     */
+    long getMidnight(long day);
 }
