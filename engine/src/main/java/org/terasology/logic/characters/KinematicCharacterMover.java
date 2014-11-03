@@ -189,7 +189,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!newSwimming) {
             Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                     worldPos), new Vector3f(worldPos)};
-            float factor = 0.18f;
+            float factor = 1f;
             sides[0].x += factor * movementComp.radius;
             sides[1].x -= factor * movementComp.radius;
             sides[2].z += factor * movementComp.radius;
@@ -200,15 +200,22 @@ public class KinematicCharacterMover implements CharacterMover {
                 if (block.isClimbable()) {
                     //If any of our sides are near a climbable block, check if we are near to the side and climb!
 
+                    Vector3i myPos = new Vector3i(worldPos, 0.5f);
                     Vector3i climbBlockPos = new Vector3i(side, 0.5f);
-                    Vector3i dir = block.getDirection().getVector3i();
+                    Vector3i dir = block.getDirection().getVector3i().clone();
 
                     if (dir.x != 0 && Math.abs(state.getPosition().x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
                         newClimbing = true;
-                        state.setClimbDirection(block.getDirection());
+                        if (myPos.x < climbBlockPos.x) {
+                            dir.x = -dir.x;
+                        }
+                        state.setClimbDirection(dir);
                     } else if (dir.z != 0 && Math.abs(state.getPosition().z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
                         newClimbing = true;
-                        state.setClimbDirection(block.getDirection());
+                        if (myPos.z < climbBlockPos.z) {
+                            dir.z = -dir.z;
+                        }
+                        state.setClimbDirection(dir);
                     }
                     break;
                 }
@@ -644,8 +651,7 @@ public class KinematicCharacterMover implements CharacterMover {
         Quat4f rotation = new Quat4f();
         Vector3f tmp;
 
-        Side climbSide = state.getClimbDirection();
-        Vector3i climbDir3i = climbSide.getVector3i();
+        Vector3i climbDir3i = state.getClimbDirection();
         Vector3f climbDir3f = climbDir3i.toVector3f();
 
         QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);

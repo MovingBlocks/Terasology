@@ -17,6 +17,7 @@
 package org.terasology.logic.characters;
 
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -43,7 +44,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private float yaw;
     private float pitch;
     private float footstepDelta;
-    private Side climbDirection;
+    private Vector3i climbDirection;
 
     protected CharacterStateEvent() {
     }
@@ -127,11 +128,11 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = sequenceNumber;
     }
 
-    public void setClimbDirection(Side climbDirection) {
+    public void setClimbDirection(Vector3i climbDirection) {
         this.climbDirection = climbDirection;
     }
 
-    public Side getClimbDirection() {
+    public Vector3i getClimbDirection() {
         return climbDirection;
     }
     /**
