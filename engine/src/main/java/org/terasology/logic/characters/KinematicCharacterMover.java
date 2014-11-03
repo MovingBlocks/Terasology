@@ -664,12 +664,13 @@ public class KinematicCharacterMover implements CharacterMover {
 
         // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
+            float pitchAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
             QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                TeraMath.DEG_TO_RAD * 90f * plusOrMinus
+                TeraMath.DEG_TO_RAD * pitchAmount * plusOrMinus
             );
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
