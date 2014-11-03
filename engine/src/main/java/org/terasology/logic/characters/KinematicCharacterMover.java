@@ -26,7 +26,6 @@ import org.terasology.logic.characters.events.OnEnterBlockEvent;
 import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
@@ -670,13 +669,13 @@ public class KinematicCharacterMover implements CharacterMover {
 
         // looking sidewards from ladder
         } else if (angleToClimbDirection < Math.PI * 3.0 / 4.0) {
-            float pitchAmount = state.isGrounded() ? 45f : 90f;
+            float rollAmount = state.isGrounded() ? 45f : 90f;
             tmp = new Vector3f();
             QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
             QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
-                TeraMath.DEG_TO_RAD * pitchAmount * plusOrMinus
+                TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
             );
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 

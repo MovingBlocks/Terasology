@@ -16,7 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
