@@ -64,7 +64,7 @@ public class UIStyleFamily {
     }
 
     public UIStyle getElementStyle(Class<? extends UIWidget> element) {
-        List<Class<? extends UIWidget>> classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+        List<Class<? extends UIWidget>> classes = getInheritanceTree(element);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
@@ -79,12 +79,7 @@ public class UIStyleFamily {
     }
 
     public UIStyle getElementStyle(Class<? extends UIWidget> element, String part, String mode) {
-
-        List<Class<? extends UIWidget>> classes = cachedInheritanceTree.get(element);
-        if (classes == null) {
-            classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
-            cachedInheritanceTree.put(element, classes);
-        }
+        List<Class<? extends UIWidget>> classes = getInheritanceTree(element);
         UIStyle style = null;
         for (int i = classes.size() - 1; i >= 0 && style == null; i--) {
             Table<String, String, UIStyle> elementStyles = elementStyleLookup.get(classes.get(i));
@@ -102,5 +97,14 @@ public class UIStyleFamily {
             return getElementStyle(element);
         }
         return style;
+    }
+
+    private List<Class<? extends UIWidget>> getInheritanceTree(Class<? extends UIWidget> element) {
+        List<Class<? extends UIWidget>> classes = cachedInheritanceTree.get(element);
+        if (classes == null) {
+            classes = ReflectionUtil.getInheritanceTree(element, UIWidget.class);
+            cachedInheritanceTree.put(element, classes);
+        }
+        return classes;
     }
 }
