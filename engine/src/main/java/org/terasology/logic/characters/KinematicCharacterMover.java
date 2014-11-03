@@ -188,35 +188,45 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!newSwimming) {
             Vector3f[] sides = {new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(
                     worldPos), new Vector3f(worldPos)};
-            float factor = 1f;
+            float factor = 1.0f;
             sides[0].x += factor * movementComp.radius;
             sides[1].x -= factor * movementComp.radius;
             sides[2].z += factor * movementComp.radius;
             sides[3].z -= factor * movementComp.radius;
             sides[4].y -= movementComp.height;
+
+            float distance = 100f;
+
             for (Vector3f side : sides) {
                 Block block = worldProvider.getBlock(side);
                 if (block.isClimbable()) {
-                    //If any of our sides are near a climbable block, check if we are near to the side and climb!
-
+                    //If any of our sides are near a climbable block, check if we are near to the side
                     Vector3i myPos = new Vector3i(worldPos, 0.5f);
                     Vector3i climbBlockPos = new Vector3i(side, 0.5f);
                     Vector3i dir = block.getDirection().getVector3i().clone();
+                    float currentDistance = 10f;
 
-                    if (dir.x != 0 && Math.abs(state.getPosition().x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
+                    if (dir.x != 0 && Math.abs(worldPos.x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
                         newClimbing = true;
                         if (myPos.x < climbBlockPos.x) {
                             dir.x = -dir.x;
                         }
-                        state.setClimbDirection(dir);
-                    } else if (dir.z != 0 && Math.abs(state.getPosition().z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
+                        currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
+
+                    } else if (dir.z != 0 && Math.abs(worldPos.z - (float) climbBlockPos.z + (float) dir.z * .5f) < movementComp.radius + 0.1f) {
                         newClimbing = true;
                         if (myPos.z < climbBlockPos.z) {
                             dir.z = -dir.z;
                         }
+                        currentDistance = Math.abs(climbBlockPos.z - worldPos.z);
+                    }
+
+                    // if there are multiple climb blocks, choose the nearest one. This can happen when there are two
+                    // adjacent ledges around a corner.
+                    if (currentDistance < distance) {
+                        distance = currentDistance;
                         state.setClimbDirection(dir);
                     }
-                    break;
                 }
             }
         }
