@@ -16,6 +16,7 @@
 package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.KHRDebug;
 import org.lwjgl.opengl.KHRDebugCallback;
@@ -64,9 +65,11 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.sun.BasicCelestialModel;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -190,7 +193,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(bufferPool);
-        skysphere = new Skysphere(this);
+        skysphere = new Skysphere();
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
         worldTimeEventManager = new WorldTimeEventManager(worldProvider);
 
@@ -997,10 +1000,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         PerformanceMonitor.startActivity("Update Close Chunks");
         updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Skysphere");
-        skysphere.update();
         PerformanceMonitor.endActivity();
 
         if (activeCamera != null) {

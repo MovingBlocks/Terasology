@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.time;
+package org.terasology.world.sun;
+
+import org.terasology.world.time.TimeEventBase;
 
 /**
  * Sent to a world at the middle of the night
