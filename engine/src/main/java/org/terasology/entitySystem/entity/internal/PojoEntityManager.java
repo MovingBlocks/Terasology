@@ -428,12 +428,12 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     @Override
-    public void subscribe(EntityChangeSubscriber subscriber) {
+    public void subscribeChangeListener(EntityChangeSubscriber subscriber) {
         subscribers.add(subscriber);
     }
 
     @Override
-    public void subscribe(EntityDestroySubscriber subscriber) {
+    public void subscribeDestroyListener(EntityDestroySubscriber subscriber) {
         destroySubscribers.add(subscriber);
     }
 

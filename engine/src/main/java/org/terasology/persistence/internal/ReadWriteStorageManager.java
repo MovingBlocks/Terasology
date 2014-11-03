@@ -115,7 +115,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) throws IOException {
         super(savePath, environment, entityManager, storeChunksInZips);
 
-        entityManager.subscribe(this);
+        entityManager.subscribeDestroyListener(this);
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);

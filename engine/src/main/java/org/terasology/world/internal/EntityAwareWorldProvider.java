@@ -96,7 +96,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void initialise() {
-        entityManager.subscribe(this);
+        entityManager.subscribeChangeListener(this);
     }
 
     @Override
