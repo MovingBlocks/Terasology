@@ -1,0 +1,9 @@
+{
+    "attachmentAllowed" : false,
+    "rotation" : "horizontal",
+    "climbable" : true,
+    "penetrable" : true,
+    "shape" : "engine:verticalOffsetPlane",
+    "translucent" : true,
+    "doubleSided" : true
+}
