@@ -54,7 +54,7 @@ artifactoryPublish.skip = true
  * 4. Comment 'wrapper' task
  */
 //task wrapper(type: Wrapper) {
-//    gradleVersion = '1.8'
+//    gradleVersion = '2.1'
 //}
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
