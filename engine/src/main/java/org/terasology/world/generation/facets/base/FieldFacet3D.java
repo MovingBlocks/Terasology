@@ -31,8 +31,6 @@ public interface FieldFacet3D extends WorldFacet3D {
 
     float getWorld(Vector3i pos);
 
-    float[] getInternal();
-
     void set(int x, int y, int z, float value);
 
     void set(Vector3i pos, float value);
@@ -40,6 +38,4 @@ public interface FieldFacet3D extends WorldFacet3D {
     void setWorld(int x, int y, int z, float value);
 
     void setWorld(Vector3i pos, float value);
-
-    void set(float[] newData);
 }

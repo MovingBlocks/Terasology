@@ -53,7 +53,6 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
         return getWorld(pos.x, pos.y, pos.z);
     }
 
-    @Override
     public float[] getInternal() {
         return data;
     }
@@ -78,7 +77,6 @@ public abstract class BaseFieldFacet3D extends BaseFacet3D implements FieldFacet
         setWorld(pos.x, pos.y, pos.z, value);
     }
 
-    @Override
     public void set(float[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);

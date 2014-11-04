@@ -55,7 +55,6 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
         return getWorld(pos.x, pos.y, pos.z);
     }
 
-    @Override
     public T[] getInternal() {
         return data;
     }
@@ -80,7 +79,6 @@ public abstract class BaseObjectFacet3D<T> extends BaseFacet3D implements Object
         setWorld(pos.x, pos.y, pos.z, value);
     }
 
-    @Override
     public void set(T[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
