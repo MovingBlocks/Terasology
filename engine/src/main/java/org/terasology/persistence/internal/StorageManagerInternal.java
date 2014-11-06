@@ -350,9 +350,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(storeChunksInZips,
                 storagePathProvider);
 
-        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-
         /**
          * Currently loaded persistent entities without owner that have not been saved yet.
          */
@@ -362,6 +359,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 unsavedEntities.add(entity);
             }
         }
+        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
         addChunksToSaveTransaction(saveTransactionBuilder, chunkProvider, unsavedEntities);
         addPlayersToSaveTransaction(saveTransactionBuilder, networkSystem, unsavedEntities);
@@ -626,7 +625,12 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
 
     private boolean isSavingNecessary() {
-        if (unloadedAndUnsavedChunkMap.size() >= config.getSystem().getMaxUnloadedChunksTillSave()) {
+        ChunkProvider chunkProvider = CoreRegistry.get(ChunkProvider.class);
+        int unloadedChunkCount = unloadedAndUnsavedChunkMap.size();
+        int loadedChunkCount = chunkProvider.getAllChunks().size();
+        double totalChunkCount = unloadedChunkCount + loadedChunkCount;
+        double percentageUnloaded = 100.0 * (unloadedChunkCount / (double) totalChunkCount);
+        if (percentageUnloaded >= config.getSystem().getMaxUnloadedChunksPercentageTillSave()) {
             return true;
         }
 

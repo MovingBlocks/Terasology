@@ -24,7 +24,7 @@ public class SystemConfig {
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
     private int maxSecondsBetweenSaves = 60;
-    private int maxUnloadedChunksTillSave = 10;
+    private int maxUnloadedChunksPercentageTillSave = 40;
     private boolean debugEnabled;
     private boolean monitoringEnabled;
 
@@ -60,12 +60,12 @@ public class SystemConfig {
         this.maxSecondsBetweenSaves = maxSecondsBetweenSaves;
     }
 
-    public int getMaxUnloadedChunksTillSave() {
-        return maxUnloadedChunksTillSave;
+    public int getMaxUnloadedChunksPercentageTillSave() {
+        return maxUnloadedChunksPercentageTillSave;
     }
 
-    public void setMaxUnloadedChunksTillSave(int maxUnloadedChunksTillSave) {
-        this.maxUnloadedChunksTillSave = maxUnloadedChunksTillSave;
+    public void setMaxUnloadedChunksPercentageTillSave(int maxUnloadedChunksPercentageTillSave) {
+        this.maxUnloadedChunksPercentageTillSave = maxUnloadedChunksPercentageTillSave;
     }
 
     public boolean isDebugEnabled() {
