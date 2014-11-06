@@ -70,5 +70,7 @@ public interface StorageManager {
      */
     void deactivateChunk(Chunk chunk);
 
+    boolean isSaving();
+
     void checkAndRepairSaveIfNecessary() throws IOException;
 }

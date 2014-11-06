@@ -655,6 +655,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         nextAutoSave = System.currentTimeMillis() + msBetweenAutoSave;
     }
 
+    @Override
     public boolean isSaving() {
         return saveTransaction != null && saveTransaction.getResult() == null;
     }
