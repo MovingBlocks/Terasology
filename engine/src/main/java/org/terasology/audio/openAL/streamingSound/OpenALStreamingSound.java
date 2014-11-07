@@ -22,6 +22,7 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 import org.terasology.audio.openAL.OpenALException;
+import org.terasology.audio.openAL.OpenALManager;
 
 import java.nio.ByteBuffer;
 
@@ -35,11 +36,11 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
     protected int[] buffers = new int[0];
     protected int lastUpdatedBuffer;
 
-    private AudioManager audioManager;
+    private OpenALManager audioManager;
     private StreamingSoundData stream;
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
-    public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, AudioManager audioManager) {
+    public OpenALStreamingSound(AssetUri uri, StreamingSoundData data, OpenALManager audioManager) {
         super(uri);
         this.audioManager = audioManager;
         onReload(data);
@@ -113,6 +114,9 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
 
     @Override
     protected void onDispose() {
+
+        audioManager.purgeSound(this);
+
         // TODO: Fix this - probably failing if sound is playing
         for (int buffer : buffers) {
             if (buffer != 0) {
