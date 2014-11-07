@@ -273,7 +273,11 @@ public class AssetManager {
     public <D extends AssetData> void reload(Asset<D> asset) {
         AssetData data = loadAssetData(asset.getURI(), false);
         if (data != null) {
-            asset.reload((D) data);
+            try {
+                asset.reload((D) data);
+            } catch (Exception e) {
+                logger.error("Could not reload asset " + asset.getURI(), e);
+            }
         }
     }
 
@@ -410,7 +414,11 @@ public class AssetManager {
 
     public void dispose(Asset<?> asset) {
         if (!asset.isDisposed()) {
-            asset.dispose();
+            try {
+                asset.dispose();
+            } catch (Exception e) {
+                logger.error("Could not dispose asset {}", asset.getURI(), e);
+            }
         }
         assetCache.remove(asset.getURI());
     }
