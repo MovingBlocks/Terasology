@@ -135,18 +135,7 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void writeChunkStores() throws IOException {
-        // This is a little bit of a hack to get around a JAVA 7 bug (hopefully fixed in JAVA 8
-        FileSystemProvider zipProvider = null;
-        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
-            if ("jar".equalsIgnoreCase(provider.getScheme())) {
-                zipProvider = provider;
-            }
-        }
-
-        if (zipProvider == null) {
-            logger.error("Zip archive support missing! Unable to save chunks.");
-            return;
-        }
+        FileSystemProvider zipProvider = getZipFileSystemProvider();
 
         Path chunksPath =  storagePathProvider.getWorldTempPath();
         Files.createDirectories(chunksPath);
@@ -205,6 +194,20 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+    private FileSystemProvider getZipFileSystemProvider() throws IOException {
+        // This is a little bit of a hack to get around a JAVA 7 bug (hopefully fixed in JAVA 8
+        FileSystemProvider zipProvider = null;
+        for (FileSystemProvider provider : FileSystemProvider.installedProviders()) {
+            if ("jar".equalsIgnoreCase(provider.getScheme())) {
+                zipProvider = provider;
+            }
+        }
+
+        if (zipProvider == null) {
+            throw new IOException("Zip archive support missing! Unable to save chunks.");
+        }
+        return zipProvider;
+    }
 
 
     /**
