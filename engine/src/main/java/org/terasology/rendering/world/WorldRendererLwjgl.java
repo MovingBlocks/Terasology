@@ -18,8 +18,6 @@ package org.terasology.rendering.world;
 import com.google.common.collect.Lists;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.KHRDebug;
-import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -59,13 +57,11 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
 import org.terasology.world.TimerEvent;
-import org.terasology.world.WorldCommands;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.sun.BasicCelestialModel;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;

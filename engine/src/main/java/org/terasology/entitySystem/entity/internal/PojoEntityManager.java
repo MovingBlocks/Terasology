@@ -45,10 +45,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.network.ClientComponent;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
-import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
