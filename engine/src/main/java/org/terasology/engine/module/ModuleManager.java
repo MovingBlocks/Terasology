@@ -87,53 +87,53 @@ public class ModuleManager {
     private void setupSandbox() {
         moduleSecurityManager = new ModuleSecurityManager();
         // TODO: This one org.terasology entry is a hack and needs a proper fix
-        moduleSecurityManager.addAPIPackage("org.terasology.world.biomes");
-        moduleSecurityManager.addAPIPackage("java.lang");
-        moduleSecurityManager.addAPIPackage("java.lang.ref");
-        moduleSecurityManager.addAPIPackage("java.math");
-        moduleSecurityManager.addAPIPackage("java.util");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.atomic");
-        moduleSecurityManager.addAPIPackage("java.util.concurrent.locks");
-        moduleSecurityManager.addAPIPackage("java.util.regex");
-        moduleSecurityManager.addAPIPackage("java.awt");
-        moduleSecurityManager.addAPIPackage("java.awt.geom");
-        moduleSecurityManager.addAPIPackage("java.awt.image");
-        moduleSecurityManager.addAPIPackage("com.google.common.annotations");
-        moduleSecurityManager.addAPIPackage("com.google.common.cache");
-        moduleSecurityManager.addAPIPackage("com.google.common.collect");
-        moduleSecurityManager.addAPIPackage("com.google.common.base");
-        moduleSecurityManager.addAPIPackage("com.google.common.math");
-        moduleSecurityManager.addAPIPackage("com.google.common.primitives");
-        moduleSecurityManager.addAPIPackage("com.google.common.util.concurrent");
-        moduleSecurityManager.addAPIPackage("gnu.trove");
-        moduleSecurityManager.addAPIPackage("gnu.trove.decorator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.function");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator");
-        moduleSecurityManager.addAPIPackage("gnu.trove.iterator.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.list.linked");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.map.custom_hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure");
-        moduleSecurityManager.addAPIPackage("gnu.trove.procedure.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.queue");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set");
-        moduleSecurityManager.addAPIPackage("gnu.trove.set.hash");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack");
-        moduleSecurityManager.addAPIPackage("gnu.trove.stack.array");
-        moduleSecurityManager.addAPIPackage("gnu.trove.strategy");
-        moduleSecurityManager.addAPIPackage("javax.vecmath");
-        moduleSecurityManager.addAPIPackage("com.yourkit.runtime");
-        moduleSecurityManager.addAPIPackage("com.bulletphysics.linearmath");
-        moduleSecurityManager.addAPIPackage("sun.reflect");
-        moduleSecurityManager.addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
-        moduleSecurityManager.addAPIClass(IOException.class);
-        moduleSecurityManager.addAPIClass(InvocationTargetException.class);
-        moduleSecurityManager.addAPIClass(LoggerFactory.class);
-        moduleSecurityManager.addAPIClass(Logger.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("org.terasology.world.biomes");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.lang");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.lang.ref");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.math");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.atomic");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.concurrent.locks");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.util.regex");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.awt");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.awt.geom");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.awt.image");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.annotations");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.cache");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.collect");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.base");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.math");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.primitives");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.google.common.util.concurrent");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.decorator");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.function");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.iterator");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.iterator.hash");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.list");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.list.array");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.list.linked");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.map");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.map.hash");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.map.custom_hash");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.procedure");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.procedure.array");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.queue");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.set");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.set.hash");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.stack");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.stack.array");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("gnu.trove.strategy");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("javax.vecmath");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.yourkit.runtime");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("com.bulletphysics.linearmath");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("sun.reflect");
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(com.esotericsoftware.reflectasm.MethodAccess.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(IOException.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(InvocationTargetException.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(LoggerFactory.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(Logger.class);
 
         APIScanner apiScanner = new APIScanner(moduleSecurityManager);
         for (Module module : registry) {
@@ -142,12 +142,11 @@ public class ModuleManager {
             }
         }
 
-        moduleSecurityManager.grantFullPermission("ch.qos.logback.classic");
-        moduleSecurityManager.grantPermission("com.google.gson", ReflectPermission.class);
-        moduleSecurityManager.grantPermission("com.google.gson.internal", ReflectPermission.class);
+        moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson", ReflectPermission.class);
+        moduleSecurityManager.getBasePermissionSet().grantPermission("com.google.gson.internal", ReflectPermission.class);
 
-        moduleSecurityManager.addAPIClass(java.nio.ByteBuffer.class);
-        moduleSecurityManager.addAPIClass(java.nio.IntBuffer.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.ByteBuffer.class);
+        moduleSecurityManager.getBasePermissionSet().addAPIClass(java.nio.IntBuffer.class);
 
         Policy.setPolicy(new ModuleSecurityPolicy());
         System.setSecurityManager(moduleSecurityManager);

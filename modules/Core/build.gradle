@@ -64,15 +64,6 @@ version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.modules'
 
-// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-if (env.BUILD_NUMBER != null) {
-    version += '-SNAPSHOT+' + env.BUILD_NUMBER
-} else {
-    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
-    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
-    //println "Fancy local MODULE version for $project.name: $version"
-}
-
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
