@@ -16,10 +16,18 @@
 package org.terasology.entitySystem.systems;
 
 /**
+ * Interface for component systems that (may) need to be updated every time
+ * the engine is updated.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public interface UpdateSubscriberSystem extends ComponentSystem {
 
+    /**
+     * Update function for the Component System, which is called each
+     * time the engine is updated.
+     * @param delta The time (in seconds) since the last engine update.
+     */
     void update(float delta);
 
 }
