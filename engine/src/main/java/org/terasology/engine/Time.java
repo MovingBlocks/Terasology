@@ -59,4 +59,9 @@ public interface Time {
      */
     long getRealTimeInMs();
 
+    /**
+     * @return Real time in seconds.
+     */
+    float getRealTime();
+
 }
