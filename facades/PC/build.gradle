@@ -1,7 +1,6 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -62,24 +61,10 @@ jar {
 }
 
 configurations {
-    // for Artifactory publishing
-    published
-
     // for fetching modules for running a server
     modules {
         transitive = false
     }
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar
 }
 
 task runPC(type:JavaExec) {
@@ -247,7 +232,7 @@ task distModules (type: Sync) {
     }
 }
 
-task distAppZip (type: Zip) {
+task distPCZip (type: Zip) {
     dependsOn distApp
     dependsOn distModules
     from "$distsDir/app"
@@ -257,7 +242,7 @@ task distAppZip (type: Zip) {
 task distForLauncher (type: Sync) {
 
     into rootDirDist
-    from distAppZip
+    from distPCZip
 
     into ("../resources/main/org/terasology/version") {
         from ("$rootDir/engine/build/classes/org/terasology/version") {

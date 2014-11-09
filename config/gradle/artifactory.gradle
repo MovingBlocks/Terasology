@@ -1,6 +1,8 @@
 // This include file applies our Artifactory related settings to places that need them (root project + modules)
+// It is a superset of the the stuff common to Java sub projects so we include the common.gradle here
+apply from: "$rootDir/config/gradle/common.gradle"
 
-// Artifactory publishing requires these two (without maven we'd get no .pom with dependency info published)
+// Artifactory publishing requires these (without maven we'd get no .pom with dependency info published)
 apply plugin: 'maven'
 apply plugin: 'artifactory-publish'
 apply plugin: 'maven-publish'
@@ -20,4 +22,78 @@ buildscript {
     }
 }
 
+// This configures what we need to interact with the MovingBlocks Artifactory instance
+artifactory {
+    contextUrl = 'http://artifactory.terasology.org:8081/artifactory'
 
+    // This is the target for publishing artifacts
+    publish {
+        repository {
+            // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
+            if (rootProject.hasProperty("artifactoryPublishRepo")) {
+                repoKey = "$artifactoryPublishRepo"
+                println "setting repoKey to $artifactoryPublishRepo"
+            } else {
+                repoKey = 'libs-snapshot-local'
+                println "repoKey is libs-snapshot-local"
+            }
+
+            // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
+            // This way we make it so you can run locally without having the user/pass set - but if the artifactoryPublish task is called it'll fail
+            if (rootProject.hasProperty("artifactoryUser") && rootProject.hasProperty("artifactoryPass")) {
+                username = "$artifactoryUser"
+                password = "$artifactoryPass"
+            }
+            // Note that republishing artifacts under the same name (without an incremented SNAPSHOT for instance) may fail with "Forbidden"
+        }
+
+        defaults {
+            publications ('mavenJava')
+        }
+    }
+
+    // This is the source where we get dependencies
+    resolve {
+        repository {
+            // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
+            if (rootProject.hasProperty("artifactoryResolveRepo")) {
+                repoKey = "$artifactoryResolveRepo"
+            } else {
+                repoKey = 'libs-release-local'
+            }
+        }
+    }
+}
+
+// The following helps configure artifacts for each sub-project that applies this file
+// A configuration for publishing artifacts
+configurations {
+    published
+}
+
+// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
+artifacts {
+    published jar
+    published sourceJar
+    published javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar {
+            }
+            artifact sourceJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
+}
+
+// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
+artifactoryPublish {
+    dependsOn jar, sourceJar, javadocJar
+}

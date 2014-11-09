@@ -1,7 +1,6 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
-apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 // Get the gradle versioneye plugin from Maven central
@@ -204,23 +203,6 @@ task createVersionInfoFile {
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
-
-// A configuration for publishing artifacts
-configurations {
-    published
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-    published javadocJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar, javadocJar
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
