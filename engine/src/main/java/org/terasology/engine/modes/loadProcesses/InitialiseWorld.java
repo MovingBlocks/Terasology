@@ -52,6 +52,9 @@ import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.internal.WorldProviderCoreImpl;
 import org.terasology.world.internal.WorldProviderWrapper;
+import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.BasicCelestialModel;
+import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
  * @author Immortius
@@ -111,6 +114,11 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         chunkProvider.setBlockEntityRegistry(entityWorldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
+        CoreRegistry.put(CelestialSystem.class, celestialSystem);
+        CoreRegistry.get(ComponentSystemManager.class).register(celestialSystem);
+
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
@@ -120,9 +128,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
         CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
-
-        // TODO: This may be the wrong place, or we should change time handling so that it deals better with time not passing
-        worldProvider.getTime().setMilliseconds(worldInfo.getTime());
 
         return true;
     }

@@ -27,9 +27,6 @@ public interface WorldTime extends ComponentSystem {
      */
     long DAY_LENGTH = 1000 * 60 * 60 * 24;
 
-    long MIDDAY_TIME = DAY_LENGTH / 4;
-    long MIDNIGHT_TIME = 3 * DAY_LENGTH / 4;
-
     /**
      * The number of timer tick events per day.
      * This must be a divisor of {@link #DAY_LENGTH} to avoid rounding issues.

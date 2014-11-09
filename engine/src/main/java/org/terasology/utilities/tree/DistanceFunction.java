@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.time;
+package org.terasology.utilities.tree;
 
-/**
- * Sent to the world on dusk (half way through the day, when the sun sets)
- *
- * @author Immortius
- */
-public class OnDuskEvent extends TimeEventBase {
-
-    public OnDuskEvent(long worldTimeMS) {
-        super(worldTimeMS);
-    }
+public interface DistanceFunction {
+    float getDistance(float[] p1, float[] p2);
+    float getPointRegionDistance(float[] p1, float[] min, float[] max);
 }

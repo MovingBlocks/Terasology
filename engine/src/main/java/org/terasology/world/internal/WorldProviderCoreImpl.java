@@ -80,6 +80,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
+
         this.worldTime = new WorldTimeImpl();
         worldTime.setMilliseconds(time);
 
