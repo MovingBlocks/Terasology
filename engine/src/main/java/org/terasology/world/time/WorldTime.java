@@ -31,7 +31,7 @@ public interface WorldTime extends ComponentSystem {
      * The number of timer tick events per day.
      * This must be a divisor of {@link #DAY_LENGTH} to avoid rounding issues.
      */
-    long TICK_EVENTS_PER_DAY = 100;
+    long TICK_EVENTS_PER_DAY = 1000;
 
     long TICK_EVENT_RATE = DAY_LENGTH / TICK_EVENTS_PER_DAY;
 
