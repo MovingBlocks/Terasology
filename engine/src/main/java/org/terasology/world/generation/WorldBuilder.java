@@ -108,10 +108,10 @@ public class WorldBuilder {
                                 for (Class<? extends WorldFacet> producedFacet : produces.value()) {
                                     ensureBorderCalculatedForFacet(producedFacet, providerChains, borders);
                                     Border3D borderForProducedFacet = borders.get(producedFacet);
-                                    border = new Border3D(
-                                            Math.max(border.getTop(), borderForProducedFacet.getTop() + requiredBorder.top()),
-                                            Math.max(border.getBottom(), borderForProducedFacet.getBottom() + requiredBorder.bottom()),
-                                            Math.max(border.getSides(), borderForProducedFacet.getSides() + requiredBorder.sides()));
+                                    border = border.maxWith(
+                                            borderForProducedFacet.getTop() + requiredBorder.top(),
+                                            borderForProducedFacet.getBottom() + requiredBorder.bottom(),
+                                            borderForProducedFacet.getSides() + requiredBorder.sides());
                                 }
                             }
                             if (updates != null) {
@@ -120,10 +120,10 @@ public class WorldBuilder {
                                     FacetBorder borderForFacetAnnotation = producedFacetAnnotation.border();
                                     ensureBorderCalculatedForFacet(producedFacet, providerChains, borders);
                                     Border3D borderForProducedFacet = borders.get(producedFacet);
-                                    border = new Border3D(
-                                            Math.max(border.getTop(), borderForProducedFacet.getTop() + requiredBorder.top() + borderForFacetAnnotation.top()),
-                                            Math.max(border.getBottom(), borderForProducedFacet.getBottom() + requiredBorder.bottom() + borderForFacetAnnotation.bottom()),
-                                            Math.max(border.getSides(), borderForProducedFacet.getSides() + requiredBorder.sides() + borderForFacetAnnotation.sides()));
+                                    border = border.maxWith(
+                                            borderForProducedFacet.getTop() + requiredBorder.top() + borderForFacetAnnotation.top(),
+                                            borderForProducedFacet.getBottom() + requiredBorder.bottom() + borderForFacetAnnotation.bottom(),
+                                            borderForProducedFacet.getSides() + requiredBorder.sides() + borderForFacetAnnotation.sides());
                                 }
                             }
                         }
