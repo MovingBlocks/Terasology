@@ -81,26 +81,57 @@ public class WorldBuilder {
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {
         Map<Class<? extends WorldFacet>, Border3D> borders = Maps.newHashMap();
 
-        Border3D largestBorder = new Border3D(0, 0, 0);
-
-        // loop through the providers and find all the max sized borders for each facet
-        for (FacetProvider provider : providersList) {
-            Requires requirements = provider.getClass().getAnnotation(Requires.class);
-            if (requirements != null) {
-                for (Facet requirement : requirements.value()) {
-                    largestBorder = new Border3D(
-                            Math.max(requirement.border().top(), largestBorder.getTop()),
-                            Math.max(requirement.border().bottom(), largestBorder.getBottom()),
-                            Math.max(requirement.border().sides(), largestBorder.getSides()));
-                }
-            }
-        }
-
-        for (Class<? extends WorldFacet> type : providerChains.keySet()) {
-            borders.put(type, largestBorder);
+        for (Class<? extends WorldFacet> facet : providerChains.keySet()) {
+            ensureBorderCalculatedForFacet(facet, providerChains, borders);
         }
 
         return borders;
+    }
+
+    private void ensureBorderCalculatedForFacet(Class<? extends WorldFacet> facet, ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains,
+                                                Map<Class<? extends WorldFacet>, Border3D> borders) {
+        if (!borders.containsKey(facet)) {
+            Border3D border = new Border3D(0, 0, 0);
+
+            for (FacetProvider facetProvider : providerChains.values()) {
+                // Find all facets that require it
+                Requires requires = facetProvider.getClass().getAnnotation(Requires.class);
+                if (requires != null) {
+                    for (Facet requiredFacet : requires.value()) {
+                        if (requiredFacet.value() == facet) {
+                            Produces produces = facetProvider.getClass().getAnnotation(Produces.class);
+                            Updates updates = facetProvider.getClass().getAnnotation(Updates.class);
+
+                            FacetBorder requiredBorder = requiredFacet.border();
+
+                            if (produces != null) {
+                                for (Class<? extends WorldFacet> producedFacet : produces.value()) {
+                                    ensureBorderCalculatedForFacet(producedFacet, providerChains, borders);
+                                    Border3D borderForProducedFacet = borders.get(producedFacet);
+                                    border = new Border3D(
+                                            Math.max(border.getTop(), borderForProducedFacet.getTop() + requiredBorder.top()),
+                                            Math.max(border.getBottom(), borderForProducedFacet.getBottom() + requiredBorder.bottom()),
+                                            Math.max(border.getSides(), borderForProducedFacet.getSides() + requiredBorder.sides()));
+                                }
+                            }
+                            if (updates != null) {
+                                for (Facet producedFacetAnnotation : updates.value()) {
+                                    Class<? extends WorldFacet> producedFacet = producedFacetAnnotation.value();
+                                    FacetBorder borderForFacetAnnotation = producedFacetAnnotation.border();
+                                    ensureBorderCalculatedForFacet(producedFacet, providerChains, borders);
+                                    Border3D borderForProducedFacet = borders.get(producedFacet);
+                                    border = new Border3D(
+                                            Math.max(border.getTop(), borderForProducedFacet.getTop() + requiredBorder.top() + borderForFacetAnnotation.top()),
+                                            Math.max(border.getBottom(), borderForProducedFacet.getBottom() + requiredBorder.bottom() + borderForFacetAnnotation.bottom()),
+                                            Math.max(border.getSides(), borderForProducedFacet.getSides() + requiredBorder.sides() + borderForFacetAnnotation.sides()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            borders.put(facet, border);
+        }
     }
 
     private ListMultimap<Class<? extends WorldFacet>, FacetProvider> determineProviderChains() {
