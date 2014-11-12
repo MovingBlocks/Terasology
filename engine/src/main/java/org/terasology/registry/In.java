@@ -24,6 +24,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Makes sure the value of a field is initialized, such that it references to an instance from the core registry.
+ * The field must be public.
+ *
+ * For example, the following makes sure that the entityManager field is initialized to refer to the engines EntityManager:
+ * <pre>{@code
+ * 	@In
+ *  public EntityManager entityManager;
+ *	}</pre>
+ *	</code>
+ *
  * @author Immortius
  */
 @API
