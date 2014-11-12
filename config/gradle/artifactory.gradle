@@ -24,7 +24,7 @@ buildscript {
 
 // This configures what we need to interact with the MovingBlocks Artifactory instance
 artifactory {
-    contextUrl = 'http://artifactory.terasology.org:8081/artifactory'
+    contextUrl = 'http://artifactory.terasology.org/artifactory'
 
     // This is the target for publishing artifacts
     publish {
@@ -83,8 +83,10 @@ artifacts {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar {
-            }
+            // Without this we get a .pom with no dependencies
+            from components.java
+
+            artifact jar
             artifact sourceJar {
                 classifier "sources"
             }

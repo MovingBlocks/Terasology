@@ -12,7 +12,7 @@ apply plugin: 'findbugs'
 repositories {
     mavenCentral()
     maven {
-        url "http://artifactory.terasology.org:8081/artifactory/repo"
+        url "http://artifactory.terasology.org/artifactory/repo"
     }
 }
 
