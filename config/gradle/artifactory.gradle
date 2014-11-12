@@ -31,11 +31,11 @@ artifactory {
         repository {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryPublishRepo")) {
-                repoKey = "$artifactoryPublishRepo"
-                println "setting repoKey to $artifactoryPublishRepo"
+                repoKey = artifactoryPublishRepo
+                println "setting PUBLISH repoKey to $artifactoryPublishRepo"
             } else {
                 repoKey = 'libs-snapshot-local'
-                println "repoKey is libs-snapshot-local"
+                println "PUBLISH repoKey is libs-snapshot-local"
             }
 
             // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
@@ -57,9 +57,11 @@ artifactory {
         repository {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryResolveRepo")) {
-                repoKey = "$artifactoryResolveRepo"
+                repoKey = artifactoryResolveRepo
+                println "setting RESOLVE repoKey to $artifactoryResolveRepo"
             } else {
                 repoKey = 'libs-release-local'
+                println "RESOLVE repoKey is libs-release-local"
             }
         }
     }

@@ -184,11 +184,20 @@ println "Scanning for version in engine-module.txt for engine"
 def slurper = new JsonSlurper()
 def moduleConfig = slurper.parseText(moduleFile.text)
 
-// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
+
+// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
+if (env.ReleaseScope == null) {
+    version += '-SNAPSHOT'
+    println "Sticking with default snapshot for $project.name: $version"
+} else {
+    // Do version stuff
+    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
+}
 
 // This version info file actually goes inside the built jar and can be used at runtime
 task createVersionInfoFile {
