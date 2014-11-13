@@ -15,6 +15,7 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Rect2i;
@@ -34,7 +35,8 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 @Requires({@Facet(SeaLevelFacet.class),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
-        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
+        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
+        @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
 public class TreeProvider implements ConfigurableFacetProvider {
 
     private NoiseTable treeNoise;
