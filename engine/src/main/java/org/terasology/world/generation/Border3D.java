@@ -70,6 +70,17 @@ public class Border3D {
                 new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
     }
 
+    public Border3D extendBy(int topExtension, int bottomExtension, int sidesExtension) {
+        return new Border3D(top + topExtension, bottom + bottomExtension, sides + sidesExtension);
+    }
+
+    public Border3D maxWith(int topValue, int bottomValue, int sidesValue) {
+        return new Border3D(
+                Math.max(top, topValue),
+                Math.max(bottom, bottomValue),
+                Math.max(sides, sidesValue));
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
