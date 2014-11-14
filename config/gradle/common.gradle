@@ -12,7 +12,13 @@ apply plugin: 'findbugs'
 repositories {
     mavenCentral()
     maven {
-        url "http://artifactory.terasology.org:8081/artifactory/repo"
+        if (rootProject.hasProperty("alternativeResolutionRepo")) {
+            // If the user supplies an alternative repo via gradle.properties then use that
+            url alternativeResolutionRepo
+        } else {
+            // Our default is the main virtual repo containing everything except repos for testing Artifactory itself
+            url "http://artifactory.terasology.org/artifactory/virtual-repo-live"
+        }
     }
 }
 
@@ -60,7 +66,6 @@ pmd {
 }
 
 findbugs {
-    toolVersion = "3.0.0"
     ignoreFailures = true
     // This works as a solo module build in Jenkins as the config dir is copied in as part of the engine harness
     excludeFilter = new File(rootDir, "config/findbugs/findbugs-exclude.xml")

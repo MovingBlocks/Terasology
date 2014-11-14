@@ -1,7 +1,6 @@
 // Engine tests are split out due to otherwise quirky project dependency issues with module tests extending engine tests
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,23 +45,6 @@ jar {
 
     // Copy in test stuff, which isn't included by default
     from sourceSets.test.output
-}
-
-// A configuration for publishing artifacts
-configurations {
-    published
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-    published javadocJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar, javadocJar
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

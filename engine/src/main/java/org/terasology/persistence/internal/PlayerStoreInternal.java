@@ -29,7 +29,7 @@ import java.util.Map;
  * @author Immortius
  */
 final class PlayerStoreInternal implements PlayerStore {
-    private static final String CHARACTER = "character";
+    static final String CHARACTER = "character";
 
     private final EngineEntityManager entityManager;
     private final String id;
@@ -61,23 +61,6 @@ final class PlayerStoreInternal implements PlayerStore {
         return id;
     }
 
-    @Override
-    public void save() {
-        save(true);
-    }
-
-    @Override
-    public void save(boolean deactivateEntities) {
-        EntityData.PlayerStore.Builder playerEntityStore = EntityData.PlayerStore.newBuilder();
-        playerEntityStore.setCharacterPosX(relevanceLocation.x);
-        playerEntityStore.setCharacterPosY(relevanceLocation.y);
-        playerEntityStore.setCharacterPosZ(relevanceLocation.z);
-        playerEntityStore.setHasCharacter(hasCharacter());
-        EntityStorer storer = new EntityStorer(entityManager);
-        storer.store(character, CHARACTER, deactivateEntities);
-        playerEntityStore.setStore(storer.finaliseStore());
-        manager.store(id, playerEntityStore.build(), storer.getExternalReferences());
-    }
 
     @Override
     public void restoreEntities() {

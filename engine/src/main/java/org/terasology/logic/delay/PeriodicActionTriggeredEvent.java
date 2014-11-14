@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.logic.delay;
 
-import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.event.Event;
 
 /**
- * @author Immortius
+ * @author Marcin Sciesinski <marcins78@gmail.com>
  */
-public interface GlobalStore {
+public class PeriodicActionTriggeredEvent implements Event {
+    private String actionId;
 
-    void store(EntityRef entity);
+    public PeriodicActionTriggeredEvent(String actionId) {
+        this.actionId = actionId;
+    }
 
-    void save();
+    public String getActionId() {
+        return actionId;
+    }
 }

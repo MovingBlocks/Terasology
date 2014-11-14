@@ -34,10 +34,14 @@ tasks.addRule("Pattern: fetchModule<ID>") { String taskName ->
             def repo = (taskName - 'fetchModule')
             def parentDir = 'modules'
 
-            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'Terasology'
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubHome')) {
+                githubHome =alternativeGithubHome
             }
 
             def destination = file("$parentDir/$repo")
@@ -84,10 +88,14 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
             def repo = (taskName - 'createModule')
             def parentDir = 'modules'
 
-            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'Terasology'
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubHome')) {
+                githubHome =alternativeGithubHome
             }
 
             def destination = file("$parentDir/$repo")
@@ -122,6 +130,7 @@ tasks.addRule("Pattern: createModule<ID>") { String taskName ->
 }
 
 // Dynamic task definition for cloning an existing meta-module (with the meta-module name embedded in the task name as <ID>)
+// Note how this one uses a different override name - modules & meta modules share names, so cannot co-exist in same Org
 // Sample command: gradlew fetchMetaStructuralResources
 tasks.addRule("Pattern: fetchMeta<ID>") { String taskName ->
     if (taskName.startsWith("fetchMeta")) {
@@ -135,10 +144,14 @@ tasks.addRule("Pattern: fetchMeta<ID>") { String taskName ->
             def repo = (taskName - 'fetchMeta')
             def parentDir = 'meta'
 
-            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubMetaAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MetaTerasology'
-            if (project.hasProperty('githubAccount')) {
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
+            if (project.hasProperty('githubMetaAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubMetaHome')) {
+                githubHome =alternativeGithubHome
             }
 
             // Since meta-modules only accompany normal modules they need a unique name
@@ -172,10 +185,14 @@ tasks.addRule("Pattern: createMeta<ID>") { String taskName ->
             def repo = (taskName - 'createMeta')
             def parentDir = 'meta'
 
-            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubMetaAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MetaTerasology'
-            if (project.hasProperty('githubAccount')) {
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
+            if (project.hasProperty('githubMetaAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubMetaHome')) {
+                githubHome =alternativeGithubHome
             }
 
             // Since meta-modules only accompany normal modules they need a unique name
@@ -222,10 +239,14 @@ tasks.addRule("Pattern: fetchFacade<ID>") { String taskName ->
 
             println "Repo is $repo - localName is $localName"
 
-            // Default GitHub account name to look for the repo in. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MovingBlocks'
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubHome')) {
+                githubHome =alternativeGithubHome
             }
 
             def destination = file("$parentDir/$localName")
@@ -261,10 +282,14 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
 
             println "Repo is $repo - localName is $localName"
 
-            // Default GitHub account name to link the repo to. Supply with -PgithubAccount="TargetAccountName"
+            // Default GitHub account to use. Supply with -PgithubAccount="TargetAccountName" or via gradle.properties
             def githubHome = 'MovingBlocks'
+
+            // Command line parameter has precedence - if it is set we do not check gradle.properties
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubHome')) {
+                githubHome =alternativeGithubHome
             }
 
             def destination = file("$parentDir/$localName")
@@ -295,7 +320,7 @@ tasks.addRule("Pattern: createFacade<ID>") { String taskName ->
     }
 }
 
-// Dynamic task for fetching project-related libs. Probably rarely needed and half-hardcoded for specific libs anyway
+// Dynamic task for fetching project-related libs
 // Sample command: gradlew fetchLibJitter
 tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
     if (taskName.startsWith("fetchLib")) {
@@ -329,10 +354,9 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
             // Allow user to override the GitHub account to pull from. Supply with -PgithubAccount="TargetAccountName"
             if (project.hasProperty('githubAccount')) {
                 githubHome = githubAccount
+            } else if (project.hasProperty('alternativeGithubHome')) {
+                githubHome =alternativeGithubHome
             }
-
-            // Prep destination - this creates the "libs" dir if it doesn't exists and places a subprojects.gradle there
-            checkLibsDir(parentDir)
 
             def destination = file("$parentDir/$repo")
 
@@ -350,32 +374,3 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
         }
     }
 }
-
-// Check for a sub project type dir (/modules, /libs, etc), and create it along with a subprojects.gradle if no exist
-// NOTE: With the PC Facade and Core module back in main repo their subproject.gradles are already there and this just does libs
-def checkLibsDir(String dir) {
-    def typeDir = new File(dir)
-    if (!typeDir.exists()) {
-        println "typeDir " + typeDir + " didn't exist yet, creating it and generating a subprojects.gradle file for it"
-        typeDir.mkdir()
-        def subProjectGradleFile = new File(typeDir, 'subprojects.gradle')
-        subProjectGradleFile.createNewFile()
-
-        // TODO: Change this to be a template file instead? Although two other instances will be kept (facades, modules)
-        // Fill in the new file, including its parent dir so each is unique
-        subProjectGradleFile.text = '''
-// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-// The first time this type of sub is added this file is created, but the sub-sub isn't available until next run
-new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
-    def subprojectName = 'libs:' + possibleSubprojectDir.name
-    println "Processing lib project $subprojectName, including it as a sub-project"
-    include subprojectName
-    def subprojectPath = ':' + subprojectName
-    def subproject = project(subprojectPath)
-    subproject.projectDir = possibleSubprojectDir
-}
-'''
-
-    }
-}
-

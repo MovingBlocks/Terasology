@@ -67,12 +67,17 @@ public class ChunkImpl implements Chunk {
     private BlockManager blockManager;
     private BiomeManager biomeManager;
 
-    private TeraArray blockData;
     private TeraArray sunlightData;
     private TeraArray sunlightRegenData;
-    private TeraArray biomeData;
     private TeraArray lightData;
+
+
+    private TeraArray blockData;
+    private volatile TeraArray blockDataSnapshot;
     private TeraArray extraData;
+    private volatile TeraArray extraDataSnapshot;
+    private TeraArray biomeData;
+    private volatile TeraArray biomeDataSnapshot;
 
     private AABB aabb;
     private Region3i region;
@@ -174,6 +179,9 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Block setBlock(int x, int y, int z, Block block) {
+        if (blockData == blockDataSnapshot) {
+            blockData = blockData.copy();
+        }
         int oldValue = blockData.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
             if (!block.isLiquid()) {
@@ -259,6 +267,9 @@ public class ChunkImpl implements Chunk {
     @Override
     public void setLiquid(int x, int y, int z, LiquidData newState) {
         byte newValue = newState.toByte();
+        if (extraData == extraDataSnapshot) {
+            extraData = extraData.copy();
+        }
         extraData.set(x, y, z, newValue);
     }
 
@@ -279,6 +290,9 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public Biome setBiome(int x, int y, int z, Biome biome) {
+        if (biomeData == biomeDataSnapshot) {
+            biomeData = biomeData.copy();
+        }
         short shortId = biomeManager.getBiomeShortId(biome);
         short previousShortId = (short) biomeData.set(x, y, z, shortId);
         return biomeManager.getBiomeByShortId(previousShortId);
@@ -578,4 +592,31 @@ public class ChunkImpl implements Chunk {
     public EntityData.ChunkStore.Builder encode() {
         return ChunkSerializer.encode(chunkPos, blockData, extraData, biomeData);
     }
+
+    /**
+     * Calling this method results in a (cheap) snapshot to be taken of the current state of the chunk.
+     * This snapshot can then be obtained and rleased by calling {@link #encodeAndReleaseSnapshot()}.
+     */
+    public void createSnapshot() {
+        this.blockDataSnapshot = this.blockData;
+        this.extraDataSnapshot = this.extraData;
+        this.biomeDataSnapshot = this.biomeData;
+    }
+
+    /**
+     * This method can only be
+     * called once after {@link #createSnapshot()} has been called. It can be called from a different thread than
+     * {@link #createSnapshot()}, but it must be made sure that neither method is still running when the other gets
+     * called.
+     *
+     * @return an encoded version of the snapshot taken with {@link #createSnapshot()}.
+     */
+    public EntityData.ChunkStore.Builder encodeAndReleaseSnapshot() {
+        EntityData.ChunkStore.Builder result = ChunkSerializer.encode(chunkPos, blockDataSnapshot, extraDataSnapshot, biomeDataSnapshot);
+        this.blockDataSnapshot = null;
+        this.extraDataSnapshot = null;
+        this.biomeDataSnapshot = null;
+        return result;
+    }
+
 }

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,26 +29,29 @@ import java.util.Set;
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @ForceBlockActive
-public final class DelayedActionComponent implements Component {
+public final class PeriodicActionComponent implements Component {
     private Map<String, Long> actionIdsWakeUp = new HashMap<>();
+    private Map<String, Long> actionIdsPeriod = new HashMap<>();
     private long lowestWakeUp = Long.MAX_VALUE;
 
-    public DelayedActionComponent() {
+    public PeriodicActionComponent() {
     }
 
-    public void addActionId(String actionId, long wakeUp) {
+    public void addScheduledActionId(String actionId, long wakeUp, long period) {
         actionIdsWakeUp.put(actionId, wakeUp);
+        actionIdsPeriod.put(actionId, period);
         lowestWakeUp = Math.min(lowestWakeUp, wakeUp);
     }
 
-    public void removeActionId(String actionId) {
+    public void removeScheduledActionId(String actionId) {
         final long removedWakeUp = actionIdsWakeUp.remove(actionId);
+        actionIdsPeriod.remove(actionId);
         if (removedWakeUp == lowestWakeUp) {
             lowestWakeUp = findSmallestWakeUp();
         }
     }
 
-    public Set<String> removeActionsUpTo(final long worldTime) {
+    public Set<String> getTriggeredActionsAndReschedule(final long worldTime) {
         final Set<String> result = new HashSet<>();
         final Iterator<Map.Entry<String, Long>> entryIterator = actionIdsWakeUp.entrySet().iterator();
         while (entryIterator.hasNext()) {
@@ -58,6 +61,12 @@ public final class DelayedActionComponent implements Component {
                 entryIterator.remove();
             }
         }
+
+        // Rescheduling
+        for (String actionId : result) {
+            actionIdsWakeUp.put(actionId, worldTime + actionIdsPeriod.get(actionId));
+        }
+
         lowestWakeUp = findSmallestWakeUp();
 
         return result;
@@ -67,19 +76,19 @@ public final class DelayedActionComponent implements Component {
         return lowestWakeUp;
     }
 
-    public boolean isEmpty() {
-        return actionIdsWakeUp.isEmpty();
-    }
-
-    public boolean containsActionId(String actionId) {
-        return actionIdsWakeUp.containsKey(actionId);
-    }
-
     private long findSmallestWakeUp() {
         long result = Long.MAX_VALUE;
         for (long value : actionIdsWakeUp.values()) {
             result = Math.min(result, value);
         }
         return result;
+    }
+
+    public boolean isEmpty() {
+        return actionIdsWakeUp.isEmpty();
+    }
+
+    public boolean containsActionId(String actionId) {
+        return actionIdsWakeUp.containsKey(actionId);
     }
 }

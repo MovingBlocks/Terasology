@@ -1,7 +1,7 @@
 # Force default for all text just in case - commit with LF, check out with OS-specific line endings
 * text=auto
 
-*.bat          text
+*.bat          text eol=crlf
 *.block        text
 *.command      text eol=lf
 *.glsl         text

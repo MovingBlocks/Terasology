@@ -19,6 +19,9 @@ package org.terasology.entitySystem.systems;
 import org.terasology.network.NetworkMode;
 
 /**
+ * Enumeration of registration modes for ComponentSystems.
+ * The registration mode dictates if a component system should be run locally or not.
+ *
  * @author Immortius
  */
 public enum RegisterMode {

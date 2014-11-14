@@ -30,19 +30,6 @@ public interface PlayerStore {
     String getId();
 
     /**
-     * Saves the store - call this when you have finished setting up the store. When this is called all entities
-     * in the store will be deactivated.
-     */
-    void save();
-
-    /**
-     * Saves the store - call this when you have finished setting up the store.
-     *
-     * @param deactivateEntities Whether the stored entities should be deactivated
-     */
-    void save(boolean deactivateEntities);
-
-    /**
      * Restores all entities contained in this store, activating them.
      */
     void restoreEntities();

@@ -32,6 +32,7 @@ import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
@@ -47,7 +48,10 @@ public class ServerCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-    
+
+    @In
+    private StorageManager storageManager;
+
     @Command(shortDescription = "Shutdown the server", runOnServer = true)
     public String shutdownServer(EntityRef sender) {
 
@@ -134,6 +138,11 @@ public class ServerCommands extends BaseComponentSystem {
         }
         
         return "Request declined";
+    }
+
+    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
+    public void save() {
+        storageManager.requestSaving();
     }
 }
 
