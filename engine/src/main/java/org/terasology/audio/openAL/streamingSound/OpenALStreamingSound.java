@@ -54,11 +54,13 @@ public final class OpenALStreamingSound extends AbstractAsset<StreamingSoundData
         stream.readNextInto(dataBuffer);
 
         if (dataBuffer.limit() == 0) {
+            // rewind to ensure that limit is reset to capacity
+            dataBuffer.clear();
             return false;
         }
 
-        AL10.alBufferData(buffer, stream.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16,
-                dataBuffer, stream.getSamplingRate());
+        int format = stream.getChannels() == 1 ? AL10.AL_FORMAT_MONO16 : AL10.AL_FORMAT_STEREO16;
+        AL10.alBufferData(buffer, format, dataBuffer, stream.getSamplingRate());
         OpenALException.checkState("Uploading buffer data");
 
         this.lastUpdatedBuffer = buffer;
