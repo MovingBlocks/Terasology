@@ -18,7 +18,6 @@ package org.terasology.game;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.ModuleConfig;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.module.ModuleManager;
@@ -68,63 +67,15 @@ public class Game {
         time.setGameTime(manifest.getTime());
     }
 
-    public void save() {
-        ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
-            sys.preSave();
-        }
-        terasologyEngine.stopThreads();
+    public String getName() {
+        return name;
+    }
 
-        StorageManager storageManager = CoreRegistry.get(StorageManager.class);
-        if (storageManager != null) {
-            BlockManager blockManager = CoreRegistry.get(BlockManager.class);
-            BiomeManager biomeManager = CoreRegistry.get(BiomeManager.class);
-            WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+    public EngineTime getTime() {
+        return time;
+    }
 
-            ModuleConfig moduleConfig = new ModuleConfig();
-            GameManifest gameManifest = new GameManifest(name, seed, time.getGameTimeInMs());
-            for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
-                moduleConfig.addModule(module.getId());
-                gameManifest.addModule(module.getId(), module.getVersion());
-            }
-
-            List<String> registeredBlockFamilies = Lists.newArrayList();
-            for (BlockFamily family : blockManager.listRegisteredBlockFamilies()) {
-                registeredBlockFamilies.add(family.getURI().toString());
-            }
-            gameManifest.setRegisteredBlockFamilies(registeredBlockFamilies);
-            gameManifest.setBlockIdMap(blockManager.getBlockIdMap());
-            List<Biome> biomes = biomeManager.getBiomes();
-            Map<String, Short> biomeIdMap = new HashMap<>(biomes.size());
-            for (Biome biome : biomes) {
-                short shortId = biomeManager.getBiomeShortId(biome);
-                String id = biomeManager.getBiomeId(biome);
-                biomeIdMap.put(id, shortId);
-            }
-            gameManifest.setBiomeIdMap(biomeIdMap);
-
-            gameManifest.addWorld(worldProvider.getWorldInfo());
-
-            try {
-                GameManifest.save(PathManager.getInstance().getCurrentSavePath().resolve(GameManifest.DEFAULT_FILE_NAME), gameManifest);
-            } catch (IOException e) {
-                logger.error("Failed to save world manifest", e);
-            }
-
-            try {
-                storageManager.flush();
-            } catch (IOException e) {
-                logger.error("Failed to save game", e);
-            }
-            storageManager.shutdown();
-        }
-
-        terasologyEngine.restartThreads();
-
-        for (ComponentSystem sys : componentSystemManager.iterateAll()) {
-            sys.postSave();
-        }
-
-
+    public String getSeed() {
+        return seed;
     }
 }

@@ -81,6 +81,8 @@ public interface GameEngine {
      */
     void submitTask(String name, Runnable task);
 
+    boolean hasPendingState();
+
     boolean isHibernationAllowed();
 
     void setHibernationAllowed(boolean allowed);

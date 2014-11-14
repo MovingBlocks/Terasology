@@ -104,9 +104,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         }
 
         // Init. a new world
+        EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
         StorageManager storageManager = CoreRegistry.put(StorageManager.class,
-                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), (EngineEntityManager) CoreRegistry.get(EntityManager.class)));
-        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, worldGenerator);
+                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), entityManager));
+        LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));
         WorldProvider worldProvider = new WorldProviderWrapper(entityWorldProvider);

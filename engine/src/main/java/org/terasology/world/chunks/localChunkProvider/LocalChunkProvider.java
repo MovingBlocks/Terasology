@@ -27,6 +27,7 @@ import gnu.trove.map.hash.TShortObjectHashMap;
 import gnu.trove.procedure.TShortObjectProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -51,7 +52,6 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
-import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -65,12 +65,7 @@ import org.terasology.world.internal.ChunkViewCoreImpl;
 import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -85,6 +80,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     private static final Vector3i UNLOAD_LEEWAY = Vector3i.one();
 
     private StorageManager storageManager;
+    private final EntityManager entityManager;
 
     private ChunkGenerationPipeline pipeline;
     private TaskMaster<ChunkUnloadRequest> unloadRequestTaskMaster;
@@ -108,9 +104,10 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
     private LightMerger<ReadyChunkInfo> lightMerger = new LightMerger<>(this);
 
-    public LocalChunkProvider(StorageManager storageManager, WorldGenerator generator) {
+    public LocalChunkProvider(StorageManager storageManager, EntityManager entityManager, WorldGenerator generator) {
         this.blockManager = CoreRegistry.get(BlockManager.class);
         this.storageManager = storageManager;
+        this.entityManager = entityManager;
         this.generator = generator;
         this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
         this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 4);
@@ -377,11 +374,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     for (ChunkRelevanceRegion region : regions.values()) {
                         region.chunkUnloaded(pos);
                     }
-                    ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-                    store.storeAllEntities();
-                    store.save();
-
+                    storageManager.deactivateChunk(chunk);
                     chunk.dispose();
+
                     try {
                         unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
                     } catch (InterruptedException e) {
@@ -398,6 +393,8 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         }
         PerformanceMonitor.endActivity();
     }
+
+
 
     private void updateRelevance() {
         for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
@@ -483,16 +480,30 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
     }
 
     @Override
-    public void dispose() {
+    public Collection<Chunk> getAllChunks() {
+        return nearCache.values();
+    }
+
+
+    public void restart() {
+        pipeline.restart();
+        unloadRequestTaskMaster.restart();
+        lightMerger.restart();
+    }
+
+    @Override
+    public void shutdown() {
         pipeline.shutdown();
         unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
         lightMerger.shutdown();
+    }
+
+    @Override
+    public void dispose() {
+        shutdown();
 
         for (Chunk chunk : nearCache.values()) {
             chunk.dispose();
-            ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-            store.storeAllEntities();
-            store.save();
         }
         nearCache.clear();
         /*
@@ -500,38 +511,6 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
          * that no new chunk get created
          */
         ChunkMonitor.fireChunkProviderDisposed(this);
-    }
-
-    @Override
-    public void purgeChunks() {
-        ChunkMonitor.fireChunkProviderDisposed(this);
-        pipeline.shutdown();
-        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
-
-        for (Chunk chunk : nearCache.values()) {
-            if (chunk.isReady()) {
-                worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
-                chunk.dispose();
-                ChunkStore store = storageManager.createChunkStoreForSave(chunk);
-                store.storeAllEntities();
-                store.save();
-            }
-        }
-        nearCache.clear();
-        storageManager.purgeChunks();
-
-        worldEntity.send(new PurgeWorldEvent());
-
-        this.pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
-        this.unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
-        ChunkMonitor.fireChunkProviderInitialized(this);
-
-        for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
-            for (Vector3i pos : chunkRelevanceRegion.getCurrentRegion()) {
-                createOrLoadChunk(pos);
-            }
-            chunkRelevanceRegion.setUpToDate();
-        }
     }
 
     private void createOrLoadChunk(Vector3i chunkPos) {

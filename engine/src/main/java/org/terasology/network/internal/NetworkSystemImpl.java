@@ -55,12 +55,7 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.Client;
-import org.terasology.network.JoinStatus;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
-import org.terasology.network.Server;
+import org.terasology.network.*;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -726,9 +721,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         clientList.remove(client);
         clientPlayerLookup.remove(client.getEntity());
         logger.info("Client disconnected: " + client.getName());
-        PlayerStore playerStore = storageManager.createPlayerStoreForSave(client.getId());
-        client.getEntity().send(new DisconnectedEvent(playerStore));
-        playerStore.save();
+        storageManager.deactivatePlayer(client);
+        client.getEntity().send(new DisconnectedEvent());
         client.disconnect();
     }
 

@@ -44,10 +44,7 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import javax.vecmath.Vector3f;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -170,7 +167,18 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void purgeChunks() {
+    public void shutdown() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<Chunk> getAllChunks() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void restart() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

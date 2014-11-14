@@ -21,6 +21,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
+import java.util.Collection;
+
 /**
  * @author Immortius
  */
@@ -128,7 +130,14 @@ public interface ChunkProvider {
     void dispose();
 
     /**
-     * Destroys all chunks and triggers their regeneration
+     * Shutdowns all threads of the chunk provider. This is used to create a save game from a consisent state.
      */
-    void purgeChunks();
+    void shutdown();
+
+    Collection<Chunk> getAllChunks();
+
+    /**
+     * Restarts all thread activity of the chunk provider.
+     */
+    void restart();
 }

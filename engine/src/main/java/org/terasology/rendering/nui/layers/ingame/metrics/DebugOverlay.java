@@ -26,6 +26,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -70,6 +71,10 @@ public class DebugOverlay extends CoreScreenLayer {
             new AllocationsMode(), new RunningThreadsMode(), new WorldRendererMode(), new NetworkStatsMode());
     private int currentMode;
     private UILabel metricsLabel;
+
+
+    @In
+    private StorageManager storageManager;
 
 
     @Override
@@ -134,6 +139,23 @@ public class DebugOverlay extends CoreScreenLayer {
                             biomeId);
                 }
             });
+        }
+        UILabel saveStatusLabel = find("saveStatusLabel", UILabel.class);
+        if (saveStatusLabel != null) {
+            saveStatusLabel.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return "Saving... ";
+                }
+            });
+            saveStatusLabel.bindVisible(
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return storageManager.isSaving();
+                        }
+                    }
+            );
         }
 
         metricsLabel = find("metrics", UILabel.class);

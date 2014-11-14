@@ -497,6 +497,11 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    @Override
+    public boolean hasPendingState() {
+        return pendingState != null;
+    }
+
     private void switchState(GameState newState) {
         if (currentState != null) {
             currentState.dispose();
