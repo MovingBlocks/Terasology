@@ -37,6 +37,7 @@ import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
@@ -287,7 +288,7 @@ public class ConsoleImpl implements Console {
                 }
 
                 return true;
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidCommandCallException e) {
                 String msgText = e.getLocalizedMessage();
                 if (msgText != null && !msgText.isEmpty()) {
                     if (callingClient.exists()) {
@@ -296,12 +297,6 @@ public class ConsoleImpl implements Console {
                         addErrorMessage(e.getLocalizedMessage());
                     }
                 }
-                return false;
-
-            } catch (Exception e) {
-                addErrorMessage("Error executing command '" + commandName + "': " + e.getLocalizedMessage());
-
-                logger.error("Failed to execute command", e);
                 return false;
             }
         }

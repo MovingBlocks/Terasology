@@ -91,7 +91,7 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
     
-    @Command(shortDescription = "Sends a message to all other players", runOnServer = true)
+    @Command(shortDescription = "Sends a message to all other players", runOnServer = true, requiredPermission = "")
     public void say(@CommandParam("message") String message, EntityRef speaker) {
         logger.debug("Received chat message from {} : '{}'", speaker, message);
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {

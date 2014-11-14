@@ -87,7 +87,7 @@ public class BlockCommands extends BaseComponentSystem {
         blockItemFactory = new BlockItemFactory(entityManager);
     }
 
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera)
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera), also apply required permission
     @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
             "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
     public String placeBlock(@CommandParam("blockName") String blockName) {

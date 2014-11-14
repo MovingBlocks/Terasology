@@ -294,7 +294,8 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
+    // TODO: permission
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
             "item in front of the player. You can simply pick it up.")
     public String spawnBlock(@CommandParam("blockName") String blockName) {
