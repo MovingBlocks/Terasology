@@ -23,7 +23,15 @@ package org.terasology.entitySystem.event;
  */
 public interface ConsumableEvent extends Event {
 
+    /**
+     * Tells whether or not the Event has been consumed.
+     * @return true if the the event has been consumed, false otherwise.
+     */
     boolean isConsumed();
 
+    /**
+     * Marks the Event as consumed.
+     * Makes subsequent {@link #isConsumed()} calls return true.
+     */
     void consume();
 }

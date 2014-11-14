@@ -16,6 +16,9 @@
 package org.terasology.entitySystem.systems;
 
 /**
+ * Abstract class implementing the {@link org.terasology.entitySystem.systems.ComponentSystem} interface.
+ * All interface method implementations are empty/NO-OP.
+ *
  * @author Immortius
  */
 public abstract class BaseComponentSystem implements ComponentSystem {
