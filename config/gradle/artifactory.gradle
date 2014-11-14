@@ -27,16 +27,16 @@ buildscript {
 artifactory {
     contextUrl = 'http://artifactory.terasology.org/artifactory'
 
-    // This is the target for publishing artifacts
+    // This is the target for publishing artifacts. Unless testing locally usually the setting in Jenkins is used
     publish {
         repository {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryPublishRepo")) {
                 repoKey = artifactoryPublishRepo
-                println "setting PUBLISH repoKey to $artifactoryPublishRepo"
+                //println "setting PUBLISH repoKey to $artifactoryPublishRepo"
             } else {
                 repoKey = 'terasology-snapshot-local'
-                println "PUBLISH repoKey is terasology-snapshot-local"
+                //println "PUBLISH repoKey is terasology-snapshot-local"
             }
 
             // User and pass are overridden in Jenkins. You can supply your own for manual use in a local prop file, such as gradle.properties
@@ -53,16 +53,17 @@ artifactory {
         }
     }
 
-    // This is the source where we get dependencies
+    // This is the source where we get dependencies. Or it would be but it does not appear to work
+    // Only the main repositories {} seems to matter, and if commented out this still doesn't help
     resolve {
         repository {
             // The repoKey can be overridden in Jenkins and via local gradle.properties if desired for testing
             if (rootProject.hasProperty("artifactoryResolveRepo")) {
                 repoKey = artifactoryResolveRepo
-                println "setting RESOLVE repoKey to $artifactoryResolveRepo"
+                //println "setting RESOLVE repoKey to $artifactoryResolveRepo"
             } else {
-                repoKey = 'repo'
-                println "RESOLVE repoKey is repo"
+                repoKey = 'virtual-repo-live'
+                //println "RESOLVE repoKey is repo"
             }
         }
     }
