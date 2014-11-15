@@ -212,7 +212,9 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onRun(RunButton event, EntityRef entity) {
-        run = event.isDown();
+        if (event.isDown()) {
+            run = !run;
+        }
         event.consume();
     }
 
