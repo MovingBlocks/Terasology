@@ -22,6 +22,6 @@ import org.terasology.input.*;
  * @author Florian <florian@fkoeberle.de>
  */
 @RegisterBindButton(id = "toggleSpeedPermanently", description = "Toggle Speed Permanently")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.CAPS_LOCK)
 public class ToggleSpeedPermanentlyButton extends BindButtonEvent {
 }
