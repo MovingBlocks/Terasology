@@ -95,7 +95,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean run;
+    private boolean run = true;
     private boolean jump;
     private float lookPitch;
     private float lookYaw;
