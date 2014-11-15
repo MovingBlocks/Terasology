@@ -28,11 +28,8 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
-import org.terasology.input.binds.movement.ForwardsMovementAxis;
-import org.terasology.input.binds.movement.JumpButton;
-import org.terasology.input.binds.movement.RunButton;
-import org.terasology.input.binds.movement.StrafeMovementAxis;
-import org.terasology.input.binds.movement.VerticalMovementAxis;
+import org.terasology.input.binds.movement.*;
+import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
@@ -40,8 +37,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
-import org.terasology.logic.characters.events.ActivationPredicted;
-import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryUtils;
@@ -51,10 +46,7 @@ import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
-import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.In;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
@@ -95,7 +87,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // Input
     private Vector3f relativeMovement = new Vector3f();
-    private boolean run = true;
+    private boolean runPerDefault = true;
+    private boolean run = runPerDefault;
     private boolean jump;
     private float lookPitch;
     private float lookYaw;
@@ -211,8 +204,17 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     }
 
     @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
-    public void onRun(RunButton event, EntityRef entity) {
+    public void onToggleSpeedTemporarily(ToggleSpeedTemporarilyButton event, EntityRef entity) {
+        boolean toggle = event.isDown();
+        run = runPerDefault ^ toggle;
+
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {ClientComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
+    public void onToggleSpeedPermanently(ToggleSpeedPermanentlyButton event, EntityRef entity) {
         if (event.isDown()) {
+            runPerDefault = !runPerDefault;
             run = !run;
         }
         event.consume();

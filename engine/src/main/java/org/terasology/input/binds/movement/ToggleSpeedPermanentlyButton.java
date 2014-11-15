@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,12 @@
 
 package org.terasology.input.binds.movement;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.input.DefaultBinding;
-import org.terasology.input.InputType;
-import org.terasology.input.Keyboard;
-import org.terasology.input.RegisterBindButton;
+import org.terasology.input.*;
 
 /**
- * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
-@RegisterBindButton(id = "run", description = "Run")
+@RegisterBindButton(id = "toggleSpeedPermanently", description = "Toggle Speed Permanently")
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R)
-public class RunButton extends BindButtonEvent {
+public class ToggleSpeedPermanentlyButton extends BindButtonEvent {
 }
