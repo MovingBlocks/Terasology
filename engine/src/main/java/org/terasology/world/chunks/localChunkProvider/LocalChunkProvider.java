@@ -52,6 +52,7 @@ import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
+import org.terasology.world.chunks.event.PurgeWorldEvent;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -511,6 +512,41 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
          * that no new chunk get created
          */
         ChunkMonitor.fireChunkProviderDisposed(this);
+    }
+
+    @Override
+    public void purgeWorld() {
+        ChunkMonitor.fireChunkProviderDisposed(this);
+        pipeline.shutdown();
+        unloadRequestTaskMaster.shutdown(new ChunkUnloadRequest(), true);
+        lightMerger.shutdown();
+
+        for (Chunk chunk : nearCache.values()) {
+            if (chunk.isReady()) {
+                worldEntity.send(new BeforeChunkUnload(chunk.getPosition()));
+                storageManager.deactivateChunk(chunk);
+                chunk.dispose();
+            }
+        }
+        nearCache.clear();
+        readyChunks.clear();
+        sortedReadyChunks.clear();
+        storageManager.deleteWorld();
+        preparingChunks.clear();
+        worldEntity.send(new PurgeWorldEvent());
+
+        pipeline = new ChunkGenerationPipeline(new ChunkTaskRelevanceComparator());
+        unloadRequestTaskMaster = TaskMaster.createFIFOTaskMaster("Chunk-Unloader", 8);
+        lightMerger = new LightMerger<>(this);
+        lightMerger.restart();
+        ChunkMonitor.fireChunkProviderInitialized(this);
+
+        for (ChunkRelevanceRegion chunkRelevanceRegion : regions.values()) {
+            for (Vector3i pos : chunkRelevanceRegion.getCurrentRegion()) {
+                createOrLoadChunk(pos);
+            }
+            chunkRelevanceRegion.setUpToDate();
+        }
     }
 
     private void createOrLoadChunk(Vector3i chunkPos) {

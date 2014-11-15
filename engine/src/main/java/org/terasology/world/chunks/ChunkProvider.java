@@ -98,6 +98,8 @@ public interface ChunkProvider {
      */
     void beginUpdate();
 
+    void purgeWorld();
+
     /**
      * @param pos
      * @return Whether this chunk is available and ready for use

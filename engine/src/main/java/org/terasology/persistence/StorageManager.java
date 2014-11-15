@@ -73,4 +73,6 @@ public interface StorageManager {
     boolean isSaving();
 
     void checkAndRepairSaveIfNecessary() throws IOException;
+
+    void deleteWorld();
 }
