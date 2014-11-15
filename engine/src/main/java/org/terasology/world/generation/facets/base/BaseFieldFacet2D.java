@@ -53,7 +53,6 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
         return getWorld(pos.x, pos.y);
     }
 
-    @Override
     public float[] getInternal() {
         return data;
     }
@@ -78,7 +77,6 @@ public abstract class BaseFieldFacet2D extends BaseFacet2D implements FieldFacet
         setWorld(pos.x, pos.y, value);
     }
 
-    @Override
     public void set(float[] newData) {
         Preconditions.checkArgument(newData.length == data.length, "New data must have same length as existing");
         System.arraycopy(newData, 0, data, 0, newData.length);

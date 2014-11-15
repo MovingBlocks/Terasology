@@ -31,8 +31,6 @@ public interface BooleanFieldFacet3D extends WorldFacet3D {
 
     boolean getWorld(Vector3i pos);
 
-    boolean[] getInternal();
-
     void set(int x, int y, int z, boolean value);
 
     void set(Vector3i pos, boolean value);
@@ -40,6 +38,4 @@ public interface BooleanFieldFacet3D extends WorldFacet3D {
     void setWorld(int x, int y, int z, boolean value);
 
     void setWorld(Vector3i pos, boolean value);
-
-    void set(boolean[] newData);
 }

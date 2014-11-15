@@ -53,7 +53,6 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
         return getWorld(pos.x, pos.y, pos.z);
     }
 
-    @Override
     public boolean[] getInternal() {
         return data;
     }
@@ -78,7 +77,6 @@ public abstract class BaseBooleanFieldFacet3D extends BaseFacet3D implements Boo
         setWorld(pos.x, pos.y, pos.z, value);
     }
 
-    @Override
     public void set(boolean[] newData) {
         Preconditions.checkArgument(newData.length == data.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
