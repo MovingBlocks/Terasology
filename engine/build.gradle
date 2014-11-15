@@ -1,19 +1,12 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
-// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
-apply from: "$rootDir/config/gradle/artifactory.gradle"
-
-// Get the gradle versioneye plugin from Maven central
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.standardout:gradle-versioneye-plugin:0.1.1'
-    }
+// Get the gradle versioneye plugin from the plugins.gradle.org repo
+plugins {
+    id "org.standardout.versioneye" version "1.0.0"
 }
 
-apply plugin: 'versioneye'
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
