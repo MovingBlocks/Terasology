@@ -26,6 +26,6 @@ import org.terasology.input.RegisterBindButton;
  * @author Immortius
  */
 @RegisterBindButton(id = "run", description = "Run")
-@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.LEFT_SHIFT)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KeyId.R)
 public class RunButton extends BindButtonEvent {
 }
