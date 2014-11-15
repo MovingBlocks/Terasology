@@ -167,6 +167,10 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
+    public void purgeWorld() {
+    }
+
+    @Override
     public void shutdown() {
         throw new UnsupportedOperationException();
     }

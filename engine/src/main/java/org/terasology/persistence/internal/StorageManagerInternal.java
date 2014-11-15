@@ -51,6 +51,7 @@ import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
 import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
@@ -669,6 +670,22 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         saveTransactionHelper.cleanupSaveTransactionDirectory();
         if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
             saveTransactionHelper.mergeChanges();
+        }
+    }
+
+
+    @Override
+    public void deleteWorld() {
+        waitForCompletionOfPreviousSave();
+        unloadedAndUnsavedChunkMap.clear();
+        unloadedAndSavingChunkMap.clear();
+        unloadedAndUnsavedPlayerMap.clear();
+        unloadedAndSavingPlayerMap.clear();
+
+        try {
+            FilesUtil.recursiveDelete(storagePathProvider.getWorldPath());
+        } catch (IOException e) {
+            logger.error("Failed to purge chunks", e);
         }
     }
 
