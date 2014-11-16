@@ -149,16 +149,24 @@ jar {
 }
 
 task cacheReflections {
+    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
     inputs.files project.classes.outputs.files
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
     doFirst {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        file(sourceSets.main.output.classesDir.toString()).mkdirs()
         Reflections reflections = new ConfigurationBuilder()
-                    .addUrls((configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL()))
-                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-                    .build()
+                .addUrls(configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                .build()
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
+}
+
+task cleanReflections(type: Delete) {
+    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

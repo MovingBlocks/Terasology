@@ -34,7 +34,8 @@ Note: Keys between the latest stable and latest develop build may differ.
 * [Q] - Throw held (block) item (hold down to charge for a longer throw!)
 * [Space] - Jump / Ascend
 * [Ctrl] - Crouch / Descend
-* [Shift] - Hold to run
+* [Shift] - Hold to run (or walk when run is toggled to default)
+* [Caps lock] - Toggle default between run or walk (starts on run)
 * [Left click] - Trigger left click action (default = remove block)
 * [Right click] - Trigger right click action (default = place block)
 * [Mouse wheel up/down] - Cycle through toolbar slots OR pick up / deposit items into stacks in an inventory one at a time
@@ -60,11 +61,11 @@ Only works when the F3 debug mode is enabled (and may come and go)
 
 * [Arrow up/down] - Adjust the current time in small steps
 * [Arrow left/right] - Adjust the current time in larger steps
-* [R] - Debug render wire-frame
 * [F4] - Cycle advanced debug metrics
 * [F6] - Debug rendering enabled
 * [F7] - Cycle debug rendering stage
 * [F8] - Debug render chunk bounding boxes
+* [F9] - Debug render wire-frame
 
 Tools
 --------

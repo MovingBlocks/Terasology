@@ -218,6 +218,7 @@ task createSkeleton() {
 }
 
 task cacheReflections {
+    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
     inputs.files project.classes.outputs.files
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
@@ -230,6 +231,11 @@ task cacheReflections {
                 .build()
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
+}
+
+task cleanReflections(type: Delete) {
+    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
