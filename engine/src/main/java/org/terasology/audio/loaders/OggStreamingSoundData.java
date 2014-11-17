@@ -51,7 +51,7 @@ public class OggStreamingSoundData implements StreamingSoundData {
     public ByteBuffer readNextInto(ByteBuffer dataBuffer) {
         try {
             reader.read(dataBuffer, 0, dataBuffer.capacity());
-            dataBuffer.rewind();
+            dataBuffer.flip();
             return dataBuffer;
         } catch (IOException e) {
             throw new RuntimeException("Error reading from sound stream at " + url, e);

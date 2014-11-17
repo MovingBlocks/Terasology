@@ -30,7 +30,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.manager.WorldTimeEventManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
@@ -56,7 +55,6 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
-import org.terasology.world.TimerEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
@@ -155,9 +153,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /* UPDATING */
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-    /* EVENTS */
-    private final WorldTimeEventManager worldTimeEventManager;
-
     /* PHYSICS */
     // TODO: Remove physics handling from world renderer
     private final BulletPhysics bulletPhysics;
@@ -191,7 +186,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         chunkTessellator = new ChunkTessellator(bufferPool);
         skysphere = new Skysphere();
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
-        worldTimeEventManager = new WorldTimeEventManager(worldProvider);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         systemManager = CoreRegistry.get(ComponentSystemManager.class);
@@ -212,7 +206,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
-        initTimeEvents();
     }
 
 
@@ -289,105 +282,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         result.z -= cameraPos.z;
 
         return result.lengthSquared();
-    }
-
-    private Vector3f getPlayerPosition() {
-        if (player != null) {
-            return player.getPosition();
-        }
-        return new Vector3f();
-    }
-
-    /**
-     * Creates the world time events to play the game's soundtrack at specific times.
-     */
-    public void initTimeEvents() {
-        final AudioManager audioManager = CoreRegistry.get(AudioManager.class);
-
-        // SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.1, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heaven"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
-                }
-            }
-        });
-
-        // AFTERNOON
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.25, true) {
-            @Override
-            public void run() {
-                //TODO get beter tck instead afternoon
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
-                }
-            }
-        });
-
-        // SUNSET
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.4, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunset"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.6, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.75, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
-                }
-            }
-        });
-
-        // BEFORE SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.9, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heroes"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Resurface"));
-                }
-            }
-        });
     }
 
     /**
@@ -1005,11 +899,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             positionLightCamera();
             lightCamera.update(delta);
         }
-
-        // And finally fire any active events
-        PerformanceMonitor.startActivity("Fire Events");
-        worldTimeEventManager.fireWorldTimeEvents();
-        PerformanceMonitor.endActivity();
 
         smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
