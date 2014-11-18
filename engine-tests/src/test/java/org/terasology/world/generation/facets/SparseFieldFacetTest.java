@@ -61,7 +61,7 @@ public class SparseFieldFacetTest extends FieldFacetTest {
         facet.setWorld(13, 28, 34, 2);
         facet.setWorld(10, 21, 35, 1);
 
-        Map<Vector3i, Number> expected = ImmutableMap.of(
+        Map<Vector3i, Number> expected = ImmutableMap.<Vector3i, Number>of(
             new Vector3i(0, 1, 2), 4.0f,
             new Vector3i(0, 1, 3), 3.0f,
             new Vector3i(3, 8, 4), 2.0f,
@@ -81,7 +81,7 @@ public class SparseFieldFacetTest extends FieldFacetTest {
         facet.setWorld(13, 28, 34, 2);
         facet.setWorld(10, 21, 35, 1);
 
-        Map<Vector3i, Number> expected = ImmutableMap.of(
+        Map<Vector3i, Number> expected = ImmutableMap.<Vector3i, Number>of(
             new Vector3i(10, 21, 32), 4.0f,
             new Vector3i(10, 21, 33), 3.0f,
             new Vector3i(13, 28, 34), 2.0f,
