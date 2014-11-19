@@ -143,11 +143,10 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
 	                    }
 	                }
 	            }
-            }else{
-            	Vector3i pos =new Vector3i(spawnPos.x,spawnPos.y,spawnPos.z);
-                if (findOpenVerticalPosition(pos)) {
-                    return pos;
-                }
+            }
+            Vector3i pos =new Vector3i(spawnPos.x,spawnPos.y,spawnPos.z);
+            if (findOpenVerticalPosition(pos)) {
+                return pos;
             }
         }
         return spawnPos;
