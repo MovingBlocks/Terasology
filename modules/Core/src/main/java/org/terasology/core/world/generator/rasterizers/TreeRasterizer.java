@@ -105,10 +105,11 @@ public class TreeRasterizer implements WorldRasterizer {
         TreeFacet facet = chunkRegion.getFacet(TreeFacet.class);
         BiomeFacet biomeFacet = chunkRegion.getFacet(BiomeFacet.class);
 
-        for (Vector3i pos : facet.getRelativeRegion()) {
-            float facetValue = facet.get(pos);
-            CoreBiome biome = biomeFacet.get(pos.x, pos.z);
+        for (Map.Entry<Vector3i, Number> entry : facet.getRelativeEntries().entrySet()) {
+            float facetValue = entry.getValue().floatValue();
             if (facetValue > 0) {
+                Vector3i pos = entry.getKey();
+                CoreBiome biome = biomeFacet.get(pos.x, pos.z);
                 for (TreeGenerator generator : treeGeneratorLookup.get(biome)) {
                     if (generator.getGenerationProbability() > (facetValue / 256f)) {
                         generator.generate(chunk, new FastRandom((long) facetValue), pos.x, pos.y, pos.z);

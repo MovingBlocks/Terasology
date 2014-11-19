@@ -79,7 +79,7 @@ public class TreeProvider implements ConfigurableFacetProvider {
                         && (z < facet.getWorldRegion().maxZ() && TeraMath.floorToInt(surface.getWorld(x, z + 1)) == height)
                         // and if it selects a % of them
                         && treeNoise.noise(x, z) / 256f < configuration.density) {
-                    facet.setWorld(x, height + 1, z, treeSeedNoise.noise(x, z));
+                    facet.setWorld(x, height + 1, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
                 }
             }
         }
