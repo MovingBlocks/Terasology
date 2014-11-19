@@ -129,9 +129,9 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             // try and find somewhere in this chunk a spot to land
             Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
             //check if generation uses sea level and surfaceheight facets
-            if(worldRegion.getFacet(SurfaceHeightFacet.class) != null && worldRegion.getFacet(SeaLevelFacet.class) != null){
-	            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-	            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
+	        SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+            if(surfaceHeightFacet != null && seaLevelFacet != null){
 	            int seaLevel = seaLevelFacet.getSeaLevel();
 	
 	            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
