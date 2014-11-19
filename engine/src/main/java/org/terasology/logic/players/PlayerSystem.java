@@ -128,17 +128,25 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         if (world != null) {
             // try and find somewhere in this chunk a spot to land
             Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
-            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
-            int seaLevel = seaLevelFacet.getSeaLevel();
-
-            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
-                if (height > seaLevel) {
-                    pos.y = height;
-                    if (findOpenVerticalPosition(pos)) {
-                        return pos;
-                    }
+            //check if generation uses sea level and surfaceheight facets
+            if(worldRegion.getFacet(SurfaceHeightFacet.class) != null && worldRegion.getFacet(SeaLevelFacet.class) != null){
+	            SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
+	            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+	            int seaLevel = seaLevelFacet.getSeaLevel();
+	
+	            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+	                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
+	                if (height > seaLevel) {
+	                    pos.y = height;
+	                    if (findOpenVerticalPosition(pos)) {
+	                        return pos;
+	                    }
+	                }
+	            }
+            }else{
+            	Vector3i pos =new Vector3i(spawnPos.x,spawnPos.y,spawnPos.z);
+                if (findOpenVerticalPosition(pos)) {
+                    return pos;
                 }
             }
         }
