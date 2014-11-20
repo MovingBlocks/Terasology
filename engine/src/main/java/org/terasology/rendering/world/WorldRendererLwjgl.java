@@ -185,7 +185,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(bufferPool);
         skysphere = new Skysphere();
-        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         systemManager = CoreRegistry.get(ComponentSystemManager.class);
@@ -196,6 +195,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             localPlayerCamera = new PerspectiveCamera(CoreRegistry.get(Config.class).getRendering().getCameraSettings());
         }
         activeCamera = localPlayerCamera;
+
+        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider, activeCamera.getPosition());
 
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
@@ -997,6 +998,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      * Disposes this world.
      */
     public void dispose() {
+        chunkMeshUpdateManager.shutdown();
         worldProvider.dispose();
         CoreRegistry.get(AudioManager.class).stopAllSounds();
     }
