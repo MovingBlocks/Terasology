@@ -16,18 +16,19 @@
 package org.terasology.entitySystem.systems;
 
 /**
+ * <p>
  * Interface for component systems that needs to be updated every time
  * the engine is updated.
- * <p>
- * Note: Usage of the UpdateSubscriberSystem interface should be avoided: 
+ * </p>
+ * <p><b>Note:</b> Usage of the UpdateSubscriberSystem interface should be avoided:
  * receiving the update call on every engine frame is overkill for most systems.
  * For most cases it will be sufficient to
  *   <ul>
- *	   <li>
+ *     <li>
  *       use {@link org.terasology.entitySystem.event.ReceiveEvent}
- *	     to update the system on specific events ({@link org.terasology.entitySystem.event.Event}),
+ *       to update the system on specific events ({@link org.terasology.entitySystem.event.Event}),
  *     </li>
- *	   <li>
+ *     <li>
  *       use {@link org.terasology.logic.DelayManager} to update entities or to call a system update function
  *       at a specific times.
  *     </li>

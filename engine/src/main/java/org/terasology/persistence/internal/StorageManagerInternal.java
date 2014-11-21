@@ -73,7 +73,14 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.zip.GZIPInputStream;
 
@@ -150,7 +157,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
      *
      * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
      */
-    private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder saveTransaction, Set<EntityRef> unsavedEntities) {
+    private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder transactionBuilder, Set<EntityRef> unsavedEntities) {
         GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
         for (StoreMetadata table : storeMetadata.values()) {
             globalStoreSaver.addStoreMetadata(table);
@@ -159,7 +166,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             globalStoreSaver.store(entity);
         }
         EntityData.GlobalStore globalStore = globalStoreSaver.save();
-        saveTransaction.addGlobalStore(globalStore);
+        transactionBuilder.setGlobalStore(globalStore);
     }
 
     @Override
@@ -234,7 +241,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
          * from unloadedAndUnsavedChunkMap get added to unloadedAndSavingChunkMap.
          */
         Iterator<Map.Entry<Vector3i, CompressedChunkBuilder>> unsavedEntryIterator = unloadedAndUnsavedChunkMap.entrySet().iterator();
-        while(unsavedEntryIterator.hasNext()) {
+        while (unsavedEntryIterator.hasNext()) {
             Map.Entry<Vector3i, CompressedChunkBuilder> entry = unsavedEntryIterator.next();
             unloadedAndSavingChunkMap.put(entry.getKey(), entry.getValue());
             unsavedEntryIterator.remove();
@@ -248,7 +255,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 unloadedAndSavingChunkMap.remove(chunk.getPosition());
                 Collection<EntityRef> entitiesToStore = chunkPosToEntitiesMap.get(chunk.getPosition());
                 if (entitiesToStore == null) {
-                    entitiesToStore = Collections.EMPTY_SET;
+                    entitiesToStore = Collections.emptySet();
                 }
                 unsavedEntities.removeAll(entitiesToStore);
                 CompressedChunkBuilder compressedChunkBuilder = createCompressedChunkBuilder(chunk,
@@ -386,7 +393,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
          * from unloadedAndUnsavedPlayerMap get added to unloadedAndSavingPlayerMap.
          */
         Iterator<Map.Entry<String, EntityData.PlayerStore>> unsavedEntryIterator = unloadedAndUnsavedPlayerMap.entrySet().iterator();
-        while(unsavedEntryIterator.hasNext()) {
+        while (unsavedEntryIterator.hasNext()) {
             Map.Entry<String, EntityData.PlayerStore> entry = unsavedEntryIterator.next();
             unloadedAndSavingPlayerMap.put(entry.getKey(), entry.getValue());
             unsavedEntryIterator.remove();
@@ -630,7 +637,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         int unloadedChunkCount = unloadedAndUnsavedChunkMap.size();
         int loadedChunkCount = chunkProvider.getAllChunks().size();
         double totalChunkCount = unloadedChunkCount + loadedChunkCount;
-        double percentageUnloaded = 100.0 * (unloadedChunkCount / (double) totalChunkCount);
+        double percentageUnloaded = 100.0 * unloadedChunkCount / totalChunkCount;
         if (percentageUnloaded >= config.getSystem().getMaxUnloadedChunksPercentageTillSave()) {
             return true;
         }

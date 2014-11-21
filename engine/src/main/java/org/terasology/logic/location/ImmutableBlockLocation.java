@@ -35,7 +35,7 @@ public class ImmutableBlockLocation {
 
     public ImmutableBlockLocation move(Side side) {
         final Vector3i directionVector = side.getVector3i();
-        return new ImmutableBlockLocation(x+directionVector.x, y+directionVector.y, z+directionVector.z);
+        return new ImmutableBlockLocation(x + directionVector.x, y + directionVector.y, z + directionVector.z);
     }
 
     public Vector3i toVector3i() {
@@ -44,14 +44,27 @@ public class ImmutableBlockLocation {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ImmutableBlockLocation that = (ImmutableBlockLocation) o;
 
-        if (x != that.x) return false;
-        if (y != that.y) return false;
-        if (z != that.z) return false;
+        if (x != that.x) {
+            return false;
+        }
+
+        if (y != that.y) {
+            return false;
+        }
+
+        if (z != that.z) {
+            return false;
+        }
 
         return true;
     }

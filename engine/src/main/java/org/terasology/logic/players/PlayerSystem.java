@@ -130,21 +130,21 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
             //check if generation uses sea level and surfaceheight facets
             SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-	        SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
-            if(surfaceHeightFacet != null && seaLevelFacet != null){
-	            int seaLevel = seaLevelFacet.getSeaLevel();
-	
-	            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-	                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
-	                if (height > seaLevel) {
-	                    pos.y = height;
-	                    if (findOpenVerticalPosition(pos)) {
-	                        return pos;
-	                    }
-	                }
-	            }
+            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+            if (surfaceHeightFacet != null && seaLevelFacet != null) {
+                int seaLevel = seaLevelFacet.getSeaLevel();
+
+                for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+                    int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
+                    if (height > seaLevel) {
+                        pos.y = height;
+                        if (findOpenVerticalPosition(pos)) {
+                            return pos;
+                        }
+                    }
+                }
             }
-            Vector3i pos =new Vector3i(spawnPos.x,spawnPos.y,spawnPos.z);
+            Vector3i pos = new Vector3i(spawnPos.x, spawnPos.y, spawnPos.z);
             if (findOpenVerticalPosition(pos)) {
                 return pos;
             }

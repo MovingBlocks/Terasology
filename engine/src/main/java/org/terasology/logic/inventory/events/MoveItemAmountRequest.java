@@ -41,5 +41,7 @@ public class MoveItemAmountRequest extends AbstractMoveItemRequest {
         return amount;
     }
 
-    public int getToSlot() { return toSlot; }
+    public int getToSlot() {
+        return toSlot;
+    }
 }
