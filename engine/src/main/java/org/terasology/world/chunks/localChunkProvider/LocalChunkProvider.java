@@ -602,7 +602,14 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
 
         @Override
         public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1.getPosition()) - score(o2.getPosition());
+            return score(o1) - score(o2);
+        }
+
+        private int score(ChunkTask task) {
+            if (task.isTerminateSignal()) {
+                return -1;
+            }
+            return score(task.getPosition());
         }
 
         private int score(Vector3i chunk) {
