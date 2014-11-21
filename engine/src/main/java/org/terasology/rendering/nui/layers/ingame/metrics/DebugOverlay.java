@@ -141,7 +141,8 @@ public class DebugOverlay extends CoreScreenLayer {
             });
         }
         UILabel saveStatusLabel = find("saveStatusLabel", UILabel.class);
-        if (saveStatusLabel != null) {
+        // clients do not have a storage manager
+        if (saveStatusLabel != null && storageManager != null) {
             saveStatusLabel.bindText(new ReadOnlyBinding<String>() {
                 @Override
                 public String get() {
