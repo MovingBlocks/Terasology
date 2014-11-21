@@ -20,20 +20,16 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.GameEngine;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.utilities.concurrency.Task;
 import org.terasology.utilities.concurrency.TaskMaster;
 import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.RenderableChunk;
-import org.terasology.world.chunks.internal.ChunkRelevanceRegion;
 import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.chunks.pipeline.ShutdownChunkTask;
 
@@ -173,11 +169,14 @@ public final class ChunkMeshUpdateManager {
     private class ChunkUpdaterComparator implements Comparator<ChunkTask> {
         @Override
         public int compare(ChunkTask o1, ChunkTask o2) {
-            return score(o1.getPosition()) - score(o2.getPosition());
+            return score(o1) - score(o2);
         }
 
-        private int score(Vector3i chunk) {
-            return distFromRegion(chunk, TeraMath.calcChunkPos(cameraPosition));
+        private int score(ChunkTask task) {
+            if (task.isTerminateSignal()) {
+                return -1;
+            }
+            return distFromRegion(task.getPosition(), TeraMath.calcChunkPos(cameraPosition));
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {
