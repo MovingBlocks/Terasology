@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -44,11 +45,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.OnActivatedBlocks;
 import org.terasology.world.block.OnAddedBlocks;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkBlockIterator;
-import org.terasology.world.chunks.ChunkConstants;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.*;
 import org.terasology.world.chunks.event.BeforeChunkUnload;
 import org.terasology.world.chunks.event.OnChunkGenerated;
 import org.terasology.world.chunks.event.OnChunkLoaded;
@@ -73,6 +70,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
@@ -233,6 +231,9 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
             chunk.lock();
             try {
                 chunk.markReady();
+                updateAdjacentChunksReadyFieldOf(chunk);
+                updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
+
                 if (!readyChunkInfo.isNewChunk()) {
                     PerformanceMonitor.startActivity("Generating Block Entities");
                     generateBlockEntities(chunk);
@@ -377,6 +378,7 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
                     }
                     storageManager.deactivateChunk(chunk);
                     chunk.dispose();
+                    updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
 
                     try {
                         unloadRequestTaskMaster.put(new ChunkUnloadRequest(chunk, this));
@@ -395,6 +397,33 @@ public class LocalChunkProvider implements ChunkProvider, GeneratingChunkProvide
         PerformanceMonitor.endActivity();
     }
 
+    private boolean areAdjacentChunksReady(Chunk chunk) {
+        Vector3i centerChunkPos = chunk.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = nearCache.get(adjChunkPos);
+            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
+            if (!adjChunkReady) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
+        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
+    }
+
+    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
+        Vector3i centerChunkPos = chunkInCenter.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = nearCache.get(adjChunkPos);
+            if (adjChunk != null) {
+                updateAdjacentChunksReadyFieldOf(adjChunk);
+            }
+        }
+    }
 
 
     private void updateRelevance() {

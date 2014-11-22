@@ -54,6 +54,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @author Florian <florian@fkoeberle.de>
  */
 public class ChunkImpl implements Chunk {
 
@@ -93,6 +94,7 @@ public class ChunkImpl implements Chunk {
     private ChunkMesh[] activeMesh;
     private ChunkMesh[] pendingMesh;
     private AABB[] subMeshAABB;
+    private boolean AdjacentChunksReady;
 
     public ChunkImpl(int x, int y, int z) {
         this(new Vector3i(x, y, z));
@@ -556,6 +558,16 @@ public class ChunkImpl implements Chunk {
     @Override
     public boolean isReady() {
         return ready;
+    }
+
+    @Override
+    public void setAdjacentChunksReady(boolean value) {
+        this.AdjacentChunksReady = value;
+    }
+
+    @Override
+    public boolean areAdjacentChunksReady() {
+        return this.AdjacentChunksReady;
     }
 
     @Override

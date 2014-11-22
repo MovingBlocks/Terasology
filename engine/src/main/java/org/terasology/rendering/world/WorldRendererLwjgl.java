@@ -1114,7 +1114,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     public boolean isChunkValidForRender(RenderableChunk c) {
-        return worldProvider.getLocalView(c.getPosition()) != null;
+        return c.isReady() && c.areAdjacentChunksReady();
     }
 
     public boolean isChunkVisible(Camera cam, RenderableChunk c) {
