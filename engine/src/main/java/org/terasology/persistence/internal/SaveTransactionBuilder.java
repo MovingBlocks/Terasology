@@ -43,7 +43,7 @@ class SaveTransactionBuilder {
         playerStores.put(id, playerStore);
     }
 
-    public void addGlobalStore(EntityData.GlobalStore globalStore) {
+    public void setGlobalStore(EntityData.GlobalStore globalStore) {
         this.globalStore = globalStore;
     }
 
