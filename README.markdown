@@ -165,6 +165,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [GrowingFlora](https://github.com/Terasology/GrowingFlora) - organically growing (step by step) trees and such
 * [Hunger](https://github.com/Terasology/Hunger) - makes the player slowly gets hungry (needs actual GUI work and ways to then actually eat food though). Console `hungerCheck` for stats
 * [Journal](https://github.com/Terasology/Journal) - allows the player to use an in-game journal for gameplay notifications and such. Default toggle key 'J'
+* [LandOfTerra](https://github.com/Terasology/LandOfTerra) - contains a set of unusual world generators
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept

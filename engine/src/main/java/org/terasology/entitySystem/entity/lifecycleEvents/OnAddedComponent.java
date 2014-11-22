@@ -23,6 +23,8 @@ import org.terasology.entitySystem.event.Event;
  * <p/>
  * Note that this event will only be received by @ReceiveEvent methods where all components in its list are present and
  * at least one is involved in the action causing the event.
+ *
+ * @see org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent
  */
 public final class OnAddedComponent implements Event {
 
