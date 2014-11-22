@@ -128,11 +128,6 @@ public abstract class TimeBase implements EngineTime {
     }
 
     @Override
-    public float getRealTime() {
-        return getRawTimeInMs() / 1000f;
-    }
-
-    @Override
     public void updateTimeFromServer(long targetTime) {
         desynch = targetTime - getGameTimeInMs();
     }
