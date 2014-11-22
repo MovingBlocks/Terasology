@@ -270,6 +270,7 @@ public class StorageManagerTest {
     public void storeAndRestoreChunkStore() {
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
+        chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
@@ -289,6 +290,7 @@ public class StorageManagerTest {
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
         chunk.setBlock(0, 4, 2, testBlock2);
+        chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         when(chunkProvider.getChunk(Mockito.any(Vector3i.class))).thenReturn(chunk);
@@ -316,6 +318,7 @@ public class StorageManagerTest {
     public void entitySurvivesStorageInChunkStore() throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
+        chunk.markReady();;
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
