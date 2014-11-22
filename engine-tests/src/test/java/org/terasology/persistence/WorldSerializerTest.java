@@ -76,7 +76,7 @@ public class WorldSerializerTest {
     public void testNotPersistedIfFlagedOtherwise() throws Exception {
         EntityRef entity = entityManager.create();
         entity.setPersistent(false);
-        int id = entity.getId();
+        long id = entity.getId();
 
         EntityData.GlobalStore worldData = worldSerializer.serializeWorld(false);
         assertEquals(0, worldData.getEntityCount());

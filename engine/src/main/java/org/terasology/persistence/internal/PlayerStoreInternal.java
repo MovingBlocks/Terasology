@@ -16,6 +16,7 @@
 package org.terasology.persistence.internal;
 
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
@@ -38,7 +39,7 @@ final class PlayerStoreInternal implements PlayerStore {
     private EntityRef character = EntityRef.NULL;
     private boolean hasCharacter;
     private EntityData.EntityStore entityStore;
-    private TIntSet externalRefs;
+    private TLongSet externalRefs;
 
     PlayerStoreInternal(String id, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
@@ -46,7 +47,8 @@ final class PlayerStoreInternal implements PlayerStore {
         this.entityManager = entityManager;
     }
 
-    PlayerStoreInternal(String id, EntityData.PlayerStore store, TIntSet externalRefs, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, EntityData.PlayerStore store, TLongSet externalRefs,
+                        StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;
         this.entityManager = entityManager;

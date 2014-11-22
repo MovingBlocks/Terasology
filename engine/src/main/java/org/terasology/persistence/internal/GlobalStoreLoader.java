@@ -18,7 +18,9 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -81,7 +83,7 @@ final class GlobalStoreLoader {
 
         refTables = Lists.newArrayListWithCapacity(globalStore.getStoreReferenceSetCount());
         for (EntityData.EntityStoreMetadata metadataData : globalStore.getStoreReferenceSetList()) {
-            TIntSet refs = new TIntHashSet(metadataData.getReferenceList());
+            TLongSet refs = new TLongHashSet(metadataData.getReferenceList());
             StoreId id;
             switch (metadataData.getType()) {
                 case ChunkStoreType:

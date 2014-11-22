@@ -22,7 +22,7 @@ import org.terasology.entitySystem.entity.LowLevelEntityManager;
  */
 public class DefaultRefStrategy implements RefStrategy {
     @Override
-    public BaseEntityRef createRefFor(int id, LowLevelEntityManager entityManager) {
+    public BaseEntityRef createRefFor(long id, LowLevelEntityManager entityManager) {
         return new PojoEntityRef(entityManager, id);
     }
 }

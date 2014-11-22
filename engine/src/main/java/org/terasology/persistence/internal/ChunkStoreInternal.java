@@ -17,6 +17,7 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
@@ -41,7 +42,7 @@ final class ChunkStoreInternal implements ChunkStore {
 
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
-    private TIntSet externalRefs;
+    private TLongSet externalRefs;
 
     public ChunkStoreInternal(Chunk chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
         this.chunk = chunk;
@@ -50,7 +51,7 @@ final class ChunkStoreInternal implements ChunkStore {
         this.entityManager = entityManager;
     }
 
-    public ChunkStoreInternal(EntityData.ChunkStore chunkData, TIntSet externalRefs, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
+    public ChunkStoreInternal(EntityData.ChunkStore chunkData, TLongSet externalRefs, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;

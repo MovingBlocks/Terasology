@@ -17,7 +17,9 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
@@ -39,8 +41,8 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
     private final EntitySerializer serializer;
     private final EntityData.EntityStore.Builder entityStoreBuilder;
     private final OwnershipHelper helper;
-    private TIntSet externalReferences = new TIntHashSet();
-    private TIntSet storedEntityIds = new TIntHashSet();
+    private TLongSet externalReferences = new TLongHashSet();
+    private TLongSet storedEntityIds = new TLongHashSet();
 
     public EntityStorer(EngineEntityManager entityManager) {
         this.entityManager = entityManager;
@@ -93,12 +95,12 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
         return entityStoreBuilder.build();
     }
 
-    public TIntSet getExternalReferences() {
+    public TLongSet getExternalReferences() {
         return externalReferences;
     }
 
     @Override
-    public boolean loadingRef(int id) {
+    public boolean loadingRef(long id) {
         return true;
     }
 

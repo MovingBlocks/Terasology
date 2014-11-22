@@ -17,8 +17,9 @@ package org.terasology.persistence.typeHandling.extensionTypes;
 
 import com.google.common.collect.Lists;
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.persistence.typeHandling.DeserializationContext;
@@ -59,8 +60,9 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     @Override
     public EntityRef deserialize(PersistedData data, DeserializationContext context) {
         if (data.isNumber()) {
-            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(data.getAsInteger())) {
-                return entityManager.createEntityRefWithId(data.getAsInteger());
+            // TODO If
+            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(data.getAsLong())) {
+                return entityManager.createEntityRefWithId(data.getAsLong());
             }
         }
         return EntityRef.NULL;
@@ -68,15 +70,15 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
     @Override
     public PersistedData serializeCollection(Collection<EntityRef> value, SerializationContext context) {
-        TIntList items = new TIntArrayList();
+        TLongList items = new TLongArrayList();
         for (EntityRef ref : value) {
             if (!ref.exists()) {
-                items.add(0);
+                items.add(0L);
             } else {
                 if (refInterceptor.get() == null || refInterceptor.get().savingRef(ref)) {
                     items.add((ref).getId());
                 } else {
-                    items.add(0);
+                    items.add(0L);
                 }
             }
         }
@@ -87,6 +89,24 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     public List<EntityRef> deserializeCollection(PersistedData data, DeserializationContext context) {
         PersistedDataArray array = data.getAsArray();
         List<EntityRef> result = Lists.newArrayListWithCapacity(array.size());
+        addEntitiesForIntArray(result, array);
+        addEntitiesFromLongArray(result, array);
+        return result;
+    }
+
+    private void addEntitiesFromLongArray(List<EntityRef> result, PersistedDataArray array) {
+        TLongIterator iterator = array.getAsLongArray().iterator();
+        while (iterator.hasNext()) {
+            long item = iterator.next();
+            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(item)) {
+                result.add(entityManager.createEntityRefWithId(item));
+            } else {
+                result.add(EntityRef.NULL);
+            }
+        }
+    }
+
+    private void addEntitiesForIntArray(List<EntityRef> result, PersistedDataArray array) {
         TIntIterator iterator = array.getAsIntegerArray().iterator();
         while (iterator.hasNext()) {
             int item = iterator.next();
@@ -96,7 +116,6 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
                 result.add(EntityRef.NULL);
             }
         }
-        return result;
     }
 
     public interface EntityRefInterceptor {
@@ -104,7 +123,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
          * @param id
          * @return Whether to complete loading the ref. If false, EntityRef.NULL is used instead.
          */
-        boolean loadingRef(int id);
+        boolean loadingRef(long id);
 
         /**
          * @param ref The entity ref being saved

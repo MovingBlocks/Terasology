@@ -19,8 +19,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
+import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.procedure.TLongProcedure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -80,7 +83,7 @@ public class WorldSerializerImpl implements WorldSerializer {
             world.addPrefab(prefabSerializer.serialize(prefab));
         }
 
-        TIntList nonPersistedIds = new TIntArrayList();
+        TLongList nonPersistedIds = new TLongArrayList();
         for (EntityRef entity : entityManager.getAllEntities()) {
             if (verbose || entity.isPersistent()) {
                 world.addEntity(entitySerializer.serialize(entity));
@@ -100,7 +103,7 @@ public class WorldSerializerImpl implements WorldSerializer {
     @Override
     public void deserializeWorld(EntityData.GlobalStore world) {
         entityManager.setNextId(world.getNextEntityId());
-        for (Integer deadId : world.getFreedEntityIdList()) {
+        for (Long deadId : world.getFreedEntityIdList()) {
             entityManager.getFreedIds().add(deadId);
         }
 
@@ -171,16 +174,16 @@ public class WorldSerializerImpl implements WorldSerializer {
         prefabSerializer.setComponentIdMapping(componentIdTable);
     }
 
-    private void writeIdInfo(final EntityData.GlobalStore.Builder world, TIntList nonPersistedIds) {
+    private void writeIdInfo(final EntityData.GlobalStore.Builder world, TLongList nonPersistedIds) {
         world.setNextEntityId(entityManager.getNextId());
-        entityManager.getFreedIds().forEach(new TIntProcedure() {
-            public boolean execute(int i) {
+        entityManager.getFreedIds().forEach(new TLongProcedure() {
+            public boolean execute(long i) {
                 world.addFreedEntityId(i);
                 return true;
             }
         });
-        nonPersistedIds.forEach(new TIntProcedure() {
-            public boolean execute(int i) {
+        nonPersistedIds.forEach(new TLongProcedure() {
+            public boolean execute(long i) {
                 world.addFreedEntityId(i);
                 return true;
             }

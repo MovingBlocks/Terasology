@@ -16,6 +16,7 @@
 package org.terasology.persistence.internal;
 
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import org.terasology.persistence.internal.StoreId;
 
 /**
@@ -23,9 +24,9 @@ import org.terasology.persistence.internal.StoreId;
  */
 public final class StoreMetadata {
     private StoreId id;
-    private TIntSet externalReferences;
+    private TLongSet externalReferences;
 
-    public StoreMetadata(StoreId id, TIntSet externalReferences) {
+    public StoreMetadata(StoreId id, TLongSet externalReferences) {
         this.id = id;
         this.externalReferences = externalReferences;
     }
@@ -34,7 +35,7 @@ public final class StoreMetadata {
         return id;
     }
 
-    public TIntSet getExternalReferences() {
+    public TLongSet getExternalReferences() {
         return externalReferences;
     }
 }

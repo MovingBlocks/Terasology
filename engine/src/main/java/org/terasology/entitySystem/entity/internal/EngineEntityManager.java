@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.entity.internal;
 
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.TLongSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
@@ -69,7 +70,7 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      * @param components
      * @return The entityRef for the newly created entity
      */
-    EntityRef createEntityWithId(int id, Iterable<Component> components);
+    EntityRef createEntityWithId(long id, Iterable<Component> components);
 
     /**
      * Creates an entity ref with the given id. This is used when loading components with references.
@@ -77,28 +78,28 @@ public interface EngineEntityManager extends LowLevelEntityManager {
      * @param id
      * @return The entityRef for the given id
      */
-    EntityRef createEntityRefWithId(int id);
+    EntityRef createEntityRefWithId(long id);
 
     /**
      * This is used to persist the entity manager's state
      *
      * @return The id that will be used for the next entity (after freed ids are used)
      */
-    int getNextId();
+    long getNextId();
 
     /**
      * Sets the next id the entity manager will use. This is used when restoring the entity manager's state.
      *
      * @param id
      */
-    void setNextId(int id);
+    void setNextId(long id);
 
     /**
      * A list of freed ids. This is used when persisting the entity manager's state
      *
      * @return A list of freed ids that are available for reuse.
      */
-    TIntSet getFreedIds();
+    TLongSet getFreedIds();
 
     /**
      * Removes all entities from the entity manager and resets its state.

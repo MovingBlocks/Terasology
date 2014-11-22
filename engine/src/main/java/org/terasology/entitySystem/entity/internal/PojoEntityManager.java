@@ -21,12 +21,13 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.UnsignedInts;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import com.google.common.primitives.UnsignedLongs;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.iterator.TLongObjectIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -63,14 +64,14 @@ import java.util.Set;
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityManager implements LowLevelEntityManager, EngineEntityManager {
-    public static final int NULL_ID = 0;
+    public static final long NULL_ID = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
 
-    private int nextEntityId = 1;
-    private TIntSet loadedIds = new TIntHashSet();
-    private TIntSet freedIds = new TIntHashSet();
-    private Map<Integer, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
+    private long nextEntityId = 1;
+    private TLongSet loadedIds = new TLongHashSet();
+    private TLongSet freedIds = new TLongHashSet();
+    private Map<Long, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable store = new ComponentTable();
 
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
@@ -145,10 +146,10 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         return createEntityRef(createEntity());
     }
 
-    private int createEntity() {
+    private long createEntity() {
         if (!freedIds.isEmpty()) {
-            TIntIterator iterator = freedIds.iterator();
-            int id = iterator.next();
+            TLongIterator iterator = freedIds.iterator();
+            long id = iterator.next();
             iterator.remove();
             loadedIds.add(id);
             return id;
@@ -180,7 +181,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     private EntityRef createEntity(Iterable<Component> components) {
-        int entityId = createEntity();
+        long entityId = createEntity();
 
         Prefab prefab = null;
         for (Component component : components) {
@@ -247,7 +248,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     @Override
-    public EntityRef getEntity(int id) {
+    public EntityRef getEntity(long id) {
         return createEntityRef(id);
     }
 
@@ -315,15 +316,15 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         if (componentClasses.length == 1) {
             return iterateEntities(componentClasses[0]);
         }
-        TIntList idList = new TIntArrayList();
-        TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
+        TLongList idList = new TLongArrayList();
+        TLongObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClasses[0]);
         if (primeIterator == null) {
             return Collections.emptyList();
         }
 
         while (primeIterator.hasNext()) {
             primeIterator.advance();
-            int id = primeIterator.key();
+            long id = primeIterator.key();
             boolean discard = false;
             for (int i = 1; i < componentClasses.length; ++i) {
                 if (store.get(id, componentClasses[i]) == null) {
@@ -339,15 +340,15 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     private Iterable<EntityRef> iterateEntities(Class<? extends Component> componentClass) {
-        TIntList idList = new TIntArrayList();
-        TIntObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClass);
+        TLongList idList = new TLongArrayList();
+        TLongObjectIterator<? extends Component> primeIterator = store.componentIterator(componentClass);
         if (primeIterator == null) {
             return Collections.emptyList();
         }
 
         while (primeIterator.hasNext()) {
             primeIterator.advance();
-            int id = primeIterator.key();
+            long id = primeIterator.key();
             idList.add(primeIterator.key());
         }
         return new EntityIterable(idList);
@@ -379,7 +380,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      */
 
     @Override
-    public EntityRef createEntityRefWithId(int id) {
+    public EntityRef createEntityRefWithId(long id) {
         if (isExistingEntity(id)) {
             return createEntityRef(id);
         }
@@ -419,7 +420,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     @Override
-    public EntityRef createEntityWithId(int id, Iterable<Component> components) {
+    public EntityRef createEntityWithId(long id, Iterable<Component> components) {
         if (!freedIds.contains(id)) {
             for (Component c : components) {
                 store.put(id, c);
@@ -462,7 +463,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     @Override
     public void deactivateForStorage(EntityRef entity) {
         if (entity.exists()) {
-            int entityId = entity.getId();
+            long entityId = entity.getId();
             if (eventSystem != null) {
                 eventSystem.send(entity, BeforeDeactivateComponent.newInstance());
             }
@@ -472,17 +473,17 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     @Override
-    public int getNextId() {
+    public long getNextId() {
         return nextEntityId;
     }
 
     @Override
-    public void setNextId(int id) {
+    public void setNextId(long id) {
         nextEntityId = id;
     }
 
     @Override
-    public TIntSet getFreedIds() {
+    public TLongSet getFreedIds() {
         return freedIds;
     }
 
@@ -496,13 +497,13 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @return Whether the entity has a component of the given type
      */
     @Override
-    public boolean hasComponent(int entityId, Class<? extends Component> componentClass) {
+    public boolean hasComponent(long entityId, Class<? extends Component> componentClass) {
         return store.get(entityId, componentClass) != null;
     }
 
     @Override
-    public boolean isExistingEntity(int id) {
-        return freedIds.contains(id) || UnsignedInts.toLong(nextEntityId) > UnsignedInts.toLong(id);
+    public boolean isExistingEntity(long id) {
+        return freedIds.contains(id) || nextEntityId > id;
     }
 
     /**
@@ -510,7 +511,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @return Whether the entity is currently active
      */
     @Override
-    public boolean isActiveEntity(int id) {
+    public boolean isActiveEntity(long id) {
         return loadedIds.contains(id);
     }
 
@@ -519,7 +520,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @return An iterable over the components of the given entity
      */
     @Override
-    public Iterable<Component> iterateComponents(int entityId) {
+    public Iterable<Component> iterateComponents(long entityId) {
         return store.iterateComponents(entityId);
     }
 
@@ -529,7 +530,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @param entityId
      */
     @Override
-    public void destroy(int entityId) {
+    public void destroy(long entityId) {
         // Don't allow the destruction of unloaded entities.
         if (!loadedIds.contains(entityId)) {
             return;
@@ -550,7 +551,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
 
     private void destroy(EntityRef ref) {
         // Don't allow the destruction of unloaded entities.
-        int entityId = ref.getId();
+        long entityId = ref.getId();
         entityCache.remove(entityId);
         loadedIds.remove(entityId);
         freedIds.add(entityId);
@@ -567,7 +568,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @return The component of that type owned by the given entity, or null if it doesn't have that component
      */
     @Override
-    public <T extends Component> T getComponent(int entityId, Class<T> componentClass) {
+    public <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
         //return componentLibrary.copy(store.get(entityId, componentClass));
         return store.get(entityId, componentClass);
     }
@@ -581,7 +582,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @return The added component
      */
     @Override
-    public <T extends Component> T addComponent(int entityId, T component) {
+    public <T extends Component> T addComponent(long entityId, T component) {
         Preconditions.checkNotNull(component);
         Component oldComponent = store.put(entityId, component);
         if (oldComponent != null) {
@@ -611,7 +612,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @param componentClass
      */
     @Override
-    public <T extends Component> T removeComponent(int entityId, Class<T> componentClass) {
+    public <T extends Component> T removeComponent(long entityId, Class<T> componentClass) {
         T component = store.get(entityId, componentClass);
         if (component != null) {
             if (eventSystem != null) {
@@ -632,7 +633,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * @param component
      */
     @Override
-    public void saveComponent(int entityId, Component component) {
+    public void saveComponent(long entityId, Component component) {
         Component oldComponent = store.put(entityId, component);
         if (oldComponent == null) {
             logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId);
@@ -657,7 +658,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
      * Implementation
      */
 
-    private EntityRef createEntityRef(int entityId) {
+    private EntityRef createEntityRef(long entityId) {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
@@ -703,7 +704,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     public <T extends Component> Iterable<Map.Entry<EntityRef, T>> listComponents(Class<T> componentClass) {
-        TIntObjectIterator<T> iterator = store.componentIterator(componentClass);
+        TLongObjectIterator<T> iterator = store.componentIterator(componentClass);
         if (iterator != null) {
             List<Map.Entry<EntityRef, T>> list = new ArrayList<Map.Entry<EntityRef, T>>();
             while (iterator.hasNext()) {
@@ -738,9 +739,9 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     private class EntityIterable implements Iterable<EntityRef> {
-        private TIntList list;
+        private TLongList list;
 
-        public EntityIterable(TIntList list) {
+        public EntityIterable(TLongList list) {
             this.list = list;
         }
 
@@ -750,9 +751,9 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     private class EntityIterator implements Iterator<EntityRef> {
-        private TIntIterator idIterator;
+        private TLongIterator idIterator;
 
-        public EntityIterator(TIntIterator idIterator) {
+        public EntityIterator(TLongIterator idIterator) {
             this.idIterator = idIterator;
         }
 

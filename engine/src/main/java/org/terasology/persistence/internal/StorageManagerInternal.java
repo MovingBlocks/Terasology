@@ -18,11 +18,11 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
+import gnu.trove.set.TLongSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -97,7 +97,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
-    private TIntObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TIntObjectHashMap<>();
+    private TLongObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TLongObjectHashMap<>();
     private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
 
     private boolean storeChunksInZips = true;
@@ -217,7 +217,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     public PlayerStore loadPlayerStore(String playerId) {
         EntityData.PlayerStore store = loadPlayerStoreData(playerId);
         if (store != null) {
-            TIntSet validRefs = null;
+            TLongSet validRefs = null;
             StoreMetadata table = storeMetadata.get(new PlayerStoreId(playerId));
             if (table != null) {
                 validRefs = table.getExternalReferences();
@@ -316,7 +316,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
-        TIntSet externalRefs = storer.getExternalReferences();
+        TLongSet externalRefs = storer.getExternalReferences();
 
         Vector3i chunkPosition = chunk.getPosition();
 
@@ -442,7 +442,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         playerEntityStore.setStore(storer.finaliseStore());
 
 
-        TIntSet externalReference = storer.getExternalReferences();
+        TLongSet externalReference = storer.getExternalReferences();
         if (externalReference.size() > 0) {
             StoreMetadata metadata = new StoreMetadata(new PlayerStoreId(playerId), externalReference);
              indexStoreMetadata(metadata);
@@ -505,7 +505,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         byte[] chunkData = loadCompressedChunk(chunkPos);
         ChunkStore store = null;
         if (chunkData != null) {
-            TIntSet validRefs = null;
+            TLongSet validRefs = null;
             StoreMetadata table = storeMetadata.get(new ChunkStoreId(chunkPos));
             if (table != null) {
                 validRefs = table.getExternalReferences();
@@ -541,9 +541,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private void indexStoreMetadata(StoreMetadata metadata) {
         storeMetadata.put(metadata.getId(), metadata);
-        TIntIterator iterator = metadata.getExternalReferences().iterator();
+        TLongIterator iterator = metadata.getExternalReferences().iterator();
         while (iterator.hasNext()) {
-            int refId = iterator.next();
+            long refId = iterator.next();
             List<StoreMetadata> tables = externalRefHolderLookup.get(refId);
             if (tables == null) {
                 tables = Lists.newArrayList();
@@ -554,7 +554,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public void onEntityDestroyed(int entityId) {
+    public void onEntityDestroyed(long entityId) {
         List<StoreMetadata> tables = externalRefHolderLookup.remove(entityId);
         if (tables != null) {
             for (StoreMetadata table : tables) {
