@@ -124,7 +124,7 @@ public class StoragePathProvider {
     }
 
     public Path getChunkPath(Vector3i chunkPos) {
-        return worldsPath.resolve(getChunkFilename(chunkPos));
+        return worldPath.resolve(getChunkFilename(chunkPos));
     }
 
     public Path getChunkTempPath(Vector3i chunkPos) {
