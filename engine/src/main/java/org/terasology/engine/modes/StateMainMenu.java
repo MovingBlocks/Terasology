@@ -70,31 +70,36 @@ public class StateMainMenu implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
 
-        //lets get the entity event system running
+        //let's get the entity event system running
         entityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(),
                 CoreRegistry.get(NetworkSystem.class), CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class));
+
         eventSystem = CoreRegistry.get(EventSystem.class);
         CoreRegistry.put(Console.class, new ConsoleImpl());
 
         nuiManager = CoreRegistry.get(NUIManager.class);
         ((NUIManagerInternal) nuiManager).refreshWidgetsLibrary();
+        eventSystem.registerEventHandler(nuiManager);
 
+        // TODO: Should the CSM be registered here every time or only in engine init? See Issue #1125
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
 
+        // TODO: Reduce coupling between Input system and CameraTargetSystem,
+        // TODO: potentially eliminating the following lines. See Issue #1126
         CameraTargetSystem cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
+
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
         componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
-        eventSystem.registerEventHandler(CoreRegistry.get(NUIManager.class));
         inputSystem = CoreRegistry.get(InputSystem.class);
 
+        // TODO: REMOVE this and handle refreshing of core game state at the engine level - see Issue #1127
         new RegisterInputSystem().step();
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
-
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         localPlayer.setClientEntity(localPlayerEntity);
 
