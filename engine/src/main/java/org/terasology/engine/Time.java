@@ -55,13 +55,11 @@ public interface Time {
     float getGameTime();
 
     /**
+     * There is no variant of this method that returns seconds because the values can become to large to represent the
+     * as float with the necessary precision.
+     *
      * @return Real time in milliseconds.
      */
     long getRealTimeInMs();
-
-    /**
-     * @return Real time in seconds.
-     */
-    float getRealTime();
 
 }
