@@ -378,6 +378,5 @@ public class PojoEntityManagerTest {
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
-        assertFalse(entityManager.getFreedIds().contains(id));
     }
 }

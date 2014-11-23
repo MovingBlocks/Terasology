@@ -95,17 +95,5 @@ final class GlobalStoreSaver {
 
     private void writeIdInfo() {
         store.setNextEntityId(entityManager.getNextId());
-        entityManager.getFreedIds().forEach(new TLongProcedure() {
-            public boolean execute(long i) {
-                store.addFreedEntityId(i);
-                return true;
-            }
-        });
-        nonPersistentIds.forEach(new TLongProcedure() {
-            public boolean execute(long i) {
-                store.addFreedEntityId(i);
-                return true;
-            }
-        });
     }
 }

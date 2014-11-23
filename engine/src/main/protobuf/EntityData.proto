@@ -162,7 +162,7 @@ message GlobalStore {
     repeated string component_class = 3;
 
     optional int64 next_entity_id = 16;
-    repeated int64 freed_entity_id = 17 [packed=true];
+    repeated int64 deprecated_data_17 = 17 [packed=true];
     repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index
     repeated EntityStoreMetadata storeReferenceSet = 19;
 

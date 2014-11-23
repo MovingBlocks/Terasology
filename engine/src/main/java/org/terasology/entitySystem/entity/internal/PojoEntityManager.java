@@ -70,7 +70,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
 
     private long nextEntityId = 1;
     private TLongSet loadedIds = new TLongHashSet();
-    private TLongSet freedIds = new TLongHashSet();
     private Map<Long, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable store = new ComponentTable();
 
@@ -107,7 +106,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         store.clear();
         nextEntityId = 1;
         loadedIds.clear();
-        freedIds.clear();
         entityCache.clear();
     }
 
@@ -147,13 +145,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     }
 
     private long createEntity() {
-        if (!freedIds.isEmpty()) {
-            TLongIterator iterator = freedIds.iterator();
-            long id = iterator.next();
-            iterator.remove();
-            loadedIds.add(id);
-            return id;
-        }
         if (nextEntityId == NULL_ID) {
             nextEntityId++;
         }
@@ -421,18 +412,19 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
 
     @Override
     public EntityRef createEntityWithId(long id, Iterable<Component> components) {
-        if (!freedIds.contains(id)) {
-            for (Component c : components) {
-                store.put(id, c);
-            }
-            loadedIds.add(id);
-            EntityRef entity = createEntityRef(id);
-            if (eventSystem != null) {
-                eventSystem.send(entity, OnActivatedComponent.newInstance());
-            }
-            return entity;
+        if (id >= nextEntityId) {
+            logger.error("Prevented attempt to create entity with an invalid id.");
+            return EntityRef.NULL;
         }
-        return EntityRef.NULL;
+        for (Component c : components) {
+            store.put(id, c);
+        }
+        loadedIds.add(id);
+        EntityRef entity = createEntityRef(id);
+        if (eventSystem != null) {
+            eventSystem.send(entity, OnActivatedComponent.newInstance());
+        }
+        return entity;
     }
 
     @Override
@@ -482,10 +474,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         nextEntityId = id;
     }
 
-    @Override
-    public TLongSet getFreedIds() {
-        return freedIds;
-    }
 
     /*
      * For use by Entity Refs
@@ -503,7 +491,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
 
     @Override
     public boolean isExistingEntity(long id) {
-        return freedIds.contains(id) || nextEntityId > id;
+        return nextEntityId > id;
     }
 
     /**
@@ -554,7 +542,6 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         long entityId = ref.getId();
         entityCache.remove(entityId);
         loadedIds.remove(entityId);
-        freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
             ((PojoEntityRef) ref).invalidate();
         }

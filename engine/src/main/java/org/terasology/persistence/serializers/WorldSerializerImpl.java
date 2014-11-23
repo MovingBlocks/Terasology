@@ -83,16 +83,13 @@ public class WorldSerializerImpl implements WorldSerializer {
             world.addPrefab(prefabSerializer.serialize(prefab));
         }
 
-        TLongList nonPersistedIds = new TLongArrayList();
         for (EntityRef entity : entityManager.getAllEntities()) {
             if (verbose || entity.isPersistent()) {
                 world.addEntity(entitySerializer.serialize(entity));
-            } else {
-                nonPersistedIds.add(entity.getId());
             }
         }
 
-        writeIdInfo(world, nonPersistedIds);
+        writeIdInfo(world);
 
         entitySerializer.removeComponentIdMapping();
         prefabSerializer.removeComponentIdMapping();
@@ -103,9 +100,6 @@ public class WorldSerializerImpl implements WorldSerializer {
     @Override
     public void deserializeWorld(EntityData.GlobalStore world) {
         entityManager.setNextId(world.getNextEntityId());
-        for (Long deadId : world.getFreedEntityIdList()) {
-            entityManager.getFreedIds().add(deadId);
-        }
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < world.getComponentClassCount(); ++index) {
@@ -174,20 +168,8 @@ public class WorldSerializerImpl implements WorldSerializer {
         prefabSerializer.setComponentIdMapping(componentIdTable);
     }
 
-    private void writeIdInfo(final EntityData.GlobalStore.Builder world, TLongList nonPersistedIds) {
+    private void writeIdInfo(final EntityData.GlobalStore.Builder world) {
         world.setNextEntityId(entityManager.getNextId());
-        entityManager.getFreedIds().forEach(new TLongProcedure() {
-            public boolean execute(long i) {
-                world.addFreedEntityId(i);
-                return true;
-            }
-        });
-        nonPersistedIds.forEach(new TLongProcedure() {
-            public boolean execute(long i) {
-                world.addFreedEntityId(i);
-                return true;
-            }
-        });
     }
 
 }

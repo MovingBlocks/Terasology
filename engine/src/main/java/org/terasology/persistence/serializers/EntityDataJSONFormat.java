@@ -129,12 +129,6 @@ public final class EntityDataJSONFormat {
                 if (nextId != null) {
                     world.setNextEntityId(nextId.getAsInt());
                 }
-                JsonArray freedIdArray = jsonObject.getAsJsonArray("freed_entity_id");
-                if (freedIdArray != null) {
-                    for (JsonElement freedId : freedIdArray) {
-                        world.addFreedEntityId(freedId.getAsInt());
-                    }
-                }
 
             }
             return world.build();

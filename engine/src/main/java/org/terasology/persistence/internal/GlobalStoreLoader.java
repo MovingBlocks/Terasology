@@ -72,7 +72,6 @@ final class GlobalStoreLoader {
     public void load(EntityData.GlobalStore globalStore) {
         entityManager.clear();
         entityManager.setNextId(globalStore.getNextEntityId());
-        entityManager.getFreedIds().addAll(globalStore.getFreedEntityIdList());
 
         loadComponentMapping(globalStore);
         loadMissingPrefabs(globalStore);

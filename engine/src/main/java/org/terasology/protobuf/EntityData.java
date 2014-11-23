@@ -15817,19 +15817,19 @@ public final class EntityData {
      */
     long getNextEntityId();
 
-    // repeated int64 freed_entity_id = 17 [packed = true];
+    // repeated int64 deprecated_data_17 = 17 [packed = true];
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    java.util.List<java.lang.Long> getFreedEntityIdList();
+    java.util.List<java.lang.Long> getDeprecatedData17List();
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    int getFreedEntityIdCount();
+    int getDeprecatedData17Count();
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    long getFreedEntityId(int index);
+    long getDeprecatedData17(int index);
 
     // repeated string prefab_name = 18;
     /**
@@ -15974,21 +15974,21 @@ public final class EntityData {
             }
             case 136: {
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-                freedEntityId_ = new java.util.ArrayList<java.lang.Long>();
+                deprecatedData17_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              freedEntityId_.add(input.readInt64());
+              deprecatedData17_.add(input.readInt64());
               break;
             }
             case 138: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
-                freedEntityId_ = new java.util.ArrayList<java.lang.Long>();
+                deprecatedData17_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000010;
               }
               while (input.getBytesUntilLimit() > 0) {
-                freedEntityId_.add(input.readInt64());
+                deprecatedData17_.add(input.readInt64());
               }
               input.popLimit(limit);
               break;
@@ -16027,7 +16027,7 @@ public final class EntityData {
           componentClass_ = new com.google.protobuf.UnmodifiableLazyStringList(componentClass_);
         }
         if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
+          deprecatedData17_ = java.util.Collections.unmodifiableList(deprecatedData17_);
         }
         if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           prefabName_ = new com.google.protobuf.UnmodifiableLazyStringList(prefabName_);
@@ -16185,29 +16185,29 @@ public final class EntityData {
       return nextEntityId_;
     }
 
-    // repeated int64 freed_entity_id = 17 [packed = true];
-    public static final int FREED_ENTITY_ID_FIELD_NUMBER = 17;
-    private java.util.List<java.lang.Long> freedEntityId_;
+    // repeated int64 deprecated_data_17 = 17 [packed = true];
+    public static final int DEPRECATED_DATA_17_FIELD_NUMBER = 17;
+    private java.util.List<java.lang.Long> deprecatedData17_;
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
     public java.util.List<java.lang.Long>
-        getFreedEntityIdList() {
-      return freedEntityId_;
+        getDeprecatedData17List() {
+      return deprecatedData17_;
     }
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    public int getFreedEntityIdCount() {
-      return freedEntityId_.size();
+    public int getDeprecatedData17Count() {
+      return deprecatedData17_.size();
     }
     /**
-     * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    public long getFreedEntityId(int index) {
-      return freedEntityId_.get(index);
+    public long getDeprecatedData17(int index) {
+      return deprecatedData17_.get(index);
     }
-    private int freedEntityIdMemoizedSerializedSize = -1;
+    private int deprecatedData17MemoizedSerializedSize = -1;
 
     // repeated string prefab_name = 18;
     public static final int PREFAB_NAME_FIELD_NUMBER = 18;
@@ -16296,7 +16296,7 @@ public final class EntityData {
       prefab_ = java.util.Collections.emptyList();
       componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       nextEntityId_ = 0L;
-      freedEntityId_ = java.util.Collections.emptyList();
+      deprecatedData17_ = java.util.Collections.emptyList();
       prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       storeReferenceSet_ = java.util.Collections.emptyList();
     }
@@ -16349,12 +16349,12 @@ public final class EntityData {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt64(16, nextEntityId_);
       }
-      if (getFreedEntityIdList().size() > 0) {
+      if (getDeprecatedData17List().size() > 0) {
         output.writeRawVarint32(138);
-        output.writeRawVarint32(freedEntityIdMemoizedSerializedSize);
+        output.writeRawVarint32(deprecatedData17MemoizedSerializedSize);
       }
-      for (int i = 0; i < freedEntityId_.size(); i++) {
-        output.writeInt64NoTag(freedEntityId_.get(i));
+      for (int i = 0; i < deprecatedData17_.size(); i++) {
+        output.writeInt64NoTag(deprecatedData17_.get(i));
       }
       for (int i = 0; i < prefabName_.size(); i++) {
         output.writeBytes(18, prefabName_.getByteString(i));
@@ -16395,17 +16395,17 @@ public final class EntityData {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < freedEntityId_.size(); i++) {
+        for (int i = 0; i < deprecatedData17_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt64SizeNoTag(freedEntityId_.get(i));
+            .computeInt64SizeNoTag(deprecatedData17_.get(i));
         }
         size += dataSize;
-        if (!getFreedEntityIdList().isEmpty()) {
+        if (!getDeprecatedData17List().isEmpty()) {
           size += 2;
           size += com.google.protobuf.CodedOutputStream
               .computeInt32SizeNoTag(dataSize);
         }
-        freedEntityIdMemoizedSerializedSize = dataSize;
+        deprecatedData17MemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
@@ -16556,7 +16556,7 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000004);
         nextEntityId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
-        freedEntityId_ = java.util.Collections.emptyList();
+        deprecatedData17_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -16623,10 +16623,10 @@ public final class EntityData {
         }
         result.nextEntityId_ = nextEntityId_;
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
+          deprecatedData17_ = java.util.Collections.unmodifiableList(deprecatedData17_);
           bitField0_ = (bitField0_ & ~0x00000010);
         }
-        result.freedEntityId_ = freedEntityId_;
+        result.deprecatedData17_ = deprecatedData17_;
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           prefabName_ = new com.google.protobuf.UnmodifiableLazyStringList(
               prefabName_);
@@ -16723,13 +16723,13 @@ public final class EntityData {
         if (other.hasNextEntityId()) {
           setNextEntityId(other.getNextEntityId());
         }
-        if (!other.freedEntityId_.isEmpty()) {
-          if (freedEntityId_.isEmpty()) {
-            freedEntityId_ = other.freedEntityId_;
+        if (!other.deprecatedData17_.isEmpty()) {
+          if (deprecatedData17_.isEmpty()) {
+            deprecatedData17_ = other.deprecatedData17_;
             bitField0_ = (bitField0_ & ~0x00000010);
           } else {
-            ensureFreedEntityIdIsMutable();
-            freedEntityId_.addAll(other.freedEntityId_);
+            ensureDeprecatedData17IsMutable();
+            deprecatedData17_.addAll(other.deprecatedData17_);
           }
           onChanged();
         }
@@ -17425,67 +17425,67 @@ public final class EntityData {
         return this;
       }
 
-      // repeated int64 freed_entity_id = 17 [packed = true];
-      private java.util.List<java.lang.Long> freedEntityId_ = java.util.Collections.emptyList();
-      private void ensureFreedEntityIdIsMutable() {
+      // repeated int64 deprecated_data_17 = 17 [packed = true];
+      private java.util.List<java.lang.Long> deprecatedData17_ = java.util.Collections.emptyList();
+      private void ensureDeprecatedData17IsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = new java.util.ArrayList<java.lang.Long>(freedEntityId_);
+          deprecatedData17_ = new java.util.ArrayList<java.lang.Long>(deprecatedData17_);
           bitField0_ |= 0x00000010;
          }
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
       public java.util.List<java.lang.Long>
-          getFreedEntityIdList() {
-        return java.util.Collections.unmodifiableList(freedEntityId_);
+          getDeprecatedData17List() {
+        return java.util.Collections.unmodifiableList(deprecatedData17_);
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public int getFreedEntityIdCount() {
-        return freedEntityId_.size();
+      public int getDeprecatedData17Count() {
+        return deprecatedData17_.size();
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public long getFreedEntityId(int index) {
-        return freedEntityId_.get(index);
+      public long getDeprecatedData17(int index) {
+        return deprecatedData17_.get(index);
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder setFreedEntityId(
+      public Builder setDeprecatedData17(
           int index, long value) {
-        ensureFreedEntityIdIsMutable();
-        freedEntityId_.set(index, value);
+        ensureDeprecatedData17IsMutable();
+        deprecatedData17_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder addFreedEntityId(long value) {
-        ensureFreedEntityIdIsMutable();
-        freedEntityId_.add(value);
+      public Builder addDeprecatedData17(long value) {
+        ensureDeprecatedData17IsMutable();
+        deprecatedData17_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder addAllFreedEntityId(
+      public Builder addAllDeprecatedData17(
           java.lang.Iterable<? extends java.lang.Long> values) {
-        ensureFreedEntityIdIsMutable();
-        super.addAll(values, freedEntityId_);
+        ensureDeprecatedData17IsMutable();
+        super.addAll(values, deprecatedData17_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int64 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder clearFreedEntityId() {
-        freedEntityId_ = java.util.Collections.emptyList();
+      public Builder clearDeprecatedData17() {
+        deprecatedData17_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
@@ -17999,15 +17999,15 @@ public final class EntityData {
       "\023EntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.Sto" +
       "reType\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeIn" +
       "tegerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\003B\002\020\001" +
-      "*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 ",
+      "*\t\010\210\'\020\200\200\200\200\002\"\341\001\n\013GlobalStore\022\027\n\006entity\030\001 ",
       "\003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n" +
       "\017component_class\030\003 \003(\t\022\026\n\016next_entity_id" +
-      "\030\020 \001(\003\022\033\n\017freed_entity_id\030\021 \003(\003B\002\020\001\022\023\n\013p" +
-      "refab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 " +
-      "\003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\t" +
-      "StoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkS" +
-      "toreType\020\002B\'\n\027org.terasology.protobufB\nE" +
-      "ntityDataH\001"
+      "\030\020 \001(\003\022\036\n\022deprecated_data_17\030\021 \003(\003B\002\020\001\022\023" +
+      "\n\013prefab_name\030\022 \003(\t\022/\n\021storeReferenceSet" +
+      "\030\023 \003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*" +
+      "4\n\tStoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016Chu" +
+      "nkStoreType\020\002B\'\n\027org.terasology.protobuf" +
+      "B\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -18097,7 +18097,7 @@ public final class EntityData {
           internal_static_GlobalStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_GlobalStore_descriptor,
-              new java.lang.String[] { "Entity", "Prefab", "ComponentClass", "NextEntityId", "FreedEntityId", "PrefabName", "StoreReferenceSet", });
+              new java.lang.String[] { "Entity", "Prefab", "ComponentClass", "NextEntityId", "DeprecatedData17", "PrefabName", "StoreReferenceSet", });
           return null;
         }
       };

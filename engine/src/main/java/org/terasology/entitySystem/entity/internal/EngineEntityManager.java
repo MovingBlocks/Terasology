@@ -95,13 +95,6 @@ public interface EngineEntityManager extends LowLevelEntityManager {
     void setNextId(long id);
 
     /**
-     * A list of freed ids. This is used when persisting the entity manager's state
-     *
-     * @return A list of freed ids that are available for reuse.
-     */
-    TLongSet getFreedIds();
-
-    /**
      * Removes all entities from the entity manager and resets its state.
      */
     void clear();

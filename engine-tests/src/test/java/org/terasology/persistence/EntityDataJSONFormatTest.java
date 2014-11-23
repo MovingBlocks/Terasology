@@ -69,19 +69,6 @@ public class EntityDataJSONFormatTest {
     }
 
     @Test
-    public void testPersistFreedIds() throws Exception {
-        worldBuilder.addFreedEntityId(1);
-        assertPersist(worldBuilder);
-    }
-
-    @Test
-    public void testPersistMultipleFreedIds() throws Exception {
-        worldBuilder.addFreedEntityId(1);
-        worldBuilder.addFreedEntityId(2);
-        assertPersist(worldBuilder);
-    }
-
-    @Test
     public void testPersistEmptyEntity() throws Exception {
         EntityData.Entity entity = entityBuilder.build();
         worldBuilder.addEntity(entity);
