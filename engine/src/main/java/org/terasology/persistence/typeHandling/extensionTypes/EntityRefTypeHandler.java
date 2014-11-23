@@ -36,23 +36,16 @@ import java.util.List;
  */
 public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
 
-    private static ThreadLocal<EntityRefInterceptor> refInterceptor = new ThreadLocal<>();
     private EngineEntityManager entityManager;
 
     public EntityRefTypeHandler(EngineEntityManager engineEntityManager) {
         this.entityManager = engineEntityManager;
     }
 
-    public static void setReferenceInterceptor(EntityRefInterceptor interceptor) {
-        refInterceptor.set(interceptor);
-    }
-
     @Override
     public PersistedData serialize(EntityRef value, SerializationContext context) {
-        if (value.exists()) {
-            if (refInterceptor.get() == null || refInterceptor.get().savingRef(value)) {
-                return context.create(value.getId());
-            }
+        if (value.exists() && value.isPersistent()) {
+            return context.create(value.getId());
         }
         return context.createNull();
     }
@@ -60,10 +53,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     @Override
     public EntityRef deserialize(PersistedData data, DeserializationContext context) {
         if (data.isNumber()) {
-            // TODO If
-            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(data.getAsLong())) {
-                return entityManager.createEntityRefWithId(data.getAsLong());
-            }
+            return entityManager.createEntityRefWithId(data.getAsLong());
         }
         return EntityRef.NULL;
     }
@@ -75,7 +65,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
             if (!ref.exists()) {
                 items.add(0L);
             } else {
-                if (refInterceptor.get() == null || refInterceptor.get().savingRef(ref)) {
+                if (ref.isPersistent()) {
                     items.add((ref).getId());
                 } else {
                     items.add(0L);
@@ -98,11 +88,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         TLongIterator iterator = array.getAsLongArray().iterator();
         while (iterator.hasNext()) {
             long item = iterator.next();
-            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(item)) {
-                result.add(entityManager.createEntityRefWithId(item));
-            } else {
-                result.add(EntityRef.NULL);
-            }
+            result.add(entityManager.createEntityRefWithId(item));
         }
     }
 
@@ -110,27 +96,9 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         TIntIterator iterator = array.getAsIntegerArray().iterator();
         while (iterator.hasNext()) {
             int item = iterator.next();
-            if (refInterceptor.get() == null || refInterceptor.get().loadingRef(item)) {
-                result.add(entityManager.createEntityRefWithId(item));
-            } else {
-                result.add(EntityRef.NULL);
-            }
+            result.add(entityManager.createEntityRefWithId(item));
         }
     }
 
-    public interface EntityRefInterceptor {
-        /**
-         * @param id
-         * @return Whether to complete loading the ref. If false, EntityRef.NULL is used instead.
-         */
-        boolean loadingRef(long id);
-
-        /**
-         * @param ref The entity ref being saved
-         * @return Whether to save this reference
-         */
-        boolean savingRef(EntityRef ref);
-
-    }
 
 }

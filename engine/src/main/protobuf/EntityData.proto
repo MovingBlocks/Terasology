@@ -147,15 +147,6 @@ message RunLengthEncoding8 {
     extensions 5000 to max;
 }
 
-message EntityStoreMetadata {
-    optional StoreType type = 1;
-    optional string storeStringId = 2;
-    repeated int32 storeIntegerId = 3 [packed=true];
-    repeated int64 reference = 4 [packed=true];
-
-    extensions 5000 to max;
-}
-
 message GlobalStore {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;
@@ -164,7 +155,7 @@ message GlobalStore {
     optional int64 next_entity_id = 16;
     repeated int64 deprecated_data_17 = 17 [packed=true];
     repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index
-    repeated EntityStoreMetadata storeReferenceSet = 19;
+    // deprecated repeated entityStoreMetadata deprecated_data_19 = 19;
 
     extensions 5000 to max;
 }

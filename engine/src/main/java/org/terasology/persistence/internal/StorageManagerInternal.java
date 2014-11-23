@@ -97,9 +97,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
-    private TLongObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TLongObjectHashMap<>();
-    private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
-
     private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
@@ -159,9 +156,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
      */
     private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder transactionBuilder, Set<EntityRef> unsavedEntities) {
         GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
-        for (StoreMetadata table : storeMetadata.values()) {
-            globalStoreSaver.addStoreMetadata(table);
-        }
         for (EntityRef entity : unsavedEntities) {
             globalStoreSaver.store(entity);
         }
@@ -177,10 +171,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
                 GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
                 loader.load(store);
-                for (StoreMetadata refTable : loader.getStoreMetadata()) {
-                    storeMetadata.put(refTable.getId(), refTable);
-                    indexStoreMetadata(refTable);
-                }
             }
         }
     }
@@ -217,12 +207,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     public PlayerStore loadPlayerStore(String playerId) {
         EntityData.PlayerStore store = loadPlayerStoreData(playerId);
         if (store != null) {
-            TLongSet validRefs = null;
-            StoreMetadata table = storeMetadata.get(new PlayerStoreId(playerId));
-            if (table != null) {
-                validRefs = table.getExternalReferences();
-            }
-            return new PlayerStoreInternal(playerId, store, validRefs, this, entityManager);
+            return new PlayerStoreInternal(playerId, store, this, entityManager);
         }
         return new PlayerStoreInternal(playerId, this, entityManager);
     }
@@ -316,25 +301,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
-        TLongSet externalRefs = storer.getExternalReferences();
-
-        Vector3i chunkPosition = chunk.getPosition();
 
         ChunkImpl chunkImpl = (ChunkImpl) chunk;
         boolean viaSnapshot = !deactivate;
         if (viaSnapshot) {
             chunkImpl.createSnapshot();
         }
-        CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
-
-        if (externalRefs.size() > 0) {
-            StoreMetadata metadata = new StoreMetadata(new ChunkStoreId(chunkPosition), externalRefs);
-            indexStoreMetadata(metadata);
-        }
-
-        return compressedChunkBuilder;
-
-
+        return new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
     }
 
 
@@ -441,12 +414,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         storer.store(character, PlayerStoreInternal.CHARACTER, deactivate);
         playerEntityStore.setStore(storer.finaliseStore());
 
-
-        TLongSet externalReference = storer.getExternalReferences();
-        if (externalReference.size() > 0) {
-            StoreMetadata metadata = new StoreMetadata(new PlayerStoreId(playerId), externalReference);
-             indexStoreMetadata(metadata);
-        }
         return playerEntityStore.build();
     }
 
@@ -505,15 +472,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         byte[] chunkData = loadCompressedChunk(chunkPos);
         ChunkStore store = null;
         if (chunkData != null) {
-            TLongSet validRefs = null;
-            StoreMetadata table = storeMetadata.get(new ChunkStoreId(chunkPos));
-            if (table != null) {
-                validRefs = table.getExternalReferences();
-            }
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, validRefs, this, entityManager);
+                store = new ChunkStoreInternal(storeData, this, entityManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }
@@ -539,31 +501,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
 
-    private void indexStoreMetadata(StoreMetadata metadata) {
-        storeMetadata.put(metadata.getId(), metadata);
-        TLongIterator iterator = metadata.getExternalReferences().iterator();
-        while (iterator.hasNext()) {
-            long refId = iterator.next();
-            List<StoreMetadata> tables = externalRefHolderLookup.get(refId);
-            if (tables == null) {
-                tables = Lists.newArrayList();
-                externalRefHolderLookup.put(refId, tables);
-            }
-            tables.add(metadata);
-        }
-    }
-
     @Override
     public void onEntityDestroyed(long entityId) {
-        List<StoreMetadata> tables = externalRefHolderLookup.remove(entityId);
-        if (tables != null) {
-            for (StoreMetadata table : tables) {
-                table.getExternalReferences().remove(entityId);
-                if (table.getExternalReferences().isEmpty()) {
-                    storeMetadata.remove(table.getId());
-                }
-            }
-        }
+
     }
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {

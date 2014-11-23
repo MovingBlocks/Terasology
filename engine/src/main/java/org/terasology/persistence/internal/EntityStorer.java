@@ -16,9 +16,7 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Maps;
-import gnu.trove.set.TIntSet;
 import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,7 +25,6 @@ import org.terasology.entitySystem.entity.internal.OwnershipHelper;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.persistence.serializers.EntitySerializer;
 import org.terasology.persistence.serializers.FieldSerializeCheck;
-import org.terasology.persistence.typeHandling.extensionTypes.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
@@ -35,7 +32,7 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
+final class EntityStorer {
 
     private final EngineEntityManager entityManager;
     private final EntitySerializer serializer;
@@ -75,9 +72,7 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
                     }
                 }
             }
-            EntityRefTypeHandler.setReferenceInterceptor(this);
             EntityData.Entity entityData = serializer.serialize(entity, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
-            EntityRefTypeHandler.setReferenceInterceptor(null);
             entityStoreBuilder.addEntity(entityData);
             if (!name.isEmpty()) {
                 entityStoreBuilder.addEntityName(name);
@@ -99,19 +94,4 @@ final class EntityStorer implements EntityRefTypeHandler.EntityRefInterceptor {
         return externalReferences;
     }
 
-    @Override
-    public boolean loadingRef(long id) {
-        return true;
-    }
-
-    @Override
-    public boolean savingRef(EntityRef ref) {
-        if (!ref.isPersistent()) {
-            return false;
-        }
-        if (!storedEntityIds.contains(ref.getId())) {
-            externalReferences.add(ref.getId());
-        }
-        return true;
-    }
 }
