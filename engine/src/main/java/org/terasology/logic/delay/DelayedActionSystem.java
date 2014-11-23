@@ -187,6 +187,8 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
         if (!delayedComponent.isEmpty() && oldWakeUp < newWakeUp) {
             delayedOperationsSortedByTime.remove(oldWakeUp, entity);
             delayedOperationsSortedByTime.put(newWakeUp, entity);
+        } else if (delayedComponent.isEmpty()) {
+            delayedOperationsSortedByTime.remove(oldWakeUp, entity);
         }
         saveOrRemoveComponent(entity, delayedComponent);
     }
@@ -200,6 +202,8 @@ public class DelayedActionSystem extends BaseComponentSystem implements UpdateSu
         if (!periodicActionComponent.isEmpty() && oldWakeUp < newWakeUp) {
             periodicOperationsSortedByTime.remove(oldWakeUp, entity);
             periodicOperationsSortedByTime.put(newWakeUp, entity);
+        } else if (periodicActionComponent.isEmpty()) {
+            periodicOperationsSortedByTime.remove(oldWakeUp, entity);
         }
         saveOrRemoveComponent(entity, periodicActionComponent);
     }
