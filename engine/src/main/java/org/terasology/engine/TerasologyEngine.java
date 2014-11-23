@@ -286,7 +286,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     @Override
-    public void dispose() {
+    public void close() {
 
         /*
          * The engine is shutdown even when running is true for so that terasology gets also properly disposed in
@@ -366,7 +366,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
-        GameThread.setGameThread();
+        GameThread.setToCurrentThread();
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
 
         ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());

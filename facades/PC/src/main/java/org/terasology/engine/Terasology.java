@@ -115,7 +115,7 @@ public final class Terasology {
                     engine.run(new StateMainMenu());
                 }
             } finally {
-                engine.dispose();
+                engine.close();
             }
         } catch (RuntimeException | IOException e) {
 
