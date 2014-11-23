@@ -64,6 +64,18 @@ public class Rect2iTest {
     }
 
     @Test
+    public void testEncompass() {
+        // encompass self
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(5, 5, 47, 57)));
+
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(45, 35, 5, 20)));
+        assertTrue(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 2, 2)));
+
+        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 3, 2)));
+        assertFalse(Rect2i.createFromMinAndSize(5, 5, 47, 57).encompasses(Rect2i.createFromMinAndSize(50, 60, 2, 3)));
+    }
+
+    @Test
     public void testContains() {
         Rect2i a = Rect2i.createFromMinAndMax(0, 0, 0, 0);
         assertTrue(a.contains(0, 0));
