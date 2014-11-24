@@ -65,7 +65,7 @@ public abstract class TerasologyTestingEnvironment {
     private static ModuleManager moduleManager;
     private static AssetManager assetManager;
 
-    private static DisplayEnvironment env;
+    private static HeadlessEnvironment env;
 
     private EngineEntityManager engineEntityManager;
     private ComponentSystemManager componentSystemManager;
@@ -80,7 +80,7 @@ public abstract class TerasologyTestingEnvironment {
         if (!setup) {
             setup = true;
 
-            env = new DisplayEnvironment();
+            env = new HeadlessEnvironment();
             assetManager = CoreRegistry.get(AssetManager.class);
             blockManager = CoreRegistry.get(BlockManager.class);
             config = CoreRegistry.get(Config.class);
