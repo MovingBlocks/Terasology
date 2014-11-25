@@ -70,6 +70,10 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.*;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -110,6 +114,12 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Unable to resolve skin '" + skin + "'";
         }
+    }
+
+    @Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
+    public String enableAutoScreenReloading() {
+        CoreRegistry.get(NUIManager.class).enableAutoReload();
+        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
     }
 
     @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
