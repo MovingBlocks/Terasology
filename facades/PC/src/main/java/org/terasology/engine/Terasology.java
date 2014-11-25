@@ -45,7 +45,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Class providing the main() method for launching Terasology.
+ * Class providing the main() method for launching Terasology as a PC app.
  *
  * Through the following launch arguments default locations to store logs and
  * game saves can be overridden, by using the current directory or a specified

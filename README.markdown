@@ -5,20 +5,20 @@ Terasology
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by aiming for the NPC-helper and caretaker focus from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 
-Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft.
+Terasology is an open source project started by Benjamin "begla" Glatzel to research procedural terrain generation and efficient rendering techniques in Java using the [LWJGL](http://lwjgl.org). The engine uses a block-based voxel-like approach as seen in Minecraft. You can check out his blog at [Moving Blocks!](http://blog.movingblocks.net)
 
-The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out our [Community Portal](http://forum.movingblocks.net/index.php), our blog [Moving Blocks!](http://blog.movingblocks.net), and our [Facebook Page](http://www.facebook.com/pages/Terasology/248329655219905).
+The creators of Terasology are a diverse mix of software developers, game testers, graphic artists, and musicians. Get involved by checking out our [Community Portal](http://forum.terasology.org/index.php), [Facebook Page](http://www.facebook.com/pages/Terasology/248329655219905), [Twitter](https://twitter.com/Terasology), [G+](https://plus.google.com/b/103835217961917018533), or [Reddit](http://www.reddit.com/r/Terasology)
 
 Terasology is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html) and available in source code form at [GitHub](https://github.com/MovingBlocks/Terasology).
 
 Setup
 --------
 
-Terasology requires Java 7, the newer the better - [download it here](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
+Terasology requires Java 7 or 8, the newer the better - [download it here](http://www.java.com/en/download/manual.jsp). Also make sure that your graphics card driver is up to date.
 
 For easy setup (recommended) you can use our launcher - [download it here](https://github.com/MovingBlocks/TerasologyLauncher/releases)
 
-For direct downloads you can get the latest [stable version here](http://jenkins.movingblocks.net/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.movingblocks.net/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
+For direct downloads you can get the latest [stable version here](http://jenkins.terasology.org/job/TerasologyStable/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip) or our cutting-edge develop version [here from our Jenkins](http://jenkins.terasology.org/job/Terasology/lastSuccessfulBuild/artifact/build/distributions/Terasology.zip)
 
 You can use the Windows executable or one of the default launch scripts to start the game. They will setup your Java Virtual Machine to allocate up to 1024 MB of memory. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x [scriptname].sh".
 
@@ -72,7 +72,7 @@ Tools
 
 May move slot or disappear as development continues
 
-* Axe / Pickaxe - Faster right-click removal of some blocks
+* Axe / Pickaxe / Shovel - Faster right-click removal of some blocks
 * Torch - Shiny! Place with left click. Try throwing these in water at night
 * Explosion tool - Big bada boom!
 * Railgun  - Bigger bada boom, in a straight line!
@@ -92,11 +92,11 @@ Press the `grave` key (usually the \` key immediately above `tab`) to show the i
 * hspeed - greatly increase your movement speed
 * hjump - jump really high. Almost like flying - but it isn't. Just jump good.
 * restoreSpeed - normalizes speed (both horizontal and vertical)
-* help "giveBlock" - Shows detailed help on the "giveBlock" command
-* giveBlock "Water" - Gives 16 water blocks
-* giveBlock "Stone" "Stair" 99 - Gives you 99 stone stair blocks
-* giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
-* giveBlock "TNT" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* help giveBlock - Shows detailed help on the "giveBlock" command
+* giveBlock Water - Gives 16 water blocks
+* giveBlock Stone Stair 99 - Gives you 99 stone stair blocks
+* giveBlock Chest - Gives you a Chest block you can place, activate ('E'), put stuff in, break, pick up, place elsewhere, find same stuff in it!
+* giveBlock TNT - Gives you 16 TNT blocks you can place and activate ('E') to blow up
 * listBlocks - Lists all actively used blocks (have been loaded for the world)
 * listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
 * listShapes - Lists the available shapes
@@ -126,7 +126,7 @@ If you want to pull down the source code for a module you can easily do so via G
 
 This fetches the module source for the "Sample" module and the second command fetches any dependencies and updates the IntelliJ project structure so you can see it as a module. Likewise for Eclipse or any other setup you should run any one `gradlew` command to make sure the new module's dependencies have been fetched as well. See [Codebase Structure](https://github.com/MovingBlocks/Terasology/wiki/Codebase-Structure) in the wiki for more.
 
-[![Build Status](http://jenkins.movingblocks.net/job/Terasology/badge/icon)](http://jenkins.movingblocks.net/job/Terasology/)
+[![Build Status](http://jenkins.terasology.org/job/Terasology/badge/icon)](http://jenkins.terasology.org/job/Terasology/)
 [![Dependency Status](https://www.versioneye.com/user/projects/537612b214c1584e82000022/badge.svg)](https://www.versioneye.com/user/projects/537612b214c1584e82000022)
 
 Modules
@@ -138,7 +138,7 @@ Modules must be enabled during world creation by selecting them using the "Modul
 
 As opposed to engine level projects listed under https://github.com/MovingBlocks all modules are listed under a different GitHub organization at https://github.com/Terasology
 
-Here's a list of modules bundled with the game by default (as of this writing anyway - this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.movingblocks.net/view/Modules and you can download updated modules from there if needed.
+Here's a list of modules bundled with the game by default (as of this writing anyway - this line-up will change now and then). It should roughly match this category in Jenkins: http://jenkins.terasology.org/view/Modules and you can download updated modules from there if needed.
 
 * [AlterationEffects](https://github.com/Terasology/AlterationEffects) - module for storing some buff/debuff type effects
 * [AnotherWorld](https://github.com/Terasology/AnotherWorld) - world gen module, includes features like ore placement and caves, used by WoodAndStone's world
@@ -208,7 +208,7 @@ Credits
 
 This is an incomplete list and the team is constantly growing. See also [Dev Team](https://github.com/MovingBlocks/Terasology/wiki/Dev-team) in the wiki but at least one of them is bound to be out of date
 
-Apologies in advance for any omissions, contact [Cervator](http://forum.movingblocks.net/members/cervator.2/) on the forum if you believe you've been missed :-)
+Apologies in advance for any omissions, contact [Cervator](http://forum.terasology.org/members/cervator.2/) on the forum if you believe you've been missed :-)
 
 Contributors
 --------
