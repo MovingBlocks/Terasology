@@ -78,7 +78,7 @@ import java.util.List;
 
 public final class Terasology {
 
-    private static final String[] PRINT_USAGE_FLAGS = {"--help", "-help", "/help", "-h", "/h", "/?"};
+    private static final String[] PRINT_USAGE_FLAGS = {"--help", "-help", "/help", "-h", "/h", "-?", "/?"};
     private static final String USE_CURRENT_DIR_AS_HOME = "-homedir";
     private static final String USE_SPECIFIED_DIR_AS_HOME = "-homedir=";
     private static final String START_HEADLESS = "-headless";
@@ -140,7 +140,7 @@ public final class Terasology {
 
         System.out.println("Usage:");
         System.out.println();
-        System.out.println("    terasology [" + printUsageFlags + "] [" + USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>] [" + START_HEADLESS + "]");
+        System.out.println("    terasology [" + printUsageFlags + "] [" + USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>] [" + START_HEADLESS + "] [" + LOAD_LAST_GAME + "] [" + NO_CRASH_REPORT + "]");
         System.out.println();
         System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
         System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
