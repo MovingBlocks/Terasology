@@ -27,11 +27,6 @@ import org.terasology.engine.modes.GameState;
 public interface GameEngine extends AutoCloseable {
 
     /**
-     * Initialises the engine
-     */
-    void init();
-
-    /**
      * Runs the engine, which will block the thread.
      * Invalid for a disposed engine
      */
@@ -47,6 +42,16 @@ public interface GameEngine extends AutoCloseable {
      * This method should not throw exceptions.
      */
     void close();
+
+    /**
+     * @return Whether the engine has been uninitialized
+     */
+    boolean isUninitialized();
+
+    /**
+     * @return Whether the engine has been initialized
+     */
+    boolean isInitialized();
 
     /**
      * @return Whether the engine is running
