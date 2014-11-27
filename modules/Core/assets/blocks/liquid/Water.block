@@ -30,6 +30,6 @@
     "replacementAllowed" : true,
     "tint" : [0.1, 0.2, 0.2],
     "entity" : {
-        "prefab" : "water"
+        "prefab" : "core:water"
     }
 }
