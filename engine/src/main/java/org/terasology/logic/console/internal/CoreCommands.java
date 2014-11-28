@@ -70,10 +70,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.*;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 /**

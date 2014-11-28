@@ -16,7 +16,11 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -45,7 +49,12 @@ import org.terasology.reflection.metadata.ClassLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
-import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.ControlWidget;
+import org.terasology.rendering.nui.CoreScreenLayer;
+import org.terasology.rendering.nui.NUIManager;
+import org.terasology.rendering.nui.ScreenLayerClosedEvent;
+import org.terasology.rendering.nui.UIScreenLayer;
+import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
@@ -53,8 +62,17 @@ import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.Deque;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
