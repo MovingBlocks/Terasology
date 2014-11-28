@@ -308,7 +308,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         EntityStorer storer = new EntityStorer(entityManager);
         for (EntityRef entityRef : entitiesToSave) {
             if (entityRef.isPersistent()) {
-                storer.store(entityRef, false);
+                storer.store(entityRef, deactivate);
+            } else {
+                if (deactivate) {
+                    entityRef.destroy();
+                }
             }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
