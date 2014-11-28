@@ -16,10 +16,10 @@
 package org.terasology.rendering.nui.internal;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
+import com.google.common.collect.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -46,23 +46,33 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.*;
+import org.terasology.rendering.nui.asset.UIData;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.rendering.nui.layers.hud.HUDScreenLayer;
 
-import java.util.Deque;
-import java.util.Map;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * @author Immortius
  */
 public class NUIManagerInternal extends BaseComponentSystem implements NUIManager {
-
+    private Logger logger = LoggerFactory.getLogger(NUIManagerInternal.class);
     private Deque<UIScreenLayer> screens = Queues.newArrayDeque();
     private HUDScreenLayer hudScreenLayer = new HUDScreenLayer();
     private BiMap<AssetUri, UIScreenLayer> screenLookup = HashBiMap.create();
     private CanvasControl canvas;
     private WidgetLibrary widgetsLibrary;
     private UIWidget focus;
+    private boolean autoReloadEnabled;
+    private Set<AssetUri> autoReloadingScreensUris;
+    private Map<Path, AssetUri> filePathToAssetUriMap;
+    private Map<WatchKey, Path> watchKeyToPathMap;
+    private Set<Path> watchedDirectories;
+    private WatchService autoReloadWatchService;
 
     private boolean forceReleaseMouse;
 
@@ -136,26 +146,38 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
     @Override
     public void closeScreen(AssetUri screenUri) {
+        boolean sendEvents = true;
+        closeScreen(screenUri, sendEvents);
+    }
+
+    private void closeScreen(AssetUri screenUri, boolean sendEvents) {
         UIScreenLayer screen = screenLookup.remove(screenUri);
         if (screen != null) {
             screens.remove(screen);
-            onCloseScreen(screen, screenUri);
+            onCloseScreen(screen, screenUri, sendEvents);
         }
+    }
+
+    private void closeScreenWithoutEvent(AssetUri screenUri) {
+        boolean sendEvents = false;
+        closeScreen(screenUri, sendEvents);
     }
 
     @Override
     public void closeScreen(UIScreenLayer screen) {
         if (screens.remove(screen)) {
             AssetUri screenUri = screenLookup.inverse().remove(screen);
-            onCloseScreen(screen, screenUri);
+            onCloseScreen(screen, screenUri, true);
         }
     }
 
-    private void onCloseScreen(UIScreenLayer screen, AssetUri screenUri) {
+    private void onCloseScreen(UIScreenLayer screen, AssetUri screenUri, boolean sendEvents) {
         screen.onClosed();
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        if (localPlayer != null) {
-            localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
+        if (sendEvents) {
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            if (localPlayer != null) {
+                localPlayer.getClientEntity().send(new ScreenLayerClosedEvent(screenUri));
+            }
         }
     }
 
@@ -194,6 +216,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         UIElement element = Assets.getUIElement(screenUri);
         if (element != null) {
             return pushScreen(element);
+        } else {
+            logger.error("Can't find screen " + screenUri);
         }
         return null;
     }
@@ -349,6 +373,92 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
 
         for (ControlWidget widget : overlays.values()) {
             widget.update(delta);
+        }
+
+        if (autoReloadEnabled) {
+            try {
+                if (autoReloadWatchService == null) {
+                    autoReloadWatchService = FileSystems.getDefault().newWatchService();
+                    // TODO dispose watch service properly. As it is only for debugging it does not matter much.
+                    autoReloadingScreensUris = Sets.newHashSet();
+                    watchedDirectories = Sets.newHashSet();
+                    watchKeyToPathMap = Maps.newHashMap();
+                    filePathToAssetUriMap = Maps.newHashMap();
+                }
+                registerCurrentScreensForAutoReloading();
+                reloadChangedScreens();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    private void registerCurrentScreensForAutoReloading() throws URISyntaxException, IOException {
+        for (AssetUri uri: screenLookup.keySet()) {
+            if (!autoReloadingScreensUris.contains(uri)) {
+                autoReloadingScreensUris.add(uri);
+                List<URL> urls = CoreRegistry.get(AssetManager.class).getAssetURLs(uri);
+                URL firstURL = urls.get(0);
+                Path filePath = Paths.get(firstURL.toURI());
+                Path directory = filePath.getParent();
+                if (!watchedDirectories.contains(directory)) {
+                    watchedDirectories.add(directory);
+                    WatchKey watchKey = directory.register(autoReloadWatchService, StandardWatchEventKinds.ENTRY_MODIFY,
+                            StandardWatchEventKinds.ENTRY_CREATE);
+                    watchKeyToPathMap.put(watchKey, directory);
+                    logger.info("Watching directory {} for screen ui file changes", directory);
+                }
+
+                filePathToAssetUriMap.put(filePath, uri);
+            }
+        }
+    }
+
+    private void reloadChangedScreens() throws InterruptedException {
+        while (true) {
+            WatchKey key = autoReloadWatchService.poll();
+            if (key == null) {
+                return;
+            }
+            Path directory = watchKeyToPathMap.get(key);
+            for (WatchEvent<?> event: key.pollEvents()) {
+                WatchEvent.Kind<?> kind = event.kind();
+                Path relativePath = (Path) event.context();
+                if (kind == StandardWatchEventKinds.OVERFLOW) {
+                    logger.warn("Can't keep up with screen changes");
+                    continue;
+                } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY
+                        || kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                    /*
+                     * Reason for ENTRY_CREATE watching: Create events get also sent at renames.
+                     * Some editors perform a rename when they save to do it atomically
+                     */
+
+                    Path fullPath = directory.resolve(relativePath);
+                    logger.info("File in folder with screens changed: {}", fullPath);
+
+                    AssetUri uri = filePathToAssetUriMap.get(fullPath);
+                    if (uri != null) {
+
+                        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
+                        if (uiData != null) {
+                            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
+
+                            closeScreenWithoutEvent(uri);
+                            pushScreen(uri);
+
+                            logger.info("Reloaded screen {}", uri);
+                        } else {
+                            logger.error("Failed to reload screen {}", uri);
+                        }
+                    }
+                }
+            }
+            key.reset();
         }
     }
 
@@ -511,4 +621,8 @@ public class NUIManagerInternal extends BaseComponentSystem implements NUIManage
         screen.onOpened();
     }
 
+    @Override
+    public void enableAutoReload() {
+        this.autoReloadEnabled = true;
+    }
 }
