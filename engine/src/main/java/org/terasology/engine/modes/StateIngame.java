@@ -69,7 +69,6 @@ public class StateIngame implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
     private NetworkSystem networkSystem;
-    ;
 
     /* GAME LOOP */
     private boolean pauseGame;

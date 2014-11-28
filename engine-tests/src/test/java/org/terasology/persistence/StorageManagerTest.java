@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
+
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -23,7 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
+import org.mockito.Matchers;
 import org.terasology.asset.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
@@ -62,6 +63,7 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.WorldInfo;
 
 import javax.vecmath.Vector3f;
+
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.util.Arrays;
@@ -81,6 +83,9 @@ public class StorageManagerTest {
     public static final String PLAYER_ID = "someId";
     public static final Vector3i CHUNK_POS = new Vector3i(1, 2, 3);
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     private ModuleManager moduleManager;
     private NetworkSystem networkSystem;
     private StorageManagerInternal esm;
@@ -88,9 +93,6 @@ public class StorageManagerTest {
     private Block testBlock;
     private Block testBlock2;
     private EntityRef character;
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
     public void setup() throws Exception {
@@ -113,7 +115,6 @@ public class StorageManagerTest {
                 new ReflectionReflectFactory());
 
         this.character = entityManager.create();
-        EntityRef character = this.character;
         Client client = createClientMock(PLAYER_ID, character);
 
         when(networkSystem.getPlayers()).thenReturn(Arrays.asList(client));
@@ -131,14 +132,14 @@ public class StorageManagerTest {
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
-        
+
         CoreRegistry.put(ChunkProvider.class, mock(ChunkProvider.class));
 
         Game game = mock(Game.class);
         when(game.getTime()).thenReturn(mock(EngineTime.class));
         CoreRegistry.put(Game.class, game);
         BiomeManager biomeManager = mock(BiomeManager.class);
-        when(biomeManager.getBiomes()).thenReturn(Collections.<Biome> emptyList());
+        when(biomeManager.getBiomes()).thenReturn(Collections.<Biome>emptyList());
         CoreRegistry.put(BiomeManager.class, biomeManager);
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
@@ -148,18 +149,18 @@ public class StorageManagerTest {
 
     }
 
-    private Client createClientMock(String clientId, EntityRef character) {
-        EntityRef clientEntity = createClientEntity(character);
+    private Client createClientMock(String clientId, EntityRef charac) {
+        EntityRef clientEntity = createClientEntity(charac);
         Client client = mock(Client.class);
         when(client.getEntity()).thenReturn(clientEntity);
         when(client.getId()).thenReturn(clientId);
         return client;
     }
 
-    private EntityRef createClientEntity(EntityRef character) {
+    private EntityRef createClientEntity(EntityRef charac) {
         ClientComponent clientComponent = new ClientComponent();
         clientComponent.local = true;
-        clientComponent.character = character;
+        clientComponent.character = charac;
         EntityRef clientEntity = entityManager.create(clientComponent);
         return clientEntity;
     }
@@ -225,7 +226,7 @@ public class StorageManagerTest {
         restored.restoreEntities();
         assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
     }
-    
+
 
     @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
@@ -293,7 +294,7 @@ public class StorageManagerTest {
         chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
-        when(chunkProvider.getChunk(Mockito.any(Vector3i.class))).thenReturn(chunk);
+        when(chunkProvider.getChunk(Matchers.any(Vector3i.class))).thenReturn(chunk);
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         boolean storeChunkInZips = true;
 
@@ -318,7 +319,7 @@ public class StorageManagerTest {
     public void entitySurvivesStorageInChunkStore() throws Exception {
         Chunk chunk = new ChunkImpl(CHUNK_POS);
         chunk.setBlock(0, 0, 0, testBlock);
-        chunk.markReady();;
+        chunk.markReady();
         ChunkProvider chunkProvider = mock(ChunkProvider.class);
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);

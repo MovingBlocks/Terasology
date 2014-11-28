@@ -22,7 +22,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.generation.Region;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.time.WorldTime;
 

@@ -15,13 +15,11 @@
  */
 package org.terasology.world.biomes;
 
-import org.terasology.engine.SimpleUri;
-
 /**
  * Represents a Biome that can be used in cases where the real biome is not yet known, i.e.
  * when the chunk containing the requested block is not yet loaded.
  */
-class UnknownBiome implements Biome {
+final class UnknownBiome implements Biome {
 
     public static final UnknownBiome INSTANCE = new UnknownBiome();
 

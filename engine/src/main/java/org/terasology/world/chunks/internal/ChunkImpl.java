@@ -94,7 +94,7 @@ public class ChunkImpl implements Chunk {
     private ChunkMesh[] activeMesh;
     private ChunkMesh[] pendingMesh;
     private AABB[] subMeshAABB;
-    private boolean AdjacentChunksReady;
+    private boolean adjacentChunksReady;
 
     public ChunkImpl(int x, int y, int z) {
         this(new Vector3i(x, y, z));
@@ -562,12 +562,12 @@ public class ChunkImpl implements Chunk {
 
     @Override
     public void setAdjacentChunksReady(boolean value) {
-        this.AdjacentChunksReady = value;
+        this.adjacentChunksReady = value;
     }
 
     @Override
     public boolean areAdjacentChunksReady() {
-        return this.AdjacentChunksReady;
+        return this.adjacentChunksReady;
     }
 
     @Override

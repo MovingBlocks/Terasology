@@ -15,28 +15,13 @@
  */
 package org.terasology.game;
 
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.TerasologyEngine;
-import org.terasology.engine.module.ModuleManager;
-import org.terasology.entitySystem.systems.ComponentSystem;
-import org.terasology.module.Module;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.paths.PathManager;
-import org.terasology.persistence.StorageManager;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.biomes.Biome;
-import org.terasology.world.biomes.BiomeManager;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.BlockFamily;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
