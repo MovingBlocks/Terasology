@@ -17,8 +17,10 @@
   <!-- rule ref="rulesets/java/imports.xml"/> -->
   <!-- <rule ref="rulesets/java/javabeans.xml"/> -->
   <!-- <rule ref="rulesets/java/junit.xml"/> -->
-  <rule ref="rulesets/java/logging-jakarta-commons.xml"/>
-  <rule ref="rulesets/java/logging-java.xml"/>
+  <!-- <rule ref="rulesets/java/logging-jakarta-commons.xml"/> -->
+  <rule ref="rulesets/java/logging-java.xml">
+      <exclude name="GuardLogStatementJavaUtil"/>
+  </rule>
   <rule ref="rulesets/java/migrating.xml"/>
   <!-- <rule ref="rulesets/java/naming.xml"/> -->
   <!-- <rule ref="rulesets/java/optimizations.xml"/> -->
