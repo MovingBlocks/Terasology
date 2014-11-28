@@ -98,7 +98,6 @@ public final class Terasology {
         handleLaunchArguments(args);
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
-            engine.init();
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
                 engine.run(new StateHeadlessSetup());

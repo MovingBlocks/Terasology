@@ -80,7 +80,6 @@ public final class TeraEd extends JWindow {
 
             engine.setHibernationAllowed(false);
             engine.subscribeToStateChange(mainWindow);
-            engine.init();
 
             engine.run(new StateMainMenu());
             engine.close();
