@@ -47,7 +47,7 @@ public class SparseFieldFacetTest extends FieldFacetTest {
 
     @Test
     public void testBoxedGetSetSparse() {
-        facet.set(0, 1, 3, new Integer(64));
+        facet.set(0, 1, 3, Integer.valueOf(64));
         Assert.assertEquals(64.0f, facet.get(0, 1, 3), 0.0);
     }
 

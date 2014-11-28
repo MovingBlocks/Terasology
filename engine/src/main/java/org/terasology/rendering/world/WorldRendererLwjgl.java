@@ -49,7 +49,6 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -412,6 +411,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Renders the world.
      */
+    @Override
     public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
         switch (stereoRenderState) {
             case MONO:
@@ -831,18 +831,22 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
     }
 
+    @Override
     public float getSmoothedPlayerSunlightValue() {
         return smoothedPlayerSunlightValue;
     }
 
+    @Override
     public float getSunlightValue() {
         return getSunlightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
 
+    @Override
     public float getBlockLightValue() {
         return getBlockLightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
 
+    @Override
     public float getRenderingLightValueAt(Vector3f pos) {
         float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
@@ -858,6 +862,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return Math.max(lightValueBlock, lightValueSun);
     }
 
+    @Override
     public float getSunlightValueAt(Vector3f pos) {
         float sunlight = worldProvider.getSunlight(pos) / 15.0f;
         sunlight *= getDaylight();
@@ -865,10 +870,12 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return sunlight;
     }
 
+    @Override
     public float getBlockLightValueAt(Vector3f pos) {
         return worldProvider.getLight(pos) / 15.0f;
     }
 
+    @Override
     public void update(float delta) {
 
         PerformanceMonitor.startActivity("Update Tick");
@@ -935,6 +942,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         lightCamera.getViewingDirection().set(negSunDirection);
     }
 
+    @Override
     public boolean isHeadUnderWater() {
         Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
 
@@ -973,11 +981,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      *
      * @param p The player
      */
+    @Override
     public void setPlayer(LocalPlayer p) {
         player = p;
         updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
     }
 
+    @Override
     public void changeViewDistance(ViewDistance viewingDistance) {
         logger.info("New Viewing Distance: {}", viewingDistance);
         updateChunksInProximity(calculateViewRegion(viewingDistance));
@@ -989,6 +999,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return Region3i.createFromCenterExtents(newChunkPos, new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2));
     }
 
+    @Override
     public ChunkProvider getChunkProvider() {
         return chunkProvider;
     }
@@ -996,6 +1007,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Disposes this world.
      */
+    @Override
     public void dispose() {
         worldProvider.dispose();
         CoreRegistry.get(AudioManager.class).stopAllSounds();
@@ -1004,6 +1016,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * @return true if pregeneration is complete
      */
+    @Override
     public boolean pregenerateChunks() {
         boolean complete = true;
         Vector3i newChunkPos = calcCamChunkOffset();
@@ -1067,38 +1080,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         builder.append("Unready Chunks: ");
         builder.append(statChunkNotReady);
         builder.append("\n");
+        builder.append("Rendered Triangles: ");
+        builder.append(statRenderedTriangles);
+        builder.append("\n");
         return builder.toString();
-    }
-
-    @Override
-    public String toString() {
-        float renderedTriangles = 0.0f;
-        String renderedTrianglesUnit = "";
-
-        if (statRenderedTriangles > 1000000.0f) {
-            renderedTriangles = statRenderedTriangles / 1000000.0f;
-            renderedTrianglesUnit = "mil";
-        } else if (statRenderedTriangles > 1000.0f) {
-            renderedTriangles = statRenderedTriangles / 1000.0f;
-            renderedTrianglesUnit = "k";
-        }
-
-        return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                        + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
-
-                ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
-                worldProvider.getTime().getDays(),
-                DefaultRenderingProcess.getInstance().getExposure(),
-                statDirtyChunks,
-                statIgnoredPhases,
-                statVisibleChunks,
-                renderedTriangles,
-                renderedTrianglesUnit,
-                statChunkMeshEmpty,
-                statChunkNotReady,
-                worldProvider.getSeed(),
-                worldProvider.getTitle()
-        );
     }
 
     public LocalPlayer getPlayer() {
@@ -1109,6 +1094,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return cam.getViewFrustum().intersects(aabb);
     }
 
+    @Override
     public boolean isAABBVisible(AABB aabb) {
         return isAABBVisible(activeCamera, aabb);
     }
@@ -1139,14 +1125,17 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     }
 
+    @Override
     public float getDaylight() {
         return skysphere.getDaylight();
     }
 
+    @Override
     public WorldProvider getWorldProvider() {
         return worldProvider;
     }
 
+    @Override
     public Skysphere getSkysphere() {
         return skysphere;
     }
@@ -1155,27 +1144,33 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return time;
     }
 
+    @Override
     public float getTick() {
         return tick;
     }
 
 
+    @Override
     public BulletPhysics getBulletRenderer() {
         return bulletPhysics;
     }
 
+    @Override
     public Camera getActiveCamera() {
         return activeCamera;
     }
 
+    @Override
     public Camera getLightCamera() {
         return lightCamera;
     }
 
+    @Override
     public WorldRenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
     }
 
+    @Override
     public Vector3f getTint() {
         Vector3f cameraPos = getActiveCamera().getPosition();
         Block block = worldProvider.getBlock(cameraPos);

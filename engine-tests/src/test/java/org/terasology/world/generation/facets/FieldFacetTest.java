@@ -73,31 +73,31 @@ public abstract class FieldFacetTest {
 
     @Test
     public void testBoxedGetSet() {
-        facet.set(0, 1, 3, new Integer(4));
+        facet.set(0, 1, 3, 4f);
         Assert.assertEquals(4.0f, facet.get(0, 1, 3), 0.0);
     }
 
     @Test
     public void testBoxedWorldGetSet() {
-        facet.set(0, 1, 4, new Integer(8));
+        facet.set(0, 1, 4, 8f);
         Assert.assertEquals(8.0f, facet.get(0, 1, 4), 0.0);
     }
 
     @Test
     public void testMixedGetSet1() {
-        facet.set(0, 1, 5, new Integer(16));
+        facet.set(0, 1, 5, 16f);
         Assert.assertEquals(16.0f, facet.getWorld(10, 21, 35), 0.0);
     }
 
     @Test
     public void testMixedGetSet2() {
-        facet.setWorld(24, 35, 46, new Integer(32));
+        facet.setWorld(24, 35, 46, 32f);
         Assert.assertEquals(32.0f, facet.get(14, 15, 16), 0.0);
     }
 
     @Test
     public void testMixedOnBorder() {
-        facet.set(-5, -6, -7, new Integer(64));
+        facet.set(-5, -6, -7, 64f);
         Assert.assertEquals(64.0f, facet.getWorld(5, 14, 23), 0.0);
     }
 

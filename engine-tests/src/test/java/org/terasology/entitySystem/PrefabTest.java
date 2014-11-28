@@ -68,8 +68,6 @@ public class PrefabTest {
         CoreRegistry.put(ModuleManager.class, moduleManager);
         CoreRegistry.put(AssetManager.class, assetManager);
         AssetType.registerAssetTypes(assetManager);
-        URL url = getClass().getClassLoader().getResource("testResources");
-        url = new URL(url.toString().substring(0, url.toString().length() - "testResources".length() - 1));
         assetManager.setAssetFactory(AssetType.PREFAB, new AssetFactory<PrefabData, Prefab>() {
             @Override
             public Prefab buildAsset(AssetUri uri, PrefabData data) {

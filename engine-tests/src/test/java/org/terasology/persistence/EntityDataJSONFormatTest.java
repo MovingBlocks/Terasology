@@ -17,8 +17,10 @@ package org.terasology.persistence;
 
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.persistence.serializers.EntityDataJSONFormat;
 import org.terasology.protobuf.EntityData;
 
@@ -299,11 +301,11 @@ public class EntityDataJSONFormatTest {
 
     private EntityData.GlobalStore persistAndRetrieve(EntityData.GlobalStore world) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos, TerasologyConstants.CHARSET));
         EntityDataJSONFormat.write(world, writer);
         writer.flush();
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        return EntityDataJSONFormat.readWorld(new BufferedReader(new InputStreamReader(bais)));
+        return EntityDataJSONFormat.readWorld(new BufferedReader(new InputStreamReader(bais, TerasologyConstants.CHARSET)));
     }
 
 }

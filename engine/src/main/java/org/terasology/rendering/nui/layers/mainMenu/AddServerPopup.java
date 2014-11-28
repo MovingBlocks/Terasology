@@ -36,7 +36,7 @@ import com.google.common.primitives.Ints;
 public class AddServerPopup extends CoreScreenLayer {
 
     public static final AssetUri ASSET_URI = new AssetUri(AssetType.UI_ELEMENT, "engine:addServerPopup");
-    
+
     @In
     private Config config;
     private UIText nameText;
@@ -60,12 +60,13 @@ public class AddServerPopup extends CoreScreenLayer {
 
                 String name = nameText.getText();
                 String address = addressText.getText();
-                Integer port = Ints.tryParse(portText.getText());
-                
+                Integer portBoxed = Ints.tryParse(portText.getText());
+                int port = (portBoxed != null) ? portBoxed.intValue() : TerasologyConstants.DEFAULT_PORT;
+
                 if (serverInfo == null) {
                     // create new
                     serverInfo = new ServerInfo(name, address, port);
-                    
+
                     config.getNetwork().add(serverInfo);
                 } else {
                     // update existing
@@ -77,7 +78,7 @@ public class AddServerPopup extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
-        
+
         okButton.bindEnabled(new ReadOnlyBinding<Boolean>() {
 
             @Override
@@ -94,7 +95,7 @@ public class AddServerPopup extends CoreScreenLayer {
                 getManager().popScreen();
             }
         });
-        
+
         // copy name to address on ENTER if address is empty
         nameText.subscribe(new ActivateEventListener() {
             @Override
@@ -103,11 +104,11 @@ public class AddServerPopup extends CoreScreenLayer {
                     addressText.setText(nameText.getText());
                     addressText.setCursorPosition(addressText.getText().length());
                 }
-                
+
                 getManager().setFocus(addressText);
             }
         });
-        
+
         // simulate tabbing behavior
         // TODO: replace with NUI tabbing, once available
         addressText.subscribe(new ActivateEventListener() {
@@ -116,7 +117,7 @@ public class AddServerPopup extends CoreScreenLayer {
                 getManager().setFocus(portText);
             }
         });
-        
+
     }
 
     @Override
@@ -132,7 +133,7 @@ public class AddServerPopup extends CoreScreenLayer {
 
         getManager().setFocus(nameText);
     }
-    
+
     @Override
     public void onClosed() {
         super.onClosed();
@@ -140,10 +141,10 @@ public class AddServerPopup extends CoreScreenLayer {
 
     public void setServerInfo(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        
+
         nameText.setText(serverInfo.getName());
         nameText.setCursorPosition(nameText.getText().length());
-        
+
         addressText.setText(serverInfo.getAddress());
         addressText.setCursorPosition(addressText.getText().length());
 

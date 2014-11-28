@@ -16,6 +16,7 @@
 package org.terasology.engine.module;
 
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
@@ -65,7 +66,7 @@ public class ModuleManager {
         metadataReader.registerExtension(IS_GAMEPLAY_EXT, Boolean.TYPE);
         metadataReader.registerExtension(DEFAULT_WORLD_GENERATOR_EXT, String.class);
         Module engineModule;
-        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"))) {
+        try (Reader reader = new InputStreamReader(getClass().getResourceAsStream("/engine-module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = metadataReader.read(reader);
             engineModule = ClasspathModule.create(metadata, getClass(), Module.class);
         } catch (IOException e) {

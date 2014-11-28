@@ -16,6 +16,8 @@
 package org.terasology.testUtil;
 
 import com.google.common.collect.Sets;
+
+import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.module.ClasspathModule;
 import org.terasology.module.ModuleMetadata;
@@ -34,7 +36,7 @@ public final class ModuleManagerFactory {
 
     public static ModuleManager create() throws Exception {
         ModuleManager moduleManager = new ModuleManager();
-        try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"))) {
+        try (Reader reader = new InputStreamReader(ModuleManagerFactory.class.getResourceAsStream("/module.txt"), TerasologyConstants.CHARSET)) {
             ModuleMetadata metadata = new ModuleMetadataReader().read(reader);
             moduleManager.getRegistry().add(ClasspathModule.create(metadata, ModuleManagerFactory.class));
         }
