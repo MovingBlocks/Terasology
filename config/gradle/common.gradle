@@ -63,6 +63,9 @@ checkstyle {
 pmd {
     ignoreFailures = true
     ruleSetFiles = files("$rootDir/config/pmd/pmd.xml")
+    // by default, gradle uses both ruleset file AND the rulesets. 
+    // We override the ruleSets to use only those from the file 
+    ruleSets = []
 }
 
 findbugs {
