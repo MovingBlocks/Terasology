@@ -327,6 +327,18 @@ public class ColumnLayout extends CoreLayout<LayoutHint> {
         return autoSizeColumns;
     }
 
+    public boolean isFillVerticalSpace() {
+        return fillVerticalSpace;
+    }
+
+    /**
+     * @param fillVerticalSpace true if the vertical space of the canvas should be filled.
+     *        The elements are centered vertically otherwise.
+     */
+    public void setFillVerticalSpace(boolean fillVerticalSpace) {
+        this.fillVerticalSpace = fillVerticalSpace;
+    }
+
     public void setAutoSizeColumns(boolean autoSizeColumns) {
         this.autoSizeColumns = autoSizeColumns;
     }

@@ -46,14 +46,37 @@ public class ColumnLayoutTest {
     public void setup() {
         columnLayout = new ColumnLayout();
 
-        canvas = mock(Canvas.class);
-
         itemAt1x1 = mock(UIWidget.class);
         itemAt2x1 = mock(UIWidget.class);
         itemAt3x1 = mock(UIWidget.class);
         itemAt1x2 = mock(UIWidget.class);
         itemAt2x2 = mock(UIWidget.class);
         itemAt3x2 = mock(UIWidget.class);
+
+        canvas = mock(Canvas.class);
+
+        //    +-----------------------------------+  +---+  +-------+
+        //    |                                   |  |2x1|  |       |
+        //    |               1x1                 |  +---+  |  3x1  |
+        //    |                                   |         |       |
+        //    +-----------------------------------+         +-------+
+
+        when(canvas.calculateRestrictedSize(eq(itemAt1x1), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
+        when(canvas.calculateRestrictedSize(eq(itemAt2x1), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
+        when(canvas.calculateRestrictedSize(eq(itemAt3x1), any(Vector2i.class))).thenReturn(new Vector2i(10, 10));
+
+        //    +--------------+  +---+  +--------------+
+        //    |              |  |2x2|  |              |
+        //    |     1x2      |  +---+  |      3x2     |
+        //    |              |         |              |
+        //    +--------------+         +--------------+
+
+        when(canvas.calculateRestrictedSize(eq(itemAt1x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
+        when(canvas.calculateRestrictedSize(eq(itemAt2x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
+        when(canvas.calculateRestrictedSize(eq(itemAt3x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
+
+        Vector2i availableSize = new Vector2i(200, 200);
+        when(canvas.size()).thenReturn(availableSize);
 
         columnLayout.setColumns(3);
         columnLayout.addWidget(itemAt1x1);
@@ -68,26 +91,16 @@ public class ColumnLayoutTest {
     public void testThreeColumnsProportionallySized() throws Exception {
 
         columnLayout.setAutoSizeColumns(false);
+        columnLayout.setFillVerticalSpace(false);
         columnLayout.setColumnWidths(0.5f, 0.2f, 0.3f);
 
-        when(canvas.calculateRestrictedSize(eq(itemAt1x1), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x1), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x1), any(Vector2i.class))).thenReturn(new Vector2i(10, 10));
+        Vector2i result = columnLayout.getPreferredContentSize(canvas, canvas.size());
 
-        when(canvas.calculateRestrictedSize(eq(itemAt1x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-
-        Vector2i availableSize = new Vector2i(200, 200);
-
-        Vector2i result = columnLayout.getPreferredContentSize(canvas, availableSize);
         // This is the size of the first column divided by its ratio.
         // In general, the minimum column size / ratio guarantees the ration
         // and insures that every column has at least as much as its preferred size
         assertEquals(100, result.x);
         assertEquals(20, result.y);
-
-        when(canvas.size()).thenReturn(availableSize);
 
         columnLayout.onDraw(canvas);
 
@@ -110,22 +123,11 @@ public class ColumnLayoutTest {
     public void testThreeColumnsAutosizedMinimallySized() throws Exception {
 
         columnLayout.setAutoSizeColumns(true);
+        columnLayout.setFillVerticalSpace(false);
 
-        when(canvas.calculateRestrictedSize(eq(itemAt1x1), any(Vector2i.class))).thenReturn(new Vector2i(50, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x1), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x1), any(Vector2i.class))).thenReturn(new Vector2i(10, 10));
-
-        when(canvas.calculateRestrictedSize(eq(itemAt1x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-        when(canvas.calculateRestrictedSize(eq(itemAt2x2), any(Vector2i.class))).thenReturn(new Vector2i(5, 5));
-        when(canvas.calculateRestrictedSize(eq(itemAt3x2), any(Vector2i.class))).thenReturn(new Vector2i(20, 10));
-
-        Vector2i availableSize = new Vector2i(200, 200);
-
-        Vector2i result = columnLayout.getPreferredContentSize(canvas, availableSize);
+        Vector2i result = columnLayout.getPreferredContentSize(canvas, canvas.size());
         assertEquals(75, result.x);
         assertEquals(20, result.y);
-
-        when(canvas.size()).thenReturn(availableSize);
 
         columnLayout.onDraw(canvas);
 
