@@ -87,6 +87,8 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
+    private static final int ONE_MEBIBYTE = 1024 * 1024;
+
     private Config config;
     private RenderingConfig renderingConfig;
     private EngineTime time;
@@ -102,12 +104,8 @@ public class TerasologyEngine implements GameEngine {
 
     private boolean hibernationAllowed;
     private boolean gameFocused = true;
-    private final int ONE_MEBIBYTE = 1024 * 1024;
 
     private Deque<EngineSubsystem> subsystems;
-    public Iterable<EngineSubsystem> getSubsystems() {
-        return subsystems;
-    }
 
     public TerasologyEngine(Collection<EngineSubsystem> subsystems) {
 
@@ -152,6 +150,10 @@ public class TerasologyEngine implements GameEngine {
 
         double seconds = 0.001 * totalInitTime.elapsed(TimeUnit.MILLISECONDS);
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
+    }
+
+    public Iterable<EngineSubsystem> getSubsystems() {
+        return subsystems;
     }
 
     /**
@@ -236,7 +238,7 @@ public class TerasologyEngine implements GameEngine {
      * @param clazz The required type, i.e. Time.class
      * @throws IllegalStateException Details the required system that has not been registered.
      */
-    private void verifyRequiredSystemIsRegistered(Class clazz) {
+    private void verifyRequiredSystemIsRegistered(Class<?> clazz) {
         if (CoreRegistry.get(clazz) == null) {
             throw new IllegalStateException(clazz.getSimpleName() + " not registered as a core system.");
         }
@@ -371,7 +373,7 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public boolean isRunning() {
-        return engineState == EngineState.RUNNING ;
+        return engineState == EngineState.RUNNING;
     }
 
     @Override
