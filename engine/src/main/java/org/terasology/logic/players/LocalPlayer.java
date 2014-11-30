@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.players;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -24,15 +25,14 @@ import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.registry.CoreRegistry;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

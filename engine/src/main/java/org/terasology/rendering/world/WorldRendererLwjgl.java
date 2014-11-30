@@ -36,6 +36,8 @@ import org.terasology.math.AABB;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.registry.CoreRegistry;
@@ -59,9 +61,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -16,8 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import javax.vecmath.Vector3f;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -43,6 +41,7 @@ import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;

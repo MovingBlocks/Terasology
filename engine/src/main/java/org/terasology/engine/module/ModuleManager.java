@@ -89,6 +89,7 @@ public class ModuleManager {
         moduleSecurityManager = new ModuleSecurityManager();
         // TODO: This one org.terasology entry is a hack and needs a proper fix
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("org.terasology.world.biomes");
+        moduleSecurityManager.getBasePermissionSet().addAPIPackage("org.terasology.math.geom");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.lang");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.lang.ref");
         moduleSecurityManager.getBasePermissionSet().addAPIPackage("java.math");

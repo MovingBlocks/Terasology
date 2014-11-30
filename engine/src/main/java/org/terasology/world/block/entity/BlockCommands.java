@@ -34,6 +34,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -44,8 +45,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
-
-import javax.vecmath.Vector3f;
 
 import java.util.Collections;
 import java.util.Iterator;

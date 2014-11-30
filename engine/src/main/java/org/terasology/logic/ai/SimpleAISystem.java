@@ -29,13 +29,12 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.geom.AxisAngle4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

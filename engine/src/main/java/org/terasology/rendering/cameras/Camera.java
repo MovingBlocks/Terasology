@@ -18,9 +18,8 @@ package org.terasology.rendering.cameras;
 import org.terasology.config.Config;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides global access to fonts.

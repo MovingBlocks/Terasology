@@ -17,16 +17,18 @@ package org.terasology.rendering.assets.mesh;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.module.Module;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

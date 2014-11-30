@@ -17,14 +17,14 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.AxisAngle4f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.CoreChunk;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 import java.util.Map;
 
 /**

@@ -18,7 +18,8 @@ package org.terasology.math;
 
 import com.google.common.collect.Maps;
 
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
+
 import java.util.EnumMap;
 
 /**

@@ -24,9 +24,8 @@ import org.terasology.audio.StaticSound;
 import org.terasology.audio.StaticSoundData;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Null implementation of the AudioManager

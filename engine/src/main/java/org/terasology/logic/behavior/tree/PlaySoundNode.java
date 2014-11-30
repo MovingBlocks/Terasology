@@ -20,11 +20,10 @@ import org.terasology.asset.AssetUri;
 import org.terasology.audio.AudioEndListener;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.StaticSound;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.properties.OneOf;
 import org.terasology.rendering.nui.properties.Range;
-
-import javax.vecmath.Vector3f;
 
 /**
  * <b>Properties</b>: <b>sound</b>, <b>volume</b><br/>

@@ -39,6 +39,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.Game;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
@@ -61,8 +62,6 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.WorldInfo;
-
-import javax.vecmath.Vector3f;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Files;

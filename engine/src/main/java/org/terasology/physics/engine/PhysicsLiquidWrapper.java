@@ -18,11 +18,12 @@ package org.terasology.physics.engine;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
+
+import org.terasology.math.VecMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -76,8 +77,8 @@ public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
         }
 
         @Override
-        public Vector3f getCollisionOffset() {
-            return offset;
+        public javax.vecmath.Vector3f getCollisionOffset() {
+            return VecMath.to(offset);
         }
 
         @Override

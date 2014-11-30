@@ -18,7 +18,9 @@ package org.terasology.rendering.nui.properties;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.terasology.engine.SimpleUri;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
 import org.terasology.reflection.metadata.DefaultClassMetadata;
@@ -33,7 +35,6 @@ import org.terasology.rendering.nui.widgets.UIDropdown;
 import org.terasology.rendering.nui.widgets.UISlider;
 import org.terasology.rendering.nui.widgets.UITextEntry;
 
-import javax.vecmath.Vector3f;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;

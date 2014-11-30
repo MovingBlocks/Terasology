@@ -17,12 +17,13 @@ package org.terasology.world.block.shapes;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
+
 import org.terasology.asset.AssetData;
 import org.terasology.math.Side;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
-import javax.vecmath.Vector3f;
 import java.util.EnumMap;
 
 /**

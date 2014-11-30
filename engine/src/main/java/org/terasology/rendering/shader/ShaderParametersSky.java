@@ -19,14 +19,13 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
+import org.terasology.math.geom.Vector3d;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 /**
  * Parameters for the sky shader program.

@@ -18,6 +18,7 @@ package org.terasology.world.block;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -27,7 +28,12 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VecMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
@@ -38,10 +44,6 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.ChunkConstants;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.Map;
 
 /**
@@ -564,12 +566,12 @@ public final class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        Transform t = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), offset, 1.0f));
-        Vector3f min = new Vector3f();
-        Vector3f max = new Vector3f();
+        Transform t = new Transform(new javax.vecmath.Matrix4f(new javax.vecmath.Quat4f(0, 0, 0, 1), VecMath.to(offset), 1.0f));
+        javax.vecmath.Vector3f min = new javax.vecmath.Vector3f();
+        javax.vecmath.Vector3f max = new javax.vecmath.Vector3f();
         shape.getAabb(t, min, max);
 
-        bounds = AABB.createMinMax(min, max);
+        bounds = AABB.createMinMax(VecMath.from(min), VecMath.from(max));
     }
 
     public CollisionShape getCollisionShape() {

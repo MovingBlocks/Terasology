@@ -15,14 +15,15 @@
  */
 package org.terasology.math;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 
-import javax.vecmath.Quat4f;
 import java.util.List;
+
+import org.terasology.math.geom.Quat4f;
 
 /**
  * Rotation provides easy access to 90 degree increments of rotations - intended for block-related rotations.

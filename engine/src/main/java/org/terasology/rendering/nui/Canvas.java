@@ -19,6 +19,8 @@ import org.terasology.asset.AssetUri;
 import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -26,9 +28,6 @@ import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.skin.UISkin;
 import org.terasology.rendering.nui.skin.UIStyle;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * Canvas provides primitive drawing operations for use by the UI.

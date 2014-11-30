@@ -19,6 +19,7 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
+
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,11 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.AxisAngle4f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -46,10 +52,6 @@ import org.terasology.rendering.opengl.OpenGLMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Map;
@@ -260,7 +262,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 location.getWorldPosition(worldPos);
                 float worldScale = location.getWorldScale();
 
-                Matrix4f matrixWorldSpace = new Matrix4f(worldRot, worldPos, worldScale);
+                javax.vecmath.Matrix4f matrixWorldSpace = new javax.vecmath.Matrix4f(VecMath.to(worldRot), VecMath.to(worldPos), worldScale);
                 transWorldSpace.set(matrixWorldSpace);
 
                 Vector3f worldPositionCameraSpace = new Vector3f();

@@ -35,6 +35,7 @@ import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.particles.BlockParticleEffectComponent;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
@@ -51,8 +52,6 @@ import org.terasology.world.block.items.BlockItemFactory;
 import org.terasology.world.block.items.OnBlockToItem;
 import org.terasology.world.block.regions.ActAsBlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Event handler for events affecting block entities

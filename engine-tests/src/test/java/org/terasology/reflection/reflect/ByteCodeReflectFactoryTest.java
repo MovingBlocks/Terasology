@@ -21,8 +21,7 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.location.LocationComponent;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

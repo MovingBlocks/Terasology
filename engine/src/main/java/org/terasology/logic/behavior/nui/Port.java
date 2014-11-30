@@ -19,13 +19,12 @@ import org.terasology.asset.Assets;
 import org.terasology.input.MouseInput;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
 import org.terasology.rendering.nui.InteractionListener;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Represents a port at a RenderableNode. There are several types of ports:

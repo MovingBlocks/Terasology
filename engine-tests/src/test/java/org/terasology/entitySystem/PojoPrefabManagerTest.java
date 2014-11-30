@@ -30,6 +30,8 @@ import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.entitySystem.prefab.internal.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.mathTypes.Quat4fTypeHandler;
 import org.terasology.persistence.typeHandling.mathTypes.Vector3fTypeHandler;
@@ -38,9 +40,6 @@ import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

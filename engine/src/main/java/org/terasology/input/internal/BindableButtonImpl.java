@@ -29,8 +29,7 @@ import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
 import org.terasology.math.Vector3i;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 import java.util.List;
 import java.util.Set;

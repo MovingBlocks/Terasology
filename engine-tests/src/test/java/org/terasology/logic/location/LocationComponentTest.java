@@ -15,17 +15,16 @@
  */
 package org.terasology.logic.location;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.testUtil.TeraAssert;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

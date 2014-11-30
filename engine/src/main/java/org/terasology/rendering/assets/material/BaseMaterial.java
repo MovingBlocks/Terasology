@@ -17,15 +17,15 @@ package org.terasology.rendering.assets.material;
 
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 
 public abstract class BaseMaterial extends AbstractAsset<MaterialData> implements Material {

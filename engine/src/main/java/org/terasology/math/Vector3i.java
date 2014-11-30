@@ -15,8 +15,9 @@
  */
 package org.terasology.math;
 
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3d;
+import org.terasology.math.geom.Vector3f;
+
 import java.io.Serializable;
 
 /**
@@ -24,7 +25,7 @@ import java.io.Serializable;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class Vector3i extends javax.vecmath.Vector3i implements Serializable {
+public class Vector3i extends org.terasology.math.geom.Vector3i implements Serializable {
     private static final long serialVersionUID = -1965792038041767639L;
 
     /**

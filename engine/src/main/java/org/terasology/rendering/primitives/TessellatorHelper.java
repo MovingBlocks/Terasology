@@ -15,11 +15,10 @@
  */
 package org.terasology.rendering.primitives;
 
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.module.sandbox.API;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 @API
 public final class TessellatorHelper {

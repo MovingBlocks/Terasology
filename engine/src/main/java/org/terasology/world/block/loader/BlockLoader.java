@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -38,6 +39,9 @@ import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
@@ -54,9 +58,6 @@ import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

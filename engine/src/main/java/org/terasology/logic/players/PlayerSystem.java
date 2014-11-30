@@ -17,6 +17,7 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Lists;
+
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -32,6 +33,8 @@ import org.terasology.logic.players.event.RespawnRequestEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -50,8 +53,6 @@ import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generator.WorldGenerator;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.Iterator;
 import java.util.List;
 

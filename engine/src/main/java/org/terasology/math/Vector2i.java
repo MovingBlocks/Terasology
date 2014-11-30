@@ -18,8 +18,8 @@ package org.terasology.math;
 
 import com.google.common.base.Preconditions;
 
-import javax.vecmath.Vector2d;
-import javax.vecmath.Vector2f;
+import org.terasology.math.geom.Vector2d;
+import org.terasology.math.geom.Vector2f;
 
 /**
  * A 2-element vector represented by signed integer x,y

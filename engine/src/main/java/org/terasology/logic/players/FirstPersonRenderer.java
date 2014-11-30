@@ -16,6 +16,7 @@
 package org.terasology.logic.players;
 
 import com.google.common.collect.Maps;
+
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -45,9 +49,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;

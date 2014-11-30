@@ -18,14 +18,13 @@ package org.terasology.engine.modes.loadProcesses;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.engine.TerasologyConstants;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.internal.NUIManagerInternal;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-
-import javax.vecmath.Vector4f;
 
 /**
  * @author Immortius

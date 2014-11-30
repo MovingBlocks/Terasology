@@ -18,20 +18,22 @@ package org.terasology.rendering.md5;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.module.Module;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

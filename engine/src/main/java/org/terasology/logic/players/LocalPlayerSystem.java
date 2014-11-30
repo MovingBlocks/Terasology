@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.players;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.asset.AssetUri;
 import org.terasology.config.Config;
 import org.terasology.engine.Time;
@@ -29,7 +30,6 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.binds.interaction.FrobButton;
 import org.terasology.input.binds.inventory.UseItemButton;
 import org.terasology.input.binds.movement.*;
-import org.terasology.input.binds.movement.ToggleSpeedTemporarilyButton;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
@@ -45,6 +45,8 @@ import org.terasology.math.AABB;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.Physics;
 import org.terasology.registry.In;
@@ -58,9 +60,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.regions.BlockRegionComponent;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

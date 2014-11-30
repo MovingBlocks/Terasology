@@ -20,6 +20,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -28,6 +29,9 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.registry.CoreRegistry;
@@ -40,9 +44,6 @@ import org.terasology.world.block.family.*;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.block.shapes.BlockShape;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

@@ -16,7 +16,7 @@
 
 package org.terasology.rendering.logic;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -38,6 +38,11 @@ import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.Location;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.MatrixUtils;
+import org.terasology.math.geom.BaseQuat4f;
+import org.terasology.math.geom.BaseVector3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.In;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
@@ -45,12 +50,6 @@ import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.opengl.OpenGLSkeletalMesh;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.BaseQuat4f;
-import javax.vecmath.BaseVector3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.util.List;

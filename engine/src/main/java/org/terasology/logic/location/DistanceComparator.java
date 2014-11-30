@@ -16,9 +16,8 @@
 package org.terasology.logic.location;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector3f;
 import java.util.Comparator;
 
 /**

@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
@@ -29,6 +30,8 @@ import org.terasology.math.Border;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
@@ -48,8 +51,6 @@ import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UITooltip;
 import org.terasology.rendering.opengl.FrameBufferObject;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;

@@ -17,6 +17,7 @@
 package org.terasology.logic.inventory;
 
 import com.bulletphysics.collision.shapes.BoxShape;
+
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.entitySystem.entity.EntityBuilder;
@@ -26,6 +27,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.events.CollideEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
@@ -37,8 +40,6 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.utilities.random.Random;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemComponent;
-
-import javax.vecmath.Vector3f;
 
 
 @RegisterSystem(RegisterMode.AUTHORITY)
@@ -70,12 +71,12 @@ public class ItemPickupSystem extends BaseComponentSystem {
             mesh.material = Assets.getMaterial("engine:terrain");
         }
         if (blockFamily.getArchetypeBlock().getCollisionShape() instanceof BoxShape && builder.hasComponent(BoxShapeComponent.class)) {
-            Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new Vector3f());
+            javax.vecmath.Vector3f extents = ((BoxShape) blockFamily.getArchetypeBlock().getCollisionShape()).getHalfExtentsWithoutMargin(new javax.vecmath.Vector3f());
             extents.scale(2.0f);
             extents.x = Math.max(extents.x, 0.5f);
             extents.y = Math.max(extents.y, 0.5f);
             extents.z = Math.max(extents.z, 0.5f);
-            builder.getComponent(BoxShapeComponent.class).extents.set(extents);
+            builder.getComponent(BoxShapeComponent.class).extents.set(VecMath.from(extents));
         }
         if (blockFamily.getArchetypeBlock().getLuminance() > 0 && !builder.hasComponent(LightComponent.class)) {
             LightComponent lightComponent = builder.addComponent(new LightComponent());

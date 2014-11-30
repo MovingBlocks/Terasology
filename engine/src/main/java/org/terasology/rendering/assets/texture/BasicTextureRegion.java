@@ -19,8 +19,7 @@ import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
-
-import javax.vecmath.Vector2f;
+import org.terasology.math.geom.Vector2f;
 
 /**
  * @author Immortius

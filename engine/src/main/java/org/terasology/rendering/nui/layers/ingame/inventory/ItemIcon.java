@@ -15,10 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.ingame.inventory;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.asset.Assets;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.assets.texture.TextureRegion;
@@ -35,8 +38,6 @@ import org.terasology.rendering.nui.widgets.TooltipLine;
 import org.terasology.rendering.nui.widgets.TooltipLineRenderer;
 import org.terasology.rendering.nui.widgets.UIList;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 

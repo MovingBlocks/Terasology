@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.internal;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
 import com.google.common.base.Function;
 
 import org.terasology.asset.AssetManager;
@@ -44,6 +44,9 @@ import org.terasology.logic.health.HealthComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
@@ -65,9 +68,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;

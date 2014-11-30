@@ -16,8 +16,8 @@
 package org.terasology.utilities.procedural;
 
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector2f;
 
-import javax.vecmath.Vector2f;
 import java.util.Random;
 
 /**

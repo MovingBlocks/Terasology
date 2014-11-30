@@ -17,6 +17,10 @@
 package org.terasology.logic.characters;
 
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.BaseQuat4f;
+import org.terasology.math.geom.BaseVector3f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -24,11 +28,6 @@ import org.terasology.network.BroadcastEvent;
 import org.terasology.network.NetworkEvent;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
-
-import javax.vecmath.BaseQuat4f;
-import javax.vecmath.BaseVector3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

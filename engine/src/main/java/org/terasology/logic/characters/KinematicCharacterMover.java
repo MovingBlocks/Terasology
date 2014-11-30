@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,16 +30,15 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.AxisAngle4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.

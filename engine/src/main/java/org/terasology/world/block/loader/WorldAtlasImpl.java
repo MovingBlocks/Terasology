@@ -18,9 +18,11 @@ package org.terasology.world.block.loader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.math.IntMath;
+
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectIntProcedure;
+
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import org.terasology.asset.Assets;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.Rect2f;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.atlas.Atlas;
@@ -42,7 +45,7 @@ import org.terasology.rendering.assets.texture.TextureData;
 import org.terasology.rendering.assets.texture.subtexture.SubtextureData;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;

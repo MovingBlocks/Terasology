@@ -19,10 +19,9 @@ package org.terasology.rendering;
 import org.lwjgl.opengl.GL11;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;

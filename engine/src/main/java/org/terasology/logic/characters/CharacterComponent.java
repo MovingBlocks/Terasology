@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -23,11 +24,10 @@ import org.terasology.logic.characters.interactions.InteractionEndPredicted;
 import org.terasology.logic.characters.interactions.InteractionStartPredicted;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * Information common to characters (the physical body of players and creatures)

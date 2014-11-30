@@ -33,19 +33,22 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
+
 import org.terasology.asset.AssetLoader;
 import org.terasology.math.Rotation;
+import org.terasology.math.VecMath;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.module.Module;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,7 +61,7 @@ import java.util.Locale;
  * @author Immortius
  */
 public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
-    private static final BoxShape CUBE_SHAPE = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+    private static final BoxShape CUBE_SHAPE = new BoxShape(new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
     private Gson gson;
 
     public JsonBlockShapeLoader() {
@@ -146,7 +149,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
 
             if (collisionInfo.has(CONVEX_HULL) && collisionInfo.get(CONVEX_HULL).isJsonPrimitive()
                     && collisionInfo.get(CONVEX_HULL).getAsJsonPrimitive().isBoolean()) {
-                ObjectArrayList<Vector3f> verts = buildVertList(shape);
+                ObjectArrayList<javax.vecmath.Vector3f> verts = buildVertList(shape);
                 ConvexHullShape convexHull = new ConvexHullShape(verts);
                 shape.setCollisionShape(convexHull);
             } else if (collisionInfo.has(COLLIDERS) && collisionInfo.get(COLLIDERS).isJsonArray()
@@ -159,13 +162,13 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             }
         }
 
-        private ObjectArrayList<Vector3f> buildVertList(BlockShapeData shape) {
-            ObjectArrayList<Vector3f> result = new ObjectArrayList<>();
+        private ObjectArrayList<javax.vecmath.Vector3f> buildVertList(BlockShapeData shape) {
+            ObjectArrayList<javax.vecmath.Vector3f> result = new ObjectArrayList<>();
             for (BlockPart part : BlockPart.values()) {
                 BlockMeshPart meshPart = shape.getMeshPart(part);
                 if (meshPart != null) {
                     for (int i = 0; i < meshPart.size(); ++i) {
-                        result.add(meshPart.getVertex(i));
+                        result.add(VecMath.to(meshPart.getVertex(i)));
                     }
                 }
             }
@@ -206,7 +209,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             CompoundShape collisionShape = new CompoundShape();
 
             for (ColliderInfo collider : colliders) {
-                Transform transform = new Transform(new Matrix4f(Rotation.none().getQuat4f(), collider.offset, 1.0f));
+                Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
                 collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);
@@ -223,7 +226,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShapeData> {
             }
             extent.absolute();
 
-            return new ColliderInfo(offset, new BoxShape(extent));
+            return new ColliderInfo(offset, new BoxShape(VecMath.to(extent)));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {

@@ -15,6 +15,51 @@
  */
 package org.terasology.physics.bullet;
 
+import gnu.trove.iterator.TFloatIterator;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.AABB;
+import org.terasology.math.VecMath;
+import org.terasology.math.Vector3i;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.physics.components.RigidBodyComponent;
+import org.terasology.physics.components.TriggerComponent;
+import org.terasology.physics.engine.CharacterCollider;
+import org.terasology.physics.engine.PhysicsEngine;
+import org.terasology.physics.engine.PhysicsLiquidWrapper;
+import org.terasology.physics.engine.PhysicsSystem;
+import org.terasology.physics.engine.PhysicsWorldWrapper;
+import org.terasology.physics.engine.RigidBody;
+import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CylinderShapeComponent;
+import org.terasology.physics.shapes.HullShapeComponent;
+import org.terasology.physics.shapes.SphereShapeComponent;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
@@ -48,47 +93,6 @@ import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.iterator.TFloatIterator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
-import org.terasology.math.Vector3i;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.HitResult;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.physics.components.RigidBodyComponent;
-import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.engine.CharacterCollider;
-import org.terasology.physics.engine.PhysicsEngine;
-import org.terasology.physics.engine.PhysicsLiquidWrapper;
-import org.terasology.physics.engine.PhysicsSystem;
-import org.terasology.physics.engine.PhysicsWorldWrapper;
-import org.terasology.physics.engine.RigidBody;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CylinderShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.physics.shapes.SphereShapeComponent;
-import org.terasology.registry.CoreRegistry;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Physics engine implementation using TeraBullet (a customised version of JBullet)
@@ -129,9 +133,9 @@ public class BulletPhysics implements PhysicsEngine {
         liquidWrapper = new PhysicsLiquidWrapper(world);
         VoxelWorldShape liquidShape = new VoxelWorldShape(liquidWrapper);
 
-        Matrix4f rot = new Matrix4f();
+        Matrix3f rot = new Matrix3f();
         rot.setIdentity();
-        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(rot));
+        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         BulletRigidBody rigidBody = new BulletRigidBody(blockConsInf);
         rigidBody.rb.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.rb.getCollisionFlags());
@@ -183,8 +187,8 @@ public class BulletPhysics implements PhysicsEngine {
     @Override
     public List<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
         // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
-        BoxShape shape = new BoxShape(area.getExtents());
-        GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.SENSOR_TRIGGER,
+        BoxShape shape = new BoxShape(VecMath.to(area.getExtents()));
+        GhostObject scanObject = createCollider(VecMath.to(area.getCenter()), shape, CollisionFilterGroups.SENSOR_TRIGGER,
                 combineGroups(collisionFilter), CollisionFlags.NO_CONTACT_RESPONSE);
         // This in particular is overkill
         broadphase.calculateOverlappingPairs(dispatcher);
@@ -201,8 +205,9 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups) {
-        Vector3f to = new Vector3f(direction);
+    public HitResult rayTrace(org.terasology.math.geom.Vector3f from1, org.terasology.math.geom.Vector3f direction, float distance, CollisionGroup... collisionGroups) {
+        Vector3f to = new Vector3f(VecMath.to(direction));
+        Vector3f from = VecMath.to(from1);
         to.scale(distance);
         to.add(from);
 
@@ -217,9 +222,14 @@ public class BulletPhysics implements PhysicsEngine {
         if (closest.hasHit()) {
             if (closest.userData instanceof Vector3i) { //We hit a world block
                 final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
-                return new HitResult(entityAt, closest.hitPointWorld, closest.hitNormalWorld, (Vector3i) closest.userData);
+                return new HitResult(entityAt,
+                        VecMath.from(closest.hitPointWorld),
+                        VecMath.from(closest.hitNormalWorld),
+                        (Vector3i) closest.userData);
             } else if (closest.userData instanceof EntityRef) { //we hit an other entity
-                return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
+                return new HitResult((EntityRef) closest.userData,
+                        VecMath.from(closest.hitPointWorld),
+                        VecMath.from(closest.hitNormalWorld));
             } else { //we hit something we don't understand, assume its nothing and log a warning
                 logger.warn("Unidentified object was hit in the physics engine: {}", closest.userData);
                 return new HitResult();
@@ -278,10 +288,10 @@ public class BulletPhysics implements PhysicsEngine {
                 newRigidBody(entity);
             } else {
                 if (!rigidBody.rb.getAngularFactor().equals(rb.angularFactor)) {
-                    rigidBody.rb.setAngularFactor(rb.angularFactor);
+                    rigidBody.rb.setAngularFactor(VecMath.to(rb.angularFactor));
                 }
                 if (!rigidBody.rb.getLinearFactor().equals(rb.linearFactor)) {
-                    rigidBody.rb.setLinearFactor(rb.linearFactor);
+                    rigidBody.rb.setLinearFactor(VecMath.to(rb.linearFactor));
                 }
                 rigidBody.rb.setFriction(rb.friction);
             }
@@ -337,7 +347,9 @@ public class BulletPhysics implements PhysicsEngine {
                 discreteDynamicsWorld.removeCollisionObject(triggerObj);
                 newTrigger(entity);
             } else {
-                triggerObj.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
+                Quat4f worldRotation = VecMath.to(location.getWorldRotation());
+                Vector3f worldPosition = VecMath.to(location.getWorldPosition());
+                triggerObj.setWorldTransform(new Transform(new Matrix4f(worldRotation, worldPosition, 1.0f)));
             }
             return true;
         } else {
@@ -389,10 +401,10 @@ public class BulletPhysics implements PhysicsEngine {
     }
 
     @Override
-    public void awakenArea(Vector3f pos, float radius) {
-        Vector3f min = new Vector3f(pos);
+    public void awakenArea(org.terasology.math.geom.Vector3f pos, float radius) {
+        Vector3f min = new Vector3f(VecMath.to(pos));
         min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
-        Vector3f max = new Vector3f(pos);
+        Vector3f max = new Vector3f(VecMath.to(pos));
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
         discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
@@ -418,7 +430,7 @@ public class BulletPhysics implements PhysicsEngine {
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
             PairCachingGhostObject triggerObj = createCollider(
-                    location.getWorldPosition(),
+                    VecMath.to(location.getWorldPosition()),
                     shape,
                     StandardCollisionGroup.SENSOR.getFlag(),
                     combineGroups(detectGroups),
@@ -453,7 +465,7 @@ public class BulletPhysics implements PhysicsEngine {
         if (locComp == null || movementComp == null) {
             throw new IllegalArgumentException("Expected an entity with a Location component and CharacterMovementComponent.");
         }
-        Vector3f pos = locComp.getWorldPosition();
+        Vector3f pos = VecMath.to(locComp.getWorldPosition());
         final float worldScale = locComp.getWorldScale();
         final float height = (movementComp.height - 2 * movementComp.radius) * worldScale;
         final float width = movementComp.radius * worldScale;
@@ -481,8 +493,8 @@ public class BulletPhysics implements PhysicsEngine {
             RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.setUserPointer(entity);
-            collider.rb.setAngularFactor(rigidBody.angularFactor);
-            collider.rb.setLinearFactor(rigidBody.linearFactor);
+            collider.rb.setAngularFactor(VecMath.to(rigidBody.angularFactor));
+            collider.rb.setLinearFactor(VecMath.to(rigidBody.linearFactor));
             collider.rb.setFriction(rigidBody.friction);
             collider.collidesWith = combineGroups(rigidBody.collidesWith);
             updateKinematicSettings(rigidBody, collider);
@@ -600,7 +612,7 @@ public class BulletPhysics implements PhysicsEngine {
     private ConvexShape getShapeFor(EntityRef entity) {
         BoxShapeComponent box = entity.getComponent(BoxShapeComponent.class);
         if (box != null) {
-            Vector3f halfExtents = new Vector3f(box.extents);
+            Vector3f halfExtents = new Vector3f(VecMath.to(box.extents));
             halfExtents.scale(0.5f);
             return new BoxShape(halfExtents);
         }
@@ -714,7 +726,7 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    public static class BulletRigidBody implements RigidBody {
+    private static class BulletRigidBody implements RigidBody {
 
         public final com.bulletphysics.dynamics.RigidBody rb;
         public short collidesWith;
@@ -727,75 +739,87 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public void applyImpulse(Vector3f impulse) {
-            pendingImpulse.add(impulse);
+        public void applyImpulse(org.terasology.math.geom.Vector3f impulse) {
+            pendingImpulse.add(VecMath.to(impulse));
         }
 
         @Override
-        public void applyForce(Vector3f force) {
-            pendingForce.add(force);
+        public void applyForce(org.terasology.math.geom.Vector3f force) {
+            pendingForce.add(VecMath.to(force));
         }
 
         @Override
-        public void translate(Vector3f translation) {
-            rb.translate(translation);
+        public void translate(org.terasology.math.geom.Vector3f translation) {
+            rb.translate(VecMath.to(translation));
         }
 
         @Override
-        public Quat4f getOrientation(Quat4f out) {
-            return rb.getOrientation(out);
+        public org.terasology.math.geom.Quat4f getOrientation(org.terasology.math.geom.Quat4f out) {
+            Quat4f vm = VecMath.to(out);
+            rb.getOrientation(vm);
+            out.set(vm.x, vm.y, vm.z, vm.w);
+            return out;
         }
 
         @Override
-        public Vector3f getLocation(Vector3f out) {
-            return rb.getCenterOfMassPosition(out);
+        public org.terasology.math.geom.Vector3f getLocation(org.terasology.math.geom.Vector3f out) {
+            Vector3f vm = VecMath.to(out);
+            rb.getCenterOfMassPosition(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
         }
 
         @Override
-        public Vector3f getLinearVelocity(Vector3f out) {
-            return rb.getLinearVelocity(out);
+        public org.terasology.math.geom.Vector3f getLinearVelocity(org.terasology.math.geom.Vector3f out) {
+            Vector3f vm = VecMath.to(out);
+            rb.getLinearVelocity(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
         }
 
         @Override
-        public Vector3f getAngularVelocity(Vector3f out) {
-            return rb.getAngularVelocity(out);
+        public org.terasology.math.geom.Vector3f getAngularVelocity(org.terasology.math.geom.Vector3f out) {
+            Vector3f vm = VecMath.to(out);
+            rb.getAngularVelocity(vm);
+            out.set(vm.x, vm.y, vm.z);
+            return out;
         }
 
         @Override
-        public void setLinearVelocity(Vector3f value) {
-            rb.setLinearVelocity(value);
+        public void setLinearVelocity(org.terasology.math.geom.Vector3f value) {
+            rb.setLinearVelocity(VecMath.to(value));
         }
 
         @Override
-        public void setAngularVelocity(Vector3f value) {
-            rb.setAngularVelocity(value);
+        public void setAngularVelocity(org.terasology.math.geom.Vector3f value) {
+            rb.setAngularVelocity(VecMath.to(value));
         }
 
         @Override
-        public void setOrientation(Quat4f orientation) {
+        public void setOrientation(org.terasology.math.geom.Quat4f orientation) {
             rb.getWorldTransform(pooledTransform);
-            pooledTransform.setRotation(orientation);
+            pooledTransform.setRotation(VecMath.to(orientation));
             rb.proceedToTransform(pooledTransform);
         }
 
         @Override
-        public void setLocation(Vector3f location) {
+        public void setLocation(org.terasology.math.geom.Vector3f location) {
             rb.getWorldTransform(pooledTransform);
-            pooledTransform.origin.set(location);
+            pooledTransform.origin.set(VecMath.to(location));
             rb.proceedToTransform(pooledTransform);
         }
 
         @Override
-        public void setVelocity(Vector3f linear, Vector3f angular) {
-            rb.setLinearVelocity(linear);
-            rb.setAngularVelocity(angular);
+        public void setVelocity(org.terasology.math.geom.Vector3f linear, org.terasology.math.geom.Vector3f angular) {
+            rb.setLinearVelocity(VecMath.to(linear));
+            rb.setAngularVelocity(VecMath.to(angular));
         }
 
         @Override
-        public void setTransform(Vector3f location, Quat4f orientation) {
+        public void setTransform(org.terasology.math.geom.Vector3f location, org.terasology.math.geom.Quat4f orientation) {
             rb.getWorldTransform(pooledTransform);
-            pooledTransform.origin.set(location);
-            pooledTransform.setRotation(orientation);
+            pooledTransform.origin.set(VecMath.to(location));
+            pooledTransform.setRotation(VecMath.to(orientation));
             rb.proceedToTransform(pooledTransform);
         }
 
@@ -834,23 +858,23 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public Vector3f getLocation(Vector3f out) {
+        public org.terasology.math.geom.Vector3f getLocation() {
             collider.getWorldTransform(temp);
-            return temp.origin;
+            return new org.terasology.math.geom.Vector3f(temp.origin.x, temp.origin.y, temp.origin.z);
         }
 
         @Override
-        public void setLocation(Vector3f loc) {
+        public void setLocation(org.terasology.math.geom.Vector3f loc) {
             collider.getWorldTransform(temp);
-            temp.origin.set(loc);
+            temp.origin.set(VecMath.to(loc));
             collider.setWorldTransform(temp);
         }
 
         @Override
-        public BulletSweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor) {
-            Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), startPos, 1.0f));
-            Transform endTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), endPos, 1.0f));
-            BulletSweepCallback callback = new BulletSweepCallback(collider, new Vector3f(0, 1, 0), slopeFactor);
+        public BulletSweepCallback sweep(org.terasology.math.geom.Vector3f startPos, org.terasology.math.geom.Vector3f endPos, float allowedPenetration, float slopeFactor) {
+            Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), VecMath.to(startPos), 1.0f));
+            Transform endTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), VecMath.to(endPos), 1.0f));
+            BulletSweepCallback callback = new BulletSweepCallback(collider, new org.terasology.math.geom.Vector3f(0, 1, 0), slopeFactor);
             callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
             callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
             collider.convexSweepTest((ConvexShape) (collider.getCollisionShape()), startTransform, endTransform, callback, allowedPenetration);

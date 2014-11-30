@@ -22,9 +22,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.List;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 
 import com.google.common.collect.Lists;
 

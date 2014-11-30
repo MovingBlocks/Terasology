@@ -19,6 +19,7 @@ import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -34,10 +35,9 @@ import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

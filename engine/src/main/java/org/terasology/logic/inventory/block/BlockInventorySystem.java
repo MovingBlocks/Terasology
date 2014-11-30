@@ -28,14 +28,13 @@ import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.block.items.BlockItemComponent;
 import org.terasology.world.block.items.OnBlockItemPlaced;
 import org.terasology.world.block.items.OnBlockToItem;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

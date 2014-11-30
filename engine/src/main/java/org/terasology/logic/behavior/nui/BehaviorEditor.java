@@ -16,6 +16,7 @@
 package org.terasology.logic.behavior.nui;
 
 import com.google.common.base.Charsets;
+
 import org.terasology.input.MouseInput;
 import org.terasology.logic.behavior.BehaviorNodeComponent;
 import org.terasology.logic.behavior.BehaviorNodeFactory;
@@ -26,6 +27,7 @@ import org.terasology.logic.behavior.asset.BehaviorTreeLoader;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Vector2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
@@ -36,7 +38,6 @@ import org.terasology.rendering.nui.UIWidget;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.layouts.ZoomableLayout;
 
-import javax.vecmath.Vector2f;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

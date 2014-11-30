@@ -17,8 +17,7 @@
 package org.terasology.utilities.procedural;
 
 import org.terasology.math.Rect2i;
-
-import javax.vecmath.Vector2f;
+import org.terasology.math.geom.Vector2f;
 
 /**
  * Computes Brownian noise based on some noise generator.

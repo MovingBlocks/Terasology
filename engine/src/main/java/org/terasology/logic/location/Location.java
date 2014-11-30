@@ -21,9 +21,9 @@ import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.util.Iterator;
 
 /**

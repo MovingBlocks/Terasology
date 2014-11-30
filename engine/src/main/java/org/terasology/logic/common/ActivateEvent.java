@@ -19,8 +19,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

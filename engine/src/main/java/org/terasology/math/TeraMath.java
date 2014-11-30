@@ -16,9 +16,8 @@
 
 package org.terasology.math;
 
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.chunks.ChunkConstants;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Collection of math functions.

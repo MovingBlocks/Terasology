@@ -15,10 +15,8 @@
  */
 package org.terasology.math;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * @author Immortius

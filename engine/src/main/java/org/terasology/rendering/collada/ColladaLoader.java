@@ -34,11 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
 import org.eaxy.Document;
 import org.eaxy.Element;
 import org.eaxy.ElementSet;
@@ -46,6 +41,10 @@ import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;

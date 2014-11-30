@@ -20,8 +20,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.math.geom.Vector3f;
 
-import javax.vecmath.Vector3f;
 import java.util.HashSet;
 import java.util.Set;
 
