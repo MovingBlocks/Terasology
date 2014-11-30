@@ -960,16 +960,6 @@ public class ColladaLoader {
         return floatStrings;
     }
 
-    public static void main(String[] args) {
-        ColladaLoader loader = new ColladaLoader();
-        try {
-            File file = new File("/home/mkienenb/workspaces/keplar-Terasology/ParseCollada/Dwarf_crowd.dae.xml");
-            loader.parseMeshData(new FileInputStream(file));
-        } catch (IOException | ColladaParseException e) {
-            e.printStackTrace();
-        }
-    }
-
     private class Input {
         public String semantic;
         public String sourceName;

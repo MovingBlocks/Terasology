@@ -157,7 +157,7 @@ public final class Rect2i implements Iterable<Vector2i> {
     }
 
     public boolean encompasses(Rect2i other) {
-        return !isEmpty() && other.posX >= posX && other.posY >= posY && other.posX + other.w <= posX + w && other.posY + w <= posY + w;
+        return !isEmpty() && other.posX >= posX && other.posY >= posY && other.posX + other.w <= posX + w && other.posY + other.h <= posY + h;
     }
 
     public boolean overlaps(Rect2i other) {

@@ -26,6 +26,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -72,6 +73,10 @@ public class DebugOverlay extends CoreScreenLayer {
     private UILabel metricsLabel;
 
 
+    @In
+    private StorageManager storageManager;
+
+
     @Override
     public void initialise() {
         bindVisible(new ReadOnlyBinding<Boolean>() {
@@ -87,7 +92,7 @@ public class DebugOverlay extends CoreScreenLayer {
                 @Override
                 public String get() {
                     double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
-                    return String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f",
+                    return String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f MB, max mem: %.2f MB",
                             time.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0);
                 }
             });
@@ -128,12 +133,30 @@ public class DebugOverlay extends CoreScreenLayer {
                         Biome biome = worldProvider.getBiome(blockPos);
                         biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
                     }
-                    return String.format("total vus: %s | worldTime: %.2f | biome: %s",
+                    return String.format("total vus: %s | worldTime: %.3f | biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
-                            worldProvider.getTime().getDays(),
+                            worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
                             biomeId);
                 }
             });
+        }
+        UILabel saveStatusLabel = find("saveStatusLabel", UILabel.class);
+        // clients do not have a storage manager
+        if (saveStatusLabel != null && storageManager != null) {
+            saveStatusLabel.bindText(new ReadOnlyBinding<String>() {
+                @Override
+                public String get() {
+                    return "Saving... ";
+                }
+            });
+            saveStatusLabel.bindVisible(
+                    new ReadOnlyBinding<Boolean>() {
+                        @Override
+                        public Boolean get() {
+                            return storageManager.isSaving();
+                        }
+                    }
+            );
         }
 
         metricsLabel = find("metrics", UILabel.class);

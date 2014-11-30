@@ -1,0 +1,7 @@
+{
+    "template" : true,
+    "categories" : ["soil","soil2"],
+    "hardness" : 90,
+    "mass" : 32,
+    "sounds": "Core:soil"
+}

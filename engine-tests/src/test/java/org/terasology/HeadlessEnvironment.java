@@ -39,7 +39,6 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabData;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.module.DependencyResolver;
-import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleRegistry;
 import org.terasology.module.ResolutionResult;
@@ -64,8 +63,6 @@ import org.terasology.world.block.loader.WorldAtlas;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.shapes.BlockShapeData;
 import org.terasology.world.block.shapes.BlockShapeImpl;
-
-import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -246,7 +243,7 @@ public class HeadlessEnvironment extends Environment {
         // which isn't closed automatically
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         if (storageManager != null) {
-            storageManager.shutdown();
+            storageManager.finishSavingAndShutdown();
         }
 
         CoreRegistry.clear();

@@ -31,8 +31,6 @@ public interface ObjectFacet2D<T> extends WorldFacet2D {
 
     T getWorld(Vector2i pos);
 
-    T[] getInternal();
-
     void set(int x, int y, T value);
 
     void set(Vector2i pos, T value);
@@ -40,6 +38,4 @@ public interface ObjectFacet2D<T> extends WorldFacet2D {
     void setWorld(int x, int y, T value);
 
     void setWorld(Vector2i pos, T value);
-
-    void set(T[] data);
 }

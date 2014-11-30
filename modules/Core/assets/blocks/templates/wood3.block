@@ -1,0 +1,7 @@
+{
+    "template" : true,
+    "categories" : ["wood","wood2","wood3"],
+    "hardness" : 1200,
+    "mass" : 50,
+    "sounds": "Core:wood"
+}

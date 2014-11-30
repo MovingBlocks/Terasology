@@ -44,6 +44,10 @@ public abstract class AbstractClient implements Client {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         if (clientComp != null) {
             clientComp.clientInfo.destroy();
+            /*
+             * The character does not get destroyed here. Instead it gets only deactivated when it gets stored,
+             * so that it's id lives on.
+             */
         }
         clientEntity.destroy();
     }

@@ -44,10 +44,10 @@ import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
 
+import java.util.Collection;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Immortius
@@ -55,7 +55,6 @@ import static org.junit.Assert.fail;
 public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
     private BlockManagerImpl blockManager;
-    private Block air;
     private Block solid;
     private SunlightPropagationRules lightRules;
     private SunlightRegenPropagationRules regenRules;
@@ -70,6 +69,7 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
 
     @Before
+    @Override
     public void setup() throws Exception {
         super.setup();
 
@@ -93,8 +93,6 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
         lightRules = new SunlightPropagationRules(regenWorldView);
         sunlightPropagator = new StandardBatchPropagator(lightRules, lightWorldView);
         propagator = new SunlightRegenBatchPropagator(regenRules, regenWorldView, sunlightPropagator, lightWorldView);
-
-        air = BlockManager.getAir();
     }
 
 
@@ -227,37 +225,42 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
         @Override
         public void setWorldEntity(EntityRef entity) {
+            // do nothing
+        }
 
+        @Override
+        public Collection<Chunk> getAllChunks() {
+            return this.chunks.values();
         }
 
         @Override
         public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
-
+            // do nothing
         }
 
         @Override
         public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener listener) {
-
+            // do nothing
         }
 
         @Override
         public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
-
+            // do nothing
         }
 
         @Override
         public void removeRelevanceEntity(EntityRef entity) {
-
+            // do nothing
         }
 
         @Override
         public void completeUpdate() {
-
+            // do nothing
         }
 
         @Override
         public void beginUpdate() {
-
+            // do nothing
         }
 
         @Override
@@ -277,12 +280,23 @@ public class BetweenChunkPropagationTest extends TerasologyTestingEnvironment {
 
         @Override
         public void dispose() {
-
+            // do nothing
         }
 
         @Override
-        public void purgeChunks() {
+        public void restart() {
+            // do nothing
+        }
 
+        @Override
+        public void shutdown() {
+            // do nothing
+        }
+
+        @Override
+        public void purgeWorld() {
+            // do nothing
         }
     }
+
 }

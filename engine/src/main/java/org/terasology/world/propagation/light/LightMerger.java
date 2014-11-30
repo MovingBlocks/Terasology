@@ -46,6 +46,7 @@ public class LightMerger<T> {
     public LightMerger(GeneratingChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
     }
+    private boolean running = true;
 
     public void beginMerge(final Chunk chunk, final T data) {
         resultFuture = executorService.submit(new Callable<T>() {
@@ -139,11 +140,19 @@ public class LightMerger<T> {
     }
 
     public void shutdown() {
+        running = false;
         executorService.shutdown();
         try {
             executorService.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("Failed to shutdown light merge thread in a timely manner");
+        }
+    }
+
+    public void restart() {
+        if (!running) {
+            executorService = Executors.newSingleThreadExecutor();
+            running = true;
         }
     }
 }

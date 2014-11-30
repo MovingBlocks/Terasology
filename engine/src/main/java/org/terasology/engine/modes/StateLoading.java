@@ -148,6 +148,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseWorld(gameManifest));
+        loadProcesses.add(new EnsureSaveGameConsistency());
         loadProcesses.add(new InitialisePhysics());
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new LoadEntities());
@@ -198,9 +199,10 @@ public class StateLoading implements GameState {
 
     @Override
     public void update(float delta) {
+        GameEngine gameEngine = CoreRegistry.get(GameEngine.class);
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         long startTime = time.getRawTimeInMs();
-        while (current != null && time.getRawTimeInMs() - startTime < 20) {
+        while (current != null && time.getRawTimeInMs() - startTime < 20 && !gameEngine.hasPendingState()) {
             if (current.step()) {
                 popStep();
             }

@@ -15,11 +15,9 @@
  */
 
 {
-    "hardness" : 6,
-    "categories" : ["wood"],
+    "basedOn" : "core:wood",
     "tiles" : {
         "topBottom" : "OakTrunk",
         "sides" : "BirkBark"
-    },
-    "sounds": "Core:wood"
+    }
 }

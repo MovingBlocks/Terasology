@@ -19,6 +19,7 @@ import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius
@@ -29,6 +30,14 @@ public interface World {
 
     void rasterizeChunk(CoreChunk chunk);
 
+    /**
+     * @return a <b>new</b> set containing all facet classes
+     */
+    Set<Class<? extends WorldFacet>> getAllFacets();
+
+    /**
+     * @return a <b>new</b> set containing all named facets
+     */
     Map<String, Class<? extends WorldFacet>> getNamedFacets();
 
     void initialize();

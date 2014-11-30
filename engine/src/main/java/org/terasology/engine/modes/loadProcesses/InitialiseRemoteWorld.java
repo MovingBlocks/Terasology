@@ -32,6 +32,9 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 import org.terasology.world.internal.EntityAwareWorldProvider;
 import org.terasology.world.internal.WorldProviderCoreImpl;
 import org.terasology.world.internal.WorldProviderWrapper;
+import org.terasology.world.sun.BasicCelestialModel;
+import org.terasology.world.sun.CelestialSystem;
+import org.terasology.world.sun.DefaultCelestialSystem;
 
 /**
  * @author Immortius
@@ -62,6 +65,10 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         CoreRegistry.put(WorldProvider.class, worldProvider);
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+
+        DefaultCelestialSystem celestialSystem = new DefaultCelestialSystem(new BasicCelestialModel());
+        CoreRegistry.put(CelestialSystem.class, celestialSystem);
+        CoreRegistry.get(ComponentSystemManager.class).register(celestialSystem);
 
         // Init. a new world
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);

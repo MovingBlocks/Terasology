@@ -16,9 +16,8 @@
 package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
+
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.KHRDebug;
-import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
@@ -31,7 +30,6 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.logic.manager.WorldTimeEventManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
@@ -51,14 +49,11 @@ import org.terasology.rendering.cameras.OculusStereoCamera;
 import org.terasology.rendering.cameras.OrthographicCamera;
 import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
-import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.ChunkView;
-import org.terasology.world.TimerEvent;
-import org.terasology.world.WorldCommands;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
@@ -67,6 +62,7 @@ import org.terasology.world.chunks.RenderableChunk;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -156,9 +152,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /* UPDATING */
     private final ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-    /* EVENTS */
-    private final WorldTimeEventManager worldTimeEventManager;
-
     /* PHYSICS */
     // TODO: Remove physics handling from world renderer
     private final BulletPhysics bulletPhysics;
@@ -190,9 +183,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
         chunkTessellator = new ChunkTessellator(bufferPool);
-        skysphere = new Skysphere(this);
+        skysphere = new Skysphere();
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
-        worldTimeEventManager = new WorldTimeEventManager(worldProvider);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         systemManager = CoreRegistry.get(ComponentSystemManager.class);
@@ -213,8 +205,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
-        initTimeEvents();
     }
 
 
@@ -291,105 +281,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         result.z -= cameraPos.z;
 
         return result.lengthSquared();
-    }
-
-    private Vector3f getPlayerPosition() {
-        if (player != null) {
-            return player.getPosition();
-        }
-        return new Vector3f();
-    }
-
-    /**
-     * Creates the world time events to play the game's soundtrack at specific times.
-     */
-    public void initTimeEvents() {
-        final AudioManager audioManager = CoreRegistry.get(AudioManager.class);
-
-        // SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.1, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heaven"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
-                }
-            }
-        });
-
-        // AFTERNOON
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.25, true) {
-            @Override
-            public void run() {
-                //TODO get beter tck instead afternoon
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
-                }
-            }
-        });
-
-        // SUNSET
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.4, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Sunset"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.6, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
-                }
-            }
-        });
-
-        // NIGHT
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.75, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
-                }
-            }
-        });
-
-        // BEFORE SUNRISE
-        worldTimeEventManager.addWorldTimeEvent(new TimerEvent(0.9, true) {
-            @Override
-            public void run() {
-                if (getPlayerPosition().y < 50) {
-                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
-                } else if (getPlayerPosition().y > 175) {
-                    audioManager.playMusic(Assets.getMusic("engine:Heroes"));
-                } else {
-                    audioManager.playMusic(Assets.getMusic("engine:Resurface"));
-                }
-            }
-        });
     }
 
     /**
@@ -520,6 +411,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Renders the world.
      */
+    @Override
     public void render(DefaultRenderingProcess.StereoRenderState stereoRenderState) {
         switch (stereoRenderState) {
             case MONO:
@@ -938,18 +830,22 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
     }
 
+    @Override
     public float getSmoothedPlayerSunlightValue() {
         return smoothedPlayerSunlightValue;
     }
 
+    @Override
     public float getSunlightValue() {
         return getSunlightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
 
+    @Override
     public float getBlockLightValue() {
         return getBlockLightValueAt(new Vector3f(getActiveCamera().getPosition()));
     }
 
+    @Override
     public float getRenderingLightValueAt(Vector3f pos) {
         float rawLightValueSun = worldProvider.getSunlight(pos) / 15.0f;
         float rawLightValueBlock = worldProvider.getLight(pos) / 15.0f;
@@ -965,6 +861,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return Math.max(lightValueBlock, lightValueSun);
     }
 
+    @Override
     public float getSunlightValueAt(Vector3f pos) {
         float sunlight = worldProvider.getSunlight(pos) / 15.0f;
         sunlight *= getDaylight();
@@ -972,10 +869,12 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return sunlight;
     }
 
+    @Override
     public float getBlockLightValueAt(Vector3f pos) {
         return worldProvider.getLight(pos) / 15.0f;
     }
 
+    @Override
     public void update(float delta) {
 
         PerformanceMonitor.startActivity("Update Tick");
@@ -998,10 +897,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Skysphere");
-        skysphere.update();
-        PerformanceMonitor.endActivity();
-
         if (activeCamera != null) {
             activeCamera.update(delta);
         }
@@ -1010,11 +905,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
             positionLightCamera();
             lightCamera.update(delta);
         }
-
-        // And finally fire any active events
-        PerformanceMonitor.startActivity("Fire Events");
-        worldTimeEventManager.fireWorldTimeEvents();
-        PerformanceMonitor.endActivity();
 
         smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
@@ -1051,6 +941,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         lightCamera.getViewingDirection().set(negSunDirection);
     }
 
+    @Override
     public boolean isHeadUnderWater() {
         Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
 
@@ -1089,11 +980,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      *
      * @param p The player
      */
+    @Override
     public void setPlayer(LocalPlayer p) {
         player = p;
         updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
     }
 
+    @Override
     public void changeViewDistance(ViewDistance viewingDistance) {
         logger.info("New Viewing Distance: {}", viewingDistance);
         updateChunksInProximity(calculateViewRegion(viewingDistance));
@@ -1105,6 +998,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return Region3i.createFromCenterExtents(newChunkPos, new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2));
     }
 
+    @Override
     public ChunkProvider getChunkProvider() {
         return chunkProvider;
     }
@@ -1112,6 +1006,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * Disposes this world.
      */
+    @Override
     public void dispose() {
         worldProvider.dispose();
         CoreRegistry.get(AudioManager.class).stopAllSounds();
@@ -1120,6 +1015,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     /**
      * @return true if pregeneration is complete
      */
+    @Override
     public boolean pregenerateChunks() {
         boolean complete = true;
         Vector3i newChunkPos = calcCamChunkOffset();
@@ -1183,38 +1079,10 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         builder.append("Unready Chunks: ");
         builder.append(statChunkNotReady);
         builder.append("\n");
+        builder.append("Rendered Triangles: ");
+        builder.append(statRenderedTriangles);
+        builder.append("\n");
         return builder.toString();
-    }
-
-    @Override
-    public String toString() {
-        float renderedTriangles = 0.0f;
-        String renderedTrianglesUnit = "";
-
-        if (statRenderedTriangles > 1000000.0f) {
-            renderedTriangles = statRenderedTriangles / 1000000.0f;
-            renderedTrianglesUnit = "mil";
-        } else if (statRenderedTriangles > 1000.0f) {
-            renderedTriangles = statRenderedTriangles / 1000.0f;
-            renderedTrianglesUnit = "k";
-        }
-
-        return String.format("world (db: %d, b: %s, t: %.1f, exposure: %.1f"
-                        + ", dirty: %d, ign: %d, vis: %d, tri: %.1f%s, empty: %d, !rdy: %d, seed: \"%s\", title: \"%s\")",
-
-                ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).getLastRendered(),
-                worldProvider.getTime().getDays(),
-                DefaultRenderingProcess.getInstance().getExposure(),
-                statDirtyChunks,
-                statIgnoredPhases,
-                statVisibleChunks,
-                renderedTriangles,
-                renderedTrianglesUnit,
-                statChunkMeshEmpty,
-                statChunkNotReady,
-                worldProvider.getSeed(),
-                worldProvider.getTitle()
-        );
     }
 
     public LocalPlayer getPlayer() {
@@ -1225,12 +1093,13 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return cam.getViewFrustum().intersects(aabb);
     }
 
+    @Override
     public boolean isAABBVisible(AABB aabb) {
         return isAABBVisible(activeCamera, aabb);
     }
 
     public boolean isChunkValidForRender(RenderableChunk c) {
-        return worldProvider.getLocalView(c.getPosition()) != null;
+        return c.isReady() && c.areAdjacentChunksReady();
     }
 
     public boolean isChunkVisible(Camera cam, RenderableChunk c) {
@@ -1255,14 +1124,17 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     }
 
+    @Override
     public float getDaylight() {
         return skysphere.getDaylight();
     }
 
+    @Override
     public WorldProvider getWorldProvider() {
         return worldProvider;
     }
 
+    @Override
     public Skysphere getSkysphere() {
         return skysphere;
     }
@@ -1271,27 +1143,33 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return time;
     }
 
+    @Override
     public float getTick() {
         return tick;
     }
 
 
+    @Override
     public BulletPhysics getBulletRenderer() {
         return bulletPhysics;
     }
 
+    @Override
     public Camera getActiveCamera() {
         return activeCamera;
     }
 
+    @Override
     public Camera getLightCamera() {
         return lightCamera;
     }
 
+    @Override
     public WorldRenderingStage getCurrentRenderStage() {
         return currentRenderingStage;
     }
 
+    @Override
     public Vector3f getTint() {
         Vector3f cameraPos = getActiveCamera().getPosition();
         Block block = worldProvider.getBlock(cameraPos);

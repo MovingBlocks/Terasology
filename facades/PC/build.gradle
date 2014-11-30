@@ -1,7 +1,6 @@
 // The PC facade is responsible for the primary distribution - a plain Java application runnable on PCs
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config
-apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -61,23 +60,11 @@ jar {
     }
 }
 
-// A configuration for publishing artifacts - TODO: For PC this isn't needed by anything until game distribution is a separate Jenkins job
 configurations {
-    published
+    // for fetching modules for running a server
     modules {
         transitive = false
     }
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar
 }
 
 task runPC(type:JavaExec) {
@@ -100,7 +87,8 @@ task runPC(type:JavaExec) {
     classpath project(':engine').configurations.runtime
 }
 
-task setupServerConfig() {
+// By delaying this task to doLast (the << bit) we don't get the headless server dir set up unless actually wanting it
+task setupServerConfig() << {
     description "Parses parameters passed via Gradle and writes them to the local run-from-source server dir's config.cfg"
     
     def json = new JsonBuilder()
@@ -133,15 +121,15 @@ task setupServerConfig() {
     config.text = json.toPrettyString()
 }
 
-task setupServerModules(type: Sync) {
+task setupServerModules(type: Sync) << {
     description 'Parses "extraModules" - a comma-separated list of modules and puts them into ' + localServerDataPath
 
     if (project.hasProperty('extraModules')) {
         // Grab modules from Artifactory - cheats by declaring them as dependencies
-        extraModules.split(',').each { String module ->
+        extraModules.tokenize(' ,').each { String module ->
             println "Extra module: " + module
             dependencies {
-                modules group: 'org.terasology.modules', name: module, version: '+'
+                modules group: 'org.terasology.modules', name: module, version: '+', changing: 'true'
             }
         }
     }
@@ -230,12 +218,10 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-// Distribute modules - with the option to provide a list of additional modules to include as dependencies
-// Note how in a local developer workspace this might grab more than Core, but in Jenkins always only Core
-// Example command including additional modules: gradlew -PextraModules="Signalling,BlockNetwork"
+// Distribute modules - only grabs Core in Jenkins but locally will grab any present. "Distros" now handle Jenkins packs
 task distModules (type: Sync) {
-    description = "Prepares modules for distribution"
-    //dependsOn distApp
+    description = "Prepares local modules for distribution"
+    dependsOn distApp
     dependsOn rootProject.moduleJars
 
     // So this is probably a hack, but it works ;-) It does not work if it is in distApp, default "into" quirk ?
@@ -244,38 +230,11 @@ task distModules (type: Sync) {
         from "$rootDir/modules/${it.name}/build/libs"
         include "*.jar"
     }
-
-    // If the execution was supplied with an extraModules property then include those modules as well
-    if (project.hasProperty('extraModules')) {
-        extraModules.split(',').each { String dependency ->
-            println "Extra module: " + dependency
-
-            // See if the supplied extra already exists in the local workspace, in that case don't add it again
-            if (findProject(':modules:' + dependency) != null) {
-                println "Found supplied extra $dependency already present in local workspace, ignoring"
-            } else {
-                dependencies {
-                    // TODO: When version handling and promotion is in then we can probably remove "changing"
-                    compile group: 'org.terasology.modules', name: dependency, version: '+', changing: true
-                }
-            }
-        }
-
-        // Note: This causes early resolution of artifacts! Can mess with order of execution/classpath and cause issues
-        // Example: gradlew distApp copyModules -PextraModules="Signalling" fails due to to lacking engine on classpath
-        // But the error goes away if either distApp is removed or this following statement isn't reached
-        configurations.compile.resolvedConfiguration.resolvedArtifacts.each { ResolvedArtifact artifact ->
-            def id = artifact.moduleVersion.id
-            if (id.group == 'org.terasology.modules') {
-                println "Remotely resolved $id.group - $id.name at version $id.version"
-                from artifact.file
-                into("$distsDir/app/modules")
-            }
-        }
-    }
 }
 
-task distAppZip (type: Zip) {
+task distPCZip (type: Zip) {
+    dependsOn distApp
+    dependsOn distModules
     from "$distsDir/app"
     archiveName = "Terasology.zip"
 }
@@ -283,7 +242,7 @@ task distAppZip (type: Zip) {
 task distForLauncher (type: Sync) {
 
     into rootDirDist
-    from distAppZip
+    from distPCZip
 
     into ("../resources/main/org/terasology/version") {
         from ("$rootDir/engine/build/classes/org/terasology/version") {
@@ -303,14 +262,14 @@ idea {
 }
 
 task copyEclipseLauncher(type: Copy) {
-	from "$rootDir/config/eclipse"
-	into projectDir
-	include("Terasology.launch")
+    from "$rootDir/config/eclipse"
+    into projectDir
+    include("Terasology.launch")
 }
 
 tasks.eclipse {
-	dependsOn copyEclipseLauncher
-	dependsOn rootProject.extractNatives
+    dependsOn copyEclipseLauncher
+    dependsOn rootProject.extractNatives
 }
 
 cleanEclipse.doLast {

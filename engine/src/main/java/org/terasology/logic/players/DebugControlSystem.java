@@ -143,10 +143,6 @@ public class DebugControlSystem extends BaseComponentSystem {
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey().getId()) {
-                case Keyboard.KeyId.R:
-                    config.getRendering().getDebug().setWireframe(!config.getRendering().getDebug().isWireframe());
-                    event.consume();
-                    break;
                 case Keyboard.KeyId.K:
                     entity.send(new DoDamageEvent(9999, null));
                     break;
@@ -161,6 +157,10 @@ public class DebugControlSystem extends BaseComponentSystem {
                     break;
                 case Keyboard.KeyId.F8:
                     config.getRendering().getDebug().setRenderChunkBoundingBoxes(!config.getRendering().getDebug().isRenderChunkBoundingBoxes());
+                    event.consume();
+                    break;
+                case Keyboard.KeyId.F9:
+                    config.getRendering().getDebug().setWireframe(!config.getRendering().getDebug().isWireframe());
                     event.consume();
                     break;
                 default:

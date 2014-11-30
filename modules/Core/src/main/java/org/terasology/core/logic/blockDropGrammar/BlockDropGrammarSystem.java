@@ -37,6 +37,7 @@ import org.terasology.world.block.entity.damage.BlockDamageModifierComponent;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
+import java.util.List;
 
 /**
  * @author Marcin Sciesinski <marcins78@gmail.com>
@@ -76,8 +77,22 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
         }
 
         if (random.nextFloat() < chanceOfBlockDrop) {
-            if (blockDrop.blockDrops != null) {
-                for (String drop : blockDrop.blockDrops) {
+            List<String> blockDrops = blockDrop.blockDrops;
+            List<String> itemDrops = blockDrop.itemDrops;
+
+            if (blockDamageModifierComponent != null && blockDrop.droppedWithTool != null) {
+                for (String toolType : blockDamageModifierComponent.materialDamageMultiplier.keySet()) {
+                    if (blockDrop.droppedWithTool.containsKey(toolType)) {
+                        BlockDropGrammarComponent.DropDefinition dropDefinition = blockDrop.droppedWithTool.get(toolType);
+                        blockDrops = dropDefinition.blockDrops;
+                        itemDrops = dropDefinition.itemDrops;
+                        break;
+                    }
+                }
+            }
+
+            if (blockDrops != null) {
+                for (String drop : blockDrops) {
                     String dropResult = drop;
                     boolean dropping = true;
                     int pipeIndex = dropResult.indexOf('|');
@@ -98,8 +113,8 @@ public class BlockDropGrammarSystem extends BaseComponentSystem {
                 }
             }
 
-            if (blockDrop.itemDrops != null) {
-                for (String drop : blockDrop.itemDrops) {
+            if (itemDrops != null) {
+                for (String drop : itemDrops) {
                     String dropResult = drop;
                     boolean dropping = true;
                     int pipeIndex = dropResult.indexOf('|');

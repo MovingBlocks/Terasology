@@ -29,24 +29,17 @@ public abstract class BaseInteractionScreen extends CoreScreenLayer {
     @In
     private LocalPlayer localPlayer;
 
-    private EntityRef previousInteractionTarget;
-
     protected EntityRef getInteractionTarget() {
         EntityRef characterEntity = localPlayer.getCharacterEntity();
         CharacterComponent characterComponent = characterEntity.getComponent(CharacterComponent.class);
 
-        if (previousInteractionTarget != characterComponent.predictedInteractionTarget && characterComponent.predictedInteractionTarget != null) {
-            previousInteractionTarget = characterComponent.predictedInteractionTarget;
-            initializeWithInteractionTarget(previousInteractionTarget);
-        }
-
-        return previousInteractionTarget;
+        return characterComponent.predictedInteractionTarget;
     }
 
     @Override
     public void onOpened() {
         super.onOpened();
-        getInteractionTarget();
+        initializeWithInteractionTarget(getInteractionTarget());
     }
 
     protected abstract void initializeWithInteractionTarget(EntityRef interactionTarget);

@@ -53,15 +53,15 @@ public class FactoryTest {
         BehaviorTreeLoader loader = new BehaviorTreeLoader();
         BehaviorTreeData data = buildSample();
 
-        OutputStream os = new ByteArrayOutputStream(10000);
+        ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
         loader.save(os, data);
-        String jsonExpected = os.toString();
-        data = loader.load(null, new ByteArrayInputStream(jsonExpected.getBytes()), null, null);
+        byte[] jsonExpected = os.toByteArray();
+        data = loader.load(null, new ByteArrayInputStream(jsonExpected), null, null);
         os = new ByteArrayOutputStream(10000);
         loader = new BehaviorTreeLoader();
         loader.save(os, data);
-        String jsonActual = os.toString();
-        Assert.assertEquals(jsonActual, jsonExpected);
+        byte[] jsonActual = os.toByteArray();
+        Assert.assertArrayEquals(jsonActual, jsonExpected);
     }
 
     private BehaviorTreeData buildSample() {

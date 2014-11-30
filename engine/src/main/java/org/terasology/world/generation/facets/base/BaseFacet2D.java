@@ -45,14 +45,14 @@ public class BaseFacet2D implements WorldFacet2D {
 
     protected final int getRelativeIndex(int x, int z) {
         if (!relativeRegion.contains(x, z)) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d) for region %s", x, z, relativeRegion.toString()));
+            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d) for region %s", x, z, relativeRegion.toString()));
         }
         return x - relativeRegion.minX() + relativeRegion.sizeX() * (z - relativeRegion.minY());
     }
 
     protected final int getWorldIndex(int x, int z) {
         if (!worldRegion.contains(x, z)) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d) for region %s", x, z, worldRegion.toString()));
+            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d) for region %s", x, z, worldRegion.toString()));
         }
         return x - worldRegion.minX() + worldRegion.sizeX() * (z - worldRegion.minY());
     }

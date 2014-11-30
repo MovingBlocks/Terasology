@@ -15,7 +15,6 @@
  */
 package org.terasology.world.biomes;
 
-import org.terasology.engine.SimpleUri;
 import org.terasology.module.sandbox.API;
 
 @API

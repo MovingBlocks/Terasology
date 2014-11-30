@@ -44,14 +44,14 @@ public class BaseFacet3D implements WorldFacet3D {
 
     protected final int getRelativeIndex(int x, int y, int z) {
         if (!relativeRegion.encompasses(x, y, z)) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
+            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, relativeRegion.toString()));
         }
         return x - relativeRegion.minX() + relativeRegion.sizeX() * (y - relativeRegion.minY() + relativeRegion.sizeY() * (z - relativeRegion.minZ()));
     }
 
     protected final int getWorldIndex(int x, int y, int z) {
         if (!worldRegion.encompasses(x, y, z)) {
-            throw new ArrayIndexOutOfBoundsException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
+            throw new IllegalArgumentException(String.format("Out of bounds: (%d, %d, %d) for region %s", x, y, z, worldRegion.toString()));
         }
         return x - worldRegion.minX() + worldRegion.sizeX() * (y - worldRegion.minY() + worldRegion.sizeY() * (z - worldRegion.minZ()));
     }

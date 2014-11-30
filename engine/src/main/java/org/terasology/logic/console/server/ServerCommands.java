@@ -32,9 +32,11 @@ import org.terasology.network.ClientInfoComponent;
 import org.terasology.network.ColorComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
+import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * Commands to administer a remote server
@@ -47,7 +49,13 @@ public class ServerCommands extends BaseComponentSystem {
 
     @In
     private EntityManager entityManager;
-    
+
+    @In
+    private StorageManager storageManager;
+
+    @In
+    private ChunkProvider chunkProvider;
+
     @Command(shortDescription = "Shutdown the server", runOnServer = true)
     public String shutdownServer(EntityRef sender) {
 
@@ -134,6 +142,16 @@ public class ServerCommands extends BaseComponentSystem {
         }
         
         return "Request declined";
+    }
+
+    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
+    public void save() {
+        storageManager.requestSaving();
+    }
+
+    @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
+    public void purgeWorld() {
+        chunkProvider.purgeWorld();
     }
 }
 

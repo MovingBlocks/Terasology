@@ -15,6 +15,7 @@
  */
 package org.terasology.core.world.generator.facetProviders;
 
+import org.terasology.core.world.generator.facets.BiomeFacet;
 import org.terasology.core.world.generator.facets.TreeFacet;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Rect2i;
@@ -22,12 +23,7 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector2i;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
-import org.terasology.world.generation.ConfigurableFacetProvider;
-import org.terasology.world.generation.Facet;
-import org.terasology.world.generation.FacetBorder;
-import org.terasology.world.generation.GeneratingRegion;
-import org.terasology.world.generation.Produces;
-import org.terasology.world.generation.Requires;
+import org.terasology.world.generation.*;
 import org.terasology.world.generation.facets.DensityFacet;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
@@ -39,7 +35,8 @@ import org.terasology.world.generation.facets.SurfaceHeightFacet;
 @Requires({@Facet(SeaLevelFacet.class),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
-        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
+        @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
+        @Facet(value = BiomeFacet.class, border = @FacetBorder(bottom = 15, sides = 10))})
 public class TreeProvider implements ConfigurableFacetProvider {
 
     private NoiseTable treeNoise;
@@ -54,7 +51,8 @@ public class TreeProvider implements ConfigurableFacetProvider {
 
     @Override
     public void process(GeneratingRegion region) {
-        TreeFacet facet = new TreeFacet(region.getRegion(), region.getBorderForFacet(TreeFacet.class));
+        Border3D borderForTreeFacet = region.getBorderForFacet(TreeFacet.class);
+        TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 15, 10));
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
         SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
@@ -81,7 +79,7 @@ public class TreeProvider implements ConfigurableFacetProvider {
                         && (z < facet.getWorldRegion().maxZ() && TeraMath.floorToInt(surface.getWorld(x, z + 1)) == height)
                         // and if it selects a % of them
                         && treeNoise.noise(x, z) / 256f < configuration.density) {
-                    facet.setWorld(x, height + 1, z, treeSeedNoise.noise(x, z));
+                    facet.setWorld(x, height + 1, z, Integer.valueOf(treeSeedNoise.noise(x, z)));
                 }
             }
         }

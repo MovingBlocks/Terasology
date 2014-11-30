@@ -1,6 +1,4 @@
-
 // This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
-// The first time this type of sub is added this file is created, but the sub-sub isn't available until next run
 new File(rootDir, 'meta').eachDir { possibleSubprojectDir ->
     def subprojectName = 'meta:' + possibleSubprojectDir.name
     println "Processing meta module $subprojectName, including it as a sub-project"

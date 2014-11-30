@@ -1,0 +1,15 @@
+// This magically allows subdirs in this subproject to themselves become sub-subprojects in a proper tree structure
+new File(rootDir, 'libs').eachDir { possibleSubprojectDir ->
+    def subprojectName = 'libs:' + possibleSubprojectDir.name
+    println "Gradle is reviewing library $subprojectName for possible inclusion in the Gradle project tree"
+    File buildFile = new File(possibleSubprojectDir, "build.gradle")
+    if (buildFile.exists()) {
+        println "Library $subprojectName has a build file so counting it as integratable code and sub-projecting it"
+        include subprojectName
+        def subprojectPath = ':' + subprojectName
+        def subproject = project(subprojectPath)
+        subproject.projectDir = possibleSubprojectDir
+    } else {
+        println "Library dir found without a build.gradle, not including $subprojectName in the Gradle project tree"
+    }
+}

@@ -129,4 +129,5 @@ public final class TaskMaster<T extends Task> {
             running = true;
         }
     }
+
 }

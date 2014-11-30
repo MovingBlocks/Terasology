@@ -104,6 +104,7 @@ public class BiomeManager implements BiomeRegistry {
         return biomeIdMap.inverse().get(biome);
     }
 
+    @Override
     public void registerBiome(Biome biome) {
         String fullId = biome.getId();
 

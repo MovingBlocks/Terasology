@@ -32,7 +32,6 @@ import org.terasology.rendering.opengl.DefaultRenderingProcess.StereoRenderState
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldCommands;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
@@ -71,7 +70,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(noCamera);
         config = CoreRegistry.get(Config.class);
-        CoreRegistry.get(ComponentSystemManager.class).register(new WorldCommands(chunkProvider));
     }
 
     @Override

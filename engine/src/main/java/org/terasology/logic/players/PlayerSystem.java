@@ -128,18 +128,25 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         if (world != null) {
             // try and find somewhere in this chunk a spot to land
             Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
+            //check if generation uses sea level and surfaceheight facets
             SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
             SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
-            int seaLevel = seaLevelFacet.getSeaLevel();
+            if (surfaceHeightFacet != null && seaLevelFacet != null) {
+                int seaLevel = seaLevelFacet.getSeaLevel();
 
-            for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
-                int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
-                if (height > seaLevel) {
-                    pos.y = height;
-                    if (findOpenVerticalPosition(pos)) {
-                        return pos;
+                for (Vector3i pos : ChunkConstants.CHUNK_REGION) {
+                    int height = TeraMath.floorToInt(surfaceHeightFacet.get(pos.x, pos.z));
+                    if (height > seaLevel) {
+                        pos.y = height;
+                        if (findOpenVerticalPosition(pos)) {
+                            return pos;
+                        }
                     }
                 }
+            }
+            Vector3i pos = new Vector3i(spawnPos.x, spawnPos.y, spawnPos.z);
+            if (findOpenVerticalPosition(pos)) {
+                return pos;
             }
         }
         return spawnPos;
@@ -245,9 +252,6 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
     @ReceiveEvent(components = ClientComponent.class)
     public void onDisconnect(DisconnectedEvent event, EntityRef entity) {
         EntityRef character = entity.getComponent(ClientComponent.class).character;
-        if (character.exists()) {
-            event.getPlayerStore().setCharacter(character);
-        }
         removeRelevanceEntity(entity);
     }
 

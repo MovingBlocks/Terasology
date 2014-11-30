@@ -16,6 +16,8 @@
 
 package org.terasology.logic.console;
 
+import org.terasology.logic.permission.PermissionManager;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -46,4 +48,6 @@ public @interface Command {
      * @return Whether this command should be sent to and run on the server.
      */
     boolean runOnServer() default false;
+
+    String requiredPermission() default PermissionManager.OPERATOR_PERMISSION;
 }

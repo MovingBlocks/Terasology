@@ -16,11 +16,12 @@
 package org.terasology.persistence.internal;
 
 import gnu.trove.set.TIntSet;
+import org.terasology.persistence.internal.StoreId;
 
 /**
  * @author Immortius
  */
-final class StoreMetadata {
+public final class StoreMetadata {
     private StoreId id;
     private TIntSet externalReferences;
 

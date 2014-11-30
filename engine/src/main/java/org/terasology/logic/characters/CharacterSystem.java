@@ -16,6 +16,8 @@
 
 package org.terasology.logic.characters;
 
+import javax.vecmath.Vector3f;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -25,15 +27,21 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.characters.events.*;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.characters.events.ActivationRequest;
+import org.terasology.logic.characters.events.ActivationRequestDenied;
+import org.terasology.logic.characters.events.AttackRequest;
+import org.terasology.logic.characters.events.DeathEvent;
+import org.terasology.logic.characters.events.DropItemRequest;
 import org.terasology.logic.characters.interactions.InteractionUtil;
 import org.terasology.logic.common.ActivateEvent;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.inventory.*;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -45,8 +53,6 @@ import org.terasology.physics.events.ImpulseEvent;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -155,16 +161,14 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         }
         EntityRef controller = characterComponent.controller;
 
-        ClientComponent clientComponent =  controller.getComponent(ClientComponent.class);
-        if (characterComponent == null) {
-            return "?";
-        }
+        ClientComponent clientComponent = controller.getComponent(ClientComponent.class);
         EntityRef clientInfo = clientComponent.clientInfo;
 
         DisplayNameComponent displayNameComponent = clientInfo.getComponent(DisplayNameComponent.class);
         if (displayNameComponent == null) {
             return "?";
         }
+
         return displayNameComponent.name;
     }
 
@@ -181,36 +185,42 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
         if (!(vectorsAreAboutEqual(event.getOrigin(), originPos))) {
-            logger.info("Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}", getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
+            String msg = "Player {} seems to have cheated: It stated that it performed an action from {} but the predicted position is {}";
+            logger.info(msg, getPlayerNameFromCharacter(character), event.getOrigin(), originPos);
             return false;
         }
 
         if (event.isOwnedEntityUsage()) {
             if (!event.getUsedOwnedEntity().exists()) {
-                logger.info("Denied activation attempt by {} since the used entity does not exist on the authority", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since the used entity does not exist on the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
             if (!networkSystem.getOwnerEntity(event.getUsedOwnedEntity()).equals(networkSystem.getOwnerEntity(character))) {
-                logger.info("Denied activation attempt by {} since it does not own the entity at the authority", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since it does not own the entity at the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
         } else {
             // check for cheats so that data can later be trusted:
             if (event.getUsedOwnedEntity().exists()) {
-                logger.info("Denied activation attempt by {} since it is not properly marked as owned entity usage", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since it is not properly marked as owned entity usage";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
         }
 
         if (event.isEventWithTarget()) {
             if (!event.getTarget().exists()) {
-                logger.info("Denied activation attempt by {} since the target does not exist on the authority", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since the target does not exist on the authority";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false; // can happen if target existed on client
             }
 
             HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
             if (!result.isHit()) {
-                logger.info("Denied activation attempt by {} since at the authority there was nothing to activate at that place", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since at the authority there was nothing to activate at that place";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
             EntityRef hitEntity = result.getEntity();
@@ -220,22 +230,26 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
                  * server entity dump. When certain fields don't get replicated, then wrong entity might get hin in the
                  * hit test.
                  */
-                logger.info("Denied activation attempt by {} since at the authority another entity would have been activated", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since at the authority another entity would have been activated";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
 
             if (!(vectorsAreAboutEqual(event.getHitPosition(), result.getHitPoint()))) {
-                logger.info("Denied activation attempt by {} since at the authority the object got hit at a differnt position", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since at the authority the object got hit at a differnt position";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
         } else {
             // In order to trust the data later we need to verify it even if it should be correct if no one cheats:
             if (event.getTarget().exists()) {
-                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a target", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a target";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
             if (!(vectorsAreAboutEqual(event.getHitPosition(), originPos))) {
-                logger.info("Denied activation attempt by {} since the event was not properly labeled as having a hit postion", getPlayerNameFromCharacter(character));
+                String msg = "Denied activation attempt by {} since the event was not properly labeled as having a hit postion";
+                logger.info(msg, getPlayerNameFromCharacter(character));
                 return false;
             }
         }
@@ -282,7 +296,7 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
     }
 
     private boolean isDistanceToLarge(LocationComponent characterLocation, LocationComponent targetLocation, float maxInteractionRange) {
-        float maxInteractionRangeSquared = maxInteractionRange*maxInteractionRange;
+        float maxInteractionRangeSquared = maxInteractionRange * maxInteractionRange;
         Vector3f positionDelta = new Vector3f();
         positionDelta.add(characterLocation.getWorldPosition());
         positionDelta.sub(targetLocation.getWorldPosition());

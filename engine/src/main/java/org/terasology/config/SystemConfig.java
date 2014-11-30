@@ -23,10 +23,10 @@ public class SystemConfig {
     private long dayNightLengthInMs = 1800000;
     private int maxThreads = 2;
     private int verticalChunkMeshSegments = 1;
-
+    private int maxSecondsBetweenSaves = 60;
+    private int maxUnloadedChunksPercentageTillSave = 40;
     private boolean debugEnabled;
     private boolean monitoringEnabled;
-    private boolean reflectionsCacheEnabled;
 
     public long getDayNightLengthInMs() {
         return dayNightLengthInMs;
@@ -52,6 +52,22 @@ public class SystemConfig {
         this.verticalChunkMeshSegments = verticalChunkMeshSegments;
     }
 
+    public int getMaxSecondsBetweenSaves() {
+        return maxSecondsBetweenSaves;
+    }
+
+    public void setMaxSecondsBetweenSaves(int maxSecondsBetweenSaves) {
+        this.maxSecondsBetweenSaves = maxSecondsBetweenSaves;
+    }
+
+    public int getMaxUnloadedChunksPercentageTillSave() {
+        return maxUnloadedChunksPercentageTillSave;
+    }
+
+    public void setMaxUnloadedChunksPercentageTillSave(int maxUnloadedChunksPercentageTillSave) {
+        this.maxUnloadedChunksPercentageTillSave = maxUnloadedChunksPercentageTillSave;
+    }
+
     public boolean isDebugEnabled() {
         return debugEnabled;
     }
@@ -60,14 +76,6 @@ public class SystemConfig {
         this.debugEnabled = debugEnabled;
     }
 
-    public boolean isReflectionsCacheEnabled() {
-        return reflectionsCacheEnabled;
-    }
-
-    public void setReflectionsCacheEnabled(boolean reflectionsCacheEnabled) {
-        this.reflectionsCacheEnabled = reflectionsCacheEnabled;
-    }
-    
     public boolean isMonitoringEnabled() {
         return monitoringEnabled;
     }

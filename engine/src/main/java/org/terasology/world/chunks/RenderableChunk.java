@@ -46,4 +46,10 @@ public interface RenderableChunk extends LitChunk {
     AABB getSubMeshAABB(int subMesh);
 
     void disposeMesh();
+
+    void setAdjacentChunksReady(boolean b);
+
+    boolean areAdjacentChunksReady();
+
+    boolean isReady();
 }

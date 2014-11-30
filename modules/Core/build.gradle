@@ -1,7 +1,6 @@
 // Simple build file for modules - the one under the Core module is the template, will be copied as needed to modules
 
 // Grab all the common stuff like plugins to use, artifact repositories, code analysis config, Artifactory settings, Git magic
-apply from: "$rootDir/config/gradle/common.gradle"
 apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
@@ -64,13 +63,13 @@ version = moduleConfig.version
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.modules'
 
-// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-if (env.BUILD_NUMBER != null) {
-    version += '-SNAPSHOT+' + env.BUILD_NUMBER
+// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
+if (env.ReleaseScope == null) {
+    version += '-SNAPSHOT'
+    println "Sticking with default snapshot for $project.name: $version"
 } else {
-    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
-    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
-    //println "Fancy local MODULE version for $project.name: $version"
+    // Do version stuff
+    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
 }
 
 // TODO: Remove when we don't need to rely on snapshots. Needed here for solo builds in Jenkins
@@ -155,6 +154,8 @@ dependencies {
 
         // TODO: While this is easy it would prevent modules declaring an engine dependency of a specific version
         // Tricky scenario: Building a module with a transitive dependency on engine-tests - that seems to be ignored
+        // TODO: Look for a provided engine jar in the workspace and use that if present
+        // TODO: Only use engine, engine-tests, and maybe core for compilation, but remove when publishing?
         compile(group: 'org.terasology.engine', name: 'engine', version: '+', changing: true)
         compile(group: 'org.terasology.engine', name: 'engine-tests', version: '+', changing: true)
 
@@ -217,6 +218,7 @@ task createSkeleton() {
 }
 
 task cacheReflections {
+    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
     inputs.files project.classes.outputs.files
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
@@ -229,6 +231,11 @@ task cacheReflections {
                 .build()
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
+}
+
+task cleanReflections(type: Delete) {
+    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
 }
 
 // This task syncs everything in the assets dir into the output dir, used when jarring the module
@@ -262,23 +269,6 @@ jar {
             into 'build/classes'
         }
     }
-}
-
-// A configuration for publishing artifacts
-configurations {
-    published
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-    published javadocJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar, javadocJar
 }
 
 // Prep an IntelliJ module for the Terasology module - yes, might want to read that twice :D

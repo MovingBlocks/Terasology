@@ -157,36 +157,38 @@ public class FirstPersonRenderer extends BaseComponentSystem implements RenderSy
     }
 
     private void renderIcon(TextureRegion iconTexture, float bobOffset, float handMovementAnimationOffset) {
-        Material shader = Assets.getMaterial("engine:prog.block");
-        shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
+        if (iconTexture != null) {
+            Material shader = Assets.getMaterial("engine:prog.block");
+            shader.activateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
 
-        shader.enable();
+            shader.enable();
 
-        shader.setBoolean("textured", false, true);
+            shader.setBoolean("textured", false, true);
 
-        shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
-        shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
+            shader.setFloat("sunlight", worldRenderer.getSunlightValue(), true);
+            shader.setFloat("blockLight", worldRenderer.getBlockLightValue(), true);
 
-        glPushMatrix();
+            glPushMatrix();
 
-        float textureScale = Math.max(iconTexture.getWidth(), iconTexture.getHeight()) / 16f;
+            float textureScale = Math.max(iconTexture.getWidth(), iconTexture.getHeight()) / 16f;
 
-        glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, (-1.5f - handMovementAnimationOffset * 0.5f) * (float) Math.pow(textureScale, 0.5));
-        glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
-        glRotatef(-20f, 1.0f, 0.0f, 0.0f);
-        glRotatef(-80f, 0.0f, 1.0f, 0.0f);
-        glRotatef(45f, 0.0f, 0.0f, 1.0f);
-        float scale = 0.75f * (float) Math.pow(textureScale, 0.5);
-        glScalef(scale, scale, scale);
+            glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, (-1.5f - handMovementAnimationOffset * 0.5f) * (float) Math.pow(textureScale, 0.5));
+            glRotatef(-handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
+            glRotatef(-20f, 1.0f, 0.0f, 0.0f);
+            glRotatef(-80f, 0.0f, 1.0f, 0.0f);
+            glRotatef(45f, 0.0f, 0.0f, 1.0f);
+            float scale = 0.75f * (float) Math.pow(textureScale, 0.5);
+            glScalef(scale, scale, scale);
 
-        if (iconTexture instanceof Asset<?>) {
-            Mesh itemMesh = IconMeshFactory.getIconMesh(iconTexture);
-            itemMesh.render();
+            if (iconTexture instanceof Asset<?>) {
+                Mesh itemMesh = IconMeshFactory.getIconMesh(iconTexture);
+                itemMesh.render();
+            }
+
+            glPopMatrix();
+
+            shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
         }
-
-        glPopMatrix();
-
-        shader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_MATRIX_STACK);
     }
 
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {

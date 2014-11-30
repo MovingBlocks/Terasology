@@ -15,13 +15,16 @@
  */
 package org.terasology.world.generation;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.terasology.math.Region3i;
 import org.terasology.world.chunks.CoreChunk;
 
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius
@@ -64,6 +67,11 @@ public class WorldImpl implements World {
         }
 
         return facets;
+    }
+
+    @Override
+    public Set<Class<? extends WorldFacet>> getAllFacets() {
+        return Sets.newHashSet(facetProviderChains.keySet());
     }
 
     @Override

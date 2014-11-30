@@ -4,6 +4,7 @@
 {
     "template" : true,
     "categories" : ["mineral"],
-    "hardness" : 8,
+    "hardness" : 18,
+    "mass" : 100,
     "sounds": "Core:stone"
 }

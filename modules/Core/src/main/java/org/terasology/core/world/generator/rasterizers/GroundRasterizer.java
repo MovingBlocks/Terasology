@@ -23,6 +23,8 @@ import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.WorldRasterizer;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
+import org.terasology.world.liquid.LiquidData;
+import org.terasology.world.liquid.LiquidType;
 
 /**
  * @author Immortius
@@ -41,6 +43,7 @@ public class GroundRasterizer implements WorldRasterizer {
 
     @Override
     public void generateChunk(CoreChunk chunk, Region chunkRegion) {
+        LiquidData waterLiquid = new LiquidData(LiquidType.WATER, LiquidData.MAX_LIQUID_DEPTH);
         SurfaceHeightFacet surfaceHeightData = chunkRegion.getFacet(SurfaceHeightFacet.class);
         Vector3i chunkOffset = chunk.getChunkWorldOffset();
         for (int x = 0; x < chunk.getChunkSizeX(); ++x) {
@@ -52,6 +55,7 @@ public class GroundRasterizer implements WorldRasterizer {
                 }
                 for (; y < chunk.getChunkSizeY() && y + chunkOffset.y <= 32; ++y) {
                     chunk.setBlock(x, y, z, water);
+                    chunk.setLiquid(x, y, z, waterLiquid);
                 }
             }
         }

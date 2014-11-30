@@ -30,7 +30,6 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
-import org.terasology.game.Game;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
@@ -39,6 +38,7 @@ import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.StorageManager;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
@@ -73,6 +73,8 @@ public class StateIngame implements GameState {
     /* GAME LOOP */
     private boolean pauseGame;
 
+    private StorageManager storageManager;
+
     public StateIngame() {
     }
 
@@ -86,6 +88,7 @@ public class StateIngame implements GameState {
         inputSystem = CoreRegistry.get(InputSystem.class);
         eventSystem.registerEventHandler(nuiManager);
         networkSystem = CoreRegistry.get(NetworkSystem.class);
+        storageManager = CoreRegistry.get(StorageManager.class);
 
         if (CoreRegistry.get(Config.class).getRendering().isOculusVrSupport()
                 && OculusVrHelper.isNativeLibraryLoaded()) {
@@ -113,6 +116,10 @@ public class StateIngame implements GameState {
         }
 
         boolean save = networkSystem.getMode().isAuthority();
+        if (save) {
+            storageManager.waitForCompletionOfPreviousSaveAndStartSaving();
+        }
+
         networkSystem.shutdown();
         // TODO: Shutdown background threads
         eventSystem.process();
@@ -125,13 +132,13 @@ public class StateIngame implements GameState {
         }
         componentSystemManager.shutdown();
 
-        if (save) {
-            CoreRegistry.get(Game.class).save();
-        }
-
         CoreRegistry.get(PhysicsEngine.class).dispose();
 
         entityManager.clear();
+
+        if (storageManager != null) {
+            storageManager.finishSavingAndShutdown();
+        }
         ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).loadEnvironment(Collections.<Module>emptySet(), true);
         CoreRegistry.get(AssetManager.class).setEnvironment(environment);
         CoreRegistry.get(Console.class).dispose();
@@ -147,6 +154,7 @@ public class StateIngame implements GameState {
 
     @Override
     public void update(float delta) {
+
         eventSystem.process();
 
         for (UpdateSubscriberSystem system : componentSystemManager.iterateUpdateSubscribers()) {
@@ -158,9 +166,15 @@ public class StateIngame implements GameState {
         if (worldRenderer != null && shouldUpdateWorld()) {
             worldRenderer.update(delta);
         }
+        if (storageManager != null) {
+            storageManager.update();
+        }
+
 
         updateUserInterface(delta);
     }
+
+
 
     @Override
     public void handleInput(float delta) {

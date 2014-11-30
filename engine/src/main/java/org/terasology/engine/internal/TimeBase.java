@@ -40,6 +40,7 @@ public abstract class TimeBase implements EngineTime {
 
     private AtomicLong gameTime = new AtomicLong(0);
 
+    @Override
     public abstract long getRawTimeInMs();
 
     /**
@@ -47,6 +48,7 @@ public abstract class TimeBase implements EngineTime {
      *
      * @return The number of update cycles to run
      */
+    @Override
     public Iterator<Float> tick() {
         long now = getRawTimeInMs();
         long newDelta = now - last.get();
@@ -135,6 +137,7 @@ public abstract class TimeBase implements EngineTime {
         this.paused = paused;
     }
 
+    @Override
     public boolean isPaused() {
         return paused;
     }

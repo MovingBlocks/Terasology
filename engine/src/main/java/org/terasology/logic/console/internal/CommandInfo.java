@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.permission.PermissionManager;
+import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -46,6 +49,7 @@ public class CommandInfo {
     private List<String> parameterTypes = Lists.newArrayList();
     private String shortDescription;
     private String helpText;
+    private String requiredPermission;
     private boolean clientEntityRequired;
     private boolean runOnServer;
 
@@ -77,6 +81,7 @@ public class CommandInfo {
         this.runOnServer = commandAnnotation.runOnServer();
         this.shortDescription = commandAnnotation.shortDescription();
         this.helpText = commandAnnotation.helpText();
+        this.requiredPermission = commandAnnotation.requiredPermission();
     }
     
     private String getParamName(int i) {
@@ -141,19 +146,18 @@ public class CommandInfo {
      * @param params a set of string parameter
      * @param callingClient the responsible client (passed as last parameter)
      * @return the return value of the method call or an empty string, never <code>null</code>.
-     * @throws IllegalArgumentException if the method call was not successful 
-     * @throws Exception if something went seriously wrong
+     * @throws InvalidCommandCallException if the method call was not successful
      */
-    public String execute(List<String> params, EntityRef callingClient) throws Exception {
+    public String execute(List<String> params, EntityRef callingClient) throws InvalidCommandCallException {
         Object[] processedParams = new Object[method.getParameterTypes().length];
         if (isClientEntityRequired()) {
             if (params.size() + 1 != method.getParameterTypes().length) {
-                throw new IllegalArgumentException("Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1));
+                throw new InvalidCommandCallException("Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1));
             }
 
             processedParams[processedParams.length - 1] = callingClient;
         } else if (params.size() != method.getParameterTypes().length) {
-            throw new IllegalArgumentException("Incorrect number of parameters, expected " + (method.getParameterTypes().length));
+            throw new InvalidCommandCallException("Incorrect number of parameters, expected " + (method.getParameterTypes().length));
         }
         for (int i = 0; i < params.size(); ++i) {
             try {
@@ -166,16 +170,40 @@ public class CommandInfo {
                     processedParams[i] = params.get(i);
                 }
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Bad argument '" + params.get(i) + "'");
+                throw new InvalidCommandCallException("Bad argument '" + params.get(i) + "'", e);
             }
         }
-        try {
-            Object result = method.invoke(provider, processedParams);
-            return (result != null) ? result.toString() : "";
-        } catch (InvocationTargetException ite) {
-            // we end up here, if the called method throws an exception (which is ok)
-            Throwable e = ite.getTargetException();
-            throw new IllegalArgumentException(e.getLocalizedMessage(), e);
+
+        if (clientHasPermissionToCallCommand(callingClient)) {
+            try {
+                Object result = method.invoke(provider, processedParams);
+                return (result != null) ? result.toString() : "";
+            } catch (InvocationTargetException ite) {
+                // we end up here, if the called method throws an exception (which is ok)
+                Throwable e = ite.getTargetException();
+                throw new InvalidCommandCallException(e.getLocalizedMessage(), e);
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                throw new InvalidCommandCallException(e.getMessage(), e);
+            }
+        } else {
+            throw new InvalidCommandCallException("You do not have enough permissions to execute this command");
         }
+    }
+
+    private boolean clientHasPermissionToCallCommand(EntityRef callingClient) {
+        PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
+        boolean hasPermission = true;
+
+        if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
+            hasPermission = false;
+            ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
+            if (clientComponent != null) {
+                EntityRef character = clientComponent.character;
+                if (permissionManager.hasPermission(character, requiredPermission)) {
+                    hasPermission = true;
+                }
+            }
+        }
+        return hasPermission;
     }
 }

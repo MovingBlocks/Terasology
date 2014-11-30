@@ -22,7 +22,19 @@ import org.terasology.entitySystem.systems.ComponentSystem;
  */
 public interface WorldTime extends ComponentSystem {
 
-    int DAY_LENGTH = 1000 * 60 * 60 * 24;
+    /**
+     * The length of a day in milli-seconds
+     */
+    long DAY_LENGTH = 1000 * 60 * 60 * 24;
+
+    /**
+     * The number of timer tick events per day.
+     * This must be a divisor of {@link #DAY_LENGTH} to avoid rounding issues.
+     */
+    long TICK_EVENTS_PER_DAY = 100;
+
+    long TICK_EVENT_RATE = DAY_LENGTH / TICK_EVENTS_PER_DAY;
+
 
     /**
      * @return World time in milliseconds.

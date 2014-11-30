@@ -16,6 +16,7 @@
 
 package org.terasology.logic.characters;
 
+import org.terasology.math.Vector3i;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
@@ -44,6 +45,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private float yaw;
     private float pitch;
     private float footstepDelta;
+    private Vector3i climbDirection;
 
     protected CharacterStateEvent() {
     }
@@ -59,6 +61,7 @@ public class CharacterStateEvent extends NetworkEvent {
         this.pitch = previous.pitch;
         this.yaw = previous.yaw;
         this.footstepDelta = previous.footstepDelta;
+        this.climbDirection = previous.climbDirection;
     }
 
     public CharacterStateEvent(
@@ -126,6 +129,13 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = sequenceNumber;
     }
 
+    public void setClimbDirection(Vector3i climbDirection) {
+        this.climbDirection = climbDirection;
+    }
+
+    public Vector3i getClimbDirection() {
+        return climbDirection;
+    }
     /**
      * Retrieve the pitch in degrees.
      *
@@ -255,4 +265,5 @@ public class CharacterStateEvent extends NetworkEvent {
         CharacterCollider collider = physics.getCharacterCollider(entity);
         collider.setLocation(newPos);
     }
+
 }

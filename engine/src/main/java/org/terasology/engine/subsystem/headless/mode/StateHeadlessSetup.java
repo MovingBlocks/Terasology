@@ -28,17 +28,20 @@ import org.terasology.module.Module;
 import org.terasology.naming.Name;
 import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
+import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
 import org.terasology.world.time.WorldTime;
 
+import java.util.List;
+
 /**
- * The class implements the main game menu.
- * <p/>
+ * The class is game selection menu replacement for the headless server.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * @version 0.3
+ * @author Florian <florian@fkoeberle.de>
  */
 public class StateHeadlessSetup extends StateSetup {
 
@@ -49,6 +52,17 @@ public class StateHeadlessSetup extends StateSetup {
     public void init(GameEngine gameEngine) {
         super.init(gameEngine);
 
+        GameManifest gameManifest = null;
+        List<GameInfo> savedGames = GameProvider.getSavedGames();
+        if (savedGames.size() > 0) {
+            gameManifest = savedGames.get(0).getManifest();
+        } else {
+            gameManifest = createGameManifest();
+        }
+        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
+    }
+
+    private GameManifest createGameManifest() {
         GameManifest gameManifest = new GameManifest();
 
         Config config = CoreRegistry.get(Config.class);
@@ -83,7 +97,7 @@ public class StateHeadlessSetup extends StateSetup {
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
                 (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
-        gameEngine.changeState(new StateLoading(gameManifest, NetworkMode.LISTEN_SERVER));
+        return gameManifest;
     }
 
     @Override

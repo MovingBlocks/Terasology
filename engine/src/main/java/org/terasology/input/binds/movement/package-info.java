@@ -23,7 +23,8 @@
                 "engine:backwards",
                 "engine:left",
                 "engine:right",
-                "engine:run",
+                "engine:toggleSpeedPermanently",
+                "engine:toggleSpeedTemporarily",
                 "engine:jump",
                 "engine:crouch"
         }) package org.terasology.input.binds.movement;

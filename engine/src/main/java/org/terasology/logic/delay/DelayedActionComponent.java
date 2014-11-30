@@ -18,7 +18,6 @@ package org.terasology.logic.delay;
 import org.terasology.entitySystem.Component;
 import org.terasology.world.block.ForceBlockActive;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Not for public use. Use DelayManager instead.
  * @author Marcin Sciesinski <marcins78@gmail.com>
  */
 @ForceBlockActive
@@ -67,19 +67,19 @@ public final class DelayedActionComponent implements Component {
         return lowestWakeUp;
     }
 
+    public boolean isEmpty() {
+        return actionIdsWakeUp.isEmpty();
+    }
+
+    public boolean containsActionId(String actionId) {
+        return actionIdsWakeUp.containsKey(actionId);
+    }
+
     private long findSmallestWakeUp() {
         long result = Long.MAX_VALUE;
         for (long value : actionIdsWakeUp.values()) {
             result = Math.min(result, value);
         }
         return result;
-    }
-
-    public boolean isEmpty() {
-        return actionIdsWakeUp.isEmpty();
-    }
-
-    public Map<String, Long> getActionIdsWakeUp() {
-        return Collections.unmodifiableMap(actionIdsWakeUp);
     }
 }

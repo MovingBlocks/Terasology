@@ -35,7 +35,7 @@ import java.util.List;
 public class BlockDefinition {
     public String displayName = "";
     public boolean liquid;
-    public byte hardness = 0x3;
+    public int hardness = 0x3;
 
     public boolean attachmentAllowed = true;
     public boolean replacementAllowed;

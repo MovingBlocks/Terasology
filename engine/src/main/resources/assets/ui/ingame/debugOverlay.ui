@@ -33,7 +33,19 @@
                     "position-horizontal-center" : {},
                     "position-vertical-top" : {}
                 }
-            }
+            },
+            {
+                "type" : "UILabel",
+                "id" : "saveStatusLabel",
+                "layoutInfo" : {
+                    "use-content-width" : true,
+                    "use-content-height" : true,
+                    "position-top": {},
+                    "position-right" : {
+                        "offset" : 8
+                    }
+                }
+            },
         ]
     }
 }

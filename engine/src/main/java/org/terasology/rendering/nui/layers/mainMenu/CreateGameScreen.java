@@ -126,7 +126,9 @@ public class CreateGameScreen extends CoreScreenLayer {
                     // find the first gameplay module that is available
                     for (Name moduleName : config.getDefaultModSelection().listModules()) {
                         Module module = moduleManager.getRegistry().getLatestModuleVersion(moduleName);
-                        if (moduleManager.isGameplayModule(module)) {
+
+                        // module is null if it is no longer present
+                        if (module != null && moduleManager.isGameplayModule(module)) {
                             set(module);
                             return selected;
                         }
@@ -271,8 +273,9 @@ public class CreateGameScreen extends CoreScreenLayer {
                         gameManifest.addModule(module.getId(), module.getVersion());
                     }
 
+                    float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
                     WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                            (long) (WorldTime.DAY_LENGTH * 0.025f), worldGenerator.getSelection().getUri());
+                            (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
                     gameManifest.addWorld(worldInfo);
 
                     gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Region3i;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -44,14 +45,12 @@ import org.terasology.world.propagation.light.InternalLightProcessor;
 import org.terasology.world.propagation.light.LightMerger;
 
 import javax.vecmath.Vector3f;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvider {
 
@@ -112,6 +111,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
                     Chunk oldChunk = chunkCache.put(chunk.getPosition(), chunk);
                     if (oldChunk != null) {
                         oldChunk.dispose();
+                        updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
                     }
                 }
             }
@@ -170,7 +170,22 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public void purgeChunks() {
+    public void purgeWorld() {
+    }
+
+    @Override
+    public void shutdown() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<Chunk> getAllChunks() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void restart() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -237,6 +252,8 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         Chunk chunk = lightMerger.completeMerge();
         if (chunk != null) {
             chunk.markReady();
+            updateAdjacentChunksReadyFieldOf(chunk);
+            updateAdjacentChunksReadyFieldOfAdjChunks(chunk);
             listener.onChunkReady(chunk.getPosition());
             worldEntity.send(new OnChunkLoaded(chunk.getPosition()));
         }
@@ -286,4 +303,33 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             return vec.lengthSquared();
         }
     }
+
+    private boolean areAdjacentChunksReady(Chunk chunk) {
+        Vector3i centerChunkPos = chunk.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = chunkCache.get(adjChunkPos);
+            boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
+            if (!adjChunkReady) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateAdjacentChunksReadyFieldOf(Chunk chunk) {
+        chunk.setAdjacentChunksReady(areAdjacentChunksReady(chunk));
+    }
+
+    private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
+        Vector3i centerChunkPos = chunkInCenter.getPosition();
+        for (Side side : Side.values()) {
+            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            Chunk adjChunk = chunkCache.get(adjChunkPos);
+            if (adjChunk != null) {
+                updateAdjacentChunksReadyFieldOf(adjChunk);
+            }
+        }
+    }
+
 }

@@ -104,7 +104,7 @@ public final class GameThread {
     /**
      * Sets the game thread. This can only be done once.
      */
-    public static void setGameThread() {
+    public static void setToCurrentThread() {
         if (gameThread == null) {
             gameThread = Thread.currentThread();
         }

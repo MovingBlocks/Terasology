@@ -1,0 +1,11 @@
+{
+    "parent": "engine:iconItem",
+    "DisplayName": {
+        "name": "Improved Pick Axe"
+    },
+    "Item": {
+        "icon": "engine:items.pick",
+        "renderWithIcon": true,
+        "damageType": "pickaxeTier2Damage"
+    }
+}

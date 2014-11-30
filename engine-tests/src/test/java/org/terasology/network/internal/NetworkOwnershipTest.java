@@ -70,6 +70,7 @@ public class NetworkOwnershipTest extends TerasologyTestingEnvironment {
         clientNetComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
         clientEntity = entityManager.create(clientNetComp);
         when(client.getEntity()).thenReturn(clientEntity);
+        when(client.getId()).thenReturn("dummyID");
         networkSystem.mockHost();
         networkSystem.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), mock(BlockEntityRegistry.class));
         networkSystem.registerNetworkEntity(clientEntity);

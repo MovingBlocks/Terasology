@@ -17,6 +17,7 @@ package org.terasology.logic.console.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
+
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -60,12 +61,14 @@ import org.terasology.rendering.nui.layers.mainMenu.MessagePopup;
 import org.terasology.rendering.nui.layers.mainMenu.WaitPopup;
 import org.terasology.rendering.nui.skin.UISkinData;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
@@ -107,6 +110,12 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             return "Unable to resolve skin '" + skin + "'";
         }
+    }
+
+    @Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
+    public String enableAutoScreenReloading() {
+        CoreRegistry.get(NUIManager.class).enableAutoReload();
+        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
     }
 
     @Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
@@ -202,7 +211,7 @@ public class CoreCommands extends BaseComponentSystem {
     public void join(@CommandParam("address") final String address) {
         join(address, TerasologyConstants.DEFAULT_PORT);
     }
-    
+
     @Command(shortDescription = "Join a game")
     public void join(@CommandParam("address") final String address, @CommandParam("port") final int port) {
 
@@ -220,17 +229,17 @@ public class CoreCommands extends BaseComponentSystem {
         final WaitPopup<JoinStatus> popup = manager.pushScreen(WaitPopup.ASSET_URI, WaitPopup.class);
         popup.setMessage("Join Game", "Connecting to '" + address + ":" + port + "' - please wait ...");
         popup.onSuccess(new Function<JoinStatus, Void>() {
-            
+
             @Override
             public Void apply(JoinStatus result) {
                 GameEngine engine = CoreRegistry.get(GameEngine.class);
                 if (result.getStatus() != JoinStatus.Status.FAILED) {
-                    engine.changeState(new StateLoading(result));               
+                    engine.changeState(new StateLoading(result));
                 } else {
                     MessagePopup screen = manager.pushScreen(MessagePopup.ASSET_URI, MessagePopup.class);
                     screen.setMessage("Failed to Join", "Could not connect to server - " + result.getErrorMessage());
                 }
-                
+
                 return null;
             }
         });
@@ -247,7 +256,7 @@ public class CoreCommands extends BaseComponentSystem {
             return "Not connected";
         }
     }
-    
+
     @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
         EntityRef cameraTarget = cameraTargetSystem.getTarget();
@@ -291,7 +300,8 @@ public class CoreCommands extends BaseComponentSystem {
         }
     }
 
-    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
+    // TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
+    // TODO: permission
     @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
             "item in front of the player. You can simply pick it up.")
     public String spawnBlock(@CommandParam("blockName") String blockName) {
@@ -311,6 +321,14 @@ public class CoreCommands extends BaseComponentSystem {
 
         pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
         return "Spawned block.";
+    }
+
+    @Command(shortDescription = "Sets the current world time in days")
+    public String setWorldTime(@CommandParam("day") float day) {
+        WorldProvider world = CoreRegistry.get(WorldProvider.class);
+        world.getTime().setDays(day);
+
+        return "World time changed";
     }
 
 }

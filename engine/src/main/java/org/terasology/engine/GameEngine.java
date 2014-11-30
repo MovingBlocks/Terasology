@@ -24,12 +24,7 @@ import org.terasology.engine.modes.GameState;
  *
  * @author Immortius
  */
-public interface GameEngine {
-
-    /**
-     * Initialises the engine
-     */
-    void init();
+public interface GameEngine extends AutoCloseable {
 
     /**
      * Runs the engine, which will block the thread.
@@ -46,7 +41,17 @@ public interface GameEngine {
      * Cleans up the engine. Can only be called after shutdown.
      * This method should not throw exceptions.
      */
-    void dispose();
+    void close();
+
+    /**
+     * @return Whether the engine has been uninitialized
+     */
+    boolean isUninitialized();
+
+    /**
+     * @return Whether the engine has been initialized
+     */
+    boolean isInitialized();
 
     /**
      * @return Whether the engine is running
@@ -80,6 +85,8 @@ public interface GameEngine {
      * @param task
      */
     void submitTask(String name, Runnable task);
+
+    boolean hasPendingState();
 
     boolean isHibernationAllowed();
 

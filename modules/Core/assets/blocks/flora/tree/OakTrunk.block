@@ -21,13 +21,8 @@
  * Entirely separate trees would have their own tree + leaf block definitions (rename the plain "Tree" then)
  */
 {
-    "hardness": 6,
+    "basedOn" : "core:wood",
     "displayName": "Oak Log",
-
-    "categories": ["wood"],
-
-    "sounds": "Core:wood",
-
     // Graphics
     "tiles": {
         "sides": "OakBark"

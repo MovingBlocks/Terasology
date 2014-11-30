@@ -13,7 +13,7 @@
             "sword", "cyanVial", "cyanFluff", "", "candle", "", "", "", "", "", "", "", "", "", "removeBlockJob", "yellowSkull",
             "bow", "blueVial", "blueFluff", "", "dynamiteStick", "", "", "", "", "", "", "", "", "", "walkToJob", "orangeSkull",
             "crossbow", "blackVial", "brownFluff", "mandrake", "dynamite", "", "", "", "", "", "", "", "", "", "", "blackSkull",
-            "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "whiteSkull"
+            "shovel", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "whiteSkull"
 
         ]
     }

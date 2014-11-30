@@ -1,20 +1,12 @@
 // The engine build is the primary Java project and has the primary list of dependencies
 
-// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
-apply from: "$rootDir/config/gradle/common.gradle"
-apply from: "$rootDir/config/gradle/artifactory.gradle"
-
-// Get the gradle versioneye plugin from Maven central
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.standardout:gradle-versioneye-plugin:0.1.1'
-    }
+// Get the gradle versioneye plugin from the plugins.gradle.org repo
+plugins {
+    id "org.standardout.versioneye" version "1.0.0"
 }
 
-apply plugin: 'versioneye'
+// Grab all the common stuff like plugins to use, artifact repositories, code analysis config, etc
+apply from: "$rootDir/config/gradle/artifactory.gradle"
 
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -97,39 +89,49 @@ configurations.all {
 
 // Primary dependencies definition
 dependencies {
-    // Main library files fetched online
-    compile group: 'org.terasology', name: 'gestalt-module', version: '1.2.3-SNAPSHOT', changing: 'true'
-    compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
-    compile group: 'com.google.guava', name: 'guava', version: '17.0'
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
+
+    // Storage and networking
+    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.3'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.5.0'
     compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
-    compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
     compile group: 'io.netty', name: 'netty', version: '3.6.5.Final'
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
-    compile group: 'java3d', name: 'vecmath', version: '1.3.1'
-    //compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
+
+    // Java magic
     compile group: 'net.java.dev.jna', name: 'jna', version: '3.5.2'
     compile group: 'net.java.dev.jna', name: 'platform', version: '3.5.2'
-    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
-    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
     compile group: 'com.esotericsoftware.reflectasm', name: 'reflectasm', version: '1.09'
-    compile group: 'ec.util', name: 'MersenneTwister', version: '20'
+
+    // Graphics, 3D, UI, etc
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: LwjglVersion
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: LwjglVersion
+    compile group: 'java3d', name: 'vecmath', version: '1.3.1' // Note: Downgraded to this release until TeraMath ready
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.1'
     compile group: 'com.miglayout', name: 'miglayout-core', version: '4.2'
+    compile group: 'org.newdawn.slick', name: 'slick', version: '237'
+
+    // Logging and audio
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
+
+    // Small-time 3rd party libs we've stored in our Artifactory for access
+    compile group: 'ec.util', name: 'MersenneTwister', version: '20'
+    compile group: 'org.eaxy', name: 'eaxy', version: '0.1'
+
+    // Our developed libs
+    compile group: 'org.terasology', name: 'gestalt-module', version: '2.1.0'
+    compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
     compile fileTree(dir: 'libs', include: '*.jar')
 
     // TODO: These could be moved into facade
     compile group: 'org.terasology', name: 'CrashReporter', version: '+', changing: true
-    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     runtime group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.7'
-    // And here is Groovy to read the config file
-    runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.3.6'
+    runtime group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    // And here is Groovy just to read the config file
+    runtime group: 'org.codehaus.groovy', name: 'groovy', version: '2.3.7'
 
     // In addition to all the above the dev source set also needs to depend on what gets compiled in main
     devCompile sourceSets.main.output
@@ -147,16 +149,24 @@ jar {
 }
 
 task cacheReflections {
+    description = 'Caches reflection output to make regular startup faster. May go stale and need cleanup at times.'
     inputs.files project.classes.outputs.files
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
     doFirst {
+        // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
+        file(sourceSets.main.output.classesDir.toString()).mkdirs()
         Reflections reflections = new ConfigurationBuilder()
-                    .addUrls((configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL()))
-                    .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
-                    .build()
+                .addUrls(configurations.runtime.collect { it.toURI().toURL()} + sourceSets.main.output.classesDir.toURI().toURL())
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                .build()
         reflections.save(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     }
+}
+
+task cleanReflections(type: Delete) {
+    description = 'Cleans the reflection cache. Useful in cases where it has gone stale and needs regeneration.'
+    delete sourceSets.main.output.classesDir.toString() + "/reflections.cache"
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,19 +185,19 @@ println "Scanning for version in engine-module.txt for engine"
 def slurper = new JsonSlurper()
 def moduleConfig = slurper.parseText(moduleFile.text)
 
-// Gradle uses the magic version variable when creating the jar name (unless explicitly set somewhere else I guess)
+// Gradle uses the magic version variable when creating the jar name (unless explicitly set differently)
 version = moduleConfig.version
 
 // Jenkins-Artifactory integration catches on to this as part of the Maven-type descriptor
 group = 'org.terasology.engine'
 
-// Check to see if we're running in Jenkins and in that case attach a snapshot+job build number
-if (env.BUILD_NUMBER != null) {
-    version += '-SNAPSHOT+' + env.BUILD_NUMBER
+// Everything is considered a snapshot unless built by a Jenkins release job. Might as well just attach -SNAPSHOT here
+if (env.ReleaseScope == null) {
+    version += '-SNAPSHOT'
+    println "Sticking with default snapshot for $project.name: $version"
 } else {
-    // Mainly useful for local testing against Artifactory to make uniquely timestamped artifacts
-    version += '-SNAPSHOT+' + new SimpleDateFormat("HH-mm-ss").format(new Date())
-    println "Fancy local version: $version"
+    // Do version stuff
+    println "Expecting running as Jenkins release job, need to increment version $version by scope: " + env.ReleaseScope
 }
 
 // This version info file actually goes inside the built jar and can be used at runtime
@@ -213,23 +223,6 @@ task createVersionInfoFile {
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
-
-// A configuration for publishing artifacts
-configurations {
-    published
-}
-
-// Define the artifacts we want to publish (the .pom will also be included since the Maven plugin is active)
-artifacts {
-    published jar
-    published sourceJar
-    published javadocJar
-}
-
-// Technically the plain "jar" both here and above is included automatically, but leaving it explicit for clarity
-artifactoryPublish {
-    dependsOn jar, sourceJar, javadocJar
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
