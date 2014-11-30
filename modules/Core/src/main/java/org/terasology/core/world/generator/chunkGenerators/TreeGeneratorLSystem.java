@@ -66,9 +66,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
-        Matrix4f rotation = new Matrix4f();
-        rotation.setIdentity();
-        rotation.setRotation(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
+        Matrix4f rotation = new Matrix4f(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
 
         float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
@@ -110,7 +108,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     }
 
                     Vector3f dir = new Vector3f(1f, 0f, 0f);
-                    rotation.transform(dir);
+                    rotation.transformVector(dir);
 
                     position.add(dir);
                     break;
@@ -120,33 +118,27 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case ']':
                     return;
                 case '+':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(0f, 0f, 1f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 0f, 1f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '-':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(0f, 0f, -1f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 0f, -1f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '&':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(0f, 1f, 0f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 1f, 0f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '^':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(0f, -1f, 0f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new AxisAngle4f(0f, -1f, 0f, angle + angleOffset));
                     rotation.mul(tempRotation);
                     break;
                 case '*':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(1f, 0f, 0f, angle));
+                    tempRotation = new Matrix4f(new AxisAngle4f(1f, 0f, 0f, angle));
                     rotation.mul(tempRotation);
                     break;
                 case '/':
-                    tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(-1f, 0f, 0f, angle));
+                    tempRotation = new Matrix4f(new AxisAngle4f(-1f, 0f, 0f, angle));
                     rotation.mul(tempRotation);
                     break;
                 default:
