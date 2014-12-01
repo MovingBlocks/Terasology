@@ -53,9 +53,9 @@ void main() {
     //depthLin - distance of the fragment currently being processed from the camera as a fraction of the view distance.
     float depthLin = linDepthViewingDistance(currentDepth);
     float blur = 0.0;//the amount of blur that will be applied to the fragment
-    //nearBoundDOF - Distance from the camera to the beginning of the area where no blur will be applied as a fraction of the view distance
     //TODO: The size of the no blur area should not be based on the viewingDistance 2*(0.15*viewingDistance)
     //TODO: but it works until I can figure out how to specify a distance based on maybe block size. - Amrit 'Who'
+    //nearBoundDOF - Distance from the camera to the beginning of the area where no blur will be applied as a fraction of the view distance
     float nearBoundDOF = (blurFocusDistance - (0.15*viewingDistance))/viewingDistance;
     //farBoundDOF - Distance from the camera to the end of the area where no blur will be applied as a fraction of the view distance
     float farBoundDOF = (blurFocusDistance + (0.15*viewingDistance))/viewingDistance;
