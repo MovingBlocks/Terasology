@@ -7,7 +7,7 @@
     "hardness" : 1,
     "colorSource" : "foliage_lut",
     "debrisOnDestroy" : false,
-	"translucent" : true,
-	"doubleSided" : true,
+    "translucent" : true,
+    "doubleSided" : true,
     "waving" : true
 }
