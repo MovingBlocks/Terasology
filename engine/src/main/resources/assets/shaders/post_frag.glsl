@@ -47,15 +47,25 @@ void main() {
 #endif
 
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x * 2.0 - 1.0;
-
+//TODO: Separate the underwater shader effect from the depth of field effect and clean up unecessary code left from previous DOF implementation - Amrit 'Who'
+//Calculate blur for depth of field effect and underwater.
 #ifndef NO_BLUR
+    //depthLin - distance of the fragment currently being processed from the camera as a fraction of the view distance.
     float depthLin = linDepthViewingDistance(currentDepth);
-    float blur = 0.0;
-
-    float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
-    if (depthLin > finalBlurStart && !swimming) {
-       blur = clamp((depthLin - finalBlurStart) / blurLength, 0.0, 1.0);
-    } else if (swimming) {
+    float blur = 0.0;//the amount of blur that will be applied to the fragment
+    //nearBoundDOF - Distance from the camera to the beginning of the area where no blur will be applied as a fraction of the view distance
+    //TODO: The size of the no blur area should not be based on the viewingDistance 2*(0.15*viewingDistance)
+    //TODO: but it works until I can figure out how to specify a distance based on maybe block size. - Amrit 'Who'
+    float nearBoundDOF = (blurFocusDistance - (0.15*viewingDistance))/viewingDistance;
+    //farBoundDOF - Distance from the camera to the end of the area where no blur will be applied as a fraction of the view distance
+    float farBoundDOF = (blurFocusDistance + (0.15*viewingDistance))/viewingDistance;
+    //if the fragment is beyond the far boundary increase the blur proportional to the fragment distance from the boundary
+    if (depthLin > farBoundDOF  && !swimming)
+       blur = clamp((depthLin - farBoundDOF) / blurLength, 0.0, 1.0);
+    //else if the fragment is closer than the near boundary increase the blur proportional to the fragment distance from the boundary
+    else if (depthLin < nearBoundDOF  && !swimming)
+        blur = clamp(blurLength/depthLin, 0.0, 1.0);
+    else if (swimming) {
        blur = 1.0;
     }
 #endif

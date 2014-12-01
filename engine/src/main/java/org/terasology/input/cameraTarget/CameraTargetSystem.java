@@ -16,6 +16,8 @@
 
 package org.terasology.input.cameraTarget;
 
+import org.terasology.config.Config;
+import org.terasology.registry.CoreRegistry;
 import com.google.common.base.Objects;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -40,9 +42,9 @@ import java.util.Arrays;
  */
 public class CameraTargetSystem extends BaseComponentSystem {
 
-    // TODO: This should come from somewhere, probably player entity?
-    public static final float TARGET_DISTANCE = 5f;
-
+    // TODO: This should come from somewhere, probably player entity
+    //set the target distance to as far as the player can see. Used to get the focal distance for effects such as DOF.
+    public static final float TARGET_DISTANCE = CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f;
     @In
     private LocalPlayer localPlayer;
 
