@@ -212,23 +212,6 @@ public class StorageManagerTest {
     }
 
     @Test
-    public void referenceCorrectlyInvalidatedWhileStored() {
-        EntityRef someEntity = entityManager.create();
-        character.addComponent(new EntityRefComponent(someEntity));
-
-        esm.waitForCompletionOfPreviousSaveAndStartSaving();
-        esm.finishSavingAndShutdown();
-
-        someEntity.destroy();
-        entityManager.create(); // This causes the destroyed entity's id to be reused
-
-        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
-        restored.restoreEntities();
-        assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
-    }
-
-
-    @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
         long entityId = entity.getId();
