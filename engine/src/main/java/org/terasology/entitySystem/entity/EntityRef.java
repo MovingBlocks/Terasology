@@ -68,7 +68,7 @@ public abstract class EntityRef implements MutableComponentContainer {
      * @return The identifier of this entity. Should be avoided where possible and the EntityRef
      *         used instead to allow it to be invalidated if the entity is destroyed.
      */
-    public abstract int getId();
+    public abstract long getId();
 
     /**
      * @return Whether this entity should be saved

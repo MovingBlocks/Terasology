@@ -106,7 +106,7 @@ public interface EntityManager {
      * @param id
      * @return The entity with the given id, or the null entity
      */
-    EntityRef getEntity(int id);
+    EntityRef getEntity(long id);
 
     /**
      * @param other

@@ -373,11 +373,10 @@ public class PojoEntityManagerTest {
     @Test
     public void destructionOfUnloadedEntitiesPrevented() {
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
+        long id = entity.getId();
         entityManager.deactivateForStorage(entity);
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
-        assertFalse(entityManager.getFreedIds().contains(id));
     }
 }

@@ -18,11 +18,11 @@ package org.terasology.persistence.internal;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
+import gnu.trove.set.TLongSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -97,9 +97,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
-    private TIntObjectMap<List<StoreMetadata>> externalRefHolderLookup = new TIntObjectHashMap<>();
-    private Map<StoreId, StoreMetadata> storeMetadata = Maps.newHashMap();
-
     private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
@@ -159,9 +156,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
      */
     private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder transactionBuilder, Set<EntityRef> unsavedEntities) {
         GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
-        for (StoreMetadata table : storeMetadata.values()) {
-            globalStoreSaver.addStoreMetadata(table);
-        }
         for (EntityRef entity : unsavedEntities) {
             globalStoreSaver.store(entity);
         }
@@ -177,10 +171,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
                 GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
                 loader.load(store);
-                for (StoreMetadata refTable : loader.getStoreMetadata()) {
-                    storeMetadata.put(refTable.getId(), refTable);
-                    indexStoreMetadata(refTable);
-                }
             }
         }
     }
@@ -217,12 +207,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     public PlayerStore loadPlayerStore(String playerId) {
         EntityData.PlayerStore store = loadPlayerStoreData(playerId);
         if (store != null) {
-            TIntSet validRefs = null;
-            StoreMetadata table = storeMetadata.get(new PlayerStoreId(playerId));
-            if (table != null) {
-                validRefs = table.getExternalReferences();
-            }
-            return new PlayerStoreInternal(playerId, store, validRefs, this, entityManager);
+            return new PlayerStoreInternal(playerId, store, this, entityManager);
         }
         return new PlayerStoreInternal(playerId, this, entityManager);
     }
@@ -316,25 +301,13 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             }
         }
         EntityData.EntityStore entityStore = storer.finaliseStore();
-        TIntSet externalRefs = storer.getExternalReferences();
-
-        Vector3i chunkPosition = chunk.getPosition();
 
         ChunkImpl chunkImpl = (ChunkImpl) chunk;
         boolean viaSnapshot = !deactivate;
         if (viaSnapshot) {
             chunkImpl.createSnapshot();
         }
-        CompressedChunkBuilder compressedChunkBuilder = new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
-
-        if (externalRefs.size() > 0) {
-            StoreMetadata metadata = new StoreMetadata(new ChunkStoreId(chunkPosition), externalRefs);
-            indexStoreMetadata(metadata);
-        }
-
-        return compressedChunkBuilder;
-
-
+        return new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
     }
 
 
@@ -441,12 +414,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         storer.store(character, PlayerStoreInternal.CHARACTER, deactivate);
         playerEntityStore.setStore(storer.finaliseStore());
 
-
-        TIntSet externalReference = storer.getExternalReferences();
-        if (externalReference.size() > 0) {
-            StoreMetadata metadata = new StoreMetadata(new PlayerStoreId(playerId), externalReference);
-             indexStoreMetadata(metadata);
-        }
         return playerEntityStore.build();
     }
 
@@ -505,15 +472,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         byte[] chunkData = loadCompressedChunk(chunkPos);
         ChunkStore store = null;
         if (chunkData != null) {
-            TIntSet validRefs = null;
-            StoreMetadata table = storeMetadata.get(new ChunkStoreId(chunkPos));
-            if (table != null) {
-                validRefs = table.getExternalReferences();
-            }
             ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
             try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
                 EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, validRefs, this, entityManager);
+                store = new ChunkStoreInternal(storeData, this, entityManager);
             } catch (IOException e) {
                 logger.error("Failed to read existing saved chunk {}", chunkPos);
             }
@@ -539,31 +501,9 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
 
-    private void indexStoreMetadata(StoreMetadata metadata) {
-        storeMetadata.put(metadata.getId(), metadata);
-        TIntIterator iterator = metadata.getExternalReferences().iterator();
-        while (iterator.hasNext()) {
-            int refId = iterator.next();
-            List<StoreMetadata> tables = externalRefHolderLookup.get(refId);
-            if (tables == null) {
-                tables = Lists.newArrayList();
-                externalRefHolderLookup.put(refId, tables);
-            }
-            tables.add(metadata);
-        }
-    }
-
     @Override
-    public void onEntityDestroyed(int entityId) {
-        List<StoreMetadata> tables = externalRefHolderLookup.remove(entityId);
-        if (tables != null) {
-            for (StoreMetadata table : tables) {
-                table.getExternalReferences().remove(entityId);
-                if (table.getExternalReferences().isEmpty()) {
-                    storeMetadata.remove(table.getId());
-                }
-            }
-        }
+    public void onEntityDestroyed(long entityId) {
+
     }
 
     private void addGameManifestToSaveTransaction(SaveTransactionBuilder saveTransactionBuilder) {

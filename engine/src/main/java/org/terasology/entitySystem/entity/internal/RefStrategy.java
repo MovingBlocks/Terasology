@@ -22,5 +22,5 @@ import org.terasology.entitySystem.entity.LowLevelEntityManager;
  */
 public interface RefStrategy {
 
-    BaseEntityRef createRefFor(int id, LowLevelEntityManager entityManager);
+    BaseEntityRef createRefFor(long id, LowLevelEntityManager entityManager);
 }

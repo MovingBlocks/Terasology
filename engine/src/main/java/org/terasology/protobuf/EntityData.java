@@ -4156,15 +4156,15 @@ public final class EntityData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Entity> {
 
-    // optional int32 id = 1;
+    // optional int64 id = 1;
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
-    int getId();
+    long getId();
 
     // repeated .Component component = 2;
     /**
@@ -4230,15 +4230,15 @@ public final class EntityData {
      */
     boolean getAlwaysRelevant();
 
-    // optional int32 owner = 6;
+    // optional int64 owner = 6;
     /**
-     * <code>optional int32 owner = 6;</code>
+     * <code>optional int64 owner = 6;</code>
      */
     boolean hasOwner();
     /**
-     * <code>optional int32 owner = 6;</code>
+     * <code>optional int64 owner = 6;</code>
      */
-    int getOwner();
+    long getOwner();
 
     // repeated string removed_component = 15;
     /**
@@ -4313,7 +4313,7 @@ public final class EntityData {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              id_ = input.readInt32();
+              id_ = input.readInt64();
               break;
             }
             case 18: {
@@ -4357,7 +4357,7 @@ public final class EntityData {
             }
             case 48: {
               bitField0_ |= 0x00000008;
-              owner_ = input.readInt32();
+              owner_ = input.readInt64();
               break;
             }
             case 122: {
@@ -4417,19 +4417,19 @@ public final class EntityData {
     }
 
     private int bitField0_;
-    // optional int32 id = 1;
+    // optional int64 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
-    private int id_;
+    private long id_;
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
-    public int getId() {
+    public long getId() {
       return id_;
     }
 
@@ -4552,19 +4552,19 @@ public final class EntityData {
       return alwaysRelevant_;
     }
 
-    // optional int32 owner = 6;
+    // optional int64 owner = 6;
     public static final int OWNER_FIELD_NUMBER = 6;
-    private int owner_;
+    private long owner_;
     /**
-     * <code>optional int32 owner = 6;</code>
+     * <code>optional int64 owner = 6;</code>
      */
     public boolean hasOwner() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 owner = 6;</code>
+     * <code>optional int64 owner = 6;</code>
      */
-    public int getOwner() {
+    public long getOwner() {
       return owner_;
     }
 
@@ -4599,12 +4599,12 @@ public final class EntityData {
     }
 
     private void initFields() {
-      id_ = 0;
+      id_ = 0L;
       component_ = java.util.Collections.emptyList();
       removedComponentIndex_ = java.util.Collections.emptyList();
       parentPrefab_ = "";
       alwaysRelevant_ = false;
-      owner_ = 0;
+      owner_ = 0L;
       removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
@@ -4633,7 +4633,7 @@ public final class EntityData {
         .ExtendableMessage<org.terasology.protobuf.EntityData.Entity>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, id_);
+        output.writeInt64(1, id_);
       }
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(2, component_.get(i));
@@ -4652,7 +4652,7 @@ public final class EntityData {
         output.writeBool(5, alwaysRelevant_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(6, owner_);
+        output.writeInt64(6, owner_);
       }
       for (int i = 0; i < removedComponent_.size(); i++) {
         output.writeBytes(15, removedComponent_.getByteString(i));
@@ -4669,7 +4669,7 @@ public final class EntityData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, id_);
+          .computeInt64Size(1, id_);
       }
       for (int i = 0; i < component_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -4699,7 +4699,7 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, owner_);
+          .computeInt64Size(6, owner_);
       }
       {
         int dataSize = 0;
@@ -4828,7 +4828,7 @@ public final class EntityData {
 
       public Builder clear() {
         super.clear();
-        id_ = 0;
+        id_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (componentBuilder_ == null) {
           component_ = java.util.Collections.emptyList();
@@ -4842,7 +4842,7 @@ public final class EntityData {
         bitField0_ = (bitField0_ & ~0x00000008);
         alwaysRelevant_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
-        owner_ = 0;
+        owner_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000020);
         removedComponent_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000040);
@@ -5024,35 +5024,35 @@ public final class EntityData {
       }
       private int bitField0_;
 
-      // optional int32 id = 1;
-      private int id_ ;
+      // optional int64 id = 1;
+      private long id_ ;
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
-      public int getId() {
+      public long getId() {
         return id_;
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
-      public Builder setId(int value) {
+      public Builder setId(long value) {
         bitField0_ |= 0x00000001;
         id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = 0;
+        id_ = 0L;
         onChanged();
         return this;
       }
@@ -5470,35 +5470,35 @@ public final class EntityData {
         return this;
       }
 
-      // optional int32 owner = 6;
-      private int owner_ ;
+      // optional int64 owner = 6;
+      private long owner_ ;
       /**
-       * <code>optional int32 owner = 6;</code>
+       * <code>optional int64 owner = 6;</code>
        */
       public boolean hasOwner() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int32 owner = 6;</code>
+       * <code>optional int64 owner = 6;</code>
        */
-      public int getOwner() {
+      public long getOwner() {
         return owner_;
       }
       /**
-       * <code>optional int32 owner = 6;</code>
+       * <code>optional int64 owner = 6;</code>
        */
-      public Builder setOwner(int value) {
+      public Builder setOwner(long value) {
         bitField0_ |= 0x00000020;
         owner_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 owner = 6;</code>
+       * <code>optional int64 owner = 6;</code>
        */
       public Builder clearOwner() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        owner_ = 0;
+        owner_ = 0L;
         onChanged();
         return this;
       }
@@ -5611,15 +5611,15 @@ public final class EntityData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<PackedEntity> {
 
-    // optional int32 id = 1;
+    // optional int64 id = 1;
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
     boolean hasId();
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
-    int getId();
+    long getId();
 
     // repeated int32 componentId = 2 [packed = true];
     /**
@@ -5694,15 +5694,15 @@ public final class EntityData {
      */
     int getRemovedComponent(int index);
 
-    // optional int32 owner = 7;
+    // optional int64 owner = 7;
     /**
-     * <code>optional int32 owner = 7;</code>
+     * <code>optional int64 owner = 7;</code>
      */
     boolean hasOwner();
     /**
-     * <code>optional int32 owner = 7;</code>
+     * <code>optional int64 owner = 7;</code>
      */
-    int getOwner();
+    long getOwner();
 
     // optional string parentPrefabUri = 16;
     /**
@@ -5772,7 +5772,7 @@ public final class EntityData {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              id_ = input.readInt32();
+              id_ = input.readInt64();
               break;
             }
             case 16: {
@@ -5837,7 +5837,7 @@ public final class EntityData {
             }
             case 56: {
               bitField0_ |= 0x00000008;
-              owner_ = input.readInt32();
+              owner_ = input.readInt64();
               break;
             }
             case 130: {
@@ -5894,19 +5894,19 @@ public final class EntityData {
     }
 
     private int bitField0_;
-    // optional int32 id = 1;
+    // optional int64 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
-    private int id_;
+    private long id_;
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional int32 id = 1;</code>
+     * <code>optional int64 id = 1;</code>
      */
-    public int getId() {
+    public long getId() {
       return id_;
     }
 
@@ -6026,19 +6026,19 @@ public final class EntityData {
     }
     private int removedComponentMemoizedSerializedSize = -1;
 
-    // optional int32 owner = 7;
+    // optional int64 owner = 7;
     public static final int OWNER_FIELD_NUMBER = 7;
-    private int owner_;
+    private long owner_;
     /**
-     * <code>optional int32 owner = 7;</code>
+     * <code>optional int64 owner = 7;</code>
      */
     public boolean hasOwner() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional int32 owner = 7;</code>
+     * <code>optional int64 owner = 7;</code>
      */
-    public int getOwner() {
+    public long getOwner() {
       return owner_;
     }
 
@@ -6086,13 +6086,13 @@ public final class EntityData {
     }
 
     private void initFields() {
-      id_ = 0;
+      id_ = 0L;
       componentId_ = java.util.Collections.emptyList();
       componentFieldCounts_ = com.google.protobuf.ByteString.EMPTY;
       fieldIds_ = com.google.protobuf.ByteString.EMPTY;
       fieldValue_ = java.util.Collections.emptyList();
       removedComponent_ = java.util.Collections.emptyList();
-      owner_ = 0;
+      owner_ = 0L;
       parentPrefabUri_ = "";
     }
     private byte memoizedIsInitialized = -1;
@@ -6121,7 +6121,7 @@ public final class EntityData {
         .ExtendableMessage<org.terasology.protobuf.EntityData.PackedEntity>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, id_);
+        output.writeInt64(1, id_);
       }
       if (getComponentIdList().size() > 0) {
         output.writeRawVarint32(18);
@@ -6147,7 +6147,7 @@ public final class EntityData {
         output.writeInt32NoTag(removedComponent_.get(i));
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(7, owner_);
+        output.writeInt64(7, owner_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeBytes(16, getParentPrefabUriBytes());
@@ -6164,7 +6164,7 @@ public final class EntityData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, id_);
+          .computeInt64Size(1, id_);
       }
       {
         int dataSize = 0;
@@ -6208,7 +6208,7 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, owner_);
+          .computeInt64Size(7, owner_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -6332,7 +6332,7 @@ public final class EntityData {
 
       public Builder clear() {
         super.clear();
-        id_ = 0;
+        id_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000001);
         componentId_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -6348,7 +6348,7 @@ public final class EntityData {
         }
         removedComponent_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000020);
-        owner_ = 0;
+        owner_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000040);
         parentPrefabUri_ = "";
         bitField0_ = (bitField0_ & ~0x00000080);
@@ -6536,35 +6536,35 @@ public final class EntityData {
       }
       private int bitField0_;
 
-      // optional int32 id = 1;
-      private int id_ ;
+      // optional int64 id = 1;
+      private long id_ ;
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
-      public int getId() {
+      public long getId() {
         return id_;
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
-      public Builder setId(int value) {
+      public Builder setId(long value) {
         bitField0_ |= 0x00000001;
         id_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 id = 1;</code>
+       * <code>optional int64 id = 1;</code>
        */
       public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = 0;
+        id_ = 0L;
         onChanged();
         return this;
       }
@@ -7013,35 +7013,35 @@ public final class EntityData {
         return this;
       }
 
-      // optional int32 owner = 7;
-      private int owner_ ;
+      // optional int64 owner = 7;
+      private long owner_ ;
       /**
-       * <code>optional int32 owner = 7;</code>
+       * <code>optional int64 owner = 7;</code>
        */
       public boolean hasOwner() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
-       * <code>optional int32 owner = 7;</code>
+       * <code>optional int64 owner = 7;</code>
        */
-      public int getOwner() {
+      public long getOwner() {
         return owner_;
       }
       /**
-       * <code>optional int32 owner = 7;</code>
+       * <code>optional int64 owner = 7;</code>
        */
-      public Builder setOwner(int value) {
+      public Builder setOwner(long value) {
         bitField0_ |= 0x00000040;
         owner_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 owner = 7;</code>
+       * <code>optional int64 owner = 7;</code>
        */
       public Builder clearOwner() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        owner_ = 0;
+        owner_ = 0L;
         onChanged();
         return this;
       }
@@ -9696,19 +9696,19 @@ public final class EntityData {
     com.google.protobuf.ByteString
         getEntityNameBytes(int index);
 
-    // repeated int32 entityNamed = 4 [packed = true];
+    // repeated int64 entityNamed = 4 [packed = true];
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
-    java.util.List<java.lang.Integer> getEntityNamedList();
+    java.util.List<java.lang.Long> getEntityNamedList();
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
     int getEntityNamedCount();
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
-    int getEntityNamed(int index);
+    long getEntityNamed(int index);
   }
   /**
    * Protobuf type {@code EntityStore}
@@ -9787,21 +9787,21 @@ public final class EntityData {
             }
             case 32: {
               if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-                entityNamed_ = new java.util.ArrayList<java.lang.Integer>();
+                entityNamed_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000008;
               }
-              entityNamed_.add(input.readInt32());
+              entityNamed_.add(input.readInt64());
               break;
             }
             case 34: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000008) == 0x00000008) && input.getBytesUntilLimit() > 0) {
-                entityNamed_ = new java.util.ArrayList<java.lang.Integer>();
+                entityNamed_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000008;
               }
               while (input.getBytesUntilLimit() > 0) {
-                entityNamed_.add(input.readInt32());
+                entityNamed_.add(input.readInt64());
               }
               input.popLimit(limit);
               break;
@@ -9969,26 +9969,26 @@ public final class EntityData {
       return entityName_.getByteString(index);
     }
 
-    // repeated int32 entityNamed = 4 [packed = true];
+    // repeated int64 entityNamed = 4 [packed = true];
     public static final int ENTITYNAMED_FIELD_NUMBER = 4;
-    private java.util.List<java.lang.Integer> entityNamed_;
+    private java.util.List<java.lang.Long> entityNamed_;
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
-    public java.util.List<java.lang.Integer>
+    public java.util.List<java.lang.Long>
         getEntityNamedList() {
       return entityNamed_;
     }
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
     public int getEntityNamedCount() {
       return entityNamed_.size();
     }
     /**
-     * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+     * <code>repeated int64 entityNamed = 4 [packed = true];</code>
      */
-    public int getEntityNamed(int index) {
+    public long getEntityNamed(int index) {
       return entityNamed_.get(index);
     }
     private int entityNamedMemoizedSerializedSize = -1;
@@ -10038,7 +10038,7 @@ public final class EntityData {
         output.writeRawVarint32(entityNamedMemoizedSerializedSize);
       }
       for (int i = 0; i < entityNamed_.size(); i++) {
-        output.writeInt32NoTag(entityNamed_.get(i));
+        output.writeInt64NoTag(entityNamed_.get(i));
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -10076,7 +10076,7 @@ public final class EntityData {
         int dataSize = 0;
         for (int i = 0; i < entityNamed_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(entityNamed_.get(i));
+            .computeInt64SizeNoTag(entityNamed_.get(i));
         }
         size += dataSize;
         if (!getEntityNamedList().isEmpty()) {
@@ -10840,64 +10840,64 @@ public final class EntityData {
         return this;
       }
 
-      // repeated int32 entityNamed = 4 [packed = true];
-      private java.util.List<java.lang.Integer> entityNamed_ = java.util.Collections.emptyList();
+      // repeated int64 entityNamed = 4 [packed = true];
+      private java.util.List<java.lang.Long> entityNamed_ = java.util.Collections.emptyList();
       private void ensureEntityNamedIsMutable() {
         if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          entityNamed_ = new java.util.ArrayList<java.lang.Integer>(entityNamed_);
+          entityNamed_ = new java.util.ArrayList<java.lang.Long>(entityNamed_);
           bitField0_ |= 0x00000008;
          }
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
-      public java.util.List<java.lang.Integer>
+      public java.util.List<java.lang.Long>
           getEntityNamedList() {
         return java.util.Collections.unmodifiableList(entityNamed_);
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
       public int getEntityNamedCount() {
         return entityNamed_.size();
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
-      public int getEntityNamed(int index) {
+      public long getEntityNamed(int index) {
         return entityNamed_.get(index);
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
       public Builder setEntityNamed(
-          int index, int value) {
+          int index, long value) {
         ensureEntityNamedIsMutable();
         entityNamed_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
-      public Builder addEntityNamed(int value) {
+      public Builder addEntityNamed(long value) {
         ensureEntityNamedIsMutable();
         entityNamed_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
       public Builder addAllEntityNamed(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
+          java.lang.Iterable<? extends java.lang.Long> values) {
         ensureEntityNamedIsMutable();
         super.addAll(values, entityNamed_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 entityNamed = 4 [packed = true];</code>
+       * <code>repeated int64 entityNamed = 4 [packed = true];</code>
        */
       public Builder clearEntityNamed() {
         entityNamed_ = java.util.Collections.emptyList();
@@ -14823,916 +14823,6 @@ public final class EntityData {
     // @@protoc_insertion_point(class_scope:RunLengthEncoding8)
   }
 
-  public interface EntityStoreMetadataOrBuilder extends
-      com.google.protobuf.GeneratedMessage.
-          ExtendableMessageOrBuilder<EntityStoreMetadata> {
-
-    // optional .StoreType type = 1;
-    /**
-     * <code>optional .StoreType type = 1;</code>
-     */
-    boolean hasType();
-    /**
-     * <code>optional .StoreType type = 1;</code>
-     */
-    org.terasology.protobuf.EntityData.StoreType getType();
-
-    // optional string storeStringId = 2;
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    boolean hasStoreStringId();
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    java.lang.String getStoreStringId();
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getStoreStringIdBytes();
-
-    // repeated int32 storeIntegerId = 3 [packed = true];
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    java.util.List<java.lang.Integer> getStoreIntegerIdList();
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    int getStoreIntegerIdCount();
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    int getStoreIntegerId(int index);
-
-    // repeated int32 reference = 4 [packed = true];
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    java.util.List<java.lang.Integer> getReferenceList();
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    int getReferenceCount();
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    int getReference(int index);
-  }
-  /**
-   * Protobuf type {@code EntityStoreMetadata}
-   */
-  public static final class EntityStoreMetadata extends
-      com.google.protobuf.GeneratedMessage.ExtendableMessage<
-        EntityStoreMetadata> implements EntityStoreMetadataOrBuilder {
-    // Use EntityStoreMetadata.newBuilder() to construct.
-    private EntityStoreMetadata(com.google.protobuf.GeneratedMessage.ExtendableBuilder<org.terasology.protobuf.EntityData.EntityStoreMetadata, ?> builder) {
-      super(builder);
-      this.unknownFields = builder.getUnknownFields();
-    }
-    private EntityStoreMetadata(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final EntityStoreMetadata defaultInstance;
-    public static EntityStoreMetadata getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public EntityStoreMetadata getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-      return this.unknownFields;
-    }
-    private EntityStoreMetadata(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-            case 8: {
-              int rawValue = input.readEnum();
-              org.terasology.protobuf.EntityData.StoreType value = org.terasology.protobuf.EntityData.StoreType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(1, rawValue);
-              } else {
-                bitField0_ |= 0x00000001;
-                type_ = value;
-              }
-              break;
-            }
-            case 18: {
-              bitField0_ |= 0x00000002;
-              storeStringId_ = input.readBytes();
-              break;
-            }
-            case 24: {
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-                storeIntegerId_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000004;
-              }
-              storeIntegerId_.add(input.readInt32());
-              break;
-            }
-            case 26: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000004) == 0x00000004) && input.getBytesUntilLimit() > 0) {
-                storeIntegerId_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000004;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                storeIntegerId_.add(input.readInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
-            case 32: {
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-                reference_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              reference_.add(input.readInt32());
-              break;
-            }
-            case 34: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008) && input.getBytesUntilLimit() > 0) {
-                reference_ = new java.util.ArrayList<java.lang.Integer>();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              while (input.getBytesUntilLimit() > 0) {
-                reference_.add(input.readInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
-      } finally {
-        if (((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
-          storeIntegerId_ = java.util.Collections.unmodifiableList(storeIntegerId_);
-        }
-        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
-          reference_ = java.util.Collections.unmodifiableList(reference_);
-        }
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.terasology.protobuf.EntityData.internal_static_EntityStoreMetadata_descriptor;
-    }
-
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.terasology.protobuf.EntityData.internal_static_EntityStoreMetadata_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.terasology.protobuf.EntityData.EntityStoreMetadata.class, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder.class);
-    }
-
-    public static com.google.protobuf.Parser<EntityStoreMetadata> PARSER =
-        new com.google.protobuf.AbstractParser<EntityStoreMetadata>() {
-      public EntityStoreMetadata parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new EntityStoreMetadata(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<EntityStoreMetadata> getParserForType() {
-      return PARSER;
-    }
-
-    private int bitField0_;
-    // optional .StoreType type = 1;
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private org.terasology.protobuf.EntityData.StoreType type_;
-    /**
-     * <code>optional .StoreType type = 1;</code>
-     */
-    public boolean hasType() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    /**
-     * <code>optional .StoreType type = 1;</code>
-     */
-    public org.terasology.protobuf.EntityData.StoreType getType() {
-      return type_;
-    }
-
-    // optional string storeStringId = 2;
-    public static final int STORESTRINGID_FIELD_NUMBER = 2;
-    private java.lang.Object storeStringId_;
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    public boolean hasStoreStringId() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    public java.lang.String getStoreStringId() {
-      java.lang.Object ref = storeStringId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          storeStringId_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string storeStringId = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getStoreStringIdBytes() {
-      java.lang.Object ref = storeStringId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        storeStringId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    // repeated int32 storeIntegerId = 3 [packed = true];
-    public static final int STOREINTEGERID_FIELD_NUMBER = 3;
-    private java.util.List<java.lang.Integer> storeIntegerId_;
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    public java.util.List<java.lang.Integer>
-        getStoreIntegerIdList() {
-      return storeIntegerId_;
-    }
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    public int getStoreIntegerIdCount() {
-      return storeIntegerId_.size();
-    }
-    /**
-     * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-     */
-    public int getStoreIntegerId(int index) {
-      return storeIntegerId_.get(index);
-    }
-    private int storeIntegerIdMemoizedSerializedSize = -1;
-
-    // repeated int32 reference = 4 [packed = true];
-    public static final int REFERENCE_FIELD_NUMBER = 4;
-    private java.util.List<java.lang.Integer> reference_;
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    public java.util.List<java.lang.Integer>
-        getReferenceList() {
-      return reference_;
-    }
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    public int getReferenceCount() {
-      return reference_.size();
-    }
-    /**
-     * <code>repeated int32 reference = 4 [packed = true];</code>
-     */
-    public int getReference(int index) {
-      return reference_.get(index);
-    }
-    private int referenceMemoizedSerializedSize = -1;
-
-    private void initFields() {
-      type_ = org.terasology.protobuf.EntityData.StoreType.PlayerStoreType;
-      storeStringId_ = "";
-      storeIntegerId_ = java.util.Collections.emptyList();
-      reference_ = java.util.Collections.emptyList();
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-
-      if (!extensionsAreInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.EntityData.EntityStoreMetadata>.ExtensionWriter extensionWriter =
-          newExtensionWriter();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, type_.getNumber());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, getStoreStringIdBytes());
-      }
-      if (getStoreIntegerIdList().size() > 0) {
-        output.writeRawVarint32(26);
-        output.writeRawVarint32(storeIntegerIdMemoizedSerializedSize);
-      }
-      for (int i = 0; i < storeIntegerId_.size(); i++) {
-        output.writeInt32NoTag(storeIntegerId_.get(i));
-      }
-      if (getReferenceList().size() > 0) {
-        output.writeRawVarint32(34);
-        output.writeRawVarint32(referenceMemoizedSerializedSize);
-      }
-      for (int i = 0; i < reference_.size(); i++) {
-        output.writeInt32NoTag(reference_.get(i));
-      }
-      extensionWriter.writeUntil(536870912, output);
-      getUnknownFields().writeTo(output);
-    }
-
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, type_.getNumber());
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, getStoreStringIdBytes());
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < storeIntegerId_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(storeIntegerId_.get(i));
-        }
-        size += dataSize;
-        if (!getStoreIntegerIdList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        storeIntegerIdMemoizedSerializedSize = dataSize;
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < reference_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(reference_.get(i));
-        }
-        size += dataSize;
-        if (!getReferenceList().isEmpty()) {
-          size += 1;
-          size += com.google.protobuf.CodedOutputStream
-              .computeInt32SizeNoTag(dataSize);
-        }
-        referenceMemoizedSerializedSize = dataSize;
-      }
-      size += extensionsSerializedSize();
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-
-    private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.terasology.protobuf.EntityData.EntityStoreMetadata parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.EntityData.EntityStoreMetadata prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code EntityStoreMetadata}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
-          org.terasology.protobuf.EntityData.EntityStoreMetadata, Builder> implements org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.terasology.protobuf.EntityData.internal_static_EntityStoreMetadata_descriptor;
-      }
-
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.terasology.protobuf.EntityData.internal_static_EntityStoreMetadata_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.terasology.protobuf.EntityData.EntityStoreMetadata.class, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder.class);
-      }
-
-      // Construct using org.terasology.protobuf.EntityData.EntityStoreMetadata.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-
-      public Builder clear() {
-        super.clear();
-        type_ = org.terasology.protobuf.EntityData.StoreType.PlayerStoreType;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        storeStringId_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
-        storeIntegerId_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        reference_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.terasology.protobuf.EntityData.internal_static_EntityStoreMetadata_descriptor;
-      }
-
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata getDefaultInstanceForType() {
-        return org.terasology.protobuf.EntityData.EntityStoreMetadata.getDefaultInstance();
-      }
-
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata build() {
-        org.terasology.protobuf.EntityData.EntityStoreMetadata result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata buildPartial() {
-        org.terasology.protobuf.EntityData.EntityStoreMetadata result = new org.terasology.protobuf.EntityData.EntityStoreMetadata(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.type_ = type_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.storeStringId_ = storeStringId_;
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          storeIntegerId_ = java.util.Collections.unmodifiableList(storeIntegerId_);
-          bitField0_ = (bitField0_ & ~0x00000004);
-        }
-        result.storeIntegerId_ = storeIntegerId_;
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
-          reference_ = java.util.Collections.unmodifiableList(reference_);
-          bitField0_ = (bitField0_ & ~0x00000008);
-        }
-        result.reference_ = reference_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.terasology.protobuf.EntityData.EntityStoreMetadata) {
-          return mergeFrom((org.terasology.protobuf.EntityData.EntityStoreMetadata)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(org.terasology.protobuf.EntityData.EntityStoreMetadata other) {
-        if (other == org.terasology.protobuf.EntityData.EntityStoreMetadata.getDefaultInstance()) return this;
-        if (other.hasType()) {
-          setType(other.getType());
-        }
-        if (other.hasStoreStringId()) {
-          bitField0_ |= 0x00000002;
-          storeStringId_ = other.storeStringId_;
-          onChanged();
-        }
-        if (!other.storeIntegerId_.isEmpty()) {
-          if (storeIntegerId_.isEmpty()) {
-            storeIntegerId_ = other.storeIntegerId_;
-            bitField0_ = (bitField0_ & ~0x00000004);
-          } else {
-            ensureStoreIntegerIdIsMutable();
-            storeIntegerId_.addAll(other.storeIntegerId_);
-          }
-          onChanged();
-        }
-        if (!other.reference_.isEmpty()) {
-          if (reference_.isEmpty()) {
-            reference_ = other.reference_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-          } else {
-            ensureReferenceIsMutable();
-            reference_.addAll(other.reference_);
-          }
-          onChanged();
-        }
-        this.mergeExtensionFields(other);
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-
-      public final boolean isInitialized() {
-        if (!extensionsAreInitialized()) {
-          
-          return false;
-        }
-        return true;
-      }
-
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        org.terasology.protobuf.EntityData.EntityStoreMetadata parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (org.terasology.protobuf.EntityData.EntityStoreMetadata) e.getUnfinishedMessage();
-          throw e;
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-      private int bitField0_;
-
-      // optional .StoreType type = 1;
-      private org.terasology.protobuf.EntityData.StoreType type_ = org.terasology.protobuf.EntityData.StoreType.PlayerStoreType;
-      /**
-       * <code>optional .StoreType type = 1;</code>
-       */
-      public boolean hasType() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
-      }
-      /**
-       * <code>optional .StoreType type = 1;</code>
-       */
-      public org.terasology.protobuf.EntityData.StoreType getType() {
-        return type_;
-      }
-      /**
-       * <code>optional .StoreType type = 1;</code>
-       */
-      public Builder setType(org.terasology.protobuf.EntityData.StoreType value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        bitField0_ |= 0x00000001;
-        type_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional .StoreType type = 1;</code>
-       */
-      public Builder clearType() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = org.terasology.protobuf.EntityData.StoreType.PlayerStoreType;
-        onChanged();
-        return this;
-      }
-
-      // optional string storeStringId = 2;
-      private java.lang.Object storeStringId_ = "";
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public boolean hasStoreStringId() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public java.lang.String getStoreStringId() {
-        java.lang.Object ref = storeStringId_;
-        if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          storeStringId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getStoreStringIdBytes() {
-        java.lang.Object ref = storeStringId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          storeStringId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public Builder setStoreStringId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        storeStringId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public Builder clearStoreStringId() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        storeStringId_ = getDefaultInstance().getStoreStringId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string storeStringId = 2;</code>
-       */
-      public Builder setStoreStringIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        storeStringId_ = value;
-        onChanged();
-        return this;
-      }
-
-      // repeated int32 storeIntegerId = 3 [packed = true];
-      private java.util.List<java.lang.Integer> storeIntegerId_ = java.util.Collections.emptyList();
-      private void ensureStoreIntegerIdIsMutable() {
-        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
-          storeIntegerId_ = new java.util.ArrayList<java.lang.Integer>(storeIntegerId_);
-          bitField0_ |= 0x00000004;
-         }
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public java.util.List<java.lang.Integer>
-          getStoreIntegerIdList() {
-        return java.util.Collections.unmodifiableList(storeIntegerId_);
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public int getStoreIntegerIdCount() {
-        return storeIntegerId_.size();
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public int getStoreIntegerId(int index) {
-        return storeIntegerId_.get(index);
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public Builder setStoreIntegerId(
-          int index, int value) {
-        ensureStoreIntegerIdIsMutable();
-        storeIntegerId_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public Builder addStoreIntegerId(int value) {
-        ensureStoreIntegerIdIsMutable();
-        storeIntegerId_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public Builder addAllStoreIntegerId(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureStoreIntegerIdIsMutable();
-        super.addAll(values, storeIntegerId_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 storeIntegerId = 3 [packed = true];</code>
-       */
-      public Builder clearStoreIntegerId() {
-        storeIntegerId_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);
-        onChanged();
-        return this;
-      }
-
-      // repeated int32 reference = 4 [packed = true];
-      private java.util.List<java.lang.Integer> reference_ = java.util.Collections.emptyList();
-      private void ensureReferenceIsMutable() {
-        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
-          reference_ = new java.util.ArrayList<java.lang.Integer>(reference_);
-          bitField0_ |= 0x00000008;
-         }
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public java.util.List<java.lang.Integer>
-          getReferenceList() {
-        return java.util.Collections.unmodifiableList(reference_);
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public int getReferenceCount() {
-        return reference_.size();
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public int getReference(int index) {
-        return reference_.get(index);
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public Builder setReference(
-          int index, int value) {
-        ensureReferenceIsMutable();
-        reference_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public Builder addReference(int value) {
-        ensureReferenceIsMutable();
-        reference_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public Builder addAllReference(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureReferenceIsMutable();
-        super.addAll(values, reference_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated int32 reference = 4 [packed = true];</code>
-       */
-      public Builder clearReference() {
-        reference_ = java.util.Collections.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:EntityStoreMetadata)
-    }
-
-    static {
-      defaultInstance = new EntityStoreMetadata(true);
-      defaultInstance.initFields();
-    }
-
-    // @@protoc_insertion_point(class_scope:EntityStoreMetadata)
-  }
-
   public interface GlobalStoreOrBuilder extends
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<GlobalStore> {
@@ -15807,29 +14897,29 @@ public final class EntityData {
     com.google.protobuf.ByteString
         getComponentClassBytes(int index);
 
-    // optional int32 next_entity_id = 16;
+    // optional int64 next_entity_id = 16;
     /**
-     * <code>optional int32 next_entity_id = 16;</code>
+     * <code>optional int64 next_entity_id = 16;</code>
      */
     boolean hasNextEntityId();
     /**
-     * <code>optional int32 next_entity_id = 16;</code>
+     * <code>optional int64 next_entity_id = 16;</code>
      */
-    int getNextEntityId();
+    long getNextEntityId();
 
-    // repeated int32 freed_entity_id = 17 [packed = true];
+    // repeated int64 deprecated_data_17 = 17 [packed = true];
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    java.util.List<java.lang.Integer> getFreedEntityIdList();
+    java.util.List<java.lang.Long> getDeprecatedData17List();
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    int getFreedEntityIdCount();
+    int getDeprecatedData17Count();
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    int getFreedEntityId(int index);
+    long getDeprecatedData17(int index);
 
     // repeated string prefab_name = 18;
     /**
@@ -15866,31 +14956,6 @@ public final class EntityData {
      */
     com.google.protobuf.ByteString
         getPrefabNameBytes(int index);
-
-    // repeated .EntityStoreMetadata storeReferenceSet = 19;
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata> 
-        getStoreReferenceSetList();
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    org.terasology.protobuf.EntityData.EntityStoreMetadata getStoreReferenceSet(int index);
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    int getStoreReferenceSetCount();
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    java.util.List<? extends org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder> 
-        getStoreReferenceSetOrBuilderList();
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder getStoreReferenceSetOrBuilder(
-        int index);
   }
   /**
    * Protobuf type {@code GlobalStore}
@@ -15969,26 +15034,26 @@ public final class EntityData {
             }
             case 128: {
               bitField0_ |= 0x00000001;
-              nextEntityId_ = input.readInt32();
+              nextEntityId_ = input.readInt64();
               break;
             }
             case 136: {
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-                freedEntityId_ = new java.util.ArrayList<java.lang.Integer>();
+                deprecatedData17_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000010;
               }
-              freedEntityId_.add(input.readInt32());
+              deprecatedData17_.add(input.readInt64());
               break;
             }
             case 138: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000010) == 0x00000010) && input.getBytesUntilLimit() > 0) {
-                freedEntityId_ = new java.util.ArrayList<java.lang.Integer>();
+                deprecatedData17_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000010;
               }
               while (input.getBytesUntilLimit() > 0) {
-                freedEntityId_.add(input.readInt32());
+                deprecatedData17_.add(input.readInt64());
               }
               input.popLimit(limit);
               break;
@@ -15999,14 +15064,6 @@ public final class EntityData {
                 mutable_bitField0_ |= 0x00000020;
               }
               prefabName_.add(input.readBytes());
-              break;
-            }
-            case 154: {
-              if (!((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-                storeReferenceSet_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.EntityStoreMetadata>();
-                mutable_bitField0_ |= 0x00000040;
-              }
-              storeReferenceSet_.add(input.readMessage(org.terasology.protobuf.EntityData.EntityStoreMetadata.PARSER, extensionRegistry));
               break;
             }
           }
@@ -16027,13 +15084,10 @@ public final class EntityData {
           componentClass_ = new com.google.protobuf.UnmodifiableLazyStringList(componentClass_);
         }
         if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
+          deprecatedData17_ = java.util.Collections.unmodifiableList(deprecatedData17_);
         }
         if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
           prefabName_ = new com.google.protobuf.UnmodifiableLazyStringList(prefabName_);
-        }
-        if (((mutable_bitField0_ & 0x00000040) == 0x00000040)) {
-          storeReferenceSet_ = java.util.Collections.unmodifiableList(storeReferenceSet_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -16169,45 +15223,45 @@ public final class EntityData {
       return componentClass_.getByteString(index);
     }
 
-    // optional int32 next_entity_id = 16;
+    // optional int64 next_entity_id = 16;
     public static final int NEXT_ENTITY_ID_FIELD_NUMBER = 16;
-    private int nextEntityId_;
+    private long nextEntityId_;
     /**
-     * <code>optional int32 next_entity_id = 16;</code>
+     * <code>optional int64 next_entity_id = 16;</code>
      */
     public boolean hasNextEntityId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional int32 next_entity_id = 16;</code>
+     * <code>optional int64 next_entity_id = 16;</code>
      */
-    public int getNextEntityId() {
+    public long getNextEntityId() {
       return nextEntityId_;
     }
 
-    // repeated int32 freed_entity_id = 17 [packed = true];
-    public static final int FREED_ENTITY_ID_FIELD_NUMBER = 17;
-    private java.util.List<java.lang.Integer> freedEntityId_;
+    // repeated int64 deprecated_data_17 = 17 [packed = true];
+    public static final int DEPRECATED_DATA_17_FIELD_NUMBER = 17;
+    private java.util.List<java.lang.Long> deprecatedData17_;
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    public java.util.List<java.lang.Integer>
-        getFreedEntityIdList() {
-      return freedEntityId_;
+    public java.util.List<java.lang.Long>
+        getDeprecatedData17List() {
+      return deprecatedData17_;
     }
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    public int getFreedEntityIdCount() {
-      return freedEntityId_.size();
+    public int getDeprecatedData17Count() {
+      return deprecatedData17_.size();
     }
     /**
-     * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+     * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
      */
-    public int getFreedEntityId(int index) {
-      return freedEntityId_.get(index);
+    public long getDeprecatedData17(int index) {
+      return deprecatedData17_.get(index);
     }
-    private int freedEntityIdMemoizedSerializedSize = -1;
+    private int deprecatedData17MemoizedSerializedSize = -1;
 
     // repeated string prefab_name = 18;
     public static final int PREFAB_NAME_FIELD_NUMBER = 18;
@@ -16255,50 +15309,13 @@ public final class EntityData {
       return prefabName_.getByteString(index);
     }
 
-    // repeated .EntityStoreMetadata storeReferenceSet = 19;
-    public static final int STOREREFERENCESET_FIELD_NUMBER = 19;
-    private java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata> storeReferenceSet_;
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    public java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata> getStoreReferenceSetList() {
-      return storeReferenceSet_;
-    }
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    public java.util.List<? extends org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder> 
-        getStoreReferenceSetOrBuilderList() {
-      return storeReferenceSet_;
-    }
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    public int getStoreReferenceSetCount() {
-      return storeReferenceSet_.size();
-    }
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    public org.terasology.protobuf.EntityData.EntityStoreMetadata getStoreReferenceSet(int index) {
-      return storeReferenceSet_.get(index);
-    }
-    /**
-     * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-     */
-    public org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder getStoreReferenceSetOrBuilder(
-        int index) {
-      return storeReferenceSet_.get(index);
-    }
-
     private void initFields() {
       entity_ = java.util.Collections.emptyList();
       prefab_ = java.util.Collections.emptyList();
       componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      nextEntityId_ = 0;
-      freedEntityId_ = java.util.Collections.emptyList();
+      nextEntityId_ = 0L;
+      deprecatedData17_ = java.util.Collections.emptyList();
       prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      storeReferenceSet_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -16313,12 +15330,6 @@ public final class EntityData {
       }
       for (int i = 0; i < getPrefabCount(); i++) {
         if (!getPrefab(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      for (int i = 0; i < getStoreReferenceSetCount(); i++) {
-        if (!getStoreReferenceSet(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -16347,20 +15358,17 @@ public final class EntityData {
         output.writeBytes(3, componentClass_.getByteString(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(16, nextEntityId_);
+        output.writeInt64(16, nextEntityId_);
       }
-      if (getFreedEntityIdList().size() > 0) {
+      if (getDeprecatedData17List().size() > 0) {
         output.writeRawVarint32(138);
-        output.writeRawVarint32(freedEntityIdMemoizedSerializedSize);
+        output.writeRawVarint32(deprecatedData17MemoizedSerializedSize);
       }
-      for (int i = 0; i < freedEntityId_.size(); i++) {
-        output.writeInt32NoTag(freedEntityId_.get(i));
+      for (int i = 0; i < deprecatedData17_.size(); i++) {
+        output.writeInt64NoTag(deprecatedData17_.get(i));
       }
       for (int i = 0; i < prefabName_.size(); i++) {
         output.writeBytes(18, prefabName_.getByteString(i));
-      }
-      for (int i = 0; i < storeReferenceSet_.size(); i++) {
-        output.writeMessage(19, storeReferenceSet_.get(i));
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -16391,21 +15399,21 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(16, nextEntityId_);
+          .computeInt64Size(16, nextEntityId_);
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < freedEntityId_.size(); i++) {
+        for (int i = 0; i < deprecatedData17_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(freedEntityId_.get(i));
+            .computeInt64SizeNoTag(deprecatedData17_.get(i));
         }
         size += dataSize;
-        if (!getFreedEntityIdList().isEmpty()) {
+        if (!getDeprecatedData17List().isEmpty()) {
           size += 2;
           size += com.google.protobuf.CodedOutputStream
               .computeInt32SizeNoTag(dataSize);
         }
-        freedEntityIdMemoizedSerializedSize = dataSize;
+        deprecatedData17MemoizedSerializedSize = dataSize;
       }
       {
         int dataSize = 0;
@@ -16415,10 +15423,6 @@ public final class EntityData {
         }
         size += dataSize;
         size += 2 * getPrefabNameList().size();
-      }
-      for (int i = 0; i < storeReferenceSet_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(19, storeReferenceSet_.get(i));
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -16531,7 +15535,6 @@ public final class EntityData {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getEntityFieldBuilder();
           getPrefabFieldBuilder();
-          getStoreReferenceSetFieldBuilder();
         }
       }
       private static Builder create() {
@@ -16554,18 +15557,12 @@ public final class EntityData {
         }
         componentClass_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
-        nextEntityId_ = 0;
+        nextEntityId_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000008);
-        freedEntityId_ = java.util.Collections.emptyList();
+        deprecatedData17_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         prefabName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000020);
-        if (storeReferenceSetBuilder_ == null) {
-          storeReferenceSet_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000040);
-        } else {
-          storeReferenceSetBuilder_.clear();
-        }
         return this;
       }
 
@@ -16623,25 +15620,16 @@ public final class EntityData {
         }
         result.nextEntityId_ = nextEntityId_;
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = java.util.Collections.unmodifiableList(freedEntityId_);
+          deprecatedData17_ = java.util.Collections.unmodifiableList(deprecatedData17_);
           bitField0_ = (bitField0_ & ~0x00000010);
         }
-        result.freedEntityId_ = freedEntityId_;
+        result.deprecatedData17_ = deprecatedData17_;
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           prefabName_ = new com.google.protobuf.UnmodifiableLazyStringList(
               prefabName_);
           bitField0_ = (bitField0_ & ~0x00000020);
         }
         result.prefabName_ = prefabName_;
-        if (storeReferenceSetBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040)) {
-            storeReferenceSet_ = java.util.Collections.unmodifiableList(storeReferenceSet_);
-            bitField0_ = (bitField0_ & ~0x00000040);
-          }
-          result.storeReferenceSet_ = storeReferenceSet_;
-        } else {
-          result.storeReferenceSet_ = storeReferenceSetBuilder_.build();
-        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -16723,13 +15711,13 @@ public final class EntityData {
         if (other.hasNextEntityId()) {
           setNextEntityId(other.getNextEntityId());
         }
-        if (!other.freedEntityId_.isEmpty()) {
-          if (freedEntityId_.isEmpty()) {
-            freedEntityId_ = other.freedEntityId_;
+        if (!other.deprecatedData17_.isEmpty()) {
+          if (deprecatedData17_.isEmpty()) {
+            deprecatedData17_ = other.deprecatedData17_;
             bitField0_ = (bitField0_ & ~0x00000010);
           } else {
-            ensureFreedEntityIdIsMutable();
-            freedEntityId_.addAll(other.freedEntityId_);
+            ensureDeprecatedData17IsMutable();
+            deprecatedData17_.addAll(other.deprecatedData17_);
           }
           onChanged();
         }
@@ -16742,32 +15730,6 @@ public final class EntityData {
             prefabName_.addAll(other.prefabName_);
           }
           onChanged();
-        }
-        if (storeReferenceSetBuilder_ == null) {
-          if (!other.storeReferenceSet_.isEmpty()) {
-            if (storeReferenceSet_.isEmpty()) {
-              storeReferenceSet_ = other.storeReferenceSet_;
-              bitField0_ = (bitField0_ & ~0x00000040);
-            } else {
-              ensureStoreReferenceSetIsMutable();
-              storeReferenceSet_.addAll(other.storeReferenceSet_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.storeReferenceSet_.isEmpty()) {
-            if (storeReferenceSetBuilder_.isEmpty()) {
-              storeReferenceSetBuilder_.dispose();
-              storeReferenceSetBuilder_ = null;
-              storeReferenceSet_ = other.storeReferenceSet_;
-              bitField0_ = (bitField0_ & ~0x00000040);
-              storeReferenceSetBuilder_ = 
-                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getStoreReferenceSetFieldBuilder() : null;
-            } else {
-              storeReferenceSetBuilder_.addAllMessages(other.storeReferenceSet_);
-            }
-          }
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -16783,12 +15745,6 @@ public final class EntityData {
         }
         for (int i = 0; i < getPrefabCount(); i++) {
           if (!getPrefab(i).isInitialized()) {
-            
-            return false;
-          }
-        }
-        for (int i = 0; i < getStoreReferenceSetCount(); i++) {
-          if (!getStoreReferenceSet(i).isInitialized()) {
             
             return false;
           }
@@ -17392,100 +16348,100 @@ public final class EntityData {
         return this;
       }
 
-      // optional int32 next_entity_id = 16;
-      private int nextEntityId_ ;
+      // optional int64 next_entity_id = 16;
+      private long nextEntityId_ ;
       /**
-       * <code>optional int32 next_entity_id = 16;</code>
+       * <code>optional int64 next_entity_id = 16;</code>
        */
       public boolean hasNextEntityId() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional int32 next_entity_id = 16;</code>
+       * <code>optional int64 next_entity_id = 16;</code>
        */
-      public int getNextEntityId() {
+      public long getNextEntityId() {
         return nextEntityId_;
       }
       /**
-       * <code>optional int32 next_entity_id = 16;</code>
+       * <code>optional int64 next_entity_id = 16;</code>
        */
-      public Builder setNextEntityId(int value) {
+      public Builder setNextEntityId(long value) {
         bitField0_ |= 0x00000008;
         nextEntityId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 next_entity_id = 16;</code>
+       * <code>optional int64 next_entity_id = 16;</code>
        */
       public Builder clearNextEntityId() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        nextEntityId_ = 0;
+        nextEntityId_ = 0L;
         onChanged();
         return this;
       }
 
-      // repeated int32 freed_entity_id = 17 [packed = true];
-      private java.util.List<java.lang.Integer> freedEntityId_ = java.util.Collections.emptyList();
-      private void ensureFreedEntityIdIsMutable() {
+      // repeated int64 deprecated_data_17 = 17 [packed = true];
+      private java.util.List<java.lang.Long> deprecatedData17_ = java.util.Collections.emptyList();
+      private void ensureDeprecatedData17IsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
-          freedEntityId_ = new java.util.ArrayList<java.lang.Integer>(freedEntityId_);
+          deprecatedData17_ = new java.util.ArrayList<java.lang.Long>(deprecatedData17_);
           bitField0_ |= 0x00000010;
          }
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public java.util.List<java.lang.Integer>
-          getFreedEntityIdList() {
-        return java.util.Collections.unmodifiableList(freedEntityId_);
+      public java.util.List<java.lang.Long>
+          getDeprecatedData17List() {
+        return java.util.Collections.unmodifiableList(deprecatedData17_);
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public int getFreedEntityIdCount() {
-        return freedEntityId_.size();
+      public int getDeprecatedData17Count() {
+        return deprecatedData17_.size();
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public int getFreedEntityId(int index) {
-        return freedEntityId_.get(index);
+      public long getDeprecatedData17(int index) {
+        return deprecatedData17_.get(index);
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder setFreedEntityId(
-          int index, int value) {
-        ensureFreedEntityIdIsMutable();
-        freedEntityId_.set(index, value);
+      public Builder setDeprecatedData17(
+          int index, long value) {
+        ensureDeprecatedData17IsMutable();
+        deprecatedData17_.set(index, value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder addFreedEntityId(int value) {
-        ensureFreedEntityIdIsMutable();
-        freedEntityId_.add(value);
+      public Builder addDeprecatedData17(long value) {
+        ensureDeprecatedData17IsMutable();
+        deprecatedData17_.add(value);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder addAllFreedEntityId(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureFreedEntityIdIsMutable();
-        super.addAll(values, freedEntityId_);
+      public Builder addAllDeprecatedData17(
+          java.lang.Iterable<? extends java.lang.Long> values) {
+        ensureDeprecatedData17IsMutable();
+        super.addAll(values, deprecatedData17_);
         onChanged();
         return this;
       }
       /**
-       * <code>repeated int32 freed_entity_id = 17 [packed = true];</code>
+       * <code>repeated int64 deprecated_data_17 = 17 [packed = true];</code>
        */
-      public Builder clearFreedEntityId() {
-        freedEntityId_ = java.util.Collections.emptyList();
+      public Builder clearDeprecatedData17() {
+        deprecatedData17_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
@@ -17620,246 +16576,6 @@ public final class EntityData {
         return this;
       }
 
-      // repeated .EntityStoreMetadata storeReferenceSet = 19;
-      private java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata> storeReferenceSet_ =
-        java.util.Collections.emptyList();
-      private void ensureStoreReferenceSetIsMutable() {
-        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
-          storeReferenceSet_ = new java.util.ArrayList<org.terasology.protobuf.EntityData.EntityStoreMetadata>(storeReferenceSet_);
-          bitField0_ |= 0x00000040;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.EntityData.EntityStoreMetadata, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder, org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder> storeReferenceSetBuilder_;
-
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata> getStoreReferenceSetList() {
-        if (storeReferenceSetBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(storeReferenceSet_);
-        } else {
-          return storeReferenceSetBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public int getStoreReferenceSetCount() {
-        if (storeReferenceSetBuilder_ == null) {
-          return storeReferenceSet_.size();
-        } else {
-          return storeReferenceSetBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata getStoreReferenceSet(int index) {
-        if (storeReferenceSetBuilder_ == null) {
-          return storeReferenceSet_.get(index);
-        } else {
-          return storeReferenceSetBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder setStoreReferenceSet(
-          int index, org.terasology.protobuf.EntityData.EntityStoreMetadata value) {
-        if (storeReferenceSetBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.set(index, value);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder setStoreReferenceSet(
-          int index, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder builderForValue) {
-        if (storeReferenceSetBuilder_ == null) {
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder addStoreReferenceSet(org.terasology.protobuf.EntityData.EntityStoreMetadata value) {
-        if (storeReferenceSetBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.add(value);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder addStoreReferenceSet(
-          int index, org.terasology.protobuf.EntityData.EntityStoreMetadata value) {
-        if (storeReferenceSetBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.add(index, value);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder addStoreReferenceSet(
-          org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder builderForValue) {
-        if (storeReferenceSetBuilder_ == null) {
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.add(builderForValue.build());
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder addStoreReferenceSet(
-          int index, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder builderForValue) {
-        if (storeReferenceSetBuilder_ == null) {
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder addAllStoreReferenceSet(
-          java.lang.Iterable<? extends org.terasology.protobuf.EntityData.EntityStoreMetadata> values) {
-        if (storeReferenceSetBuilder_ == null) {
-          ensureStoreReferenceSetIsMutable();
-          super.addAll(values, storeReferenceSet_);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder clearStoreReferenceSet() {
-        if (storeReferenceSetBuilder_ == null) {
-          storeReferenceSet_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000040);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public Builder removeStoreReferenceSet(int index) {
-        if (storeReferenceSetBuilder_ == null) {
-          ensureStoreReferenceSetIsMutable();
-          storeReferenceSet_.remove(index);
-          onChanged();
-        } else {
-          storeReferenceSetBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder getStoreReferenceSetBuilder(
-          int index) {
-        return getStoreReferenceSetFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder getStoreReferenceSetOrBuilder(
-          int index) {
-        if (storeReferenceSetBuilder_ == null) {
-          return storeReferenceSet_.get(index);  } else {
-          return storeReferenceSetBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public java.util.List<? extends org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder> 
-           getStoreReferenceSetOrBuilderList() {
-        if (storeReferenceSetBuilder_ != null) {
-          return storeReferenceSetBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(storeReferenceSet_);
-        }
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder addStoreReferenceSetBuilder() {
-        return getStoreReferenceSetFieldBuilder().addBuilder(
-            org.terasology.protobuf.EntityData.EntityStoreMetadata.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder addStoreReferenceSetBuilder(
-          int index) {
-        return getStoreReferenceSetFieldBuilder().addBuilder(
-            index, org.terasology.protobuf.EntityData.EntityStoreMetadata.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .EntityStoreMetadata storeReferenceSet = 19;</code>
-       */
-      public java.util.List<org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder> 
-           getStoreReferenceSetBuilderList() {
-        return getStoreReferenceSetFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.EntityData.EntityStoreMetadata, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder, org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder> 
-          getStoreReferenceSetFieldBuilder() {
-        if (storeReferenceSetBuilder_ == null) {
-          storeReferenceSetBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.terasology.protobuf.EntityData.EntityStoreMetadata, org.terasology.protobuf.EntityData.EntityStoreMetadata.Builder, org.terasology.protobuf.EntityData.EntityStoreMetadataOrBuilder>(
-                  storeReferenceSet_,
-                  ((bitField0_ & 0x00000040) == 0x00000040),
-                  getParentForChildren(),
-                  isClean());
-          storeReferenceSet_ = null;
-        }
-        return storeReferenceSetBuilder_;
-      }
-
       // @@protoc_insertion_point(builder_scope:GlobalStore)
     }
 
@@ -17932,11 +16648,6 @@ public final class EntityData {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_RunLengthEncoding8_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_EntityStoreMetadata_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_EntityStoreMetadata_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_GlobalStore_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -17960,15 +16671,15 @@ public final class EntityData {
       "me_index\030\003 \001(\005\"S\n\tComponent\022\022\n\ntype_inde" +
       "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
       "ameValue*\t\010\210\'\020\200\200\200\200\002\"\274\001\n\006Entity\022\n\n\002id\030\001 \001",
-      "(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
+      "(\003\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
       "oved_component_index\030\003 \003(\005B\002\020\001\022\025\n\rparent" +
       "_prefab\030\004 \001(\t\022\026\n\016alwaysRelevant\030\005 \001(\010\022\r\n" +
-      "\005owner\030\006 \001(\005\022\031\n\021removed_component\030\017 \003(\t*" +
-      "\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\005\022" +
+      "\005owner\030\006 \001(\003\022\031\n\021removed_component\030\017 \003(\t*" +
+      "\t\010\210\'\020\200\200\200\200\002\"\320\001\n\014PackedEntity\022\n\n\002id\030\001 \001(\003\022" +
       "\027\n\013componentId\030\002 \003(\005B\002\020\001\022\034\n\024componentFie" +
       "ldCounts\030\003 \001(\014\022\020\n\010fieldIds\030\004 \001(\014\022\032\n\nfiel" +
       "dValue\030\005 \003(\0132\006.Value\022\034\n\020removedComponent" +
-      "\030\006 \003(\005B\002\020\001\022\r\n\005owner\030\007 \001(\005\022\027\n\017parentPrefa" +
+      "\030\006 \003(\005B\002\020\001\022\r\n\005owner\030\007 \001(\003\022\027\n\017parentPrefa" +
       "bUri\030\020 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\314\001\n\006Prefab\022\022\n\nname",
       "_index\030\001 \001(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Compon" +
       "ent\022\026\n\ndeprecated\030\003 \003(\005B\002\020\001\022\027\n\tpersisted" +
@@ -17979,7 +16690,7 @@ public final class EntityData {
       "lue\030\003 \003(\0132\006.Value*\t\010\210\'\020\200\200\200\200\002\"w\n\013EntitySt" +
       "ore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\017componen" +
       "t_class\030\003 \003(\t\022\022\n\nentityName\030\002 \003(\t\022\027\n\013ent" +
-      "ityNamed\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013Player",
+      "ityNamed\030\004 \003(\003B\002\020\001*\t\010\210\'\020\200\200\200\200\002\"\220\001\n\013Player",
       "Store\022\033\n\005store\030\001 \001(\0132\014.EntityStore\022\025\n\rch" +
       "aracterPosX\030\017 \001(\002\022\025\n\rcharacterPosY\030\020 \001(\002" +
       "\022\025\n\rcharacterPosZ\030\021 \001(\002\022\024\n\014hasCharacter\030" +
@@ -17995,19 +16706,14 @@ public final class EntityData {
       "\200\200\200\200\002\"L\n\023RunLengthEncoding16\022\026\n\nrunLengt" +
       "hs\030\001 \003(\021B\002\020\001\022\022\n\006values\030\002 \003(\021B\002\020\001*\t\010\210\'\020\200\200" +
       "\200\200\002\"G\n\022RunLengthEncoding8\022\026\n\nrunLengths\030" +
-      "\001 \003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\204\001\n" +
-      "\023EntityStoreMetadata\022\030\n\004type\030\001 \001(\0162\n.Sto" +
-      "reType\022\025\n\rstoreStringId\030\002 \001(\t\022\032\n\016storeIn" +
-      "tegerId\030\003 \003(\005B\002\020\001\022\025\n\treference\030\004 \003(\005B\002\020\001" +
-      "*\t\010\210\'\020\200\200\200\200\002\"\336\001\n\013GlobalStore\022\027\n\006entity\030\001 ",
-      "\003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n" +
-      "\017component_class\030\003 \003(\t\022\026\n\016next_entity_id" +
-      "\030\020 \001(\005\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013p" +
-      "refab_name\030\022 \003(\t\022/\n\021storeReferenceSet\030\023 " +
-      "\003(\0132\024.EntityStoreMetadata*\t\010\210\'\020\200\200\200\200\002*4\n\t" +
-      "StoreType\022\023\n\017PlayerStoreType\020\001\022\022\n\016ChunkS" +
-      "toreType\020\002B\'\n\027org.terasology.protobufB\nE" +
-      "ntityDataH\001"
+      "\001 \003(\021B\002\020\001\022\016\n\006values\030\002 \001(\014*\t\010\210\'\020\200\200\200\200\002\"\260\001\n" +
+      "\013GlobalStore\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n" +
+      "\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017component_clas" +
+      "s\030\003 \003(\t\022\026\n\016next_entity_id\030\020 \001(\003\022\036\n\022depre" +
+      "cated_data_17\030\021 \003(\003B\002\020\001\022\023\n\013prefab_name\030\022",
+      " \003(\t*\t\010\210\'\020\200\200\200\200\002*4\n\tStoreType\022\023\n\017PlayerSt" +
+      "oreType\020\001\022\022\n\016ChunkStoreType\020\002B\'\n\027org.ter" +
+      "asology.protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -18086,18 +16792,12 @@ public final class EntityData {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RunLengthEncoding8_descriptor,
               new java.lang.String[] { "RunLengths", "Values", });
-          internal_static_EntityStoreMetadata_descriptor =
-            getDescriptor().getMessageTypes().get(12);
-          internal_static_EntityStoreMetadata_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_EntityStoreMetadata_descriptor,
-              new java.lang.String[] { "Type", "StoreStringId", "StoreIntegerId", "Reference", });
           internal_static_GlobalStore_descriptor =
-            getDescriptor().getMessageTypes().get(13);
+            getDescriptor().getMessageTypes().get(12);
           internal_static_GlobalStore_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_GlobalStore_descriptor,
-              new java.lang.String[] { "Entity", "Prefab", "ComponentClass", "NextEntityId", "FreedEntityId", "PrefabName", "StoreReferenceSet", });
+              new java.lang.String[] { "Entity", "Prefab", "ComponentClass", "NextEntityId", "DeprecatedData17", "PrefabName", });
           return null;
         }
       };

@@ -81,7 +81,7 @@ public class NetEntityRef extends BaseEntityRef {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return networkSystem.getEntityId(networkId);
     }
 

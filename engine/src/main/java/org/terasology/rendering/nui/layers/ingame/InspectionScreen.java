@@ -15,20 +15,14 @@
  */
 package org.terasology.rendering.nui.layers.ingame;
 
-import org.lwjgl.input.Mouse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.InspectionToolComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.BaseInteractionScreen;
 import org.terasology.rendering.nui.UIWidget;
-import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIButton;
-import org.terasology.rendering.nui.widgets.UILabel;
-import org.terasology.rendering.nui.widgets.UILoadBar;
 import org.terasology.rendering.nui.widgets.UIText;
 
 /**
@@ -76,7 +70,7 @@ public class InspectionScreen extends BaseInteractionScreen {
     private void updateFields(EntityRef interactionTarget) {
         InspectionToolComponent inspectorComponent = interactionTarget.getComponent(InspectionToolComponent.class);
         EntityRef inspectedEntity = inspectorComponent.inspectedEntity;
-        entityIdField.setText(Integer.toString(inspectedEntity.getId()));
+        entityIdField.setText(Long.toString(inspectedEntity.getId()));
         if (inspectedEntity.exists()) {
             if (inspectedEntity.isActive()) {
                 fullDescriptionLabel.setText(inspectedEntity.toFullDescription());

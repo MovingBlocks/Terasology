@@ -231,7 +231,7 @@ public class StorageManagerTest {
     @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
-        int entityId = entity.getId();
+        long entityId = entity.getId();
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
@@ -324,7 +324,7 @@ public class StorageManagerTest {
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
+        long id = entity.getId();
         LocationComponent locationComponent = new LocationComponent();
         Vector3f positionInChunk = new Vector3f(chunk.getAABB().getMin());
         positionInChunk.x += 1;
