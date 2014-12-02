@@ -17,12 +17,6 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
-import gnu.trove.set.TLongSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -82,6 +76,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -100,6 +97,18 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
+    /**
+     * This lock should be hold during read and write operation in the world directory. Currently it is being hold
+     * during reads of chunks or players as they are crruently the only data that needs to be loaded during the game.
+     *
+     * This lock ensures that reading threads can properly finish reading even when for example the ZIP file with the
+     * chunks got replaced with a newer version. Chunks that are getting saved get loaded from memory. It can however
+     * still be that a thread tries to load another chunk from the same ZIP file that contains the chunk that needs to
+     * be saved. Thus it can potentially happen that 2 threads want to read/write the same ZIP file with chunks.
+     */
+    private final ReadWriteLock worldDirectoryLock = new ReentrantReadWriteLock(true);
+    private final Lock worldDirectoryReadLock = worldDirectoryLock.readLock();
+    private final Lock worldDirectoryWriteLock = worldDirectoryLock.writeLock();
     private SaveTransaction saveTransaction;
     private Config config;
 
@@ -112,6 +121,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private ConcurrentMap<Vector3i, CompressedChunkBuilder> unloadedAndSavingChunkMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
+
 
     public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
         this(environment, entityManager, true);
@@ -193,12 +203,17 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             return disposedSavingPlayer;
         }
         Path storePath = storagePathProvider.getPlayerFilePath(playerId);
-        if (Files.isRegularFile(storePath)) {
-            try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(storePath))) {
-                return EntityData.PlayerStore.parseFrom(inputStream);
-            } catch (IOException e) {
-                logger.error("Failed to load player data for {}", playerId, e);
+        worldDirectoryReadLock.lock();
+        try {
+            if (Files.isRegularFile(storePath)) {
+                try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(storePath))) {
+                    return EntityData.PlayerStore.parseFrom(inputStream);
+                } catch (IOException e) {
+                    logger.error("Failed to load player data for {}", playerId, e);
+                }
             }
+        } finally {
+            worldDirectoryReadLock.unlock();
         }
         return null;
     }
@@ -333,7 +348,7 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
     private SaveTransaction createSaveTransaction() {
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(storeChunksInZips,
-                storagePathProvider);
+                storagePathProvider, worldDirectoryWriteLock);
 
         /**
          * Currently loaded persistent entities without owner that have not been saved yet.
@@ -452,17 +467,22 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
             return disposedSavingChunk.buildEncodedChunk();
         }
 
-        if (storeChunksInZips) {
-            return loadChunkZip(chunkPos);
-        } else {
-            Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
-            if (Files.isRegularFile(chunkPath)) {
-                try {
-                    return Files.readAllBytes(chunkPath);
-                } catch (IOException e) {
-                    logger.error("Failed to load chunk {}", chunkPos, e);
+        worldDirectoryReadLock.lock();
+        try {
+            if (storeChunksInZips) {
+                return loadChunkZip(chunkPos);
+            } else {
+                Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
+                if (Files.isRegularFile(chunkPath)) {
+                    try {
+                        return Files.readAllBytes(chunkPath);
+                    } catch (IOException e) {
+                        logger.error("Failed to load chunk {}", chunkPos, e);
+                    }
                 }
             }
+        } finally {
+            worldDirectoryReadLock.unlock();
         }
         return null;
     }

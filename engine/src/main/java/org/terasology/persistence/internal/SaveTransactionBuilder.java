@@ -21,12 +21,14 @@ import org.terasology.math.Vector3i;
 import org.terasology.protobuf.EntityData;
 
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Utility class for creating {@link SaveTransaction} instances.
  * @author Florian <florian@fkoeberle.de>
  */
 class SaveTransactionBuilder {
+    private final Lock worldDirectoryWriteLock;
     private Map<String, EntityData.PlayerStore> playerStores = Maps.newHashMap();
     private Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilders = Maps.newHashMap();
     private EntityData.GlobalStore globalStore;
@@ -34,9 +36,11 @@ class SaveTransactionBuilder {
     private final StoragePathProvider storagePathProvider;
     private GameManifest gameManifest;
 
-    SaveTransactionBuilder(boolean storeChunksInZips, StoragePathProvider storagePathProvider) {
+    SaveTransactionBuilder(boolean storeChunksInZips, StoragePathProvider storagePathProvider,
+                           Lock worldDirectoryWriteLock) {
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
+        this.worldDirectoryWriteLock = worldDirectoryWriteLock;
     }
 
     public void addPlayerStore(String id, EntityData.PlayerStore playerStore) {
@@ -53,7 +57,7 @@ class SaveTransactionBuilder {
 
     public SaveTransaction build() {
         return new SaveTransaction(playerStores, globalStore, compressedChunkBuilders, gameManifest, storeChunksInZips,
-                storagePathProvider);
+                storagePathProvider, worldDirectoryWriteLock);
     }
 
     public void setGameManifest(GameManifest gameManifest) {
