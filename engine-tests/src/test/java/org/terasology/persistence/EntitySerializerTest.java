@@ -158,7 +158,9 @@ public class EntitySerializerTest {
     public void testDeltaLoadNoChange() throws Exception {
         EntityRef entity = entityManager.create("test:Test");
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -171,7 +173,9 @@ public class EntitySerializerTest {
         EntityRef entity = entityManager.create("test:Test");
         entity.addComponent(new IntegerComponent(2));
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -186,7 +190,9 @@ public class EntitySerializerTest {
         EntityRef entity = entityManager.create("test:Test");
         entity.removeComponent(StringComponent.class);
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -200,7 +206,9 @@ public class EntitySerializerTest {
         comp.value = "Delta";
         entity.saveComponent(comp);
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());
@@ -213,7 +221,9 @@ public class EntitySerializerTest {
         EntityRef entity = entityManager.create(prefab);
 
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef newEntity = entitySerializer.deserialize(entityData);
         assertTrue(newEntity.hasComponent(EntityInfoComponent.class));
         EntityInfoComponent comp = newEntity.getComponent(EntityInfoComponent.class);
@@ -227,7 +237,9 @@ public class EntitySerializerTest {
         entity.setAlwaysRelevant(!defaultSetting);
 
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef newEntity = entitySerializer.deserialize(entityData);
         assertEquals(!defaultSetting, newEntity.isAlwaysRelevant());
     }
@@ -239,7 +251,9 @@ public class EntitySerializerTest {
         EntityRef entity = entityManager.create();
         entity.addComponent(new MappedTypeComponent());
         EntityData.Entity entityData = entitySerializer.serialize(entity);
+        long nextId = entityManager.getNextId();
         entityManager.clear();
+        entityManager.setNextId(nextId);
         EntityRef loadedEntity = entitySerializer.deserialize(entityData);
 
         assertTrue(loadedEntity.exists());
