@@ -111,6 +111,24 @@ public class SaveTransaction extends AbstractTask {
     }
 
     private void perpareChangesForMerge() throws IOException {
+        try {
+            renameMergeFolder();
+        }catch (AccessDeniedException e) {
+            /*
+             * On some windows systems the rename fails sometimes with a AccessDeniedException, The exact cause is
+             * unknown, but it is propablz a virus scanner. Renaming the folder 1 second later works.
+             */
+            logger.warn("Rename of merge folder failed, retrying in one second");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                Thread.currentThread().interrupt();
+            }
+            renameMergeFolder();
+        }
+    }
+
+    private void renameMergeFolder() throws IOException {
         Path directoryForUnfinishedFiles = storagePathProvider.getUnfinishedSaveTransactionPath();
         Path directoryForFinishedFiles = storagePathProvider.getUnmergedChangesPath();
 
