@@ -20,8 +20,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.UnsignedInts;
-import com.google.common.primitives.UnsignedLongs;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
@@ -67,8 +65,8 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
     public static final long NULL_ID = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
-
-    private long nextEntityId = 1;
+    private static long NEXT_ID_START_VALUE = 1;
+    private long nextEntityId = NEXT_ID_START_VALUE;
     private TLongSet loadedIds = new TLongHashSet();
     private Map<Long, BaseEntityRef> entityCache = new MapMaker().weakValues().concurrencyLevel(4).initialCapacity(1000).makeMap();
     private ComponentTable store = new ComponentTable();
@@ -104,7 +102,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             entityRef.invalidate();
         }
         store.clear();
-        nextEntityId = 1;
+        nextEntityId = NEXT_ID_START_VALUE;
         loadedIds.clear();
         entityCache.clear();
     }
