@@ -45,11 +45,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
     @EditorRange(min = 0.0f, max = 1.0f)
     private float filmGrainIntensity = 0.025f;
 
-    @EditorRange(min = 0.0f, max = 1.0f)
-    private float blurStart;
-    @EditorRange(min = 0.0f, max = 1.0f)
-    private float blurLength = 0.15f;
-
     @Override
     public void applyParameters(Material program) {
         super.applyParameters(program);
@@ -66,12 +61,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++, true);
 
-            if (cameraTargetSystem != null) {
-                program.setFloat("blurFocusDistance", cameraTargetSystem.getFocalDistance(), true);
-            }
-
-            program.setFloat("blurStart", blurStart, true);
-            program.setFloat("blurLength", blurLength, true);
+            if (cameraTargetSystem != null)
+                program.setFloat("focalDistance", cameraTargetSystem.getFocalDistance(), true);//for use in DOF effect
         }
 
         Texture colorGradingLut = Assets.getTexture("engine:colorGradingLut1");
