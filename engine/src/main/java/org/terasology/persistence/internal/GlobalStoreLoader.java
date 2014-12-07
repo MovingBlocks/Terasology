@@ -39,7 +39,10 @@ import org.terasology.protobuf.EntityData;
 import java.util.Map;
 
 /**
+ * TODO performance optimization: entity manager data & entities get loaded two times but each time only 1 gets used
+ * 
  * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  */
 final class GlobalStoreLoader {
 
@@ -61,13 +64,16 @@ final class GlobalStoreLoader {
         this.prefabSerializer = prefabSerializer;
     }
 
-    public void load(EntityData.GlobalStore globalStore) {
+    public void loadAllButEntities(EntityData.GlobalStore globalStore) {
         entityManager.clear();
         entityManager.setNextId(globalStore.getNextEntityId());
 
         loadComponentMapping(globalStore);
         loadMissingPrefabs(globalStore);
+    }
 
+    public void loadEntities(EntityData.GlobalStore globalStore) {
+        loadComponentMapping(globalStore);
         for (EntityData.Entity entityData : globalStore.getEntityList()) {
             entitySerializer.deserialize(entityData);
         }

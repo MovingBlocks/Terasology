@@ -220,7 +220,8 @@ public class StorageManagerTest {
         esm.finishSavingAndShutdown();
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
-        newSM.loadGlobalStore();
+        newSM.loadManagerDataFromGlobalStore();
+        newSM.loadEntitiesGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
         assertEquals(1, entities.size());
@@ -238,7 +239,7 @@ public class StorageManagerTest {
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
-        newSM.loadGlobalStore();
+        newSM.loadManagerDataFromGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
         restored.restoreEntities();
@@ -288,7 +289,7 @@ public class StorageManagerTest {
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager,
                 storeChunkInZips);
-        newSM.loadGlobalStore();
+        newSM.loadManagerDataFromGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         assertNotNull(restored);
@@ -320,7 +321,7 @@ public class StorageManagerTest {
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
         StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
-        newSM.loadGlobalStore();
+        newSM.loadManagerDataFromGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
         restored.restoreEntities();

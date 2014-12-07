@@ -15,13 +15,11 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * The entity store manager handles the storing and retrieval of stores of entities (and other data). In particular
@@ -32,9 +30,15 @@ import java.util.Collection;
 public interface StorageManager {
 
     /**
-     * Loads the global store, restoring the entity manager's state and all global entities
+     * Loads from the global store all data to restore the entity manager's state. Does explicitly not load entities.
+     * So that it is possible to load the entities after the systems have been initialized.
      */
-    void loadGlobalStore() throws IOException;
+    void loadManagerDataFromGlobalStore() throws IOException;
+
+    /**
+     * Loads the entities stored in the global store.
+     */
+    void loadEntitiesGlobalStore() throws IOException;
 
     /**
      * Loads a saved player store
