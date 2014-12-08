@@ -16,6 +16,8 @@
 
 package org.terasology.input.cameraTarget;
 
+import org.terasology.config.Config;
+import org.terasology.registry.CoreRegistry;
 import com.google.common.base.Objects;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -26,7 +28,6 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -40,9 +41,9 @@ import java.util.Arrays;
  */
 public class CameraTargetSystem extends BaseComponentSystem {
 
-    // TODO: This should come from somewhere, probably player entity?
-    public static final float TARGET_DISTANCE = 5f;
-
+    // TODO: This should come from somewhere, probably player entity
+    //set the target distance to as far as the player can see. Used to get the focal distance for effects such as DOF.
+    public static final float TARGET_DISTANCE = CoreRegistry.get(Config.class).getRendering().getViewDistance().getChunkDistance().x * 8.0f;
     @In
     private LocalPlayer localPlayer;
 
@@ -122,17 +123,17 @@ public class CameraTargetSystem extends BaseComponentSystem {
     }
 
     private void updateFocalDistance(HitResult hitInfo, float delta) {
+        float focusRate = 4.0f;//how fast the focus distance is updated
+        //if the hit result from a trace has a recorded a hit
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
+            //calculate the distance from the player to the hit point
             playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
-
-            if (focalDistance == Float.MAX_VALUE) {
-                focalDistance = playerToTargetRay.length();
-            } else {
-                focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * 20.0f);
-            }
+            //gradually adjust focalDistance from it's current value to the hit point distance
+            focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
+        //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
         } else {
-            focalDistance = Float.MAX_VALUE;
+            focalDistance = TeraMath.lerp(focalDistance, TARGET_DISTANCE, delta * focusRate);
         }
     }
 
