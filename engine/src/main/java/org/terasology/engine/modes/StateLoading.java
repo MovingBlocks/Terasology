@@ -123,6 +123,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseRemoteWorld(gameManifest));
+        loadProcesses.add(new LoadDataForEntitySystem());
         loadProcesses.add(new InitialisePhysics());
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new PreBeginSystems());
@@ -149,6 +150,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseWorld(gameManifest));
         loadProcesses.add(new EnsureSaveGameConsistency());
+        loadProcesses.add(new LoadDataForEntitySystem());
         loadProcesses.add(new InitialisePhysics());
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new LoadEntities());

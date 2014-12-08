@@ -53,7 +53,7 @@ public class LoadEntities extends SingleStepLoadProcess {
         }
         StorageManager storageManager = CoreRegistry.get(StorageManager.class);
         try {
-            storageManager.loadGlobalStore();
+            storageManager.loadEntitiesGlobalStore();
         } catch (IOException e) {
             logger.error("Failed to load global data.", e);
         }

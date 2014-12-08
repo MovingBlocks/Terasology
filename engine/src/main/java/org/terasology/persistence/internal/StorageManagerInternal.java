@@ -174,17 +174,28 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public void loadGlobalStore() throws IOException {
+    public void loadManagerDataFromGlobalStore() throws IOException {
         Path globalDataFile = storagePathProvider.getGlobalEntityStorePath();
         if (Files.isRegularFile(globalDataFile)) {
             try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
                 EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
                 GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
-                loader.load(store);
+                loader.loadAllButEntities(store);
             }
         }
     }
 
+    @Override
+    public void loadEntitiesGlobalStore() throws IOException {
+        Path globalDataFile = storagePathProvider.getGlobalEntityStorePath();
+        if (Files.isRegularFile(globalDataFile)) {
+            try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
+                EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
+                GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
+                loader.loadEntities(store);
+            }
+        }
+    }
 
     @Override
     public void deactivatePlayer(Client client) {
