@@ -15,9 +15,12 @@
  */
 package org.terasology.core.logic;
 
+import org.terasology.asset.Assets;
+import org.terasology.core.CoreSettingsComponent;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.InventoryComponent;
@@ -40,6 +43,11 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
 
     @ReceiveEvent(components = InventoryComponent.class)
     public void onPlayerSpawnedEvent(OnPlayerSpawnedEvent event, EntityRef player) {
+        Prefab settingsPrefab = Assets.getPrefab("Core:CoreSettings");
+        if (!settingsPrefab.getComponent(CoreSettingsComponent.class).useStartingInventory) {
+            return;
+        }
+
         BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
         // Goodie chest
         EntityRef chest = blockFactory.newInstance(blockManager.getBlockFamily("core:chest"));
