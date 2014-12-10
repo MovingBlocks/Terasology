@@ -23,19 +23,13 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageEvent;
+import org.terasology.logic.console.*;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -69,17 +63,17 @@ public class ConsoleSystem extends BaseComponentSystem {
             if (!msg.toString().isEmpty()) {
                 msg.append(Message.NEW_LINE);
             }
-            msg.append(FontColor.getColored(cmd.getUsageMessage(), ConsoleColors.COMMAND));
+            msg.append(FontColor.getColored(cmd.getUsage(), ConsoleColors.COMMAND));
             msg.append(" - ");
-            msg.append(cmd.getShortDescription());
+            msg.append(cmd.getDescription());
         }
         return msg.toString();
     }
 
     @Command(shortDescription = "Detailed help on a command")
     public String help(@CommandParam("command") String command) {
-        Collection<CommandInfo> cmdCollection = console.getCommand(command);
-        if (cmdCollection.isEmpty()) {
+        CommandInfo[] cmdCollection = console.getCommand(command);
+        if (cmdCollection.length <= 0) {
             return "No help available for command '" + command + "'. Unknown command.";
         } else {
             StringBuilder msg = new StringBuilder();
@@ -87,7 +81,7 @@ public class ConsoleSystem extends BaseComponentSystem {
             for (CommandInfo cmd : cmdCollection) {
                 msg.append("=====================================================================================================================");
                 msg.append(Message.NEW_LINE);
-                msg.append(cmd.getUsageMessage());
+                msg.append(cmd.getUsage());
                 msg.append(Message.NEW_LINE);
                 msg.append("=====================================================================================================================");
                 msg.append(Message.NEW_LINE);
@@ -96,8 +90,8 @@ public class ConsoleSystem extends BaseComponentSystem {
                     msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Message.NEW_LINE);
-                } else if (!cmd.getShortDescription().isEmpty()) {
-                    msg.append(cmd.getShortDescription());
+                } else if (!cmd.getDescription().isEmpty()) {
+                    msg.append(cmd.getDescription());
                     msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Message.NEW_LINE);
@@ -120,7 +114,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     public void onCommand(CommandEvent event, EntityRef entity) {
         List<String> params = event.getParams();
         for (CommandInfo cmd : console.getCommand(event.getCommand())) {
-            if (cmd.getParameterCount() == params.size() && cmd.isRunOnServer()) {
+            if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
                 console.execute(event.getCommand(), event.getParams(), entity);
                 break;
             }

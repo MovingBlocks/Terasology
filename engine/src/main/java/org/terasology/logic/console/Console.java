@@ -18,7 +18,6 @@ package org.terasology.logic.console;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.internal.CommandInfo;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -107,7 +106,7 @@ public interface Console {
      * @param name The name of the command.
      * @return An iterator over the commands.
      */
-    Collection<CommandInfo> getCommand(String name);
+    CommandInfo[] getCommand(String name);
 
     /**
      * Get the list of all loaded commands.

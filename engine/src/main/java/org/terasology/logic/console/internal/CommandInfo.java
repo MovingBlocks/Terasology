@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,195 +15,238 @@
  */
 package org.terasology.logic.console.internal;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
-import org.terasology.logic.permission.PermissionManager;
-import org.terasology.network.ClientComponent;
-import org.terasology.registry.CoreRegistry;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Metadata on a command, including the ability to execute it.
  *
- * @author Immortius
+ * Created by Limeth on 9.12.2014.
  */
-public class CommandInfo {
-    private static final Logger logger = LoggerFactory.getLogger(CommandInfo.class);
+public class CommandInfo implements Comparable<CommandInfo>
+{
+	private static final Logger logger = LoggerFactory.getLogger(javax.activation.CommandInfo.class);
+	public static final Comparator<CommandInfo> COMPARATOR = new Comparator<CommandInfo>()
+	{
+		@Override
+		public int compare(CommandInfo o1, CommandInfo o2)
+		{
+			if(!o1.endsWithVarargs() && o2.endsWithVarargs())
+				return -1;
+			else if(o1.endsWithVarargs() && !o2.endsWithVarargs())
+				return 1;
 
-    private Method method;
-    private Object provider;
+			if(o1.getRequiredParameterCount() > o2.getRequiredParameterCount())
+				return -1;
+			else if(o1.getRequiredParameterCount() < o2.getRequiredParameterCount())
+				return 1;
 
-    private String name;
-    private List<String> parameterNames = Lists.newArrayList();
-    private List<String> parameterTypes = Lists.newArrayList();
-    private String shortDescription;
-    private String helpText;
-    private String requiredPermission;
-    private boolean clientEntityRequired;
-    private boolean runOnServer;
+			return 0;
+		}
+	};
 
-    public CommandInfo(Method method, Object provider) {
-        this.method = method;
-        this.provider = provider;
-        this.name = method.getName();
-        Command commandAnnotation = method.getAnnotation(Command.class);
-        if (commandAnnotation == null) {
-            throw new IllegalArgumentException("Method not annotated with command");
-        }
-        for (int i = 0; i < method.getParameterTypes().length; ++i) {
-            Class<?> parameterType = method.getParameterTypes()[i];
-            if (i == method.getParameterTypes().length - 1 && parameterType == EntityRef.class) {
-                clientEntityRequired = true;
-            } else {
-                String paramType = parameterType.getSimpleName().toLowerCase();
-                String paramName = getParamName(i);
-                
-                if (paramName == null) {
-                    paramName = "p" + i;
-                    logger.warn("Parameter {} in method {} does not have a CommandParam annotation", i, method);
-                }
+	private final Method method;
+	private final Object provider;
+	private CommandParameterInfo[] lazyParameters;
+	private String lazyUsage;
+	private Boolean lazyClientParameterRequired;
 
-                parameterNames.add(paramName);
-                parameterTypes.add(paramType);
-            }
-        }
-        this.runOnServer = commandAnnotation.runOnServer();
-        this.shortDescription = commandAnnotation.shortDescription();
-        this.helpText = commandAnnotation.helpText();
-        this.requiredPermission = commandAnnotation.requiredPermission();
-    }
-    
-    private String getParamName(int i) {
-        // JAVA8: if relevant classes are compiled with the "-parameters" flag, 
-        // the parameter name can be accessed through reflection like this:
-        // Parameter p = method.getParameters()[i]
-        // if (p.isNamePresent()) {
-        //     return p.getName();
-        // }
-        
-        for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
-            if (paramAnnot instanceof CommandParam) {
-                return ((CommandParam) paramAnnot).value();
-            }
-        }
-        
-        return null;
-    }
+	public CommandInfo(Method method, Object provider)
+	{
+		Objects.requireNonNull(method, "The method must not be null!");
+		Objects.requireNonNull(provider, "The provider must not be null!");
 
-    public String getName() {
-        return name;
-    }
+		if(method.getAnnotation(Command.class) == null)
+			throw new IllegalArgumentException("The provided method is not annotated by the Command annotation.");
 
-    public Collection<String> getParameterNames() {
-        return ImmutableList.copyOf(parameterNames);
-    }
+		this.method = method;
+		this.provider = provider;
+	}
 
-    public int getParameterCount() {
-        return parameterNames.size();
-    }
+	public String execute(List<String> rawParams, EntityRef sender) throws InvalidCommandCallException
+	{
+		CommandParameterInfo[] params = getParameters();
+		int requiredParameterCount = getRequiredParameterCount();
+		Object[] processedParams;
 
-    public String getShortDescription() {
-        return shortDescription;
-    }
+		if(isClientParameterRequired())
+		{
+			processedParams = new Object[params.length + 1];
+			processedParams[processedParams.length - 1] = sender;
+		}
+		else
+			processedParams = new Object[params.length];
 
-    public String getHelpText() {
-        return helpText;
-    }
+		for(int i = 0; i < requiredParameterCount; i++)
+		{
+			String rawParam = rawParams.get(i);
+			CommandParameterInfo param = params[i];
+			processedParams[i] = param.getValue(rawParam);
+		}
 
-    public boolean isClientEntityRequired() {
-        return clientEntityRequired;
-    }
+		if(endsWithVarargs())
+		{
+			CommandParameterInfo param = params[params.length - 1];
+			Object varargsResult;
 
-    public boolean isRunOnServer() {
-        return runOnServer;
-    }
+			if(rawParams.size() <= requiredParameterCount)
+			{
+				Class<?> type = param.getType();
+				varargsResult = Array.newInstance(type, 0);
+			}
+			else
+			{
+				String rawParam = rawParams.get(requiredParameterCount);
 
-    public String getUsageMessage() {
-        StringBuilder builder = new StringBuilder(name);
-        for (int i = 0; i < parameterNames.size(); i++) {
-            builder.append(" <");
-            builder.append(parameterTypes.get(i));
-            builder.append(" ");
-            builder.append(parameterNames.get(i));
-            builder.append(">");
-        }
+				for(int i = requiredParameterCount + 1; i < rawParams.size(); i++)
+					rawParam += " " + rawParams.get(i);
 
-        return builder.toString();
-    }
+				varargsResult = param.getValue(rawParam);
+			}
 
-    /**
-     * @param params a set of string parameter
-     * @param callingClient the responsible client (passed as last parameter)
-     * @return the return value of the method call or an empty string, never <code>null</code>.
-     * @throws InvalidCommandCallException if the method call was not successful
-     */
-    public String execute(List<String> params, EntityRef callingClient) throws InvalidCommandCallException {
-        Object[] processedParams = new Object[method.getParameterTypes().length];
-        if (isClientEntityRequired()) {
-            if (params.size() + 1 != method.getParameterTypes().length) {
-                throw new InvalidCommandCallException("Incorrect number of parameters, expected " + (method.getParameterTypes().length - 1));
-            }
+			processedParams[requiredParameterCount] = varargsResult;
+		}
 
-            processedParams[processedParams.length - 1] = callingClient;
-        } else if (params.size() != method.getParameterTypes().length) {
-            throw new InvalidCommandCallException("Incorrect number of parameters, expected " + (method.getParameterTypes().length));
-        }
-        for (int i = 0; i < params.size(); ++i) {
-            try {
-                Class<?> type = method.getParameterTypes()[i];
-                if (type == Float.TYPE) {
-                    processedParams[i] = Float.parseFloat(params.get(i));
-                } else if (type == Integer.TYPE) {
-                    processedParams[i] = Integer.parseInt(params.get(i));
-                } else if (type == String.class) {
-                    processedParams[i] = params.get(i);
-                }
-            } catch (NumberFormatException e) {
-                throw new InvalidCommandCallException("Bad argument '" + params.get(i) + "'", e);
-            }
-        }
+		try
+		{
+			Object result = method.invoke(provider, processedParams);
 
-        if (clientHasPermissionToCallCommand(callingClient)) {
-            try {
-                Object result = method.invoke(provider, processedParams);
-                return (result != null) ? result.toString() : "";
-            } catch (InvocationTargetException ite) {
-                // we end up here, if the called method throws an exception (which is ok)
-                Throwable e = ite.getTargetException();
-                throw new InvalidCommandCallException(e.getLocalizedMessage(), e);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                throw new InvalidCommandCallException(e.getMessage(), e);
-            }
-        } else {
-            throw new InvalidCommandCallException("You do not have enough permissions to execute this command");
-        }
-    }
+			return result == null ? null : result.toString();
+		}
+		catch(Exception e)
+		{
+			InvalidCommandCallException newE = new InvalidCommandCallException("An error occurred while executing the command.", e);
 
-    private boolean clientHasPermissionToCallCommand(EntityRef callingClient) {
-        PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
-        boolean hasPermission = true;
+			e.printStackTrace();
 
-        if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
-            hasPermission = false;
-            ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
-            if (clientComponent != null) {
-                EntityRef character = clientComponent.character;
-                if (permissionManager.hasPermission(character, requiredPermission)) {
-                    hasPermission = true;
-                }
-            }
-        }
-        return hasPermission;
-    }
+			throw newE;
+		}
+	}
+
+	private Command getAnnotation()
+	{
+		return method.getAnnotation(Command.class);
+	}
+
+	private String initUsage()
+	{
+		String name = getName();
+		StringBuilder builder = new StringBuilder(name);
+
+		for(CommandParameterInfo param : getParameters())
+			builder.append(' ').append(param.getUsage());
+
+		return lazyUsage = builder.toString();
+	}
+
+	public String getUsage()
+	{
+		return lazyUsage != null ? lazyUsage : initUsage();
+	}
+
+	public String getName()
+	{
+		return method.getName();
+	}
+
+	private CommandParameterInfo[] initParameters()
+	{
+		Class<?>[] types = method.getParameterTypes();
+		int paramAmount = types.length + (isClientParameterRequired() ? -1 : 0);
+		lazyParameters = CommandParameterInfo.valueOf(method, 0, paramAmount);
+
+		for(int i = 0; i < lazyParameters.length; i++)
+		{
+			CommandParameterInfo param = lazyParameters[i];
+
+			if(!param.hasName())
+				logger.warn("Parameter {} in method {} does not have a CommandParam annotation", i, method);
+
+			if(param.getArrayDelimiter() == Command.ARRAY_DELIMITER_VARARGS && i < lazyParameters.length - 1)
+				logger.warn("Parameter {} in method {} uses the varargs delimiter, but is not at the end", i, method);
+		}
+
+		return lazyParameters;
+	}
+
+	public CommandParameterInfo[] getParameters()
+	{
+		return lazyParameters != null ? lazyParameters : initParameters();
+	}
+
+	/**
+	 * @return The required amount of parameters for this command. If the last argument is a {@code varargs}, the argument is not counted.
+	 */
+	public int getRequiredParameterCount()
+	{
+		return getParameters().length + (endsWithVarargs() ? -1 : 0);
+	}
+
+	public boolean endsWithVarargs()
+	{
+		CommandParameterInfo[] params = getParameters();
+
+		return params.length > 0 && params[params.length - 1].isVarargs();
+	}
+
+	private boolean initClientParameterRequired()
+	{
+		Class<?>[] types = method.getParameterTypes();
+
+		if(types.length <= 0)
+			return false;
+
+		if(types[types.length - 1] != EntityRef.class)
+			return false;
+
+		Annotation[] annotations = method.getParameterAnnotations()[types.length - 1];
+
+		for(Annotation annotation : annotations)
+			if(annotation.getClass() == CommandParam.class)
+				return false;
+
+		return true;
+	}
+
+	private boolean isClientParameterRequired()
+	{
+		return lazyClientParameterRequired != null ? lazyClientParameterRequired
+		                                           : (lazyClientParameterRequired = initClientParameterRequired());
+	}
+
+	public String getDescription()
+	{
+		return getAnnotation().shortDescription();
+	}
+
+	public String getHelpText()
+	{
+		return getAnnotation().helpText();
+	}
+
+	public boolean isRunOnServer()
+	{
+		return getAnnotation().runOnServer();
+	}
+
+	public String getRequiredPermission()
+	{
+		return getAnnotation().requiredPermission();
+	}
+
+	@Override
+	public int compareTo(CommandInfo o)
+	{
+		return COMPARATOR.compare(this, o);
+	}
 }

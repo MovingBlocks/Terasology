@@ -22,12 +22,22 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to provide the name of a Command's params (since the names are otherwise unavailable)
+ * Used to provide the name and possibly the delimiter of a Command's parameters
  *
- * @author Immortius
+ * @author Immortius, Limeth
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface CommandParam {
+
     String value();
+
+	/**
+	 * Used if the command method parameter is an array.
+	 * The {@code \} (backslash) character is used for escaping the delimiter.
+	 * The space character can be used only when the parameter is the last one as a {@code varargs} parameter.
+	 *
+	 * @return The array delimiter
+	 */
+	char arrayDelimiter() default Command.ARRAY_DELIMITER_DEFAULT;
 }
