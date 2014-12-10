@@ -16,15 +16,12 @@
 
 package org.terasology.math;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author Tobias 'skaldarnar' Nett Date: 17.11.12
  */
-public class Matrix4i implements Serializable {
-
-    private static final long serialVersionUID = 7818313294943678102L;
+public class Matrix4i {
 
     private static final int M00 = 0;
     private static final int M01 = 1;
