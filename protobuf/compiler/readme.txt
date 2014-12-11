@@ -1,6 +1,6 @@
 Protocol Buffers - Google's data interchange format
 Copyright 2008 Google Inc.
-http://code.google.com/p/protobuf/
+https://developers.google.com/protocol-buffers/
 
 This package contains a precompiled Win32 binary version of the protocol buffer
 compiler (protoc).  This binary is intended for Windows users who want to
@@ -12,4 +12,4 @@ the C++ compiler used.
 
 You will still need to download the source code package in order to obtain the
 Java or Python runtime libraries.  Get it from:
-  http://code.google.com/p/protobuf/downloads/
+  https://github.com/google/protobuf/releases/
