@@ -101,6 +101,16 @@ ext {
             ])
         }
 
+        // Special case for the "Index" lib if present - not a standard Java project but still under Git control
+        File indexLibDir = new File(rootDir, "libs/Index")
+        if (indexLibDir.exists() && indexLibDir.isDirectory()) {
+            println "Preparing IntelliJ Git setup for Index lib"
+            vcsMappings.appendNode('mapping', [
+                    'directory' : "\$PROJECT_DIR\$" + "/libs/Index",
+                    'vcs' : 'Git'
+            ])
+        }
+
         // Set meta-modules to use Git
         rootProject.project(':meta').childProjects.each { child ->
 
