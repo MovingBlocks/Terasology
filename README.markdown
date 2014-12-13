@@ -216,16 +216,17 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Pathfinding](https://github.com/Terasology/Pathfinding) - framework for pathfinding used by other modules
 * [PlantPack](https://github.com/Terasology/PlantPack) - more plants! Used by the Wood and Stone gameplay
 * [Portals](https://github.com/Terasology/Portals) - allows placement of portal blocks that'll spawn Oreons `giveBlock "portal"`
-* [Rails](https://github.com/Terasology/Rails) - Railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts
+* [Rails](https://github.com/Terasology/Rails) - railroads and trains! Press 'e' to start a caboose or enter a cart. Use the wrench to attach carts
 * [Sample](https://github.com/Terasology/Sample) - miscellaneous example content showcasing module usage
 * [Seasons](https://github.com/Terasology/Seasons) - adds seasons to the game
 * [Signalling](https://github.com/Terasology/Signalling) - circuitry implementation based on BlockNetwork, similar to redstone
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
-* ~~[TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)~~
+* ~~[TerraTech](https://github.com/Terasology/TerraTech) - machines to improve your life (the "Terra" is for Earth, not short for Terasology)~~
+* [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - A world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
-* [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
+* [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
 * [WorldlyTooltip](https://github.com/Terasology/WorldlyTooltip) - a little tooltip that shows you what you're looking at (hold `alt` for debug details)
 * ~~[Zones](https://github.com/Terasology/Zones) - allows you to define zones within the world, that other modules can then use for assorted reasons~~
@@ -249,7 +250,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb, Gimpanse / shartte, Flo_K, emanuele3d
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, ChrisK, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon / LinusVanElswijk, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI, Calinou, Limeth, KokPok
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro, Halamix2
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
 * World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias
