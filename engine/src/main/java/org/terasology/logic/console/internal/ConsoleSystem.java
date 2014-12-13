@@ -66,11 +66,10 @@ public class ConsoleSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
         List<String> params = event.getParams();
-        for (ICommand cmd : console.getCommand(event.getCommand())) {
-            if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
-                console.execute(event.getCommand(), event.getParams(), entity);
-                break;
-            }
+        ICommand cmd = console.getCommand(event.getCommand());
+
+        if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
+            console.execute(event.getCommand(), event.getParams(), entity);
         }
     }
 }

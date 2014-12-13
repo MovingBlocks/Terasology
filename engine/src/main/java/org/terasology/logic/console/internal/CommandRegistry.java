@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.internal;
 
-import com.google.common.collect.TreeMultiset;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.ICommand;
 
@@ -26,29 +25,24 @@ import java.util.HashMap;
  *
  * Contains {@link Command}s ordered by priority.
  */
-public class CommandRegistry extends HashMap<String, TreeMultiset<ICommand>>
-{
+public class CommandRegistry extends HashMap<String, ICommand> {
 	@Override
-	public TreeMultiset<ICommand> get(Object key)
-	{
+	public ICommand get(Object key) {
 		return super.get(key.toString().toLowerCase());
 	}
 
 	@Override
-	public TreeMultiset<ICommand> put(String key, TreeMultiset<ICommand> value)
-	{
+	public ICommand put(String key, ICommand value) {
 		return super.put(key.toLowerCase(), value);
 	}
 
 	@Override
-	public boolean containsKey(Object key)
-	{
+	public boolean containsKey(Object key) {
 		return super.containsKey(key.toString().toLowerCase());
 	}
 
 	@Override
-	public TreeMultiset<ICommand> remove(Object key)
-	{
+	public ICommand remove(Object key) {
 		return super.remove(key.toString().toLowerCase());
 	}
 }

@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.console.dynamic;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.terasology.entitySystem.entity.EntityRef;
 
 import java.util.Comparator;
@@ -56,13 +54,11 @@ public interface ICommand extends Comparable<ICommand> {
      *
      * @return The name of this command
      */
-    @NotNull
     String getName();
 
     /**
      * @return The parameter definitions of this command
      */
-    @NotNull
     CommandParameter[] getParameters();
 
     /**
@@ -96,7 +92,6 @@ public interface ICommand extends Comparable<ICommand> {
      *
      * @return The usage hint of this command
      */
-    @NotNull
     String getUsage();
 
     /**
@@ -105,7 +100,6 @@ public interface ICommand extends Comparable<ICommand> {
      * @param parameters Parameters in an Object[] array as defined in {@link org.terasology.logic.console.dynamic.Command#getParameters()}.
      * @return A reply to the sender.
      */
-    @Nullable
     String executeRaw(List<String> parameters, EntityRef sender) throws CommandExecutionException;
 
     /**
@@ -115,7 +109,6 @@ public interface ICommand extends Comparable<ICommand> {
      * @return A reply to the sender.
      */
     //TODO maybe return an array of serializable objects?
-    @Nullable
     String[] suggestRaw(List<String> parameters, EntityRef sender) throws CommandSuggestionException;
 
     /**

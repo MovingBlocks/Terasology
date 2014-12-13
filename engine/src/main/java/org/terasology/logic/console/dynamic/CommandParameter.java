@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.dynamic;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 import java.lang.reflect.Array;
@@ -101,20 +100,12 @@ public final class CommandParameter {
     }
 
     /**
-     * A hacky way to get the array class of a class.
-     * <pre>
-     * {@code Class<? extends String[]> = getArrayClass(String.class);}
-     * </pre>
-     *
      * @param clazz The child class of the array class returned
-     * @param param Do not fill any parameters, leave blank.
      * @return The array class of {@code clazz}
      */
-    @SafeVarargs
-    @SuppressWarnings("unchecked, unused")
-    private static <T> Class<? extends T[]> getArrayClass(Class<T> clazz, T... param) {
-        Preconditions.checkArgument(param.length <= 0, "Leave the varargs parameter blank!");
-        return (Class<T[]>) param.getClass();
+    @SuppressWarnings("unchecked")
+    private static <T> Class<T[]> getArrayClass(Class<T> clazz) {
+        return (Class<T[]>) Array.newInstance(clazz).getClass();
     }
 
     public Object getValue(String param) throws CommandParameterParseException {
@@ -135,10 +126,9 @@ public final class CommandParameter {
     private List<String> unescape(String rawParameter, boolean split) throws CommandParameterParseException {
         String string = rawParameter;
         List<String> params = new ArrayList<>();
-        int i = -1;
+        int i = 0;
 
         while (i < string.length()) {
-            i++;
             char c = string.charAt(i);
 
             if (c == Command.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
@@ -153,16 +143,20 @@ public final class CommandParameter {
                     throw new CommandParameterParseException("Character '" + following + "' cannot be escaped.", rawParameter);
                 }
 
+                i++;
                 continue;
             }
 
             if (split && c == arrayDelimiter) {
                 String param = string.substring(0, i);
                 string = string.substring(i + 1);
-                i = -1;
+                i = 0;
 
                 params.add(param);
+                continue;
             }
+
+            i++;
         }
 
         if (string.length() > 0) {

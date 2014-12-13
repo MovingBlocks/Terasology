@@ -51,20 +51,21 @@ public class PlaySoundCommand extends Command {
         };
     }
 
-    public String execute(EntityRef sender, String sound, Float xOffset, Float yOffset, Float zOffset) {
+    public String execute(EntityRef sender, String nullableSound, Float xOffset, Float yOffset, Float zOffset) {
         Vector3f position = localPlayer.getPosition();
-        StaticSound foundSound = Assets.getSound(sound != null ? sound : "engine:dig");
+        String soundName = nullableSound != null ? nullableSound : "engine:dig";
+        StaticSound sound = Assets.getSound(soundName);
 
-        if(foundSound == null) {
-            return "Sound '" + sound + "' not found.";
+        if(sound == null) {
+            return "Sound '" + soundName + "' not found.";
         }
 
         position.x += xOffset != null ? xOffset : 0;
         position.y += yOffset != null ? yOffset : 0;
         position.z += zOffset != null ? zOffset : 0;
-        audioManager.playSound(foundSound, position);
+        audioManager.playSound(sound, position);
 
-        return "Playing sound '" + sound + "'.";
+        return "Playing sound '" + soundName + "'.";
     }
 
     //TODO Add the suggest method

@@ -65,32 +65,30 @@ public class HelpCommand extends Command {
 
             return msg.toString();
         } else {
-            ICommand[] cmdCollection = console.getCommand(command);
-            if (cmdCollection.length <= 0) {
+            ICommand cmd = console.getCommand(command);
+            if (cmd == null) {
                 return "No help available for command '" + command + "'. Unknown command.";
             } else {
                 StringBuilder msg = new StringBuilder();
 
-                for (ICommand cmd : cmdCollection) {
+                msg.append("=====================================================================================================================");
+                msg.append(Message.NEW_LINE);
+                msg.append(cmd.getUsage());
+                msg.append(Message.NEW_LINE);
+                msg.append("=====================================================================================================================");
+                msg.append(Message.NEW_LINE);
+                if (!cmd.getHelpText().isEmpty()) {
+                    msg.append(cmd.getHelpText());
+                    msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Message.NEW_LINE);
-                    msg.append(cmd.getUsage());
+                } else if (!cmd.getDescription().isEmpty()) {
+                    msg.append(cmd.getDescription());
                     msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
-                    msg.append(Message.NEW_LINE);
-                    if (!cmd.getHelpText().isEmpty()) {
-                        msg.append(cmd.getHelpText());
-                        msg.append(Message.NEW_LINE);
-                        msg.append("=====================================================================================================================");
-                        msg.append(Message.NEW_LINE);
-                    } else if (!cmd.getDescription().isEmpty()) {
-                        msg.append(cmd.getDescription());
-                        msg.append(Message.NEW_LINE);
-                        msg.append("=====================================================================================================================");
-                        msg.append(Message.NEW_LINE);
-                    }
                     msg.append(Message.NEW_LINE);
                 }
+
                 return msg.toString();
             }
         }

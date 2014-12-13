@@ -107,7 +107,7 @@ public interface Console {
      * @param name The name of the command.
      * @return An iterator over the commands.
      */
-    org.terasology.logic.console.dynamic.ICommand[] getCommand(String name);
+    ICommand getCommand(String name);
 
     /**
      * Get the collection of all loaded commands.

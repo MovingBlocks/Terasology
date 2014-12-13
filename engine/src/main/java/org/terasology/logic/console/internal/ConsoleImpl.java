@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
-import com.google.common.collect.TreeMultiset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,7 +31,6 @@ import org.terasology.logic.console.ConsoleSubscriber;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageType;
-import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandExecutionException;
 import org.terasology.logic.console.dynamic.ICommand;
 import org.terasology.network.ClientComponent;
@@ -58,7 +56,6 @@ public class ConsoleImpl implements Console {
     private static final int MAX_COMMAND_HISTORY = 30;
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
     private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
-    private final TreeMultiset<ICommand> commands = TreeMultiset.create();
     private final CommandRegistry commandRegistry = new CommandRegistry();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
@@ -75,29 +72,19 @@ public class ConsoleImpl implements Console {
 
         logger.debug("Registering {}...", command.getName());
 
-        if (isCommandRegistered(command)) {
-            logger.warn("Command already registered the same name ({}), parameter count ({}) and varargs policy ({})," +
-                    " skipping", commandName, command.getRequiredParameterCount(), command.endsWithVarargs());
+        if (commandRegistry.containsKey(commandName)) {
+            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
+                    commandName, commandRegistry.get(commandName).getClass().getCanonicalName(),
+                    command.getClass().getCanonicalName());
         } else {
-            commands.add(command);
-            TreeMultiset<ICommand> cmdList = commandRegistry.get(commandName);
-
-            if (cmdList == null) {
-                cmdList = TreeMultiset.create();
-                commandRegistry.put(commandName, cmdList);
-            } else {
-                logger.warn("Command {} already registered, conflicting {} and {}.",
-                        commandName, cmdList.iterator().next().getClass().getCanonicalName(),
-                        command.getClass().getCanonicalName());
-            }
-
-            cmdList.add(command);
+            commandRegistry.put(commandName, command);
+            logger.info("Command '{}' successfully registered for class '{}'.", commandName,
+                    command.getClass().getCanonicalName());
         }
     }
 
     @Override
     public void dispose() {
-        commands.clear();
         commandRegistry.clear();
         messageHistory.clear();
     }
@@ -248,15 +235,14 @@ public class ConsoleImpl implements Console {
         }
 
         //get the command
-        ICommand cmd = findBestCommand(commandName, params.size());
+        ICommand cmd = getCommand(commandName);
 
         //check if the command is loaded
         if (cmd == null) {
             if (commandRegistry.containsKey(commandName)) {
+                ICommand command = commandRegistry.get(commandName);
                 addErrorMessage("Incorrect number of parameters. Try:");
-                for (ICommand ci : commandRegistry.get(commandName)) {
-                    addMessage(ci.getUsage());
-                }
+                addMessage(command.getUsage());
             } else {
                 addErrorMessage("Unknown command '" + commandName + "'");
             }
@@ -312,14 +298,8 @@ public class ConsoleImpl implements Console {
      * @return An array of commands with given name
      */
     @Override
-    public ICommand[] getCommand(String name) {
-        TreeMultiset<ICommand> correspondingCommands = commandRegistry.get(name);
-
-        if (correspondingCommands == null) {
-            return new Command[0];
-        }
-
-        return correspondingCommands.toArray(new ICommand[correspondingCommands.size()]);
+    public ICommand getCommand(String name) {
+        return commandRegistry.get(name);
     }
 
     /**
@@ -329,39 +309,6 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public Collection<ICommand> getCommands() {
-        return commands;
-    }
-
-    public ICommand findBestCommand(String name, int args) {
-        TreeMultiset<ICommand> correspondingCommands = commandRegistry.get(name);
-
-        if (correspondingCommands == null) {
-            return null;
-        }
-
-        for (ICommand command : correspondingCommands) {
-            if ((command.getRequiredParameterCount() == args && !command.endsWithVarargs())
-                    || (command.getRequiredParameterCount() <= args && command.endsWithVarargs())) {
-                return command;
-            }
-        }
-
-        return null;
-    }
-
-    public boolean isCommandRegistered(ICommand cmd) {
-        TreeMultiset<ICommand> registeredCommands = commandRegistry.get(cmd.getName());
-
-        if (registeredCommands == null || registeredCommands.size() <= 0) {
-            return false;
-        }
-
-        for (ICommand current : registeredCommands) {
-            if (cmd.compareTo(current) == 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return commandRegistry.values();
     }
 }

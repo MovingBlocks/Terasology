@@ -16,7 +16,6 @@
 package org.terasology.logic.console.dynamic;
 
 import com.google.common.collect.Lists;
-import com.sun.istack.internal.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -25,7 +24,6 @@ import org.terasology.logic.console.Console;
 import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,7 +73,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         console.registerCommand(this);
     }
 
-    @Nullable
     protected abstract CommandParameter[] constructParameters();
 
     private void registerParameters() throws CommandInitializationException {
@@ -150,8 +147,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         Class<?> clazz = getClass();
         Method[] methods = clazz.getDeclaredMethods();
 
-        LoggerFactory.getLogger("LIMETHDEBUG").debug("Methods {}", Arrays.toString(methods));
-
         List<Method> result = Lists.newArrayList();
 
         for (Method method : methods) {
@@ -189,7 +184,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
             }
 
             Class<?> expectedType = parameters[i].getTypeRaw();
-            Class<?> providedType = methodParameters[i - 1];
+            Class<?> providedType = methodParameters[i + 1];
 
             if (!expectedType.isAssignableFrom(providedType)) {
                 throw new CommandInitializationException("Cannot assign command argument from "
