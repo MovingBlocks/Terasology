@@ -93,7 +93,7 @@ public class ComponentSystemManager {
                     InjectionHelper.share(newSystem);
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (Error | Exception e) {
                     logger.error("Failed to load system {}", id, e);
                 }
             }
@@ -132,10 +132,6 @@ public class ComponentSystemManager {
 
     private void initialiseSystem(ComponentSystem system) {
         InjectionHelper.inject(system);
-        if (console != null) {
-            console.registerCommandProvider(system);
-        }
-
         try {
             system.initialise();
         } catch (Throwable e) {

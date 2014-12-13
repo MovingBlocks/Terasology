@@ -27,8 +27,6 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
@@ -39,8 +37,6 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
 /**
- * This system provides the ability to chat with a "say" command. Chat messages are broadcast to all players.
- *
  * @author Immortius
  */
 @RegisterSystem
@@ -88,14 +84,6 @@ public class ChatSystem extends BaseComponentSystem {
                     overlay.setVisible(true);
                 }
             }
-        }
-    }
-    
-    @Command(shortDescription = "Sends a message to all other players", runOnServer = true, requiredPermission = "")
-    public void say(@CommandParam("message") String message, EntityRef speaker) {
-        logger.debug("Received chat message from {} : '{}'", speaker, message);
-        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
-            client.send(new ChatMessageEvent(message, speaker.getComponent(ClientComponent.class).clientInfo));
         }
     }
 }

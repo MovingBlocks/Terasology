@@ -17,24 +17,34 @@
 package org.terasology.logic.console.internal;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.*;
-import org.reflections.ReflectionUtils;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
+import com.google.common.collect.TreeMultiset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.*;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleMessageEvent;
+import org.terasology.logic.console.ConsoleSubscriber;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.MessageType;
+import org.terasology.logic.console.dynamic.Command;
+import org.terasology.logic.console.dynamic.CommandExecutionException;
+import org.terasology.logic.console.dynamic.ICommand;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.collection.CircularBuffer;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
-
-import static org.reflections.ReflectionUtils.withModifier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The console handles commands and messages.
@@ -42,119 +52,103 @@ import static org.reflections.ReflectionUtils.withModifier;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class ConsoleImpl implements Console {
-	private static final Logger logger              = LoggerFactory.getLogger(ConsoleImpl.class);
-	private static final String PARAM_SPLIT_REGEX   = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
-	private static final int    MAX_MESSAGE_HISTORY = 255;
-	private static final int    MAX_COMMAND_HISTORY = 30;
+    private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
+    private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+    private static final int MAX_MESSAGE_HISTORY = 255;
+    private static final int MAX_COMMAND_HISTORY = 30;
+    private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
+    private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
+    private final TreeMultiset<ICommand> commands = TreeMultiset.create();
+    private final CommandRegistry commandRegistry = new CommandRegistry();
+    private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
-	private final List<CommandInfo>       commands            = Lists.newArrayList();
-	private final CommandRegistry         commandRegistry     = new CommandRegistry();
-	private final CircularBuffer<Message> messageHistory      = CircularBuffer.create(MAX_MESSAGE_HISTORY);
-	private final CircularBuffer<String>  localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
+    private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
-	private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
+    /**
+     * Registers a {@link ICommand}.
+     *
+     * @param command The command to be registered
+     */
+    @Override
+    public void registerCommand(ICommand command) {
+        String commandName = command.getName();
 
-	private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        logger.debug("Registering {}...", command.getName());
 
-	private boolean commandsSorted;
+        if (isCommandRegistered(command)) {
+            logger.warn("Command already registered the same name ({}), parameter count ({}) and varargs policy ({})," +
+                    " skipping", commandName, command.getRequiredParameterCount(), command.endsWithVarargs());
+        } else {
+            commands.add(command);
+            TreeMultiset<ICommand> cmdList = commandRegistry.get(commandName);
 
-	/**
-	 * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
-	 *
-	 * @param provider
-	 */
-	@Override
-	public void registerCommandProvider(Object provider)
-	{
-		Predicate<? super Method> predicate = Predicates.<Method>and(withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
-		Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
-		if(!commandMethods.isEmpty())
-		{
-			for(Method method : commandMethods)
-			{
-				CommandInfo command = new CommandInfo(method, provider);
-				String commandName = command.getName();
+            if (cmdList == null) {
+                cmdList = TreeMultiset.create();
+                commandRegistry.put(commandName, cmdList);
+            } else {
+                logger.warn("Command {} already registered, conflicting {} and {}.",
+                        commandName, cmdList.iterator().next().getClass().getCanonicalName(),
+                        command.getClass().getCanonicalName());
+            }
 
-				if(isCommandRegistered(command))
-				{
-					logger.warn("Command already registered the same name ({}), parameter count ({}) and varargs policy ({}), skipping", commandName, command.getRequiredParameterCount(), command.endsWithVarargs());
-				}
-				else
-				{
-					commands.add(command);
-					TreeMultiset<CommandInfo> cmdList = commandRegistry.get(commandName);
+            cmdList.add(command);
+        }
+    }
 
-					if(cmdList == null)
-						commandRegistry.put(commandName, cmdList = TreeMultiset.create());
+    @Override
+    public void dispose() {
+        commands.clear();
+        commandRegistry.clear();
+        messageHistory.clear();
+    }
 
-					cmdList.add(command);
-				}
-			}
-			commandsSorted = false;
-		}
-	}
+    /**
+     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
+     *
+     * @param message The message content
+     */
+    @Override
+    public void addMessage(String message) {
+        addMessage(new Message(message));
+    }
 
-	@Override
-	public void dispose()
-	{
-		commands.clear();
-		commandRegistry.clear();
-		messageHistory.clear();
-	}
+    /**
+     * Adds a message to the console
+     *
+     * @param message The content of the message
+     * @param type    The type of the message
+     */
+    @Override
+    public void addMessage(String message, MessageType type) {
+        addMessage(new Message(message, type));
+    }
 
-	/**
-	 * Adds a message to the console (as a CoreMessageType.CONSOLE message)
-	 *
-	 * @param message
-	 */
-	@Override
-	public void addMessage(String message)
-	{
-		addMessage(new Message(message));
-	}
+    private void addErrorMessage(String message) {
+        addMessage(new Message(message, CoreMessageType.ERROR));
+    }
 
-	/**
-	 * Adds a message to the console
-	 *
-	 * @param message
-	 * @param type
-	 */
-	@Override
-	public void addMessage(String message, MessageType type)
-	{
-		addMessage(new Message(message, type));
-	}
+    /**
+     * Adds a message to the console
+     *
+     * @param message The message to be added
+     */
+    @Override
+    public void addMessage(Message message) {
+        String uncoloredText = FontColor.stripColor(message.getMessage());
+        logger.info("[{}] {}", message.getType(), uncoloredText);
+        messageHistory.add(message);
+        for (ConsoleSubscriber subscriber : messageSubscribers) {
+            subscriber.onNewConsoleMessage(message);
+        }
+    }
 
-	private void addErrorMessage(String message)
-	{
-		addMessage(new Message(message, CoreMessageType.ERROR));
-	}
+    @Override
+    public void removeMessage(Message message) {
+        messageHistory.remove(message);
+    }
 
-	/**
-	 * Adds a message to the console
-	 *
-	 * @param message
-	 */
-	@Override
-	public void addMessage(Message message)
-	{
-		String uncoloredText = FontColor.stripColor(message.getMessage());
-		logger.info("[{}] {}", message.getType(), uncoloredText);
-		messageHistory.add(message);
-		for(ConsoleSubscriber subscriber : messageSubscribers)
-		{
-			subscriber.onNewConsoleMessage(message);
-		}
-	}
-
-	@Override
-	public void removeMessage(Message message)
-	{
-		messageHistory.remove(message);
-	}
-
-	@Override
-	public void replaceMessage(Message oldMsg, Message newMsg) {
+    @Override
+    public void replaceMessage(Message oldMsg, Message newMsg) {
         int idx = messageHistory.indexOf(oldMsg);
         if (idx >= 0) {
             messageHistory.set(idx, newMsg);
@@ -172,7 +166,7 @@ public class ConsoleImpl implements Console {
     @Override
     public Iterable<Message> getMessages(MessageType... types) {
         final List<MessageType> allowedTypes = Arrays.asList(types);
-        
+
         // JAVA8: this can be simplified using Stream.filter()
         return Collections2.filter(messageHistory, new Predicate<Message>() {
 
@@ -182,7 +176,7 @@ public class ConsoleImpl implements Console {
             }
         });
     }
-    
+
     @Override
     public List<String> getPreviousCommands() {
         return ImmutableList.copyOf(localCommandHistory);
@@ -190,8 +184,6 @@ public class ConsoleImpl implements Console {
 
     /**
      * Subscribe for notification of all messages added to the console
-     *
-     * @param subscriber
      */
     @Override
     public void subscribe(ConsoleSubscriber subscriber) {
@@ -200,8 +192,6 @@ public class ConsoleImpl implements Console {
 
     /**
      * Unsubscribe from receiving notification of messages being added to the console
-     *
-     * @param subscriber
      */
     @Override
     public void unsubscribe(ConsoleSubscriber subscriber) {
@@ -217,7 +207,7 @@ public class ConsoleImpl implements Console {
         if (cleanedCommand.isEmpty()) {
             return false;
         }
-        
+
         //get the command name
         int commandEndIndex = cleanedCommand.indexOf(" ");
         String commandName;
@@ -248,23 +238,23 @@ public class ConsoleImpl implements Console {
         }
 
         return execute(commandName, params, callingClient);
-    }        
+    }
 
     @Override
     public boolean execute(String commandName, List<String> params, EntityRef callingClient) {
-        
+
         if (commandName.isEmpty()) {
             return false;
         }
-        
+
         //get the command
-        CommandInfo cmd = findBestCommand(commandName, params.size());
+        ICommand cmd = findBestCommand(commandName, params.size());
 
         //check if the command is loaded
         if (cmd == null) {
             if (commandRegistry.containsKey(commandName)) {
                 addErrorMessage("Incorrect number of parameters. Try:");
-                for (CommandInfo ci : commandRegistry.get(commandName)) {
+                for (ICommand ci : commandRegistry.get(commandName)) {
                     addMessage(ci.getUsage());
                 }
             } else {
@@ -279,7 +269,7 @@ public class ConsoleImpl implements Console {
             return true;
         } else {
             try {
-                String result = cmd.execute(params, callingClient);
+                String result = cmd.executeRaw(params, callingClient);
                 if (result != null && !result.isEmpty()) {
                     if (callingClient.exists()) {
                         callingClient.send(new ConsoleMessageEvent(result));
@@ -289,7 +279,7 @@ public class ConsoleImpl implements Console {
                 }
 
                 return true;
-            } catch (InvalidCommandCallException e) {
+            } catch (CommandExecutionException e) {
                 String msgText = e.getLocalizedMessage();
                 if (msgText != null && !msgText.isEmpty()) {
                     if (callingClient.exists()) {
@@ -322,13 +312,14 @@ public class ConsoleImpl implements Console {
      * @return An array of commands with given name
      */
     @Override
-    public CommandInfo[] getCommand(String name) {
-		TreeMultiset<CommandInfo> commands = commandRegistry.get(name);
+    public ICommand[] getCommand(String name) {
+        TreeMultiset<ICommand> correspondingCommands = commandRegistry.get(name);
 
-	    if(commands == null)
-		    return new CommandInfo[0];
+        if (correspondingCommands == null) {
+            return new Command[0];
+        }
 
-		return commands.toArray(new CommandInfo[commands.size()]);
+        return correspondingCommands.toArray(new ICommand[correspondingCommands.size()]);
     }
 
     /**
@@ -337,49 +328,40 @@ public class ConsoleImpl implements Console {
      * @return Returns the command list.
      */
     @Override
-    public List<CommandInfo> getCommandList() {
-        if (!commandsSorted) {
-            Collections.sort(commands, new Comparator<CommandInfo>() {
-                @Override
-                public int compare(CommandInfo o1, CommandInfo o2) {
-                    int nameComp = o1.getName().compareTo(o2.getName());
-                    if (nameComp == 0) {
-                        return o1.getRequiredParameterCount() - o2.getRequiredParameterCount();
-                    }
-                    return nameComp;
-                }
-            });
-            commandsSorted = true;
-        }
+    public Collection<ICommand> getCommands() {
         return commands;
     }
 
-	public CommandInfo findBestCommand(String name, int args)
-	{
-		TreeMultiset<CommandInfo> commands = commandRegistry.get(name);
+    public ICommand findBestCommand(String name, int args) {
+        TreeMultiset<ICommand> correspondingCommands = commandRegistry.get(name);
 
-		if(commands == null)
-			return null;
+        if (correspondingCommands == null) {
+            return null;
+        }
 
-		for(CommandInfo command : commands)
-			if((command.getRequiredParameterCount() == args && !command.endsWithVarargs())
-			   || (command.getRequiredParameterCount() <= args && command.endsWithVarargs()))
-				return command;
+        for (ICommand command : correspondingCommands) {
+            if ((command.getRequiredParameterCount() == args && !command.endsWithVarargs())
+                    || (command.getRequiredParameterCount() <= args && command.endsWithVarargs())) {
+                return command;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public boolean isCommandRegistered(CommandInfo cmd)
-	{
-		TreeMultiset<CommandInfo> registeredCommands = commandRegistry.get(cmd.getName());
+    public boolean isCommandRegistered(ICommand cmd) {
+        TreeMultiset<ICommand> registeredCommands = commandRegistry.get(cmd.getName());
 
-		if(registeredCommands == null || registeredCommands.size() <= 0)
-			return false;
+        if (registeredCommands == null || registeredCommands.size() <= 0) {
+            return false;
+        }
 
-		for(CommandInfo current : registeredCommands)
-			if(cmd.compareTo(current) == 0)
-				return true;
+        for (ICommand current : registeredCommands) {
+            if (cmd.compareTo(current) == 0) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

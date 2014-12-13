@@ -16,20 +16,21 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.CommandInfo;
+import org.terasology.logic.console.dynamic.ICommand;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * @author Immortius
  */
 public interface Console {
-    /**
-     * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
-     *
-     * @param provider
-     */
-    void registerCommandProvider(Object provider);
+	/**
+	 * Registers a {@link ICommand}.
+	 *
+	 * @param command
+	 */
+    void registerCommand(ICommand command);
 
     void dispose();
 
@@ -106,14 +107,14 @@ public interface Console {
      * @param name The name of the command.
      * @return An iterator over the commands.
      */
-    CommandInfo[] getCommand(String name);
+    org.terasology.logic.console.dynamic.ICommand[] getCommand(String name);
 
     /**
-     * Get the list of all loaded commands.
+     * Get the collection of all loaded commands.
      *
-     * @return Returns the command list.
+     * @return Returns the commands.
      */
-    List<CommandInfo> getCommandList();
+    Collection<ICommand> getCommands();
 
     /**
      * If <code>oldMsg</code> does not exist, the method does nothing.

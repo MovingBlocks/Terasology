@@ -15,14 +15,12 @@
  */
 package org.terasology.logic.console.ui;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.internal.CommandInfo;
+import org.terasology.logic.console.dynamic.ICommand;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
@@ -36,8 +34,9 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -69,13 +68,13 @@ public class ConsoleScreen extends CoreScreenLayer {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
-        List<CommandInfo> commands = console.getCommandList();
+        Collection<ICommand> commands = console.getCommands();
         
         // JAVA8: replace with lamba expression
-        Collection<String> commandNames = Collections2.transform(commands, new Function<CommandInfo, String>() {
+        Collection<String> commandNames = Collections2.transform(commands, new Function<ICommand, String>() {
 
             @Override
-            public String apply(CommandInfo input) {
+            public String apply(ICommand input) {
                 return input.getName();
             }
         });

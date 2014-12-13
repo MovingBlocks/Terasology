@@ -23,11 +23,12 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
-import org.terasology.logic.console.*;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.MessageEvent;
+import org.terasology.logic.console.dynamic.ICommand;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.NUIManager;
 
 import java.util.List;
@@ -37,7 +38,6 @@ import java.util.List;
  */
 @RegisterSystem
 public class ConsoleSystem extends BaseComponentSystem {
-    
     @In
     private Console console;
 
@@ -55,53 +55,6 @@ public class ConsoleSystem extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "General help", helpText = "Prints out short descriptions for all available commands.")
-    public String help() {
-        StringBuilder msg = new StringBuilder();
-        List<CommandInfo> commands = console.getCommandList();
-        for (CommandInfo cmd : commands) {
-            if (!msg.toString().isEmpty()) {
-                msg.append(Message.NEW_LINE);
-            }
-            msg.append(FontColor.getColored(cmd.getUsage(), ConsoleColors.COMMAND));
-            msg.append(" - ");
-            msg.append(cmd.getDescription());
-        }
-        return msg.toString();
-    }
-
-    @Command(shortDescription = "Detailed help on a command")
-    public String help(@CommandParam("command") String command) {
-        CommandInfo[] cmdCollection = console.getCommand(command);
-        if (cmdCollection.length <= 0) {
-            return "No help available for command '" + command + "'. Unknown command.";
-        } else {
-            StringBuilder msg = new StringBuilder();
-
-            for (CommandInfo cmd : cmdCollection) {
-                msg.append("=====================================================================================================================");
-                msg.append(Message.NEW_LINE);
-                msg.append(cmd.getUsage());
-                msg.append(Message.NEW_LINE);
-                msg.append("=====================================================================================================================");
-                msg.append(Message.NEW_LINE);
-                if (!cmd.getHelpText().isEmpty()) {
-                    msg.append(cmd.getHelpText());
-                    msg.append(Message.NEW_LINE);
-                    msg.append("=====================================================================================================================");
-                    msg.append(Message.NEW_LINE);
-                } else if (!cmd.getDescription().isEmpty()) {
-                    msg.append(cmd.getDescription());
-                    msg.append(Message.NEW_LINE);
-                    msg.append("=====================================================================================================================");
-                    msg.append(Message.NEW_LINE);
-                }
-                msg.append(Message.NEW_LINE);
-            }
-            return msg.toString();
-        }
-    }
-
     @ReceiveEvent(components = ClientComponent.class)
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
@@ -113,7 +66,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
         List<String> params = event.getParams();
-        for (CommandInfo cmd : console.getCommand(event.getCommand())) {
+        for (ICommand cmd : console.getCommand(event.getCommand())) {
             if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
                 console.execute(event.getCommand(), event.getParams(), entity);
                 break;
