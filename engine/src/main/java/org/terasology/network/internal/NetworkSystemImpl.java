@@ -25,7 +25,9 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.TIntLongMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntLongHashMap;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -113,7 +115,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     private OwnershipHelper ownershipHelper;
 
     private ChannelFactory factory;
-    private TIntIntMap netIdToEntityId = new TIntIntHashMap();
+    private TIntLongMap netIdToEntityId = new TIntLongHashMap();
 
     private EngineTime time;
     private long nextNetworkTick;
@@ -359,8 +361,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         server.setRemoteWorldProvider(remoteWorldProvider);
     }
 
-    public void registerClientNetworkEntity(int netId, int entityId) {
-        int oldId = netIdToEntityId.put(netId, entityId);
+    public void registerClientNetworkEntity(int netId, long entityId) {
+        long oldId = netIdToEntityId.put(netId, entityId);
         if (oldId != NULL_NET_ID && oldId != entityId) {
             logger.error("Registered duplicate network id: {}", netId);
         } else {
@@ -673,7 +675,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         }
     }
 
-    int getEntityId(int netId) {
+    long getEntityId(int netId) {
         return netIdToEntityId.get(netId);
     }
 
@@ -685,7 +687,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 logger.error("Requesting entity before entity manager set up");
             }
         } else {
-            int entityId = netIdToEntityId.get(netId);
+            long entityId = netIdToEntityId.get(netId);
             if (entityManager != null && entityId != NULL_NET_ID) {
                 return entityManager.getEntity(entityId);
             }

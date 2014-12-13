@@ -25,16 +25,16 @@ import org.terasology.network.NetworkComponent;
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityRef extends BaseEntityRef {
-    private int id;
+    private long id;
     private boolean exists = true;
 
-    PojoEntityRef(LowLevelEntityManager manager, int id) {
+    PojoEntityRef(LowLevelEntityManager manager, long id) {
         super(manager);
         this.id = id;
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 

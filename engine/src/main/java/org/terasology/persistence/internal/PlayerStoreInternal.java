@@ -15,8 +15,6 @@
  */
 package org.terasology.persistence.internal;
 
-import gnu.trove.set.TIntSet;
-
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
@@ -39,7 +37,6 @@ final class PlayerStoreInternal implements PlayerStore {
     private EntityRef character = EntityRef.NULL;
     private boolean hasCharacter;
     private EntityData.EntityStore entityStore;
-    private TIntSet externalRefs;
 
     PlayerStoreInternal(String id, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
@@ -47,14 +44,14 @@ final class PlayerStoreInternal implements PlayerStore {
         this.entityManager = entityManager;
     }
 
-    PlayerStoreInternal(String id, EntityData.PlayerStore store, TIntSet externalRefs, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, EntityData.PlayerStore store, StorageManagerInternal entityStoreManager,
+                        EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;
         this.entityManager = entityManager;
         this.entityStore = store.getStore();
         this.relevanceLocation.set(store.getCharacterPosX(), store.getCharacterPosY(), store.getCharacterPosZ());
         this.hasCharacter = store.getHasCharacter();
-        this.externalRefs = externalRefs;
     }
 
     @Override
@@ -67,7 +64,7 @@ final class PlayerStoreInternal implements PlayerStore {
     public void restoreEntities() {
         if (entityStore != null) {
             EntityRestorer restorer = new EntityRestorer(entityManager);
-            Map<String, EntityRef> refMap = restorer.restore(entityStore, externalRefs);
+            Map<String, EntityRef> refMap = restorer.restore(entityStore);
             EntityRef loadedCharacter = refMap.get(CHARACTER);
             if (loadedCharacter != null) {
                 this.character = loadedCharacter;

@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.permission;
 
+import org.terasology.config.Config;
+import org.terasology.config.PermissionConfig;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
@@ -23,6 +25,7 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Command;
 import org.terasology.logic.console.CommandParam;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 
 @RegisterSystem
@@ -31,6 +34,23 @@ public class PermissionCommands extends BaseComponentSystem {
     private PermissionManager permissionManager;
     @In
     private EntityManager entityManager;
+
+    @Command(shortDescription = "Use an one time key to get op permission",
+            helpText = "The config file contains a one time key which can be used to get op permission",
+            runOnServer = true, requiredPermission = "")
+    public String usePermissionKey(@CommandParam("key") String key, EntityRef client) {
+        PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
+        String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
+
+        if (expectedKey != null && !expectedKey.equals("") && key.equals(expectedKey)) {
+            permissionConfig.setOneTimeAuthorizationKey("");
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            permissionManager.addPermission(clientComponent.character, PermissionManager.OPERATOR_PERMISSION);
+            return "Permission key used: You have now \"op\" rights";
+        } else {
+            return "Key invalid or used";
+        }
+    }
 
     @Command(shortDescription = "Gives specified permission to player",
             helpText = "Gives specified permission to player",

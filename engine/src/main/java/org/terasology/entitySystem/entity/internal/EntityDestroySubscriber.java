@@ -20,6 +20,6 @@ package org.terasology.entitySystem.entity.internal;
  */
 public interface EntityDestroySubscriber {
 
-    void onEntityDestroyed(int entityId);
+    void onEntityDestroyed(long entityId);
 
 }

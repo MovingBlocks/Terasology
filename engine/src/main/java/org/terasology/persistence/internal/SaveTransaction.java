@@ -31,6 +31,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Task that writes a previously created memory snapshot of the game to the disk.
@@ -44,6 +45,7 @@ public class SaveTransaction extends AbstractTask {
 
     private static final ImmutableMap<String, String> CREATE_ZIP_OPTIONS = ImmutableMap.of("create", "true", "encoding", "UTF-8");
     private final GameManifest gameManifest;
+    private final Lock worldDirectoryWriteLock;
     private volatile SaveTransactionResult result;
 
     // Unprocessed data to save:
@@ -61,7 +63,8 @@ public class SaveTransaction extends AbstractTask {
 
     public SaveTransaction(Map<String, EntityData.PlayerStore> playerStores, EntityData.GlobalStore globalStore,
                            Map<Vector3i, CompressedChunkBuilder> compressedChunkBuilder, GameManifest gameManifest,
-                           boolean storeChunksInZips, StoragePathProvider storagePathProvider) {
+                           boolean storeChunksInZips, StoragePathProvider storagePathProvider,
+                           Lock worldDirectoryWriteLock) {
         this.playerStores = playerStores;
         this.compressedChunkBuilders = compressedChunkBuilder;
         this.globalStore = globalStore;
@@ -69,6 +72,7 @@ public class SaveTransaction extends AbstractTask {
         this.storeChunksInZips = storeChunksInZips;
         this.storagePathProvider = storagePathProvider;
         this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
+        this.worldDirectoryWriteLock = worldDirectoryWriteLock;
     }
 
 
@@ -90,7 +94,7 @@ public class SaveTransaction extends AbstractTask {
             writeChunkStores();
             saveGameManifest();
             perpareChangesForMerge();
-            saveTransactionHelper.mergeChanges();
+            mergeChanges();
             result = SaveTransactionResult.createSuccessResult();
             logger.info("Save game finished");
         } catch (Throwable t) {
@@ -99,12 +103,32 @@ public class SaveTransaction extends AbstractTask {
         }
     }
 
+
+
     private void createSaveTransactionDirectory() throws IOException {
         Path directory = storagePathProvider.getUnfinishedSaveTransactionPath();
         Files.createDirectories(directory);
     }
 
     private void perpareChangesForMerge() throws IOException {
+        try {
+            renameMergeFolder();
+        }catch (AccessDeniedException e) {
+            /*
+             * On some windows systems the rename fails sometimes with a AccessDeniedException, The exact cause is
+             * unknown, but it is propablz a virus scanner. Renaming the folder 1 second later works.
+             */
+            logger.warn("Rename of merge folder failed, retrying in one second");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                Thread.currentThread().interrupt();
+            }
+            renameMergeFolder();
+        }
+    }
+
+    private void renameMergeFolder() throws IOException {
         Path directoryForUnfinishedFiles = storagePathProvider.getUnfinishedSaveTransactionPath();
         Path directoryForFinishedFiles = storagePathProvider.getUnmergedChangesPath();
 
@@ -225,6 +249,15 @@ public class SaveTransaction extends AbstractTask {
             GameManifest.save(path, gameManifest);
         } catch (IOException e) {
             logger.error("Failed to save world manifest", e);
+        }
+    }
+
+    private void mergeChanges() throws IOException {
+        worldDirectoryWriteLock.lock();
+        try {
+            saveTransactionHelper.mergeChanges();
+        } finally {
+            worldDirectoryWriteLock.unlock();
         }
     }
 

@@ -67,6 +67,7 @@ public final class Config {
 
     private SystemConfig system = new SystemConfig();
     private PlayerConfig player = new PlayerConfig();
+    private PermissionConfig permission = new PermissionConfig();
     private InputConfig input = new InputConfig();
     private AudioConfig audio = new AudioConfig();
     private RenderingConfig rendering = new RenderingConfig();
@@ -80,6 +81,10 @@ public final class Config {
      * Create a new, empty config
      */
     public Config() {
+    }
+
+    public PermissionConfig getPermission() {
+        return permission;
     }
 
     /**
@@ -120,6 +125,7 @@ public final class Config {
     public SecurityConfig getSecurity() {
         return security;
     }
+
 
     /**
      * Saves this config to the default configuration file

@@ -359,6 +359,7 @@ public class PojoEntityManagerTest {
 
     @Test
     public void isLoadedTrueAfterRestore() {
+        entityManager.setNextId(3);
         EntityRef entity = entityManager.createEntityWithId(2, Collections.<Component>emptyList());
         assertTrue(entity.isActive());
     }
@@ -373,11 +374,10 @@ public class PojoEntityManagerTest {
     @Test
     public void destructionOfUnloadedEntitiesPrevented() {
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
+        long id = entity.getId();
         entityManager.deactivateForStorage(entity);
         assertTrue(entity.exists());
         entity.destroy();
         assertTrue(entity.exists());
-        assertFalse(entityManager.getFreedIds().contains(id));
     }
 }

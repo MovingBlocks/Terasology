@@ -180,10 +180,6 @@ public class TerasologyEngine implements GameEngine {
         logger.info("Initialization completed in {}sec.", String.format("%.2f", seconds));
     }
 
-    public Iterable<EngineSubsystem> getSubsystems() {
-        return subsystems;
-    }
-
     /**
      * Logs software, environment and hardware information.
      */
@@ -373,147 +369,6 @@ public class TerasologyEngine implements GameEngine {
     }
 
     /**
-     * Causes the main loop to stop at the end of the current frame, cleanly ending
-     * the current GameState, all running task threads and disposing subsystems.
-     */
-    @Override
-    public void shutdown() {
-        engineState = EngineState.INITIALIZED;
-    }
-
-    /**
-     * Disposes of the engine by disposing of its subystems. Originally this method
-     * was called dispose(), but to improve Exception handling in the PC Facade the
-     * GameEngine interface implemented by this class was made to extend AutoCloseable.
-     * This in turn requires a close() method.
-     */
-    @Override
-    public void close() {
-        /*
-         * The engine is shutdown even when in RUNNING state. This way terasology gets properly disposed also in
-         * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
-         * be closed.
-         */
-        engineState = EngineState.DISPOSED;
-        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-        while (iter.hasNext()) {
-            EngineSubsystem subsystem = iter.next();
-            try {
-                subsystem.dispose();
-            } catch (Throwable t) {
-                logger.error("Unable to dispose subsystem {}", subsystem, t);
-            }
-        }
-
-    }
-
-    @Override
-    public boolean isUninitialized() {
-        return engineState == EngineState.UNINITIALIZED;
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return engineState == EngineState.INITIALIZED;
-    }
-
-    @Override
-    public boolean isRunning() {
-        return engineState == EngineState.RUNNING;
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return engineState == EngineState.DISPOSED;
-    }
-
-    @Override
-    public GameState getState() {
-        return currentState;
-    }
-
-    /**
-     Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
-     (each is a GameState). The change can be immediate, if there is no current game
-     state set, or scheduled, when a current state exists and the new state is stored as
-     pending. That been said, scheduled changes occurs in the main loop through the call
-     processStateChanges(). As such, from a user perspective in normal circumstances,
-     scheduled changes are likely to be perceived as immediate.
-     */
-    @Override
-    public void changeState(GameState newState) {
-        if (currentState != null) {
-            pendingState = newState;    // scheduled change
-        } else {
-            switchState(newState);      // immediate change
-        }
-    }
-
-    @Override
-    public void submitTask(final String name, final Runnable task) {
-        try {
-            commonThreadPool.put(new Task() {
-                @Override
-                public String getName() {
-                    return name;
-                }
-
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    Thread.currentThread().setName("Engine-Task-Pool");
-                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
-                        task.run();
-                    } catch (RejectedExecutionException e) {
-                        ThreadMonitor.addError(e);
-                        logger.error("Thread submitted after shutdown requested: {}", name);
-                    } catch (Throwable e) {
-                        ThreadMonitor.addError(e);
-                    }
-                }
-
-                @Override
-                public boolean isTerminateSignal() {
-                    return false;
-                }
-            });
-        } catch (InterruptedException e) {
-            logger.error("Failed to submit task {}, running on main thread", name, e);
-            task.run();
-        }
-    }
-
-    private void cleanup() {
-        logger.info("Shutting down Terasology...");
-
-        try {
-            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
-            while (iter.hasNext()) {
-                EngineSubsystem subsystem = iter.next();
-                subsystem.shutdown(config);
-            }
-
-            config.save();
-            if (currentState != null) {
-                currentState.dispose();
-                currentState = null;
-            }
-        } finally {
-            // Even if a graceful shutdown of the subsystems fails,
-            // the thread pool has to be shut down
-            stopThreads();
-        }
-    }
-
-    public void stopThreads() {
-        commonThreadPool.shutdown(new ShutdownTask(), false);
-    }
-
-    public void restartThreads() {
-        commonThreadPool.restart();
-    }
-
-    /**
      * The main loop runs until the EngineState is set back to INITIALIZED by shutdown()
      * or until the OS requests the application's window to be closed. Engine cleanup
      * and disposal occur afterwards.
@@ -599,16 +454,85 @@ public class TerasologyEngine implements GameEngine {
         engineState = EngineState.INITIALIZED;
     }
 
+    private void cleanup() {
+        logger.info("Shutting down Terasology...");
+
+        try {
+            Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+            while (iter.hasNext()) {
+                EngineSubsystem subsystem = iter.next();
+                subsystem.shutdown(config);
+            }
+
+            config.save();
+            if (currentState != null) {
+                currentState.dispose();
+                currentState = null;
+            }
+        } finally {
+            // Even if a graceful shutdown of the subsystems fails,
+            // the thread pool has to be shut down
+            stopThreads();
+        }
+    }
+
+    /**
+     * Causes the main loop to stop at the end of the current frame, cleanly ending
+     * the current GameState, all running task threads and disposing subsystems.
+     */
+    @Override
+    public void shutdown() {
+        engineState = EngineState.INITIALIZED;
+    }
+
+    /**
+     * Disposes of the engine by disposing of its subsystems. Originally this method
+     * was called dispose(), but to improve Exception handling in the PC Facade the
+     * GameEngine interface implemented by this class was made to extend AutoCloseable.
+     * This in turn requires a close() method.
+     */
+    @Override
+    public void close() {
+        /*
+         * The engine is shutdown even when in RUNNING state. This way terasology gets properly disposed also in
+         * case of a crash: The mouse must be made visible again for the crash reporter and the main window needs to
+         * be closed.
+         */
+        engineState = EngineState.DISPOSED;
+        Iterator<EngineSubsystem> iter = subsystems.descendingIterator();
+        while (iter.hasNext()) {
+            EngineSubsystem subsystem = iter.next();
+            try {
+                subsystem.dispose();
+            } catch (Throwable t) {
+                logger.error("Unable to dispose subsystem {}", subsystem, t);
+            }
+        }
+
+    }
+
+    /**
+     Changes the game state, i.e. to switch from the MainMenu to Ingame via Loading screen
+     (each is a GameState). The change can be immediate, if there is no current game
+     state set, or scheduled, when a current state exists and the new state is stored as
+     pending. That been said, scheduled changes occurs in the main loop through the call
+     processStateChanges(). As such, from a user perspective in normal circumstances,
+     scheduled changes are likely to be perceived as immediate.
+     */
+    @Override
+    public void changeState(GameState newState) {
+        if (currentState != null) {
+            pendingState = newState;    // scheduled change
+        } else {
+            switchState(newState);      // immediate change
+        }
+    }
+
     private void processPendingState() {
         if (pendingState != null) {
             switchState(pendingState);
             pendingState = null;
         }
-    }
-
-    @Override
-    public boolean hasPendingState() {
-        return pendingState != null;
     }
 
     private void switchState(GameState newState) {
@@ -624,6 +548,40 @@ public class TerasologyEngine implements GameEngine {
         InputSystem inputSystem = CoreRegistry.get(InputSystem.class);
         inputSystem.getMouseDevice().getInputQueue();
         inputSystem.getKeyboard().getInputQueue();
+    }
+
+    @Override
+    public boolean hasPendingState() {
+        return pendingState != null;
+    }
+
+    @Override
+    public GameState getState() {
+        return currentState;
+    }
+
+    @Override
+    public boolean isUninitialized() {
+        return engineState == EngineState.UNINITIALIZED;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return engineState == EngineState.INITIALIZED;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return engineState == EngineState.RUNNING;
+    }
+
+    @Override
+    public boolean isDisposed() {
+        return engineState == EngineState.DISPOSED;
+    }
+
+    public Iterable<EngineSubsystem> getSubsystems() {
+        return subsystems;
     }
 
     public boolean isFullscreen() {
@@ -672,5 +630,47 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void unsubscribeToStateChange(StateChangeSubscriber subscriber) {
         stateChangeSubscribers.remove(subscriber);
+    }
+
+    @Override
+    public void submitTask(final String name, final Runnable task) {
+        try {
+            commonThreadPool.put(new Task() {
+                @Override
+                public String getName() {
+                    return name;
+                }
+
+                @Override
+                public void run() {
+                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                    Thread.currentThread().setName("Engine-Task-Pool");
+                    try (ThreadActivity ignored = ThreadMonitor.startThreadActivity(task.getClass().getSimpleName())) {
+                        task.run();
+                    } catch (RejectedExecutionException e) {
+                        ThreadMonitor.addError(e);
+                        logger.error("Thread submitted after shutdown requested: {}", name);
+                    } catch (Throwable e) {
+                        ThreadMonitor.addError(e);
+                    }
+                }
+
+                @Override
+                public boolean isTerminateSignal() {
+                    return false;
+                }
+            });
+        } catch (InterruptedException e) {
+            logger.error("Failed to submit task {}, running on main thread", name, e);
+            task.run();
+        }
+    }
+
+    public void stopThreads() {
+        commonThreadPool.shutdown(new ShutdownTask(), false);
+    }
+
+    public void restartThreads() {
+        commonThreadPool.restart();
     }
 }

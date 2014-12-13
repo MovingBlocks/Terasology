@@ -22,22 +22,22 @@ import org.terasology.entitySystem.Component;
  */
 public interface LowLevelEntityManager extends EntityManager {
 
-    boolean isExistingEntity(int id);
+    boolean isExistingEntity(long id);
 
-    boolean isActiveEntity(int id);
+    boolean isActiveEntity(long id);
 
-    <T extends Component> T getComponent(int id, Class<T> componentClass);
+    <T extends Component> T getComponent(long id, Class<T> componentClass);
 
-    boolean hasComponent(int id, Class<? extends Component> componentClass);
+    boolean hasComponent(long id, Class<? extends Component> componentClass);
 
-    <T extends Component> T addComponent(int id, T component);
+    <T extends Component> T addComponent(long id, T component);
 
-    <T extends Component> T removeComponent(int id, Class<T> componentClass);
+    <T extends Component> T removeComponent(long id, Class<T> componentClass);
 
-    void saveComponent(int id, Component component);
+    void saveComponent(long id, Component component);
 
-    Iterable<Component> iterateComponents(int id);
+    Iterable<Component> iterateComponents(long id);
 
-    void destroy(int id);
+    void destroy(long id);
 
 }

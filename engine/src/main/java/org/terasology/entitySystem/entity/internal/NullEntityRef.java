@@ -91,7 +91,7 @@ public final class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return PojoEntityManager.NULL_ID;
     }
 

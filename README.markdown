@@ -22,7 +22,38 @@ For direct downloads you can get the latest [stable version here](http://jenkins
 
 You can use the Windows executable or one of the default launch scripts to start the game. They will setup your Java Virtual Machine to allocate up to 1024 MB of memory. Under Linux and Mac OS X the run script needs the access permission "Execute" to run properly: "chmod +x [scriptname].sh".
 
-To name yourself for a multiplayer game use Settings / Player
+The game auto-saves at regular intervals so it is decently crash-hardened at this point (no more playing for 20 minutes then poof lost world via crash). Still no guarantees though! Pre-Alpha :-)
+
+Multiplayer
+--------
+
+To name yourself for a multiplayer game use Settings / Player. You can also pick a color, which will affect your placeholder monkey head player avatar.
+
+You can host a local server using the game client and have friends connect to your IP. Game port is 25777 which needs to be open and forwarded to your PC.
+
+Unlike in single player in a multiplayer situation permissions are enforced for console commands. On a local server the player who started the game gets "op" rights.
+
+You can also run a headless server, but this is harder to configure at the moment. You need to launch the game via command line, Windows example:
+
+`Terasology.exe -headless -homedir=server`
+
+This will launch the server and store game files in the "server" subdir at the place you launch from (otherwise it'll use the default path, which could clash with a client on the same system)
+
+In this case *there is no default player with "op" rights*. You need to "op" yourself using the `oneTimeAuthorizationKey` that generates in the server's `config.cfg`
+
+Join the server and run the console command `usePermissionKey <key>` where you replace `<key>` with the value from your config file. This only works once.
+
+In either server situation you can "op" other players by executing `givePermission <player> op` in the console, replacing `<player>` with the desired player's name (case sensitive).
+
+With "op" rights you can terminate the server gracefully via `shutdownServer` in the console. Note that the server *detaches* (at least on Windows via .exe) from its command prompt, so you get no handy logging there. If you cannot connect or get "op" you may have to terminate the `javaw` process manually.
+
+Finally to get modules configured for a headless server you either have to manually edit in a list of modules to the `defaultModSelection` section, and `defaultGenerator` for your chosen world, then delete the `saves` dir for the server and restart it. Start a single player world and look at the `config.cfg` that generates for hints.
+
+Alternatively you can run from source and supply parameters for game configuration. For instance here is how you would launch with ThroughoutTheAges active, our most complete setting. Keep in mind the module list may change any day, check in the game client what modules highlight with TTA selected to confirm.
+
+`gradlew -PworldGen="WoodAndStone:throughoutTheAges" -PextraModules="AlterationEffects,AnotherWorld,ClimateConditions,CopperAndBronze,Core,Crops,Fences,Fluid,Genome,GrowingFlora,Hunger,Journal,MultiBlock,PlantPack,NameGenerator,Seasons,StructuralResources,WoodAndStone,Workstation" startServer`
+
+This will all become easier as the project and especially the launcher mature further :-)
 
 Controls
 --------
@@ -169,7 +200,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
-* [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module 
+* ~~[Machines](https://github.com/Terasology/Machines) - machine infrastructure library module~~
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
@@ -192,7 +223,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
-* [TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)
+* ~~[TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)~~
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - A world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
@@ -206,7 +237,7 @@ Some of the modules in action:
 Credits
 --------
 
-This is an incomplete list and the team is constantly growing. See also [Dev Team](https://github.com/MovingBlocks/Terasology/wiki/Dev-team) in the wiki but at least one of them is bound to be out of date
+This is an incomplete list and the team is constantly growing.
 
 Apologies in advance for any omissions, contact [Cervator](http://forum.terasology.org/members/cervator.2/) on the forum if you believe you've been missed :-)
 
@@ -218,7 +249,7 @@ Contributors
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Andre Herber, Panserbjoern, MarcinSc, Synopia, Xanhou, mkienenb, Gimpanse / shartte, Flo_K, emanuele3d
 * Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, ChrisK, Maternal
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei, UberWaffe, Chridal
-* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42
+* General: Janred, Josh, Stuthulhu, t3hk0d3, AbraCadaver, ahoehma, Brokenshakles, DizzyDragon, esereja, NowNewStart, pencilcheck, sdab, hagish, Philius342, temsa, nitrix, R41D3NN, Aperion, ilgarma, mcourteaux, philip-wernersbach, Xeano, Jamoozy, sdab, zriezenman, NanjoW, SleekoNiko, Eliwood, nh_99, jobernolte, emenifee, socram8888, dataupload, UltimateBudgie, maym86, aldoborrero, PrivateAlpha, CruzBishop, JoeClacks, Nate-Devv, Member1221, Jtsessions, porl, jacklin213, meniku, GeckoTheGeek42, IWhoI
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro, Halamix2
 * Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly, mkalb, MrBarsack, Philaxx, 3000Lane, MiJyn, neoascetic
 * World Team: bi0hax, ddr2, Nym Traveel, Skaldarnar, Tenson, Laurimann, MPratt, msteiger, Josharias

@@ -211,26 +211,9 @@ public class StorageManagerTest {
     }
 
     @Test
-    public void referenceCorrectlyInvalidatedWhileStored() {
-        EntityRef someEntity = entityManager.create();
-        character.addComponent(new EntityRefComponent(someEntity));
-
-        esm.waitForCompletionOfPreviousSaveAndStartSaving();
-        esm.finishSavingAndShutdown();
-
-        someEntity.destroy();
-        entityManager.create(); // This causes the destroyed entity's id to be reused
-
-        PlayerStore restored = esm.loadPlayerStore(PLAYER_ID);
-        restored.restoreEntities();
-        assertFalse(character.getComponent(EntityRefComponent.class).entityRef.exists());
-    }
-
-
-    @Test
     public void globalEntitiesStoredAndRestored() throws Exception {
         EntityRef entity = entityManager.create(new StringComponent("Test"));
-        int entityId = entity.getId();
+        long entityId = entity.getId();
 
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
@@ -323,7 +306,7 @@ public class StorageManagerTest {
         when(chunkProvider.getAllChunks()).thenReturn(Arrays.asList(chunk));
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
         EntityRef entity = entityManager.create();
-        int id = entity.getId();
+        long id = entity.getId();
         LocationComponent locationComponent = new LocationComponent();
         Vector3f positionInChunk = new Vector3f(chunk.getAABB().getMin());
         positionInChunk.x += 1;
