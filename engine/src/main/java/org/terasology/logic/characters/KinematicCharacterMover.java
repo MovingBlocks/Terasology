@@ -30,7 +30,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
-import org.terasology.math.geom.AxisAngle4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
@@ -537,8 +536,7 @@ public class KinematicCharacterMover implements CharacterMover {
                                 CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
-            AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
-            result.getRotation().set(axisAngle);
+            result.getRotation().set(new Vector3f(0, 1, 0), yaw);
         } else {
             result.getRotation().set(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }

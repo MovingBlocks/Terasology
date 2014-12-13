@@ -40,7 +40,6 @@ import org.terasology.math.AABB;
 import org.terasology.math.MatrixUtils;
 import org.terasology.math.TeraMath;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.AxisAngle4f;
 import org.terasology.math.geom.Matrix4f;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -195,9 +194,9 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-                AxisAngle4f rot = new AxisAngle4f();
-                rot.set(worldRot);
-                glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
+                Vector3f axis = worldRot.getAxis();
+                float angle = (float) worldRot.getAngle();
+                glRotatef(TeraMath.RAD_TO_DEG * angle, axis.getX(), axis.getY(), axis.getZ());
                 glScalef(worldScale, worldScale, worldScale);
 
                 meshComp.material.setFloat4("colorOffset", meshComp.color.rf(), meshComp.color.gf(), meshComp.color.bf(), meshComp.color.af(), true);

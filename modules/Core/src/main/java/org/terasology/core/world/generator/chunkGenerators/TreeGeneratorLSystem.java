@@ -17,8 +17,8 @@ package org.terasology.core.world.generator.chunkGenerators;
 
 import org.terasology.math.LSystemRule;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.AxisAngle4f;
 import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.CharSequenceIterator;
 import org.terasology.utilities.random.Random;
@@ -66,7 +66,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public void generate(CoreChunk view, Random rand, int posX, int posY, int posZ) {
         Vector3f position = new Vector3f(0f, 0f, 0f);
 
-        Matrix4f rotation = new Matrix4f(new AxisAngle4f(0f, 0f, 1f, (float) Math.PI / 2f));
+        Matrix4f rotation = new Matrix4f(new Quat4f(new Vector3f(0f, 0f, 1f), (float) Math.PI / 2f), Vector3f.ZERO, 1.0f);
 
         float angleOffset = rand.nextFloat(-MAX_ANGLE_OFFSET, MAX_ANGLE_OFFSET);
         recurse(view, rand, posX, posY, posZ, angleOffset, new CharSequenceIterator(initialAxiom), position, rotation, 0);
@@ -118,27 +118,27 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case ']':
                     return;
                 case '+':
-                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 0f, 1f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, 0f, 1f), angle + angleOffset), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 case '-':
-                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 0f, -1f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, 0f, -1f), angle + angleOffset), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 case '&':
-                    tempRotation = new Matrix4f(new AxisAngle4f(0f, 1f, 0f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, 1f, 0f), angle + angleOffset), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 case '^':
-                    tempRotation = new Matrix4f(new AxisAngle4f(0f, -1f, 0f, angle + angleOffset));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(0f, -1f, 0f), angle + angleOffset), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 case '*':
-                    tempRotation = new Matrix4f(new AxisAngle4f(1f, 0f, 0f, angle));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(1f, 0f, 0f), angle), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 case '/':
-                    tempRotation = new Matrix4f(new AxisAngle4f(-1f, 0f, 0f, angle));
+                    tempRotation = new Matrix4f(new Quat4f(new Vector3f(-1f, 0f, 0f), angle), Vector3f.ZERO, 1.0f);
                     rotation.mul(tempRotation);
                     break;
                 default:
