@@ -200,7 +200,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [LegacyMusic](https://github.com/Terasology/LegacyMusic) - older music pieces predating the official soundtrack
 * [LightAndShadow](https://github.com/Terasology/LightAndShadow) - main module for the Light & Shadow gameplay
 * [LightAndShadowResources](https://github.com/Terasology/LightAndShadowResources) - IMMA FIRIN’ MAH LASR!! Art assets for the Light & Shadow concept
-* [Machines](https://github.com/Terasology/Machines) - machine infrastructure library module 
+* ~~[Machines](https://github.com/Terasology/Machines) - machine infrastructure library module~~
 * [Malicious](https://github.com/Terasology/Malicious) - a series of module security tests to check that modules cannot do naughty things when running
 * [MasterOfOreon](https://github.com/Terasology/MasterOfOreon) - Master the Oreons, or others like them, from the throne-world of the Ancients! A menu command system, default show/hide key 'O'
 * [Maze](https://github.com/Terasology/Maze) - a maze generator. Right-click with the provided maze tool on one block then again on another and a maze will generate between the two points (in multiple layers if the area is tall enough)
@@ -223,7 +223,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * [Soils](https://github.com/Terasology/Soils) - a small pack of different soil types
 * [Spawning](https://github.com/Terasology/Spawning) - split out from Portals to serve as general utility for anything needing stuff to spawn
 * [StructuralResources](https://github.com/Terasology/StructuralResources) - a set of structural shapes suitable for buildings and such
-* [TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)
+* ~~[TerraTech](https://github.com/Terasology/TerraTech) - Machines to improve your life (the "Terra" is for Earth, not short for Terasology)~~
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - A world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big gameplay module featuring "from scratch" crafting throughout the ages - wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
@@ -237,7 +237,7 @@ Some of the modules in action:
 Credits
 --------
 
-This is an incomplete list and the team is constantly growing. See also [Dev Team](https://github.com/MovingBlocks/Terasology/wiki/Dev-team) in the wiki but at least one of them is bound to be out of date
+This is an incomplete list and the team is constantly growing.
 
 Apologies in advance for any omissions, contact [Cervator](http://forum.terasology.org/members/cervator.2/) on the forum if you believe you've been missed :-)
 
