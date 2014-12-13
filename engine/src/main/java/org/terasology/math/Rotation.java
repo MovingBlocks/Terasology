@@ -116,8 +116,7 @@ public final class Rotation {
     }
 
     public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f();
-        QuaternionUtil.setEuler(rotation, yaw.getRadians(), pitch.getRadians(), roll.getRadians());
+        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
         rotation.normalize();
         return rotation;
     }

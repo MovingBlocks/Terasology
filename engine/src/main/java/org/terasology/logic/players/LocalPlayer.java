@@ -106,8 +106,7 @@ public class LocalPlayer {
         if (character == null) {
             return new Quat4f(0, 0, 0, 1);
         }
-        Quat4f rot = new Quat4f();
-        QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
+        Quat4f rot = new Quat4f(TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
         return rot;
     }
 
@@ -116,8 +115,7 @@ public class LocalPlayer {
         if (character == null) {
             return Direction.FORWARD.getVector3f();
         }
-        Quat4f rot = new Quat4f();
-        QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
+        Quat4f rot = new Quat4f(TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
         Vector3f dir = Direction.FORWARD.getVector3f();

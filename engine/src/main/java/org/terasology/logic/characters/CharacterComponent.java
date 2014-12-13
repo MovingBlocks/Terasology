@@ -92,8 +92,7 @@ public final class CharacterComponent implements Component {
     public float handAnimation;
 
     public Quat4f getLookRotation() {
-        Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
+        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
         return lookRotation;
     }
 

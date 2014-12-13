@@ -133,17 +133,17 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
-        Quat4f viewRot = new Quat4f();
+        Quat4f viewRot;
         switch (characterMovementComponent.mode) {
             case WALKING:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 break;
             case CLIMBING:
                 // Rotation is applied in KinematicCharacterMover
                 break;
             default:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
+                viewRot = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
@@ -155,8 +155,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent,
                               CharacterComponent characterComp, LocationComponent location) {
         // TODO: Remove, use component camera, breaks spawn camera anyway
-        Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
+        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
         updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 

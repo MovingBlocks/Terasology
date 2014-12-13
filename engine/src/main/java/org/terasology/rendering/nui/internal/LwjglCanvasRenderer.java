@@ -26,7 +26,6 @@ import org.terasology.asset.Assets;
 import org.terasology.math.AABB;
 import org.terasology.math.Border;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.Quat4fUtil;
 import org.terasology.math.Rect2f;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
@@ -171,9 +170,9 @@ public class LwjglCanvasRenderer implements CanvasRenderer {
         Vector3f centerOffset = meshAABB.getCenter();
         centerOffset.scale(-1.0f);
 
-        Matrix4f centerTransform = new Matrix4f(Quat4fUtil.IDENTITY, centerOffset, 1.0f);
+        Matrix4f centerTransform = new Matrix4f(Quat4f.IDENTITY, centerOffset, 1.0f);
         Matrix4f userTransform = new Matrix4f(rotation, offset, -fitScale * scale);
-        Matrix4f translateTransform = new Matrix4f(Quat4fUtil.IDENTITY,
+        Matrix4f translateTransform = new Matrix4f(Quat4f.IDENTITY,
                 new Vector3f(drawRegion.minX() + drawRegion.width() / 2,
                         drawRegion.minY() + drawRegion.height() / 2, 0), 1);
 

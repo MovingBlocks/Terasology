@@ -287,7 +287,7 @@ public class CoreCommands extends BaseComponentSystem {
         } else {
             dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = QuaternionUtil.shortestArcQuat(Direction.FORWARD.getVector3f(), dir, new Quat4f());
+        Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
         Prefab prefab = Assets.getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {

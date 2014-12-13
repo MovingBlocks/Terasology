@@ -540,7 +540,7 @@ public class KinematicCharacterMover implements CharacterMover {
             AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
             result.getRotation().set(axisAngle);
         } else {
-            QuaternionUtil.setEuler(result.getRotation(), TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0);
+            result.getRotation().set(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }
     }
 
@@ -658,13 +658,12 @@ public class KinematicCharacterMover implements CharacterMover {
         if (state.getClimbDirection() == null) {
             return;
         }
-        Quat4f rotation = new Quat4f();
         Vector3f tmp;
 
         Vector3i climbDir3i = state.getClimbDirection();
         Vector3f climbDir3f = climbDir3i.toVector3f();
 
-        QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        Quat4f rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
         QuaternionUtil.quatRotate(rotation, tmp, tmp);
         float angleToClimbDirection = tmp.angle(climbDir3f);
@@ -675,7 +674,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (angleToClimbDirection < Math.PI / 4.0 || Math.abs(input.getPitch()) > 60f) {
             float pitchAmount = state.isGrounded() ? 45f : 90f;
             float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
         // looking sidewards from ladder
@@ -685,14 +684,14 @@ public class KinematicCharacterMover implements CharacterMover {
             QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                 TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
             );
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
         // facing away from ladder
         } else {
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }
