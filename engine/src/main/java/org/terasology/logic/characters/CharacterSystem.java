@@ -16,8 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import javax.vecmath.Vector3f;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
@@ -54,6 +52,8 @@ import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.world.WorldProvider;
 
+import javax.vecmath.Vector3f;
+
 /**
  * @author Immortius
  */
@@ -82,7 +82,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     private PickupBuilder pickupBuilder;
 
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
+            StandardCollisionGroup.CHARACTER};
 
 
     @Override
