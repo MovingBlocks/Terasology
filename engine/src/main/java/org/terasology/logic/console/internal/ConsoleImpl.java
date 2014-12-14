@@ -17,20 +17,11 @@
 package org.terasology.logic.console.internal;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleMessageEvent;
-import org.terasology.logic.console.ConsoleSubscriber;
-import org.terasology.logic.console.CoreMessageType;
-import org.terasology.logic.console.Message;
-import org.terasology.logic.console.MessageType;
+import org.terasology.logic.console.*;
 import org.terasology.logic.console.dynamic.CommandExecutionException;
 import org.terasology.logic.console.dynamic.ICommand;
 import org.terasology.network.ClientComponent;
@@ -186,50 +177,20 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public boolean execute(String command, EntityRef callingClient) {
-
-        // trim and remove double spaces
-        String cleanedCommand = command.trim().replaceAll("\\s\\s+", " ");
-
-        if (cleanedCommand.isEmpty()) {
-            return false;
-        }
-
-        //get the command name
-        int commandEndIndex = cleanedCommand.indexOf(" ");
-        String commandName;
-        if (commandEndIndex >= 0) {
-            commandName = cleanedCommand.substring(0, commandEndIndex);
-        } else {
-            commandName = cleanedCommand;
-            commandEndIndex = commandName.length();
-        }
-
-        //remove command name from string
-        String parameterPart = cleanedCommand.substring(commandEndIndex).trim();
-
-        //get the parameters
-        List<String> params = splitParameters(parameterPart);
-
-        // remove quotation marks
-        for (int i = 0; i < params.size(); i++) {
-            String value = params.get(i);
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                params.set(i, value.substring(1, value.length() - 1));
-            }
-        }
+    public boolean execute(String rawCommand, EntityRef callingClient) {
+        String commandName = processCommandName(rawCommand);
+        List<String> processedParameters = processParameters(rawCommand);
 
         ClientComponent cc = callingClient.getComponent(ClientComponent.class);
         if (cc.local) {
-            localCommandHistory.add(command);
+            localCommandHistory.add(rawCommand);
         }
 
-        return execute(commandName, params, callingClient);
+        return execute(commandName, processedParameters, callingClient);
     }
 
     @Override
     public boolean execute(String commandName, List<String> params, EntityRef callingClient) {
-
         if (commandName.isEmpty()) {
             return false;
         }
@@ -239,14 +200,13 @@ public class ConsoleImpl implements Console {
 
         //check if the command is loaded
         if (cmd == null) {
-            if (commandRegistry.containsKey(commandName)) {
-                ICommand command = commandRegistry.get(commandName);
-                addErrorMessage("Incorrect number of parameters. Try:");
-                addMessage(command.getUsage());
-            } else {
-                addErrorMessage("Unknown command '" + commandName + "'");
-            }
+            addErrorMessage("Unknown command '" + commandName + "'");
+            return false;
+        }
 
+        if(params.size() < cmd.getRequiredParameterCount()) {
+            addErrorMessage("Please, provide required arguments marked by <>.");
+            addMessage(cmd.getUsage());
             return false;
         }
 
@@ -266,20 +226,82 @@ public class ConsoleImpl implements Console {
 
                 return true;
             } catch (CommandExecutionException e) {
-                String msgText = e.getLocalizedMessage();
-                if (msgText != null && !msgText.isEmpty()) {
-                    if (callingClient.exists()) {
-                        callingClient.send(new ConsoleMessageEvent(e.getLocalizedMessage()));
-                    } else {
-                        addErrorMessage(e.getLocalizedMessage());
+                Throwable cause = e.getCause();
+                String causeMessage = cause.getLocalizedMessage();
+
+                e.printStackTrace();
+
+                if (causeMessage == null || causeMessage.isEmpty()) {
+                    causeMessage = cause.getMessage();
+
+                    if (causeMessage == null || causeMessage.isEmpty()) {
+                        causeMessage = cause.toString();
+
+                        if (causeMessage == null || causeMessage.isEmpty()) {
+                            return false;
+                        }
                     }
                 }
+
+                String errorReport = FontColor.getColored("An error occurred while executing command '"
+                                                          + commandName + "': " + causeMessage, ConsoleColors.ERROR);
+
+                if (callingClient.exists()) {
+                    callingClient.send(new ConsoleMessageEvent(errorReport));
+                } else {
+                    addErrorMessage(errorReport);
+                }
+
                 return false;
             }
         }
     }
 
-    private List<String> splitParameters(String paramStr) {
+    private static String cleanCommand(String rawCommand) {
+        // trim and remove double spaces
+        return rawCommand.trim().replaceAll("\\s\\s+", " ");
+    }
+
+    @Override
+    public String processCommandName(String rawCommand) {
+        String cleanedCommand = cleanCommand(rawCommand);
+        int commandEndIndex = cleanedCommand.indexOf(" ");
+
+        if (commandEndIndex >= 0) {
+            return cleanedCommand.substring(0, commandEndIndex);
+        } else {
+            return cleanedCommand;
+        }
+    }
+
+    @Override
+    public List<String> processParameters(String rawCommand) {
+        String cleanedCommand = cleanCommand(rawCommand);
+        //get the command name
+        int commandEndIndex = cleanedCommand.indexOf(" ");
+
+        if (commandEndIndex < 0) {
+            commandEndIndex = cleanedCommand.length();
+        }
+
+        //remove command name from string
+        String parameterPart = cleanedCommand.substring(commandEndIndex).trim();
+
+        //get the parameters
+        List<String> params = splitParameters(parameterPart);
+
+        // remove quotation marks
+        for (int i = 0; i < params.size(); i++) {
+            String value = params.get(i);
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                params.set(i, value.substring(1, value.length() - 1));
+            }
+        }
+
+        return params;
+    }
+
+    private static List<String> splitParameters(String paramStr) {
         String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
         List<String> params = Lists.newArrayList();
         for (String s : rawParams) {

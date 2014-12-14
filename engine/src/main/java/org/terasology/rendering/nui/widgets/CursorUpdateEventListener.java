@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package org.terasology.rendering.nui.widgets;
 
 /**
- * Used to mark a class extending {@link org.terasology.logic.console.dynamic.Command} to be registered
- *
- * Created by Limeth on 11.12.2014.
+ * @author Limeth
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface RegisterCommand
-{
+public interface CursorUpdateEventListener {
+    void onCursorUpdated(int oldPosition, int newPosition);
 }

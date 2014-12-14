@@ -21,10 +21,10 @@ package org.terasology.logic.console.ui;
 public interface TabCompletionEngine {
 
     /**
-     * @param text
-     * @return The completed text, or the original text.
+     * @param command The currently entered command
+     * @return The command with a completed argument or the command provided.
      */
-    String complete(String text);
+    String complete(String command);
 
     /**
      * Resets the completion engine

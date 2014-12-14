@@ -26,7 +26,7 @@ import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.network.ClientComponent;
-import org.terasology.registry.In;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
@@ -38,27 +38,14 @@ import java.util.List;
 /**
  * @author Immortius, Limeth
  */
+//TODO This command is static, so the GiveItemCommand can use it. Maybe there is a better way?
 @RegisterSystem
 public class GiveBlockCommand extends Command {
-    @In
-    private BlockManager blockManager;
-
-    @In
-    private InventoryManager inventoryManager;
-
-    @In
-    private EntityManager entityManager;
-
-    private BlockItemFactory blockItemFactory;
+    private static BlockItemFactory lazyBlockItemFactory;
 
     public GiveBlockCommand() {
         super("giveBlock", true, "Adds a block to your inventory",
                 "Puts a desired number (or 16) of the given block with the give shape into your inventory");
-    }
-
-    @Override
-    public void initialiseMore() {
-        blockItemFactory = new BlockItemFactory(entityManager);
     }
 
     @Override
@@ -70,8 +57,18 @@ public class GiveBlockCommand extends Command {
         };
     }
 
-    public String execute(EntityRef sender, String uri, Integer nullableQuantity, String shapeUri) {
+    //TODO May cause issues.
+    private static BlockItemFactory getBlockItemFactory() {
+        if(lazyBlockItemFactory == null) {
+            lazyBlockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
+        }
+
+        return lazyBlockItemFactory;
+    }
+
+    public static String execute(EntityRef sender, String uri, Integer nullableQuantity, String shapeUri) {
         int quantity = nullableQuantity != null ? nullableQuantity : 16;
+        BlockManager blockManager = CoreRegistry.get(BlockManager.class);
 
         if (shapeUri == null) {
             List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
@@ -128,16 +125,20 @@ public class GiveBlockCommand extends Command {
      * @param blockFamily the block family of the queried block
      * @param quantity    the number of blocks that are queried
      */
-    private String giveBlock(BlockFamily blockFamily, int quantity, EntityRef client) {
+    private static String giveBlock(BlockFamily blockFamily, int quantity, EntityRef client) {
         if (quantity < 1) {
             return "Here, have these zero (0) items just like you wanted";
         }
 
+        BlockItemFactory blockItemFactory = getBlockItemFactory();
         EntityRef item = blockItemFactory.newInstance(blockFamily, quantity);
+
         if (!item.exists()) {
             throw new IllegalArgumentException("Unknown block or item");
         }
+
         EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
+        InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
 
         if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
             item.destroy();

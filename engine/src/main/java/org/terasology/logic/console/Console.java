@@ -102,6 +102,18 @@ public interface Console {
     boolean execute(String commandName, List<String> params, EntityRef callingClient);
 
     /**
+     * @param rawCommand Command entered in the UI
+     * @return Command name
+     */
+    String processCommandName(String rawCommand);
+
+    /**
+     * @param rawCommand Command entered in the UI
+     * @return String command arguments
+     */
+    List<String> processParameters(String rawCommand);
+
+    /**
      * Get a group of commands by their name. These will vary by the number of parameters they accept
      *
      * @param name The name of the command.

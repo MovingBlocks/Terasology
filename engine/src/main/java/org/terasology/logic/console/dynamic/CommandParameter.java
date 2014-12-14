@@ -103,9 +103,8 @@ public final class CommandParameter {
      * @param clazz The child class of the array class returned
      * @return The array class of {@code clazz}
      */
-    @SuppressWarnings("unchecked")
-    private static <T> Class<T[]> getArrayClass(Class<T> clazz) {
-        return (Class<T[]>) Array.newInstance(clazz).getClass();
+    private static <T> Class<?> getArrayClass(Class<T> clazz) {
+        return Array.newInstance(clazz, 0).getClass();
     }
 
     public Object getValue(String param) throws CommandParameterParseException {
@@ -171,19 +170,19 @@ public final class CommandParameter {
         try {
             Class<?> childType = getType();
 
-            if (childType == Long.TYPE) {
+            if (childType == Long.class) {
                 return Long.parseLong(string);
-            } else if (childType == Integer.TYPE) {
+            } else if (childType == Integer.class) {
                 return Integer.parseInt(string);
-            } else if (childType == Short.TYPE) {
+            } else if (childType == Short.class) {
                 return Short.parseShort(string);
-            } else if (childType == Byte.TYPE) {
+            } else if (childType == Byte.class) {
                 return Byte.parseByte(string);
-            } else if (childType == Double.TYPE) {
+            } else if (childType == Double.class) {
                 return Double.parseDouble(string);
-            } else if (childType == Float.TYPE) {
+            } else if (childType == Float.class) {
                 return Float.parseFloat(string);
-            } else if (childType == Character.TYPE) {
+            } else if (childType == Character.class) {
                 return (char) Integer.parseInt(string);
             } else if (childType == String.class) {
                 return string;

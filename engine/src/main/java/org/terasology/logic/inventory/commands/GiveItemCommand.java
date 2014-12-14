@@ -34,9 +34,6 @@ import org.terasology.world.block.entity.commands.GiveBlockCommand;
 @RegisterSystem
 public class GiveItemCommand extends Command {
     @In
-    private GiveBlockCommand giveBlockCommand;
-
-    @In
     private InventoryManager inventoryManager;
 
     @In
@@ -66,7 +63,7 @@ public class GiveItemCommand extends Command {
             }
             return "You received an item of " + prefab.getName();
         } else {
-            return giveBlockCommand.execute(sender, itemPrefabName, null, null);
+            return GiveBlockCommand.execute(sender, itemPrefabName, null, null);
         }
     }
 

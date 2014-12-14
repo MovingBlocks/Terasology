@@ -20,6 +20,7 @@ import org.terasology.input.Keyboard;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.databinding.DefaultBinding;
+import org.terasology.rendering.nui.widgets.CursorUpdateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.List;
@@ -32,6 +33,18 @@ public class UICommandEntry extends UIText {
     private Binding<List<String>> commandHistory = new DefaultBinding<List<String>>(Lists.<String>newArrayList());
     private int index;
     private TabCompletionEngine tabCompletionEngine;
+
+    public UICommandEntry() {
+        subscribe(new CursorUpdateEventListener() {
+            @Override
+            public void onCursorUpdated(int oldPosition, int newPosition) {
+                if(tabCompletionEngine == null)
+                    return;
+
+                tabCompletionEngine.reset();
+            }
+        });
+    }
 
     @Override
     public void onKeyEvent(KeyEvent event) {
@@ -68,7 +81,7 @@ public class UICommandEntry extends UIText {
                 case Keyboard.KeyId.TAB:
                     if (tabCompletionEngine != null) {
                         setText(tabCompletionEngine.complete(getText()));
-                        setCursorPosition(getText().length());
+                        setCursorPosition(getText().length(), true, false);
                         event.consume();
                     }
                     break;

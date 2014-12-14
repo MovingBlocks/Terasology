@@ -15,105 +15,201 @@
  */
 package org.terasology.logic.console.ui;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.dynamic.CommandSuggestionException;
+import org.terasology.logic.console.dynamic.ICommand;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.FontColor;
+import org.terasology.utilities.CamelCaseMatcher;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.Message;
-import org.terasology.rendering.FontColor;
-import org.terasology.utilities.CamelCaseMatcher;
-
-import com.google.common.collect.Lists;
-
 /**
- * A text completion engine with cycle-through functionality 
+ * A text completion engine with cycle-through functionality
+ *
  * @author Martin Steiger
  */
 public class CyclingTabCompletionEngine implements TabCompletionEngine {
-
     private static final int MAX_CYCLES = 10;
-
     private final Console console;
-    
-    private final Collection<String> allNames;
-    private final List<String> matchList = Lists.newArrayList();
+    private int selectionIndex;
+    private String[] previousMatches;
+    private Message previousMessage;
+    private Collection<String> commandNames;
+    private String query;
 
-    private int index;
-    private Message prevMessage;
-
-    public CyclingTabCompletionEngine(Console console, Collection<String> allNames) {
+    public CyclingTabCompletionEngine(Console console) {
         this.console = console;
-        this.allNames = allNames;
+    }
+
+    private boolean updateCommandNamesIfNecessary() {
+        Collection<ICommand> commands = console.getCommands();
+
+        if (commandNames != null && commandNames.size() == commands.size()) {
+            return false;
+        }
+
+        commandNames = Collections2.transform(commands, new Function<ICommand, String>() {
+            @Override
+            public String apply(ICommand input) {
+                return input.getName();
+            }
+        });
+
+        return true;
+    }
+
+    private String[] findMatches(String commandName, List<String> commandParameters,
+                                 ICommand command, int suggestedIndex) {
+        if (suggestedIndex <= 0) {
+            updateCommandNamesIfNecessary();
+            List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(commandName, commandNames));
+            Collections.sort(matches);
+            return matches.toArray(new String[matches.size()]);
+        }
+
+        List<String> finishedParameters = Lists.newArrayList();
+
+        for (int i = 0; i < suggestedIndex - 1; i++) {
+            finishedParameters.add(commandParameters.get(i));
+        }
+
+        EntityRef sender = CoreRegistry.get(LocalPlayer.class).getClientEntity();
+
+        try {
+            return command.suggestRaw(finishedParameters, sender);
+        } catch (CommandSuggestionException e) {
+            Throwable cause = e.getCause();
+            String causeMessage = e.getLocalizedMessage();
+
+            e.printStackTrace();
+
+            if (causeMessage == null || causeMessage.isEmpty()) {
+                causeMessage = cause.getMessage();
+
+                if (causeMessage == null || causeMessage.isEmpty()) {
+                    causeMessage = cause.toString();
+
+                    if (causeMessage == null || causeMessage.isEmpty()) {
+                        return null;
+                    }
+                }
+            }
+
+            console.addMessage("Error when suggesting command: " + causeMessage, CoreMessageType.ERROR);
+            return null;
+        }
     }
 
     @Override
-    public String complete(String text) {
-        
-        if (!matchList.contains(text)) {
+    public String complete(String rawCommand) {
+        if (rawCommand.length() <= 0) {
             reset();
-            
-            String cmdQuery = text.trim();
-    
-            Collection<String> matches = CamelCaseMatcher.getMatches(cmdQuery, allNames);
-
-            if (matches.isEmpty()) {
-                return text;
-            }
-            
-            if (matches.size() == 1) {
-                return matches.iterator().next();
-            } 
-    
-            if (matches.size() > MAX_CYCLES) {
-                console.addMessage(new Message("Too many hits, please refine your search"));
-                return text;
-            }
-
-            matchList.addAll(matches);
-            Collections.sort(matchList);
+            previousMessage = new Message("Type 'help' to list all commands.");
+            console.addMessage(previousMessage);
+            return null;
+        } else if (query == null) {
+            query = rawCommand;
         }
 
+        String commandName = console.processCommandName(query);
+        List<String> commandParameters = console.processParameters(query);
+        ICommand command = console.getCommand(commandName);
+        int suggestedIndex = commandParameters.size() + (query.charAt(query.length() - 1) == ' ' ? 1 : 0);
+        String[] matches = findMatches(commandName, commandParameters, command, suggestedIndex);
+
+        if (matches == null || matches.length <= 0) {
+            return query;
+        }
+
+        if (!Arrays.equals(matches, previousMatches)) {
+            reset(false);
+
+            if (matches.length == 1) {
+                return generateResult(matches[0], commandName, commandParameters, suggestedIndex);
+            }
+
+            if (matches.length > MAX_CYCLES) {
+                console.addMessage(new Message("Too many hits, please refine your search"));
+                return query;
+            }
+
+            previousMatches = matches;
+        }
 
         StringBuilder commandMatches = new StringBuilder();
-        for (int i = 0; i < matchList.size(); i++) {
-            if (commandMatches.length() != 0) {
-                commandMatches.append(" ");
+
+        for (int i = 0; i < previousMatches.length; i++) {
+            if (i > 0) {
+                commandMatches.append(' ');
             }
-            
-            String name = matchList.get(i);
-            
-            if (index == i) {
+
+            String name = previousMatches[i];
+
+            if (selectionIndex == i) {
                 name = FontColor.getColored(name, ConsoleColors.COMMAND);
             }
 
             commandMatches.append(name);
         }
-        
-        Message message = new Message(commandMatches.toString());
-        String cmd = matchList.get(index);
 
-        if (prevMessage != null) {
-            console.replaceMessage(prevMessage, message);
+        Message message = new Message(commandMatches.toString());
+        String suggestion = previousMatches[selectionIndex];
+
+        if (previousMessage != null) {
+            console.replaceMessage(previousMessage, message);
         } else {
             console.addMessage(message);
         }
-        
-        prevMessage = message;
-        index = (index + 1) % matchList.size(); 
-        
-        return cmd;
+
+        previousMessage = message;
+        selectionIndex = (selectionIndex + 1) % previousMatches.length;
+
+        return generateResult(suggestion, commandName, commandParameters, suggestedIndex);
     }
-    
+
+    private String generateResult(String suggestion, String commandName,
+                                  List<String> commandParameters, int suggestedIndex) {
+        if (suggestedIndex <= 0) {
+            return suggestion;
+        } else {
+            String result = commandName;
+
+            for (int i = 0; i < suggestedIndex - 1; i++) {
+                result += " " + commandParameters.get(i);
+            }
+
+            return result + " " + suggestion;
+        }
+    }
+
+    private void reset(boolean removeQuery) {
+        if (previousMessage != null) {
+            console.removeMessage(previousMessage);
+        }
+
+        if (removeQuery) {
+            query = null;
+        }
+
+        previousMessage = null;
+        previousMatches = null;
+        selectionIndex = 0;
+    }
+
     @Override
     public void reset() {
-        if (prevMessage != null) {
-            console.removeMessage(prevMessage);
-        }
-        
-        prevMessage = null;
-        matchList.clear();
-        index = 0;
+        reset(true);
     }
 }

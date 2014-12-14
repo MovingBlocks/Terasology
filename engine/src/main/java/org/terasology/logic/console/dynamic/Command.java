@@ -56,8 +56,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         registerExecutionMethod();
         registerSuggestionMethod();
         initUsage();
-
-        LoggerFactory.getLogger("LIMETHDEBUG").debug("Constructing command {}", getName());
     }
 
     public void initialiseMore() {
@@ -66,8 +64,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     @Override
     public final void initialise() {
         Console console = CoreRegistry.get(Console.class);
-
-        LoggerFactory.getLogger("LIMETHDEBUG").debug("Initializing command {}", getName());
 
         initialiseMore();
         console.registerCommand(this);
@@ -128,8 +124,11 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     private void registerSuggestionMethod() throws CommandInitializationException {
         List<Method> methods = findMethods(METHOD_NAME_SUGGEST);
 
-        if (methods.size() <= 0 && parameters.length > 0) {
-            LOGGER.warn("No {} method found for command class {}.", METHOD_NAME_SUGGEST, getClass().getCanonicalName());
+        if (methods.size() <= 0) {
+            if(parameters.length > 0) {
+                LOGGER.warn("No {} method found for command class {}.", METHOD_NAME_SUGGEST, getClass().getCanonicalName());
+            }
+
             suggestionMethod = null;
             return;
         } else if (methods.size() > 1) {
@@ -260,13 +259,17 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
             Object result = executionMethod.invoke(this, processedParameters);
 
             return result != null ? String.valueOf(result) : null;
-        } catch (Exception e) {
-            throw new CommandExecutionException(e);
+        } catch (Throwable t) {
+            throw new CommandExecutionException(t.getCause()); //Skip InvocationTargetException
         }
     }
 
     @Override
     public final String[] suggestRaw(List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
+        if(suggestionMethod == null) {
+            return null;
+        }
+
         Object[] processedParameters;
 
         try {
@@ -281,13 +284,12 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
             throw new CommandSuggestionException(warning);
         }
-
         try {
             String[] result = (String[]) suggestionMethod.invoke(this, processedParameters);
 
             return result != null ? result : new String[0];
-        } catch (Exception e) {
-            throw new CommandSuggestionException(e);
+        } catch (Throwable t) {
+            throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
     }
 

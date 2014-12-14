@@ -34,7 +34,7 @@ public class SetJumpSpeedCommand extends Command {
     @Override
     protected CommandParameter[] constructParameters() {
         return new CommandParameter[] {
-                CommandParameter.array("amount", Float.class, true)
+                CommandParameter.single("amount", Float.class, true)
         };
     }
 
