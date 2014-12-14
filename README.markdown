@@ -226,6 +226,7 @@ Here's a list of modules bundled with the game by default (as of this writing an
 * ~~[TerraTech](https://github.com/Terasology/TerraTech) - machines to improve your life (the "Terra" is for Earth, not short for Terasology)~~
 * [ThroughoutTheAges](https://github.com/Terasology/ThroughoutTheAges) - gameplay module for a large content series letting you slowly climb a tech tree to improve your available tools, foods, and so on
 * [TutorialWorldGeneration](https://github.com/Terasology/TutorialWorldGeneration) - A world generation tutorial module, goes with a guide in its [wiki](https://github.com/Terasology/TutorialWorldGeneration/wiki)
+* [WildAnimals](https://github.com/Terasology/WildAnimals) - big content module including "from scratch" crafting, starting with wood here
 * [WoodAndStone](https://github.com/Terasology/WoodAndStone) - big content module including "from scratch" crafting, starting with wood here
 * [Workstation](https://github.com/Terasology/Workstation) - workstations offer a way to use blocks in-world for advanced purposes
 * [WorldlyTooltip](https://github.com/Terasology/WorldlyTooltip) - a little tooltip that shows you what you're looking at (hold `alt` for debug details)
