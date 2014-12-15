@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.exceptions;
+package org.terasology.logic.console.internal.adapter;
 
-public class InvalidCommandCallException extends Exception {
-    public InvalidCommandCallException(String message) {
-        super(message);
-    }
+import com.sun.istack.internal.NotNull;
 
-    public InvalidCommandCallException(String message, Throwable cause) {
-        super(message, cause);
-    }
+/**
+ * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.internal.Command}
+ *
+ * @author Limeth
+ */
+public interface CommandArgumentAdapter<T> {
+    @NotNull
+    T parse(@NotNull String composed);
+    @NotNull
+    String compose(@NotNull T parsed);
 }
