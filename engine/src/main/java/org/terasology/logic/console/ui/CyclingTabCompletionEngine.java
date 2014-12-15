@@ -91,13 +91,13 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         try {
             return command.suggestRaw(currentValue, finishedParameters, sender);
         } catch (CommandSuggestionException e) {
-            Throwable cause = e.getCause();
             String causeMessage = e.getLocalizedMessage();
 
             e.printStackTrace();
 
-            if (causeMessage == null || causeMessage.isEmpty()) {
-                causeMessage = cause.getMessage();
+            if (causeMessage == null) {
+                Throwable cause = e.getCause();
+                causeMessage = cause.getLocalizedMessage();
 
                 if (causeMessage == null || causeMessage.isEmpty()) {
                     causeMessage = cause.toString();

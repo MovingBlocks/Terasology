@@ -23,8 +23,8 @@ import java.util.Map;
 /**
  * @author Limeth
  */
-public class BasicCommandArgumentAdapter {
-    public static final CommandArgumentAdapter<Long> LONG = new CommandArgumentAdapter<Long>() {
+public class BasicCommandParameterAdapter {
+    public static final CommandParameterAdapter<Long> LONG = new CommandParameterAdapter<Long>() {
         @Override
         public Long parse(@NotNull String composed) {
             return Long.parseLong(composed);
@@ -36,7 +36,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Integer> INTEGER = new CommandArgumentAdapter<Integer>() {
+    public static final CommandParameterAdapter<Integer> INTEGER = new CommandParameterAdapter<Integer>() {
         @Override
         public Integer parse(@NotNull String composed) {
             return Integer.parseInt(composed);
@@ -48,7 +48,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Short> SHORT = new CommandArgumentAdapter<Short>() {
+    public static final CommandParameterAdapter<Short> SHORT = new CommandParameterAdapter<Short>() {
         @Override
         public Short parse(@NotNull String composed) {
             return Short.parseShort(composed);
@@ -60,7 +60,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Byte> BYTE = new CommandArgumentAdapter<Byte>() {
+    public static final CommandParameterAdapter<Byte> BYTE = new CommandParameterAdapter<Byte>() {
         @Override
         public Byte parse(@NotNull String composed) {
             return Byte.parseByte(composed);
@@ -72,7 +72,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Character> CHARACTER = new CommandArgumentAdapter<Character>() {
+    public static final CommandParameterAdapter<Character> CHARACTER = new CommandParameterAdapter<Character>() {
         @Override
         public Character parse(@NotNull String composed) {
             if (composed.length() != 1) {
@@ -88,7 +88,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Double> DOUBLE = new CommandArgumentAdapter<Double>() {
+    public static final CommandParameterAdapter<Double> DOUBLE = new CommandParameterAdapter<Double>() {
         @Override
         public Double parse(@NotNull String composed) {
             return Double.parseDouble(composed);
@@ -100,7 +100,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Float> FLOAT = new CommandArgumentAdapter<Float>() {
+    public static final CommandParameterAdapter<Float> FLOAT = new CommandParameterAdapter<Float>() {
         @Override
         public Float parse(@NotNull String composed) {
             return Float.parseFloat(composed);
@@ -112,7 +112,7 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static final CommandArgumentAdapter<Boolean> BOOLEAN = new CommandArgumentAdapter<Boolean>() {
+    public static final CommandParameterAdapter<Boolean> BOOLEAN = new CommandParameterAdapter<Boolean>() {
         @Override
         public Boolean parse(@NotNull String composed) {
             return Boolean.parseBoolean(composed);
@@ -124,14 +124,26 @@ public class BasicCommandArgumentAdapter {
         }
     };
 
-    public static CommandArgumentAdapter[] values() {
-        return new CommandArgumentAdapter[] {
-                LONG, INTEGER, SHORT, BYTE, CHARACTER, DOUBLE, FLOAT, BOOLEAN
+    public static final CommandParameterAdapter<String> STRING = new CommandParameterAdapter<String>() {
+        @Override
+        public String parse(@NotNull String composed) {
+            return composed;
+        }
+
+        @Override
+        public String compose(@NotNull String parsed) {
+            return parsed;
+        }
+    };
+
+    public static CommandParameterAdapter[] values() {
+        return new CommandParameterAdapter[] {
+                LONG, INTEGER, SHORT, BYTE, CHARACTER, DOUBLE, FLOAT, BOOLEAN, STRING
         };
     }
 
-    public static Map<Class<?>, CommandArgumentAdapter> map() {
-        Map<Class<?>, CommandArgumentAdapter> map = new HashMap<>();
+    public static Map<Class<?>, CommandParameterAdapter> map() {
+        Map<Class<?>, CommandParameterAdapter> map = new HashMap<>();
 
         map.put(Long.class, LONG);
         map.put(Integer.class, INTEGER);
@@ -141,6 +153,7 @@ public class BasicCommandArgumentAdapter {
         map.put(Double.class, DOUBLE);
         map.put(Float.class, FLOAT);
         map.put(Boolean.class, BOOLEAN);
+        map.put(String.class, STRING);
 
         return map;
     }

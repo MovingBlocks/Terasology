@@ -74,9 +74,19 @@ public interface ICommand extends Comparable<ICommand> {
     String getDescription();
 
     /**
+     * @return True, if the description is not null and is not empty
+     */
+    boolean hasDescription();
+
+    /**
      * @return A detailed description of how to use this command
      */
     String getHelpText();
+
+    /**
+     * @return True, if the help text is not null and is not empty
+     */
+    boolean hasHelpText();
 
     /**
      * @return The required amount of parameters for this method to function properly

@@ -46,7 +46,7 @@ import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.console.internal.adapter.CommandArgumentAdapterManager;
+import org.terasology.logic.console.internal.adapter.CommandParameterAdapterManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -282,7 +282,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.putPermanently(CommandArgumentAdapterManager.class, CommandArgumentAdapterManager.basic());
+        CoreRegistry.putPermanently(CommandParameterAdapterManager.class, CommandParameterAdapterManager.basic());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
         CoreRegistry.putPermanently(Game.class, new Game(this, time));
         assetManager.setEnvironment(moduleManager.getEnvironment());

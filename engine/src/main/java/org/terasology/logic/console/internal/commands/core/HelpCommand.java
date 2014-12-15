@@ -22,8 +22,8 @@ import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.internal.Command;
 import org.terasology.logic.console.internal.CommandParameter;
-import org.terasology.logic.console.internal.ICommand;
 import org.terasology.logic.console.internal.CoreCommand;
+import org.terasology.logic.console.internal.ICommand;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 
@@ -79,12 +79,12 @@ public class HelpCommand extends Command {
                 msg.append(Message.NEW_LINE);
                 msg.append("=====================================================================================================================");
                 msg.append(Message.NEW_LINE);
-                if (!cmd.getHelpText().isEmpty()) {
+                if (cmd.hasHelpText()) {
                     msg.append(cmd.getHelpText());
                     msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");
                     msg.append(Message.NEW_LINE);
-                } else if (!cmd.getDescription().isEmpty()) {
+                } else if (cmd.hasDescription()) {
                     msg.append(cmd.getDescription());
                     msg.append(Message.NEW_LINE);
                     msg.append("=====================================================================================================================");

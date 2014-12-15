@@ -272,10 +272,11 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
     @Override
     public final String[] suggestRaw(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
-        if(suggestionMethod == null) {
+        if (suggestionMethod == null) {
             return null;
         }
 
+        //Generate an array to be used as a parameter in the 'suggest' method
         Object[] processedParameters;
 
         try {
@@ -290,25 +291,70 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
             throw new CommandSuggestionException(warning);
         }
-        try {
-            String[] result = (String[]) suggestionMethod.invoke(this, processedParameters);
 
-            if (result == null || result.length <= 0) {
-                return result;
+        //Get the suggested parameter to compare the result with
+        CommandParameter suggestedParameter = null;
+
+        for (int i = 1; i < processedParameters.length; i++) {
+            if (processedParameters[i] == null) {
+                suggestedParameter = parameters[i - 1];
+                break;
             }
+        }
 
-            //Only return results starting with currentValue
-            String[] filteredResult = filterArray(result, new Predicate<String>() {
-                @Override
-                public boolean apply(String input) {
-                    return input != null && (currentValue == null || input.startsWith(currentValue));
-                }
-            });
+        if (suggestedParameter == null) {
+            return null;
+        }
 
-            return filteredResult;
+        Object rawResult = null;
+
+        try {
+            rawResult = suggestionMethod.invoke(this, processedParameters);
         } catch (Throwable t) {
             throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
+
+        if (rawResult == null) {
+            return null;
+        }
+
+        Object[] result;
+
+        try {
+            result = (Object[]) rawResult;
+
+            if (result.getClass().getComponentType() != suggestedParameter.getType()) {
+                throw new ClassCastException();
+            }
+        } catch (ClassCastException e) {
+            Class<?> requiredComponentClass = suggestedParameter.getType();
+            Class<?> requiredClass = Array.newInstance(requiredComponentClass, 0).getClass();
+            Class<?> providedClass = rawResult.getClass();
+
+            throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
+                    + " returns a suggestion of an invalid type. Required: " + requiredClass.getCanonicalName()
+                    + "; provided: " + providedClass.getCanonicalName(), e);
+        }
+
+        String[] composedResult = composeAll(result, suggestedParameter);
+
+        //Only return results starting with currentValue
+        return filterArray(composedResult, new Predicate<String>() {
+            @Override
+            public boolean apply(String input) {
+                return input != null && (currentValue == null || input.startsWith(currentValue));
+            }
+        });
+    }
+
+    private static String[] composeAll(Object[] array, CommandParameter parameter) {
+        String[] result = new String[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            result[i] = parameter.composeSingle(array[i]);
+        }
+
+        return result;
     }
 
     private <T> T[] filterArray(T[] array, Predicate<T> predicate) {
@@ -354,8 +400,18 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     }
 
     @Override
+    public boolean hasDescription() {
+        return description != null && !description.isEmpty();
+    }
+
+    @Override
     public String getHelpText() {
         return helpText;
+    }
+
+    @Override
+    public boolean hasHelpText() {
+        return helpText != null && !helpText.isEmpty();
     }
 
     public String getUsage() {

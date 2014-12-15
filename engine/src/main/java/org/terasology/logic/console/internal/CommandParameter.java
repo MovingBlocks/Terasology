@@ -16,7 +16,9 @@
 package org.terasology.logic.console.internal;
 
 import com.google.common.collect.ImmutableMap;
+import org.terasology.logic.console.internal.adapter.CommandParameterAdapterManager;
 import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
+import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -168,31 +170,24 @@ public final class CommandParameter {
     }
 
     public Object parseSingle(String string) throws CommandParameterParseException {
-        //TODO Add a proper, extensible parsing system instead of hardcoding it
-        try {
-            Class<?> childType = getType();
+        CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
+        Class<?> childType = getType();
 
-            if (childType == Long.class) {
-                return Long.parseLong(string);
-            } else if (childType == Integer.class) {
-                return Integer.parseInt(string);
-            } else if (childType == Short.class) {
-                return Short.parseShort(string);
-            } else if (childType == Byte.class) {
-                return Byte.parseByte(string);
-            } else if (childType == Double.class) {
-                return Double.parseDouble(string);
-            } else if (childType == Float.class) {
-                return Float.parseFloat(string);
-            } else if (childType == Character.class) {
-                return (char) Integer.parseInt(string);
-            } else if (childType == String.class) {
-                return string;
+        if (parameterAdapterManager.isAdapterRegistered(childType)) {
+            try {
+                return parameterAdapterManager.parse(childType, string);
+            } catch (Error | Exception e) {
+                throw new CommandParameterParseException("An error occurred while parsing " + getType().getCanonicalName(), string);
             }
-        } catch (Exception e) {
         }
 
-        throw new CommandParameterParseException("Cannot parse a " + getType().getCanonicalName(), string);
+        throw new CommandParameterParseException("Cannot parse a " + childType.getCanonicalName(), string);
+    }
+
+    public String composeSingle(Object object) {
+        CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
+
+        return parameterAdapterManager.compose(object);
     }
 
     public boolean isEscaped(String string, int charIndex, boolean trail) {

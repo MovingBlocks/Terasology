@@ -22,7 +22,7 @@ import com.sun.istack.internal.NotNull;
  *
  * @author Limeth
  */
-public interface CommandArgumentAdapter<T> {
+public interface CommandParameterAdapter<T> {
     @NotNull
     T parse(@NotNull String composed);
     @NotNull

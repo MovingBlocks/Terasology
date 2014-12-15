@@ -23,17 +23,17 @@ import java.util.Map;
 /**
  * @author Limeth
  */
-public class CommandArgumentAdapterManager {
-    private final Map<Class<?>, CommandArgumentAdapter> adapters = Maps.newHashMap();
+public class CommandParameterAdapterManager {
+    private final Map<Class<?>, CommandParameterAdapter> adapters = Maps.newHashMap();
 
     /**
-     * @return A manager with basic adapters for wrapped primitives
+     * @return A manager with basic adapters for wrapped primitives and {@link String}
      */
     @SuppressWarnings("unchecked")
-    public static CommandArgumentAdapterManager basic() {
-        CommandArgumentAdapterManager manager = new CommandArgumentAdapterManager();
+    public static CommandParameterAdapterManager basic() {
+        CommandParameterAdapterManager manager = new CommandParameterAdapterManager();
 
-        for (Map.Entry<Class<?>, CommandArgumentAdapter> entry : BasicCommandArgumentAdapter.map().entrySet()) {
+        for (Map.Entry<Class<?>, CommandParameterAdapter> entry : BasicCommandParameterAdapter.map().entrySet()) {
             manager.registerAdapter(entry.getKey(), entry.getValue());
         }
 
@@ -43,7 +43,7 @@ public class CommandArgumentAdapterManager {
     /**
      * @return {@code true}, if the adapter didn't override a previously present adapter
      */
-    public <T> boolean registerAdapter(Class<T> clazz, CommandArgumentAdapter<T> adapter) {
+    public <T> boolean registerAdapter(Class<T> clazz, CommandParameterAdapter<T> adapter) {
         return adapters.put(clazz, adapter) == null;
     }
 
@@ -55,13 +55,13 @@ public class CommandArgumentAdapterManager {
      * @param clazz The type of the returned object
      * @param composed The string from which to parse
      * @return The parsed object
-     * @throws ClassCastException If the {@link org.terasology.logic.console.internal.adapter.CommandArgumentAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public <T> T parse(Class<T> clazz, String composed) throws ClassCastException {
         Preconditions.checkNotNull(composed, "The String to parse must not be null");
 
-        CommandArgumentAdapter adapter = getAdapter(clazz);
+        CommandParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
@@ -71,21 +71,21 @@ public class CommandArgumentAdapterManager {
     /**
      * @param parsed The object to compose
      * @return The composed object
-     * @throws ClassCastException If the {@link org.terasology.logic.console.internal.adapter.CommandArgumentAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public String compose(Object parsed) throws ClassCastException {
         Preconditions.checkNotNull(parsed, "The Object to compose must not be null");
 
         Class<?> clazz = parsed.getClass();
-        CommandArgumentAdapter adapter = getAdapter(clazz);
+        CommandParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
         return adapter.compose(parsed);
     }
 
-    public CommandArgumentAdapter getAdapter(Class<?> clazz) {
+    public CommandParameterAdapter getAdapter(Class<?> clazz) {
         return adapters.get(clazz);
     }
 }
