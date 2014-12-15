@@ -13,14 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.internal.exceptions;
 
-public class InvalidCommandCallException extends Exception {
-    public InvalidCommandCallException(String message) {
-        super(message);
+/**
+ * @author Limeth
+ */
+public class CommandParameterParseException extends Exception {
+    private final String parameter;
+
+    public CommandParameterParseException(String message, Throwable cause, String parameter) {
+        super(message, cause);
+        this.parameter = parameter;
     }
 
-    public InvalidCommandCallException(String message, Throwable cause) {
-        super(message, cause);
+    public CommandParameterParseException(String message, String parameter) {
+        super(message);
+        this.parameter = parameter;
+    }
+
+    public CommandParameterParseException(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public String getParameter() {
+        return parameter;
     }
 }

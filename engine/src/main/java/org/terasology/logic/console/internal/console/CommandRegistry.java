@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.internal.console;
 
-import org.terasology.logic.console.dynamic.Command;
-import org.terasology.logic.console.dynamic.ICommand;
+import org.terasology.logic.console.internal.ICommand;
 
 import java.util.HashMap;
 
 /**
  * Created by Limeth on 10.12.2014.
  *
- * Contains {@link Command}s ordered by priority.
+ * Contains {@link org.terasology.logic.console.internal.Command}s ordered by priority.
  */
 public class CommandRegistry extends HashMap<String, ICommand> {
 	@Override

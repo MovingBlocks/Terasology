@@ -15,10 +15,10 @@
  */
 package org.terasology.logic.console.internal;
 
-import java.util.List;
-
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
+
+import java.util.List;
 
 /**
  * This event is used to convey commands marked as runOnServer to the server.
@@ -26,7 +26,7 @@ import org.terasology.network.ServerEvent;
  * @author Immortius
  */
 @ServerEvent
-final class CommandEvent implements Event {
+public final class CommandEvent implements Event {
 
     private String command;
     private List<String> params;
@@ -34,7 +34,7 @@ final class CommandEvent implements Event {
     CommandEvent() {
     }
 
-    CommandEvent(String command, List<String> params) {
+    public CommandEvent(String command, List<String> params) {
         this.command = command;
         this.params = params;
     }

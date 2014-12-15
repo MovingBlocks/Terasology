@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal.exceptions;
 
 /**
+ * Thrown while suggesting a command parameter
  * @author Limeth
  */
-public class CommandExecutionException extends Exception {
-    public CommandExecutionException() {
+public class CommandSuggestionException extends Exception {
+    public CommandSuggestionException() {
     }
 
-    public CommandExecutionException(String message) {
+    public CommandSuggestionException(String message) {
         super(message);
     }
 
-    public CommandExecutionException(String message, Throwable cause) {
+    public CommandSuggestionException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CommandExecutionException(Throwable cause) {
+    public CommandSuggestionException(Throwable cause) {
         super(cause);
     }
 
-    public CommandExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public CommandSuggestionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -18,8 +18,8 @@ package org.terasology.logic.console.internal.commands;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.console.dynamic.Command;
-import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.Command;
+import org.terasology.logic.console.internal.CommandParameter;
 import org.terasology.registry.In;
 
 /**

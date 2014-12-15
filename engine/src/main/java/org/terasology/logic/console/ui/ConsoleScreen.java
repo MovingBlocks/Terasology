@@ -20,7 +20,7 @@ import com.google.common.collect.Collections2;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.dynamic.ICommand;
+import org.terasology.logic.console.internal.ICommand;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;

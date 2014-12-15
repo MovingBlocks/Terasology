@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal.exceptions;
 
 /**
  * @author Limeth

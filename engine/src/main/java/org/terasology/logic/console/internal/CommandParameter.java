@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal;
 
 import com.google.common.collect.ImmutableMap;
+import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

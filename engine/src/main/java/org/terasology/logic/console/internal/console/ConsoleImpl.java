@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.internal.console;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
@@ -22,8 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.*;
-import org.terasology.logic.console.dynamic.CommandExecutionException;
-import org.terasology.logic.console.dynamic.ICommand;
+import org.terasology.logic.console.internal.CommandEvent;
+import org.terasology.logic.console.internal.ICommand;
+import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
@@ -53,7 +54,7 @@ public class ConsoleImpl implements Console {
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
     /**
-     * Registers a {@link ICommand}.
+     * Registers a {@link org.terasology.logic.console.internal.ICommand}.
      *
      * @param command The command to be registered
      */

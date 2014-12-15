@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal;
 
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
+import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
 
 import java.util.Comparator;
 import java.util.List;
@@ -97,7 +99,7 @@ public interface ICommand extends Comparable<ICommand> {
     /**
      * Executes the command
      *
-     * @param parameters Parameters in an Object[] array as defined in {@link org.terasology.logic.console.dynamic.Command#getParameters()}.
+     * @param parameters Parameters in an Object[] array as defined in {@link Command#getParameters()}.
      * @return A reply to the sender.
      */
     String executeRaw(List<String> parameters, EntityRef sender) throws CommandExecutionException;

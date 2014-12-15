@@ -20,10 +20,10 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.console.dynamic.Command;
+import org.terasology.logic.console.internal.Command;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.CommandParameter;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.network.ClientComponent;
 

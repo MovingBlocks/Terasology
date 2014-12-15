@@ -19,7 +19,6 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.logic.console.dynamic.Command;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.Set;

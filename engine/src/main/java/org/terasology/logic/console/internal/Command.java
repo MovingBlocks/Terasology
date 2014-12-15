@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
@@ -22,6 +22,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
+import org.terasology.logic.console.internal.exceptions.CommandInitializationException;
+import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
 import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Array;

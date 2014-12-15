@@ -18,7 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.terasology.registry.CoreRegistry;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.internal.ConsoleImpl;
+import org.terasology.logic.console.internal.console.ConsoleImpl;
 
 /**
  * @author Immortius

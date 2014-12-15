@@ -21,8 +21,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.Keyboard;
-import org.terasology.logic.console.dynamic.Command;
-import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.Command;
+import org.terasology.logic.console.internal.CommandParameter;
 import org.terasology.registry.In;
 
 /**

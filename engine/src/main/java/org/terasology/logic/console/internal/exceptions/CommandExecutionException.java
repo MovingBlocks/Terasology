@@ -13,29 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.dynamic;
+package org.terasology.logic.console.internal.exceptions;
 
 /**
  * @author Limeth
  */
-public class CommandParameterParseException extends Exception {
-    private final String parameter;
-
-    public CommandParameterParseException(String message, Throwable cause, String parameter) {
-        super(message, cause);
-        this.parameter = parameter;
+public class CommandExecutionException extends Exception {
+    public CommandExecutionException() {
     }
 
-    public CommandParameterParseException(String message, String parameter) {
+    public CommandExecutionException(String message) {
         super(message);
-        this.parameter = parameter;
     }
 
-    public CommandParameterParseException(String parameter) {
-        this.parameter = parameter;
+    public CommandExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public String getParameter() {
-        return parameter;
+    public CommandExecutionException(Throwable cause) {
+        super(cause);
+    }
+
+    public CommandExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
