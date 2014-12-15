@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.commands;
+package org.terasology.logic.console.internal.commands.core;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
@@ -23,6 +23,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
 import org.terasology.logic.console.dynamic.ICommand;
+import org.terasology.logic.console.internal.CoreCommand;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 
@@ -32,6 +33,7 @@ import java.util.Collection;
  * @author Immortius, Limeth
  */
 @RegisterSystem
+@CoreCommand
 public class HelpCommand extends Command {
     @In
     private Console console;

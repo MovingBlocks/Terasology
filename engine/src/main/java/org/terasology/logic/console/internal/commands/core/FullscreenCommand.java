@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.commands;
+package org.terasology.logic.console.internal.commands.core;
 
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyEngine;
@@ -21,12 +21,14 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.CoreCommand;
 import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius, Limeth
  */
 @RegisterSystem
+@CoreCommand
 public class FullscreenCommand extends Command {
     public FullscreenCommand() {
         super("fullscreen", false, "Toggles Fullscreen Mode", null);

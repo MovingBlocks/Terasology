@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.commands;
+package org.terasology.logic.console.internal.commands.core;
 
 import org.terasology.engine.GameEngine;
-import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
+import org.terasology.logic.console.internal.CoreCommand;
 import org.terasology.registry.CoreRegistry;
 
 /**
  * @author Immortius, Limeth
  */
 @RegisterSystem
-public class LeaveCommand extends Command {
-    public LeaveCommand() {
-        super("leave", false, "Leaves the current game and returns to main menu", null);
+@CoreCommand
+public class ExitCommand extends Command {
+    public ExitCommand() {
+        super("exit", false, "Exits the game", null);
     }
 
     @Override
@@ -39,13 +38,8 @@ public class LeaveCommand extends Command {
         return new CommandParameter[0];
     }
 
-    public String execute(EntityRef sender) {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
-        if (networkSystem.getMode() != NetworkMode.NONE) {
-            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-            return "Leaving...";
-        } else {
-            return "Not connected";
-        }
+    public void execute(EntityRef sender)
+    {
+        CoreRegistry.get(GameEngine.class).shutdown();
     }
 }

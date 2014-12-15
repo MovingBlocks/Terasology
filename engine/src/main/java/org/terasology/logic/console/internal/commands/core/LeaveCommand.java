@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.commands;
+package org.terasology.logic.console.internal.commands.core;
 
+import org.terasology.engine.GameEngine;
+import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.CoreCommand;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.rendering.nui.NUIManager;
 
 /**
  * @author Immortius, Limeth
  */
 @RegisterSystem
-public class EnableAutoScreenReloadingCommand extends Command {
-    public EnableAutoScreenReloadingCommand() {
-        super("enableAutoScreenReloading", false,
-                "Enables the automatic reloading of screens when their file changes", null);
+@CoreCommand
+public class LeaveCommand extends Command {
+    public LeaveCommand() {
+        super("leave", false, "Leaves the current game and returns to main menu", null);
     }
 
     @Override
@@ -37,9 +41,13 @@ public class EnableAutoScreenReloadingCommand extends Command {
         return new CommandParameter[0];
     }
 
-    public String execute(EntityRef sender)
-    {
-        CoreRegistry.get(NUIManager.class).enableAutoReload();
-        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
+    public String execute(EntityRef sender) {
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        if (networkSystem.getMode() != NetworkMode.NONE) {
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            return "Leaving...";
+        } else {
+            return "Not connected";
+        }
     }
 }

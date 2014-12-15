@@ -15,53 +15,43 @@
  */
 package org.terasology.logic.console.internal;
 
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
-import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.dynamic.Command;
-import org.terasology.logic.console.internal.commands.*;
 import org.terasology.registry.CoreRegistry;
 
+import java.util.Set;
+
 /**
+ * A utility for registering command classes with the {@link CoreCommand} annotation.
+ *
  * @author Limeth
  */
-@RegisterSystem
-public class CoreCommands {
+public final class CoreCommands {
 	private static final Logger LOGGER         = LoggerFactory.getLogger(CoreCommands.class);
-	private static final String TARGET_PACKAGE = CoreCommands.class.getPackage().getName() + ".commands";
-/*	private static final ClassLoader[] CLASSLOADERS = new ClassLoader[] {
-			ClasspathHelper.contextClassLoader(),
-			ClasspathHelper.staticClassLoader()
-	};
-	private static final Reflections REFLECTIONS = new Reflections(new ConfigurationBuilder()
-			                         .setScanners(new SubTypesScanner(false *//* don't exclude Object.class *//*), new ResourcesScanner())
-			                         .setUrls(ClasspathHelper.forClassLoader(CLASSLOADERS))
-			                         .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(TARGET_PACKAGE))));*/
-	@SuppressWarnings("unchecked")
-	public static final Class<? extends Command>[] COMMAND_CLASSES = new Class[] {
-			DebugTargetCommand.class, DestroyEntitiesUsingPrefabCommand.class, DumpEntitiesCommand.class,
-			EnableAutoScreenReloadingCommand.class, ExitCommand.class, FullscreenCommand.class, HelpCommand.class,
-			JoinCommand.class, KillCommand.class, LeaveCommand.class, ReloadMaterialCommand.class,
-			ReloadShaderCommand.class, ReloadSkinCommand.class, ReloadUICommand.class, SetWorldTimeCommand.class,
-			SpawnBlockCommand.class, SpawnPrefabCommand.class, TeleportCommand.class
-	};
+	private static final Reflections REFLECTIONS = new Reflections();
 
+	private CoreCommands() {}
+
+	/**
+	 * Registers all commands with the {@link org.terasology.logic.console.internal.CoreCommand} annotation.
+	 */
 	public static void initialiseCommands() {
-/*
-		Set<Class<?>> commandClasses = REFLECTIONS.getSubTypesOf(Object.class);
-*/
-		Class<? extends Command>[] commandClasses = COMMAND_CLASSES;
+		Set<Class<?>> commandClasses = REFLECTIONS.getTypesAnnotatedWith(CoreCommand.class);
 		ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
 
-		for (Class<? extends Command> commandClass : commandClasses) {
-			try {
-				Command commandObject = commandClass.newInstance();
+		for (Class<?> commandClass : commandClasses) {
+			if (Command.class.isAssignableFrom(commandClass)) {
+				try {
+					Command commandObject = (Command) commandClass.newInstance();
 
-				componentSystemManager.register(commandObject);
-			} catch (Throwable t) {
-				LOGGER.warn("Cannot register core command " + commandClass);
-				t.printStackTrace();
+					componentSystemManager.register(commandObject);
+				} catch (Throwable t) {
+					LOGGER.warn("Cannot register core command " + commandClass);
+					t.printStackTrace();
+				}
 			}
 		}
 	}

@@ -13,48 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.commands;
+package org.terasology.logic.console.internal.commands.core;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.dynamic.Command;
 import org.terasology.logic.console.dynamic.CommandParameter;
+import org.terasology.logic.console.internal.CoreCommand;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.NUIManager;
-import org.terasology.rendering.nui.asset.UIData;
 
 /**
  * @author Immortius, Limeth
  */
 @RegisterSystem
-public class ReloadUICommand extends Command {
-    public ReloadUICommand() {
-        super("reloadUI", false, "Reloads a ui and clears the HUD. Use at your own risk", null);
+@CoreCommand
+public class EnableAutoScreenReloadingCommand extends Command {
+    public EnableAutoScreenReloadingCommand() {
+        super("enableAutoScreenReloading", false,
+                "Enables the automatic reloading of screens when their file changes", null);
     }
 
     @Override
     protected CommandParameter[] constructParameters() {
-        return new CommandParameter[] {
-            CommandParameter.single("ui", String.class, true)
-        };
+        return new CommandParameter[0];
     }
 
-    public String execute(EntityRef sender, String ui)
-    {
-        CoreRegistry.get(NUIManager.class).clear();
-
-        AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
-        UIData uiData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UIData.class);
-        if (uiData != null) {
-            CoreRegistry.get(AssetManager.class).generateAsset(uri, uiData);
-            return "Success";
-        } else {
-            return "Unable to resolve ui '" + ui + "'";
-        }
+    public String execute(EntityRef sender) {
+        CoreRegistry.get(NUIManager.class).enableAutoReload();
+        return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
     }
-
-    //TODO Add the suggestion method
 }
