@@ -109,7 +109,7 @@ public interface ICommand extends Comparable<ICommand> {
      * @return A reply to the sender.
      */
     //TODO maybe return an array of serializable objects?
-    String[] suggestRaw(List<String> parameters, EntityRef sender) throws CommandSuggestionException;
+    String[] suggestRaw(String currentValue, List<String> parameters, EntityRef sender) throws CommandSuggestionException;
 
     /**
      * @param command A command to compare this command to

@@ -30,6 +30,7 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.ConsoleImpl;
 import org.terasology.logic.console.internal.ConsoleSystem;
+import org.terasology.logic.console.internal.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -91,6 +92,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
+        CoreCommands.initialiseCommands();
 
         inputSystem = CoreRegistry.get(InputSystem.class);
 

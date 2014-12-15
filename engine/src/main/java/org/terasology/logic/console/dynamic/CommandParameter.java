@@ -103,8 +103,9 @@ public final class CommandParameter {
      * @param clazz The child class of the array class returned
      * @return The array class of {@code clazz}
      */
-    private static <T> Class<?> getArrayClass(Class<T> clazz) {
-        return Array.newInstance(clazz, 0).getClass();
+    @SuppressWarnings("unchecked")
+    private static <T> Class<? extends T[]> getArrayClass(Class<T> clazz) {
+        return (Class<? extends T[]>) Array.newInstance(clazz, 0).getClass();
     }
 
     public Object getValue(String param) throws CommandParameterParseException {

@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * A text completion engine with cycle-through functionality
  *
- * @author Martin Steiger
+ * @author Martin Steiger, Limeth
  */
 public class CyclingTabCompletionEngine implements TabCompletionEngine {
     private static final int MAX_CYCLES = 10;
@@ -85,10 +85,11 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             finishedParameters.add(commandParameters.get(i));
         }
 
+        String currentValue = commandParameters.size() >= suggestedIndex ? commandParameters.get(suggestedIndex - 1) : null;
         EntityRef sender = CoreRegistry.get(LocalPlayer.class).getClientEntity();
 
         try {
-            return command.suggestRaw(finishedParameters, sender);
+            return command.suggestRaw(currentValue, finishedParameters, sender);
         } catch (CommandSuggestionException e) {
             Throwable cause = e.getCause();
             String causeMessage = e.getLocalizedMessage();
@@ -148,11 +149,11 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             previousMatches = matches;
         }
 
-        StringBuilder commandMatches = new StringBuilder();
+        StringBuilder matchMessageString = new StringBuilder();
 
         for (int i = 0; i < previousMatches.length; i++) {
             if (i > 0) {
-                commandMatches.append(' ');
+                matchMessageString.append(' ');
             }
 
             String name = previousMatches[i];
@@ -161,19 +162,19 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 name = FontColor.getColored(name, ConsoleColors.COMMAND);
             }
 
-            commandMatches.append(name);
+            matchMessageString.append(name);
         }
 
-        Message message = new Message(commandMatches.toString());
+        Message matchMessage = new Message(matchMessageString.toString());
         String suggestion = previousMatches[selectionIndex];
 
         if (previousMessage != null) {
-            console.replaceMessage(previousMessage, message);
+            console.replaceMessage(previousMessage, matchMessage);
         } else {
-            console.addMessage(message);
+            console.addMessage(matchMessage);
         }
 
-        previousMessage = message;
+        previousMessage = matchMessage;
         selectionIndex = (selectionIndex + 1) % previousMatches.length;
 
         return generateResult(suggestion, commandName, commandParameters, suggestedIndex);

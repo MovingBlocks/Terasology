@@ -41,7 +41,7 @@ import java.util.Set;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class ConsoleImpl implements Console {
-    private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleImpl.class);
     private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
@@ -61,15 +61,13 @@ public class ConsoleImpl implements Console {
     public void registerCommand(ICommand command) {
         String commandName = command.getName();
 
-        logger.debug("Registering {}...", command.getName());
-
         if (commandRegistry.containsKey(commandName)) {
-            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
+            LOGGER.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
                     commandName, commandRegistry.get(commandName).getClass().getCanonicalName(),
                     command.getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
-            logger.info("Command '{}' successfully registered for class '{}'.", commandName,
+            LOGGER.info("Command '{}' successfully registered for class '{}'.", commandName,
                     command.getClass().getCanonicalName());
         }
     }
@@ -113,7 +111,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void addMessage(Message message) {
         String uncoloredText = FontColor.stripColor(message.getMessage());
-        logger.info("[{}] {}", message.getType(), uncoloredText);
+        LOGGER.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);

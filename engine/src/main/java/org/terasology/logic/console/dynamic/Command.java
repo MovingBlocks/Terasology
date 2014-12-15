@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.dynamic;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.registry.CoreRegistry;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -265,7 +267,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     }
 
     @Override
-    public final String[] suggestRaw(List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
+    public final String[] suggestRaw(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
         if(suggestionMethod == null) {
             return null;
         }
@@ -287,10 +289,45 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         try {
             String[] result = (String[]) suggestionMethod.invoke(this, processedParameters);
 
-            return result != null ? result : new String[0];
+            if (result == null || result.length <= 0) {
+                return result;
+            }
+
+            //Only return results starting with currentValue
+            String[] filteredResult = filterArray(result, new Predicate<String>() {
+                @Override
+                public boolean apply(String input) {
+                    return input != null && (currentValue == null || input.startsWith(currentValue));
+                }
+            });
+
+            return filteredResult;
         } catch (Throwable t) {
             throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
+    }
+
+    private <T> T[] filterArray(T[] array, Predicate<T> predicate) {
+        Class<?> componentClass = array.getClass().getComponentType();
+        int filteredSize = 0;
+
+        for (T element : array) {
+            if (predicate.apply(element)) {
+                filteredSize++;
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        T[] filteredArray = (T[]) Array.newInstance(componentClass, filteredSize);
+        int insertionIndex = 0;
+
+        for (T element : array) {
+            if (predicate.apply(element)) {
+                filteredArray[insertionIndex++] = element;
+            }
+        }
+
+        return filteredArray;
     }
 
     @Override
