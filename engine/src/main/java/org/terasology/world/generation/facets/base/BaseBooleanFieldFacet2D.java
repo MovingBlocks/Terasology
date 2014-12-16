@@ -21,11 +21,15 @@ import org.terasology.math.Vector2i;
 import org.terasology.world.generation.Border3D;
 
 /**
+ * An abstract, but complete implementation of {@link BooleanFieldFacet2D} that
+ * is backed by a primitive boolean array.
+ *
+ * @author Martin Steiger
  * @author Immortius
  */
 public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements BooleanFieldFacet2D {
 
-    private boolean[] data;
+    private final boolean[] data;
 
     public BaseBooleanFieldFacet2D(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
@@ -53,6 +57,11 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
         return getWorld(pos.x, pos.y);
     }
 
+    /**
+     * This method exists for performance reasons, but it
+     * is recommended to use proper getters and setters instead.
+     * @return the internal data buffer
+     */
     public boolean[] getInternal() {
         return data;
     }
@@ -77,8 +86,13 @@ public abstract class BaseBooleanFieldFacet2D extends BaseFacet2D implements Boo
         setWorld(pos.x, pos.y, value);
     }
 
+    /**
+     * Replaces the content of backing entirely with new data.
+     * @param newData the new data (must be of size width * height)
+     * @throws IllegalArgumentException if the size does not match
+     */
     public void set(boolean[] newData) {
-        Preconditions.checkArgument(newData.length == data.length);
+        Preconditions.checkArgument(newData.length == data.length, "Length must be %s, but is %s", data.length, newData.length);
         System.arraycopy(newData, 0, data, 0, newData.length);
     }
 

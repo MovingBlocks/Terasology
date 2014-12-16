@@ -19,7 +19,13 @@ import org.terasology.math.Vector2i;
 import org.terasology.world.generation.WorldFacet2D;
 
 /**
+ * A {@link WorldFacet2D}-based facet that provides boolean values
+ * for rectangular area (see {@link #getWorldRegion()} and {@link #getRelativeRegion()}).
+ * Its entries are accessible through both relative and world coordinates (in blocks).
+ * <br/><br/>
+ * All methods throw {@link IllegalArgumentException} if coordinates are not inside the respective region.
  * @author Immortius
+ * @author Martin Steiger
  */
 public interface BooleanFieldFacet2D extends WorldFacet2D {
 
