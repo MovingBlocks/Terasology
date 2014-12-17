@@ -18,12 +18,12 @@ package org.terasology.logic.console.internal;
 import java.lang.annotation.*;
 
 /**
- * Marks a command to be registered upon game launch
+ * Marks a command to be registered upon game launch.
+ * {@code CoreCommand}s must be declared as classes extending the {@link org.terasology.logic.console.internal.Command} annotation.
  *
  * @author Limeth
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Documented
 public @interface CoreCommand {
 }

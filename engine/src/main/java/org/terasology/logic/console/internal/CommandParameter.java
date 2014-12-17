@@ -61,12 +61,10 @@ public final class CommandParameter {
                     + " instead of " + type.getSimpleName() + ".");
         }
 
-        if(arrayDelimiter != null) {
+        if (arrayDelimiter != null) {
             if (arrayDelimiter == Command.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
                 throw new IllegalArgumentException("The array delimiter must not be the same as the escape character ("
                         + Command.ARRAY_DELIMITER_ESCAPE_CHARACTER + ")!");
-            } else if (arrayDelimiter == Command.ARRAY_DELIMITER_VARARGS && required) {
-                throw new IllegalArgumentException("A varargs parameter must not be required!");
             }
         }
 
@@ -84,22 +82,23 @@ public final class CommandParameter {
         return new CommandParameter(name, type, null, required);
     }
 
-    public static CommandParameter array(String name, Class<?> childType, char arrayDelimiter, boolean required) {
+    public static CommandParameter array(String name, Class<?> childType, Character arrayDelimiter, boolean required) {
         if (childType.isArray()) {
             throw new IllegalArgumentException("The child type of an array CommandParameterDefinition must not be an array!");
         }
 
         Class<?> type = getArrayClass(childType);
+        char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : Command.ARRAY_DELIMITER_DEFAULT;
 
-        return new CommandParameter(name, type, arrayDelimiter, required);
+        return new CommandParameter(name, type, arrayDelimiterNotNull, required);
     }
 
     public static CommandParameter array(String name, Class<?> childType, boolean required) {
-        return array(name, childType, Command.ARRAY_DELIMITER_DEFAULT, required);
+        return array(name, childType, null, required);
     }
 
-    public static CommandParameter varargs(String name, Class<?> childType) {
-        return array(name, childType, Command.ARRAY_DELIMITER_VARARGS, false);
+    public static CommandParameter varargs(String name, Class<?> childType, boolean required) {
+        return array(name, childType, Command.ARRAY_DELIMITER_VARARGS, required);
     }
 
     /**

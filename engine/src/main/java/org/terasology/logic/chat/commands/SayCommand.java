@@ -22,12 +22,10 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.chat.ChatMessageEvent;
-import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.internal.Command;
 import org.terasology.logic.console.internal.CommandParameter;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 
 /**
  * This commands provides the ability to chat. Chat messages are broadcast to all players.
@@ -48,15 +46,11 @@ public class SayCommand extends Command {
     @Override
     protected CommandParameter[] constructParameters() {
         return new CommandParameter[] {
-                CommandParameter.varargs("message", String.class)
+                CommandParameter.varargs("message", String.class, true)
         };
     }
 
     public String execute(EntityRef sender, String[] messageArray) {
-        if(messageArray == null) {
-            return FontColor.getColored("Provide a message to send, please.", ConsoleColors.ERROR);
-        }
-
         String message = Joiner.on(' ').join(messageArray);
 
         logger.debug("Received chat message from {} : '{}'", sender, message);

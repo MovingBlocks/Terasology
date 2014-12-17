@@ -37,9 +37,10 @@ public final class CoreCommands {
 	/**
 	 * Registers all commands with the {@link org.terasology.logic.console.internal.CoreCommand} annotation.
 	 */
+	//TODO Is there a more efficient way?
 	public static void initialiseCommands() {
-		Set<Class<?>> commandClasses = REFLECTIONS.getTypesAnnotatedWith(CoreCommand.class);
 		ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
+		Set<Class<?>> commandClasses = REFLECTIONS.getTypesAnnotatedWith(CoreCommand.class);
 
 		for (Class<?> commandClass : commandClasses) {
 			if (Command.class.isAssignableFrom(commandClass)) {

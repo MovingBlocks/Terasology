@@ -47,15 +47,11 @@ public class TellCommand extends Command {
     protected CommandParameter[] constructParameters() {
         return new CommandParameter[] {
                 CommandParameter.single("user", String.class, true),
-                CommandParameter.varargs("message", String.class)
+                CommandParameter.varargs("message", String.class, true)
         };
     }
 
     public String execute(EntityRef sender, String username, String[] messageArray) {
-        if (messageArray == null) {
-            return FontColor.getColored("Provide a message to send, please.", ConsoleColors.ERROR);
-        }
-
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
         boolean unique = true;

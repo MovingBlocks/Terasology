@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.internal;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -26,7 +27,9 @@ import org.terasology.logic.console.internal.exceptions.CommandExecutionExceptio
 import org.terasology.logic.console.internal.exceptions.CommandInitializationException;
 import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
 import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -43,24 +46,59 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     public static final char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
     private final String name;
+    private final String requiredPermission;
     private final boolean runOnServer;
     private final String description;
     private final String helpText;
+    private final SpecificAccessibleObject<Method> executionMethod;
+    private final SpecificAccessibleObject<Method> suggestionMethod;
     private CommandParameter[] parameters;
     private int requiredParameterCount;
-    private Method executionMethod;
-    private Method suggestionMethod;
     private String usage;
 
-    public Command(String name, boolean runOnServer, String description, String helpText) {
+    public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
+                   SpecificAccessibleObject<Method> executionMethod, SpecificAccessibleObject<Method> suggestionMethod) {
+        Preconditions.checkNotNull(executionMethod);
+
         this.name = name;
+        this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
         this.runOnServer = runOnServer;
         this.description = description;
         this.helpText = helpText;
+        this.executionMethod = executionMethod;
+        this.suggestionMethod = suggestionMethod;
+
+        postConstruct();
+    }
+
+    public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
+                   String executionMethodName, String suggestionMethodName) {
+        this.name = name;
+        this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
+        this.runOnServer = runOnServer;
+        this.description = description;
+        this.helpText = helpText;
+        this.executionMethod = findExecutionMethod(executionMethodName);
+        this.suggestionMethod = findSuggestionMethod(suggestionMethodName);
+
+        postConstruct();
+    }
+
+    public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText) {
+        this(name, requiredPermission, runOnServer, description, helpText, (String) null, (String) null);
+    }
+
+    @Deprecated
+    public Command(String name, boolean runOnServer, String description, String helpText) {
+        this(name, null, runOnServer, description, helpText, (String) null, (String) null);
+    }
+
+    private void postConstruct() {
+        this.parameters = constructParametersNotNull();
 
         registerParameters();
-        registerExecutionMethod();
-        registerSuggestionMethod();
+        validateExecutionMethod();
+        validateSuggestionMethod();
         initUsage();
     }
 
@@ -72,26 +110,31 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         Console console = CoreRegistry.get(Console.class);
 
         initialiseMore();
-        console.registerCommand(this);
+
+        if (console != null) {
+            console.registerCommand(this);
+        }
     }
 
     protected abstract CommandParameter[] constructParameters();
 
+    private CommandParameter[] constructParametersNotNull() {
+        CommandParameter[] constructedParameters = constructParameters();
+        return constructedParameters != null ? constructedParameters : new CommandParameter[0];
+    }
+
     private void registerParameters() throws CommandInitializationException {
-        CommandParameter[] editableParameters = constructParameters();
-
-        if (editableParameters == null) {
-            parameters = new CommandParameter[0];
-            return;
-        }
-
         requiredParameterCount = 0;
         boolean optionalFound = false;
 
-        for (int i = 0; i < editableParameters.length; i++) {
-            CommandParameter parameter = editableParameters[i];
+        for (int i = 0; i < parameters.length; i++) {
+            CommandParameter parameter = parameters[i];
 
-            if (parameter.isVarargs() && i < editableParameters.length - 1) {
+            if (parameter == null) {
+                throw new CommandInitializationException("A command parameter must not be null! Index: " + i);
+            }
+
+            if (parameter.isVarargs() && i < parameters.length - 1) {
                 throw new CommandInitializationException("A varargs parameter must be at the end. Invalid: " + i + "; " + parameter.getName());
             }
 
@@ -107,45 +150,37 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
                 optionalFound = true;
             }
         }
-
-        this.parameters = editableParameters;
     }
 
-    private void registerExecutionMethod() throws CommandInitializationException {
-        List<Method> methods = findMethods(METHOD_NAME_EXECUTE);
+    private SpecificAccessibleObject<Method> findExecutionMethod(String methodName) throws CommandInitializationException {
+        String lookupName = methodName != null ? methodName : METHOD_NAME_EXECUTE;
+        List<Method> methods = findMethods(lookupName);
 
         if (methods.size() < 0) {
-            throw new CommandInitializationException("No " + METHOD_NAME_EXECUTE + " method found");
+            throw new CommandInitializationException("No " + lookupName + " method found");
         } else if (methods.size() > 1) {
-            throw new CommandInitializationException("More than 1 " + METHOD_NAME_EXECUTE + " methods found");
+            throw new CommandInitializationException("More than 1 " + lookupName + " methods found");
         }
 
         Method method = methods.get(0);
 
-        checkArgumentCompatibility(method);
-
-        executionMethod = method;
+        return new SpecificAccessibleObject<>(method, this);
     }
 
-    private void registerSuggestionMethod() throws CommandInitializationException {
-        List<Method> methods = findMethods(METHOD_NAME_SUGGEST);
+    private SpecificAccessibleObject<Method> findSuggestionMethod(String methodName) throws CommandInitializationException {
+        String lookupName = methodName != null ? methodName : METHOD_NAME_SUGGEST;
+        List<Method> methods = findMethods(lookupName);
 
         if (methods.size() <= 0) {
-            if(parameters.length > 0) {
-                LOGGER.warn("No {} method found for command class {}.", METHOD_NAME_SUGGEST, getClass().getCanonicalName());
-            }
-
-            suggestionMethod = null;
-            return;
+            LOGGER.warn("No '{}' method found for command '{}' in class {}", lookupName, name, getClass().getCanonicalName());
+            return null;
         } else if (methods.size() > 1) {
-            throw new CommandInitializationException("More than 1 " + METHOD_NAME_SUGGEST + " methods found");
+            throw new CommandInitializationException("More than 1 " + lookupName + " methods found");
         }
 
         Method method = methods.get(0);
 
-        checkArgumentCompatibility(method);
-
-        suggestionMethod = method;
+        return new SpecificAccessibleObject<>(method, this);
     }
 
     private List<Method> findMethods(String methodName) {
@@ -200,6 +235,16 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         }
     }
 
+    private void validateExecutionMethod() {
+        checkArgumentCompatibility(executionMethod.getAccessibleObject());
+    }
+
+    private void validateSuggestionMethod() {
+        if (suggestionMethod != null) {
+            checkArgumentCompatibility(suggestionMethod.getAccessibleObject());
+        }
+    }
+
     private void initUsage() {
         StringBuilder builder = new StringBuilder(name);
 
@@ -238,7 +283,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
                 varargsResult = varargsParameter.getValue(rawParam.toString());
             }
 
-            processedParameters[requiredParameterCount + 1] = varargsResult;
+            processedParameters[varargsIndex + 1] = varargsResult;
         }
 
         return processedParameters;
@@ -262,7 +307,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         }
 
         try {
-            Object result = executionMethod.invoke(this, processedParameters);
+            Object result = executionMethod.getAccessibleObject().invoke(executionMethod.getTarget(), processedParameters);
 
             return result != null ? String.valueOf(result) : null;
         } catch (Throwable t) {
@@ -309,7 +354,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         Object rawResult = null;
 
         try {
-            rawResult = suggestionMethod.invoke(this, processedParameters);
+            rawResult = suggestionMethod.getAccessibleObject().invoke(suggestionMethod.getTarget(), processedParameters);
         } catch (Throwable t) {
             throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
@@ -434,5 +479,13 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     @Override
     public int compareTo(ICommand o) {
         return ICommand.COMPARATOR.compare(this, o);
+    }
+
+    public SpecificAccessibleObject<Method> getExecutionMethod() {
+        return executionMethod;
+    }
+
+    public SpecificAccessibleObject<Method> getSuggestionMethod() {
+        return suggestionMethod;
     }
 }
