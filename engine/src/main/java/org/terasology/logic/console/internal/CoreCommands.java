@@ -19,6 +19,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.ComponentSystemManager;
+import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.Set;
@@ -43,14 +44,16 @@ public final class CoreCommands {
 		Set<Class<?>> commandClasses = REFLECTIONS.getTypesAnnotatedWith(CoreCommand.class);
 
 		for (Class<?> commandClass : commandClasses) {
-			if (Command.class.isAssignableFrom(commandClass)) {
-				try {
-					Command commandObject = (Command) commandClass.newInstance();
+			if (commandClass.isAnnotationPresent(RegisterSystem.class)) {
+				if (Command.class.isAssignableFrom(commandClass)) {
+					try {
+						Command commandObject = (Command) commandClass.newInstance();
 
-					componentSystemManager.register(commandObject);
-				} catch (Throwable t) {
-					LOGGER.warn("Cannot register core command " + commandClass);
-					t.printStackTrace();
+						componentSystemManager.register(commandObject);
+					} catch (Throwable t) {
+						LOGGER.warn("Cannot register core command " + commandClass);
+						t.printStackTrace();
+					}
 				}
 			}
 		}
