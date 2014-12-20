@@ -51,13 +51,12 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     private final String description;
     private final String helpText;
     private final SpecificAccessibleObject<Method> executionMethod;
-    private final SpecificAccessibleObject<Method> suggestionMethod;
     private CommandParameter[] parameters;
     private int requiredParameterCount;
     private String usage;
 
     public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                   SpecificAccessibleObject<Method> executionMethod, SpecificAccessibleObject<Method> suggestionMethod) {
+                   SpecificAccessibleObject<Method> executionMethod/*, SpecificAccessibleObject<Method> suggestionMethod*/) {
         Preconditions.checkNotNull(executionMethod);
 
         this.name = name;
@@ -66,7 +65,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         this.description = description;
         this.helpText = helpText;
         this.executionMethod = executionMethod;
-        this.suggestionMethod = suggestionMethod;
 
         postConstruct();
     }
@@ -79,7 +77,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         this.description = description;
         this.helpText = helpText;
         this.executionMethod = findExecutionMethod(executionMethodName);
-        this.suggestionMethod = findSuggestionMethod(suggestionMethodName);
 
         postConstruct();
     }
@@ -88,17 +85,14 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         this(name, requiredPermission, runOnServer, description, helpText, (String) null, (String) null);
     }
 
-    @Deprecated
     public Command(String name, boolean runOnServer, String description, String helpText) {
-        this(name, null, runOnServer, description, helpText, (String) null, (String) null);
+        this(name, PermissionManager.OPERATOR_PERMISSION, runOnServer, description, helpText, (String) null, (String) null);
     }
 
     private void postConstruct() {
         this.parameters = constructParametersNotNull();
-
         registerParameters();
         validateExecutionMethod();
-        validateSuggestionMethod();
         initUsage();
     }
 
@@ -239,12 +233,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         checkArgumentCompatibility(executionMethod.getAccessibleObject());
     }
 
-    private void validateSuggestionMethod() {
-        if (suggestionMethod != null) {
-            checkArgumentCompatibility(suggestionMethod.getAccessibleObject());
-        }
-    }
-
     private void initUsage() {
         StringBuilder builder = new StringBuilder(name);
 
@@ -255,15 +243,19 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         usage = builder.toString();
     }
 
-    private Object[] processParameters(List<String> rawParameters, EntityRef sender) throws CommandParameterParseException {
+    private Object[] processParameters(List<String> rawParameters, EntityRef sender, boolean includeSender) throws CommandParameterParseException {
+        int senderRelativeIndex = includeSender ? 1 : 0;
         int singleParameterCount = parameters.length + (endsWithVarargs() ? -1 : 0);
-        Object[] processedParameters = new Object[parameters.length + 1];
-        processedParameters[0] = sender;
+        Object[] processedParameters = new Object[parameters.length + senderRelativeIndex];
+
+        if (includeSender) {
+            processedParameters[0] = sender;
+        }
 
         for (int i = 0; i < singleParameterCount && i < rawParameters.size(); i++) {
             String rawParam = rawParameters.get(i);
             CommandParameter param = parameters[i];
-            processedParameters[i + 1] = param.getValue(rawParam);
+            processedParameters[i + senderRelativeIndex] = param.getValue(rawParam);
         }
 
         if (endsWithVarargs()) {
@@ -276,14 +268,14 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
             } else {
                 StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
 
-                for (int i = varargsIndex + 1; i < rawParameters.size(); i++) {
+                for (int i = varargsIndex + senderRelativeIndex; i < rawParameters.size(); i++) {
                     rawParam.append(ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
                 }
 
                 varargsResult = varargsParameter.getValue(rawParam.toString());
             }
 
-            processedParameters[varargsIndex + 1] = varargsResult;
+            processedParameters[varargsIndex + senderRelativeIndex] = varargsResult;
         }
 
         return processedParameters;
@@ -294,7 +286,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         Object[] processedParameters;
 
         try {
-            processedParameters = processParameters(rawParameters, sender);
+            processedParameters = processParameters(rawParameters, sender, true);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -317,15 +309,11 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
     @Override
     public final String[] suggestRaw(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
-        if (suggestionMethod == null) {
-            return null;
-        }
-
         //Generate an array to be used as a parameter in the 'suggest' method
-        Object[] processedParameters;
+        Object[] processedParametersWithoutSender;
 
         try {
-            processedParameters = processParameters(rawParameters, sender);
+            processedParametersWithoutSender = processParameters(rawParameters, sender, false);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -340,9 +328,9 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         //Get the suggested parameter to compare the result with
         CommandParameter suggestedParameter = null;
 
-        for (int i = 1; i < processedParameters.length; i++) {
-            if (processedParameters[i] == null) {
-                suggestedParameter = parameters[i - 1];
+        for (int i = 0; i < processedParametersWithoutSender.length; i++) {
+            if (processedParametersWithoutSender[i] == null) {
+                suggestedParameter = parameters[i];
                 break;
             }
         }
@@ -351,34 +339,26 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
             return null;
         }
 
-        Object rawResult = null;
+        Object[] result = null;
 
         try {
-            rawResult = suggestionMethod.getAccessibleObject().invoke(suggestionMethod.getTarget(), processedParameters);
+            result = suggestedParameter.suggest(sender, processedParametersWithoutSender);
         } catch (Throwable t) {
             throw new CommandSuggestionException(t.getCause()); //Skip InvocationTargetException
         }
 
-        if (rawResult == null) {
+        if (result == null) {
             return null;
         }
 
-        Object[] result;
-
-        try {
-            result = (Object[]) rawResult;
-
-            if (result.getClass().getComponentType() != suggestedParameter.getType()) {
-                throw new ClassCastException();
-            }
-        } catch (ClassCastException e) {
+        if (result.getClass().getComponentType() != suggestedParameter.getType()) {
             Class<?> requiredComponentClass = suggestedParameter.getType();
             Class<?> requiredClass = Array.newInstance(requiredComponentClass, 0).getClass();
-            Class<?> providedClass = rawResult.getClass();
+            Class<?> providedClass = result.getClass();
 
             throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
                     + " returns a suggestion of an invalid type. Required: " + requiredClass.getCanonicalName()
-                    + "; provided: " + providedClass.getCanonicalName(), e);
+                    + "; provided: " + providedClass.getCanonicalName());
         }
 
         String[] composedResult = composeAll(result, suggestedParameter);
@@ -483,9 +463,5 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
     public SpecificAccessibleObject<Method> getExecutionMethod() {
         return executionMethod;
-    }
-
-    public SpecificAccessibleObject<Method> getSuggestionMethod() {
-        return suggestionMethod;
     }
 }

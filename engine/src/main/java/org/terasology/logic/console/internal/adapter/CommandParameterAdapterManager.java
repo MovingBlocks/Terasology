@@ -17,12 +17,14 @@ package org.terasology.logic.console.internal.adapter;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.terasology.module.sandbox.API;
 
 import java.util.Map;
 
 /**
  * @author Limeth
  */
+@API
 public class CommandParameterAdapterManager {
     private final Map<Class<?>, CommandParameterAdapter> adapters = Maps.newHashMap();
 

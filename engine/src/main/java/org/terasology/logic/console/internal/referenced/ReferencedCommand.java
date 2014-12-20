@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.CommandParameter;
+import org.terasology.logic.console.internal.CommandParameterSuggester;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
@@ -39,7 +40,7 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
 
     private ReferencedCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
                               SpecificAccessibleObject<Method> executionMethod) {
-        super(name, requiredPermission, runOnServer, description, helpText, executionMethod, null);
+        super(name, requiredPermission, runOnServer, description, helpText, executionMethod);
     }
 
     /**
@@ -123,6 +124,7 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
     private static CommandParameter getParameterFor(Class<?> type, Annotation[] annotations) {
         String name = null;
         Character arrayDelimiter = null;
+        Class<? extends CommandParameterSuggester> suggesterClass = org.terasology.logic.console.internal.referenced.CommandParameter.NullCommandParameterSuggester.class;
         boolean required = true;
 
         for (Annotation annotation : annotations) {
@@ -131,17 +133,30 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
                         = (org.terasology.logic.console.internal.referenced.CommandParameter) annotation;
                 name = parameterAnnotation.value();
                 arrayDelimiter = parameterAnnotation.arrayDelimiter();
+                suggesterClass = parameterAnnotation.suggester();
                 required = parameterAnnotation.required();
                 break;
             }
         }
 
+        CommandParameterSuggester suggester;
+
+        if (suggesterClass != org.terasology.logic.console.internal.referenced.CommandParameter.NullCommandParameterSuggester.class) {
+            try {
+                suggester = suggesterClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            suggester = null;
+        }
+
         if (type.isArray()) {
             Class<?> childType = type.getComponentType();
 
-            return CommandParameter.array(name, childType, arrayDelimiter, required);
+            return CommandParameter.array(name, childType, arrayDelimiter, required, suggester);
         } else {
-            return CommandParameter.single(name, type, required);
+            return CommandParameter.single(name, type, required, suggester);
         }
     }
 }

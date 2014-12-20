@@ -16,13 +16,16 @@
 
 package org.terasology.logic.console.internal.referenced;
 
+import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.console.internal.CommandParameterSuggester;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to provide the name and possibly the delimiter of a Command's parameters
+ * Used to specify information and behavior of a command parameter
  *
  * @author Immortius, Limeth
  */
@@ -37,6 +40,8 @@ public @interface CommandParameter {
      */
     boolean required() default true;
 
+    Class<? extends CommandParameterSuggester> suggester() default NullCommandParameterSuggester.class;
+
     /**
      * Used if the command method parameter is an array.
      * The {@code \} (backslash) character is used for escaping the delimiter.
@@ -45,4 +50,14 @@ public @interface CommandParameter {
      * @return The array delimiter
      */
     char arrayDelimiter() default Command.ARRAY_DELIMITER_DEFAULT;
+
+    /**
+     * A class representing no suggester - needed, because Annotations fields don't accept nulls
+     */
+    static final class NullCommandParameterSuggester implements CommandParameterSuggester {
+        @Override
+        public Object[] suggest(EntityRef sender, Object[] resolvedParameters) {
+            throw new NullPointerException("No CommandParameterSuggester defined!");
+        }
+    }
 }

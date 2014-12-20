@@ -33,7 +33,8 @@ public final class CoreCommands {
 	private static final Logger LOGGER         = LoggerFactory.getLogger(CoreCommands.class);
 	private static final Reflections REFLECTIONS = new Reflections();
 
-	private CoreCommands() {}
+	private CoreCommands() {
+	}
 
 	/**
 	 * Registers all commands with the {@link org.terasology.logic.console.internal.CoreCommand} annotation.

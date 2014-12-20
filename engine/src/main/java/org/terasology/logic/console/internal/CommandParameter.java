@@ -16,8 +16,10 @@
 package org.terasology.logic.console.internal;
 
 import com.google.common.collect.ImmutableMap;
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.internal.adapter.CommandParameterAdapterManager;
 import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.internal.exceptions.SuggesterInstantiationException;
 import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Array;
@@ -29,7 +31,7 @@ import java.util.Objects;
 /**
  * @author Limeth
  */
-public final class CommandParameter {
+public final class CommandParameter<T> {
     private static final Map<Class<?>, Class<?>> PRIMITIVES_TO_WRAPPERS = new ImmutableMap.Builder<Class<?>, Class<?>>()
             .put(boolean.class, Boolean.class)
             .put(byte.class, Byte.class)
@@ -42,11 +44,12 @@ public final class CommandParameter {
             .put(void.class, Void.class)
             .build();
     private final String name;
-    private final Class<?> type;
+    private final Class<T> type;
     private final Character arrayDelimiter;
+    private final CommandParameterSuggester<T> suggester;
     private final boolean required;
 
-    private CommandParameter(String name, Class<?> type, Character arrayDelimiter, boolean required) {
+    private CommandParameter(String name, Class<T> type, Character arrayDelimiter, boolean required, CommandParameterSuggester<T> suggester) {
         Objects.requireNonNull(name, "The parameter name must not be null!");
 
         if (name.length() <= 0) {
@@ -71,18 +74,36 @@ public final class CommandParameter {
         this.name = name;
         this.type = type;
         this.arrayDelimiter = arrayDelimiter;
+        this.suggester = suggester;
         this.required = required;
     }
 
-    public static CommandParameter single(String name, Class<?> type, boolean required) {
+    public static <T> CommandParameter single(String name, Class<T> type, boolean required,
+                                          CommandParameterSuggester<T> suggester) {
         if (type.isArray()) {
             throw new IllegalArgumentException("The type of a simple CommandParameterDefinition must not be an array!");
         }
 
-        return new CommandParameter(name, type, null, required);
+        return new CommandParameter(name, type, null, required, suggester);
     }
 
-    public static CommandParameter array(String name, Class<?> childType, Character arrayDelimiter, boolean required) {
+    public static <T> CommandParameter single(String name, Class<T> type, boolean required,
+                                              Class<? extends CommandParameterSuggester<T>> suggesterClass)
+            throws SuggesterInstantiationException {
+        try {
+            return single(name, type, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SuggesterInstantiationException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static CommandParameter single(String name, Class<?> type, boolean required) {
+        return single(name, type, required, (CommandParameterSuggester) null);
+    }
+
+    public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
+                                             boolean required, CommandParameterSuggester<T> suggester) {
         if (childType.isArray()) {
             throw new IllegalArgumentException("The child type of an array CommandParameterDefinition must not be an array!");
         }
@@ -90,15 +111,63 @@ public final class CommandParameter {
         Class<?> type = getArrayClass(childType);
         char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : Command.ARRAY_DELIMITER_DEFAULT;
 
-        return new CommandParameter(name, type, arrayDelimiterNotNull, required);
+        return new CommandParameter(name, type, arrayDelimiterNotNull, required, suggester);
     }
 
+    public static <T> CommandParameter array(String name, Class<T> childType, Character arrayDelimiter,
+                                             boolean required, Class<? extends CommandParameterSuggester<T>> suggesterClass)
+            throws SuggesterInstantiationException {
+        try {
+            return array(name, childType, arrayDelimiter, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SuggesterInstantiationException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static CommandParameter array(String name, Class<?> childType, Character arrayDelimiter,
+                                             boolean required) {
+        return array(name, childType, arrayDelimiter, required, (CommandParameterSuggester) null);
+    }
+
+    public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
+                                             CommandParameterSuggester<T> suggester) {
+        return array(name, childType, null, required, suggester);
+    }
+
+    public static <T> CommandParameter array(String name, Class<T> childType, boolean required,
+                                             Class<? extends CommandParameterSuggester<T>> suggesterClass)
+            throws SuggesterInstantiationException {
+        try {
+            return array(name, childType, required, suggesterClass != null ? suggesterClass.newInstance() : null);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SuggesterInstantiationException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public static CommandParameter array(String name, Class<?> childType, boolean required) {
-        return array(name, childType, null, required);
+        return array(name, childType, required, (CommandParameterSuggester) null);
     }
 
+    public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
+                                               CommandParameterSuggester<T> suggester) {
+        return array(name, childType, Command.ARRAY_DELIMITER_VARARGS, required, suggester);
+    }
+
+    public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
+                                               Class<? extends CommandParameterSuggester<T>> suggester)
+            throws SuggesterInstantiationException {
+        try {
+            return varargs(name, childType, required, suggester != null ? suggester.newInstance() : null);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SuggesterInstantiationException(e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public static CommandParameter varargs(String name, Class<?> childType, boolean required) {
-        return array(name, childType, Command.ARRAY_DELIMITER_VARARGS, required);
+        return varargs(name, childType, required, (CommandParameterSuggester) null);
     }
 
     /**
@@ -194,6 +263,11 @@ public final class CommandParameter {
                 && (!trail || !isEscaped(string, charIndex - 1, true));
     }
 
+    @SuppressWarnings("unchecked")
+    public T[] suggest(EntityRef sender, Object... parameters) {
+        return suggester != null ? suggester.suggest(sender, parameters) : null;
+    }
+
     public String getUsage() {
         String typeString = getType().getSimpleName();
 
@@ -242,6 +316,10 @@ public final class CommandParameter {
 
     public Class<?> getTypeRaw() {
         return type;
+    }
+
+    public CommandParameterSuggester<T> getSuggester() {
+        return suggester;
     }
 
     public boolean isRequired() {

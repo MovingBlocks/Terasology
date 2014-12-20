@@ -25,7 +25,9 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.internal.Command;
 import org.terasology.logic.console.internal.CommandParameter;
+import org.terasology.logic.console.internal.CommandParameterSuggester;
 import org.terasology.network.ClientComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 
@@ -46,7 +48,7 @@ public class TellCommand extends Command {
     @Override
     protected CommandParameter[] constructParameters() {
         return new CommandParameter[] {
-                CommandParameter.single("user", String.class, true),
+                CommandParameter.single("user", String.class, true, UsernameCommandParameterSuggester.class),
                 CommandParameter.varargs("message", String.class, true)
         };
     }
@@ -114,8 +116,9 @@ public class TellCommand extends Command {
         return senderMessage;
     }
 
-    public String[] suggest(EntityRef sender, String username, String[] message) {
-        if (username == null) {
+    public static class UsernameCommandParameterSuggester implements CommandParameterSuggester<String> {
+        public String[] suggest(EntityRef sender, Object[] parameters) {
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
             Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
             Set<String> clientNames = Sets.newHashSet();
 
@@ -128,7 +131,5 @@ public class TellCommand extends Command {
 
             return clientNames.toArray(new String[clientNames.size()]);
         }
-
-        return null;
     }
 }
