@@ -212,7 +212,7 @@ public class ConsoleImpl implements Console {
             return false;
         }
 
-        if(params.size() < cmd.getRequiredParameterCount()) {
+        if (params.size() < cmd.getRequiredParameterCount()) {
             addErrorMessage("Please, provide required arguments marked by <>.");
             addMessage(cmd.getUsage());
             return false;
