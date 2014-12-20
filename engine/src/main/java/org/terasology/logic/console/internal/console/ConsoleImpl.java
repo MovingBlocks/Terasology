@@ -25,6 +25,7 @@ import org.terasology.logic.console.*;
 import org.terasology.logic.console.internal.CommandEvent;
 import org.terasology.logic.console.internal.ICommand;
 import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
+import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
@@ -181,6 +182,7 @@ public class ConsoleImpl implements Console {
         List<String> processedParameters = processParameters(rawCommand);
 
         ClientComponent cc = callingClient.getComponent(ClientComponent.class);
+
         if (cc.local) {
             localCommandHistory.add(rawCommand);
         }
@@ -200,6 +202,13 @@ public class ConsoleImpl implements Console {
         //check if the command is loaded
         if (cmd == null) {
             addErrorMessage("Unknown command '" + commandName + "'");
+            return false;
+        }
+
+        String requiredPermission = cmd.getRequiredPermission();
+
+        if (!clientHasPermission(callingClient, requiredPermission)) {
+            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").");
             return false;
         }
 
@@ -254,6 +263,26 @@ public class ConsoleImpl implements Console {
                 return false;
             }
         }
+    }
+
+    private boolean clientHasPermission(EntityRef callingClient, String requiredPermission) {
+        PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
+        boolean hasPermission = true;
+
+        if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
+            hasPermission = false;
+            ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
+
+            if (clientComponent != null) {
+                EntityRef character = clientComponent.character;
+
+                if (permissionManager.hasPermission(character, requiredPermission)) {
+                    hasPermission = true;
+                }
+            }
+        }
+
+        return hasPermission;
     }
 
     private static String cleanCommand(String rawCommand) {

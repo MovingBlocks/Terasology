@@ -69,6 +69,11 @@ public interface ICommand extends Comparable<ICommand> {
     boolean isRunOnServer();
 
     /**
+     * @return The permission required to execute this command
+     */
+    String getRequiredPermission();
+
+    /**
      * @return A short summary of what this Command does
      */
     String getDescription();

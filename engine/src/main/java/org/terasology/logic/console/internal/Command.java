@@ -461,6 +461,11 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         return ICommand.COMPARATOR.compare(this, o);
     }
 
+    @Override
+    public String getRequiredPermission() {
+        return requiredPermission;
+    }
+
     public SpecificAccessibleObject<Method> getExecutionMethod() {
         return executionMethod;
     }
