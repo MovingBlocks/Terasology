@@ -59,12 +59,17 @@ public final class ChunkMeshUpdateManager {
 
     private final ChunkTessellator tessellator;
     private final WorldProvider worldProvider;
-    private Vector3f cameraPosition;
+    /**
+     * This variable is volatile, so that it's value is visible to worker thread that calculates the best task to
+     * process
+     */
+    private volatile float cameraChunkPosX;
+    private volatile float cameraChunkPosY;
+    private volatile float cameraChunkPosZ;
 
-    public ChunkMeshUpdateManager(ChunkTessellator tessellator, WorldProvider worldProvider, Vector3f cameraPosition) {
+    public ChunkMeshUpdateManager(ChunkTessellator tessellator, WorldProvider worldProvider) {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
-        this.cameraPosition = cameraPosition;
 
         chunkUpdater = TaskMaster.createDynamicPriorityTaskMaster("Chunk-Updater", NUM_TASK_THREADS, new ChunkUpdaterComparator());
     }
@@ -85,6 +90,18 @@ public final class ChunkMeshUpdateManager {
         }
 
         return false;
+    }
+
+    /**
+     * The method tells the chunk mesh update manager where the camera is, so that is able to prioritize chunks near the
+     * camera. tt stores the values in volatile variables so that the change is visible to the chunk updating threads
+     * immidately.
+     */
+    public void setCameraPosition(Vector3f cameraPosition) {
+        Vector3i chunkPos = TeraMath.calcChunkPos(cameraPosition);
+        cameraChunkPosX = chunkPos.x;
+        cameraChunkPosY = chunkPos.y;
+        cameraChunkPosZ = chunkPos.z;
     }
 
     public List<RenderableChunk> availableChunksForUpdate() {
@@ -176,7 +193,7 @@ public final class ChunkMeshUpdateManager {
             if (task.isTerminateSignal()) {
                 return -1;
             }
-            return distFromRegion(task.getPosition(), TeraMath.calcChunkPos(cameraPosition));
+            return distFromRegion(task.getPosition(), new Vector3i(cameraChunkPosX, cameraChunkPosY, cameraChunkPosZ));
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {

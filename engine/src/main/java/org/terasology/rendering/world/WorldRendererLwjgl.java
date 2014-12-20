@@ -195,7 +195,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
         activeCamera = localPlayerCamera;
 
-        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider, activeCamera.getPosition());
+        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         mainDirectionalLight.lightType = LightComponent.LightType.DIRECTIONAL;
         mainDirectionalLight.lightColorAmbient = new Vector3f(1.0f, 1.0f, 1.0f);
@@ -298,6 +298,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         if (processChunkUpdates) {
             PerformanceMonitor.startActivity("Building Mesh VBOs");
+            chunkMeshUpdateManager.setCameraPosition(activeCamera.getPosition());
             for (RenderableChunk c : chunkMeshUpdateManager.availableChunksForUpdate()) {
                 if (chunksInProximity.contains(c) && c.getPendingMesh() != null) {
                     for (int i = 0; i < c.getPendingMesh().length; i++) {
