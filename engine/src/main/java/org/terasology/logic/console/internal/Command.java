@@ -446,6 +446,11 @@ public abstract class Command implements ICommand {
     }
 
     @Override
+    public Object getSource() {
+        return executionMethod.getTarget();
+    }
+
+    @Override
     public int compareTo(ICommand o) {
         return ICommand.COMPARATOR.compare(this, o);
     }

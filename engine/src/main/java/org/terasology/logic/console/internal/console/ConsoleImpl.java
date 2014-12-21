@@ -65,12 +65,12 @@ public class ConsoleImpl implements Console {
 
         if (commandRegistry.containsKey(commandName)) {
             LOGGER.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
-                    commandName, commandRegistry.get(commandName).getClass().getCanonicalName(),
+                    commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
                     command.getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
             LOGGER.info("Command '{}' successfully registered for class '{}'.", commandName,
-                    command.getClass().getCanonicalName());
+                    command.getSource().getClass().getCanonicalName());
         }
     }
 

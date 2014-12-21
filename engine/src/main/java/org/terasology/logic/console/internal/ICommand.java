@@ -112,6 +112,11 @@ public interface ICommand extends Comparable<ICommand> {
     String getUsage();
 
     /**
+     * @return The object containing the command logic
+     */
+    Object getSource();
+
+    /**
      * Executes the command
      *
      * @param parameters Parameters in an Object[] array as defined in {@link Command#getParameters()}.
