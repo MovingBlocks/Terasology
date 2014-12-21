@@ -41,7 +41,7 @@ public final class CamelCaseMatcher {
      * @param commands
      * @return
      */
-    public static Set<String> getMatches(String queryStr, Collection<String> commands) {
+    public static Set<String> getMatches(String queryStr, Collection<String> commands, boolean includeCaseInsensitiveStartingWith) {
         Set<String> matches = Sets.newHashSet();
 
         String query = queryStr.replaceAll("\\*", ".*?");
@@ -51,6 +51,10 @@ public final class CamelCaseMatcher {
         Pattern regex = Pattern.compile(re);
 
         for (String cmd : commands) {
+            if (includeCaseInsensitiveStartingWith && cmd.toLowerCase().startsWith(queryStr.toLowerCase())) {
+                matches.add(cmd);
+            }
+
             Matcher m = regex.matcher(cmd);
 
             if (m.find()) {

@@ -74,7 +74,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                                  ICommand command, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
-            List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(commandName, commandNames));
+            List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(commandName, commandNames, true));
             Collections.sort(matches);
             return matches.toArray(new String[matches.size()]);
         }
