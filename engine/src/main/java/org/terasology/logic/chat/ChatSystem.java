@@ -107,7 +107,7 @@ public class ChatSystem extends BaseComponentSystem {
     }
 
     @Command(runOnServer = true, shortDescription = "Sends a private message to a specified user")
-    public String tell(
+    public String whisper(
             EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
             @CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
