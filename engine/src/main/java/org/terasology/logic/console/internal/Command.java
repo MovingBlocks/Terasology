@@ -21,14 +21,11 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.systems.BaseComponentSystem;
-import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
 import org.terasology.logic.console.internal.exceptions.CommandInitializationException;
 import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
 import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
 import org.terasology.logic.permission.PermissionManager;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.Array;
@@ -36,9 +33,11 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ *
+ *
  * @author Limeth
  */
-public abstract class Command extends BaseComponentSystem implements ICommand {
+public abstract class Command implements ICommand {
     public static final String METHOD_NAME_EXECUTE = "execute";
     public static final String METHOD_NAME_SUGGEST = "suggest";
     public static final char ARRAY_DELIMITER_DEFAULT = ',';
@@ -56,7 +55,7 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
     private String usage;
 
     public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                   SpecificAccessibleObject<Method> executionMethod/*, SpecificAccessibleObject<Method> suggestionMethod*/) {
+                   SpecificAccessibleObject<Method> executionMethod) {
         Preconditions.checkNotNull(executionMethod);
 
         this.name = name;
@@ -94,20 +93,6 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
         registerParameters();
         validateExecutionMethod();
         initUsage();
-    }
-
-    public void initialiseMore() {
-    }
-
-    @Override
-    public final void initialise() {
-        Console console = CoreRegistry.get(Console.class);
-
-        initialiseMore();
-
-        if (console != null) {
-            console.registerCommand(this);
-        }
     }
 
     protected abstract CommandParameter[] constructParameters();
@@ -219,6 +204,10 @@ public abstract class Command extends BaseComponentSystem implements ICommand {
 
             Class<?> expectedType = parameters[i].getTypeRaw();
             Class<?> providedType = methodParameters[i + 1];
+
+            if (providedType.isPrimitive()) {
+                providedType = CommandParameter.PRIMITIVES_TO_WRAPPERS.get(providedType);
+            }
 
             if (!expectedType.isAssignableFrom(providedType)) {
                 throw new CommandInitializationException("Cannot assign command argument from "

@@ -17,7 +17,9 @@ package org.terasology.logic.console.internal.adapter;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.module.sandbox.API;
+import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Map;
 
@@ -43,9 +45,22 @@ public class CommandParameterAdapterManager {
     }
 
     /**
+     * @return A manager with basic adapters and following classes:
+     * {@link org.terasology.entitySystem.prefab.Prefab}
+     */
+    public static CommandParameterAdapterManager core() {
+        CommandParameterAdapterManager manager = basic();
+
+        manager.registerAdapter(Prefab.class, new PrefabAdapter());
+        manager.registerAdapter(BlockFamily.class, new BlockFamilyAdapter());
+
+        return manager;
+    }
+
+    /**
      * @return {@code true}, if the adapter didn't override a previously present adapter
      */
-    public <T> boolean registerAdapter(Class<T> clazz, CommandParameterAdapter<T> adapter) {
+    public <T> boolean registerAdapter(Class<? extends T> clazz, CommandParameterAdapter<T> adapter) {
         return adapters.put(clazz, adapter) == null;
     }
 
@@ -72,19 +87,31 @@ public class CommandParameterAdapterManager {
 
     /**
      * @param parsed The object to compose
+     * @param clazz The class pointing to the desired adapter
      * @return The composed object
      * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
-    public String compose(Object parsed) throws ClassCastException {
+    public <T> String compose(T parsed, Class<? super T> clazz) throws ClassCastException {
         Preconditions.checkNotNull(parsed, "The Object to compose must not be null");
 
-        Class<?> clazz = parsed.getClass();
         CommandParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
         return adapter.compose(parsed);
+    }
+
+    /**
+     * @param parsed The object to compose
+     * @return The composed object
+     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     */
+    @SuppressWarnings("unchecked")
+    public String compose(Object parsed) throws ClassCastException {
+        Class<?> clazz = parsed.getClass();
+
+        return compose(parsed, (Class<? super Object>) clazz);
     }
 
     public CommandParameterAdapter getAdapter(Class<?> clazz) {

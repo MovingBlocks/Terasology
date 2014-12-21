@@ -28,9 +28,9 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
-import org.terasology.logic.chat.commands.TellCommand;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.*;
+import org.terasology.logic.console.internal.CommandParameterSuggester;
 import org.terasology.logic.console.internal.referenced.Command;
 import org.terasology.logic.console.internal.referenced.CommandParameter;
 import org.terasology.logic.console.ui.MiniChatOverlay;
@@ -88,5 +88,89 @@ public class ChatSystem extends BaseComponentSystem {
                 }
             }
         }
+    }
+
+    @Command(name = "say", runOnServer = true, shortDescription = "Sends a message to all other players")
+    public String say(
+            EntityRef sender,
+            @CommandParameter("message") String[] messageArray
+    ) {
+        String message = Joiner.on(' ').join(messageArray);
+
+        logger.debug("Received chat message from {} : '{}'", sender, message);
+
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            client.send(new ChatMessageEvent(message, sender.getComponent(ClientComponent.class).clientInfo));
+        }
+
+        return "Message sent.";
+    }
+
+    @Command(name = "tell", runOnServer = true, shortDescription = "Sends a private message to a specified user")
+    public String execute(
+            EntityRef sender,
+            @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
+            @CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
+    ) {
+        Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
+        EntityRef targetClient = null;
+        boolean unique = true;
+
+        for (EntityRef client : clients) {
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            DisplayNameComponent displayNameComponent = clientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+
+            if (displayNameComponent == null) {
+                continue;
+            }
+
+            if (displayNameComponent.name.equalsIgnoreCase(username)) {
+                if (targetClient == null) {
+                    targetClient = client;
+                } else {
+                    unique = false;
+                    break;
+                }
+            }
+        }
+
+        if (!unique) {
+            targetClient = null;
+
+            for (EntityRef client : clients) {
+                ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+                DisplayNameComponent displayNameComponent = clientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+
+                if (displayNameComponent == null) {
+                    continue;
+                }
+
+                if (displayNameComponent.name.equals(username)) {
+                    if (targetClient == null) {
+                        targetClient = client;
+                    } else {
+                        return FontColor.getColored("Found more users with name '" + username + "'.", ConsoleColors.ERROR);
+                    }
+                }
+            }
+        }
+
+        if (targetClient == null) {
+            return FontColor.getColored("User with name '" + username + "' not found.", ConsoleColors.ERROR);
+        }
+
+        ClientComponent senderClientComponent = sender.getComponent(ClientComponent.class);
+        DisplayNameComponent senderDisplayNameComponent = senderClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+        ClientComponent targetClientComponent = targetClient.getComponent(ClientComponent.class);
+        DisplayNameComponent targetDisplayNameComponent = targetClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+        String message = Joiner.on(' ').join(messageArray);
+        String targetMessage = FontColor.getColored("*whispering* ", ConsoleColors.ERROR)
+                + FontColor.getColored(message, ConsoleColors.CHAT);
+        String senderMessage = "You -> " + targetDisplayNameComponent.name
+                + ": " + FontColor.getColored(message, ConsoleColors.CHAT);
+
+        targetClient.send(new ChatMessageEvent(targetMessage, senderClientComponent.clientInfo));
+
+        return senderMessage;
     }
 }

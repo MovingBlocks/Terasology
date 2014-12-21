@@ -16,6 +16,7 @@
 
 package org.terasology.audio.system;
 
+import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
@@ -24,11 +25,15 @@ import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
+import org.terasology.logic.console.internal.referenced.Command;
+import org.terasology.logic.console.internal.referenced.CommandParameter;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -42,6 +47,20 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     private LocalPlayer localPlayer;
     @In
     private AudioManager audioManager;
+
+    @Command(shortDescription = "Toggle muting all sound")
+    public String mute(EntityRef sender) {
+        audioManager.setMute(!audioManager.isMute());
+        return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");
+    }
+
+    @Command(shortDescription = "Plays a test sound")
+    public void playTestSound(EntityRef sender, @CommandParameter("xOffset") float xOffset, @CommandParameter("zOffset") float zOffset) {
+        Vector3f position = localPlayer.getPosition();
+        position.x += xOffset;
+        position.z += zOffset;
+        audioManager.playSound(Assets.getSound("engine:dig"), position);
+    }
 
     @ReceiveEvent
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {

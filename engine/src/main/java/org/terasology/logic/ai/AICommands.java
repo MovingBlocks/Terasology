@@ -13,34 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.ai.commands;
+package org.terasology.logic.ai;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.ai.HierarchicalAIComponent;
-import org.terasology.logic.ai.SimpleAIComponent;
-import org.terasology.logic.console.internal.Command;
-import org.terasology.logic.console.internal.CommandParameter;
+import org.terasology.logic.console.internal.referenced.Command;
 import org.terasology.registry.In;
 
 /**
- * @author Immortius, Limeth
+ * @author Immortius
  */
 @RegisterSystem
-public class DestroyAICommand extends Command {
+public class AICommands {
     @In
     private EntityManager entityManager;
 
-    public DestroyAICommand() {
-        super("destroyAI", true, "Destroys all AIs in the world", null);
+    @Command(name = "countAI", runOnServer = true, shortDescription = "Count all AIs in the world")
+    public String countAI(EntityRef sender) {
+        int simpleAIs = 0;
+        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
+            simpleAIs++;
+        }
+        int hierarchical = 0;
+        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
+            hierarchical++;
+        }
+        return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 
-    @Override
-    protected CommandParameter[] constructParameters() {
-        return new CommandParameter[0];
-    }
-
+    @Command(name = "destroyAI", runOnServer = true, shortDescription = "Destroys all AIs in the world")
     public String execute(EntityRef sender) {
         int simpleAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {

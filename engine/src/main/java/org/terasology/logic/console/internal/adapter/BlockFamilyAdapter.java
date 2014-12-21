@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.internal.adapter;
 
-import java.lang.annotation.*;
+import com.sun.istack.internal.NotNull;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
- * Marks a command to be registered upon game launch.
- * {@code CoreCommand}s must be declared as classes extending the {@link org.terasology.logic.console.internal.Command} annotation.
- *
  * @author Limeth
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface CoreCommand {
+public class BlockFamilyAdapter implements CommandParameterAdapter<BlockFamily> {
+    @Override
+    public BlockFamily parse(@NotNull String composed) {
+        return CoreRegistry.get(BlockManager.class).getBlockFamily(composed);
+    }
+
+    @Override
+    public String compose(@NotNull BlockFamily parsed) {
+        return parsed.getURI().toString();
+    }
 }

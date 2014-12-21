@@ -25,7 +25,7 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.internal.console.ConsoleImpl;
 import org.terasology.logic.console.internal.console.ConsoleSystem;
-import org.terasology.logic.console.internal.CoreCommands;
+import org.terasology.logic.console.commands.CoreCommands;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -68,7 +68,7 @@ public class StateSetup implements GameState {
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
 
         componentSystemManager.register(new ConsoleSystem(), "engine:ConsoleSystem");
-        CoreCommands.initialiseCommands();
+        componentSystemManager.register(new CoreCommands(), "engine:CoreCommands");
 
         EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
         LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());

@@ -282,7 +282,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.putPermanently(WorldGeneratorManager.class, new WorldGeneratorManager());
         CoreRegistry.putPermanently(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.putPermanently(CommandParameterAdapterManager.class, CommandParameterAdapterManager.basic());
+        CoreRegistry.putPermanently(CommandParameterAdapterManager.class, CommandParameterAdapterManager.core());
         CoreRegistry.putPermanently(NetworkSystem.class, new NetworkSystemImpl(time));
         CoreRegistry.putPermanently(Game.class, new Game(this, time));
         assetManager.setEnvironment(moduleManager.getEnvironment());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2013 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.inventory.commands;
+
+package org.terasology.logic.inventory;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.internal.Command;
-import org.terasology.logic.console.internal.CommandParameter;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.console.internal.referenced.Command;
+import org.terasology.logic.console.internal.referenced.CommandParameter;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
-import org.terasology.world.block.entity.commands.GiveBlockCommand;
+import org.terasology.world.block.entity.BlockCommands;
 
 /**
- * @author Immortius, Limeth
+ * @author Immortius
  */
 @RegisterSystem
-public class GiveItemCommand extends Command {
+public class ItemCommands extends BaseComponentSystem {
+
+    @In
+    private BlockCommands blockCommands;
+
     @In
     private InventoryManager inventoryManager;
 
@@ -42,30 +46,19 @@ public class GiveItemCommand extends Command {
     @In
     private EntityManager entityManager;
 
-    public GiveItemCommand() {
-        super("giveItem", true, "Adds an item to your inventory", null);
-    }
-
-    @Override
-    protected CommandParameter[] constructParameters() {
-        return new CommandParameter[] {
-                CommandParameter.single("prefabId or blockName", String.class, true)
-        };
-    }
-
-    public String execute(EntityRef sender, String itemPrefabName) {
+    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
+    public String giveItem(EntityRef client, @CommandParameter("prefabId or blockName") String itemPrefabName, @CommandParameter(value = "amount", required = false) Integer amount) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
-            EntityRef playerEntity = sender.getComponent(ClientComponent.class).character;
+            EntityRef playerEntity = client.getComponent(ClientComponent.class).character;
             if (!inventoryManager.giveItem(playerEntity, playerEntity, item)) {
                 item.destroy();
             }
             return "You received an item of " + prefab.getName();
         } else {
-            return GiveBlockCommand.execute(sender, itemPrefabName, null, null);
+            return blockCommands.giveBlock(client, itemPrefabName, amount, null);
         }
     }
 
-    //TODO Implement the suggest method
 }

@@ -141,10 +141,10 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 return generateResult(matches[0], commandName, commandParameters, suggestedIndex);
             }
 
-            if (matches.length > MAX_CYCLES) {
+/*            if (matches.length > MAX_CYCLES) {
                 console.addMessage(new Message("Too many hits, please refine your search"));
                 return query;
-            }
+            }*/ //TODO Find out a better way to handle too many results while returning useful information
 
             previousMatches = matches;
         }

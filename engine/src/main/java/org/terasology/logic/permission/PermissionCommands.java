@@ -13,42 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.permission.commands;
+package org.terasology.logic.permission;
 
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.internal.Command;
-import org.terasology.logic.console.internal.CommandParameter;
-import org.terasology.logic.permission.PermissionManager;
+import org.terasology.logic.console.internal.referenced.Command;
+import org.terasology.logic.console.internal.referenced.CommandParameter;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
-/**
- * @author Limeth
- */
 @RegisterSystem
-public class GivePermissionCommand extends Command {
+public class PermissionCommands extends BaseComponentSystem {
     @In
     private PermissionManager permissionManager;
     @In
     private EntityManager entityManager;
 
-    public GivePermissionCommand() {
-        super("givePermission", true, "Gives specified permission to player",
-                "Gives specified permission to player");
-    }
-
-    @Override
-    protected CommandParameter[] constructParameters() {
-        return new CommandParameter[] {
-                CommandParameter.single("player", String.class, true),
-                CommandParameter.single("permission", String.class, true)
-        };
-    }
-
-    public String execute(EntityRef sender, String player, String permission) {
+    @Command(shortDescription = "Gives specified permission to player",
+            helpText = "Gives specified permission to player",
+            runOnServer = true)
+    public String givePermission(EntityRef speaker,
+            @CommandParameter("player") String player,
+            @CommandParameter("permission") String permission) {
         boolean permissionGiven = false;
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
@@ -66,6 +55,29 @@ public class GivePermissionCommand extends Command {
         }
     }
 
+    @Command(shortDescription = "Removes specified permission from player",
+            helpText = "Removes specified permission from player",
+            runOnServer = true)
+    public String removePermission(EntityRef speaker,
+            @CommandParameter("player") String player,
+            @CommandParameter("permission") String permission) {
+        boolean permissionGiven = false;
+
+        for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            if (clientHasName(clientComponent, player)) {
+                permissionManager.removePermission(clientComponent.character, permission);
+                permissionGiven = true;
+            }
+        }
+
+        if (permissionGiven) {
+            return "Permission " + permission + " removed to player " + player;
+        } else {
+            return "Unable to find player " + player;
+        }
+    }
+
     private boolean clientHasName(ClientComponent client, String playerName) {
         EntityRef clientInfo = client.clientInfo;
         if (clientInfo != null) {
@@ -74,6 +86,4 @@ public class GivePermissionCommand extends Command {
         }
         return false;
     }
-
-    //TODO Implement the suggest method
 }

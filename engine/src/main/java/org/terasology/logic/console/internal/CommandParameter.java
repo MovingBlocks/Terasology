@@ -32,7 +32,7 @@ import java.util.Objects;
  * @author Limeth
  */
 public final class CommandParameter<T> {
-    private static final Map<Class<?>, Class<?>> PRIMITIVES_TO_WRAPPERS = new ImmutableMap.Builder<Class<?>, Class<?>>()
+    static final Map<Class<?>, Class<?>> PRIMITIVES_TO_WRAPPERS = new ImmutableMap.Builder<Class<?>, Class<?>>()
             .put(boolean.class, Boolean.class)
             .put(byte.class, Byte.class)
             .put(char.class, Character.class)
@@ -49,19 +49,28 @@ public final class CommandParameter<T> {
     private final CommandParameterSuggester<T> suggester;
     private final boolean required;
 
-    private CommandParameter(String name, Class<T> type, Character arrayDelimiter, boolean required, CommandParameterSuggester<T> suggester) {
+    @SuppressWarnings("unchecked")
+    private CommandParameter(String name, Class<T> typeParam, Character arrayDelimiter, boolean required, CommandParameterSuggester<T> suggester) {
         Objects.requireNonNull(name, "The parameter name must not be null!");
 
         if (name.length() <= 0) {
             throw new IllegalArgumentException("The parameter name must not be empty!");
         }
 
-        Objects.requireNonNull(type, "The parameter type must not be null!");
+        Objects.requireNonNull(typeParam, "The parameter type must not be null!");
 
-        if (type.isPrimitive()) {
-            throw new IllegalArgumentException("The parameter type must not be primitive!"
-                    + " Use " + PRIMITIVES_TO_WRAPPERS.get(type).getSimpleName()
-                    + " instead of " + type.getSimpleName() + ".");
+        Class<T> resultType;
+
+        if (typeParam.isPrimitive()) {
+            if (required) {
+                resultType = (Class<T>) PRIMITIVES_TO_WRAPPERS.get(typeParam);
+            } else {
+                throw new IllegalArgumentException("An optional parameter must not be primitive!"
+                        + " Use " + PRIMITIVES_TO_WRAPPERS.get(typeParam).getSimpleName()
+                        + " instead of " + typeParam.getSimpleName() + ".");
+            }
+        } else {
+            resultType = typeParam;
         }
 
         if (arrayDelimiter != null) {
@@ -72,7 +81,7 @@ public final class CommandParameter<T> {
         }
 
         this.name = name;
-        this.type = type;
+        this.type = resultType;
         this.arrayDelimiter = arrayDelimiter;
         this.suggester = suggester;
         this.required = required;
@@ -239,13 +248,13 @@ public final class CommandParameter<T> {
 
     public Object parseSingle(String string) throws CommandParameterParseException {
         CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
-        Class<?> childType = getType();
+        Class<?> childType = getTypeNotPrimitive();
 
         if (parameterAdapterManager.isAdapterRegistered(childType)) {
             try {
                 return parameterAdapterManager.parse(childType, string);
             } catch (Error | Exception e) {
-                throw new CommandParameterParseException("An error occurred while parsing " + getType().getCanonicalName(), string);
+                throw new CommandParameterParseException("An error occurred while parsing " + getType().getCanonicalName(), e, string);
             }
         }
 
@@ -255,7 +264,7 @@ public final class CommandParameter<T> {
     public String composeSingle(Object object) {
         CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
 
-        return parameterAdapterManager.compose(object);
+        return parameterAdapterManager.compose(object, (Class<? super Object>) getType());
     }
 
     public boolean isEscaped(String string, int charIndex, boolean trail) {
@@ -299,7 +308,7 @@ public final class CommandParameter<T> {
     }
 
     public boolean hasName() {
-        return name != null;
+        return name.length() >= 0;
     }
 
     public String getName() {
@@ -314,7 +323,17 @@ public final class CommandParameter<T> {
         return type;
     }
 
-    public Class<?> getTypeRaw() {
+    public Class<?> getTypeNotPrimitive() {
+        Class<?> componentType = getType();
+
+        if (componentType.isPrimitive()) {
+            return PRIMITIVES_TO_WRAPPERS.get(componentType);
+        } else {
+            return componentType;
+        }
+    }
+
+    public Class<T> getTypeRaw() {
         return type;
     }
 

@@ -35,7 +35,6 @@ import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UIText;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -102,9 +101,7 @@ public class ConsoleScreen extends CoreScreenLayer {
             @Override
             public String get() {
                 StringBuilder messageList = new StringBuilder();
-                Iterator<Message> messageIterator = console.getMessages().iterator();
-                while (messageIterator.hasNext()) {
-                    Message message = messageIterator.next();
+                for (Message message : console.getMessages()) {
                     messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
                     messageList.append(Message.NEW_LINE);
                 }
@@ -123,7 +120,6 @@ public class ConsoleScreen extends CoreScreenLayer {
                 Message.NEW_LINE +
                 "Type 'help' to see a list with available commands or 'help \"<commandName>\"' for command details." + Message.NEW_LINE +
                 "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
-                "Commands are case-sensitive, block names and such are not." + Message.NEW_LINE +
                 "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
                 "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
                 "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
