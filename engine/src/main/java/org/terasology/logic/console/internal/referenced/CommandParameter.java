@@ -33,6 +33,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 public @interface CommandParameter {
 
+    /**
+     * @return The parameter name
+     */
     String value();
 
     /**
@@ -40,6 +43,9 @@ public @interface CommandParameter {
      */
     boolean required() default true;
 
+    /**
+     * @return The class used for suggesting values for this parameter
+     */
     Class<? extends CommandParameterSuggester> suggester() default NullCommandParameterSuggester.class;
 
     /**

@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
+ * Interface of commands used in a {@link org.terasology.logic.console.Console}
+ *
  * @author Limeth
  */
 public interface ICommand extends Comparable<ICommand> {

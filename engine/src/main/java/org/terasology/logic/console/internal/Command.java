@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- *
+ * The core ICommand implementation and command information
  *
  * @author Limeth
  */
@@ -69,7 +69,7 @@ public abstract class Command implements ICommand {
     }
 
     public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                   String executionMethodName, String suggestionMethodName) {
+                   String executionMethodName) {
         this.name = name;
         this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
         this.runOnServer = runOnServer;
@@ -81,11 +81,11 @@ public abstract class Command implements ICommand {
     }
 
     public Command(String name, String requiredPermission, boolean runOnServer, String description, String helpText) {
-        this(name, requiredPermission, runOnServer, description, helpText, (String) null, (String) null);
+        this(name, requiredPermission, runOnServer, description, helpText, (String) null);
     }
 
     public Command(String name, boolean runOnServer, String description, String helpText) {
-        this(name, PermissionManager.OPERATOR_PERMISSION, runOnServer, description, helpText, (String) null, (String) null);
+        this(name, PermissionManager.OPERATOR_PERMISSION, runOnServer, description, helpText);
     }
 
     private void postConstruct() {
