@@ -61,7 +61,7 @@ public @interface Command {
     /**
      * @return The name of the command, if specified. Otherwise the method name is used.
      */
-    String name() default "";
+    String value() default "";
 
     /**
      * @return A short summary of what this Command does

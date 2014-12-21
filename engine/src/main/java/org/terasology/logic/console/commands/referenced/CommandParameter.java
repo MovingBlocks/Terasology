@@ -36,7 +36,7 @@ public @interface CommandParameter {
     /**
      * @return The parameter name
      */
-    String value();
+    String value() default "";
 
     /**
      * @return Whether the argument value is required to be present on command execution or not

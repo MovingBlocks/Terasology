@@ -90,7 +90,7 @@ public class ChatSystem extends BaseComponentSystem {
         }
     }
 
-    @Command(name = "say", runOnServer = true, shortDescription = "Sends a message to all other players")
+    @Command(runOnServer = true, shortDescription = "Sends a message to all other players")
     public String say(
             EntityRef sender,
             @CommandParameter("message") String[] messageArray
@@ -106,8 +106,8 @@ public class ChatSystem extends BaseComponentSystem {
         return "Message sent.";
     }
 
-    @Command(name = "tell", runOnServer = true, shortDescription = "Sends a private message to a specified user")
-    public String execute(
+    @Command(runOnServer = true, shortDescription = "Sends a private message to a specified user")
+    public String tell(
             EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
             @CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray

@@ -56,7 +56,7 @@ public final class ReferencedCommand extends org.terasology.logic.console.comman
 
         Preconditions.checkNotNull(commandAnnotation);
 
-        String name = commandAnnotation.name();
+        String name = commandAnnotation.value();
 
         if (name.length() <= 0) {
             name = method.getName();

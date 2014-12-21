@@ -29,7 +29,7 @@ public class AICommands {
     @In
     private EntityManager entityManager;
 
-    @Command(name = "countAI", runOnServer = true, shortDescription = "Count all AIs in the world")
+    @Command(runOnServer = true, shortDescription = "Count all AIs in the world")
     public String countAI(EntityRef sender) {
         int simpleAIs = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
@@ -42,8 +42,8 @@ public class AICommands {
         return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 
-    @Command(name = "destroyAI", runOnServer = true, shortDescription = "Destroys all AIs in the world")
-    public String execute(EntityRef sender) {
+    @Command(runOnServer = true, shortDescription = "Destroys all AIs in the world")
+    public String destroyAI(EntityRef sender) {
         int simpleAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             ref.destroy();
