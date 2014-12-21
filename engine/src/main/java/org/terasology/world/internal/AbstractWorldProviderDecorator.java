@@ -16,6 +16,8 @@
 
 package org.terasology.world.internal;
 
+import java.util.Collection;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -144,6 +146,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public WorldTime getTime() {
         return base.getTime();
+    }
+
+    @Override
+    public Collection<Region3i> getRelevantRegions() {
+        return base.getRelevantRegions();
     }
 
 }

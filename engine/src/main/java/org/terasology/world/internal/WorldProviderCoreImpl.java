@@ -16,8 +16,14 @@
 
 package org.terasology.world.internal;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.SimpleUri;
@@ -33,6 +39,7 @@ import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.CoreChunk;
 import org.terasology.world.chunks.LitChunk;
@@ -55,6 +62,9 @@ import org.terasology.world.propagation.light.SunlightWorldView;
 import org.terasology.world.time.WorldTime;
 import org.terasology.world.time.WorldTimeImpl;
 
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -355,4 +365,25 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         return worldTime;
     }
 
+    @Override
+    public Collection<Region3i> getRelevantRegions() {
+        Collection<Chunk> chunks = chunkProvider.getAllChunks();
+        Function<Chunk, Region3i> mapping = new Function<Chunk, Region3i>() {
+
+            @Override
+            public Region3i apply(Chunk input) {
+                return input.getRegion();
+            }
+        };
+
+        Predicate<Chunk> isReady = new Predicate<Chunk>() {
+
+            @Override
+            public boolean apply(Chunk input) {
+                return input.isReady();
+            }
+        };
+
+        return FluentIterable.from(chunks).filter(isReady).transform(mapping).toList();
+    }
 }
