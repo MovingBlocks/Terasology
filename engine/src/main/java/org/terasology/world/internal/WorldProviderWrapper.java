@@ -16,6 +16,9 @@
 
 package org.terasology.world.internal;
 
+import java.util.Collection;
+
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
@@ -116,4 +119,8 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
         core.unregisterListener(listener);
     }
 
+    @Override
+    public Collection<Region3i> getRelevantRegions() {
+        return core.getRelevantRegions();
+    }
 }
