@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -21,10 +21,10 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
-import org.terasology.logic.console.internal.exceptions.CommandInitializationException;
-import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
-import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
+import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commands.exceptions.CommandInitializationException;
+import org.terasology.logic.console.commands.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.console;
+package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
@@ -23,10 +23,8 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.MessageEvent;
-import org.terasology.logic.console.internal.CommandEvent;
-import org.terasology.logic.console.internal.ICommand;
+import org.terasology.logic.console.commands.CommandEvent;
+import org.terasology.logic.console.commands.ICommand;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commands;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.exceptions.CommandExecutionException;
-import org.terasology.logic.console.internal.exceptions.CommandSuggestionException;
+import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
 
 import java.util.Comparator;
 import java.util.List;

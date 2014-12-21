@@ -25,8 +25,8 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
-import org.terasology.logic.console.internal.referenced.Command;
-import org.terasology.logic.console.internal.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.network.ClientComponent;
 

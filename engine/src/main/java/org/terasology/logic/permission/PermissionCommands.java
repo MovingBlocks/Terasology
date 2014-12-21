@@ -20,8 +20,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.internal.referenced.Command;
-import org.terasology.logic.console.internal.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 

@@ -16,7 +16,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.ICommand;
+import org.terasology.logic.console.commands.ICommand;
 
 import java.util.Collection;
 import java.util.List;

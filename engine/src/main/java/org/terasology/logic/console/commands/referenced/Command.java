@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.internal.referenced;
+package org.terasology.logic.console.commands.referenced;
 
 import org.terasology.logic.permission.PermissionManager;
 

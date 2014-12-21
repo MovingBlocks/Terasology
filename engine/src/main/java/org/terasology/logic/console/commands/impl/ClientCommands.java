@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commands.impl;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.console.internal.referenced.Command;
-import org.terasology.logic.console.internal.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;

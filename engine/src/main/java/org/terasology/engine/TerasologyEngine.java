@@ -46,7 +46,7 @@ import org.terasology.identity.PublicIdentityCertificate;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
-import org.terasology.logic.console.internal.adapter.CommandParameterAdapterManager;
+import org.terasology.logic.console.commands.adapter.CommandParameterAdapterManager;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;

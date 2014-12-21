@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commands;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;

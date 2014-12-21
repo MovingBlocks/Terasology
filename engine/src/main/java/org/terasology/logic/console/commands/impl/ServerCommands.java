@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commands.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.internal.referenced.Command;
-import org.terasology.logic.console.internal.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.network.*;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;

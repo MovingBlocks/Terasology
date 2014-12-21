@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.exceptions;
+package org.terasology.logic.console.commands.exceptions;
 
 /**
  * @author Limeth
  */
-public class CommandExecutionException extends Exception {
-    public CommandExecutionException() {
+public class CommandInitializationException extends IllegalArgumentException {
+    public CommandInitializationException() {
     }
 
-    public CommandExecutionException(String message) {
-        super(message);
-    }
-
-    public CommandExecutionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public CommandExecutionException(Throwable cause) {
-        super(cause);
-    }
-
-    public CommandExecutionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public CommandInitializationException(String s) {
+        super(s);
     }
 }

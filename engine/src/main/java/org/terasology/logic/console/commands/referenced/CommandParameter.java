@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.internal.referenced;
+package org.terasology.logic.console.commands.referenced;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.CommandParameterSuggester;
+import org.terasology.logic.console.commands.CommandParameterSuggester;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

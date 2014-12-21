@@ -18,7 +18,7 @@ package org.terasology.logic.ai;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.internal.referenced.Command;
+import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.registry.In;
 
 /**

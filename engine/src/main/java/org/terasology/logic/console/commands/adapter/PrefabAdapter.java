@@ -13,16 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.exceptions;
+package org.terasology.logic.console.commands.adapter;
+
+import com.sun.istack.internal.NotNull;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * @author Limeth
  */
-public class CommandInitializationException extends IllegalArgumentException {
-    public CommandInitializationException() {
+public class PrefabAdapter implements CommandParameterAdapter<Prefab> {
+    @Override
+    public Prefab parse(@NotNull String composed) {
+        return Assets.get(AssetType.PREFAB, composed, Prefab.class);
     }
 
-    public CommandInitializationException(String s) {
-        super(s);
+    @Override
+    public String compose(@NotNull Prefab parsed) {
+        return parsed.getURI().toSimpleString();
     }
 }

@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.adapter;
+package org.terasology.logic.console.commands.adapter;
 
 import com.sun.istack.internal.NotNull;
+import org.terasology.registry.CoreRegistry;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
- * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.internal.Command}
- *
  * @author Limeth
  */
-public interface CommandParameterAdapter<T> {
-    @NotNull
-    T parse(@NotNull String composed);
-    @NotNull
-    String compose(@NotNull T parsed);
+public class BlockFamilyAdapter implements CommandParameterAdapter<BlockFamily> {
+    @Override
+    public BlockFamily parse(@NotNull String composed) {
+        return CoreRegistry.get(BlockManager.class).getBlockFamily(composed);
+    }
+
+    @Override
+    public String compose(@NotNull BlockFamily parsed) {
+        return parsed.getURI().toString();
+    }
 }

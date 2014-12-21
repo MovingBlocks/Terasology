@@ -28,7 +28,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.internal.referenced.ReferencedCommand;
+import org.terasology.logic.console.commands.referenced.ReferencedCommand;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;

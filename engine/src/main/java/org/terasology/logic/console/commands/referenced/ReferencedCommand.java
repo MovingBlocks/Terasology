@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.referenced;
+package org.terasology.logic.console.commands.referenced;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -22,8 +22,8 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.internal.CommandParameter;
-import org.terasology.logic.console.internal.CommandParameterSuggester;
+import org.terasology.logic.console.commands.CommandParameter;
+import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * @author Limeth
  */
-public final class ReferencedCommand extends org.terasology.logic.console.internal.Command {
+public final class ReferencedCommand extends org.terasology.logic.console.commands.Command {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedCommand.class);
 
     private ReferencedCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
@@ -45,7 +45,7 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
 
     /**
      * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link org.terasology.logic.console.internal.referenced.Command}.
+     * annotated with {@link org.terasology.logic.console.commands.referenced.Command}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
@@ -124,13 +124,13 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
     private static CommandParameter getParameterFor(Class<?> type, Annotation[] annotations) {
         String name = null;
         Character arrayDelimiter = null;
-        Class<? extends CommandParameterSuggester> suggesterClass = org.terasology.logic.console.internal.referenced.CommandParameter.NullCommandParameterSuggester.class;
+        Class<? extends CommandParameterSuggester> suggesterClass = org.terasology.logic.console.commands.referenced.CommandParameter.NullCommandParameterSuggester.class;
         boolean required = true;
 
         for (Annotation annotation : annotations) {
-            if (annotation instanceof org.terasology.logic.console.internal.referenced.CommandParameter) {
-                org.terasology.logic.console.internal.referenced.CommandParameter parameterAnnotation
-                        = (org.terasology.logic.console.internal.referenced.CommandParameter) annotation;
+            if (annotation instanceof org.terasology.logic.console.commands.referenced.CommandParameter) {
+                org.terasology.logic.console.commands.referenced.CommandParameter parameterAnnotation
+                        = (org.terasology.logic.console.commands.referenced.CommandParameter) annotation;
                 name = parameterAnnotation.value();
                 arrayDelimiter = parameterAnnotation.arrayDelimiter();
                 suggesterClass = parameterAnnotation.suggester();
@@ -141,7 +141,7 @@ public final class ReferencedCommand extends org.terasology.logic.console.intern
 
         CommandParameterSuggester suggester;
 
-        if (suggesterClass != org.terasology.logic.console.internal.referenced.CommandParameter.NullCommandParameterSuggester.class) {
+        if (suggesterClass != org.terasology.logic.console.commands.referenced.CommandParameter.NullCommandParameterSuggester.class) {
             try {
                 suggester = suggesterClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {

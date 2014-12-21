@@ -13,24 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.adapter;
-
-import com.sun.istack.internal.NotNull;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.Assets;
-import org.terasology.entitySystem.prefab.Prefab;
+package org.terasology.logic.console.commands.exceptions;
 
 /**
  * @author Limeth
  */
-public class PrefabAdapter implements CommandParameterAdapter<Prefab> {
-    @Override
-    public Prefab parse(@NotNull String composed) {
-        return Assets.get(AssetType.PREFAB, composed, Prefab.class);
+public class CommandParameterParseException extends Exception {
+    private final String parameter;
+
+    public CommandParameterParseException(String message, Throwable cause, String parameter) {
+        super(message, cause);
+        this.parameter = parameter;
     }
 
-    @Override
-    public String compose(@NotNull Prefab parsed) {
-        return parsed.getURI().toSimpleString();
+    public CommandParameterParseException(String message, String parameter) {
+        super(message);
+        this.parameter = parameter;
+    }
+
+    public CommandParameterParseException(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public String getParameter() {
+        return parameter;
     }
 }

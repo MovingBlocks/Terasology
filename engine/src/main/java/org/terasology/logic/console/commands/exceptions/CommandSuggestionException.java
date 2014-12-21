@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.exceptions;
+package org.terasology.logic.console.commands.exceptions;
 
 /**
+ * Thrown while suggesting a command parameter
  * @author Limeth
  */
-public class CommandParameterParseException extends Exception {
-    private final String parameter;
-
-    public CommandParameterParseException(String message, Throwable cause, String parameter) {
-        super(message, cause);
-        this.parameter = parameter;
+public class CommandSuggestionException extends Exception {
+    public CommandSuggestionException() {
     }
 
-    public CommandParameterParseException(String message, String parameter) {
+    public CommandSuggestionException(String message) {
         super(message);
-        this.parameter = parameter;
     }
 
-    public CommandParameterParseException(String parameter) {
-        this.parameter = parameter;
+    public CommandSuggestionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public String getParameter() {
-        return parameter;
+    public CommandSuggestionException(Throwable cause) {
+        super(cause);
+    }
+
+    public CommandSuggestionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commands;
 
 import com.google.common.collect.ImmutableMap;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.adapter.CommandParameterAdapterManager;
-import org.terasology.logic.console.internal.exceptions.CommandParameterParseException;
-import org.terasology.logic.console.internal.exceptions.SuggesterInstantiationException;
+import org.terasology.logic.console.commands.adapter.CommandParameterAdapterManager;
+import org.terasology.logic.console.commands.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.commands.exceptions.SuggesterInstantiationException;
 import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Array;

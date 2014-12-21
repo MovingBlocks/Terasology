@@ -13,29 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal.exceptions;
+package org.terasology.logic.console.commands.exceptions;
 
 /**
- * Thrown while suggesting a command parameter
+ * Thrown when a suggester fails instantiating via the newInstance command
+ *
  * @author Limeth
  */
-public class CommandSuggestionException extends Exception {
-    public CommandSuggestionException() {
+public class SuggesterInstantiationException extends RuntimeException {
+    public SuggesterInstantiationException() {
     }
 
-    public CommandSuggestionException(String message) {
+    public SuggesterInstantiationException(String message) {
         super(message);
     }
 
-    public CommandSuggestionException(String message, Throwable cause) {
+    public SuggesterInstantiationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CommandSuggestionException(Throwable cause) {
+    public SuggesterInstantiationException(Throwable cause) {
         super(cause);
     }
 
-    public CommandSuggestionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public SuggesterInstantiationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
