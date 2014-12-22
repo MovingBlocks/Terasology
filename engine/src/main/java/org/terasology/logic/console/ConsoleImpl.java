@@ -243,13 +243,13 @@ public class ConsoleImpl implements Console {
 
                 logger.trace("An error occurred while executing a command: ", e);
 
-                if (causeMessage == null || causeMessage.isEmpty()) {
+                if (Strings.isNullOrEmpty(causeMessage)) {
                     causeMessage = cause.getMessage();
 
-                    if (causeMessage == null || causeMessage.isEmpty()) {
+                    if (Strings.isNullOrEmpty(causeMessage)) {
                         causeMessage = cause.toString();
 
-                        if (causeMessage == null || causeMessage.isEmpty()) {
+                        if (Strings.isNullOrEmpty(causeMessage)) {
                             return false;
                         }
                     }
