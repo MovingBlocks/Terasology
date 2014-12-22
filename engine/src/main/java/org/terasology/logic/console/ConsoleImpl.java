@@ -16,13 +16,18 @@
 
 package org.terasology.logic.console;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.CommandEvent;
-import org.terasology.logic.console.commands.ICommand;
+import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.network.ClientComponent;
@@ -42,10 +47,10 @@ import java.util.Set;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class ConsoleImpl implements Console {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleImpl.class);
     private static final String PARAM_SPLIT_REGEX = " (?=([^\"]*\"[^\"]*\")*[^\"]*$)";
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
+    private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
     private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
     private final CommandRegistry commandRegistry = new CommandRegistry();
@@ -54,21 +59,21 @@ public class ConsoleImpl implements Console {
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
     /**
-     * Registers a {@link org.terasology.logic.console.commands.ICommand}.
+     * Registers a {@link org.terasology.logic.console.commands.Command}.
      *
      * @param command The command to be registered
      */
     @Override
-    public void registerCommand(ICommand command) {
+    public void registerCommand(Command command) {
         String commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
-            LOGGER.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
+            logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
                     commandName, commandRegistry.get(commandName).getSource().getClass().getCanonicalName(),
                     command.getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
-            LOGGER.info("Command '{}' successfully registered for class '{}'.", commandName,
+            logger.info("Command '{}' successfully registered for class '{}'.", commandName,
                     command.getSource().getClass().getCanonicalName());
         }
     }
@@ -112,7 +117,7 @@ public class ConsoleImpl implements Console {
     @Override
     public void addMessage(Message message) {
         String uncoloredText = FontColor.stripColor(message.getMessage());
-        LOGGER.info("[{}] {}", message.getType(), uncoloredText);
+        logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
@@ -196,7 +201,7 @@ public class ConsoleImpl implements Console {
         }
 
         //get the command
-        ICommand cmd = getCommand(commandName);
+        Command cmd = getCommand(commandName);
 
         //check if the command is loaded
         if (cmd == null) {
@@ -223,7 +228,7 @@ public class ConsoleImpl implements Console {
         } else {
             try {
                 String result = cmd.executeRaw(params, callingClient);
-                if (result != null && !result.isEmpty()) {
+                if (!Strings.isNullOrEmpty(result)) {
                     if (callingClient.exists()) {
                         callingClient.send(new ConsoleMessageEvent(result));
                     } else {
@@ -265,19 +270,18 @@ public class ConsoleImpl implements Console {
     }
 
     private boolean clientHasPermission(EntityRef callingClient, String requiredPermission) {
+        Preconditions.checkNotNull(callingClient, "The calling client must not be null!");
+
         PermissionManager permissionManager = CoreRegistry.get(PermissionManager.class);
         boolean hasPermission = true;
 
         if (permissionManager != null && requiredPermission != null && !requiredPermission.isEmpty()) {
             hasPermission = false;
             ClientComponent clientComponent = callingClient.getComponent(ClientComponent.class);
+            EntityRef character = clientComponent.character;
 
-            if (clientComponent != null) {
-                EntityRef character = clientComponent.character;
-
-                if (permissionManager.hasPermission(character, requiredPermission)) {
-                    hasPermission = true;
-                }
+            if (permissionManager.hasPermission(character, requiredPermission)) {
+                hasPermission = true;
             }
         }
 
@@ -347,7 +351,7 @@ public class ConsoleImpl implements Console {
      * @return An array of commands with given name
      */
     @Override
-    public ICommand getCommand(String name) {
+    public Command getCommand(String name) {
         return commandRegistry.get(name);
     }
 
@@ -357,7 +361,7 @@ public class ConsoleImpl implements Console {
      * @return Returns the command list.
      */
     @Override
-    public Collection<ICommand> getCommands() {
+    public Collection<Command> getCommands() {
         return commandRegistry.values();
     }
 }

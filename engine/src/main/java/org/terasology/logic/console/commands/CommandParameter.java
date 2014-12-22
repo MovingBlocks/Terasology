@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commands.adapter.CommandParameterAdapterManager;
@@ -26,7 +27,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Limeth
@@ -51,13 +52,13 @@ public final class CommandParameter<T> {
 
     @SuppressWarnings("unchecked")
     private CommandParameter(String name, Class<T> typeParam, Character arrayDelimiter, boolean required, CommandParameterSuggester<T> suggester) {
-        Objects.requireNonNull(name, "The parameter name must not be null!");
+        Preconditions.checkNotNull(name, "The parameter name must not be null!");
 
         if (name.length() <= 0) {
             throw new IllegalArgumentException("The parameter name must not be empty!");
         }
 
-        Objects.requireNonNull(typeParam, "The parameter type must not be null!");
+        Preconditions.checkNotNull(typeParam, "The parameter type must not be null!");
 
         Class<T> resultType;
 
@@ -74,11 +75,13 @@ public final class CommandParameter<T> {
         }
 
         if (arrayDelimiter != null) {
-            if (arrayDelimiter == Command.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
+            if (arrayDelimiter == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
                 throw new IllegalArgumentException("The array delimiter must not be the same as the escape character ("
-                        + Command.ARRAY_DELIMITER_ESCAPE_CHARACTER + ")!");
+                        + org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER + ")!");
             }
         }
+
+        Preconditions.checkNotNull(suggester, "The suggester must not be null!");
 
         this.name = name;
         this.type = resultType;
@@ -118,7 +121,7 @@ public final class CommandParameter<T> {
         }
 
         Class<?> type = getArrayClass(childType);
-        char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : Command.ARRAY_DELIMITER_DEFAULT;
+        char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_DEFAULT;
 
         return new CommandParameter(name, type, arrayDelimiterNotNull, required, suggester);
     }
@@ -161,7 +164,7 @@ public final class CommandParameter<T> {
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
                                                CommandParameterSuggester<T> suggester) {
-        return array(name, childType, Command.ARRAY_DELIMITER_VARARGS, required, suggester);
+        return array(name, childType, org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS, required, suggester);
     }
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
@@ -211,7 +214,7 @@ public final class CommandParameter<T> {
         while (i < string.length()) {
             char c = string.charAt(i);
 
-            if (c == Command.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
+            if (c == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
                 if (i >= string.length() - 1) {
                     throw new CommandParameterParseException("The command parameter must not end with an escape character.", rawParameter);
                 }
@@ -219,7 +222,7 @@ public final class CommandParameter<T> {
                 string = string.substring(0, i) + string.substring(i + 1);
                 char following = string.charAt(i);
 
-                if (following != Command.ARRAY_DELIMITER_ESCAPE_CHARACTER && (!split || following != arrayDelimiter)) {
+                if (following != org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER && (!split || following != arrayDelimiter)) {
                     throw new CommandParameterParseException("Character '" + following + "' cannot be escaped.", rawParameter);
                 }
 
@@ -268,31 +271,40 @@ public final class CommandParameter<T> {
     }
 
     public boolean isEscaped(String string, int charIndex, boolean trail) {
-        return charIndex - 1 >= 0 && string.charAt(charIndex - 1) == Command.ARRAY_DELIMITER_ESCAPE_CHARACTER
+        return charIndex - 1 >= 0 && string.charAt(charIndex - 1) == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER
                 && (!trail || !isEscaped(string, charIndex - 1, true));
     }
 
     @SuppressWarnings("unchecked")
-    public T[] suggest(EntityRef sender, Object... parameters) {
+    public Set<T> suggest(EntityRef sender, Object... parameters) {
         return suggester != null ? suggester.suggest(sender, parameters) : null;
     }
 
     public String getUsage() {
-        String typeString = getType().getSimpleName();
-
-        if (isArray()) {
-            typeString += getArrayDelimiter() + typeString;
-        }
-
-        String cmd = typeString + (hasName() ? " " + getName() : "");
+        String simpleTypeName = getType().getSimpleName();
+        StringBuilder usage = new StringBuilder(simpleTypeName);
 
         if (required) {
-            cmd = "<" + cmd + ">";
+            usage.append('<');
         } else {
-            cmd = "(" + cmd + ")";
+            usage.append('(');
         }
 
-        return cmd;
+        if (isArray()) {
+            usage.append(getArrayDelimiter()).append(simpleTypeName);
+        }
+
+        if (hasName()) {
+            usage.append(' ').append(getName());
+        }
+
+        if (required) {
+            usage.append('>');
+        } else {
+            usage.append(')');
+        }
+
+        return usage.toString();
     }
 
     public boolean isArray() {
@@ -300,7 +312,7 @@ public final class CommandParameter<T> {
     }
 
     public boolean isVarargs() {
-        return isArray() && getArrayDelimiter() == Command.ARRAY_DELIMITER_VARARGS;
+        return isArray() && getArrayDelimiter() == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS;
     }
 
     public Character getArrayDelimiter() {

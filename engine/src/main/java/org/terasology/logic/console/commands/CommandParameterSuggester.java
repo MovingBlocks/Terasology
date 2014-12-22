@@ -15,14 +15,12 @@
  */
 package org.terasology.logic.console.commands;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.entitySystem.prefab.internal.PojoPrefab;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Console;
 import org.terasology.network.ClientComponent;
@@ -41,13 +39,13 @@ import java.util.Set;
 public interface CommandParameterSuggester<T> {
     /**
      * @param resolvedParameters Currently entered values of the types declared in the command method
-     * @return An array of suggested matches.
+     * @return A collection of suggested matches.
      */
-    T[] suggest(EntityRef sender, Object... resolvedParameters);
+    Set<T> suggest(EntityRef sender, Object... resolvedParameters);
 
     public static class UsernameSuggester implements CommandParameterSuggester<String> {
         @Override
-        public String[] suggest(EntityRef sender, Object... resolvedParameters) {
+        public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
             Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
             Set<String> clientNames = Sets.newHashSet();
@@ -59,21 +57,19 @@ public interface CommandParameterSuggester<T> {
                 clientNames.add(displayNameComponent.name);
             }
 
-            return clientNames.toArray(new String[clientNames.size()]);
+            return clientNames;
         }
     }
 
     public static class CommandNameSuggester implements CommandParameterSuggester<String> {
         @Override
-        public String[] suggest(EntityRef sender, Object... resolvedParameters) {
+        public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
             Console console = CoreRegistry.get(Console.class);
-            Collection<ICommand> commands = console.getCommands();
-            String[] suggestions = new String[commands.size()];
-            int i = 0;
+            Collection<Command> commands = console.getCommands();
+            Set<String> suggestions = Sets.newHashSetWithExpectedSize(commands.size());
 
-            for (ICommand command : commands) {
-                suggestions[i] = command.getName();
-                i++;
+            for (Command command : commands) {
+                suggestions.add(command.getName());
             }
 
             return suggestions;
@@ -82,20 +78,20 @@ public interface CommandParameterSuggester<T> {
 
     public static class LoadedPrefabSuggester implements CommandParameterSuggester<Prefab> {
         @Override
-        public Prefab[] suggest(EntityRef sender, Object... resolvedParameters) {
+        public Set<Prefab> suggest(EntityRef sender, Object... resolvedParameters) {
             AssetManager assetManager = CoreRegistry.get(AssetManager.class);
-            Iterable<PojoPrefab> loadedPrefabs = assetManager.listLoadedAssets(AssetType.PREFAB, PojoPrefab.class);
+            Iterable<Prefab> loadedPrefabs = assetManager.listLoadedAssets(AssetType.PREFAB, Prefab.class);
 
-            return Iterables.toArray(loadedPrefabs, Prefab.class);
+            return Sets.newHashSet(loadedPrefabs);
         }
     }
 
     public static class BlockFamilySuggester implements CommandParameterSuggester<BlockFamily> {
         @Override
-        public BlockFamily[] suggest(EntityRef sender, Object... resolvedParameters) {
+        public Set<BlockFamily> suggest(EntityRef sender, Object... resolvedParameters) {
             Iterable<BlockFamily> iterable = CoreRegistry.get(BlockManager.class).listAvailableBlockFamilies();
 
-            return Iterables.toArray(iterable, BlockFamily.class);
+            return Sets.newHashSet(iterable);
         }
     }
 }

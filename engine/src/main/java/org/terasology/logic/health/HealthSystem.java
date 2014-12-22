@@ -88,7 +88,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    public void doHeal(EntityRef entity, int healAmount, EntityRef instigator, HealthComponent targetHealthComponent) {
+    private void doHeal(EntityRef entity, int healAmount, EntityRef instigator, HealthComponent targetHealthComponent) {
         HealthComponent health = targetHealthComponent;
         if (health == null) {
             health = entity.getComponent(HealthComponent.class);

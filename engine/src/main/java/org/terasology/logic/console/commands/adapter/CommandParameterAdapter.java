@@ -15,16 +15,12 @@
  */
 package org.terasology.logic.console.commands.adapter;
 
-import com.sun.istack.internal.NotNull;
-
 /**
- * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commands.Command}
+ * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commands.AbstractCommand}
  *
  * @author Limeth
  */
 public interface CommandParameterAdapter<T> {
-    @NotNull
-    T parse(@NotNull String composed);
-    @NotNull
-    String compose(@NotNull T parsed);
+    T parse(String composed);
+    String compose(T parsed);
 }

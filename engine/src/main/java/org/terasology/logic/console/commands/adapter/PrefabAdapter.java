@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.console.commands.adapter;
 
-import com.sun.istack.internal.NotNull;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.prefab.Prefab;
@@ -25,12 +24,12 @@ import org.terasology.entitySystem.prefab.Prefab;
  */
 public class PrefabAdapter implements CommandParameterAdapter<Prefab> {
     @Override
-    public Prefab parse(@NotNull String composed) {
+    public Prefab parse(String composed) {
         return Assets.get(AssetType.PREFAB, composed, Prefab.class);
     }
 
     @Override
-    public String compose(@NotNull Prefab parsed) {
+    public String compose(Prefab parsed) {
         return parsed.getURI().toSimpleString();
     }
 }

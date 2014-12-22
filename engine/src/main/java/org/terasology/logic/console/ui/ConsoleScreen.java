@@ -20,7 +20,7 @@ import com.google.common.collect.Collections2;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.ICommand;
+import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
@@ -67,13 +67,13 @@ public class ConsoleScreen extends CoreScreenLayer {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
-        Collection<ICommand> commands = console.getCommands();
+        Collection<Command> commands = console.getCommands();
         
         // JAVA8: replace with lamba expression
-        Collection<String> commandNames = Collections2.transform(commands, new Function<ICommand, String>() {
+        Collection<String> commandNames = Collections2.transform(commands, new Function<Command, String>() {
 
             @Override
-            public String apply(ICommand input) {
+            public String apply(Command input) {
                 return input.getName();
             }
         });

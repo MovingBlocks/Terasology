@@ -54,10 +54,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Command {
-    public static final char ARRAY_DELIMITER_DEFAULT = ',';
-    public static final char ARRAY_DELIMITER_VARARGS = ' ';
-    public static final char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
-
     /**
      * @return The name of the command, if specified. Otherwise the method name is used.
      */

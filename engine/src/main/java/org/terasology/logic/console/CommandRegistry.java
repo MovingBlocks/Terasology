@@ -15,23 +15,23 @@
  */
 package org.terasology.logic.console;
 
-import org.terasology.logic.console.commands.ICommand;
+import org.terasology.logic.console.commands.Command;
 
 import java.util.HashMap;
 
 /**
  * Created by Limeth on 10.12.2014.
  *
- * Contains {@link org.terasology.logic.console.commands.Command}s ordered by priority.
+ * Contains {@link org.terasology.logic.console.commands.AbstractCommand}s ordered by priority.
  */
-public class CommandRegistry extends HashMap<String, ICommand> {
+public class CommandRegistry extends HashMap<String, Command> {
 	@Override
-	public ICommand get(Object key) {
+	public Command get(Object key) {
 		return super.get(key.toString().toLowerCase());
 	}
 
 	@Override
-	public ICommand put(String key, ICommand value) {
+	public Command put(String key, Command value) {
 		return super.put(key.toLowerCase(), value);
 	}
 
@@ -41,7 +41,7 @@ public class CommandRegistry extends HashMap<String, ICommand> {
 	}
 
 	@Override
-	public ICommand remove(Object key) {
+	public Command remove(Object key) {
 		return super.remove(key.toString().toLowerCase());
 	}
 }

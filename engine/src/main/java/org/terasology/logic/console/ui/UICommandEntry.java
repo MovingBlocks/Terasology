@@ -38,8 +38,9 @@ public class UICommandEntry extends UIText {
         subscribe(new CursorUpdateEventListener() {
             @Override
             public void onCursorUpdated(int oldPosition, int newPosition) {
-                if(tabCompletionEngine == null)
+                if (tabCompletionEngine == null) {
                     return;
+                }
 
                 tabCompletionEngine.reset();
             }

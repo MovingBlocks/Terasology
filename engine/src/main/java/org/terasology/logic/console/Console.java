@@ -16,7 +16,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.ICommand;
+import org.terasology.logic.console.commands.Command;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,11 +26,11 @@ import java.util.List;
  */
 public interface Console {
 	/**
-	 * Registers a {@link ICommand}.
+	 * Registers a {@link org.terasology.logic.console.commands.Command}.
 	 *
 	 * @param command
 	 */
-    void registerCommand(ICommand command);
+    void registerCommand(Command command);
 
     void dispose();
 
@@ -119,14 +119,14 @@ public interface Console {
      * @param name The name of the command.
      * @return An iterator over the commands.
      */
-    ICommand getCommand(String name);
+    Command getCommand(String name);
 
     /**
      * Get the collection of all loaded commands.
      *
      * @return Returns the commands.
      */
-    Collection<ICommand> getCommands();
+    Collection<Command> getCommands();
 
     /**
      * If <code>oldMsg</code> does not exist, the method does nothing.

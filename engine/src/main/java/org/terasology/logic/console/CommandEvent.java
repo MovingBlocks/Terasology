@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console;
 
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
@@ -26,7 +26,7 @@ import java.util.List;
  * @author Immortius
  */
 @ServerEvent
-public final class CommandEvent implements Event {
+final class CommandEvent implements Event {
 
     private String command;
     private List<String> params;

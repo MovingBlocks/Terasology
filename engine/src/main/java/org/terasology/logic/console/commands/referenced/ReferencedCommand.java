@@ -18,10 +18,12 @@ package org.terasology.logic.console.commands.referenced;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commands.AbstractCommand;
 import org.terasology.logic.console.commands.CommandParameter;
 import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.registry.CoreRegistry;
@@ -30,12 +32,13 @@ import org.terasology.utilities.reflection.SpecificAccessibleObject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Set;
 
 /**
  * @author Limeth
  */
-public final class ReferencedCommand extends org.terasology.logic.console.commands.Command {
+public final class ReferencedCommand extends AbstractCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedCommand.class);
 
     private ReferencedCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
@@ -107,24 +110,26 @@ public final class ReferencedCommand extends org.terasology.logic.console.comman
     }
 
     @Override
-    protected CommandParameter[] constructParameters() {
+    protected List<CommandParameter> constructParameters() {
         SpecificAccessibleObject<Method> specificExecutionMethod = getExecutionMethod();
         Method executionMethod = specificExecutionMethod.getAccessibleObject();
         Class<?>[] methodParameters = executionMethod.getParameterTypes();
         Annotation[][] methodParameterAnnotations = executionMethod.getParameterAnnotations();
-        CommandParameter[] parameters = new CommandParameter[methodParameters.length - 1];
+        List<CommandParameter> parameters = Lists.newArrayListWithCapacity(methodParameters.length - 1);
 
         for (int i = 1; i < methodParameters.length; i++) {
-            parameters[i - 1] = getParameterFor(methodParameters[i], methodParameterAnnotations[i]);
+            parameters.set(i - 1, getParameterFor(methodParameters[i], methodParameterAnnotations[i]));
         }
 
         return parameters;
     }
 
+    @SuppressWarnings("unchecked")
     private static CommandParameter getParameterFor(Class<?> type, Annotation[] annotations) {
+        boolean found = false;
         String name = null;
         Character arrayDelimiter = null;
-        Class<? extends CommandParameterSuggester> suggesterClass = org.terasology.logic.console.commands.referenced.CommandParameter.NullCommandParameterSuggester.class;
+        Class<? extends CommandParameterSuggester> suggesterClass = null;
         boolean required = true;
 
         for (Annotation annotation : annotations) {
@@ -135,20 +140,21 @@ public final class ReferencedCommand extends org.terasology.logic.console.comman
                 arrayDelimiter = parameterAnnotation.arrayDelimiter();
                 suggesterClass = parameterAnnotation.suggester();
                 required = parameterAnnotation.required();
+                found = true;
                 break;
             }
         }
 
+        if (!found) {
+            throw new NullPointerException("CommandParameter annotation not found.");
+        }
+
         CommandParameterSuggester suggester;
 
-        if (suggesterClass != org.terasology.logic.console.commands.referenced.CommandParameter.NullCommandParameterSuggester.class) {
-            try {
-                suggester = suggesterClass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            suggester = null;
+        try {
+            suggester = suggesterClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
 
         if (type.isArray()) {

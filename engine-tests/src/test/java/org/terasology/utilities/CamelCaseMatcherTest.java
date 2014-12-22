@@ -38,7 +38,7 @@ public class CamelCaseMatcherTest {
                 "MPRString", "MyPosResStr", "M", "MyP*RString", "*PosResString", "My*String");
 
         for (String query : queries) {
-            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
             assertTrue("The query did not match the command", matches.size() == 1);
         }
     }
@@ -58,21 +58,21 @@ public class CamelCaseMatcherTest {
         List<String> noHitQueries = ImmutableList.of("asdfd", "AvDS", "MPRString");
 
         for (String query : noHitQueries) {
-            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
             assertTrue("The query '" + query + "' should not match any command", matches.size() == 0);
         }
 
         List<String> oneHitQueries = ImmutableList.of("liFSB", "puW", "liI");
 
         for (String query : oneHitQueries) {
-            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
             assertTrue("The query '" + query + "' should match exactly 1 command, not " + matches.size(), matches.size() == 1);
         }
 
         List<String> multiHitQueries = ImmutableList.of("liB", "spa", "seMaGSpe");
 
         for (String query : multiHitQueries) {
-            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands);
+            Collection<String> matches = CamelCaseMatcher.getMatches(query, commands, true);
             assertTrue("The query '" + query + "' should match multiple commands, not " + matches.size(), matches.size() > 1);
         }
     }

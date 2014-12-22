@@ -23,17 +23,17 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
+import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
-import org.terasology.logic.console.commands.ICommand;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A text completion engine with cycle-through functionality
@@ -44,7 +44,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     private static final int MAX_CYCLES = 10;
     private final Console console;
     private int selectionIndex;
-    private String[] previousMatches;
+    private List<String> previousMatches; //Alphabetically ordered list of matches
     private Message previousMessage;
     private Collection<String> commandNames;
     private String query;
@@ -54,15 +54,15 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     }
 
     private boolean updateCommandNamesIfNecessary() {
-        Collection<ICommand> commands = console.getCommands();
+        Collection<Command> commands = console.getCommands();
 
         if (commandNames != null && commandNames.size() == commands.size()) {
             return false;
         }
 
-        commandNames = Collections2.transform(commands, new Function<ICommand, String>() {
+        commandNames = Collections2.transform(commands, new Function<Command, String>() {
             @Override
-            public String apply(ICommand input) {
+            public String apply(Command input) {
                 return input.getName();
             }
         });
@@ -70,13 +70,11 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         return true;
     }
 
-    private String[] findMatches(String commandName, List<String> commandParameters,
-                                 ICommand command, int suggestedIndex) {
+    private Set<String> findMatches(String commandName, List<String> commandParameters,
+                                 Command command, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
-            List<String> matches = Lists.newArrayList(CamelCaseMatcher.getMatches(commandName, commandNames, true));
-            Collections.sort(matches);
-            return matches.toArray(new String[matches.size()]);
+            return CamelCaseMatcher.getMatches(commandName, commandNames, true);
         }
 
         List<String> finishedParameters = Lists.newArrayList();
@@ -126,19 +124,19 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
 
         String commandName = console.processCommandName(query);
         List<String> commandParameters = console.processParameters(query);
-        ICommand command = console.getCommand(commandName);
+        Command command = console.getCommand(commandName);
         int suggestedIndex = commandParameters.size() + (query.charAt(query.length() - 1) == ' ' ? 1 : 0);
-        String[] matches = findMatches(commandName, commandParameters, command, suggestedIndex);
+        Collection<String> matches = findMatches(commandName, commandParameters, command, suggestedIndex);
 
-        if (matches == null || matches.length <= 0) {
+        if (matches == null || matches.size() <= 0) {
             return query;
         }
 
-        if (!Arrays.equals(matches, previousMatches)) {
+        if (!matches.equals(previousMatches)) {
             reset(false);
 
-            if (matches.length == 1) {
-                return generateResult(matches[0], commandName, commandParameters, suggestedIndex);
+            if (matches.size() == 1) {
+                return generateResult(matches.iterator().next(), commandName, commandParameters, suggestedIndex);
             }
 
 /*            if (matches.length > MAX_CYCLES) {
@@ -146,27 +144,28 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 return query;
             }*/ //TODO Find out a better way to handle too many results while returning useful information
 
-            previousMatches = matches;
+            previousMatches = Lists.newArrayList(matches);
+            Collections.sort(previousMatches);
         }
 
         StringBuilder matchMessageString = new StringBuilder();
 
-        for (int i = 0; i < previousMatches.length; i++) {
+        for (int i = 0; i < previousMatches.size(); i++) {
             if (i > 0) {
                 matchMessageString.append(' ');
             }
 
-            String name = previousMatches[i];
+            String match = previousMatches.get(i);
 
             if (selectionIndex == i) {
-                name = FontColor.getColored(name, ConsoleColors.COMMAND);
+                match = FontColor.getColored(match, ConsoleColors.COMMAND);
             }
 
-            matchMessageString.append(name);
+            matchMessageString.append(match);
         }
 
         Message matchMessage = new Message(matchMessageString.toString());
-        String suggestion = previousMatches[selectionIndex];
+        String suggestion = previousMatches.get(selectionIndex);
 
         if (previousMessage != null) {
             console.replaceMessage(previousMessage, matchMessage);
@@ -175,7 +174,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         }
 
         previousMessage = matchMessage;
-        selectionIndex = (selectionIndex + 1) % previousMatches.length;
+        selectionIndex = (selectionIndex + 1) % previousMatches.size();
 
         return generateResult(suggestion, commandName, commandParameters, suggestedIndex);
     }

@@ -16,6 +16,7 @@
 
 package org.terasology.logic.console.commands.referenced;
 
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commands.CommandParameterSuggester;
 
@@ -23,6 +24,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Set;
 
 /**
  * Used to specify information and behavior of a command parameter
@@ -32,6 +34,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface CommandParameter {
+    public static final char ARRAY_DELIMITER_DEFAULT = ',';
+    public static final char ARRAY_DELIMITER_VARARGS = ' ';
+    public static final char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
 
     /**
      * @return The parameter name
@@ -46,7 +51,7 @@ public @interface CommandParameter {
     /**
      * @return The class used for suggesting values for this parameter
      */
-    Class<? extends CommandParameterSuggester> suggester() default NullCommandParameterSuggester.class;
+    Class<? extends CommandParameterSuggester> suggester() default EmptyCommandParameterSuggester.class;
 
     /**
      * Used if the command method parameter is an array.
@@ -55,15 +60,15 @@ public @interface CommandParameter {
      *
      * @return The array delimiter
      */
-    char arrayDelimiter() default Command.ARRAY_DELIMITER_DEFAULT;
+    char arrayDelimiter() default ARRAY_DELIMITER_DEFAULT;
 
     /**
      * A class representing no suggester - needed, because Annotations fields don't accept nulls
      */
-    static final class NullCommandParameterSuggester implements CommandParameterSuggester {
+    static final class EmptyCommandParameterSuggester implements CommandParameterSuggester {
         @Override
-        public Object[] suggest(EntityRef sender, Object[] resolvedParameters) {
-            throw new NullPointerException("No CommandParameterSuggester defined!");
+        public Set<Object> suggest(EntityRef sender, Object[] resolvedParameters) {
+            return Sets.newHashSet();
         }
     }
 }

@@ -29,7 +29,11 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ChatButton;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.*;
+import org.terasology.logic.console.Console;
+import org.terasology.logic.console.ConsoleColors;
+import org.terasology.logic.console.CoreMessageType;
+import org.terasology.logic.console.Message;
+import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
@@ -93,7 +97,7 @@ public class ChatSystem extends BaseComponentSystem {
     @Command(runOnServer = true, shortDescription = "Sends a message to all other players")
     public String say(
             EntityRef sender,
-            @CommandParameter("message") String[] messageArray
+            @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
     ) {
         String message = Joiner.on(' ').join(messageArray);
 
@@ -110,7 +114,7 @@ public class ChatSystem extends BaseComponentSystem {
     public String whisper(
             EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
-            @CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
+            @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
     ) {
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
