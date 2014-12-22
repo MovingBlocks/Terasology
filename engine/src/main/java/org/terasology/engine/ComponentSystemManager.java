@@ -140,8 +140,8 @@ public class ComponentSystemManager {
 
         try {
             system.initialise();
-        } catch (Throwable t) {
-            logger.error("Failed to initialise system {}", system, t);
+        } catch (RuntimeException e) {
+            logger.error("Failed to initialise system {}", system, e);
         }
     }
 
