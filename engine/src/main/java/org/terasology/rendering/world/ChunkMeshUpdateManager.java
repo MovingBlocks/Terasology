@@ -94,8 +94,8 @@ public final class ChunkMeshUpdateManager {
 
     /**
      * The method tells the chunk mesh update manager where the camera is, so that is able to prioritize chunks near the
-     * camera. tt stores the values in volatile variables so that the change is visible to the chunk updating threads
-     * immidately.
+     * camera. It stores the values in volatile variables so that the change is visible to the chunk updating threads
+     * immediately.
      */
     public void setCameraPosition(Vector3f cameraPosition) {
         Vector3i chunkPos = TeraMath.calcChunkPos(cameraPosition);
