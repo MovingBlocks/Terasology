@@ -241,7 +241,7 @@ public class ConsoleImpl implements Console {
                 Throwable cause = e.getCause();
                 String causeMessage = cause.getLocalizedMessage();
 
-                e.printStackTrace();
+                logger.trace("An error occurred while executing a command: ", e);
 
                 if (causeMessage == null || causeMessage.isEmpty()) {
                     causeMessage = cause.getMessage();
