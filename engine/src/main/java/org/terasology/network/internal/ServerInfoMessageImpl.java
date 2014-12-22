@@ -59,7 +59,6 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
 
         for (NetData.WorldInfo pbWorldInfo : info.getWorldInfoList()) {
             WorldInfo worldInfo = new WorldInfo();
-            worldInfo.setTime(pbWorldInfo.getTime());
             worldInfo.setTitle(pbWorldInfo.getTitle());
             result.add(worldInfo);
         }

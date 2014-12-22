@@ -18,9 +18,7 @@ package org.terasology.world.internal;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -59,12 +57,8 @@ import org.terasology.world.propagation.light.SunlightPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenPropagationRules;
 import org.terasology.world.propagation.light.SunlightRegenWorldView;
 import org.terasology.world.propagation.light.SunlightWorldView;
-import org.terasology.world.time.WorldTime;
-import org.terasology.world.time.WorldTimeImpl;
 
-import java.util.AbstractCollection;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +74,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private SimpleUri worldGenerator;
 
     private GeneratingChunkProvider chunkProvider;
-    private WorldTime worldTime;
 
     private final List<WorldChangeListener> listeners = Lists.newArrayList();
 
@@ -88,15 +81,12 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private Map<Vector3i, BiomeChange> biomeChanges = Maps.newHashMap();
     private List<BatchPropagator> propagators = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, long time, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, SimpleUri worldGenerator, GeneratingChunkProvider chunkProvider) {
         this.title = (title == null) ? seed : title;
         this.seed = seed;
         this.worldGenerator = worldGenerator;
         this.chunkProvider = chunkProvider;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
-
-        this.worldTime = new WorldTimeImpl();
-        worldTime.setMilliseconds(time);
 
         propagators.add(new StandardBatchPropagator(new LightPropagationRules(), new LightWorldView(chunkProvider)));
         PropagatorWorldView regenWorldView = new SunlightRegenWorldView(chunkProvider);
@@ -108,7 +98,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     public WorldProviderCoreImpl(WorldInfo info, GeneratingChunkProvider chunkProvider) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), info.getWorldGenerator(), chunkProvider);
+        this(info.getTitle(), info.getSeed(), info.getWorldGenerator(), chunkProvider);
     }
 
     @Override
@@ -132,7 +122,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, seed, worldTime.getMilliseconds(), worldGenerator);
+        return new WorldInfo(title, seed, worldGenerator);
     }
 
     @Override
@@ -358,11 +348,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public void dispose() {
         chunkProvider.dispose();
 
-    }
-
-    @Override
-    public WorldTime getTime() {
-        return worldTime;
     }
 
     @Override

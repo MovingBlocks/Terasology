@@ -16,42 +16,44 @@
 
 package org.terasology.world.sun;
 
-import static org.terasology.world.time.WorldTime.DAY_LENGTH;
-
 /**
  * A simple implementations of {@link CelestialSystem} with constant daily events
  * and perfect radial movement of a single sun.
+ *
  * @author Martin Steiger
  */
 public class BasicCelestialModel implements CelestialModel {
+    public static final long DAY_LENGTH = 1000 * 60 * 60 * 24 / 50;
 
-    private static final long DAWN_TIME = DAY_LENGTH / 4;
-    private static final long MIDDAY_TIME = DAY_LENGTH / 2;
-    private static final long DUSK_TIME = 3 * DAY_LENGTH / 4;
-    private static final long MIDNIGHT_TIME = DAY_LENGTH;
 
     @Override
-    public float getSunPosAngle(float days) {
-        return (float) (days * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.;
+    public float getSunPosAngle(long gameTime) {
+        return (float) (getDay(gameTime) * 2.0 * Math.PI - Math.PI);  // offset by 180 deg.;
     }
 
     @Override
-    public long getDawn(long day) {
-        return DAWN_TIME;
+    public float getDawn(long day) {
+        return 0.25f;
     }
 
     @Override
-    public long getMidday(long day) {
-        return MIDDAY_TIME;
+    public float getMidday(long day) {
+        return 0.5f;
     }
 
     @Override
-    public long getDusk(long day) {
-        return DUSK_TIME;
+    public float getDusk(long day) {
+        return 0.75f;
     }
 
     @Override
-    public long getMidnight(long day) {
-        return MIDNIGHT_TIME;
+    public float getMidnight(long day) {
+        return 0f;
+    }
+
+    @Override
+    public float getDay(long gameTime) {
+        // Offsetting by DAWN_TIME, so that the game starts at dawn
+        return 1f * (gameTime + 0.25f) / DAY_LENGTH;
     }
 }

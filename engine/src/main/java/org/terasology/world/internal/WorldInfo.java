@@ -27,13 +27,12 @@ public class WorldInfo {
 
     private String title = "";
     private String seed = "";
-    private long time;
     private SimpleUri worldGenerator = new SimpleUri();
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, SimpleUri worldGenerator) {
+    public WorldInfo(String title, String seed, SimpleUri worldGenerator) {
         if (title != null) {
             this.title = title;
         }
@@ -43,7 +42,6 @@ public class WorldInfo {
         if (worldGenerator != null) {
             this.worldGenerator = worldGenerator;
         }
-        this.time = time;
     }
 
     public String getTitle() {
@@ -64,14 +62,6 @@ public class WorldInfo {
         if (seed != null) {
             this.seed = seed;
         }
-    }
-
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
     }
 
     public SimpleUri getWorldGenerator() {

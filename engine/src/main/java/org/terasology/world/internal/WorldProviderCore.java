@@ -24,7 +24,6 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
-import org.terasology.world.time.WorldTime;
 
 /**
  * Provides the basic interface for all world providers.
@@ -178,8 +177,6 @@ public interface WorldProviderCore {
      * Disposes this world provider.
      */
     void dispose();
-
-    WorldTime getTime();
 
     /**
      * @return an unmodifiable view on the generated relevant regions

@@ -59,6 +59,8 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
+import org.terasology.world.sun.CelestialModel;
+import org.terasology.world.sun.CelestialSystem;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -948,7 +950,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         // Compensate for waves
         if (config.getRendering().isAnimateWater()) {
-            cameraPos.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPos, worldProvider.getTime().getDays());
+            Time time = CoreRegistry.get(Time.class);
+            CelestialModel celestialModel = CoreRegistry.get(CelestialSystem.class).getWorldCelestialModel();
+            cameraPos.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPos, celestialModel.getDay(time.getGameTimeInMs()));
         }
 
         if (worldProvider.isBlockRelevant(new Vector3f(cameraPos))) {

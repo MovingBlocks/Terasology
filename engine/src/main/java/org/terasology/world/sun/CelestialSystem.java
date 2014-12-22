@@ -21,9 +21,5 @@ package org.terasology.world.sun;
  * @author Martin Steiger
  */
 public interface CelestialSystem {
-
-    /**
-     * @return angle of the sun in radians
-     */
-    float getSunPosAngle();
+    CelestialModel getWorldCelestialModel();
 }

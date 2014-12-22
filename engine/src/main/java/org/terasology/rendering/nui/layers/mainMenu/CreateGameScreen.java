@@ -52,7 +52,6 @@ import org.terasology.utilities.random.FastRandom;
 import org.terasology.world.generator.internal.WorldGeneratorInfo;
 import org.terasology.world.generator.internal.WorldGeneratorManager;
 import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -273,9 +272,8 @@ public class CreateGameScreen extends CoreScreenLayer {
                         gameManifest.addModule(module.getId(), module.getVersion());
                     }
 
-                    float timeOffset = 0.25f + 0.025f;  // Time at dawn + little offset to spawn in a brighter env.
                     WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                            (long) (WorldTime.DAY_LENGTH * timeOffset), worldGenerator.getSelection().getUri());
+                            worldGenerator.getSelection().getUri());
                     gameManifest.addWorld(worldInfo);
 
                     gameEngine.changeState(new StateLoading(gameManifest, (loadingAsServer) ? NetworkMode.DEDICATED_SERVER : NetworkMode.NONE));

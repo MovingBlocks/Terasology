@@ -769,7 +769,8 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         if (world != null) {
             NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();
-            worldInfoBuilder.setTime(world.getTime().getMilliseconds());
+            // TODO: Protobuf probably should be changed to not contain time for world anymore
+            worldInfoBuilder.setTime(0L);
             worldInfoBuilder.setTitle(world.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
         }

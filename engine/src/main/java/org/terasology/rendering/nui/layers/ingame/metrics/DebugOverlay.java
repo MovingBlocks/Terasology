@@ -36,6 +36,8 @@ import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
+import org.terasology.world.sun.CelestialModel;
+import org.terasology.world.sun.CelestialSystem;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
@@ -133,9 +135,13 @@ public class DebugOverlay extends CoreScreenLayer {
                         Biome biome = worldProvider.getBiome(blockPos);
                         biomeId = CoreRegistry.get(BiomeManager.class).getBiomeId(biome);
                     }
+
+                    Time time = CoreRegistry.get(Time.class);
+                    CelestialModel celestialModel = CoreRegistry.get(CelestialSystem.class).getWorldCelestialModel();
+
                     return String.format("total vus: %s | worldTime: %.3f | biome: %s",
                             ChunkTessellator.getVertexArrayUpdateCount(),
-                            worldProvider.getTime().getDays() - 0.0005f,    // use floor instead of rounding up
+                            celestialModel.getDay(time.getGameTimeInMs()),    // use floor instead of rounding up
                             biomeId);
                 }
             });
