@@ -56,7 +56,11 @@ jar {
     manifest {
         //TODO: Maybe later add the engine's version number into here?
         def manifestClasspath = "$subDirLibs/" + configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Main-Class": mainClassName, "Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+        attributes("Main-Class": mainClassName)
+        attributes("Class-Path" : manifestClasspath)
+        attributes("Implementation-Title": "Terasology-" + project.name)
+        attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+        attributes("SplashScreen-Image": "splash.png")
     }
 }
 
