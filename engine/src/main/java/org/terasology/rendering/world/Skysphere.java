@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
+import org.terasology.engine.Time;
 import org.terasology.math.TeraMath;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
@@ -51,10 +52,12 @@ public class Skysphere {
     @EditorRange(min = 2.0f, max = 32.0f)
     private float turbidity = 9.0f;
 
+    private final Time time;
     private final CelestialSystem celSystem;
 
     public Skysphere() {
         celSystem = CoreRegistry.get(CelestialSystem.class);
+        time = CoreRegistry.get(Time.class);
     }
 
     public void render(Camera camera) {
@@ -99,7 +102,7 @@ public class Skysphere {
     }
 
     public float getSunPosAngle() {
-        return celSystem.getSunPosAngle();
+        return celSystem.getWorldCelestialModel().getSunPosAngle(time.getGameTimeInMs());
     }
 
     public float getDaylight() {

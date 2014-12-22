@@ -25,7 +25,6 @@ import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
-import org.terasology.world.time.WorldTime;
 
 /**
  * @author Immortius
@@ -141,11 +140,6 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     @Override
     public void dispose() {
         base.dispose();
-    }
-
-    @Override
-    public WorldTime getTime() {
-        return base.getTime();
     }
 
     @Override

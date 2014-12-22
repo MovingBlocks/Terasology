@@ -21,33 +21,34 @@ package org.terasology.world.sun;
  * @author Martin Steiger
  */
 public interface CelestialModel {
-
     /**
      * @return angle of the sun in radians
      */
-    float getSunPosAngle(float days);
+    float getSunPosAngle(long gameTime);
 
     /**
      * @param day the day
      * @return offset in milli-secs.
      */
-    long getDawn(long day);
+    float getDawn(long day);
 
     /**
      * @param day the day
      * @return offset in milli-secs.
      */
-    long getMidday(long day);
+    float getMidday(long day);
 
     /**
      * @param day the day
      * @return offset in milli-secs.
      */
-    long getDusk(long day);
+    float getDusk(long day);
 
     /**
      * @param day the day
      * @return offset in milli-secs.
      */
-    long getMidnight(long day);
+    float getMidnight(long day);
+
+    float getDay(long gameTime);
 }

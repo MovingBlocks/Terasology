@@ -322,13 +322,4 @@ public class CoreCommands extends BaseComponentSystem {
         pickupBuilder.createPickupFor(blockItem, spawnPos, 60);
         return "Spawned block.";
     }
-
-    @Command(shortDescription = "Sets the current world time in days")
-    public String setWorldTime(@CommandParam("day") float day) {
-        WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        world.getTime().setDays(day);
-
-        return "World time changed";
-    }
-
 }

@@ -31,7 +31,6 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 import org.terasology.world.internal.WorldInfo;
-import org.terasology.world.time.WorldTime;
 
 import java.util.List;
 
@@ -95,7 +94,7 @@ public class StateHeadlessSetup extends StateSetup {
         gameManifest.setSeed(worldGenConfig.getDefaultSeed());
 
         WorldInfo worldInfo = new WorldInfo(TerasologyConstants.MAIN_WORLD, gameManifest.getSeed(),
-                (long) (WorldTime.DAY_LENGTH * 0.025f), worldGeneratorUri);
+                worldGeneratorUri);
         gameManifest.addWorld(worldInfo);
         return gameManifest;
     }

@@ -25,40 +25,13 @@ import com.google.common.math.LongMath;
  * @author Martin Steiger
  */
 public abstract class TimeEventBase implements Event {
+    private float timeInDays;
 
-    private long worldTimeMS;
-    private long timeInDay;
-
-    public TimeEventBase(long worldTimeMS) {
-        this.worldTimeMS = worldTimeMS;
-        this.timeInDay = LongMath.mod(worldTimeMS, WorldTime.DAY_LENGTH);
+    public TimeEventBase(float timeInDays) {
+        this.timeInDays = timeInDays;
     }
 
-    /**
-     * @return the time of day as a fraction
-     */
-    public float getDayTime() {
-        return timeInDay / (float) WorldTime.DAY_LENGTH;
-    }
-
-    /**
-     * @return the time of day in milli secs
-     */
-    public long getDayTimeInMs() {
-        return timeInDay;
-    }
-
-    /**
-     * @return the world time in days
-     */
-    public float getWorldTime() {
-        return worldTimeMS / (float) WorldTime.DAY_LENGTH;
-    }
-
-    /**
-     * @return the world time in milli secs
-     */
-    public long getWorldTimeInMs() {
-        return worldTimeMS;
+    public float getTimeInDays() {
+        return timeInDays;
     }
 }

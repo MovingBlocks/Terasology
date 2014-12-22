@@ -16,10 +16,12 @@
 package org.terasology.rendering.shader;
 
 import org.terasology.config.Config;
+import org.terasology.engine.Time;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.sun.CelestialSystem;
 
 import javax.vecmath.Vector3f;
 
@@ -66,7 +68,9 @@ public class ShaderParametersBase implements ShaderParameters {
         }
 
         if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTime().getDays());
+            Time time = CoreRegistry.get(Time.class);
+            float day = CoreRegistry.get(CelestialSystem.class).getWorldCelestialModel().getDay(time.getGameTimeInMs());
+            program.setFloat("time", day);
         }
     }
 }

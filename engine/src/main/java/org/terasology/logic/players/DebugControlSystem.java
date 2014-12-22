@@ -18,7 +18,9 @@ package org.terasology.logic.players;
 
 import org.lwjgl.input.Mouse;
 import org.terasology.config.Config;
+import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.EventPriority;
 import org.terasology.entitySystem.event.ReceiveEvent;
@@ -55,6 +57,9 @@ public class DebugControlSystem extends BaseComponentSystem {
 
     @In
     private WorldProvider world;
+
+    @In
+    private Time time;
 
     @In
     private WorldRenderer worldRenderer;
@@ -116,19 +121,19 @@ public class DebugControlSystem extends BaseComponentSystem {
         if (debugEnabled && event.isDown()) {
             switch (event.getKey().getId()) {
                 case Keyboard.KeyId.UP:
-                    world.getTime().setDays(world.getTime().getDays() + 0.005f);
+                    ((EngineTime) time).setGameTime(time.getGameTimeInMs()+9000);
                     event.consume();
                     break;
                 case Keyboard.KeyId.DOWN:
-                    world.getTime().setDays(world.getTime().getDays() - 0.005f);
+                    ((EngineTime) time).setGameTime(time.getGameTimeInMs()-9000);
                     event.consume();
                     break;
                 case Keyboard.KeyId.RIGHT:
-                    world.getTime().setDays(world.getTime().getDays() + 0.02f);
+                    ((EngineTime) time).setGameTime(time.getGameTimeInMs()+36000);
                     event.consume();
                     break;
                 case Keyboard.KeyId.LEFT:
-                    world.getTime().setDays(world.getTime().getDays() - 0.02f);
+                    ((EngineTime) time).setGameTime(time.getGameTimeInMs()-36000);
                     event.consume();
                     break;
                 default:

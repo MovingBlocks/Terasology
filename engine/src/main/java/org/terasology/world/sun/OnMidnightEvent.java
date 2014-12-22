@@ -24,7 +24,7 @@ import org.terasology.world.time.TimeEventBase;
  */
 public class OnMidnightEvent extends TimeEventBase {
 
-    public OnMidnightEvent(long worldTimeMS) {
-        super(worldTimeMS);
+    public OnMidnightEvent(float timeInDays) {
+        super(timeInDays);
     }
 }

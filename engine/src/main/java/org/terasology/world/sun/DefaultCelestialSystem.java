@@ -16,20 +16,13 @@
 
 package org.terasology.world.sun;
 
-import static org.terasology.world.time.WorldTime.DAY_LENGTH;
-
-import java.math.RoundingMode;
-
+import org.terasology.engine.Time;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.WorldComponent;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.time.WorldTime;
-
-import com.google.common.math.LongMath;
 
 /**
  * A base class that fires events at
@@ -38,16 +31,15 @@ import com.google.common.math.LongMath;
  */
 public class DefaultCelestialSystem extends BaseComponentSystem implements CelestialSystem, UpdateSubscriberSystem {
 
-    private final WorldTime worldTime;
+    private final Time time;
 
     private long lastUpdate;
 
     private final CelestialModel model;
 
     public DefaultCelestialSystem(CelestialModel model) {
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-        worldTime = worldProvider.getTime();
-        lastUpdate = worldTime.getMilliseconds();
+        time = CoreRegistry.get(Time.class);
+        lastUpdate = time.getGameTimeInMs();
         this.model = model;
     }
 
@@ -57,53 +49,47 @@ public class DefaultCelestialSystem extends BaseComponentSystem implements Celes
     }
 
     @Override
-    public float getSunPosAngle() {
-        float days = getWorldTime().getDays();
-        float sunPosAngle = model.getSunPosAngle(days);
-        return sunPosAngle;
+    public CelestialModel getWorldCelestialModel() {
+        return model;
     }
 
     protected void fireEvents() {
-        long startTime = worldTime.getMilliseconds();
+        long startTime = time.getGameTimeInMs();
         long delta = startTime - lastUpdate;
         if (delta > 0) {
-            long timeInDay = LongMath.mod(startTime, DAY_LENGTH);
-            long day = LongMath.divide(startTime, DAY_LENGTH, RoundingMode.FLOOR);
+            float currentDay = model.getDay(startTime);
+            long currentDayNumber = (long) currentDay;
+            float timeInCurrentDay = currentDay - currentDayNumber;
 
-            long dawn = model.getDawn(day);
-            long midday = model.getMidday(day);
-            long dusk = model.getDusk(day);
-            long midnight = model.getMidnight(day);
+            float lastUpdateDay = model.getDay(lastUpdate);
+            long lastUpdateDayNumber = (long) lastUpdateDay;
+            float timeInLastUpdateDay = lastUpdateDay - lastUpdateDayNumber;
 
-            if (timeInDay - delta < midday && timeInDay >= midday) {
-                long tick = day * DAY_LENGTH + midday;
-                getWorldEntity().send(new OnMiddayEvent(tick));
+            float dawn = model.getDawn(currentDayNumber);
+            float midday = model.getMidday(currentDayNumber);
+            float dusk = model.getDusk(currentDayNumber);
+
+            if (timeInLastUpdateDay < midday && timeInCurrentDay >= midday) {
+                getWorldEntity().send(new OnMiddayEvent(currentDay));
             }
 
-            if (timeInDay - delta < dusk && timeInDay >= dusk) {
-                long tick = day * DAY_LENGTH + dusk;
-                getWorldEntity().send(new OnDuskEvent(tick));
+            if (timeInLastUpdateDay < dusk && timeInCurrentDay >= dusk) {
+                getWorldEntity().send(new OnDuskEvent(currentDay));
             }
 
-            if (timeInDay - delta < midnight && timeInDay >= midnight) {
-                long tick = day * DAY_LENGTH + midnight;
-                getWorldEntity().send(new OnMidnightEvent(tick));
+            if (lastUpdateDayNumber < currentDayNumber) {
+                getWorldEntity().send(new OnMidnightEvent(currentDay));
             }
 
-            if (timeInDay - delta < dawn && timeInDay >= dawn) {
-                long tick = day * DAY_LENGTH + dawn;
-                getWorldEntity().send(new OnDawnEvent(tick));
+            if (timeInLastUpdateDay < dawn && timeInCurrentDay >= dawn) {
+                getWorldEntity().send(new OnDawnEvent(currentDay));
             }
         }
 
         lastUpdate = startTime;
     }
 
-    protected WorldTime getWorldTime() {
-        return worldTime;
-    }
-
-    protected EntityRef getWorldEntity() {
+    private EntityRef getWorldEntity() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.getEntitiesWith(WorldComponent.class)) {
             return entity;
