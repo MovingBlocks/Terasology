@@ -17,10 +17,12 @@ package org.terasology.engine;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
@@ -37,7 +39,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,7 +94,9 @@ public final class Terasology {
     private Terasology() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+
+        SplashScreen.getInstance().post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
