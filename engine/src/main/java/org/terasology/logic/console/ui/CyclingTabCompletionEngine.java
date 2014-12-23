@@ -75,6 +75,8 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
             return CamelCaseMatcher.getMatches(commandName, commandNames, true);
+        } else if (command == null) {
+            return null;
         }
 
         List<String> finishedParameters = Lists.newArrayList();

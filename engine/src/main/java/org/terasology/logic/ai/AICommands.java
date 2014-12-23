@@ -31,7 +31,7 @@ public class AICommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @Command(runOnServer = true, shortDescription = "Count all AIs in the world")
-    public String countAI(EntityRef sender) {
+    public String countAI() {
         int simpleAIs = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             simpleAIs++;
@@ -44,7 +44,7 @@ public class AICommands extends BaseComponentSystem {
     }
 
     @Command(runOnServer = true, shortDescription = "Destroys all AIs in the world")
-    public String destroyAI(EntityRef sender) {
+    public String destroyAI() {
         int simpleAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
             ref.destroy();

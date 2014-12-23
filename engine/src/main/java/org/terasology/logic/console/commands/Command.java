@@ -65,7 +65,7 @@ public interface Command extends Comparable<Command> {
     /**
      * @return The parameter definitions of this command, never null.
      */
-    ImmutableList<CommandParameter> getParameters();
+    ImmutableList<CommandParameter> getCommandParameters();
 
     /**
      * @return Whether this command is executed on the server
@@ -123,7 +123,7 @@ public interface Command extends Comparable<Command> {
     /**
      * Executes the command
      *
-     * @param parameters Parameters in an Object[] array as defined in {@link AbstractCommand#getParameters()}.
+     * @param parameters Parameters in an Object[] array as defined in {@link AbstractCommand#getCommandParameters()}.
      * @return A reply to the sender.
      */
     String executeRaw(List<String> parameters, EntityRef sender) throws CommandExecutionException;

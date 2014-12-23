@@ -27,6 +27,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
@@ -49,13 +50,13 @@ public class AudioSystem extends BaseComponentSystem implements UpdateSubscriber
     private AudioManager audioManager;
 
     @Command(shortDescription = "Toggle muting all sound")
-    public String mute(EntityRef sender) {
+    public String mute(@Sender EntityRef sender) {
         audioManager.setMute(!audioManager.isMute());
         return "All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.");
     }
 
     @Command(shortDescription = "Plays a test sound")
-    public void playTestSound(EntityRef sender, @CommandParameter("xOffset") float xOffset, @CommandParameter("zOffset") float zOffset) {
+    public void playTestSound(@Sender EntityRef sender, @CommandParameter("xOffset") float xOffset, @CommandParameter("zOffset") float zOffset) {
         Vector3f position = localPlayer.getPosition();
         position.x += xOffset;
         position.z += zOffset;

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -32,7 +33,7 @@ import java.util.Set;
 /**
  * @author Limeth
  */
-public final class CommandParameter<T> {
+public final class CommandParameter<T> implements CommandParameterType {
     static final Map<Class<?>, Class<?>> PRIMITIVES_TO_WRAPPERS = new ImmutableMap.Builder<Class<?>, Class<?>>()
             .put(boolean.class, Boolean.class)
             .put(byte.class, Byte.class)
@@ -277,18 +278,12 @@ public final class CommandParameter<T> {
 
     @SuppressWarnings("unchecked")
     public Set<T> suggest(EntityRef sender, Object... parameters) {
-        return suggester != null ? suggester.suggest(sender, parameters) : null;
+        return suggester.suggest(sender, parameters);
     }
 
     public String getUsage() {
         String simpleTypeName = getType().getSimpleName();
         StringBuilder usage = new StringBuilder(simpleTypeName);
-
-        if (required) {
-            usage.append('<');
-        } else {
-            usage.append('(');
-        }
 
         if (isArray()) {
             usage.append(getArrayDelimiter()).append(simpleTypeName);
@@ -299,8 +294,10 @@ public final class CommandParameter<T> {
         }
 
         if (required) {
+            usage.insert(0, '<');
             usage.append('>');
         } else {
+            usage.insert(0, '(');
             usage.append(')');
         }
 
@@ -355,5 +352,10 @@ public final class CommandParameter<T> {
 
     public boolean isRequired() {
         return required;
+    }
+
+    @Override
+    public Optional<? extends Class<?>> getProvidedType() {
+        return Optional.of(getTypeRaw());
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -30,7 +31,6 @@ import org.terasology.logic.console.commands.exceptions.CommandSuggestionExcepti
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +50,8 @@ public abstract class AbstractCommand implements Command {
     private final String description;
     private final String helpText;
     private final SpecificAccessibleObject<Method> executionMethod;
-    private ImmutableList<CommandParameter> parameters;
+    private ImmutableList<CommandParameter> commandParameters;
+    private ImmutableList<CommandParameterType> executionMethodParameters;
     private int requiredParameterCount;
     private String usage;
 
@@ -89,42 +90,54 @@ public abstract class AbstractCommand implements Command {
     }
 
     private void postConstruct() {
-        this.parameters = constructParametersNotNull();
+        constructParametersNotNull();
         registerParameters();
         validateExecutionMethod();
         initUsage();
     }
 
-    protected abstract List<CommandParameter> constructParameters();
+    /**
+     * @return A list of parameter types provided to the execution method.
+     */
+    protected abstract List<CommandParameterType> constructParameters();
 
-    private ImmutableList<CommandParameter> constructParametersNotNull() {
-        List<CommandParameter> constructedParameters = constructParameters();
+    private void constructParametersNotNull() {
+        List<CommandParameterType> constructedParameters = constructParameters();
 
-        if (constructedParameters == null) {
-            return ImmutableList.of();
+        if (constructedParameters == null || constructedParameters.size() <= 0) {
+            commandParameters = ImmutableList.of();
+            executionMethodParameters = ImmutableList.of();
+            return;
         }
 
+        ImmutableList.Builder<CommandParameter> commandParameterBuilder = ImmutableList.builder();
+
         for (int i = 0; i < constructedParameters.size(); i++) {
-            if (constructedParameters.get(i) == null) {
+            CommandParameterType type = constructedParameters.get(i);
+
+            if (type == null) {
                 throw new CommandInitializationException("Invalid parameter definition #" + i + "; must not be null");
+            } else if (type instanceof CommandParameter) {
+                commandParameterBuilder.add((CommandParameter) type);
             }
         }
 
-        return ImmutableList.copyOf(constructedParameters);
+        commandParameters = commandParameterBuilder.build();
+        executionMethodParameters = ImmutableList.copyOf(constructedParameters);
     }
 
     private void registerParameters() throws CommandInitializationException {
         requiredParameterCount = 0;
         boolean optionalFound = false;
 
-        for (int i = 0; i < parameters.size(); i++) {
-            CommandParameter parameter = parameters.get(i);
+        for (int i = 0; i < commandParameters.size(); i++) {
+            CommandParameter parameter = commandParameters.get(i);
 
             if (parameter == null) {
                 throw new CommandInitializationException("A command parameter must not be null! Index: " + i);
             }
 
-            if (parameter.isVarargs() && i < parameters.size() - 1) {
+            if (parameter.isVarargs() && i < commandParameters.size() - 1) {
                 throw new CommandInitializationException("A varargs parameter must be at the end. Invalid: " + i + "; " + parameter.getName());
             }
 
@@ -177,37 +190,34 @@ public abstract class AbstractCommand implements Command {
     private void checkArgumentCompatibility(Method method) throws CommandInitializationException {
         Class<?>[] methodParameters = method.getParameterTypes();
 
-        if (methodParameters[0] != EntityRef.class) {
-            throw new CommandInitializationException("The first parameter of method " + method.getName() + " in"
-                    + " a command class must be an EntityRef (sender)");
-        }
+        int executionMethodParametersSize = executionMethodParameters.size();
+        int methodParameterCount = methodParameters.length;
 
-        int passableParameterCount = methodParameters.length - 1;
-
-        for (int i = 0; i < passableParameterCount || i < parameters.size(); i++) {
-            if (i >= passableParameterCount) {
-                throw new CommandInitializationException("Missing " + (parameters.size() - passableParameterCount)
+        for (int i = 0; i < methodParameterCount || i < executionMethodParametersSize; i++) {
+            if (i >= methodParameterCount) {
+                throw new CommandInitializationException("Missing " + (executionMethodParametersSize - methodParameterCount)
                         + " parameters in method " + method.getName()
                         + ", follow the parameter definitions from the"
                         + " 'constructParameters' method.");
-            } else if (i >= parameters.size()) {
-                throw new CommandInitializationException("Too many (" + (parameters.size() - passableParameterCount)
+            } else if (i >= executionMethodParametersSize) {
+                throw new CommandInitializationException("Too many (" + (methodParameterCount - executionMethodParametersSize)
                         + ") parameters in method " + method.getName()
                         + ", follow the parameter definitions from the"
                         + " 'constructParameters' method.");
             }
 
-            Class<?> expectedType = parameters.get(i).getTypeRaw();
-            Class<?> providedType = methodParameters[i + 1];
+            CommandParameterType expectedParameterType = executionMethodParameters.get(i);
+            Optional<? extends Class<?>> expectedType = expectedParameterType.getProvidedType();
+            Class<?> providedType = methodParameters[i];
 
             if (providedType.isPrimitive()) {
                 providedType = CommandParameter.PRIMITIVES_TO_WRAPPERS.get(providedType);
             }
 
-            if (!expectedType.isAssignableFrom(providedType)) {
+            if (expectedType.isPresent() && !expectedType.get().isAssignableFrom(providedType)) {
                 throw new CommandInitializationException("Cannot assign command argument from "
                         + providedType.getSimpleName() + " to "
-                        + expectedType.getSimpleName() + "; "
+                        + expectedType.get().getSimpleName() + "; "
                         + "command method parameter index: " + i);
             }
         }
@@ -220,49 +230,70 @@ public abstract class AbstractCommand implements Command {
     private void initUsage() {
         StringBuilder builder = new StringBuilder(name);
 
-        for (CommandParameter param : parameters) {
+        for (CommandParameter param : commandParameters) {
             builder.append(' ').append(param.getUsage());
         }
 
         usage = builder.toString();
     }
 
-    private Object[] processParameters(List<String> rawParameters, EntityRef sender, boolean includeSender) throws CommandParameterParseException {
-        int senderRelativeIndex = includeSender ? 1 : 0;
-        int singleParameterCount = parameters.size() + (endsWithVarargs() ? -1 : 0);
-        Object[] processedParameters = new Object[parameters.size() + senderRelativeIndex];
+    private Object[] processParametersCommand(List<String> rawParameters, EntityRef sender) throws CommandParameterParseException {
+        List<String> joinedParameters = joinVarargs(rawParameters);
+        Object[] processedParameters = new Object[commandParameters.size()];
 
-        if (includeSender) {
-            processedParameters[0] = sender;
-        }
-
-        for (int i = 0; i < singleParameterCount && i < rawParameters.size(); i++) {
-            String rawParam = rawParameters.get(i);
-            CommandParameter param = parameters.get(i);
-            processedParameters[i + senderRelativeIndex] = param.getValue(rawParam);
-        }
-
-        if (endsWithVarargs()) {
-            int varargsIndex = parameters.size() - 1;
-            CommandParameter varargsParameter = parameters.get(varargsIndex);
-            Object varargsResult;
-
-            if (rawParameters.size() <= varargsIndex) {
-                varargsResult = null;
-            } else {
-                StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
-
-                for (int i = varargsIndex + senderRelativeIndex; i < rawParameters.size(); i++) {
-                    rawParam.append(org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
-                }
-
-                varargsResult = varargsParameter.getValue(rawParam.toString());
-            }
-
-            processedParameters[varargsIndex + senderRelativeIndex] = varargsResult;
+        for (int i = 0; i < joinedParameters.size() && i < rawParameters.size(); i++) {
+            String rawParam = joinedParameters.get(i);
+            CommandParameter param = commandParameters.get(i);
+            processedParameters[i] = param.getValue(rawParam);
         }
 
         return processedParameters;
+    }
+
+    private Object[] processParametersMethod(List<String> rawParameters, EntityRef sender) throws CommandParameterParseException {
+        List<String> joinedParameters = joinVarargs(rawParameters);
+        Object[] processedParameters = new Object[executionMethodParameters.size()];
+        int joinedParameterIndex = 0;
+
+        for (int i = 0; i < executionMethodParameters.size(); i++) {
+            CommandParameterType parameterType = executionMethodParameters.get(i);
+
+            if (parameterType instanceof CommandParameter && joinedParameterIndex < joinedParameters.size()) {
+                CommandParameter parameter = (CommandParameter) parameterType;
+                String joinedParameter = joinedParameters.get(joinedParameterIndex++);
+
+                processedParameters[i] = parameter.getValue(joinedParameter);
+            } else if (parameterType instanceof CommandParameterType.SenderParameterType) {
+                processedParameters[i] = sender;
+            }
+        }
+
+        return processedParameters;
+    }
+
+    private List<String> joinVarargs(List<String> rawParameters) {
+        List<String> result = Lists.newArrayList();
+        int singleParameterCount = commandParameters.size() + (endsWithVarargs() ? -1 : 0);
+
+        for (int i = 0; i < singleParameterCount && i < rawParameters.size(); i++) {
+            result.add(rawParameters.get(i));
+        }
+
+        if (endsWithVarargs()) {
+            int varargsIndex = commandParameters.size() - 1;
+
+            if (rawParameters.size() > varargsIndex) {
+                StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
+
+                for (int i = varargsIndex + 1; i < rawParameters.size(); i++) {
+                    rawParam.append(org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
+                }
+
+                result.add(rawParam.toString());
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -270,7 +301,7 @@ public abstract class AbstractCommand implements Command {
         Object[] processedParameters;
 
         try {
-            processedParameters = processParameters(rawParameters, sender, true);
+            processedParameters = processParametersMethod(rawParameters, sender);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -297,7 +328,7 @@ public abstract class AbstractCommand implements Command {
         Object[] processedParametersWithoutSender;
 
         try {
-            processedParametersWithoutSender = processParameters(rawParameters, sender, false);
+            processedParametersWithoutSender = processParametersCommand(rawParameters, sender);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -314,7 +345,7 @@ public abstract class AbstractCommand implements Command {
 
         for (int i = 0; i < processedParametersWithoutSender.length; i++) {
             if (processedParametersWithoutSender[i] == null) {
-                suggestedParameter = parameters.get(i);
+                suggestedParameter = commandParameters.get(i);
                 break;
             }
         }
@@ -335,14 +366,15 @@ public abstract class AbstractCommand implements Command {
             return Sets.newHashSet();
         }
 
-        if (result.getClass().getComponentType() != suggestedParameter.getType()) {
-            Class<?> requiredComponentClass = suggestedParameter.getType();
-            Class<?> requiredClass = Array.newInstance(requiredComponentClass, 0).getClass();
-            Class<?> providedClass = result.getClass();
+        Class<?> requiredClass = suggestedParameter.getType();
 
-            throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
-                    + " returns a suggestion of an invalid type. Required: " + requiredClass.getCanonicalName()
-                    + "; provided: " + providedClass.getCanonicalName());
+        for (Object resultComponent : result) {
+            if (resultComponent == null && requiredClass.isPrimitive()
+            || resultComponent != null && !requiredClass.isAssignableFrom(resultComponent.getClass())) {
+                throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
+                        + " returns a collection containing an invalid type. Required: " + requiredClass.getCanonicalName()
+                        + "; provided: " + resultComponent.getClass().getCanonicalName());
+            }
         }
 
         Set<String> composedResult = composeAll(result, suggestedParameter);
@@ -367,8 +399,8 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public ImmutableList<CommandParameter> getParameters() {
-        return parameters;
+    public ImmutableList<CommandParameter> getCommandParameters() {
+        return commandParameters;
     }
 
     @Override
@@ -410,7 +442,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     public boolean endsWithVarargs() {
-        return parameters.size() > 0 && parameters.get(parameters.size() - 1).isVarargs();
+        return commandParameters.size() > 0 && commandParameters.get(commandParameters.size() - 1).isVarargs();
     }
 
     @Override

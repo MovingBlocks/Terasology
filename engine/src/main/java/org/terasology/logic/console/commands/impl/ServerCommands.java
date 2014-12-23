@@ -26,6 +26,7 @@ import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.network.*;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
@@ -52,7 +53,7 @@ public class ServerCommands extends BaseComponentSystem {
     private ChunkProvider chunkProvider;
 
     @Command(shortDescription = "Shutdown the server", runOnServer = true)
-    public String shutdownServer(EntityRef sender) {
+    public String shutdownServer(@Sender EntityRef sender) {
 
         // TODO: verify permissions of sender
 
@@ -67,7 +68,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Kick user by name", runOnServer = true)
-    public String kickUser(EntityRef sender, @CommandParameter("username") String username) {
+    public String kickUser(@CommandParameter("username") String username) {
 
         // TODO: verify permissions of sender
 
@@ -85,7 +86,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Kick user by ID", runOnServer = true)
-    public String kickUserByID(EntityRef sender, @CommandParameter("userId") int userId) {
+    public String kickUserByID(@CommandParameter("userId") int userId) {
 
         // TODO: verify permissions of sender
 
@@ -102,7 +103,7 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List users")
-    public String listUsers(EntityRef sender) {
+    public String listUsers() {
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -140,12 +141,12 @@ public class ServerCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
-    public void save(EntityRef sender) {
+    public void save() {
         storageManager.requestSaving();
     }
 
     @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
-    public void purgeWorld(EntityRef sender) {
+    public void purgeWorld() {
         chunkProvider.purgeWorld();
     }
 }

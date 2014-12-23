@@ -103,7 +103,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Reloads a skin")
-	public String reloadSkin(EntityRef sender, @CommandParameter("skin") String skin) {
+	public String reloadSkin(@CommandParameter("skin") String skin) {
 		AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
 		UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
 		if (uiSkinData != null) {
@@ -115,13 +115,13 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
-	public String enableAutoScreenReloading(EntityRef sender) {
+	public String enableAutoScreenReloading() {
 		CoreRegistry.get(NUIManager.class).enableAutoReload();
 		return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
-	public String reloadUI(EntityRef sender, @CommandParameter("ui") String ui) {
+	public String reloadUI(@CommandParameter("ui") String ui) {
 		CoreRegistry.get(NUIManager.class).clear();
 
 		AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
@@ -136,7 +136,7 @@ public class CoreCommands extends BaseComponentSystem {
 
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Reloads a shader")
-	public String reloadShader(EntityRef sender, @CommandParameter("shader") String shader) {
+	public String reloadShader(@CommandParameter("shader") String shader) {
 		AssetUri uri = new AssetUri(AssetType.SHADER, shader);
 		ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
 		if (shaderData != null) {
@@ -148,7 +148,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Reloads a material")
-	public String reloadMaterial(EntityRef sender, @CommandParameter("material") String material) {
+	public String reloadMaterial(@CommandParameter("material") String material) {
 		AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
 		MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
 		if (materialData != null) {
@@ -160,7 +160,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Toggles Fullscreen Mode")
-	public String fullscreen(EntityRef sender) {
+	public String fullscreen() {
 		TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
 		te.setFullscreen(!te.isFullscreen());
@@ -174,7 +174,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
-	public void destroyEntitiesUsingPrefab(EntityRef sender, @CommandParameter("prefabName") String prefabName) {
+	public void destroyEntitiesUsingPrefab(@CommandParameter("prefabName") String prefabName) {
 		Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
 		if (prefab != null) {
 			for (EntityRef entity : entityManager.getAllEntities()) {
@@ -186,12 +186,12 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Exits the game")
-	public void exit(EntityRef sender) {
+	public void exit() {
 		CoreRegistry.get(GameEngine.class).shutdown();
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Join a game")
-	public void join(EntityRef sender, @CommandParameter("address") final String address, @CommandParameter(value = "port", required = false) Integer portParam) {
+	public void join(@CommandParameter("address") final String address, @CommandParameter(value = "port", required = false) Integer portParam) {
 		final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
 
 		Callable<JoinStatus> operation = new Callable<JoinStatus>() {
@@ -226,7 +226,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Leaves the current game and returns to main menu")
-	public String leave(EntityRef sender) {
+	public String leave() {
 		NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 		if (networkSystem.getMode() != NetworkMode.NONE) {
 			CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
@@ -238,7 +238,7 @@ public class CoreCommands extends BaseComponentSystem {
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Writes out information on all entities to a text file for debugging",
 			helpText = "Writes entity information out into a file named \"entityDump.txt\".")
-	public void dumpEntities(EntityRef sender) throws IOException {
+	public void dumpEntities() throws IOException {
 		EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
 		PrefabSerializer prefabSerializer = new PrefabSerializer(engineEntityManager.getComponentLibrary(), engineEntityManager.getTypeSerializerLibrary());
 		WorldDumper worldDumper = new WorldDumper(engineEntityManager, prefabSerializer);
@@ -247,7 +247,7 @@ public class CoreCommands extends BaseComponentSystem {
 
 	// TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Spawns an instance of a prefab in the world")
-	public String spawnPrefab(EntityRef sender, @CommandParameter("prefabId") String prefabName) {
+	public String spawnPrefab(@CommandParameter("prefabId") String prefabName) {
 		Camera camera = worldRenderer.getActiveCamera();
 		Vector3f spawnPos = camera.getPosition();
 		Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -277,7 +277,7 @@ public class CoreCommands extends BaseComponentSystem {
 	// TODO: permission
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
 			"item in front of the player. You can simply pick it up.")
-	public String spawnBlock(EntityRef sender, @CommandParameter("blockName") String blockName) {
+	public String spawnBlock(@CommandParameter("blockName") String blockName) {
 		Camera camera = worldRenderer.getActiveCamera();
 		Vector3f spawnPos = camera.getPosition();
 		Vector3f offset = camera.getViewingDirection();
@@ -297,7 +297,7 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@org.terasology.logic.console.commands.referenced.Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
-	public String help(EntityRef sender, @CommandParameter(value = "command", required = false, suggester = CommandParameterSuggester.CommandNameSuggester.class) String command) {
+	public String help(@CommandParameter(value = "command", required = false, suggester = CommandParameterSuggester.CommandNameSuggester.class) String command) {
 		if (command == null) {
 			StringBuilder msg = new StringBuilder();
 			Collection<Command> commands = console.getCommands();

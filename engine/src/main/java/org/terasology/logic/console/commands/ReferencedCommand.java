@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.referenced;
+package org.terasology.logic.console.commands;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -23,9 +23,7 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commands.AbstractCommand;
-import org.terasology.logic.console.commands.CommandParameter;
-import org.terasology.logic.console.commands.CommandParameterSuggester;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
@@ -55,7 +53,7 @@ public final class ReferencedCommand extends AbstractCommand {
      */
     public static ReferencedCommand referringTo(SpecificAccessibleObject<Method> specificMethod) {
         Method method = specificMethod.getAccessibleObject();
-        Command commandAnnotation = method.getAnnotation(Command.class);
+        org.terasology.logic.console.commands.referenced.Command commandAnnotation = method.getAnnotation(org.terasology.logic.console.commands.referenced.Command.class);
 
         Preconditions.checkNotNull(commandAnnotation);
 
@@ -76,10 +74,10 @@ public final class ReferencedCommand extends AbstractCommand {
     }
 
     /**
-     * Registers all available command methods annotated with {@link Command}.
+     * Registers all available command methods annotated with {@link org.terasology.logic.console.commands.referenced.Command}.
      */
     public static void registerAvailable(Object provider) {
-        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
+        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(org.terasology.logic.console.commands.referenced.Command.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         Console console = CoreRegistry.get(Console.class);
 
@@ -110,59 +108,49 @@ public final class ReferencedCommand extends AbstractCommand {
     }
 
     @Override
-    protected List<CommandParameter> constructParameters() {
+    protected List<CommandParameterType> constructParameters() {
         SpecificAccessibleObject<Method> specificExecutionMethod = getExecutionMethod();
         Method executionMethod = specificExecutionMethod.getAccessibleObject();
         Class<?>[] methodParameters = executionMethod.getParameterTypes();
         Annotation[][] methodParameterAnnotations = executionMethod.getParameterAnnotations();
-        List<CommandParameter> parameters = Lists.newArrayListWithCapacity(methodParameters.length - 1);
+        List<CommandParameterType> parameters = Lists.newArrayListWithExpectedSize(methodParameters.length);
 
-        for (int i = 1; i < methodParameters.length; i++) {
-            parameters.set(i - 1, getParameterFor(methodParameters[i], methodParameterAnnotations[i]));
+        for (int i = 0; i < methodParameters.length; i++) {
+            parameters.add(getParameterTypeFor(methodParameters[i], methodParameterAnnotations[i]));
         }
 
         return parameters;
     }
 
-    @SuppressWarnings("unchecked")
-    private static CommandParameter getParameterFor(Class<?> type, Annotation[] annotations) {
-        boolean found = false;
-        String name = null;
-        Character arrayDelimiter = null;
-        Class<? extends CommandParameterSuggester> suggesterClass = null;
-        boolean required = true;
-
+    public static CommandParameterType getParameterTypeFor(Class<?> type, Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation instanceof org.terasology.logic.console.commands.referenced.CommandParameter) {
                 org.terasology.logic.console.commands.referenced.CommandParameter parameterAnnotation
                         = (org.terasology.logic.console.commands.referenced.CommandParameter) annotation;
-                name = parameterAnnotation.value();
-                arrayDelimiter = parameterAnnotation.arrayDelimiter();
-                suggesterClass = parameterAnnotation.suggester();
-                required = parameterAnnotation.required();
-                found = true;
-                break;
+                String name = parameterAnnotation.value();
+                char arrayDelimiter = parameterAnnotation.arrayDelimiter();
+                Class<? extends CommandParameterSuggester> suggesterClass = parameterAnnotation.suggester();
+                boolean required = parameterAnnotation.required();
+                CommandParameterSuggester suggester;
+
+                try {
+                    suggester = suggesterClass.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (type.isArray()) {
+                    Class<?> childType = type.getComponentType();
+
+                    return CommandParameter.array(name, childType, arrayDelimiter, required, suggester);
+                } else {
+                    return CommandParameter.single(name, type, required, suggester);
+                }
+            } else if (annotation instanceof Sender) {
+                return new CommandParameterType.SenderParameterType();
             }
         }
 
-        if (!found) {
-            throw new NullPointerException("CommandParameter annotation not found.");
-        }
-
-        CommandParameterSuggester suggester;
-
-        try {
-            suggester = suggesterClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (type.isArray()) {
-            Class<?> childType = type.getComponentType();
-
-            return CommandParameter.array(name, childType, arrayDelimiter, required, suggester);
-        } else {
-            return CommandParameter.single(name, type, required, suggester);
-        }
+        return new CommandParameterType.InvalidParameterType();
     }
 }

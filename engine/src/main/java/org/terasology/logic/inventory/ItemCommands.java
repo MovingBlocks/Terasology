@@ -24,6 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
@@ -47,7 +48,7 @@ public class ItemCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
-    public String giveItem(EntityRef client, @CommandParameter("prefabId or blockName") String itemPrefabName, @CommandParameter(value = "amount", required = false) Integer amount) {
+    public String giveItem(@Sender EntityRef client, @CommandParameter("prefabId or blockName") String itemPrefabName, @CommandParameter(value = "amount", required = false) Integer amount) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);

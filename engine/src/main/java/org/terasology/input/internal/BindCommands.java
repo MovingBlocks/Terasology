@@ -36,7 +36,7 @@ public class BindCommands extends BaseComponentSystem {
     private InputSystem inputSystem;
 
     @Command(shortDescription = "Maps a key to a function")
-    public String bindKey(EntityRef sender, @CommandParameter("key") String key, @CommandParameter("function") String bind) {
+    public String bindKey(@CommandParameter("key") String key, @CommandParameter("function") String bind) {
         Input keyInput = Keyboard.Key.find(key);
         if (keyInput != null) {
             inputSystem.linkBindButtonToKey(keyInput.getId(), new SimpleUri(bind));
@@ -49,7 +49,7 @@ public class BindCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY")
-    public String azerty(EntityRef sender) {
+    public String azerty() {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.Z, new SimpleUri("engine:forwards"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.S, new SimpleUri("engine:backwards"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.Q, new SimpleUri("engine:left"));
@@ -58,7 +58,7 @@ public class BindCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Switches to typical keybinds for DVORAK")
-    public String dvorak(EntityRef sender) {
+    public String dvorak() {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.COMMA, new SimpleUri("engine:forwards"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.A, new SimpleUri("engine:right"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.O, new SimpleUri("engine:backwards"));
@@ -70,7 +70,7 @@ public class BindCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")
-    public String neo(EntityRef sender) {
+    public String neo() {
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.V, new SimpleUri("engine:forwards"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.I, new SimpleUri("engine:backwards"));
         inputSystem.linkBindButtonToKey(Keyboard.KeyId.U, new SimpleUri("engine:left"));

@@ -27,6 +27,7 @@ import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.SetMovementModeEvent;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.health.HealthComponent;
 import org.terasology.network.ClientComponent;
 
@@ -37,7 +38,7 @@ import org.terasology.network.ClientComponent;
 public class MovementDebugCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Grants flight and movement through walls", runOnServer = true)
-    public String ghost(EntityRef client) {
+    public String ghost(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.GHOSTING));
 
@@ -45,7 +46,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Grants flight", runOnServer = true)
-    public String flight(EntityRef client) {
+    public String flight(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new SetMovementModeEvent(MovementMode.FLYING));
 
@@ -54,7 +55,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
 
     @Command(shortDescription = "Set speed multiplier", helpText = "Set speedMultiplier", runOnServer = true)
-    public String setSpeedMultiplier(EntityRef client, @CommandParameter("amount") float amount) {
+    public String setSpeedMultiplier(@Sender EntityRef client, @CommandParameter("amount") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
@@ -69,7 +70,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Set jump speed", runOnServer = true)
-    public String setJumpSpeed(EntityRef client, @CommandParameter("amount") float amount) {
+    public String setJumpSpeed(@Sender EntityRef client, @CommandParameter("amount") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
@@ -84,7 +85,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Show your Movement stats")
-    public String showMovement(EntityRef client) {
+    public String showMovement(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
@@ -96,7 +97,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Go really fast", runOnServer = true)
-    public String hspeed(EntityRef client) {
+    public String hspeed(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
@@ -111,7 +112,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Jump really high", runOnServer = true)
-    public String hjump(EntityRef client) {
+    public String hjump(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -129,7 +130,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Restore normal speed values", runOnServer = true)
-    public String restoreSpeed(EntityRef client) {
+    public String restoreSpeed(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
 
         Asset<?> asset = Assets.get(new AssetUri("prefab:engine:player"));
@@ -158,7 +159,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Toggles the maximum slope the player can walk up", runOnServer = true)
-    public String sleigh(EntityRef client) {
+    public String sleigh(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {
@@ -175,7 +176,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Sets the height the player can step up", runOnServer = true)
-    public String stepHeight(EntityRef client, @CommandParameter("height") float amount) {
+    public String stepHeight(@Sender EntityRef client, @CommandParameter("height") float amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         CharacterMovementComponent move = clientComp.character.getComponent(CharacterMovementComponent.class);
         if (move != null) {

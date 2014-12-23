@@ -37,6 +37,7 @@ import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.console.ui.MiniChatOverlay;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -96,7 +97,7 @@ public class ChatSystem extends BaseComponentSystem {
 
     @Command(runOnServer = true, shortDescription = "Sends a message to all other players")
     public String say(
-            EntityRef sender,
+            @Sender EntityRef sender,
             @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
     ) {
         String message = Joiner.on(' ').join(messageArray);
@@ -112,10 +113,12 @@ public class ChatSystem extends BaseComponentSystem {
 
     @Command(runOnServer = true, shortDescription = "Sends a private message to a specified user")
     public String whisper(
-            EntityRef sender,
+            @Sender EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
             @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
+            ,@Sender EntityRef sender2
     ) {
+        logger.warn("Sender2: " + sender2);
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
         boolean unique = true;

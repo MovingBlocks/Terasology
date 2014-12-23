@@ -21,6 +21,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
 import org.terasology.logic.health.HealthComponent;
@@ -42,7 +43,7 @@ public class ClientCommands extends BaseComponentSystem {
     private CameraTargetSystem cameraTargetSystem;
 
     @Command(shortDescription = "Reduce the player's health to zero", runOnServer = true)
-    public void kill(EntityRef client) {
+    public void kill(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
         if (health != null) {
@@ -51,13 +52,13 @@ public class ClientCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Displays debug information on the target entity")
-    public String debugTarget(EntityRef sender) {
+    public String debugTarget() {
         EntityRef cameraTarget = cameraTargetSystem.getTarget();
         return cameraTarget.toFullDescription();
     }
 
     @Command(shortDescription = "Sets the current world time in days")
-    public String setWorldTime(EntityRef sender, @CommandParameter("day") float day) {
+    public String setWorldTime(@CommandParameter("day") float day) {
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         world.getTime().setDays(day);
 
@@ -65,7 +66,7 @@ public class ClientCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Teleports you to a location", runOnServer = true)
-    public String teleport(EntityRef sender, @CommandParameter("x") float x, @CommandParameter("y") float y, @CommandParameter("z") float z) {
+    public String teleport(@Sender EntityRef sender, @CommandParameter("x") float x, @CommandParameter("y") float y, @CommandParameter("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
         if (location != null) {

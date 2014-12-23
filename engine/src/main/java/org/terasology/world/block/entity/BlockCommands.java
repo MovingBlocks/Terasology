@@ -30,6 +30,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
@@ -88,7 +89,7 @@ public class BlockCommands extends BaseComponentSystem {
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera), also apply required permission
     @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
             "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
-    public String placeBlock(EntityRef sender, @CommandParameter("blockName") String blockName) {
+    public String placeBlock(@CommandParameter("blockName") String blockName) {
         Camera camera = renderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -123,7 +124,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all available items (prefabs)")
-    public String listItems(EntityRef sender) {
+    public String listItems() {
 
         List<String> stringItems = Lists.newArrayList();
 
@@ -145,7 +146,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "List all available blocks")
-    public String listBlocks(EntityRef sender) {
+    public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
         stringBuilder.append(Message.NEW_LINE);
@@ -172,7 +173,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all blocks by category")
-    public String listBlocksByCategory(EntityRef sender) {
+    public String listBlocksByCategory() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
             stringBuilder.append(category);
@@ -190,7 +191,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists all available shapes")
-    public String listShapes(EntityRef sender) {
+    public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
         stringBuilder.append(Message.NEW_LINE);
@@ -206,7 +207,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
-    public String listFreeShapeBlocks(EntityRef sender) {
+    public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
         stringBuilder.append(Message.NEW_LINE);
@@ -225,7 +226,7 @@ public class BlockCommands extends BaseComponentSystem {
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true)
     public String giveBlock(
-            EntityRef sender,
+            @Sender EntityRef sender,
             @CommandParameter("blockName") String uri,
             @CommandParameter(value = "quantity", required = false) Integer quantityParam,
             @CommandParameter(value = "shapeName", required = false) String shapeUriParam) {

@@ -22,6 +22,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.commands.referenced.Command;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 
@@ -35,7 +36,7 @@ public class PermissionCommands extends BaseComponentSystem {
     @Command(shortDescription = "Gives specified permission to player",
             helpText = "Gives specified permission to player",
             runOnServer = true)
-    public String givePermission(EntityRef speaker,
+    public String givePermission(
             @CommandParameter("player") String player,
             @CommandParameter("permission") String permission) {
         boolean permissionGiven = false;
@@ -58,7 +59,7 @@ public class PermissionCommands extends BaseComponentSystem {
     @Command(shortDescription = "Removes specified permission from player",
             helpText = "Removes specified permission from player",
             runOnServer = true)
-    public String removePermission(EntityRef speaker,
+    public String removePermission(
             @CommandParameter("player") String player,
             @CommandParameter("permission") String permission) {
         boolean permissionGiven = false;
