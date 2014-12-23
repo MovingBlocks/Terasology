@@ -116,9 +116,7 @@ public class ChatSystem extends BaseComponentSystem {
             @Sender EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
             @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
-            ,@Sender EntityRef sender2
     ) {
-        logger.warn("Sender2: " + sender2);
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
         boolean unique = true;
