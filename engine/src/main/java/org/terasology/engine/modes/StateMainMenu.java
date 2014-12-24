@@ -28,7 +28,7 @@ import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commands.impl.CoreCommands;
+import org.terasology.logic.console.commands.internal.CoreCommands;
 import org.terasology.logic.console.ConsoleImpl;
 import org.terasology.logic.console.ConsoleSystem;
 import org.terasology.logic.players.LocalPlayer;

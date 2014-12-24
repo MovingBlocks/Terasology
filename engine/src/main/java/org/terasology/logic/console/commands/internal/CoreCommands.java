@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.impl;
+package org.terasology.logic.console.commands.internal;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
