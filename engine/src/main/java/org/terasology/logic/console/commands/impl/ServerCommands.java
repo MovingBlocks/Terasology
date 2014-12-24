@@ -24,7 +24,7 @@ import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.network.*;
@@ -52,7 +52,7 @@ public class ServerCommands extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
-    @Command(shortDescription = "Shutdown the server", runOnServer = true)
+    @CommandDefinition(shortDescription = "Shutdown the server", runOnServer = true)
     public String shutdownServer(@Sender EntityRef sender) {
 
         // TODO: verify permissions of sender
@@ -67,7 +67,7 @@ public class ServerCommands extends BaseComponentSystem {
         return "Server shutdown triggered";
     }
 
-    @Command(shortDescription = "Kick user by name", runOnServer = true)
+    @CommandDefinition(shortDescription = "Kick user by name", runOnServer = true)
     public String kickUser(@CommandParameter("username") String username) {
 
         // TODO: verify permissions of sender
@@ -85,7 +85,7 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user '" + username + "'");
     }
 
-    @Command(shortDescription = "Kick user by ID", runOnServer = true)
+    @CommandDefinition(shortDescription = "Kick user by ID", runOnServer = true)
     public String kickUserByID(@CommandParameter("userId") int userId) {
 
         // TODO: verify permissions of sender
@@ -102,7 +102,7 @@ public class ServerCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("No such user with ID " + userId);
     }
 
-    @Command(shortDescription = "List users")
+    @CommandDefinition(shortDescription = "List users")
     public String listUsers() {
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -140,12 +140,12 @@ public class ServerCommands extends BaseComponentSystem {
         return "Request declined";
     }
 
-    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
+    @CommandDefinition(shortDescription = "Triggers the creation of a save game", runOnServer = true)
     public void save() {
         storageManager.requestSaving();
     }
 
-    @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
+    @CommandDefinition(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
     public void purgeWorld() {
         chunkProvider.purgeWorld();
     }

@@ -29,7 +29,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.events.HorizontalCollisionEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
-import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.math.TeraMath;
@@ -203,7 +203,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
     }
 
     // Debug commands
-    @Command(shortDescription = "Reduce the player's health by an amount", runOnServer = true)
+    @CommandDefinition(shortDescription = "Reduce the player's health by an amount", runOnServer = true)
     public String damage(@Sender EntityRef client, @CommandParameter("amount") int amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoDamageEvent(amount, EngineDamageTypes.DIRECT.get(), clientComp.character));
@@ -211,20 +211,20 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Inflicted damage of " + amount;
     }
 
-    @Command(shortDescription = "Restores your health to max", runOnServer = true)
+    @CommandDefinition(shortDescription = "Restores your health to max", runOnServer = true)
     public String health(@Sender EntityRef clientEntity) {
         ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(100000, clientComp.character));
         return "Health restored";
     }
 
-    @Command(shortDescription = "Restores your health by an amount", runOnServer = true)
+    @CommandDefinition(shortDescription = "Restores your health by an amount", runOnServer = true)
     public void health(@Sender EntityRef client, @CommandParameter("amount") int amount) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(amount, clientComp.character));
     }
 
-    @Command(shortDescription = "Set max health", runOnServer = true)
+    @CommandDefinition(shortDescription = "Set max health", runOnServer = true)
     public String setMaxHealth(@Sender EntityRef client, @CommandParameter("max") int max) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -234,7 +234,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Max health set to " + max;
     }
 
-    @Command(shortDescription = "Set regen rate", runOnServer = true)
+    @CommandDefinition(shortDescription = "Set regen rate", runOnServer = true)
     public String setRegenRate(@Sender EntityRef client, @CommandParameter("rate") float rate) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -245,7 +245,7 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Set regeneration rate to " + rate;
     }
 
-    @Command(shortDescription = "Show your health")
+    @CommandDefinition(shortDescription = "Show your health")
     public String showHealth(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);

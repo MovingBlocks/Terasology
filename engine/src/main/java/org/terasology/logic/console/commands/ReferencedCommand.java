@@ -23,6 +23,7 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
@@ -46,14 +47,14 @@ public final class ReferencedCommand extends AbstractCommand {
 
     /**
      * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link org.terasology.logic.console.commands.referenced.Command}.
+     * annotated with {@link org.terasology.logic.console.commands.referenced.CommandDefinition}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
      */
     public static ReferencedCommand referringTo(SpecificAccessibleObject<Method> specificMethod) {
         Method method = specificMethod.getAccessibleObject();
-        org.terasology.logic.console.commands.referenced.Command commandAnnotation = method.getAnnotation(org.terasology.logic.console.commands.referenced.Command.class);
+        CommandDefinition commandAnnotation = method.getAnnotation(CommandDefinition.class);
 
         Preconditions.checkNotNull(commandAnnotation);
 
@@ -74,10 +75,10 @@ public final class ReferencedCommand extends AbstractCommand {
     }
 
     /**
-     * Registers all available command methods annotated with {@link org.terasology.logic.console.commands.referenced.Command}.
+     * Registers all available command methods annotated with {@link org.terasology.logic.console.commands.referenced.CommandDefinition}.
      */
     public static void registerAvailable(Object provider) {
-        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(org.terasology.logic.console.commands.referenced.Command.class));
+        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(CommandDefinition.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         Console console = CoreRegistry.get(Console.class);
 

@@ -42,7 +42,7 @@ interface CommandParameterType {
 
     /**
      * Used if the parameter of {@link ReferencedCommand} doesn't have
-     * a {@link org.terasology.logic.console.commands.referenced.Command}
+     * a {@link org.terasology.logic.console.commands.referenced.CommandDefinition}
      * nor a {@link org.terasology.logic.console.commands.referenced.Sender} annotation.
      */
     public final class InvalidParameterType implements CommandParameterType {

@@ -28,7 +28,7 @@ import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.referenced.Command;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.inventory.InventoryManager;
@@ -87,7 +87,7 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera), also apply required permission
-    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
+    @CommandDefinition(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
             "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
     public String placeBlock(@CommandParameter("blockName") String blockName) {
         Camera camera = renderer.getActiveCamera();
@@ -123,7 +123,7 @@ public class BlockCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
-    @Command(shortDescription = "Lists all available items (prefabs)")
+    @CommandDefinition(shortDescription = "Lists all available items (prefabs)")
     public String listItems() {
 
         List<String> stringItems = Lists.newArrayList();
@@ -145,7 +145,7 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-    @Command(shortDescription = "List all available blocks")
+    @CommandDefinition(shortDescription = "List all available blocks")
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
@@ -172,7 +172,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all blocks by category")
+    @CommandDefinition(shortDescription = "Lists all blocks by category")
     public String listBlocksByCategory() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
@@ -190,7 +190,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all available shapes")
+    @CommandDefinition(shortDescription = "Lists all available shapes")
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
@@ -206,7 +206,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
+    @CommandDefinition(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
@@ -222,7 +222,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Adds a block to your inventory",
+    @CommandDefinition(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true)
     public String giveBlock(

@@ -40,10 +40,11 @@ import java.lang.annotation.Target;
  * <p/>
  * An example varargs command:
  * <pre>{@code
- * //Filled out Command annotation here
- * public String tell(
- *      @CommandParameter("user") String user,
- *      @CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
+ * @literal@CommandDefinition(value = "tell", shortDescription = "Sends a private message to a user")
+ * public String tellCommand(
+ *      @literal@Sender EntityRef sender,
+ *      @literal@CommandParameter("user") String user,
+ *      @literal@CommandParameter(value = "message", arrayDelimiter = Command.ARRAY_DELIMITER_VARARGS) String[] messageArray
  * ) {
  *     return "You -> " + user + ": " + Joiner.on(' ').join(messageArray);
  * }
@@ -53,7 +54,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Command {
+public @interface CommandDefinition {
     /**
      * @return The name of the command, if specified. Otherwise the method name is used.
      */
