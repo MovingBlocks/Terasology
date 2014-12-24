@@ -21,35 +21,17 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
-import org.terasology.logic.console.commands.referenced.Sender;
-import org.terasology.logic.health.DestroyEvent;
-import org.terasology.logic.health.EngineDamageTypes;
-import org.terasology.logic.health.HealthComponent;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius, Limeth
  */
 @RegisterSystem
 public class ClientCommands extends BaseComponentSystem {
-
     @In
     private CameraTargetSystem cameraTargetSystem;
-
-    @CommandDefinition(shortDescription = "Reduce the player's health to zero", runOnServer = true)
-    public void kill(@Sender EntityRef client) {
-        ClientComponent clientComp = client.getComponent(ClientComponent.class);
-        HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if (health != null) {
-            clientComp.character.send(new DestroyEvent(clientComp.character, EntityRef.NULL, EngineDamageTypes.DIRECT.get()));
-        }
-    }
 
     @CommandDefinition(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
@@ -63,17 +45,5 @@ public class ClientCommands extends BaseComponentSystem {
         world.getTime().setDays(day);
 
         return "World time changed";
-    }
-
-    @CommandDefinition(shortDescription = "Teleports you to a location", runOnServer = true)
-    public String teleport(@Sender EntityRef sender, @CommandParameter("x") float x, @CommandParameter("y") float y, @CommandParameter("z") float z) {
-        ClientComponent clientComp = sender.getComponent(ClientComponent.class);
-        LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
-        if (location != null) {
-            location.setWorldPosition(new Vector3f(x, y, z));
-            clientComp.character.saveComponent(location);
-        }
-
-        return "Teleported to " + x + " " + y + " " + z;
     }
 }
