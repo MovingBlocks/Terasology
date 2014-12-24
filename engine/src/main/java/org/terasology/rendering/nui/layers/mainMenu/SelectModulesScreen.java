@@ -17,6 +17,7 @@ package org.terasology.rendering.nui.layers.mainMenu;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.terasology.config.Config;
 import org.terasology.config.ModuleConfig;
 import org.terasology.engine.SimpleUri;
@@ -287,9 +288,15 @@ public class SelectModulesScreen extends CoreScreenLayer {
     }
 
     private void setSelectedVersions(ResolutionResult currentSelectionResults) {
-        for (Module module : currentSelectionResults.getModules()) {
-            SelectModulesScreen.ModuleSelectionInfo info = modulesLookup.get(module.getId());
-            info.setSelectedVersion(module);
+        if (currentSelectionResults.isSuccess()) {
+            for (Module module : currentSelectionResults.getModules()) {
+                SelectModulesScreen.ModuleSelectionInfo info = modulesLookup.get(module.getId());
+
+                // the engine module is not listed
+                if (info != null) {
+                    info.setSelectedVersion(module);
+                }
+            }
         }
     }
 

@@ -18,16 +18,13 @@ package org.terasology.math;
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.io.Serializable;
 
 /**
  * Vector3i - integer vector class in the style of VecMath.
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
-    private static final long serialVersionUID = -1965792038041767639L;
-
+public class Vector3i extends javax.vecmath.Tuple3i  {
     /**
      * Constructor instantiates a new <code>Vector3i</code> with default
      * values of (0,0,0).

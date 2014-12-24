@@ -15,6 +15,8 @@
  */
 package org.terasology.world.internal;
 
+import java.util.Collection;
+
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
@@ -179,4 +181,8 @@ public interface WorldProviderCore {
 
     WorldTime getTime();
 
+    /**
+     * @return an unmodifiable view on the generated relevant regions
+     */
+    Collection<Region3i> getRelevantRegions();
 }

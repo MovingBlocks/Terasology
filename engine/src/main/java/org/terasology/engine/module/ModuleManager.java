@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.module.ClasspathModule;
+import org.terasology.module.DependencyInfo;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.module.ModuleLoader;
@@ -80,6 +81,17 @@ public class ModuleManager {
         ModulePathScanner scanner = new ModulePathScanner(new ModuleLoader(metadataReader));
         scanner.getModuleLoader().setModuleInfoPath(TerasologyConstants.MODULE_INFO_FILENAME);
         scanner.scan(registry, PathManager.getInstance().getModulePaths());
+
+        DependencyInfo engineDep = new DependencyInfo();
+        engineDep.setId(engineModule.getId());
+        engineDep.setMinVersion(engineModule.getVersion());
+        engineDep.setMaxVersion(engineModule.getVersion().getNextPatchVersion());
+
+        for (Module mod : registry) {
+            if (mod != engineModule) {
+                mod.getMetadata().getDependencies().add(engineDep);
+            }
+        }
 
         setupSandbox();
         loadEnvironment(Sets.newHashSet(engineModule), true);

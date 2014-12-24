@@ -43,7 +43,8 @@ public class LocalPlayer {
     private int nextActivationId;
 
     // TODO use same as CharacterSystem?
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
+            StandardCollisionGroup.CHARACTER};
 
     public LocalPlayer() {
     }
