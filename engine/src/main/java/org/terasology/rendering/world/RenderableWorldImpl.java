@@ -226,6 +226,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     public boolean updateChunksInProximity(ViewDistance viewDistance) {
+        logger.info("New Viewing Distance: {}", viewDistance);
         return updateChunksInProximity(calculateViewRegion(viewDistance));
     }
 
@@ -389,6 +390,11 @@ public class RenderableWorldImpl implements RenderableWorld {
 
     public RenderQueuesHelper getRenderQueues() {
         return renderQueues;
+    }
+
+    @Override
+    public ChunkProvider getChunkProvider() {
+        return chunkProvider;
     }
 
     public String getMetrics() {

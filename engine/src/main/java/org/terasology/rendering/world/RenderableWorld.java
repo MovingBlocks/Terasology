@@ -17,6 +17,8 @@ package org.terasology.rendering.world;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.ChunkProvider;
+
 /**
  * Created by manu on 24.12.2014.
  */
@@ -38,4 +40,5 @@ public interface RenderableWorld {
     RenderQueuesHelper getRenderQueues();
 
     String getMetrics();
+    ChunkProvider getChunkProvider();
 }

@@ -91,15 +91,10 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 public final class WorldRendererLwjgl implements WorldRenderer {
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
-
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererLwjgl.class);
-
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
     /* WORLD PROVIDER */
     private final WorldProvider worldProvider;
-    private ChunkProvider chunkProvider;
 
     /* PLAYER */
     private LocalPlayer player;
@@ -115,13 +110,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private LightComponent mainDirectionalLight = new LightComponent();
     private float smoothedPlayerSunlightValue;
 
-    /* CHUNKS */
-    private ChunkTessellator chunkTessellator;
-    // TODO: Review usage of ChunkImpl throughout WorldRenderer
-
     /* RENDERING */
     private RenderQueuesHelper renderQueues;
-
     private WorldRenderingStage currentRenderingStage = WorldRenderingStage.DEFAULT;
 
     /* HORIZON */
@@ -157,10 +147,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      * Initializes a new (local) world for the single player mode.
      */
     public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
-        this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(bufferPool);
         skysphere = new Skysphere();
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
@@ -184,7 +172,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         config = CoreRegistry.get(Config.class);
 
         renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, activeCamera, lightCamera);
-        this.renderQueues = renderableWorld.getRenderQueues();
+        renderQueues = renderableWorld.getRenderQueues();
     }
 
 
@@ -717,7 +705,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     @Override
     public void changeViewDistance(ViewDistance viewingDistance) {
-        logger.info("New Viewing Distance: {}", viewingDistance);
         renderableWorld.updateChunksInProximity(viewingDistance);
     }
 
@@ -828,7 +815,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     @Override
     public ChunkProvider getChunkProvider() {
-        return chunkProvider;
+        return renderableWorld.getChunkProvider();
     }
 
     @Override
