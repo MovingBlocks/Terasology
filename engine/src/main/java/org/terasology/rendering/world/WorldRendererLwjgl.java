@@ -16,8 +16,6 @@
 package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
@@ -688,6 +686,7 @@ public final class WorldRendererLwjgl implements WorldRenderer {
      */
     @Override
     public void dispose() {
+        renderableWorld.dispose();
         worldProvider.dispose();
         CoreRegistry.get(AudioManager.class).stopAllSounds();
     }
@@ -723,7 +722,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
     }
 
-    @Override
     public boolean isHeadUnderWater() {
         Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
 

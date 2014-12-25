@@ -37,6 +37,8 @@ public interface RenderableWorld {
     void updateAndQueueVisibleChunks();
     int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates);
 
+    void dispose();
+
     RenderQueuesHelper getRenderQueues();
 
     String getMetrics();

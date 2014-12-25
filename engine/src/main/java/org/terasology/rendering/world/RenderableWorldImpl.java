@@ -263,6 +263,7 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         if (processChunkUpdates) {
             PerformanceMonitor.startActivity("Building Mesh VBOs");
+            chunkMeshUpdateManager.setCameraPosition(activeCamera.getPosition());
             for (RenderableChunk c : chunkMeshUpdateManager.availableChunksForUpdate()) {
                 if (chunksInProximity.contains(c) && c.getPendingMesh() != null) {
                     for (int i = 0; i < c.getPendingMesh().length; i++) {
@@ -366,6 +367,11 @@ public class RenderableWorldImpl implements RenderableWorld {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void dispose() {
+        chunkMeshUpdateManager.shutdown();
     }
 
     public boolean isChunkValidForRender(RenderableChunk c) {
