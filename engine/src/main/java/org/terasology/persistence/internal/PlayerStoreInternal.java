@@ -15,15 +15,15 @@
  */
 package org.terasology.persistence.internal;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.TLongSet;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
 
 import javax.vecmath.Vector3f;
+
 import java.util.Map;
 
 /**
@@ -34,19 +34,19 @@ final class PlayerStoreInternal implements PlayerStore {
 
     private final EngineEntityManager entityManager;
     private final String id;
-    private final StorageManagerInternal manager;
+    private final StorageManager manager;
     private final Vector3f relevanceLocation = new Vector3f();
     private EntityRef character = EntityRef.NULL;
     private boolean hasCharacter;
     private EntityData.EntityStore entityStore;
 
-    PlayerStoreInternal(String id, StorageManagerInternal entityStoreManager, EngineEntityManager entityManager) {
+    PlayerStoreInternal(String id, StorageManager entityStoreManager, EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;
         this.entityManager = entityManager;
     }
 
-    PlayerStoreInternal(String id, EntityData.PlayerStore store, StorageManagerInternal entityStoreManager,
+    PlayerStoreInternal(String id, EntityData.PlayerStore store, StorageManager entityStoreManager,
                         EngineEntityManager entityManager) {
         this.id = id;
         this.manager = entityStoreManager;

@@ -18,6 +18,7 @@ package org.terasology.engine.modes.loadProcesses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
@@ -29,8 +30,10 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.internal.StorageManagerStub;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -77,7 +80,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment,
                 CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
 
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
@@ -105,8 +109,11 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        StorageManager storageManager = CoreRegistry.put(StorageManager.class,
-                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), entityManager));
+        boolean useSaveGames = CoreRegistry.get(Config.class).getTransients().useSaveGames();
+        StorageManager storageManager = useSaveGames
+                ? new StorageManagerInternal(environment, entityManager)
+                : new StorageManagerStub(environment, entityManager);
+        CoreRegistry.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));

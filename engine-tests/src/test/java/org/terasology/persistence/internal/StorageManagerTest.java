@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 
@@ -43,6 +43,9 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
+import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.internal.StorageManagerInternal;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;

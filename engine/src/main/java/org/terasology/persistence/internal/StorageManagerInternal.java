@@ -39,9 +39,7 @@ import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
@@ -59,14 +57,8 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,13 +71,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.zip.GZIPInputStream;
 
 /**
  * @author Immortius
  * @author Florian <florian@fkoeberle.de>
  */
-public final class StorageManagerInternal implements StorageManager, EntityDestroySubscriber {
+public final class StorageManagerInternal extends StorageManagerStub implements EntityDestroySubscriber {
     private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
 
     private final TaskMaster<Task> saveThreadManager;
@@ -94,7 +85,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
-    private boolean storeChunksInZips = true;
     private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
     /**
@@ -128,9 +118,10 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+        super(environment, entityManager, storeChunksInZips);
+
         this.entityManager = entityManager;
         this.environment = environment;
-        this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
         this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
@@ -174,26 +165,14 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     @Override
-    public void loadGlobalStore() throws IOException {
-        Path globalDataFile = storagePathProvider.getGlobalEntityStorePath();
-        if (Files.isRegularFile(globalDataFile)) {
-            try (InputStream in = new BufferedInputStream(Files.newInputStream(globalDataFile))) {
-                EntityData.GlobalStore store = EntityData.GlobalStore.parseFrom(in);
-                GlobalStoreLoader loader = new GlobalStoreLoader(environment, entityManager, prefabSerializer);
-                loader.load(store);
-            }
-        }
-    }
-
-
-    @Override
     public void deactivatePlayer(Client client) {
         EntityRef character = client.getEntity().getComponent(ClientComponent.class).character;
         EntityData.PlayerStore playerStore = createPlayerStore(client, character, true);
         unloadedAndUnsavedPlayerMap.put(client.getId(), playerStore);
     }
 
-    private EntityData.PlayerStore loadPlayerStoreData(String playerId) {
+    @Override
+    protected EntityData.PlayerStore loadPlayerStoreData(String playerId) {
         EntityData.PlayerStore  disposedUnsavedPlayer = unloadedAndUnsavedPlayerMap.get(playerId);
         if (disposedUnsavedPlayer != null) {
             return disposedUnsavedPlayer;
@@ -202,20 +181,12 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         if (disposedSavingPlayer != null) {
             return disposedSavingPlayer;
         }
-        Path storePath = storagePathProvider.getPlayerFilePath(playerId);
         worldDirectoryReadLock.lock();
         try {
-            if (Files.isRegularFile(storePath)) {
-                try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(storePath))) {
-                    return EntityData.PlayerStore.parseFrom(inputStream);
-                } catch (IOException e) {
-                    logger.error("Failed to load player data for {}", playerId, e);
-                }
-            }
+            return super.loadPlayerStoreData(playerId);
         } finally {
             worldDirectoryReadLock.unlock();
         }
-        return null;
     }
 
     @Override
@@ -325,8 +296,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         return new CompressedChunkBuilder(entityStore, chunkImpl, viaSnapshot);
     }
 
-
-
     @Override
     public void requestSaving() {
         this.saveRequested = true;
@@ -347,8 +316,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
     }
 
     private SaveTransaction createSaveTransaction() {
-        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(storeChunksInZips,
-                storagePathProvider, worldDirectoryWriteLock);
+        SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(
+                isStoreChunksInZips(), storagePathProvider, worldDirectoryWriteLock);
 
         /**
          * Currently loaded persistent entities without owner that have not been saved yet.
@@ -456,8 +425,8 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         unloadedAndUnsavedChunkMap.put(chunk.getPosition(), createCompressedChunkBuilder(chunk, entitiesOfChunk, true));
     }
 
-
-    private byte[] loadCompressedChunk(Vector3i chunkPos) {
+    @Override
+    protected byte[] loadCompressedChunk(Vector3i chunkPos) {
         CompressedChunkBuilder disposedUnsavedChunk = unloadedAndUnsavedChunkMap.get(chunkPos);
         if (disposedUnsavedChunk != null) {
             return disposedUnsavedChunk.buildEncodedChunk();
@@ -469,57 +438,11 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
 
         worldDirectoryReadLock.lock();
         try {
-            if (storeChunksInZips) {
-                return loadChunkZip(chunkPos);
-            } else {
-                Path chunkPath = storagePathProvider.getChunkPath(chunkPos);
-                if (Files.isRegularFile(chunkPath)) {
-                    try {
-                        return Files.readAllBytes(chunkPath);
-                    } catch (IOException e) {
-                        logger.error("Failed to load chunk {}", chunkPos, e);
-                    }
-                }
-            }
+            return super.loadCompressedChunk(chunkPos);
         } finally {
             worldDirectoryReadLock.unlock();
         }
-        return null;
     }
-
-    @Override
-    public ChunkStore loadChunkStore(Vector3i chunkPos) {
-        byte[] chunkData = loadCompressedChunk(chunkPos);
-        ChunkStore store = null;
-        if (chunkData != null) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(chunkData);
-            try (GZIPInputStream gzipIn = new GZIPInputStream(bais)) {
-                EntityData.ChunkStore storeData = EntityData.ChunkStore.parseFrom(gzipIn);
-                store = new ChunkStoreInternal(storeData, this, entityManager);
-            } catch (IOException e) {
-                logger.error("Failed to read existing saved chunk {}", chunkPos);
-            }
-        }
-        return store;
-    }
-
-    private byte[] loadChunkZip(Vector3i chunkPos) {
-        byte[] chunkData = null;
-        Vector3i chunkZipPos = storagePathProvider.getChunkZipPosition(chunkPos);
-        Path chunkPath = storagePathProvider.getChunkZipPath(chunkZipPos);
-        if (Files.isRegularFile(chunkPath)) {
-            try (FileSystem chunkZip = FileSystems.newFileSystem(chunkPath, null)) {
-                Path targetChunk = chunkZip.getPath(storagePathProvider.getChunkFilename(chunkPos));
-                if (Files.isRegularFile(targetChunk)) {
-                    chunkData = Files.readAllBytes(targetChunk);
-                }
-            } catch (IOException e) {
-                logger.error("Failed to load chunk zip {}", chunkPath, e);
-            }
-        }
-        return chunkData;
-    }
-
 
     @Override
     public void onEntityDestroyed(long entityId) {
@@ -616,14 +539,6 @@ public final class StorageManagerInternal implements StorageManager, EntityDestr
         } else {
             return false;
         }
-    }
-
-    /**
-     * For tests only
-     * 
-     */
-    public void setStoreChunksInZips(boolean storeChunksInZips) {
-        this.storeChunksInZips = storeChunksInZips;
     }
 
     private void scheduleNextAutoSave() {

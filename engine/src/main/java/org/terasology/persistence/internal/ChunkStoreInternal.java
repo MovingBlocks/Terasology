@@ -15,42 +15,34 @@
  */
 package org.terasology.persistence.internal;
 
-import com.google.common.collect.Lists;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.TLongSet;
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.AABB;
 import org.terasology.math.Vector3i;
-import org.terasology.network.ClientComponent;
 import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.StorageManager;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.internal.ChunkSerializer;
-
-import java.util.List;
 
 /**
  * @author Immortius
  */
 final class ChunkStoreInternal implements ChunkStore {
 
-    private StorageManagerInternal storageManager;
+    private StorageManager storageManager;
     private Vector3i chunkPosition;
     private Chunk chunk;
 
     private EngineEntityManager entityManager;
     private EntityData.EntityStore entityStore;
 
-    public ChunkStoreInternal(Chunk chunk, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
+    public ChunkStoreInternal(Chunk chunk, StorageManager storageManager, EngineEntityManager entityManager) {
         this.chunk = chunk;
         this.chunkPosition = new Vector3i(chunk.getPosition());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
     }
 
-    public ChunkStoreInternal(EntityData.ChunkStore chunkData, StorageManagerInternal storageManager, EngineEntityManager entityManager) {
+    public ChunkStoreInternal(EntityData.ChunkStore chunkData, StorageManager storageManager, EngineEntityManager entityManager) {
         this.chunkPosition = new Vector3i(chunkData.getX(), chunkData.getY(), chunkData.getZ());
         this.storageManager = storageManager;
         this.entityManager = entityManager;
