@@ -18,6 +18,7 @@ package org.terasology.logic.console.ui;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
@@ -128,13 +129,13 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         List<String> commandParameters = console.processParameters(query);
         Command command = console.getCommand(commandName);
         int suggestedIndex = commandParameters.size() + (query.charAt(query.length() - 1) == ' ' ? 1 : 0);
-        Collection<String> matches = findMatches(commandName, commandParameters, command, suggestedIndex);
+        Set<String> matches = findMatches(commandName, commandParameters, command, suggestedIndex);
 
         if (matches == null || matches.size() <= 0) {
             return query;
         }
 
-        if (!matches.equals(previousMatches)) {
+        if (previousMatches == null || !matches.equals(Sets.newHashSet(previousMatches))) {
             reset(false);
 
             if (matches.size() == 1) {
