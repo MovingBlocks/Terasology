@@ -15,11 +15,7 @@
  */
 package org.terasology.rendering.world;
 
-import com.google.common.collect.Lists;
-
 import org.lwjgl.opengl.GL11;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.config.Config;
@@ -33,7 +29,6 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Matrix4f;
@@ -53,20 +48,12 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
-import org.terasology.world.ChunkView;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.PriorityQueue;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -98,19 +85,12 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class WorldRendererLwjgl implements WorldRenderer {
-    public static final int MAX_ANIMATED_CHUNKS = 64;
-    public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-
-    private static final int MAX_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
-
-    private static final Logger logger = LoggerFactory.getLogger(WorldRendererLwjgl.class);
 
     private static final int SHADOW_FRUSTUM_BOUNDS = 500;
 
     /* WORLD PROVIDER */
     private final WorldProvider worldProvider;
-    private ChunkProvider chunkProvider;
 
     /* PLAYER */
     private LocalPlayer player;
@@ -126,19 +106,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private LightComponent mainDirectionalLight = new LightComponent();
     private float smoothedPlayerSunlightValue;
 
-    /* CHUNKS */
-    private ChunkTessellator chunkTessellator;
-    // TODO: Review usage of ChunkImpl throughout WorldRenderer
-    private final List<RenderableChunk> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
-    private Region3i renderRegion = Region3i.EMPTY;
-
     /* RENDERING */
-    private final PriorityQueue<RenderableChunk> renderQueueChunksOpaque = new PriorityQueue<>(MAX_CHUNKS, new ChunkFrontToBackComparator());
-    private final PriorityQueue<RenderableChunk> renderQueueChunksOpaqueShadow = new PriorityQueue<>(MAX_CHUNKS, new ChunkFrontToBackComparator());
-    private final PriorityQueue<RenderableChunk> renderQueueChunksOpaqueReflection = new PriorityQueue<>(MAX_CHUNKS, new ChunkFrontToBackComparator());
-    private final PriorityQueue<RenderableChunk> renderQueueChunksAlphaReject = new PriorityQueue<>(MAX_CHUNKS, new ChunkFrontToBackComparator());
-    private final PriorityQueue<RenderableChunk> renderQueueChunksAlphaBlend = new PriorityQueue<>(MAX_CHUNKS, new ChunkBackToFrontComparator());
-
+    private RenderQueuesHelper renderQueues;
     private WorldRenderingStage currentRenderingStage = WorldRenderingStage.DEFAULT;
 
     /* HORIZON */
@@ -148,17 +117,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private Time time = CoreRegistry.get(Time.class);
     private float tick;
 
-    /* UPDATING */
-    private final ChunkMeshUpdateManager chunkMeshUpdateManager;
-
     /* PHYSICS */
     // TODO: Remove physics handling from world renderer
     private final BulletPhysics bulletPhysics;
 
     /* STATISTICS */
-    private int statDirtyChunks;
-    private int statVisibleChunks;
-    private int statIgnoredPhases;
     private int statChunkMeshEmpty;
     private int statChunkNotReady;
     private int statRenderedTriangles;
@@ -174,16 +137,15 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     private ComponentSystemManager systemManager;
     private Config config;
 
+    private RenderableWorld renderableWorld;
+
     /**
      * Initializes a new (local) world for the single player mode.
      */
     public WorldRendererLwjgl(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem, GLBufferPool bufferPool) {
-        this.chunkProvider = chunkProvider;
         this.worldProvider = worldProvider;
         bulletPhysics = new BulletPhysics(worldProvider);
-        chunkTessellator = new ChunkTessellator(bufferPool);
         skysphere = new Skysphere();
-        chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         systemManager = CoreRegistry.get(ComponentSystemManager.class);
@@ -204,201 +166,56 @@ public final class WorldRendererLwjgl implements WorldRenderer {
 
         localPlayerSystem.setPlayerCamera(localPlayerCamera);
         config = CoreRegistry.get(Config.class);
+
+        renderableWorld = new RenderableWorldImpl(worldProvider, chunkProvider, bufferPool, activeCamera, lightCamera);
+        renderQueues = renderableWorld.getRenderQueues();
     }
 
 
     @Override
     public void onChunkLoaded(Vector3i pos) {
-        if (renderRegion.encompasses(pos)) {
-            RenderableChunk chunk = chunkProvider.getChunk(pos);
-            chunksInProximity.add(chunk);
-            Collections.sort(chunksInProximity, new ChunkFrontToBackComparator());
-        }
+        renderableWorld.onChunkLoaded(pos);
     }
 
     @Override
     public void onChunkUnloaded(Vector3i pos) {
-        if (renderRegion.encompasses(pos)) {
-            Iterator<RenderableChunk> iterator = chunksInProximity.iterator();
-            while (iterator.hasNext()) {
-                RenderableChunk chunk = iterator.next();
-                if (chunk.getPosition().equals(pos)) {
-                    chunk.disposeMesh();
-                    iterator.remove();
-                    Collections.sort(chunksInProximity, new ChunkFrontToBackComparator());
-                    break;
-                }
-            }
-        }
+        renderableWorld.onChunkUnloaded(pos);
     }
 
     /**
-     * Updates the list of chunks around the player.
-     *
-     * @return True if the list was changed
+     * @return true if pregeneration is complete
      */
-    public boolean updateChunksInProximity(Region3i newRegion) {
-        if (!newRegion.equals(renderRegion)) {
-            Iterator<Vector3i> removeChunks = renderRegion.subtract(newRegion);
-            while (removeChunks.hasNext()) {
-                Vector3i pos = removeChunks.next();
-
-                Iterator<RenderableChunk> iterator = chunksInProximity.iterator();
-                while (iterator.hasNext()) {
-                    RenderableChunk chunk = iterator.next();
-                    if (chunk.getPosition().equals(pos)) {
-                        chunk.disposeMesh();
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
-
-            Iterator<Vector3i> addChunks = newRegion.subtract(renderRegion);
-            while (addChunks.hasNext()) {
-                Vector3i pos = addChunks.next();
-                RenderableChunk c = chunkProvider.getChunk(pos);
-                if (c != null) {
-                    chunksInProximity.add(c);
-                }
-            }
-
-            renderRegion = newRegion;
-            Collections.sort(chunksInProximity, new ChunkFrontToBackComparator());
-            return true;
-        }
-        return false;
+    @Override
+    public boolean pregenerateChunks() {
+        return renderableWorld.pregenerateChunks();
     }
 
-    private static float distanceToCamera(RenderableChunk chunk) {
-        Vector3f result = new Vector3f((chunk.getPosition().x + 0.5f) * ChunkConstants.SIZE_X,
-                (chunk.getPosition().y + 0.5f) * ChunkConstants.SIZE_Y, (chunk.getPosition().z + 0.5f) * ChunkConstants.SIZE_Z);
+    @Override
+    public void update(float delta) {
 
-        Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-        result.x -= cameraPos.x;
-        result.y -= cameraPos.y;
-        result.z -= cameraPos.z;
+        PerformanceMonitor.startActivity("Update Tick");
+        updateTick(delta);
+        PerformanceMonitor.endActivity();
 
-        return result.lengthSquared();
+        if (activeCamera != null) {
+            activeCamera.update(delta);
+        }
+
+        if (lightCamera != null) {
+            positionLightCamera();
+            lightCamera.update(delta);
+        }
+
+        renderableWorld.update();
+
+        smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), delta);
     }
 
     /**
-     * Updates the currently visible chunks (in sight of the player).
+     * Updates the tick variable that animation is based on
      */
-    public void updateAndQueueVisibleChunks() {
-        updateAndQueueVisibleChunks(true, true);
-    }
-
-    public int updateAndQueueVisibleChunks(boolean fillShadowRenderQueue, boolean processChunkUpdates) {
-        statDirtyChunks = 0;
-        statVisibleChunks = 0;
-        statIgnoredPhases = 0;
-
-        if (processChunkUpdates) {
-            PerformanceMonitor.startActivity("Building Mesh VBOs");
-            for (RenderableChunk c : chunkMeshUpdateManager.availableChunksForUpdate()) {
-                if (chunksInProximity.contains(c) && c.getPendingMesh() != null) {
-                    for (int i = 0; i < c.getPendingMesh().length; i++) {
-                        c.getPendingMesh()[i].generateVBOs();
-                    }
-                    if (c.getMesh() != null) {
-                        for (int i = 0; i < c.getMesh().length; i++) {
-                            c.getMesh()[i].dispose();
-                        }
-                    }
-                    c.setMesh(c.getPendingMesh());
-                    c.setPendingMesh(null);
-                } else {
-                    ChunkMesh[] pendingMesh = c.getPendingMesh();
-                    c.setPendingMesh(null);
-                    if (pendingMesh != null) {
-                        for (ChunkMesh mesh : pendingMesh) {
-                            mesh.dispose();
-                        }
-                    }
-                }
-            }
-            PerformanceMonitor.endActivity();
-        }
-
-        int processedChunks = 0;
-        for (int i = 0; i < chunksInProximity.size(); i++) {
-            RenderableChunk c = chunksInProximity.get(i);
-            ChunkMesh[] mesh = c.getMesh();
-
-            if (i < TeraMath.clamp(config.getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024)
-                    && config.getRendering().isDynamicShadows() && fillShadowRenderQueue) {
-                if (isChunkVisibleLight(c) && isChunkValidForRender(c)) {
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
-                        renderQueueChunksOpaqueShadow.add(c);
-                    } else {
-                        statIgnoredPhases++;
-                    }
-                }
-            }
-
-            if (isChunkValidForRender(c)) {
-                if (isChunkVisible(c)) {
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
-                        renderQueueChunksOpaque.add(c);
-                    } else {
-                        statIgnoredPhases++;
-                    }
-
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.REFRACTIVE) > 0) {
-                        renderQueueChunksAlphaBlend.add(c);
-                    } else {
-                        statIgnoredPhases++;
-                    }
-
-                    if (triangleCount(mesh, ChunkMesh.RenderPhase.ALPHA_REJECT) > 0 && i < MAX_BILLBOARD_CHUNKS) {
-                        renderQueueChunksAlphaReject.add(c);
-                    } else {
-                        statIgnoredPhases++;
-                    }
-
-                    statVisibleChunks++;
-
-                    if (statVisibleChunks < MAX_ANIMATED_CHUNKS) {
-                        c.setAnimated(true);
-                    } else {
-                        c.setAnimated(false);
-                    }
-                }
-
-                if (isChunkVisibleReflection(c)) {
-                    renderQueueChunksOpaqueReflection.add(c);
-                }
-
-                // Process all chunks in the area, not only the visible ones
-                if (processChunkUpdates && processChunkUpdate(c)) {
-                    processedChunks++;
-                }
-            }
-        }
-
-        return processedChunks;
-    }
-
-    private boolean processChunkUpdate(RenderableChunk c) {
-        if ((c.isDirty() || c.getMesh() == null)) {
-            statDirtyChunks++;
-            chunkMeshUpdateManager.queueChunkUpdate(c);
-            return true;
-        }
-        return false;
-    }
-
-    private int triangleCount(ChunkMesh[] mesh, ChunkMesh.RenderPhase type) {
-        int count = 0;
-
-        if (mesh != null) {
-            for (ChunkMesh subMesh : mesh) {
-                count += subMesh.triangleCount(type);
-            }
-        }
-
-        return count;
+    private void updateTick(float delta) {
+        tick += delta * 1000;
     }
 
     private void resetStats() {
@@ -428,9 +245,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         resetStats();
 
         if (stereoRenderState == DefaultRenderingProcess.StereoRenderState.MONO || stereoRenderState == DefaultRenderingProcess.StereoRenderState.OCULUS_LEFT_EYE) {
-            updateAndQueueVisibleChunks();
+            renderableWorld.updateAndQueueVisibleChunks();
         } else {
-            updateAndQueueVisibleChunks(false, false);
+            renderableWorld.updateAndQueueVisibleChunks(false, false);
         }
 
         if (config.getRendering().isDynamicShadows()
@@ -483,6 +300,48 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
     }
 
+    private void renderShadowMap(Camera camera) {
+        PerformanceMonitor.startActivity("Render World (Shadow Map)");
+
+        glDisable(GL_CULL_FACE);
+
+        camera.lookThrough();
+
+        while (renderQueues.chunksOpaqueShadow.size() > 0) {
+            renderChunk(renderQueues.chunksOpaqueShadow.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.SHADOW_MAP);
+        }
+
+        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
+            renderer.renderShadows();
+        }
+
+        glEnable(GL_CULL_FACE);
+
+        PerformanceMonitor.endActivity();
+    }
+
+    public void renderWorldReflection(Camera camera) {
+        PerformanceMonitor.startActivity("Render World (Reflection)");
+        camera.lookThroughNormalized();
+        skysphere.render(camera);
+
+        Material chunkShader = Assets.getMaterial("engine:prog.chunk");
+        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+
+        if (config.getRendering().isReflectiveWater()) {
+            camera.lookThrough();
+
+            glEnable(GL_LIGHT0);
+
+            while (renderQueues.chunksOpaqueReflection.size() > 0) {
+                renderChunk(renderQueues.chunksOpaqueReflection.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.REFLECTION);
+            }
+        }
+
+        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
+        PerformanceMonitor.endActivity();
+    }
+
     public void renderWorld(Camera camera) {
         if (config.getRendering().getDebug().isWireframe()) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -517,8 +376,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
          * FIRST CHUNK PASS: OPAQUE
          */
         PerformanceMonitor.startActivity("Render Chunks (Opaque)");
-        while (renderQueueChunksOpaque.size() > 0) {
-            renderChunk(renderQueueChunksOpaque.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueues.chunksOpaque.size() > 0) {
+            renderChunk(renderQueues.chunksOpaque.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.DEFAULT);
         }
         PerformanceMonitor.endActivity();
 
@@ -526,8 +385,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
          * SECOND RENDER PASS: ALPHA REJECT
          */
         PerformanceMonitor.startActivity("Render Chunks (Alpha Reject)");
-        while (renderQueueChunksAlphaReject.size() > 0) {
-            renderChunk(renderQueueChunksAlphaReject.poll(), ChunkMesh.RenderPhase.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueues.chunksAlphaReject.size() > 0) {
+            renderChunk(renderQueues.chunksAlphaReject.poll(), ChunkMesh.RenderPhase.ALPHA_REJECT, camera, ChunkRenderMode.DEFAULT);
         }
         PerformanceMonitor.endActivity();
 
@@ -629,8 +488,8 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         if (isHeadUnderWater) {
             glDisable(GL11.GL_CULL_FACE);
         }
-        while (renderQueueChunksAlphaBlend.size() > 0) {
-            renderChunk(renderQueueChunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, camera, ChunkRenderMode.DEFAULT);
+        while (renderQueues.chunksAlphaBlend.size() > 0) {
+            renderChunk(renderQueues.chunksAlphaBlend.poll(), ChunkMesh.RenderPhase.REFRACTIVE, camera, ChunkRenderMode.DEFAULT);
         }
         PerformanceMonitor.endActivity();
         if (isHeadUnderWater) {
@@ -712,48 +571,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return true;
     }
 
-    public void renderWorldReflection(Camera camera) {
-        PerformanceMonitor.startActivity("Render World (Reflection)");
-        camera.lookThroughNormalized();
-        skysphere.render(camera);
-
-        Material chunkShader = Assets.getMaterial("engine:prog.chunk");
-        chunkShader.activateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-
-        if (config.getRendering().isReflectiveWater()) {
-            camera.lookThrough();
-
-            glEnable(GL_LIGHT0);
-
-            while (renderQueueChunksOpaqueReflection.size() > 0) {
-                renderChunk(renderQueueChunksOpaqueReflection.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.REFLECTION);
-            }
-        }
-
-        chunkShader.deactivateFeature(ShaderProgramFeature.FEATURE_USE_FORWARD_LIGHTING);
-        PerformanceMonitor.endActivity();
-    }
-
-    private void renderShadowMap(Camera camera) {
-        PerformanceMonitor.startActivity("Render World (Shadow Map)");
-
-        glDisable(GL_CULL_FACE);
-
-        camera.lookThrough();
-
-        while (renderQueueChunksOpaqueShadow.size() > 0) {
-            renderChunk(renderQueueChunksOpaqueShadow.poll(), ChunkMesh.RenderPhase.OPAQUE, camera, ChunkRenderMode.SHADOW_MAP);
-        }
-
-        for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
-            renderer.renderShadows();
-        }
-
-        glEnable(GL_CULL_FACE);
-
-        PerformanceMonitor.endActivity();
-    }
-
     private void renderChunk(RenderableChunk chunk, ChunkMesh.RenderPhase phase, Camera camera, ChunkRenderMode mode) {
         if (chunk.getMesh() != null) {
             Material shader = null;
@@ -829,6 +646,94 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         }
     }
 
+    public void positionLightCamera() {
+        // Shadows are rendered around the player so...
+        Vector3f lightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z);
+
+        // Project the camera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the camera)
+        float texelSize = 1.0f / config.getRendering().getShadowMapResolution();
+        texelSize *= 2.0f;
+
+        lightCamera.getViewProjectionMatrix().transformVector(lightPosition);           // msteiger: I guess this should be transformPoint
+        lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
+        lightCamera.getInverseViewProjectionMatrix().transformVector(lightPosition);    // msteiger: I guess this should be transformPoint
+
+        // ... we position our new camera at the position of the player and move it
+        // quite a bit into the direction of the sun (our main light).
+
+        // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
+        float stepSize = 50f;
+        Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
+
+        Vector3f sunPosition = new Vector3f(sunDirection);
+        sunPosition.scale(256.0f + 64.0f);
+        lightPosition.add(sunPosition);
+
+        lightCamera.getPosition().set(lightPosition);
+
+        // and adjust it to look from the sun direction into the direction of our player
+        Vector3f negSunDirection = new Vector3f(sunDirection);
+        negSunDirection.scale(-1.0f);
+
+        lightCamera.getViewingDirection().set(negSunDirection);
+    }
+
+    /**
+     * Disposes this world.
+     */
+    @Override
+    public void dispose() {
+        renderableWorld.dispose();
+        worldProvider.dispose();
+        CoreRegistry.get(AudioManager.class).stopAllSounds();
+    }
+
+    /**
+     * Sets a new player and spawns him at the spawning point.
+     *
+     * @param p The player
+     */
+    @Override
+    public void setPlayer(LocalPlayer p) {
+        player = p;
+        renderableWorld.updateChunksInProximity(config.getRendering().getViewDistance());
+    }
+
+    @Override
+    public void changeViewDistance(ViewDistance viewingDistance) {
+        renderableWorld.updateChunksInProximity(viewingDistance);
+    }
+
+    public boolean isAABBVisible(Camera cam, AABB aabb) {
+        return cam.getViewFrustum().intersects(aabb);
+    }
+
+    @Override
+    public boolean isAABBVisible(AABB aabb) {
+        return isAABBVisible(activeCamera, aabb);
+    }
+
+    public boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
+        return component.lightType == LightComponent.LightType.DIRECTIONAL
+                || activeCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
+
+    }
+
+    public boolean isHeadUnderWater() {
+        Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
+
+        // Compensate for waves
+        if (config.getRendering().isAnimateWater()) {
+            cameraPos.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPos, worldProvider.getTime().getDays());
+        }
+
+        if (worldProvider.isBlockRelevant(new Vector3f(cameraPos))) {
+            Block block = worldProvider.getBlock(new Vector3f(cameraPos));
+            return block.isLiquid();
+        }
+        return false;
+    }
+
     @Override
     public float getSmoothedPlayerSunlightValue() {
         return smoothedPlayerSunlightValue;
@@ -874,204 +779,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     }
 
     @Override
-    public void update(float delta) {
-
-        PerformanceMonitor.startActivity("Update Tick");
-        updateTick(delta);
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Complete chunk update");
-        chunkProvider.completeUpdate();
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Update Lighting");
-        worldProvider.processPropagation();
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Begin chunk update");
-        chunkProvider.beginUpdate();
-        PerformanceMonitor.endActivity();
-
-        PerformanceMonitor.startActivity("Update Close Chunks");
-        updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
-        PerformanceMonitor.endActivity();
-
-        if (activeCamera != null) {
-            activeCamera.update(delta);
-        }
-
-        if (lightCamera != null) {
-            positionLightCamera();
-            lightCamera.update(delta);
-        }
-
-        smoothedPlayerSunlightValue = TeraMath.lerp(smoothedPlayerSunlightValue, getSunlightValue(), delta);
-    }
-
-    public void positionLightCamera() {
-        // Shadows are rendered around the player so...
-        Vector3f lightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z);
-
-        // Project the camera position to light space and make sure it is only moved in texel steps (avoids flickering when moving the camera)
-        float texelSize = 1.0f / config.getRendering().getShadowMapResolution();
-        texelSize *= 2.0f;
-
-        lightCamera.getViewProjectionMatrix().transformVector(lightPosition);           // msteiger: I guess this should be transformPoint
-        lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
-        lightCamera.getInverseViewProjectionMatrix().transformVector(lightPosition);    // msteiger: I guess this should be transformPoint
-
-        // ... we position our new camera at the position of the player and move it
-        // quite a bit into the direction of the sun (our main light).
-
-        // Make sure the sun does not move too often since it causes massive shadow flickering (from hell to the max)!
-        float stepSize = 50f;
-        Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
-
-        Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(256.0f + 64.0f);
-        lightPosition.add(sunPosition);
-
-        lightCamera.getPosition().set(lightPosition);
-
-        // and adjust it to look from the sun direction into the direction of our player
-        Vector3f negSunDirection = new Vector3f(sunDirection);
-        negSunDirection.scale(-1.0f);
-
-        lightCamera.getViewingDirection().set(negSunDirection);
-    }
-
-    @Override
-    public boolean isHeadUnderWater() {
-        Vector3f cameraPos = new Vector3f(CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition());
-
-        // Compensate for waves
-        if (config.getRendering().isAnimateWater()) {
-            cameraPos.y -= RenderHelper.evaluateOceanHeightAtPosition(cameraPos, worldProvider.getTime().getDays());
-        }
-
-        if (worldProvider.isBlockRelevant(new Vector3f(cameraPos))) {
-            Block block = worldProvider.getBlock(new Vector3f(cameraPos));
-            return block.isLiquid();
-        }
-        return false;
-    }
-
-    /**
-     * Updates the tick variable that animation is based on
-     */
-    private void updateTick(float delta) {
-        tick += delta * 1000;
-    }
-
-    /**
-     * Chunk position of the player.
-     *
-     * @return The player offset chunk
-     */
-    private Vector3i calcCamChunkOffset() {
-        return new Vector3i((int) (getActiveCamera().getPosition().x / ChunkConstants.SIZE_X),
-                (int) (getActiveCamera().getPosition().y / ChunkConstants.SIZE_Y),
-                (int) (getActiveCamera().getPosition().z / ChunkConstants.SIZE_Z));
-    }
-
-    /**
-     * Sets a new player and spawns him at the spawning point.
-     *
-     * @param p The player
-     */
-    @Override
-    public void setPlayer(LocalPlayer p) {
-        player = p;
-        updateChunksInProximity(calculateViewRegion(config.getRendering().getViewDistance()));
-    }
-
-    @Override
-    public void changeViewDistance(ViewDistance viewingDistance) {
-        logger.info("New Viewing Distance: {}", viewingDistance);
-        updateChunksInProximity(calculateViewRegion(viewingDistance));
-    }
-
-    private Region3i calculateViewRegion(ViewDistance viewingDistance) {
-        Vector3i newChunkPos = calcCamChunkOffset();
-        Vector3i distance = viewingDistance.getChunkDistance();
-        return Region3i.createFromCenterExtents(newChunkPos, new Vector3i(distance.x / 2, distance.y / 2, distance.z / 2));
-    }
-
-    @Override
-    public ChunkProvider getChunkProvider() {
-        return chunkProvider;
-    }
-
-    /**
-     * Disposes this world.
-     */
-    @Override
-    public void dispose() {
-        worldProvider.dispose();
-        CoreRegistry.get(AudioManager.class).stopAllSounds();
-    }
-
-    /**
-     * @return true if pregeneration is complete
-     */
-    @Override
-    public boolean pregenerateChunks() {
-        boolean complete = true;
-        Vector3i newChunkPos = calcCamChunkOffset();
-        Vector3i viewingDistance = config.getRendering().getViewDistance().getChunkDistance();
-
-        chunkProvider.completeUpdate();
-        chunkProvider.beginUpdate();
-        for (Vector3i pos : Region3i.createFromCenterExtents(newChunkPos, new Vector3i(viewingDistance.x / 2, viewingDistance.y / 2, viewingDistance.z / 2))) {
-            RenderableChunk chunk = chunkProvider.getChunk(pos);
-            if (chunk == null) {
-                complete = false;
-            } else if (chunk.isDirty()) {
-                ChunkView view = worldProvider.getLocalView(chunk.getPosition());
-                if (view == null) {
-                    continue;
-                }
-                chunk.setDirty(false);
-
-                ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
-                for (int seg = 0; seg < VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = chunkTessellator.generateMesh(view,
-                        ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS, seg * (ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS));
-                }
-
-                chunk.setPendingMesh(newMeshes);
-
-                if (chunk.getPendingMesh() != null) {
-
-                    for (int j = 0; j < chunk.getPendingMesh().length; j++) {
-                        chunk.getPendingMesh()[j].generateVBOs();
-                    }
-                    if (chunk.getMesh() != null) {
-                        for (int j = 0; j < chunk.getMesh().length; j++) {
-                            chunk.getMesh()[j].dispose();
-                        }
-                    }
-                    chunk.setMesh(chunk.getPendingMesh());
-                    chunk.setPendingMesh(null);
-                }
-                return false;
-            }
-        }
-        return complete;
-    }
-
-    @Override
     public String getMetrics() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Dirty Chunks: ");
-        builder.append(statDirtyChunks);
-        builder.append("\n");
-        builder.append("Ignored Phases: ");
-        builder.append(statIgnoredPhases);
-        builder.append("\n");
-        builder.append("Visible Chunks: ");
-        builder.append(statVisibleChunks);
-        builder.append("\n");
+        builder.append(renderableWorld.getMetrics());
         builder.append("Empty Mesh Chunks: ");
         builder.append(statChunkMeshEmpty);
         builder.append("\n");
@@ -1088,41 +798,6 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         return player;
     }
 
-    public boolean isAABBVisible(Camera cam, AABB aabb) {
-        return cam.getViewFrustum().intersects(aabb);
-    }
-
-    @Override
-    public boolean isAABBVisible(AABB aabb) {
-        return isAABBVisible(activeCamera, aabb);
-    }
-
-    public boolean isChunkValidForRender(RenderableChunk c) {
-        return c.isReady() && c.areAdjacentChunksReady();
-    }
-
-    public boolean isChunkVisible(Camera cam, RenderableChunk c) {
-        return cam.getViewFrustum().intersects(c.getAABB());
-    }
-
-    public boolean isChunkVisibleLight(RenderableChunk c) {
-        return isChunkVisible(lightCamera, c);
-    }
-
-    public boolean isChunkVisible(RenderableChunk c) {
-        return isChunkVisible(activeCamera, c);
-    }
-
-    public boolean isChunkVisibleReflection(RenderableChunk c) {
-        return activeCamera.getViewFrustumReflected().intersects(c.getAABB());
-    }
-
-    public boolean isLightVisible(Vector3f positionViewSpace, LightComponent component) {
-        return component.lightType == LightComponent.LightType.DIRECTIONAL
-                || activeCamera.getViewFrustum().intersects(positionViewSpace, component.lightAttenuationRange);
-
-    }
-
     @Override
     public float getDaylight() {
         return skysphere.getDaylight();
@@ -1131,6 +806,11 @@ public final class WorldRendererLwjgl implements WorldRenderer {
     @Override
     public WorldProvider getWorldProvider() {
         return worldProvider;
+    }
+
+    @Override
+    public ChunkProvider getChunkProvider() {
+        return renderableWorld.getChunkProvider();
     }
 
     @Override
@@ -1173,47 +853,5 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         Vector3f cameraPos = getActiveCamera().getPosition();
         Block block = worldProvider.getBlock(cameraPos);
         return block.getTint();
-    }
-
-    private static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
-
-        @Override
-        public int compare(RenderableChunk o1, RenderableChunk o2) {
-            double distance = distanceToCamera(o1);
-            double distance2 = distanceToCamera(o2);
-
-            if (o1 == null) {
-                return -1;
-            } else if (o2 == null) {
-                return 1;
-            }
-
-            if (distance == distance2) {
-                return 0;
-            }
-
-            return distance2 > distance ? -1 : 1;
-        }
-    }
-
-    private static class ChunkBackToFrontComparator implements Comparator<RenderableChunk> {
-
-        @Override
-        public int compare(RenderableChunk o1, RenderableChunk o2) {
-            double distance = distanceToCamera(o1);
-            double distance2 = distanceToCamera(o2);
-
-            if (o1 == null) {
-                return 1;
-            } else if (o2 == null) {
-                return -1;
-            }
-
-            if (distance == distance2) {
-                return 0;
-            }
-
-            return distance2 > distance ? 1 : -1;
-        }
     }
 }

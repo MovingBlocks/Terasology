@@ -349,6 +349,9 @@ tasks.addRule("Pattern: fetchLib<ID>") { String taskName ->
                     githubHome = 'openleap'
                     repo = 'jitter'
                     break;
+                case 'Index' :
+                    githubHome = 'Terasology'
+                    break;
             }
 
             // Allow user to override the GitHub account to pull from. Supply with -PgithubAccount="TargetAccountName"

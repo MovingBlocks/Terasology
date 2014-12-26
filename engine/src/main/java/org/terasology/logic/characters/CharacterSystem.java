@@ -81,7 +81,8 @@ public class CharacterSystem extends BaseComponentSystem implements UpdateSubscr
 
     private PickupBuilder pickupBuilder;
 
-    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD,
+            StandardCollisionGroup.CHARACTER};
 
 
     @Override

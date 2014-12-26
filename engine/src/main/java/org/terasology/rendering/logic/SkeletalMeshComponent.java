@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.geom.Vector3f;
+import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
@@ -35,6 +36,8 @@ import java.util.Map;
 public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;
+
+    @Replicate
     public MeshAnimation animation;
     public boolean loop;
     public float animationRate = 1.0f;
