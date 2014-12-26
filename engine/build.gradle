@@ -121,6 +121,7 @@ dependencies {
 
     // Our developed libs
     compile group: 'org.terasology', name: 'gestalt-module', version: '2.1.0'
+    compile group: 'org.terasology', name: 'TeraMath', version: '+', changing: true
     compile group: 'org.terasology.bullet', name: 'tera-bullet', version: '1.0.3'
 
     // Wildcard dependency to catch any libs provided with the project (remote repo preferred instead)
