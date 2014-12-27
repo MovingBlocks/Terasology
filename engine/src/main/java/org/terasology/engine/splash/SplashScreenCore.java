@@ -17,20 +17,21 @@
 package org.terasology.engine.splash;
 
 /**
- * Provides access to a {@link SplashScreenCore} implementation.
+ * The basic interface for all splash screen implementations.
  * @author Martin Steiger
  */
-public final class SplashScreen {
+public interface SplashScreenCore {
 
-    private static final SplashScreenCore INSTANCE = (java.awt.SplashScreen.getSplashScreen() != null)
-            ? new SplashScreenImpl()
-            : new SplashScreenStub();
+    /**
+     * Adds a message to the message queue.
+     * @param message the message to post
+     */
+    void post(String message);
 
-    private SplashScreen() {
-        // no instances!
-    }
-
-    public static SplashScreenCore getInstance() {
-        return INSTANCE;
-    }
+    /**
+     * Closes the splash screen through code. If not called it
+     * will await for an AWT/Swing window to open.
+     * Closing a closed splash screen does not have an effect.
+     */
+    void close();
 }

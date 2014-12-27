@@ -118,12 +118,15 @@ public final class Terasology {
                     });
                 }
 
+                SplashScreen.getInstance().close();
                 engine.run(new StateMainMenu());
             }
         } catch (RuntimeException e) {
             if (!GraphicsEnvironment.isHeadless()) {
                 logException(e);
             }
+        } finally {
+            SplashScreen.getInstance().close();
         }
     }
 

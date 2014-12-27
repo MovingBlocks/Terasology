@@ -17,13 +17,18 @@
 package org.terasology.engine.splash;
 
 /**
- * TODO Type description
+ * A dummy implementation of {@link SplashScreenCore}.
  * @author Martin Steiger
  */
-public interface SplashScreenCore {
+class SplashScreenStub implements SplashScreenCore {
 
-    /**
-     * @param message the message to post
-     */
-    void post(String message);
+    @Override
+    public void post(String message) {
+        // ignore
+    }
+
+    @Override
+    public void close() {
+        // ignore
+    }
 }

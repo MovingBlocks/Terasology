@@ -17,13 +17,23 @@
 package org.terasology.engine.splash;
 
 /**
- * A dummy implementation of {@link SplashScreenCore}.
+ * Provides access to a {@link SplashScreenCore} implementation.
  * @author Martin Steiger
  */
-class SplashScreenStub implements SplashScreenCore {
+public final class SplashScreen {
 
-    @Override
-    public void post(String message) {
-        // ignore
+    private static final SplashScreenCore INSTANCE = (java.awt.SplashScreen.getSplashScreen() != null)
+            ? new SplashScreenImpl()
+            : new SplashScreenStub();
+
+    private SplashScreen() {
+        // no instances!
+    }
+
+    /**
+     * @return a valid instance of a splash screen. Never <code>null</code>.
+     */
+    public static SplashScreenCore getInstance() {
+        return INSTANCE;
     }
 }

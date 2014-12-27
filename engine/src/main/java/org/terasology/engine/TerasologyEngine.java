@@ -32,6 +32,7 @@ import org.terasology.engine.bootstrap.ApplyModulesUtil;
 import org.terasology.engine.modes.GameState;
 import org.terasology.engine.module.ModuleManager;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.DisplayDevice;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
@@ -145,7 +146,11 @@ public class TerasologyEngine implements GameEngine {
             logger.info("Initializing Terasology...");
             logEnvironmentInfo();
 
+            SplashScreen.getInstance().post("Loading config file ...");
+
             initConfig();
+
+            SplashScreen.getInstance().post("Pre-initialize subsystems ...");
 
             preInitSubsystems();
 
@@ -157,11 +162,15 @@ public class TerasologyEngine implements GameEngine {
 
             initManagers();
 
+            SplashScreen.getInstance().post("Post-initialize subsystems ...");
+
             postInitSubsystems();
 
             verifyRequiredSystemIsRegistered(DisplayDevice.class);
             verifyRequiredSystemIsRegistered(RenderingSubsystemFactory.class);
             verifyRequiredSystemIsRegistered(InputSystem.class);
+
+            SplashScreen.getInstance().post("Initialize assets ...");
 
             initAssets();
 
@@ -269,13 +278,17 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+
+        SplashScreen.getInstance().post("Loading modules ...");
         ModuleManager moduleManager = CoreRegistry.putPermanently(ModuleManager.class, new ModuleManager());
 
+        SplashScreen.getInstance().post("Loading reflections ...");
         ReflectFactory reflectFactory = CoreRegistry.putPermanently(ReflectFactory.class, new ReflectionReflectFactory());
         CopyStrategyLibrary copyStrategyLibrary = CoreRegistry.putPermanently(CopyStrategyLibrary.class, new CopyStrategyLibrary(reflectFactory));
 
         CoreRegistry.putPermanently(TypeSerializationLibrary.class, new TypeSerializationLibrary(reflectFactory, copyStrategyLibrary));
 
+        SplashScreen.getInstance().post("Loading assets ...");
         AssetManager assetManager = CoreRegistry.putPermanently(AssetManager.class, new AssetManager(moduleManager.getEnvironment()));
         assetManager.setEnvironment(moduleManager.getEnvironment());
         CoreRegistry.putPermanently(CollisionGroupManager.class, new CollisionGroupManager());

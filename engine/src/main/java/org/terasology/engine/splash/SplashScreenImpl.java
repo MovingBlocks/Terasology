@@ -46,7 +46,7 @@ final class SplashScreenImpl implements SplashScreenCore {
     /**
      * In frames
      */
-    private final int msgUpdateFreq = 5;
+    private final int msgUpdateFreq = 3;
 
     private final Timer timer;
 
@@ -78,6 +78,15 @@ final class SplashScreenImpl implements SplashScreenCore {
     @Override
     public void post(String message) {
         messageQueue.add(message);
+    }
+
+    @Override
+    public void close() {
+        SplashScreen splashScreen = SplashScreen.getSplashScreen();
+
+        if (splashScreen != null && splashScreen.isVisible()) {
+            splashScreen.close();
+        }
     }
 
     private void update(SplashScreen splashScreen) {
