@@ -32,21 +32,22 @@ import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.math.Vector3i;
 import org.terasology.module.ModuleEnvironment;
-import org.terasology.network.Client;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
 import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
-import org.terasology.world.chunks.Chunk;
 
 /**
- * TODO Type description
+ * An abstract implementation of {@link StorageManager} that is able
+ * to read from a data store.
+ * @author Immortius
+ * @author Florian <florian@fkoeberle.de>
  * @author Martin Steiger
  */
-public class StorageManagerStub implements StorageManager {
+public abstract class AbstractStorageManager implements StorageManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(StorageManagerStub.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractStorageManager.class);
 
     private final StoragePathProvider storagePathProvider;
 
@@ -56,22 +57,12 @@ public class StorageManagerStub implements StorageManager {
     private EngineEntityManager entityManager;
     private PrefabSerializer prefabSerializer;
 
-    public StorageManagerStub(ModuleEnvironment environment, EngineEntityManager entityManager) {
-        this(environment, entityManager, true);
-    }
-
-    public StorageManagerStub(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+    public AbstractStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
-    }
-
-
-    @Override
-    public void finishSavingAndShutdown() {
-        // don't care
     }
 
     @Override
@@ -93,22 +84,6 @@ public class StorageManagerStub implements StorageManager {
             return new PlayerStoreInternal(playerId, store, this, entityManager);
         }
         return new PlayerStoreInternal(playerId, this, entityManager);
-    }
-
-
-    @Override
-    public void requestSaving() {
-        // don't care
-    }
-
-    @Override
-    public void waitForCompletionOfPreviousSaveAndStartSaving() {
-        // don't care
-    }
-
-    @Override
-    public void deactivateChunk(Chunk chunk) {
-        // don't care
     }
 
     @Override
@@ -146,26 +121,6 @@ public class StorageManagerStub implements StorageManager {
 
     @Override
     public void update() {
-    }
-
-    @Override
-    public boolean isSaving() {
-        return false;
-    }
-
-    @Override
-    public void checkAndRepairSaveIfNecessary() throws IOException {
-        // can't do that ..
-    }
-
-    @Override
-    public void deleteWorld() {
-        // can't do that ..
-    }
-
-    @Override
-    public void deactivatePlayer(Client client) {
-        // don't care
     }
 
     public boolean isStoreChunksInZips() {

@@ -46,7 +46,7 @@ import org.terasology.naming.Name;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -91,7 +91,7 @@ public class HeadlessEnvironment extends Environment {
         ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
         EngineEntityManager engineEntityManager = CoreRegistry.get(EngineEntityManager.class);
 
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager.getEnvironment(), engineEntityManager));
+        CoreRegistry.put(StorageManager.class, new ReadWriteStorageManager(moduleManager.getEnvironment(), engineEntityManager));
     }
 
     @Override

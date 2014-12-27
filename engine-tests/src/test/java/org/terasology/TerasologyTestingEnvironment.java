@@ -38,7 +38,7 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
@@ -108,7 +108,7 @@ public abstract class TerasologyTestingEnvironment {
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager.getEnvironment(), engineEntityManager));
+        CoreRegistry.put(StorageManager.class, new ReadWriteStorageManager(moduleManager.getEnvironment(), engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

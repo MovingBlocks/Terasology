@@ -106,7 +106,7 @@ public final class Terasology {
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
             if (!saveGamesEnabled) {
-                CoreRegistry.get(Config.class).getTransients().useSaveGames(saveGamesEnabled);
+                CoreRegistry.get(Config.class).getTransients().storeSaveGames(saveGamesEnabled);
             }
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());

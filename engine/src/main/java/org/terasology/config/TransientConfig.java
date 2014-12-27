@@ -23,13 +23,13 @@ package org.terasology.config;
  */
 public class TransientConfig {
 
-    private boolean useSaveGames = true;
+    private boolean storeSaveGames = true;
 
-    public boolean useSaveGames() {
-        return useSaveGames;
+    public boolean storeSaveGames() {
+        return storeSaveGames;
     }
 
-    public void useSaveGames(boolean use) {
-        this.useSaveGames = use;
+    public void storeSaveGames(boolean use) {
+        this.storeSaveGames = use;
     }
 }

@@ -32,8 +32,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StorageManagerInternal;
-import org.terasology.persistence.internal.StorageManagerStub;
+import org.terasology.persistence.internal.ReadOnlyStorageManager;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -109,10 +109,10 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        boolean useSaveGames = CoreRegistry.get(Config.class).getTransients().useSaveGames();
+        boolean useSaveGames = CoreRegistry.get(Config.class).getTransients().storeSaveGames();
         StorageManager storageManager = useSaveGames
-                ? new StorageManagerInternal(environment, entityManager)
-                : new StorageManagerStub(environment, entityManager);
+                ? new ReadWriteStorageManager(environment, entityManager)
+                : new ReadOnlyStorageManager(environment, entityManager);
         CoreRegistry.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");

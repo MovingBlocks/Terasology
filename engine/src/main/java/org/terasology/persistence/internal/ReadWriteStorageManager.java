@@ -76,8 +76,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Immortius
  * @author Florian <florian@fkoeberle.de>
  */
-public final class StorageManagerInternal extends StorageManagerStub implements EntityDestroySubscriber {
-    private static final Logger logger = LoggerFactory.getLogger(StorageManagerInternal.class);
+public final class ReadWriteStorageManager extends AbstractStorageManager implements EntityDestroySubscriber {
+    private static final Logger logger = LoggerFactory.getLogger(ReadWriteStorageManager.class);
 
     private final TaskMaster<Task> saveThreadManager;
 
@@ -113,11 +113,11 @@ public final class StorageManagerInternal extends StorageManagerStub implements 
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
 
-    public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager) {
+    public ReadWriteStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager) {
         this(environment, entityManager, true);
     }
 
-    public StorageManagerInternal(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+    public ReadWriteStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
         super(environment, entityManager, storeChunksInZips);
 
         this.entityManager = entityManager;
@@ -187,15 +187,6 @@ public final class StorageManagerInternal extends StorageManagerStub implements 
         } finally {
             worldDirectoryReadLock.unlock();
         }
-    }
-
-    @Override
-    public PlayerStore loadPlayerStore(String playerId) {
-        EntityData.PlayerStore store = loadPlayerStoreData(playerId);
-        if (store != null) {
-            return new PlayerStoreInternal(playerId, store, this, entityManager);
-        }
-        return new PlayerStoreInternal(playerId, this, entityManager);
     }
 
     /**
