@@ -17,12 +17,12 @@ package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.module.ModuleManager;
-import org.terasology.engine.paths.PathManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.EntityDestroySubscriber;
@@ -40,7 +40,6 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.serializers.PrefabSerializer;
 import org.terasology.protobuf.EntityData;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
@@ -57,8 +56,10 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
 
 import javax.vecmath.Vector3f;
+
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,12 +82,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private final TaskMaster<Task> saveThreadManager;
 
-    private ModuleEnvironment environment;
-    private EngineEntityManager entityManager;
-    private PrefabSerializer prefabSerializer;
-
-    private final StoragePathProvider storagePathProvider;
     private final SaveTransactionHelper saveTransactionHelper;
+
     /**
      * This lock should be hold during read and write operation in the world directory. Currently it is being hold
      * during reads of chunks or players as they are crruently the only data that needs to be loaded during the game.
@@ -112,24 +109,21 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndUnsavedPlayerMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, EntityData.PlayerStore> unloadedAndSavingPlayerMap = Maps.newConcurrentMap();
 
-
-    public ReadWriteStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager) {
-        this(environment, entityManager, true);
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) throws IOException {
+        this(savePath, environment, entityManager, true);
     }
 
-    public ReadWriteStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
-        super(environment, entityManager, storeChunksInZips);
+    public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) throws IOException {
+        super(savePath, environment, entityManager, storeChunksInZips);
 
-        this.entityManager = entityManager;
-        this.environment = environment;
-        this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
         entityManager.subscribe(this);
-        this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
-        this.saveTransactionHelper = new SaveTransactionHelper(storagePathProvider);
+        Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
+        this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
 
     }
+
 
     @Override
     public void finishSavingAndShutdown() {
@@ -156,7 +150,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
      * @param unsavedEntities currently loaded persistent entities without owner that have not been saved yet.
      */
     private void addGlobalStoreToSaveTransaction(SaveTransactionBuilder transactionBuilder, Set<EntityRef> unsavedEntities) {
-        GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(entityManager, prefabSerializer);
+        GlobalStoreSaver globalStoreSaver = new GlobalStoreSaver(getEntityManager(), getPrefabSerializer());
         for (EntityRef entity : unsavedEntities) {
             globalStoreSaver.store(entity);
         }
@@ -233,7 +227,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private Map<Vector3i, Collection<EntityRef>> createChunkPosToUnsavedEntitiesMap() {
         Map<Vector3i, Collection<EntityRef>> chunkPosToEntitiesMap = Maps.newHashMap();
-        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+        for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
             /*
              * Note: Entities with owners get saved with the owner. Entities that are always relevant don't get stored
              * in chunk as the chunk is not always loaded
@@ -267,7 +261,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     private CompressedChunkBuilder createCompressedChunkBuilder(Chunk chunk,
                                                                 Collection<EntityRef> entitiesToSave,
                                                                 boolean deactivate) {
-        EntityStorer storer = new EntityStorer(entityManager);
+        EntityStorer storer = new EntityStorer(getEntityManager());
         for (EntityRef entityRef : entitiesToSave) {
             if (entityRef.isPersistent()) {
                 storer.store(entityRef, deactivate);
@@ -308,13 +302,13 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private SaveTransaction createSaveTransaction() {
         SaveTransactionBuilder saveTransactionBuilder = new SaveTransactionBuilder(
-                isStoreChunksInZips(), storagePathProvider, worldDirectoryWriteLock);
+                isStoreChunksInZips(), getStoragePathProvider(), worldDirectoryWriteLock);
 
         /**
          * Currently loaded persistent entities without owner that have not been saved yet.
          */
         Set<EntityRef> unsavedEntities = new HashSet<>();
-        for (EntityRef entity: entityManager.getAllEntities()) {
+        for (EntityRef entity: getEntityManager().getAllEntities()) {
             if (entity.isPersistent() && !entity.getOwner().exists()) {
                 unsavedEntities.add(entity);
             }
@@ -366,7 +360,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private EntityData.PlayerStore createPlayerStore(Client client, EntityRef character, boolean deactivate) {
         String playerId = client.getId();
-        PlayerStore playerStore = new PlayerStoreInternal(playerId, this, entityManager);
+        PlayerStore playerStore = new PlayerStoreInternal(playerId, this, getEntityManager());
         if (character.exists()) {
             playerStore.setCharacter(character);
         }
@@ -385,7 +379,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         playerEntityStore.setCharacterPosY(relevanceLocation.y);
         playerEntityStore.setCharacterPosZ(relevanceLocation.z);
         playerEntityStore.setHasCharacter(hasCharacter);
-        EntityStorer storer = new EntityStorer(entityManager);
+        EntityStorer storer = new EntityStorer(getEntityManager());
         storer.store(character, PlayerStoreInternal.CHARACTER, deactivate);
         playerEntityStore.setStore(storer.finaliseStore());
 
@@ -397,7 +391,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         List<EntityRef> entitiesToStore = Lists.newArrayList();
 
         AABB aabb = chunk.getAABB();
-        for (EntityRef entity : entityManager.getEntitiesWith(LocationComponent.class)) {
+        for (EntityRef entity : getEntityManager().getEntitiesWith(LocationComponent.class)) {
             if (!entity.getOwner().exists() && !entity.isAlwaysRelevant() && !entity.hasComponent(ClientComponent.class)) {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null) {
@@ -545,7 +539,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
     @Override
     public void checkAndRepairSaveIfNecessary() throws IOException {
         saveTransactionHelper.cleanupSaveTransactionDirectory();
-        if (Files.exists(storagePathProvider.getUnmergedChangesPath())) {
+        if (Files.exists(getStoragePathProvider().getUnmergedChangesPath())) {
             saveTransactionHelper.mergeChanges();
         }
     }
@@ -560,7 +554,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         unloadedAndSavingPlayerMap.clear();
 
         try {
-            FilesUtil.recursiveDelete(storagePathProvider.getWorldPath());
+            FilesUtil.recursiveDelete(getStoragePathProvider().getWorldPath());
         } catch (IOException e) {
             logger.error("Failed to purge chunks", e);
         }

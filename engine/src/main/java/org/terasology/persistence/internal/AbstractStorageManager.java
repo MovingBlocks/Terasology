@@ -51,18 +51,19 @@ public abstract class AbstractStorageManager implements StorageManager {
 
     private final StoragePathProvider storagePathProvider;
 
+    private final ModuleEnvironment environment;
+    private final EngineEntityManager entityManager;
+    private final PrefabSerializer prefabSerializer;
+
     private boolean storeChunksInZips = true;
 
-    private ModuleEnvironment environment;
-    private EngineEntityManager entityManager;
-    private PrefabSerializer prefabSerializer;
-
-    public AbstractStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+    public AbstractStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
         this.entityManager = entityManager;
         this.environment = environment;
         this.storeChunksInZips = storeChunksInZips;
         this.prefabSerializer = new PrefabSerializer(entityManager.getComponentLibrary(), entityManager.getTypeSerializerLibrary());
-        this.storagePathProvider = new StoragePathProvider(PathManager.getInstance().getCurrentSavePath());
+
+        this.storagePathProvider = new StoragePathProvider(savePath);
     }
 
     @Override
@@ -164,4 +165,19 @@ public abstract class AbstractStorageManager implements StorageManager {
         return null;
     }
 
+    protected StoragePathProvider getStoragePathProvider() {
+        return storagePathProvider;
+    }
+
+    protected ModuleEnvironment getEnvironment() {
+        return environment;
+    }
+
+    protected EngineEntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    protected PrefabSerializer getPrefabSerializer() {
+        return prefabSerializer;
+    }
 }

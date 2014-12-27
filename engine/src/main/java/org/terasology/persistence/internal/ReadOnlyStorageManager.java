@@ -17,6 +17,7 @@
 package org.terasology.persistence.internal;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.module.ModuleEnvironment;
@@ -29,12 +30,12 @@ import org.terasology.world.chunks.Chunk;
  */
 public final class ReadOnlyStorageManager extends AbstractStorageManager {
 
-    public ReadOnlyStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager) {
-        this(environment, entityManager, true);
+    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) {
+        this(savePath, environment, entityManager, true);
     }
 
-    public ReadOnlyStorageManager(ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
-        super(environment, entityManager, storeChunksInZips);
+    public ReadOnlyStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager, boolean storeChunksInZips) {
+        super(savePath, environment, entityManager, storeChunksInZips);
     }
 
     @Override

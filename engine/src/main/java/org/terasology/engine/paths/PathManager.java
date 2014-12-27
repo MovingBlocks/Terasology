@@ -156,15 +156,6 @@ public final class PathManager {
         updateDirs();
     }
 
-    public Path getCurrentSavePath() {
-        return currentWorldPath;
-    }
-
-    public void setCurrentSaveTitle(String worldTitle) throws IOException {
-        currentWorldPath = getSavePath(worldTitle);
-        Files.createDirectories(currentWorldPath);
-    }
-
     public Path getHomePath() {
         return homePath;
     }
