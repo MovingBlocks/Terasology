@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
+import org.terasology.engine.ComponentFieldUri;
 import org.terasology.logic.behavior.tree.LookupNode;
 import org.terasology.logic.behavior.tree.Node;
 import org.terasology.module.Module;
@@ -105,6 +106,7 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                     .setPrettyPrinting()
                     .registerTypeAdapterFactory(new NodeTypeAdapterFactory())
                     .registerTypeAdapter(BehaviorTree.class, new BehaviorTreeTypeAdapterFactory())
+                    .registerTypeAdapter(ComponentFieldUri.class, new ComponentFieldUriAdapterFactory())
                     .create();
         }
 
@@ -215,6 +217,26 @@ public class BehaviorTreeLoader implements AssetLoader<BehaviorTreeData> {
                 String uri = in.nextString();
                 if (uri != null && uri.length() > 0) {
                     return (BehaviorTree) Assets.resolve(AssetType.BEHAVIOR, in.nextString());
+                } else {
+                    return null;
+                }
+            }
+        }
+        private class ComponentFieldUriAdapterFactory extends TypeAdapter<ComponentFieldUri> {
+            @Override
+            public void write(JsonWriter out, ComponentFieldUri value) throws IOException {
+                if (value == null) {
+                    out.value("");
+                } else {
+                    out.value(value.toString());
+                }
+            }
+
+            @Override
+            public ComponentFieldUri read(JsonReader in) throws IOException {
+                String uri = in.nextString();
+                if (uri != null && uri.length() > 0) {
+                    return new ComponentFieldUri(uri);
                 } else {
                     return null;
                 }
