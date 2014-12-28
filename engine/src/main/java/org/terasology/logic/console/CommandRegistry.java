@@ -20,9 +20,9 @@ import org.terasology.logic.console.commands.Command;
 import java.util.HashMap;
 
 /**
- * Created by Limeth on 10.12.2014.
+ * @author Limeth
  *
- * Contains {@link org.terasology.logic.console.commands.AbstractCommand}s ordered by priority.
+ * Contains {@link org.terasology.logic.console.commands.Command}s, command names (keys) are not case sensitive.
  */
 public class CommandRegistry extends HashMap<String, Command> {
 	@Override
