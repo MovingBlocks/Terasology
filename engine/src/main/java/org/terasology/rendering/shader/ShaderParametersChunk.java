@@ -24,6 +24,7 @@ import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
+import org.terasology.world.generator.WorldGenerator;
 
 import javax.vecmath.Vector4f;
 
@@ -35,8 +36,6 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
-    @EditorRange(min = 1.0f, max = 128.0f)
-    public float waterHeight = 32.0f;
     @EditorRange(min = 0.0f, max = 2.0f)
     public float waveIntens = 2.0f;
     @EditorRange(min = 0.0f, max = 2.0f)
@@ -144,7 +143,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         alternativeWaterSettingsFrag.x = waterTint;
         program.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
 
-        program.setFloat("waterHeight", waterHeight, true);
+        int seaLevel = CoreRegistry.get(WorldGenerator.class).getWorld().getSeaLevel();
+        program.setFloat("waterHeight", seaLevel, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
             program.setFloat("waveIntensFalloff", waveIntensFalloff, true);
