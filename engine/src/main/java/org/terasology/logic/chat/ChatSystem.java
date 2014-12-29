@@ -16,7 +16,6 @@
 
 package org.terasology.logic.chat;
 
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
@@ -98,10 +97,8 @@ public class ChatSystem extends BaseComponentSystem {
     @CommandDefinition(runOnServer = true, shortDescription = "Sends a message to all other players")
     public String say(
             @Sender EntityRef sender,
-            @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
+            @CommandParameter(value = "message") String message
     ) {
-        String message = Joiner.on(' ').join(messageArray);
-
         logger.debug("Received chat message from {} : '{}'", sender, message);
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
@@ -115,7 +112,7 @@ public class ChatSystem extends BaseComponentSystem {
     public String whisper(
             @Sender EntityRef sender,
             @CommandParameter(value = "user", suggester = CommandParameterSuggester.UsernameSuggester.class) String username,
-            @CommandParameter(value = "message", arrayDelimiter = CommandParameter.ARRAY_DELIMITER_VARARGS) String[] messageArray
+            @CommandParameter("message") String message
     ) {
         Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
         EntityRef targetClient = null;
@@ -168,7 +165,6 @@ public class ChatSystem extends BaseComponentSystem {
         DisplayNameComponent senderDisplayNameComponent = senderClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
         ClientComponent targetClientComponent = targetClient.getComponent(ClientComponent.class);
         DisplayNameComponent targetDisplayNameComponent = targetClientComponent.clientInfo.getComponent(DisplayNameComponent.class);
-        String message = Joiner.on(' ').join(messageArray);
         String targetMessage = FontColor.getColored("*whispering* ", ConsoleColors.ERROR)
                 + FontColor.getColored(message, ConsoleColors.CHAT);
         String senderMessage = "You -> " + targetDisplayNameComponent.name
