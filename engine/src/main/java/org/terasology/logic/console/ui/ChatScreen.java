@@ -15,15 +15,13 @@
  */
 package org.terasology.logic.console.ui;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
@@ -34,6 +32,9 @@ import org.terasology.rendering.nui.layouts.ScrollableArea;
 import org.terasology.rendering.nui.widgets.ActivateEventListener;
 import org.terasology.rendering.nui.widgets.UILabel;
 import org.terasology.rendering.nui.widgets.UIText;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The chat console widget
@@ -77,7 +78,7 @@ public class ChatScreen extends CoreScreenLayer {
                     List<String> params = Collections.singletonList(text);
     
                     // TODO: move command execution to separate class
-                    console.execute(command, params, localPlayer.getClientEntity());
+                    console.execute(new Name(command), params, localPlayer.getClientEntity());
                     commandLine.setText("");
                     scrollArea.moveToBottom();
                 }

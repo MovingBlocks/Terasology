@@ -16,6 +16,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.event.Event;
+import org.terasology.naming.Name;
 import org.terasology.network.ServerEvent;
 
 import java.util.List;
@@ -28,22 +29,22 @@ import java.util.List;
 @ServerEvent
 final class CommandEvent implements Event {
 
-    private String command;
-    private List<String> params;
+    private Name commandName;
+    private List<String> parameters;
 
     CommandEvent() {
     }
 
-    public CommandEvent(String command, List<String> params) {
-        this.command = command;
-        this.params = params;
+    public CommandEvent(Name commandName, List<String> parameters) {
+        this.commandName = commandName;
+        this.parameters = parameters;
     }
 
-    public String getCommand() {
-        return command;
+    public Name getCommandName() {
+        return commandName;
     }
 
-    public List<String> getParams() {
-        return params;
+    public List<String> getParameters() {
+        return parameters;
     }
 }

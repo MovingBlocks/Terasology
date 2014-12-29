@@ -193,22 +193,21 @@ public class ConsoleImpl implements Console {
             localCommandHistory.add(rawCommand);
         }
 
-        return execute(commandName, processedParameters, callingClient);
+        return execute(new Name(commandName), processedParameters, callingClient);
     }
 
     @Override
-    public boolean execute(String commandNameRaw, List<String> params, EntityRef callingClient) {
-        if (commandNameRaw.isEmpty()) {
+    public boolean execute(Name commandName, List<String> params, EntityRef callingClient) {
+        if (commandName.isEmpty()) {
             return false;
         }
 
         //get the command
-        Name commandName = new Name(commandNameRaw);
         Command cmd = getCommand(commandName);
 
         //check if the command is loaded
         if (cmd == null) {
-            addErrorMessage("Unknown command '" + commandNameRaw + "'");
+            addErrorMessage("Unknown command '" + commandName + "'");
             return false;
         }
 
@@ -226,7 +225,7 @@ public class ConsoleImpl implements Console {
         }
 
         if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
-            callingClient.send(new CommandEvent(commandNameRaw, params));
+            callingClient.send(new CommandEvent(commandName, params));
             return true;
         } else {
             try {

@@ -100,7 +100,7 @@ public interface Console {
      * @param callingClient the resonsible client entity
      * @return true if successful
      */
-    boolean execute(String commandName, List<String> params, EntityRef callingClient);
+    boolean execute(Name commandName, List<String> params, EntityRef callingClient);
 
     /**
      * @param rawCommand Command entered in the UI
