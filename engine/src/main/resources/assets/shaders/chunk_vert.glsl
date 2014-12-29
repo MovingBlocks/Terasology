@@ -22,6 +22,8 @@ varying vec3 waterNormalViewSpace;
 const vec3 normalDiffOffset = vec3(-1.0, 0.0, 1.0);
 const vec2 normalDiffSize = vec2(2.0, 0.0);
 
+uniform float waterHeight;
+
 uniform float waveIntensFalloff;
 uniform float waveSizeFalloff;
 uniform float waveSpeedFalloff;
@@ -157,7 +159,7 @@ void main()
 #if defined (ANIMATED_WATER)
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
-       if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
+       if (vertexWorldPos.y < waterHeight + 0.5 && vertexWorldPos.y > waterHeight - 0.5) {
             vec4 normalAndOffset = calcWaterNormalAndOffset(vertexWorldPos.xz);
 
             waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;

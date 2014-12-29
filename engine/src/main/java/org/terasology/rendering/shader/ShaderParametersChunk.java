@@ -35,6 +35,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk extends ShaderParametersBase {
+    @EditorRange(min = 1.0f, max = 128.0f)
+    public float waterHeight = 32.0f;
     @EditorRange(min = 0.0f, max = 2.0f)
     public float waveIntens = 2.0f;
     @EditorRange(min = 0.0f, max = 2.0f)
@@ -141,6 +143,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         Vector4f alternativeWaterSettingsFrag = new Vector4f();
         alternativeWaterSettingsFrag.x = waterTint;
         program.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag, true);
+
+        program.setFloat("waterHeight", waterHeight, true);
 
         if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
             program.setFloat("waveIntensFalloff", waveIntensFalloff, true);

@@ -42,6 +42,8 @@ uniform sampler2D textureWaterNormal;
 uniform sampler2D textureWaterNormalAlt;
 #endif
 
+uniform float waterHeight;
+
 #if defined (NORMAL_MAPPING)
 varying vec3 worldSpaceNormal;
 varying mat3 normalMatrix;
@@ -136,8 +138,8 @@ void main() {
     bool isOceanWater = false;
 
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
-        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-            vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0;
+        if (vertexWorldPos.y < waterHeight + 0.5 && vertexWorldPos.y > waterHeight - 0.5 && isUpside > 0.99) {
+            vec2 scaledVertexWorldPos = vertexWorldPos.xz / waterHeight;
 
             vec2 waterOffset = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.0075), scaledVertexWorldPos.y + timeToTick(time, 0.0075));
             vec2 waterOffset2 = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.005), scaledVertexWorldPos.y - timeToTick(time, 0.005));
