@@ -47,16 +47,16 @@ import java.util.Comparator;
  */
 public class RenderableWorldImpl implements RenderableWorld {
 
-    public static final int MAX_ANIMATED_CHUNKS = 64;
-    public static final int MAX_BILLBOARD_CHUNKS = 64;
-    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
-    public static final int MAX_CHUNKS_FOR_SHADOWS = TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
-
+    private static final int MAX_ANIMATED_CHUNKS = 64;
+    private static final int MAX_BILLBOARD_CHUNKS = 64;
     private static final int MAX_LOADABLE_CHUNKS = ViewDistance.MEGA.getChunkDistance().x * ViewDistance.MEGA.getChunkDistance().y * ViewDistance.MEGA.getChunkDistance().z;
-    private static final int CHUNK_YSIZE_TO_SEGMENTS_RATIO = ChunkConstants.SIZE_Y / VERTICAL_SEGMENTS;
     private static final Vector3f CHUNK_CENTER_OFFSET = new Vector3f(0.5f, 0.5f, 0.5f);
 
     private static final Logger logger = LoggerFactory.getLogger(RenderableWorldImpl.class);
+
+    private final int maxChunksForShadows = TeraMath.clamp(CoreRegistry.get(Config.class).getRendering().getMaxChunksUsedForShadowMapping(), 64, 1024);
+    private final int verticalChunkMeshSegements = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+    private final int chunkYsizeToSegmentsRatio = ChunkConstants.SIZE_Y / verticalChunkMeshSegements;
 
     private final WorldProvider worldProvider;
     private ChunkProvider chunkProvider;
@@ -129,7 +129,7 @@ public class RenderableWorldImpl implements RenderableWorld {
         chunkProvider.beginUpdate();
 
         RenderableChunk chunk;
-        ChunkMesh[] newMesh;
+        ChunkMesh[] newMesh = new ChunkMesh[verticalChunkMeshSegements];
         ChunkView localView;
         for (Vector3i chunkCoordinates : calculateRenderableRegion(renderingConfig.getViewDistance())) {
             chunk = chunkProvider.getChunk(chunkCoordinates);
@@ -142,9 +142,8 @@ public class RenderableWorldImpl implements RenderableWorld {
                 }
                 chunk.setDirty(false);
 
-                newMesh = new ChunkMesh[VERTICAL_SEGMENTS];
-                for (int segment = 0; segment < VERTICAL_SEGMENTS; segment++) {
-                    newMesh[segment] = chunkTessellator.generateMesh(localView, CHUNK_YSIZE_TO_SEGMENTS_RATIO, segment * CHUNK_YSIZE_TO_SEGMENTS_RATIO);
+                for (int segment = 0; segment < verticalChunkMeshSegements; segment++) {
+                    newMesh[segment] = chunkTessellator.generateMesh(localView, chunkYsizeToSegmentsRatio, segment * chunkYsizeToSegmentsRatio);
                     newMesh[segment].generateVBOs();
                 }
 
@@ -156,7 +155,7 @@ public class RenderableWorldImpl implements RenderableWorld {
                 chunk.setMesh(newMesh);
 
                 pregenerationIsComplete = false;
-                return pregenerationIsComplete;
+                break;
             }
         }
         return pregenerationIsComplete;
@@ -304,7 +303,7 @@ public class RenderableWorldImpl implements RenderableWorld {
             if (isChunkValidForRender(chunk)) {
                 mesh = chunk.getMesh();
 
-                if (isDynamicShadows && fillShadowRenderQueue && chunkCounter < MAX_CHUNKS_FOR_SHADOWS && isChunkVisibleLight(chunk)) {
+                if (isDynamicShadows && fillShadowRenderQueue && chunkCounter < maxChunksForShadows && isChunkVisibleLight(chunk)) {
                     if (triangleCount(mesh, ChunkMesh.RenderPhase.OPAQUE) > 0) {
                         renderQueues.chunksOpaqueShadow.add(chunk);
                     } else {
@@ -423,13 +422,8 @@ public class RenderableWorldImpl implements RenderableWorld {
         return builder.toString();
     }
 
-    private static float squaredDistanceToCamera(RenderableChunk chunk) {
-        // This method is used in the Chunk comparator classes below. Because of its interface,
-        // a comparator cannot receive the camera as one of this method's inputs. And because
-        // they are implemented as static classes they cannot receive it in the constructor either.
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-
-        // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
+    private static float squaredDistanceToCamera(RenderableChunk chunk, Vector3f cameraPosition) {
+         // For performance reasons, to avoid instantiating too many vectors in a frequently called method,
         // comments are in use instead of appropriately named vectors.
         Vector3f result = chunk.getPosition().toVector3f(); // chunk position in chunk coordinates
         result.add(CHUNK_CENTER_OFFSET);                    // chunk center in chunk coordinates
@@ -443,12 +437,16 @@ public class RenderableWorldImpl implements RenderableWorld {
         return result.lengthSquared();
     }
 
+    // TODO: find the right place to check if the activeCamera has changed,
+    // TODO: so that the comparators can hold an up-to-date reference to it
+    // TODO: and avoid having to find it on a per-comparison basis.
     private static class ChunkFrontToBackComparator implements Comparator<RenderableChunk> {
 
         @Override
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
-            double distance1 = squaredDistanceToCamera(chunk1);
-            double distance2 = squaredDistanceToCamera(chunk2);
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
+            double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
             if (chunk1 == null) {
                 return -1;
@@ -468,8 +466,9 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         @Override
         public int compare(RenderableChunk chunk1, RenderableChunk chunk2) {
-            double distance1 = squaredDistanceToCamera(chunk1);
-            double distance2 = squaredDistanceToCamera(chunk2);
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            double distance1 = squaredDistanceToCamera(chunk1, cameraPosition);
+            double distance2 = squaredDistanceToCamera(chunk2, cameraPosition);
 
             if (chunk1 == null) {
                 return 1;
