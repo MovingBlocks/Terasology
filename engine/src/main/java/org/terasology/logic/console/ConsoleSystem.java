@@ -24,6 +24,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.ButtonState;
 import org.terasology.input.binds.general.ConsoleButton;
 import org.terasology.logic.console.commands.Command;
+import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
@@ -64,7 +65,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
         List<String> params = event.getParams();
-        Command cmd = console.getCommand(event.getCommand());
+        Command cmd = console.getCommand(new Name(event.getCommand()));
 
         if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
             console.execute(event.getCommand(), event.getParams(), entity);

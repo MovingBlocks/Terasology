@@ -27,6 +27,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.FontColor;
 import org.terasology.utilities.CamelCaseMatcher;
@@ -64,18 +65,17 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         commandNames = Collections2.transform(commands, new Function<Command, String>() {
             @Override
             public String apply(Command input) {
-                return input.getName();
+                return input.getName().toString();
             }
         });
-
         return true;
     }
 
-    private Set<String> findMatches(String commandName, List<String> commandParameters,
+    private Set<String> findMatches(Name commandName, List<String> commandParameters,
                                  Command command, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
-            return CamelCaseMatcher.getMatches(commandName, commandNames, true);
+            return CamelCaseMatcher.getMatches(commandName.toString(), commandNames, true);
         } else if (command == null) {
             return null;
         }
@@ -125,7 +125,8 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
             query = rawCommand;
         }
 
-        String commandName = console.processCommandName(query);
+        String commandNameRaw = console.processCommandName(query);
+        Name commandName = new Name(commandNameRaw);
         List<String> commandParameters = console.processParameters(query);
         Command command = console.getCommand(commandName);
         int suggestedIndex = commandParameters.size() + (query.charAt(query.length() - 1) == ' ' ? 1 : 0);
@@ -182,12 +183,12 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         return generateResult(suggestion, commandName, commandParameters, suggestedIndex);
     }
 
-    private String generateResult(String suggestion, String commandName,
+    private String generateResult(String suggestion, Name commandName,
                                   List<String> commandParameters, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             return suggestion;
         } else {
-            String result = commandName;
+            String result = commandName.toString();
 
             for (int i = 0; i < suggestedIndex - 1; i++) {
                 result += " " + commandParameters.get(i);

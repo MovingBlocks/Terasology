@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
+import org.terasology.naming.Name;
 
 import java.util.Comparator;
 import java.util.List;
@@ -60,7 +61,7 @@ public interface Command extends Comparable<Command> {
      *
      * @return The name of this command
      */
-    String getName();
+    Name getName();
 
     /**
      * @return The parameter definitions of this command, never null.

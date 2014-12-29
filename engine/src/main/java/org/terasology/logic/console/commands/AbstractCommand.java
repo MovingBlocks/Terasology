@@ -29,6 +29,7 @@ import org.terasology.logic.console.commands.exceptions.CommandInitializationExc
 import org.terasology.logic.console.commands.exceptions.CommandParameterParseException;
 import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.naming.Name;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.Method;
@@ -44,7 +45,7 @@ public abstract class AbstractCommand implements Command {
     public static final String METHOD_NAME_EXECUTE = "execute";
     public static final String METHOD_NAME_SUGGEST = "suggest";
     private static final Logger logger = LoggerFactory.getLogger(AbstractCommand.class);
-    private final String name;
+    private final Name name;
     private final String requiredPermission;
     private final boolean runOnServer;
     private final String description;
@@ -55,7 +56,7 @@ public abstract class AbstractCommand implements Command {
     private int requiredParameterCount;
     private String usage;
 
-    public AbstractCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
+    public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                            SpecificAccessibleObject<Method> executionMethod) {
         Preconditions.checkNotNull(executionMethod);
 
@@ -69,7 +70,7 @@ public abstract class AbstractCommand implements Command {
         postConstruct();
     }
 
-    public AbstractCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
+    public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                            String executionMethodName) {
         this.name = name;
         this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
@@ -81,11 +82,11 @@ public abstract class AbstractCommand implements Command {
         postConstruct();
     }
 
-    public AbstractCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText) {
+    public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText) {
         this(name, requiredPermission, runOnServer, description, helpText, (String) null);
     }
 
-    public AbstractCommand(String name, boolean runOnServer, String description, String helpText) {
+    public AbstractCommand(Name name, boolean runOnServer, String description, String helpText) {
         this(name, PermissionManager.OPERATOR_PERMISSION, runOnServer, description, helpText);
     }
 
@@ -228,7 +229,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     private void initUsage() {
-        StringBuilder builder = new StringBuilder(name);
+        StringBuilder builder = new StringBuilder(name.toString());
 
         for (CommandParameter param : commandParameters) {
             builder.append(' ').append(param.getUsage());
@@ -433,7 +434,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public String getName() {
+    public Name getName() {
         return name;
     }
 

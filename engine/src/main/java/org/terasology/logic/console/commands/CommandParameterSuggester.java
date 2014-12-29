@@ -23,6 +23,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Console;
+import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
@@ -61,12 +62,12 @@ public interface CommandParameterSuggester<T> {
         }
     }
 
-    public static class CommandNameSuggester implements CommandParameterSuggester<String> {
+    public static class CommandNameSuggester implements CommandParameterSuggester<Name> {
         @Override
-        public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
+        public Set<Name> suggest(EntityRef sender, Object... resolvedParameters) {
             Console console = CoreRegistry.get(Console.class);
             Collection<Command> commands = console.getCommands();
-            Set<String> suggestions = Sets.newHashSetWithExpectedSize(commands.size());
+            Set<Name> suggestions = Sets.newHashSetWithExpectedSize(commands.size());
 
             for (Command command : commands) {
                 suggestions.add(command.getName());

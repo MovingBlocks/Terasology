@@ -38,13 +38,14 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.logic.console.commands.Command;
+import org.terasology.logic.console.commands.CommandParameterSuggester;
 import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.naming.Name;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -298,8 +299,8 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	@CommandDefinition(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
-	public String help(@CommandParameter(value = "command", required = false, suggester = CommandParameterSuggester.CommandNameSuggester.class) String command) {
-		if (command == null) {
+	public String help(@CommandParameter(value = "command", required = false, suggester = CommandParameterSuggester.CommandNameSuggester.class) Name commandName) {
+		if (commandName == null) {
 			StringBuilder msg = new StringBuilder();
 			Collection<Command> commands = console.getCommands();
 
@@ -315,9 +316,9 @@ public class CoreCommands extends BaseComponentSystem {
 
 			return msg.toString();
 		} else {
-			Command cmd = console.getCommand(command);
+			Command cmd = console.getCommand(commandName);
 			if (cmd == null) {
-				return "No help available for command '" + command + "'. Unknown command.";
+				return "No help available for command '" + commandName + "'. Unknown command.";
 			} else {
 				StringBuilder msg = new StringBuilder();
 

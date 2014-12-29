@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.logic.console.commands.referenced.Sender;
+import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
@@ -40,7 +41,7 @@ import java.util.Set;
 public final class ReferencedCommand extends AbstractCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedCommand.class);
 
-    private ReferencedCommand(String name, String requiredPermission, boolean runOnServer, String description, String helpText,
+    private ReferencedCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                               SpecificAccessibleObject<Method> executionMethod) {
         super(name, requiredPermission, runOnServer, description, helpText, executionMethod);
     }
@@ -58,11 +59,13 @@ public final class ReferencedCommand extends AbstractCommand {
 
         Preconditions.checkNotNull(commandAnnotation);
 
-        String name = commandAnnotation.value();
+        String nameString = commandAnnotation.value();
 
-        if (name.length() <= 0) {
-            name = method.getName();
+        if (nameString.length() <= 0) {
+            nameString = method.getName();
         }
+
+        Name name = new Name(nameString);
 
         return new ReferencedCommand(
                 name,

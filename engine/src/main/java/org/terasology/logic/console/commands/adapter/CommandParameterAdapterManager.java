@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.module.sandbox.API;
+import org.terasology.naming.Name;
 import org.terasology.world.block.family.BlockFamily;
 
 import java.util.Map;
@@ -51,6 +52,7 @@ public class CommandParameterAdapterManager {
     public static CommandParameterAdapterManager core() {
         CommandParameterAdapterManager manager = basic();
 
+        manager.registerAdapter(Name.class, new NameAdapter());
         manager.registerAdapter(Prefab.class, new PrefabAdapter());
         manager.registerAdapter(BlockFamily.class, new BlockFamilyAdapter());
 

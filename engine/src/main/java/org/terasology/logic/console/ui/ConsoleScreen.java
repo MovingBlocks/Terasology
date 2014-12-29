@@ -23,6 +23,7 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
+import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
@@ -68,15 +69,6 @@ public class ConsoleScreen extends CoreScreenLayer {
         scrollArea.moveToBottom();
 
         Collection<Command> commands = console.getCommands();
-        
-        // JAVA8: replace with lamba expression
-        Collection<String> commandNames = Collections2.transform(commands, new Function<Command, String>() {
-
-            @Override
-            public String apply(Command input) {
-                return input.getName();
-            }
-        });
 
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);

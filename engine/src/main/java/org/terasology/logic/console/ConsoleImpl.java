@@ -30,6 +30,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commands.Command;
 import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.registry.CoreRegistry;
@@ -38,6 +39,7 @@ import org.terasology.utilities.collection.CircularBuffer;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +55,7 @@ public class ConsoleImpl implements Console {
     private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
     private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
-    private final CommandRegistry commandRegistry = new CommandRegistry();
+    private final HashMap<Name, Command> commandRegistry = new HashMap<Name, Command>();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
@@ -65,7 +67,7 @@ public class ConsoleImpl implements Console {
      */
     @Override
     public void registerCommand(Command command) {
-        String commandName = command.getName();
+        Name commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
             logger.warn("Command with name '{}' already registered by class '{}', skipping '{}'",
@@ -195,17 +197,18 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public boolean execute(String commandName, List<String> params, EntityRef callingClient) {
-        if (commandName.isEmpty()) {
+    public boolean execute(String commandNameRaw, List<String> params, EntityRef callingClient) {
+        if (commandNameRaw.isEmpty()) {
             return false;
         }
 
         //get the command
+        Name commandName = new Name(commandNameRaw);
         Command cmd = getCommand(commandName);
 
         //check if the command is loaded
         if (cmd == null) {
-            addErrorMessage("Unknown command '" + commandName + "'");
+            addErrorMessage("Unknown command '" + commandNameRaw + "'");
             return false;
         }
 
@@ -223,7 +226,7 @@ public class ConsoleImpl implements Console {
         }
 
         if (cmd.isRunOnServer() && !networkSystem.getMode().isAuthority()) {
-            callingClient.send(new CommandEvent(commandName, params));
+            callingClient.send(new CommandEvent(commandNameRaw, params));
             return true;
         } else {
             try {
@@ -256,7 +259,7 @@ public class ConsoleImpl implements Console {
                 }
 
                 String errorReport = FontColor.getColored("An error occurred while executing command '"
-                                                          + commandName + "': " + causeMessage, ConsoleColors.ERROR);
+                                                          + cmd.getName() + "': " + causeMessage, ConsoleColors.ERROR);
 
                 if (callingClient.exists()) {
                     callingClient.send(new ConsoleMessageEvent(errorReport));
@@ -351,7 +354,7 @@ public class ConsoleImpl implements Console {
      * @return An array of commands with given name
      */
     @Override
-    public Command getCommand(String name) {
+    public Command getCommand(Name name) {
         return commandRegistry.get(name);
     }
 
