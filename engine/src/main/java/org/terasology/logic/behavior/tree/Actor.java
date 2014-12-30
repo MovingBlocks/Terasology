@@ -16,15 +16,19 @@
 package org.terasology.logic.behavior.tree;
 
 import com.google.common.collect.Maps;
-import org.terasology.module.sandbox.API;
+import org.terasology.engine.ComponentFieldUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.module.sandbox.API;
+import org.terasology.reflection.metadata.FieldMetadata;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -72,6 +76,28 @@ public class Actor {
             minion.addComponent(component);
         }
         return component;
+    }
+
+    public Object getComponentField(ComponentFieldUri uri) {
+        ComponentLibrary componentLibrary = CoreRegistry.get(EntitySystemLibrary.class).getComponentLibrary();
+        ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(uri.getComponentUri());
+        if (metadata == null) {
+            return null;
+        }
+        Component component = minion.getComponent(metadata.getType());
+        if (component == null) {
+            return null;
+        }
+        FieldMetadata<?,?> fieldMetadata = metadata.getField(uri.getFieldName());
+        if (fieldMetadata == null) {
+            return null;
+        }
+        Field field = fieldMetadata.getField();
+        try {
+            return field.get(component);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public SkeletalMeshComponent skeletalMesh() {
