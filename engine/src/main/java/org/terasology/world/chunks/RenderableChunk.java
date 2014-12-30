@@ -39,6 +39,10 @@ public interface RenderableChunk extends LitChunk {
 
     boolean isAnimated();
 
+    boolean hasMesh();
+
+    boolean hasPendingMesh();
+
     ChunkMesh[] getMesh();
 
     ChunkMesh[] getPendingMesh();
