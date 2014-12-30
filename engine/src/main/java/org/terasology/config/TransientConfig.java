@@ -23,13 +23,20 @@ package org.terasology.config;
  */
 public class TransientConfig {
 
-    private boolean storeSaveGames = true;
+    private boolean writeSaveGamesEnabled = true;
 
-    public boolean storeSaveGames() {
-        return storeSaveGames;
+    /**
+     * Enables/disables write access for the storage manager.
+     * @return true if save games should be (periodically) stored on the file system
+     */
+    public boolean isWriteSaveGamesEnabled() {
+        return writeSaveGamesEnabled;
     }
 
-    public void storeSaveGames(boolean use) {
-        this.storeSaveGames = use;
+    /**
+     * @param storeSaveGames if save games should be (periodically) stored on the file system
+     */
+    public void setWriteSaveGamesEnabled(boolean writeSaveGamesEnabled) {
+        this.writeSaveGamesEnabled = writeSaveGamesEnabled;
     }
 }

@@ -66,7 +66,7 @@ import java.util.List;
  *      <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
  *      <tr><td>-headless</td><td>Start headless.</td></tr>
  *      <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
- *      <tr><td>-noSaveGames</td><td>Disable save games.</td></tr>
+ *      <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  *      <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
  *  </tbody>
  * </table>
@@ -93,7 +93,7 @@ public final class Terasology {
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
-    private static boolean saveGamesEnabled = true;
+    private static boolean writeSaveGamesEnabled = true;
     private static boolean loadLastGame;
 
     private Terasology() {
@@ -105,8 +105,8 @@ public final class Terasology {
         handleLaunchArguments(args);
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
-            if (!saveGamesEnabled) {
-                CoreRegistry.get(Config.class).getTransients().storeSaveGames(saveGamesEnabled);
+            if (!writeSaveGamesEnabled) {
+                CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
             }
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
@@ -215,7 +215,7 @@ public final class Terasology {
                 isHeadless = true;
                 crashReportEnabled = false;
             } else if (arg.equals(NO_SAVE_GAMES)) {
-                saveGamesEnabled = false;
+                writeSaveGamesEnabled = false;
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {
