@@ -21,11 +21,11 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 @Produces(SurfaceHeightFacet.class)
-@Requires(@Facet(SeaLevelFacet.class))
+@Requires(@Facet(WaterLevelFacet.class))
 public class FlatSurfaceHeightProvider implements FacetProvider {
     private int height;
 

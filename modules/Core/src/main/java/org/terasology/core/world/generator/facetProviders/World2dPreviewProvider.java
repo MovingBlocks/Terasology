@@ -23,11 +23,11 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 @Produces(World2dPreviewFacet.class)
-@Requires({@Facet(SurfaceHeightFacet.class), @Facet(SeaLevelFacet.class)})
+@Requires({@Facet(SurfaceHeightFacet.class), @Facet(WaterLevelFacet.class)})
 public class World2dPreviewProvider implements FacetProvider {
     static int maxSamplesPerRegion = 4;
     static int maxDepthDescribed = 64;
@@ -42,7 +42,7 @@ public class World2dPreviewProvider implements FacetProvider {
     public void process(GeneratingRegion region) {
         World2dPreviewFacet facet = new World2dPreviewFacet();
         SurfaceHeightFacet surfaceFacet = region.getRegionFacet(SurfaceHeightFacet.class);
-        SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);
+        WaterLevelFacet seaLevelFacet = region.getRegionFacet(WaterLevelFacet.class);
         float seaLevel = seaLevelFacet.getSeaLevel();
 
         float[] values = surfaceFacet.getInternal();

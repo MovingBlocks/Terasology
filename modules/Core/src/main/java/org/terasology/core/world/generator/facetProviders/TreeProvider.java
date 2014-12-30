@@ -25,14 +25,14 @@ import org.terasology.rendering.nui.properties.Range;
 import org.terasology.utilities.procedural.NoiseTable;
 import org.terasology.world.generation.*;
 import org.terasology.world.generation.facets.DensityFacet;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * Determines where trees can be placed.  Will put trees one block above the surface.
  */
 @Produces(TreeFacet.class)
-@Requires({@Facet(SeaLevelFacet.class),
+@Requires({@Facet(WaterLevelFacet.class),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = SurfaceHeightFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
         @Facet(value = DensityFacet.class, border = @FacetBorder(bottom = 15, sides = 10)),
@@ -55,7 +55,7 @@ public class TreeProvider implements ConfigurableFacetProvider {
         TreeFacet facet = new TreeFacet(region.getRegion(), borderForTreeFacet.extendBy(0, 15, 10));
         SurfaceHeightFacet surface = region.getRegionFacet(SurfaceHeightFacet.class);
         DensityFacet density = region.getRegionFacet(DensityFacet.class);
-        SeaLevelFacet seaLevel = region.getRegionFacet(SeaLevelFacet.class);
+        WaterLevelFacet seaLevel = region.getRegionFacet(WaterLevelFacet.class);
 
         Rect2i worldRegion2D = Rect2i.createFromMinAndMax(facet.getWorldRegion().minX(),
                 facet.getWorldRegion().minZ(),

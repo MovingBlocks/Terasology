@@ -24,14 +24,14 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.Updates;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 /**
  * makes sure that chunk zero has a piece of land above the water
  */
 @Updates(@Facet(SurfaceHeightFacet.class))
-@Requires(@Facet(SeaLevelFacet.class))
+@Requires(@Facet(WaterLevelFacet.class))
 public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
 
     @Override
@@ -44,7 +44,7 @@ public class EnsureSpawnableChunkZeroProvider implements FacetProvider {
         Vector3i centerChunkPos = new Vector3i(ChunkConstants.CHUNK_REGION.center());
         if (region.getRegion().encompasses(centerChunkPos)) {
             SurfaceHeightFacet facet = region.getRegionFacet(SurfaceHeightFacet.class);
-            SeaLevelFacet seaLevelFacet = region.getRegionFacet(SeaLevelFacet.class);
+            WaterLevelFacet seaLevelFacet = region.getRegionFacet(WaterLevelFacet.class);
             float seaLevel = (float) seaLevelFacet.getSeaLevel();
 
             // update the surface height so that it spikes up to sea level

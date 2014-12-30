@@ -46,7 +46,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.generation.Region;
 import org.terasology.world.generation.World;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 import org.terasology.world.generator.WorldGenerator;
 
@@ -130,7 +130,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
             Region worldRegion = world.getWorldData(Region3i.createFromMinAndSize(new Vector3i(0, 0, 0), ChunkConstants.CHUNK_SIZE));
             //check if generation uses sea level and surfaceheight facets
             SurfaceHeightFacet surfaceHeightFacet = worldRegion.getFacet(SurfaceHeightFacet.class);
-            SeaLevelFacet seaLevelFacet = worldRegion.getFacet(SeaLevelFacet.class);
+            WaterLevelFacet seaLevelFacet = worldRegion.getFacet(WaterLevelFacet.class);
             if (surfaceHeightFacet != null && seaLevelFacet != null) {
                 int seaLevel = seaLevelFacet.getSeaLevel();
 

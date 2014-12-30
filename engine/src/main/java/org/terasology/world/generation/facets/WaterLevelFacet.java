@@ -20,22 +20,22 @@ import org.terasology.world.generation.Border3D;
 import org.terasology.world.generation.facets.base.BaseFacet2D;
 
 /**
- * Stores where sea level is
+ * Stores the water level per region
  */
-public class SeaLevelFacet extends BaseFacet2D {
+public class WaterLevelFacet extends BaseFacet2D {
 
-    int seaLevel;
+    int waterLevel;
 
-    public SeaLevelFacet(Region3i targetRegion, Border3D border) {
+    public WaterLevelFacet(Region3i targetRegion, Border3D border) {
         super(targetRegion, border);
     }
 
     public int getSeaLevel() {
-        return seaLevel;
+        return waterLevel;
     }
 
-    public void setSeaLevel(int seaLevel) {
-        this.seaLevel = seaLevel;
+    public void setWaterLevel(int waterLevel) {
+        this.waterLevel = waterLevel;
     }
 
 }
