@@ -13,36 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commandSystem;
+package org.terasology.logic.console.suggesters;
 
 import com.google.common.collect.Sets;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.Console;
-import org.terasology.module.sandbox.API;
-import org.terasology.naming.Name;
+import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.world.block.BlockManager;
-import org.terasology.world.block.family.BlockFamily;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
- * A class used for suggesting command parameter values
- *
  * @author Limeth
  */
-@API
-public interface CommandParameterSuggester<T> {
-    /**
-     * @param resolvedParameters Currently entered values of the types declared in the command method
-     * @return A collection of suggested matches.
-     */
-    Set<T> suggest(EntityRef sender, Object... resolvedParameters);
+public class UsernameSuggester implements CommandParameterSuggester<String> {
+    @Override
+    public Set<String> suggest(EntityRef sender, Object... resolvedParameters) {
+        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        Iterable<EntityRef> clients = entityManager.getEntitiesWith(ClientComponent.class);
+        Set<String> clientNames = Sets.newHashSet();
+
+        for (EntityRef client : clients) {
+            ClientComponent clientComponent = client.getComponent(ClientComponent.class);
+            DisplayNameComponent displayNameComponent = clientComponent.clientInfo.getComponent(DisplayNameComponent.class);
+
+            clientNames.add(displayNameComponent.name);
+        }
+
+        return clientNames;
+    }
 }

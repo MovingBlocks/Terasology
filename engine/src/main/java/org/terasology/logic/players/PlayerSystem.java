@@ -25,8 +25,8 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
-import org.terasology.logic.console.commandSystem.annotations.CommandParameter;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.health.DestroyEvent;
 import org.terasology.logic.health.EngineDamageTypes;
@@ -280,7 +280,7 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @CommandDefinition(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true)
+    @Command(value = "kill", shortDescription = "Reduce the player's health to zero", runOnServer = true)
     public void killCommand(@Sender EntityRef client) {
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
@@ -289,8 +289,8 @@ public class PlayerSystem extends BaseComponentSystem implements UpdateSubscribe
         }
     }
 
-    @CommandDefinition(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
-    public String teleportCommand(@Sender EntityRef sender, @CommandParameter("x") float x, @CommandParameter("y") float y, @CommandParameter("z") float z) {
+    @Command(value = "teleport", shortDescription = "Teleports you to a location", runOnServer = true)
+    public String teleportCommand(@Sender EntityRef sender, @CommandParam("x") float x, @CommandParam("y") float y, @CommandParam("z") float z) {
         ClientComponent clientComp = sender.getComponent(ClientComponent.class);
         LocationComponent location = clientComp.character.getComponent(LocationComponent.class);
         if (location != null) {

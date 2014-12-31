@@ -33,7 +33,7 @@ import java.util.Set;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface CommandParameter {
+public @interface CommandParam {
     char ARRAY_DELIMITER_DEFAULT = ',';
     char ARRAY_DELIMITER_VARARGS = ' ';
     char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';

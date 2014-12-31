@@ -25,6 +25,7 @@ import com.google.common.primitives.Primitives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandInitializationException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
@@ -42,7 +43,7 @@ import java.util.Set;
  *
  * @author Limeth
  */
-public abstract class AbstractCommand implements Command {
+public abstract class AbstractCommand implements ConsoleCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractCommand.class);
     private final Name name;
@@ -52,13 +53,15 @@ public abstract class AbstractCommand implements Command {
     private final String helpText;
     private final SpecificAccessibleObject<Method> executionMethod;
     private ImmutableList<CommandParameter> commandParameters;
-    private ImmutableList<CommandParameterType> executionMethodParameters;
+    private ImmutableList<Parameter> executionMethodParameters;
     private int requiredParameterCount;
     private String usage;
 
     public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
                            SpecificAccessibleObject<Method> executionMethod) {
         Preconditions.checkNotNull(executionMethod);
+        Preconditions.checkNotNull(description);
+        Preconditions.checkNotNull(helpText);
 
         this.name = name;
         this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
@@ -67,10 +70,6 @@ public abstract class AbstractCommand implements Command {
         this.helpText = helpText;
         this.executionMethod = executionMethod;
 
-        postConstruct();
-    }
-
-    private void postConstruct() {
         constructParametersNotNull();
         registerParameters();
         validateExecutionMethod();
@@ -80,10 +79,10 @@ public abstract class AbstractCommand implements Command {
     /**
      * @return A list of parameter types provided to the execution method.
      */
-    protected abstract List<CommandParameterType> constructParameters();
+    protected abstract List<Parameter> constructParameters();
 
     private void constructParametersNotNull() {
-        List<CommandParameterType> constructedParameters = constructParameters();
+        List<Parameter> constructedParameters = constructParameters();
 
         if (constructedParameters == null || constructedParameters.size() <= 0) {
             commandParameters = ImmutableList.of();
@@ -94,7 +93,7 @@ public abstract class AbstractCommand implements Command {
         ImmutableList.Builder<CommandParameter> commandParameterBuilder = ImmutableList.builder();
 
         for (int i = 0; i < constructedParameters.size(); i++) {
-            CommandParameterType type = constructedParameters.get(i);
+            Parameter type = constructedParameters.get(i);
 
             if (type == null) {
                 throw new CommandInitializationException("Invalid parameter definition #" + i + "; must not be null");
@@ -155,7 +154,7 @@ public abstract class AbstractCommand implements Command {
                         + " 'constructParameters' method.");
             }
 
-            CommandParameterType expectedParameterType = executionMethodParameters.get(i);
+            Parameter expectedParameterType = executionMethodParameters.get(i);
             Optional<? extends Class<?>> expectedType = expectedParameterType.getProvidedType();
             Class<?> providedType = methodParameters[i];
 
@@ -205,14 +204,14 @@ public abstract class AbstractCommand implements Command {
         int joinedParameterIndex = 0;
 
         for (int i = 0; i < executionMethodParameters.size(); i++) {
-            CommandParameterType parameterType = executionMethodParameters.get(i);
+            Parameter parameterType = executionMethodParameters.get(i);
 
             if (parameterType instanceof CommandParameter && joinedParameterIndex < joinedParameters.size()) {
                 CommandParameter parameter = (CommandParameter) parameterType;
                 String joinedParameter = joinedParameters.get(joinedParameterIndex++);
 
                 processedParameters[i] = parameter.getValue(joinedParameter);
-            } else if (parameterType instanceof CommandParameterType.SenderParameterType) {
+            } else if (parameterType == MarkerParameters.SENDER) {
                 processedParameters[i] = sender;
             }
         }
@@ -235,7 +234,7 @@ public abstract class AbstractCommand implements Command {
                 StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
 
                 for (int i = varargsIndex + 1; i < rawParameters.size(); i++) {
-                    rawParam.append(org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
+                    rawParam.append(CommandParam.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
                 }
 
                 result.add(rawParam.toString());
@@ -246,7 +245,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public final String executeRaw(List<String> rawParameters, EntityRef sender) throws CommandExecutionException {
+    public final String execute(List<String> rawParameters, EntityRef sender) throws CommandExecutionException {
         Object[] processedParameters;
 
         try {
@@ -272,7 +271,7 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public final Set<String> suggestRaw(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
+    public final Set<String> suggest(final String currentValue, List<String> rawParameters, EntityRef sender) throws CommandSuggestionException {
         //Generate an array to be used as a parameter in the 'suggest' method
         Object[] processedParametersWithoutSender;
 
@@ -363,18 +362,8 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public boolean hasDescription() {
-        return description != null && !description.isEmpty();
-    }
-
-    @Override
     public String getHelpText() {
         return helpText;
-    }
-
-    @Override
-    public boolean hasHelpText() {
-        return helpText != null && !helpText.isEmpty();
     }
 
     public String getUsage() {
@@ -400,8 +389,8 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public int compareTo(Command o) {
-        return Command.COMPARATOR.compare(this, o);
+    public int compareTo(ConsoleCommand o) {
+        return ConsoleCommand.COMPARATOR.compare(this, o);
     }
 
     @Override

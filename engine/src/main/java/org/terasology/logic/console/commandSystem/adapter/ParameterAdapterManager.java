@@ -35,7 +35,7 @@ public class ParameterAdapterManager {
      * @return A manager with basic adapters for wrapped primitives and {@link String}
      */
     @SuppressWarnings("unchecked")
-    public static ParameterAdapterManager basic() {
+    public static ParameterAdapterManager createBasic() {
         ParameterAdapterManager manager = new ParameterAdapterManager();
 
         for (Map.Entry<Class, ParameterAdapter> entry : PrimitiveAdapters.MAP.entrySet()) {
@@ -49,8 +49,8 @@ public class ParameterAdapterManager {
      * @return A manager with basic adapters and following classes:
      * {@link org.terasology.entitySystem.prefab.Prefab}
      */
-    public static ParameterAdapterManager core() {
-        ParameterAdapterManager manager = basic();
+    public static ParameterAdapterManager createCore() {
+        ParameterAdapterManager manager = createBasic();
 
         manager.registerAdapter(Name.class, new NameAdapter());
         manager.registerAdapter(Prefab.class, new PrefabAdapter());
@@ -72,48 +72,48 @@ public class ParameterAdapterManager {
 
     /**
      * @param clazz The type of the returned object
-     * @param composed The string from which to parse
+     * @param raw The string from which to parse
      * @return The parsed object
      * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
-    public <T> T parse(Class<T> clazz, String composed) throws ClassCastException {
-        Preconditions.checkNotNull(composed, "The String to parse must not be null");
+    public <T> T parse(Class<T> clazz, String raw) throws ClassCastException {
+        Preconditions.checkNotNull(raw, "The String to parse must not be null");
 
         ParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
-        return (T) adapter.parse(composed);
+        return (T) adapter.parse(raw);
     }
 
     /**
-     * @param parsed The object to convertToString
+     * @param value The object to convertToString
      * @param clazz The class pointing to the desired adapter
      * @return The composed object
      * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
-    public <T> String compose(T parsed, Class<? super T> clazz) throws ClassCastException {
-        Preconditions.checkNotNull(parsed, "The Object to convertToString must not be null");
+    public <T> String convertToString(T value, Class<? super T> clazz) throws ClassCastException {
+        Preconditions.checkNotNull(value, "The Object to convertToString must not be null");
 
         ParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
-        return adapter.convertToString(parsed);
+        return adapter.convertToString(value);
     }
 
     /**
-     * @param parsed The object to convertToString
+     * @param value The object to convertToString
      * @return The composed object
      * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
-    public String compose(Object parsed) throws ClassCastException {
-        Class<?> clazz = parsed.getClass();
+    public String convertToString(Object value) throws ClassCastException {
+        Class<?> clazz = value.getClass();
 
-        return compose(parsed, (Class<? super Object>) clazz);
+        return convertToString(value, (Class<? super Object>) clazz);
     }
 
     public ParameterAdapter getAdapter(Class<?> clazz) {

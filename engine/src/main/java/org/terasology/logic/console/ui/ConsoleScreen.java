@@ -18,7 +18,7 @@ package org.terasology.logic.console.ui;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commandSystem.Command;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
@@ -65,7 +65,7 @@ public class ConsoleScreen extends CoreScreenLayer {
         final ScrollableArea scrollArea = find("scrollArea", ScrollableArea.class);
         scrollArea.moveToBottom();
 
-        Collection<Command> commands = console.getCommands();
+        Collection<ConsoleCommand> commands = console.getCommands();
 
         commandLine = find("commandLine", UICommandEntry.class);
         getManager().setFocus(commandLine);

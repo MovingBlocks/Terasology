@@ -22,8 +22,8 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
-import org.terasology.logic.console.commandSystem.annotations.CommandParameter;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
@@ -47,8 +47,8 @@ public class ItemCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @CommandDefinition(shortDescription = "Adds an item to your inventory", runOnServer = true)
-    public String giveItem(@Sender EntityRef client, @CommandParameter("prefabId or blockName") String itemPrefabName, @CommandParameter(value = "amount", required = false) Integer amount) {
+    @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
+    public String giveItem(@Sender EntityRef client, @CommandParam("prefabId or blockName") String itemPrefabName, @CommandParam(value = "amount", required = false) Integer amount) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);

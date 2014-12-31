@@ -24,7 +24,7 @@ import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commandSystem.Command;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.naming.Name;
@@ -56,15 +56,15 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     }
 
     private boolean updateCommandNamesIfNecessary() {
-        Collection<Command> commands = console.getCommands();
+        Collection<ConsoleCommand> commands = console.getCommands();
 
         if (commandNames != null && commandNames.size() == commands.size()) {
             return false;
         }
 
-        commandNames = Collections2.transform(commands, new Function<Command, String>() {
+        commandNames = Collections2.transform(commands, new Function<ConsoleCommand, String>() {
             @Override
-            public String apply(Command input) {
+            public String apply(ConsoleCommand input) {
                 return input.getName().toString();
             }
         });
@@ -72,7 +72,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
     }
 
     private Set<String> findMatches(Name commandName, List<String> commandParameters,
-                                 Command command, int suggestedIndex) {
+                                 ConsoleCommand command, int suggestedIndex) {
         if (suggestedIndex <= 0) {
             updateCommandNamesIfNecessary();
             return CamelCaseMatcher.getMatches(commandName.toString(), commandNames, true);
@@ -90,7 +90,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         EntityRef sender = CoreRegistry.get(LocalPlayer.class).getClientEntity();
 
         try {
-            return command.suggestRaw(currentValue, finishedParameters, sender);
+            return command.suggest(currentValue, finishedParameters, sender);
         } catch (CommandSuggestionException e) {
             String causeMessage = e.getLocalizedMessage();
 
@@ -128,7 +128,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         String commandNameRaw = console.processCommandName(query);
         Name commandName = new Name(commandNameRaw);
         List<String> commandParameters = console.processParameters(query);
-        Command command = console.getCommand(commandName);
+        ConsoleCommand command = console.getCommand(commandName);
         int suggestedIndex = commandParameters.size() + (query.charAt(query.length() - 1) == ' ' ? 1 : 0);
         Set<String> matches = findMatches(commandName, commandParameters, command, suggestedIndex);
 

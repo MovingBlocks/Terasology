@@ -23,7 +23,8 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
@@ -48,14 +49,14 @@ public final class MethodCommand extends AbstractCommand {
 
     /**
      * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link org.terasology.logic.console.commandSystem.annotations.CommandDefinition}.
+     * annotated with {@link org.terasology.logic.console.commandSystem.annotations.Command}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
      */
     public static MethodCommand referringTo(SpecificAccessibleObject<Method> specificMethod) {
         Method method = specificMethod.getAccessibleObject();
-        CommandDefinition commandAnnotation = method.getAnnotation(CommandDefinition.class);
+        Command commandAnnotation = method.getAnnotation(Command.class);
 
         Preconditions.checkNotNull(commandAnnotation);
 
@@ -78,22 +79,22 @@ public final class MethodCommand extends AbstractCommand {
     }
 
     /**
-     * Registers all available command methods annotated with {@link org.terasology.logic.console.commandSystem.annotations.CommandDefinition}.
+     * Registers all available command methods annotated with {@link org.terasology.logic.console.commandSystem.annotations.Command}.
      */
     public static void registerAvailable(Object provider) {
-        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(CommandDefinition.class));
+        Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(Command.class));
         Set<Method> commandMethods = ReflectionUtils.getAllMethods(provider.getClass(), predicate);
         Console console = CoreRegistry.get(Console.class);
 
         for (Method method : commandMethods) {
-            logger.debug("Registering referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+            logger.debug("Registering command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             try {
                 SpecificAccessibleObject<Method> specificMethod = new SpecificAccessibleObject<>(method, provider);
                 MethodCommand command = referringTo(specificMethod);
                 console.registerCommand(command);
-                logger.debug("Registered referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+                logger.debug("Registered command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             } catch (Throwable t) {
-                logger.error("Failed to load referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
+                logger.error("Failed to load command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
             }
         }
     }
@@ -112,12 +113,12 @@ public final class MethodCommand extends AbstractCommand {
     }
 
     @Override
-    protected List<CommandParameterType> constructParameters() {
+    protected List<Parameter> constructParameters() {
         SpecificAccessibleObject<Method> specificExecutionMethod = getExecutionMethod();
         Method executionMethod = specificExecutionMethod.getAccessibleObject();
         Class<?>[] methodParameters = executionMethod.getParameterTypes();
         Annotation[][] methodParameterAnnotations = executionMethod.getParameterAnnotations();
-        List<CommandParameterType> parameters = Lists.newArrayListWithExpectedSize(methodParameters.length);
+        List<Parameter> parameters = Lists.newArrayListWithExpectedSize(methodParameters.length);
 
         for (int i = 0; i < methodParameters.length; i++) {
             parameters.add(getParameterTypeFor(methodParameters[i], methodParameterAnnotations[i]));
@@ -126,11 +127,11 @@ public final class MethodCommand extends AbstractCommand {
         return parameters;
     }
 
-    public static CommandParameterType getParameterTypeFor(Class<?> type, Annotation[] annotations) {
+    private static Parameter getParameterTypeFor(Class<?> type, Annotation[] annotations) {
         for (Annotation annotation : annotations) {
-            if (annotation instanceof org.terasology.logic.console.commandSystem.annotations.CommandParameter) {
-                org.terasology.logic.console.commandSystem.annotations.CommandParameter parameterAnnotation
-                        = (org.terasology.logic.console.commandSystem.annotations.CommandParameter) annotation;
+            if (annotation instanceof CommandParam) {
+                CommandParam parameterAnnotation
+                        = (CommandParam) annotation;
                 String name = parameterAnnotation.value();
                 char arrayDelimiter = parameterAnnotation.arrayDelimiter();
                 Class<? extends CommandParameterSuggester> suggesterClass = parameterAnnotation.suggester();
@@ -151,10 +152,10 @@ public final class MethodCommand extends AbstractCommand {
                     return CommandParameter.single(name, type, required, suggester);
                 }
             } else if (annotation instanceof Sender) {
-                return new CommandParameterType.SenderParameterType();
+                return MarkerParameters.SENDER;
             }
         }
 
-        return new CommandParameterType.InvalidParameterType();
+        return MarkerParameters.INVALID;
     }
 }

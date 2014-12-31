@@ -38,10 +38,10 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commandSystem.Command;
-import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
-import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
-import org.terasology.logic.console.commandSystem.annotations.CommandParameter;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
@@ -104,8 +104,8 @@ public class CoreCommands extends BaseComponentSystem {
 		pickupBuilder = new PickupBuilder(entityManager);
 	}
 
-	@CommandDefinition(shortDescription = "Reloads a skin")
-	public String reloadSkin(@CommandParameter("skin") String skin) {
+	@Command(shortDescription = "Reloads a skin")
+	public String reloadSkin(@CommandParam("skin") String skin) {
 		AssetUri uri = new AssetUri(AssetType.UI_SKIN, skin);
 		UISkinData uiSkinData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, UISkinData.class);
 		if (uiSkinData != null) {
@@ -116,14 +116,14 @@ public class CoreCommands extends BaseComponentSystem {
 		}
 	}
 
-	@CommandDefinition(shortDescription = "Enables the automatic reloading of screens when their file changes")
+	@Command(shortDescription = "Enables the automatic reloading of screens when their file changes")
 	public String enableAutoScreenReloading() {
 		CoreRegistry.get(NUIManager.class).enableAutoReload();
 		return "Automatic reloading of screens enabled: Check console for hints where they get loaded from";
 	}
 
-	@CommandDefinition(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
-	public String reloadUI(@CommandParameter("ui") String ui) {
+	@Command(shortDescription = "Reloads a ui and clears the HUD. Use at your own risk")
+	public String reloadUI(@CommandParam("ui") String ui) {
 		CoreRegistry.get(NUIManager.class).clear();
 
 		AssetUri uri = new AssetUri(AssetType.UI_ELEMENT, ui);
@@ -137,8 +137,8 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 
-	@CommandDefinition(shortDescription = "Reloads a shader")
-	public String reloadShader(@CommandParameter("shader") String shader) {
+	@Command(shortDescription = "Reloads a shader")
+	public String reloadShader(@CommandParam("shader") String shader) {
 		AssetUri uri = new AssetUri(AssetType.SHADER, shader);
 		ShaderData shaderData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, ShaderData.class);
 		if (shaderData != null) {
@@ -149,8 +149,8 @@ public class CoreCommands extends BaseComponentSystem {
 		}
 	}
 
-	@CommandDefinition(shortDescription = "Reloads a material")
-	public String reloadMaterial(@CommandParameter("material") String material) {
+	@Command(shortDescription = "Reloads a material")
+	public String reloadMaterial(@CommandParam("material") String material) {
 		AssetUri uri = new AssetUri(AssetType.MATERIAL, material);
 		MaterialData materialData = CoreRegistry.get(AssetManager.class).loadAssetData(uri, MaterialData.class);
 		if (materialData != null) {
@@ -161,7 +161,7 @@ public class CoreCommands extends BaseComponentSystem {
 		}
 	}
 
-	@CommandDefinition(shortDescription = "Toggles Fullscreen Mode")
+	@Command(shortDescription = "Toggles Fullscreen Mode")
 	public String fullscreen() {
 		TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
@@ -175,8 +175,8 @@ public class CoreCommands extends BaseComponentSystem {
 
 	}
 
-	@CommandDefinition(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
-	public void destroyEntitiesUsingPrefab(@CommandParameter("prefabName") String prefabName) {
+	@Command(shortDescription = "Removes all entities of the given prefab", runOnServer = true)
+	public void destroyEntitiesUsingPrefab(@CommandParam("prefabName") String prefabName) {
 		Prefab prefab = entityManager.getPrefabManager().getPrefab(prefabName);
 		if (prefab != null) {
 			for (EntityRef entity : entityManager.getAllEntities()) {
@@ -187,13 +187,13 @@ public class CoreCommands extends BaseComponentSystem {
 		}
 	}
 
-	@CommandDefinition(shortDescription = "Exits the game")
+	@Command(shortDescription = "Exits the game")
 	public void exit() {
 		CoreRegistry.get(GameEngine.class).shutdown();
 	}
 
-	@CommandDefinition(shortDescription = "Join a game")
-	public void join(@CommandParameter("address") final String address, @CommandParameter(value = "port", required = false) Integer portParam) {
+	@Command(shortDescription = "Join a game")
+	public void join(@CommandParam("address") final String address, @CommandParam(value = "port", required = false) Integer portParam) {
 		final int port = portParam != null ? portParam : TerasologyConstants.DEFAULT_PORT;
 
 		Callable<JoinStatus> operation = new Callable<JoinStatus>() {
@@ -227,7 +227,7 @@ public class CoreCommands extends BaseComponentSystem {
 		popup.startOperation(operation, true);
 	}
 
-	@CommandDefinition(shortDescription = "Leaves the current game and returns to main menu")
+	@Command(shortDescription = "Leaves the current game and returns to main menu")
 	public String leave() {
 		NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 		if (networkSystem.getMode() != NetworkMode.NONE) {
@@ -238,7 +238,7 @@ public class CoreCommands extends BaseComponentSystem {
 		}
 	}
 
-	@CommandDefinition(shortDescription = "Writes out information on all entities to a text file for debugging",
+	@Command(shortDescription = "Writes out information on all entities to a text file for debugging",
 			helpText = "Writes entity information out into a file named \"entityDump.txt\".")
 	public void dumpEntities() throws IOException {
 		EngineEntityManager engineEntityManager = (EngineEntityManager) entityManager;
@@ -248,8 +248,8 @@ public class CoreCommands extends BaseComponentSystem {
 	}
 
 	// TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera)
-	@CommandDefinition(shortDescription = "Spawns an instance of a prefab in the world")
-	public String spawnPrefab(@CommandParameter("prefabId") String prefabName) {
+	@Command(shortDescription = "Spawns an instance of a prefab in the world")
+	public String spawnPrefab(@CommandParam("prefabId") String prefabName) {
 		Camera camera = worldRenderer.getActiveCamera();
 		Vector3f spawnPos = camera.getPosition();
 		Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -277,9 +277,9 @@ public class CoreCommands extends BaseComponentSystem {
 
 	// TODO: Fix this up for multiplayer (cannot at the moment due to the use of the camera), also applied required
 	// TODO: permission
-	@CommandDefinition(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
+	@Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
 			"item in front of the player. You can simply pick it up.")
-	public String spawnBlock(@CommandParameter("blockName") String blockName) {
+	public String spawnBlock(@CommandParam("blockName") String blockName) {
 		Camera camera = worldRenderer.getActiveCamera();
 		Vector3f spawnPos = camera.getPosition();
 		Vector3f offset = camera.getViewingDirection();
@@ -298,13 +298,13 @@ public class CoreCommands extends BaseComponentSystem {
 		return "Spawned block.";
 	}
 
-	@CommandDefinition(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
-	public String help(@CommandParameter(value = "command", required = false, suggester = CommandParameterSuggester.CommandNameSuggester.class) Name commandName) {
+	@Command(shortDescription = "Prints out short descriptions for all available commands, or a longer help text if a command is provided.")
+	public String help(@CommandParam(value = "command", required = false, suggester = CommandNameSuggester.class) Name commandName) {
 		if (commandName == null) {
 			StringBuilder msg = new StringBuilder();
-			Collection<Command> commands = console.getCommands();
+			Collection<ConsoleCommand> commands = console.getCommands();
 
-			for (Command cmd : commands) {
+			for (ConsoleCommand cmd : commands) {
 				if (!msg.toString().isEmpty()) {
 					msg.append(Message.NEW_LINE);
 				}
@@ -316,7 +316,7 @@ public class CoreCommands extends BaseComponentSystem {
 
 			return msg.toString();
 		} else {
-			Command cmd = console.getCommand(commandName);
+			ConsoleCommand cmd = console.getCommand(commandName);
 			if (cmd == null) {
 				return "No help available for command '" + commandName + "'. Unknown command.";
 			} else {
@@ -328,12 +328,12 @@ public class CoreCommands extends BaseComponentSystem {
 				msg.append(Message.NEW_LINE);
 				msg.append("=====================================================================================================================");
 				msg.append(Message.NEW_LINE);
-				if (cmd.hasHelpText()) {
+				if (!cmd.getHelpText().isEmpty()) {
 					msg.append(cmd.getHelpText());
 					msg.append(Message.NEW_LINE);
 					msg.append("=====================================================================================================================");
 					msg.append(Message.NEW_LINE);
-				} else if (cmd.hasDescription()) {
+				} else if (!cmd.getDescription().isEmpty()) {
 					msg.append(cmd.getDescription());
 					msg.append(Message.NEW_LINE);
 					msg.append("=====================================================================================================================");

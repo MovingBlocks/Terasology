@@ -19,8 +19,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.input.cameraTarget.CameraTargetSystem;
-import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
-import org.terasology.logic.console.commandSystem.annotations.CommandParameter;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.world.WorldProvider;
@@ -33,14 +33,14 @@ public class ClientCommands extends BaseComponentSystem {
     @In
     private CameraTargetSystem cameraTargetSystem;
 
-    @CommandDefinition(shortDescription = "Displays debug information on the target entity")
+    @Command(shortDescription = "Displays debug information on the target entity")
     public String debugTarget() {
         EntityRef cameraTarget = cameraTargetSystem.getTarget();
         return cameraTarget.toFullDescription();
     }
 
-    @CommandDefinition(shortDescription = "Sets the current world time in days")
-    public String setWorldTime(@CommandParameter("day") float day) {
+    @Command(shortDescription = "Sets the current world time in days")
+    public String setWorldTime(@CommandParam("day") float day) {
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
         world.getTime().setDays(day);
 

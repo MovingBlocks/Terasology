@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
+import org.terasology.module.sandbox.API;
 import org.terasology.naming.Name;
 
 import java.util.Comparator;
@@ -30,10 +31,11 @@ import java.util.Set;
  *
  * @author Limeth
  */
-public interface Command extends Comparable<Command> {
-    Comparator<Command> COMPARATOR = new Comparator<Command>() {
+@API
+public interface ConsoleCommand extends Comparable<ConsoleCommand> {
+    Comparator<ConsoleCommand> COMPARATOR = new Comparator<ConsoleCommand>() {
         @Override
-        public int compare(Command o1, Command o2) {
+        public int compare(ConsoleCommand o1, ConsoleCommand o2) {
             int nameComparison = o1.getName().compareTo(o2.getName());
 
             if (nameComparison != 0) {
@@ -73,24 +75,14 @@ public interface Command extends Comparable<Command> {
     String getRequiredPermission();
 
     /**
-     * @return A short summary of what this Command does
+     * @return A short summary of what this Command does. Is never null, but may be empty.
      */
     String getDescription();
 
     /**
-     * @return True, if the description is not null and is not empty
-     */
-    boolean hasDescription();
-
-    /**
-     * @return A detailed description of how to use this command
+     * @return A detailed description of how to use this command. Is never null, but may be empty.
      */
     String getHelpText();
-
-    /**
-     * @return True, if the help text is not null and is not empty
-     */
-    boolean hasHelpText();
 
     /**
      * @return The required amount of parameters for this method to function properly
@@ -121,7 +113,7 @@ public interface Command extends Comparable<Command> {
      * @param parameters Parameters in an Object[] array as defined in {@link AbstractCommand#getCommandParameters()}.
      * @return A reply to the sender.
      */
-    String executeRaw(List<String> parameters, EntityRef sender) throws CommandExecutionException;
+    String execute(List<String> parameters, EntityRef sender) throws CommandExecutionException;
 
     /**
      * Suggests valid parameters.
@@ -130,12 +122,12 @@ public interface Command extends Comparable<Command> {
      * @return A set of suggestions. Never null.
      */
     //TODO maybe return an array of serializable objects?
-    Set<String> suggestRaw(String currentValue, List<String> parameters, EntityRef sender) throws CommandSuggestionException;
+    Set<String> suggest(String currentValue, List<String> parameters, EntityRef sender) throws CommandSuggestionException;
 
     /**
      * @param command A command to compare this command to
      * @return The result of {@link #COMPARATOR}'s {@code compare(this, command)} command.
      */
     @Override
-    int compareTo(Command command);
+    int compareTo(ConsoleCommand command);
 }

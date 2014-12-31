@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commandSystem.adapter;
+package org.terasology.logic.console.commandSystem;
 
-import org.terasology.module.sandbox.API;
+import com.google.common.base.Optional;
+import org.terasology.entitySystem.entity.EntityRef;
 
 /**
- * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commandSystem.AbstractCommand}
+ * Classes extending this interface occur in command method parameter definition
  *
  * @author Limeth
  */
-@API
-public interface ParameterAdapter<T> {
-    T parse(String raw);
-    String convertToString(T value);
+interface Parameter {
+    Optional<? extends Class<?>> getProvidedType();
 }

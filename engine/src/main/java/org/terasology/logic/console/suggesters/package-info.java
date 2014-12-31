@@ -13,17 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commandSystem.adapter;
+
+@API package org.terasology.logic.console.suggesters;
 
 import org.terasology.module.sandbox.API;
-
-/**
- * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commandSystem.AbstractCommand}
- *
- * @author Limeth
- */
-@API
-public interface ParameterAdapter<T> {
-    T parse(String raw);
-    String convertToString(T value);
-}
