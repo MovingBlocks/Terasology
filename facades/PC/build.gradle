@@ -41,16 +41,6 @@ dependencies {
     compile project(':engine')
 }
 
-// Change the output dir
-sourceSets {
-    main {
-        java {
-            output.classesDir 'build/classes'
-        }
-        output.resourcesDir 'build/classes'
-    }
-}
-
 // Instructions for packaging a jar file for the PC facade
 jar {
     manifest {
