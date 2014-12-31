@@ -20,7 +20,7 @@ import org.terasology.core.world.generator.facetProviders.FlatSurfaceHeightProvi
 import org.terasology.core.world.generator.facetProviders.FloraProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
+import org.terasology.core.world.generator.facetProviders.WaterLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
 import org.terasology.core.world.generator.facetProviders.TreeProvider;
 import org.terasology.core.world.generator.rasterizers.FloraRasterizer;
@@ -41,7 +41,7 @@ public class FlatWorldGenerator extends BaseFacetedWorldGenerator {
     @Override
     protected WorldBuilder createWorld(long seed) {
         return new WorldBuilder(seed)
-                .addProvider(new SeaLevelProvider(32))
+                .addProvider(new WaterLevelProvider(32))
                         // height of 40 so that it is far enough from sea level so that it doesnt just create beachfront
                 .addProvider(new FlatSurfaceHeightProvider(40))
                 .addProvider(new PerlinHumidityProvider())

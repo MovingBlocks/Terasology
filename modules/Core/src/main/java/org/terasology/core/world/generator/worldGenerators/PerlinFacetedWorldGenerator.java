@@ -24,7 +24,7 @@ import org.terasology.core.world.generator.facetProviders.PerlinHumidityProvider
 import org.terasology.core.world.generator.facetProviders.PerlinOceanProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinRiverProvider;
 import org.terasology.core.world.generator.facetProviders.PerlinSurfaceTemperatureProvider;
-import org.terasology.core.world.generator.facetProviders.SeaLevelProvider;
+import org.terasology.core.world.generator.facetProviders.WaterLevelProvider;
 import org.terasology.core.world.generator.facetProviders.SurfaceToDensityProvider;
 import org.terasology.core.world.generator.facetProviders.TreeProvider;
 import org.terasology.core.world.generator.facetProviders.World2dPreviewProvider;
@@ -48,9 +48,11 @@ public class PerlinFacetedWorldGenerator extends BaseFacetedWorldGenerator {
 
     @Override
     protected WorldBuilder createWorld(long seed) {
+        int seaLevel = 32;
         return new WorldBuilder(seed)
+                .setSeaLevel(seaLevel)
                 .addProvider(new World2dPreviewProvider())
-                .addProvider(new SeaLevelProvider())
+                .addProvider(new WaterLevelProvider(seaLevel))
                 .addProvider(new PerlinHumidityProvider())
                 .addProvider(new PerlinSurfaceTemperatureProvider())
                 .addProvider(new PerlinBaseSurfaceProvider())

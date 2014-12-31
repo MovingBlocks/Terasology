@@ -32,7 +32,7 @@ import org.terasology.world.generation.FacetProvider;
 import org.terasology.world.generation.GeneratingRegion;
 import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
-import org.terasology.world.generation.facets.SeaLevelFacet;
+import org.terasology.world.generation.facets.WaterLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
 
 import java.nio.ByteBuffer;
@@ -40,7 +40,7 @@ import java.nio.IntBuffer;
 import java.util.Set;
 
 @Produces(SurfaceHeightFacet.class)
-@Requires(@Facet(SeaLevelFacet.class))
+@Requires(@Facet(WaterLevelFacet.class))
 public class HeightMapSurfaceHeightProvider implements FacetProvider {
     private static final Logger logger = LoggerFactory.getLogger(HeightMapSurfaceHeightProvider.class);
     private static final int MAX_HEIGHT = 256;
