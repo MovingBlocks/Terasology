@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.server;
+package org.terasology.logic.console.commands.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +23,11 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Message;
-import org.terasology.network.Client;
-import org.terasology.network.ClientComponent;
-import org.terasology.network.ClientInfoComponent;
-import org.terasology.network.ColorComponent;
-import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkSystem;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
+import org.terasology.network.*;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -56,23 +52,23 @@ public class ServerCommands extends BaseComponentSystem {
     @In
     private ChunkProvider chunkProvider;
 
-    @Command(shortDescription = "Shutdown the server", runOnServer = true)
-    public String shutdownServer(EntityRef sender) {
+    @CommandDefinition(shortDescription = "Shutdown the server", runOnServer = true)
+    public String shutdownServer(@Sender EntityRef sender) {
 
         // TODO: verify permissions of sender
 
         EntityRef clientInfo = sender.getComponent(ClientComponent.class).clientInfo;
         DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
-        
+
         logger.info("Shutdown triggered by {}", name.name);
-        
+
         CoreRegistry.get(GameEngine.class).shutdown();
-        
+
         return "Server shutdown triggered";
     }
-    
-    @Command(shortDescription = "Kick user by name", runOnServer = true)
-    public String kickUser(@CommandParam("username") String username, EntityRef sender) {
+
+    @CommandDefinition(shortDescription = "Kick user by name", runOnServer = true)
+    public String kickUser(@CommandParameter("username") String username) {
 
         // TODO: verify permissions of sender
 
@@ -85,15 +81,15 @@ public class ServerCommands extends BaseComponentSystem {
                 return kick(clientEntity);
             }
         }
-        
+
         throw new IllegalArgumentException("No such user '" + username + "'");
     }
 
-    @Command(shortDescription = "Kick user by ID", runOnServer = true)
-    public String kickUserByID(@CommandParam("userId") int userId, EntityRef sender) {
+    @CommandDefinition(shortDescription = "Kick user by ID", runOnServer = true)
+    public String kickUserByID(@CommandParameter("userId") int userId) {
 
         // TODO: verify permissions of sender
-        
+
         for (EntityRef clientEntity : entityManager.getEntitiesWith(ClientComponent.class)) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
             NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
@@ -105,32 +101,32 @@ public class ServerCommands extends BaseComponentSystem {
 
         throw new IllegalArgumentException("No such user with ID " + userId);
     }
-    
-    @Command(shortDescription = "List users")
-    public String listUsers(EntityRef sender) {
+
+    @CommandDefinition(shortDescription = "List users")
+    public String listUsers() {
 
         StringBuilder stringBuilder = new StringBuilder();
-        
+
         for (EntityRef clientInfo : entityManager.getEntitiesWith(ClientInfoComponent.class)) {
 
             DisplayNameComponent dnc = clientInfo.getComponent(DisplayNameComponent.class);
             ColorComponent cc = clientInfo.getComponent(ColorComponent.class);
             NetworkComponent nc = clientInfo.getComponent(NetworkComponent.class);
-            
+
             String playerText = FontColor.getColored(dnc.name, cc.color);
             String line = String.format("%s - %s (%d)", playerText, dnc.description, nc.getNetworkId());
-            
+
             stringBuilder.append(line);
             stringBuilder.append(Message.NEW_LINE);
         }
-        
+
         return stringBuilder.toString();
     }
-    
+
     private String kick(EntityRef clientEntity) {
         NetworkSystem network = CoreRegistry.get(NetworkSystem.class);
         Client client = network.getOwner(clientEntity);
-        
+
         if (!client.isLocal()) {
             EntityRef clientInfo = clientEntity.getComponent(ClientComponent.class).clientInfo;
             DisplayNameComponent name = clientInfo.getComponent(DisplayNameComponent.class);
@@ -140,18 +136,17 @@ public class ServerCommands extends BaseComponentSystem {
             network.forceDisconnect(client);
             return "User kick triggered for '" + name.name + "'";
         }
-        
+
         return "Request declined";
     }
 
-    @Command(shortDescription = "Triggers the creation of a save game", runOnServer = true)
+    @CommandDefinition(shortDescription = "Triggers the creation of a save game", runOnServer = true)
     public void save() {
         storageManager.requestSaving();
     }
 
-    @Command(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
+    @CommandDefinition(shortDescription = "Deletes the current world and generated new chunks", runOnServer = true)
     public void purgeWorld() {
         chunkProvider.purgeWorld();
     }
 }
-

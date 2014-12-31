@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.console.commands.adapter;
 
-package org.terasology.engine.modes.loadProcesses;
-
-import org.terasology.registry.CoreRegistry;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * @author Immortius
+ * @author Limeth
  */
-public class InitialiseCommandSystem extends SingleStepLoadProcess {
+public class PrefabAdapter implements CommandParameterAdapter<Prefab> {
     @Override
-    public String getMessage() {
-        return "Initialising Command System...";
+    public Prefab parse(String composed) {
+        return Assets.get(AssetType.PREFAB, composed, Prefab.class);
     }
 
     @Override
-    public boolean step() {
-        CoreRegistry.put(Console.class, new ConsoleImpl());
-        return true;
-    }
-
-    @Override
-    public int getExpectedCost() {
-        return 1;
+    public String compose(Prefab parsed) {
+        return parsed.getURI().toSimpleString();
     }
 }

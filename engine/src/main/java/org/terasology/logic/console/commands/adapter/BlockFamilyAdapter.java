@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.console.commands.adapter;
 
-package org.terasology.engine.modes.loadProcesses;
-
+import com.sun.istack.internal.NotNull;
 import org.terasology.registry.CoreRegistry;
-import org.terasology.logic.console.Console;
-import org.terasology.logic.console.ConsoleImpl;
+import org.terasology.world.block.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
- * @author Immortius
+ * @author Limeth
  */
-public class InitialiseCommandSystem extends SingleStepLoadProcess {
+public class BlockFamilyAdapter implements CommandParameterAdapter<BlockFamily> {
     @Override
-    public String getMessage() {
-        return "Initialising Command System...";
+    public BlockFamily parse(@NotNull String composed) {
+        return CoreRegistry.get(BlockManager.class).getBlockFamily(composed);
     }
 
     @Override
-    public boolean step() {
-        CoreRegistry.put(Console.class, new ConsoleImpl());
-        return true;
-    }
-
-    @Override
-    public int getExpectedCost() {
-        return 1;
+    public String compose(@NotNull BlockFamily parsed) {
+        return parsed.getURI().toString();
     }
 }

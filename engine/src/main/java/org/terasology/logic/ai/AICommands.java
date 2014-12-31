@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Command;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
 import org.terasology.registry.In;
 
 /**
@@ -27,11 +27,23 @@ import org.terasology.registry.In;
  */
 @RegisterSystem
 public class AICommands extends BaseComponentSystem {
-
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Destroys all AIs in the world", runOnServer = true)
+    @CommandDefinition(runOnServer = true, shortDescription = "Count all AIs in the world")
+    public String countAI() {
+        int simpleAIs = 0;
+        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
+            simpleAIs++;
+        }
+        int hierarchical = 0;
+        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
+            hierarchical++;
+        }
+        return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
+    }
+
+    @CommandDefinition(runOnServer = true, shortDescription = "Destroys all AIs in the world")
     public String destroyAI() {
         int simpleAI = 0;
         for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
@@ -44,18 +56,5 @@ public class AICommands extends BaseComponentSystem {
             hierarchicalAI++;
         }
         return "Simple AIs (" + simpleAI + ") Destroyed, Hierarchical AIs (" + hierarchicalAI + ") Destroyed ";
-    }
-
-    @Command(shortDescription = "Count all AIs in the world", runOnServer = true)
-    public String countAI() {
-        int simpleAIs = 0;
-        for (EntityRef ref : entityManager.getEntitiesWith(SimpleAIComponent.class)) {
-            simpleAIs++;
-        }
-        int hierarchical = 0;
-        for (EntityRef ref : entityManager.getEntitiesWith(HierarchicalAIComponent.class)) {
-            hierarchical++;
-        }
-        return "Simple AIs: " + simpleAIs + ", Hierarchical AIs: " + hierarchical;
     }
 }

@@ -16,7 +16,8 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.internal.CommandInfo;
+import org.terasology.logic.console.commands.Command;
+import org.terasology.naming.Name;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,12 +26,12 @@ import java.util.List;
  * @author Immortius
  */
 public interface Console {
-    /**
-     * Registers an object as a command provider - all methods annotated with @Command will be made available on the console.
-     *
-     * @param provider
-     */
-    void registerCommandProvider(Object provider);
+	/**
+	 * Registers a {@link org.terasology.logic.console.commands.Command}.
+	 *
+	 * @param command
+	 */
+    void registerCommand(Command command);
 
     void dispose();
 
@@ -99,7 +100,19 @@ public interface Console {
      * @param callingClient the resonsible client entity
      * @return true if successful
      */
-    boolean execute(String commandName, List<String> params, EntityRef callingClient);
+    boolean execute(Name commandName, List<String> params, EntityRef callingClient);
+
+    /**
+     * @param rawCommand Command entered in the UI
+     * @return Command name
+     */
+    String processCommandName(String rawCommand);
+
+    /**
+     * @param rawCommand Command entered in the UI
+     * @return String command arguments
+     */
+    List<String> processParameters(String rawCommand);
 
     /**
      * Get a group of commands by their name. These will vary by the number of parameters they accept
@@ -107,14 +120,14 @@ public interface Console {
      * @param name The name of the command.
      * @return An iterator over the commands.
      */
-    Collection<CommandInfo> getCommand(String name);
+    Command getCommand(Name name);
 
     /**
-     * Get the list of all loaded commands.
+     * Get the collection of all loaded commands.
      *
-     * @return Returns the command list.
+     * @return Returns the commands.
      */
-    List<CommandInfo> getCommandList();
+    Collection<Command> getCommands();
 
     /**
      * If <code>oldMsg</code> does not exist, the method does nothing.

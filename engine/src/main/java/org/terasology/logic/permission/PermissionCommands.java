@@ -22,8 +22,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -35,10 +35,10 @@ public class PermissionCommands extends BaseComponentSystem {
     @In
     private EntityManager entityManager;
 
-    @Command(shortDescription = "Use an one time key to get op permission",
+    @CommandDefinition(shortDescription = "Use an one time key to get op permission",
             helpText = "The config file contains a one time key which can be used to get op permission",
             runOnServer = true, requiredPermission = "")
-    public String usePermissionKey(@CommandParam("key") String key, EntityRef client) {
+    public String usePermissionKey(@CommandParameter("key") String key, EntityRef client) {
         PermissionConfig permissionConfig = CoreRegistry.get(Config.class).getPermission();
         String expectedKey = permissionConfig.getOneTimeAuthorizationKey();
 
@@ -52,12 +52,12 @@ public class PermissionCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Gives specified permission to player",
+    @CommandDefinition(shortDescription = "Gives specified permission to player",
             helpText = "Gives specified permission to player",
             runOnServer = true)
     public String givePermission(
-            @CommandParam("player") String player,
-            @CommandParam("permission") String permission, EntityRef speaker) {
+            @CommandParameter("player") String player,
+            @CommandParameter("permission") String permission) {
         boolean permissionGiven = false;
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {
@@ -75,12 +75,12 @@ public class PermissionCommands extends BaseComponentSystem {
         }
     }
 
-    @Command(shortDescription = "Removes specified permission from player",
+    @CommandDefinition(shortDescription = "Removes specified permission from player",
             helpText = "Removes specified permission from player",
             runOnServer = true)
     public String removePermission(
-            @CommandParam("player") String player,
-            @CommandParam("permission") String permission, EntityRef speaker) {
+            @CommandParameter("player") String player,
+            @CommandParameter("permission") String permission) {
         boolean permissionGiven = false;
 
         for (EntityRef client : entityManager.getEntitiesWith(ClientComponent.class)) {

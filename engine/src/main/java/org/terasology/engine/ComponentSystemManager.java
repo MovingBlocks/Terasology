@@ -28,6 +28,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.RenderSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.console.Console;
+import org.terasology.logic.console.commands.ReferencedCommand;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.naming.Name;
@@ -93,7 +94,7 @@ public class ComponentSystemManager {
                     InjectionHelper.share(newSystem);
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
-                } catch (InstantiationException | IllegalAccessException e) {
+                } catch (RuntimeException | IllegalAccessException | InstantiationException e) {
                     logger.error("Failed to load system {}", id, e);
                 }
             }
@@ -132,13 +133,14 @@ public class ComponentSystemManager {
 
     private void initialiseSystem(ComponentSystem system) {
         InjectionHelper.inject(system);
+
         if (console != null) {
-            console.registerCommandProvider(system);
+            ReferencedCommand.registerAvailable(system);
         }
 
         try {
             system.initialise();
-        } catch (Throwable e) {
+        } catch (RuntimeException e) {
             logger.error("Failed to initialise system {}", system, e);
         }
     }

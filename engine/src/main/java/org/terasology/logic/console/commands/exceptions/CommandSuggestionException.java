@@ -13,14 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commands.exceptions;
 
-public class InvalidCommandCallException extends Exception {
-    public InvalidCommandCallException(String message) {
+/**
+ * Thrown while suggesting a command parameter
+ * @author Limeth
+ */
+public class CommandSuggestionException extends Exception {
+    public CommandSuggestionException() {
+    }
+
+    public CommandSuggestionException(String message) {
         super(message);
     }
 
-    public InvalidCommandCallException(String message, Throwable cause) {
+    public CommandSuggestionException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public CommandSuggestionException(Throwable cause) {
+        super(cause);
+    }
+
+    public CommandSuggestionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

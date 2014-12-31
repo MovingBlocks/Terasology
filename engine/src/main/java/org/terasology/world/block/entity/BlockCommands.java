@@ -18,7 +18,6 @@ package org.terasology.world.block.entity;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
@@ -28,9 +27,10 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
 import org.terasology.logic.console.Message;
+import org.terasology.logic.console.commands.referenced.CommandDefinition;
+import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commands.referenced.Sender;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
@@ -46,7 +46,6 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
 import javax.vecmath.Vector3f;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -88,9 +87,9 @@ public class BlockCommands extends BaseComponentSystem {
     }
 
     // TODO: Fix this up for multiplayer (cannot at the moment due to the use of camera), also apply required permission
-    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
+    @CommandDefinition(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in front of the player. " +
             "The block is set directly into the world and might override existing blocks. After placement the block can be destroyed like any regular placed block.")
-    public String placeBlock(@CommandParam("blockName") String blockName) {
+    public String placeBlock(@CommandParameter("blockName") String blockName) {
         Camera camera = renderer.getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -124,7 +123,7 @@ public class BlockCommands extends BaseComponentSystem {
         throw new IllegalArgumentException("Sorry, something went wrong!");
     }
 
-    @Command(shortDescription = "Lists all available items (prefabs)")
+    @CommandDefinition(shortDescription = "Lists all available items (prefabs)")
     public String listItems() {
 
         List<String> stringItems = Lists.newArrayList();
@@ -146,7 +145,7 @@ public class BlockCommands extends BaseComponentSystem {
         return items.toString();
     }
 
-    @Command(shortDescription = "List all available blocks")
+    @CommandDefinition(shortDescription = "List all available blocks")
     public String listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
@@ -173,7 +172,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all blocks by category")
+    @CommandDefinition(shortDescription = "Lists all blocks by category")
     public String listBlocksByCategory() {
         StringBuilder stringBuilder = new StringBuilder();
         for (String category : blockManager.getBlockCategories()) {
@@ -191,7 +190,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists all available shapes")
+    @CommandDefinition(shortDescription = "Lists all available shapes")
     public String listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
@@ -207,7 +206,7 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
+    @CommandDefinition(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
     public String listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
@@ -223,63 +222,62 @@ public class BlockCommands extends BaseComponentSystem {
         return stringBuilder.toString();
     }
 
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory", runOnServer = true)
-    public String giveBlock(@CommandParam("blockName") String uri, EntityRef client) {
-        return giveBlock(uri, 16, client);
-    }
-
-    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory", runOnServer = true)
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("quantity") int quantity, EntityRef client) {
-        List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
-        if (matchingUris.size() == 1) {
-            BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
-            return giveBlock(blockFamily, quantity, client);
-        } else if (matchingUris.isEmpty()) {
-            throw new IllegalArgumentException("No block found for '" + uri + "'");
-        } else {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Non-unique block name, possible matches: ");
-            Joiner.on(", ").appendTo(builder, matchingUris);
-            return builder.toString();
-        }
-    }
-
-    @Command(shortDescription = "Adds a block to your inventory",
+    @CommandDefinition(shortDescription = "Adds a block to your inventory",
             helpText = "Puts a desired number of the given block with the give shape into your inventory",
             runOnServer = true)
-    public String giveBlock(@CommandParam("blockName") String uri, @CommandParam("shapeName") String shapeUri, @CommandParam("quantity") int quantity, EntityRef client) {
-        List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
-        if (resolvedBlockUris.isEmpty()) {
-            throw new IllegalArgumentException("No block found for '" + uri + "'");
-        } else if (resolvedBlockUris.size() > 1) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Non-unique block name, possible matches: ");
-            Joiner.on(", ").appendTo(builder, resolvedBlockUris);
-            return builder.toString();
-        }
-        List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUri);
-        if (resolvedShapeUris.isEmpty()) {
-            throw new IllegalArgumentException("No shape found for '" + shapeUri + "'");
-        } else if (resolvedShapeUris.size() > 1) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Non-unique shape name, possible matches: ");
-            Iterator<AssetUri> shapeUris = resolvedShapeUris.iterator();
-            while (shapeUris.hasNext()) {
-                builder.append(shapeUris.next().toSimpleString());
-                if (shapeUris.hasNext()) {
-                    builder.append(", ");
+    public String giveBlock(
+            @Sender EntityRef sender,
+            @CommandParameter("blockName") String uri,
+            @CommandParameter(value = "quantity", required = false) Integer quantityParam,
+            @CommandParameter(value = "shapeName", required = false) String shapeUriParam) {
+        int quantity = quantityParam != null ? quantityParam : 16;
+        if (shapeUriParam == null) {
+            List<BlockUri> matchingUris = blockManager.resolveAllBlockFamilyUri(uri);
+            if (matchingUris.size() == 1) {
+                BlockFamily blockFamily = blockManager.getBlockFamily(matchingUris.get(0));
+                return giveBlock(blockFamily, quantity, sender);
+            } else if (matchingUris.isEmpty()) {
+                throw new IllegalArgumentException("No block found for '" + uri + "'");
+            } else {
+                StringBuilder builder = new StringBuilder();
+                builder.append("Non-unique block name, possible matches: ");
+                Joiner.on(", ").appendTo(builder, matchingUris);
+                return builder.toString();
+            }
+        } else {
+            List<BlockUri> resolvedBlockUris = blockManager.resolveAllBlockFamilyUri(uri);
+            if (resolvedBlockUris.isEmpty()) {
+                throw new IllegalArgumentException("No block found for '" + uri + "'");
+            } else if (resolvedBlockUris.size() > 1) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("Non-unique block name, possible matches: ");
+                Joiner.on(", ").appendTo(builder, resolvedBlockUris);
+                return builder.toString();
+            }
+            List<AssetUri> resolvedShapeUris = Assets.resolveAllUri(AssetType.SHAPE, shapeUriParam);
+            if (resolvedShapeUris.isEmpty()) {
+                throw new IllegalArgumentException("No shape found for '" + shapeUriParam + "'");
+            } else if (resolvedShapeUris.size() > 1) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("Non-unique shape name, possible matches: ");
+                Iterator<AssetUri> shapeUris = resolvedShapeUris.iterator();
+                while (shapeUris.hasNext()) {
+                    builder.append(shapeUris.next().toSimpleString());
+                    if (shapeUris.hasNext()) {
+                        builder.append(", ");
+                    }
                 }
+
+                return builder.toString();
             }
 
-            return builder.toString();
-        }
+            BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.MODULE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
+            if (blockUri.isValid()) {
+                return giveBlock(blockManager.getBlockFamily(blockUri), quantity, sender);
+            }
 
-        BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.MODULE_SEPARATOR + resolvedShapeUris.get(0).toSimpleString());
-        if (blockUri.isValid()) {
-            return giveBlock(blockManager.getBlockFamily(blockUri), quantity, client);
+            throw new IllegalArgumentException("Invalid block or shape");
         }
-
-        throw new IllegalArgumentException("Invalid block or shape");
     }
 
     /**

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.ui;
+package org.terasology.logic.console.commands.exceptions;
 
 /**
- * @author Immortius
+ * @author Limeth
  */
-public interface TabCompletionEngine {
+public class CommandInitializationException extends IllegalArgumentException {
+    public CommandInitializationException() {
+    }
 
-    /**
-     * @param command The currently entered command
-     * @return The command with a completed argument or the command provided.
-     */
-    String complete(String command);
-
-    /**
-     * Resets the completion engine
-     */
-    void reset();
+    public CommandInitializationException(String s) {
+        super(s);
+    }
 }
