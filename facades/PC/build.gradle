@@ -60,7 +60,7 @@ jar {
         attributes("Class-Path" : manifestClasspath)
         attributes("Implementation-Title": "Terasology-" + project.name)
         attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
-        attributes("SplashScreen-Image": "splash.png")
+        attributes("SplashScreen-Image": "splash.jpg")
     }
 }
 
@@ -206,9 +206,12 @@ task distApp (type: Sync) {
         }
     }
     from('launchScripts') {
-        exclude('*.xml')
         exclude('TeraEd.exe')
     }
+	
+    // launch4j requires the splash screen to also exist next to the exe
+    from("${sourceSets.main.output.resourcesDir}/splash.jpg")
+
     from("$buildDir/$versionFileName") {}
 
     into(subDirLibs) {

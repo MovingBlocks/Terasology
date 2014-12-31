@@ -96,6 +96,13 @@ public final class Terasology {
 
     public static void main(String[] args) throws InterruptedException {
 
+        // To have the splash screen in your favorite IDE add
+        //
+        //   eclipse:  -splash:src/main/resources/splash.jpg (the PC facade root folder is the working dir.)
+        //   IntelliJ: -splash:facades/PC/src/main/resources/splash.jpg (root project is the working dir.)
+        //
+        // as JVM argument (not program argument!)
+
         SplashScreen.getInstance().post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         handlePrintUsageRequest(args);
