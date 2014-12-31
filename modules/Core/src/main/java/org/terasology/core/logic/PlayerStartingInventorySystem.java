@@ -20,6 +20,7 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
@@ -85,6 +86,11 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, EntityRef.NULL, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
+    }
+
+    @CommandDefinition
+    public String testCommand() {
+        return "Command Complete";
     }
 
 }

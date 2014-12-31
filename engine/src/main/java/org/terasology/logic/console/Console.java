@@ -16,7 +16,7 @@
 package org.terasology.logic.console;
 
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.Command;
+import org.terasology.logic.console.commandSystem.Command;
 import org.terasology.naming.Name;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface Console {
 	/**
-	 * Registers a {@link org.terasology.logic.console.commands.Command}.
+	 * Registers a {@link org.terasology.logic.console.commandSystem.Command}.
 	 *
 	 * @param command
 	 */

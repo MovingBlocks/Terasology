@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.adapter;
-
-import org.terasology.naming.Name;
+package org.terasology.logic.console.commandSystem.exceptions;
 
 /**
  * @author Limeth
  */
-public class NameAdapter implements CommandParameterAdapter<Name> {
-    @Override
-    public Name parse(String composed) {
-        return new Name(composed);
+public class CommandParameterParseException extends Exception {
+    private final String parameter;
+
+    public CommandParameterParseException(String message, Throwable cause, String parameter) {
+        super(message, cause);
+        this.parameter = parameter;
     }
 
-    @Override
-    public String compose(Name parsed) {
-        return parsed.toString();
+    public CommandParameterParseException(String message, String parameter) {
+        super(message);
+        this.parameter = parameter;
+    }
+
+    public CommandParameterParseException(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public String getParameter() {
+        return parameter;
     }
 }

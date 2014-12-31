@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.adapter;
+package org.terasology.logic.console.commandSystem.adapter;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.Assets;
@@ -22,14 +22,14 @@ import org.terasology.entitySystem.prefab.Prefab;
 /**
  * @author Limeth
  */
-public class PrefabAdapter implements CommandParameterAdapter<Prefab> {
+public class PrefabAdapter implements ParameterAdapter<Prefab> {
     @Override
-    public Prefab parse(String composed) {
-        return Assets.get(AssetType.PREFAB, composed, Prefab.class);
+    public Prefab parse(String raw) {
+        return Assets.get(AssetType.PREFAB, raw, Prefab.class);
     }
 
     @Override
-    public String compose(Prefab parsed) {
-        return parsed.getURI().toSimpleString();
+    public String convertToString(Prefab value) {
+        return value.getURI().toSimpleString();
     }
 }

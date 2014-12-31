@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Optional;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,8 +27,8 @@ interface CommandParameterType {
     Optional<? extends Class<?>> getProvidedType();
 
     /**
-     * Used if the parameter of {@link ReferencedCommand}
-     * has a {@link org.terasology.logic.console.commands.referenced.Sender} annotation
+     * Used if the parameter of {@link MethodCommand}
+     * has a {@link org.terasology.logic.console.commandSystem.annotations.Sender} annotation
      */
     public final class SenderParameterType implements CommandParameterType {
         SenderParameterType() {
@@ -41,9 +41,9 @@ interface CommandParameterType {
     }
 
     /**
-     * Used if the parameter of {@link ReferencedCommand} doesn't have
-     * a {@link org.terasology.logic.console.commands.referenced.CommandDefinition}
-     * nor a {@link org.terasology.logic.console.commands.referenced.Sender} annotation.
+     * Used if the parameter of {@link MethodCommand} doesn't have
+     * a {@link org.terasology.logic.console.commandSystem.annotations.CommandDefinition}
+     * nor a {@link org.terasology.logic.console.commandSystem.annotations.Sender} annotation.
      */
     public final class InvalidParameterType implements CommandParameterType {
         InvalidParameterType() {

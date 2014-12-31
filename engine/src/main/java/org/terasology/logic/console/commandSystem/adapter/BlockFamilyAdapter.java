@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.adapter;
+package org.terasology.logic.console.commandSystem.adapter;
 
 import com.google.common.base.Preconditions;
 import org.terasology.registry.CoreRegistry;
@@ -23,16 +23,16 @@ import org.terasology.world.block.family.BlockFamily;
 /**
  * @author Limeth
  */
-public class BlockFamilyAdapter implements CommandParameterAdapter<BlockFamily> {
+public class BlockFamilyAdapter implements ParameterAdapter<BlockFamily> {
     @Override
-    public BlockFamily parse(String composed) {
-        Preconditions.checkNotNull(composed, "'composed' must not be null!");
-        return CoreRegistry.get(BlockManager.class).getBlockFamily(composed);
+    public BlockFamily parse(String raw) {
+        Preconditions.checkNotNull(raw, "'raw' must not be null!");
+        return CoreRegistry.get(BlockManager.class).getBlockFamily(raw);
     }
 
     @Override
-    public String compose(BlockFamily parsed) {
-        Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
-        return parsed.getURI().toString();
+    public String convertToString(BlockFamily value) {
+        Preconditions.checkNotNull(value, "'value' must not be null!");
+        return value.getURI().toString();
     }
 }

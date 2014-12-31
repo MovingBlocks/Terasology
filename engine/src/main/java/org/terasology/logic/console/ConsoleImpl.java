@@ -23,12 +23,13 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.Command;
-import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commandSystem.Command;
+import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,15 +55,16 @@ public class ConsoleImpl implements Console {
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
     private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
+
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
     private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
-    private final HashMap<Name, Command> commandRegistry = new HashMap<Name, Command>();
+    private final Map<Name, Command> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
     /**
-     * Registers a {@link org.terasology.logic.console.commands.Command}.
+     * Registers a {@link org.terasology.logic.console.commandSystem.Command}.
      *
      * @param command The command to be registered
      */

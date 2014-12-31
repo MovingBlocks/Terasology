@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.collect.Sets;
 import org.terasology.asset.AssetManager;

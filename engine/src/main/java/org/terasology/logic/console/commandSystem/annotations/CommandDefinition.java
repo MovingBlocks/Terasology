@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.commands.referenced;
+package org.terasology.logic.console.commandSystem.annotations;
 
 import org.terasology.logic.permission.PermissionManager;
+import org.terasology.module.sandbox.API;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

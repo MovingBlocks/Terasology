@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.internal;
+package org.terasology.logic.console.commands;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
@@ -38,10 +38,10 @@ import org.terasology.input.cameraTarget.CameraTargetSystem;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.Command;
-import org.terasology.logic.console.commands.CommandParameterSuggester;
-import org.terasology.logic.console.commands.referenced.CommandDefinition;
-import org.terasology.logic.console.commands.referenced.CommandParameter;
+import org.terasology.logic.console.commandSystem.Command;
+import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
+import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
+import org.terasology.logic.console.commandSystem.annotations.CommandParameter;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;

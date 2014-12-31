@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.exceptions;
+package org.terasology.logic.console.commandSystem.adapter;
 
 /**
+ * Used for providing parameters to {@code execute} and {@code suggest} methods of {@link org.terasology.logic.console.commandSystem.AbstractCommand}
+ *
  * @author Limeth
  */
-public class CommandInitializationException extends IllegalArgumentException {
-    public CommandInitializationException() {
-    }
-
-    public CommandInitializationException(String s) {
-        super(s);
-    }
+public interface ParameterAdapter<T> {
+    T parse(String raw);
+    String convertToString(T value);
 }

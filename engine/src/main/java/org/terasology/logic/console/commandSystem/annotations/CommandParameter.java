@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.console.commands.referenced;
+package org.terasology.logic.console.commandSystem.annotations;
 
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.CommandParameterSuggester;
+import org.terasology.logic.console.commandSystem.CommandParameterSuggester;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -34,9 +34,9 @@ import java.util.Set;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface CommandParameter {
-    public static final char ARRAY_DELIMITER_DEFAULT = ',';
-    public static final char ARRAY_DELIMITER_VARARGS = ' ';
-    public static final char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
+    char ARRAY_DELIMITER_DEFAULT = ',';
+    char ARRAY_DELIMITER_VARARGS = ' ';
+    char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
 
     /**
      * @return The parameter name

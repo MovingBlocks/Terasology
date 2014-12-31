@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -23,8 +23,8 @@ import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.commands.referenced.CommandDefinition;
-import org.terasology.logic.console.commands.referenced.Sender;
+import org.terasology.logic.console.commandSystem.annotations.CommandDefinition;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.naming.Name;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
@@ -38,22 +38,22 @@ import java.util.Set;
 /**
  * @author Limeth
  */
-public final class ReferencedCommand extends AbstractCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReferencedCommand.class);
+public final class MethodCommand extends AbstractCommand {
+    private static final Logger logger = LoggerFactory.getLogger(MethodCommand.class);
 
-    private ReferencedCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                              SpecificAccessibleObject<Method> executionMethod) {
+    private MethodCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
+                          SpecificAccessibleObject<Method> executionMethod) {
         super(name, requiredPermission, runOnServer, description, helpText, executionMethod);
     }
 
     /**
      * Creates a new {@code ReferencedCommand} to a specific method
-     * annotated with {@link org.terasology.logic.console.commands.referenced.CommandDefinition}.
+     * annotated with {@link org.terasology.logic.console.commandSystem.annotations.CommandDefinition}.
      *
      * @param specificMethod The method to reference to
      * @return The command reference object created
      */
-    public static ReferencedCommand referringTo(SpecificAccessibleObject<Method> specificMethod) {
+    public static MethodCommand referringTo(SpecificAccessibleObject<Method> specificMethod) {
         Method method = specificMethod.getAccessibleObject();
         CommandDefinition commandAnnotation = method.getAnnotation(CommandDefinition.class);
 
@@ -67,7 +67,7 @@ public final class ReferencedCommand extends AbstractCommand {
 
         Name name = new Name(nameString);
 
-        return new ReferencedCommand(
+        return new MethodCommand(
                 name,
                 commandAnnotation.requiredPermission(),
                 commandAnnotation.runOnServer(),
@@ -78,7 +78,7 @@ public final class ReferencedCommand extends AbstractCommand {
     }
 
     /**
-     * Registers all available command methods annotated with {@link org.terasology.logic.console.commands.referenced.CommandDefinition}.
+     * Registers all available command methods annotated with {@link org.terasology.logic.console.commandSystem.annotations.CommandDefinition}.
      */
     public static void registerAvailable(Object provider) {
         Predicate<? super Method> predicate = Predicates.<Method>and(ReflectionUtils.withModifier(Modifier.PUBLIC), ReflectionUtils.withAnnotation(CommandDefinition.class));
@@ -86,14 +86,14 @@ public final class ReferencedCommand extends AbstractCommand {
         Console console = CoreRegistry.get(Console.class);
 
         for (Method method : commandMethods) {
-            LOGGER.debug("Registering referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+            logger.debug("Registering referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             try {
                 SpecificAccessibleObject<Method> specificMethod = new SpecificAccessibleObject<>(method, provider);
-                ReferencedCommand command = referringTo(specificMethod);
+                MethodCommand command = referringTo(specificMethod);
                 console.registerCommand(command);
-                LOGGER.debug("Registered referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
+                logger.debug("Registered referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName());
             } catch (Throwable t) {
-                LOGGER.error("Failed to load referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
+                logger.error("Failed to load referenced command method {} in class {}", method.getName(), method.getDeclaringClass().getCanonicalName(), t);
             }
         }
     }
@@ -103,7 +103,7 @@ public final class ReferencedCommand extends AbstractCommand {
      *
      * @return {@code this}, the same object
      */
-    public ReferencedCommand register() {
+    public MethodCommand register() {
         Console console = CoreRegistry.get(Console.class);
 
         console.registerCommand(this);
@@ -128,9 +128,9 @@ public final class ReferencedCommand extends AbstractCommand {
 
     public static CommandParameterType getParameterTypeFor(Class<?> type, Annotation[] annotations) {
         for (Annotation annotation : annotations) {
-            if (annotation instanceof org.terasology.logic.console.commands.referenced.CommandParameter) {
-                org.terasology.logic.console.commands.referenced.CommandParameter parameterAnnotation
-                        = (org.terasology.logic.console.commands.referenced.CommandParameter) annotation;
+            if (annotation instanceof org.terasology.logic.console.commandSystem.annotations.CommandParameter) {
+                org.terasology.logic.console.commandSystem.annotations.CommandParameter parameterAnnotation
+                        = (org.terasology.logic.console.commandSystem.annotations.CommandParameter) annotation;
                 String name = parameterAnnotation.value();
                 char arrayDelimiter = parameterAnnotation.arrayDelimiter();
                 Class<? extends CommandParameterSuggester> suggesterClass = parameterAnnotation.suggester();

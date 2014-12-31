@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
-import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.naming.Name;
 
 import java.util.Comparator;
@@ -31,10 +31,10 @@ import java.util.Set;
  * @author Limeth
  */
 public interface Command extends Comparable<Command> {
-    public static final Comparator<Command> COMPARATOR = new Comparator<Command>() {
+    Comparator<Command> COMPARATOR = new Comparator<Command>() {
         @Override
         public int compare(Command o1, Command o2) {
-            int nameComparison = o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+            int nameComparison = o1.getName().compareTo(o2.getName());
 
             if (nameComparison != 0) {
                 return nameComparison;
@@ -46,13 +46,7 @@ public interface Command extends Comparable<Command> {
                 return 1;
             }
 
-            if (o1.getRequiredParameterCount() > o2.getRequiredParameterCount()) {
-                return -1;
-            } else if (o1.getRequiredParameterCount() < o2.getRequiredParameterCount()) {
-                return 1;
-            }
-
-            return 0;
+            return o2.getRequiredParameterCount() - o1.getRequiredParameterCount();
         }
     };
 

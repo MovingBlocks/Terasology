@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.adapter.CommandParameterAdapterManager;
-import org.terasology.logic.console.commands.exceptions.CommandParameterParseException;
-import org.terasology.logic.console.commands.exceptions.SuggesterInstantiationException;
+import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
+import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.commandSystem.exceptions.SuggesterInstantiationException;
 import org.terasology.registry.CoreRegistry;
 
 import java.lang.reflect.Array;
@@ -76,9 +76,9 @@ public final class CommandParameter<T> implements CommandParameterType {
         }
 
         if (arrayDelimiter != null) {
-            if (arrayDelimiter == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
+            if (arrayDelimiter == org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
                 throw new IllegalArgumentException("The array delimiter must not be the same as the escape character ("
-                        + org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER + ")!");
+                        + org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER + ")!");
             }
         }
 
@@ -122,7 +122,7 @@ public final class CommandParameter<T> implements CommandParameterType {
         }
 
         Class<?> type = getArrayClass(childType);
-        char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_DEFAULT;
+        char arrayDelimiterNotNull = arrayDelimiter != null ? arrayDelimiter : org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_DEFAULT;
 
         return new CommandParameter(name, type, arrayDelimiterNotNull, required, suggester);
     }
@@ -165,7 +165,7 @@ public final class CommandParameter<T> implements CommandParameterType {
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
                                                CommandParameterSuggester<T> suggester) {
-        return array(name, childType, org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS, required, suggester);
+        return array(name, childType, org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_VARARGS, required, suggester);
     }
 
     public static <T> CommandParameter varargs(String name, Class<T> childType, boolean required,
@@ -215,7 +215,7 @@ public final class CommandParameter<T> implements CommandParameterType {
         while (i < string.length()) {
             char c = string.charAt(i);
 
-            if (c == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
+            if (c == org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER) {
                 if (i >= string.length() - 1) {
                     throw new CommandParameterParseException("The command parameter must not end with an escape character.", rawParameter);
                 }
@@ -223,7 +223,7 @@ public final class CommandParameter<T> implements CommandParameterType {
                 string = string.substring(0, i) + string.substring(i + 1);
                 char following = string.charAt(i);
 
-                if (following != org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER && (!split || following != arrayDelimiter)) {
+                if (following != org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER && (!split || following != arrayDelimiter)) {
                     throw new CommandParameterParseException("Character '" + following + "' cannot be escaped.", rawParameter);
                 }
 
@@ -251,7 +251,7 @@ public final class CommandParameter<T> implements CommandParameterType {
     }
 
     public Object parseSingle(String string) throws CommandParameterParseException {
-        CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
+        ParameterAdapterManager parameterAdapterManager = CoreRegistry.get(ParameterAdapterManager.class);
         Class<?> childType = getTypeNotPrimitive();
 
         if (parameterAdapterManager.isAdapterRegistered(childType)) {
@@ -266,13 +266,13 @@ public final class CommandParameter<T> implements CommandParameterType {
     }
 
     public String composeSingle(Object object) {
-        CommandParameterAdapterManager parameterAdapterManager = CoreRegistry.get(CommandParameterAdapterManager.class);
+        ParameterAdapterManager parameterAdapterManager = CoreRegistry.get(ParameterAdapterManager.class);
 
         return parameterAdapterManager.compose(object, (Class<? super Object>) getType());
     }
 
     public boolean isEscaped(String string, int charIndex, boolean trail) {
-        return charIndex - 1 >= 0 && string.charAt(charIndex - 1) == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER
+        return charIndex - 1 >= 0 && string.charAt(charIndex - 1) == org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_ESCAPE_CHARACTER
                 && (!trail || !isEscaped(string, charIndex - 1, true));
     }
 
@@ -309,7 +309,7 @@ public final class CommandParameter<T> implements CommandParameterType {
     }
 
     public boolean isVarargs() {
-        return isArray() && getArrayDelimiter() == org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS;
+        return isArray() && getArrayDelimiter() == org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_VARARGS;
     }
 
     public Character getArrayDelimiter() {

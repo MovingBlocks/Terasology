@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands.adapter;
+package org.terasology.logic.console.commandSystem.adapter;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -28,17 +28,17 @@ import java.util.Map;
  * @author Limeth
  */
 @API
-public class CommandParameterAdapterManager {
-    private final Map<Class<?>, CommandParameterAdapter> adapters = Maps.newHashMap();
+public class ParameterAdapterManager {
+    private final Map<Class<?>, ParameterAdapter> adapters = Maps.newHashMap();
 
     /**
      * @return A manager with basic adapters for wrapped primitives and {@link String}
      */
     @SuppressWarnings("unchecked")
-    public static CommandParameterAdapterManager basic() {
-        CommandParameterAdapterManager manager = new CommandParameterAdapterManager();
+    public static ParameterAdapterManager basic() {
+        ParameterAdapterManager manager = new ParameterAdapterManager();
 
-        for (Map.Entry<Class<?>, CommandParameterAdapter> entry : BasicCommandParameterAdapter.map().entrySet()) {
+        for (Map.Entry<Class, ParameterAdapter> entry : PrimitiveAdapters.MAP.entrySet()) {
             manager.registerAdapter(entry.getKey(), entry.getValue());
         }
 
@@ -49,8 +49,8 @@ public class CommandParameterAdapterManager {
      * @return A manager with basic adapters and following classes:
      * {@link org.terasology.entitySystem.prefab.Prefab}
      */
-    public static CommandParameterAdapterManager core() {
-        CommandParameterAdapterManager manager = basic();
+    public static ParameterAdapterManager core() {
+        ParameterAdapterManager manager = basic();
 
         manager.registerAdapter(Name.class, new NameAdapter());
         manager.registerAdapter(Prefab.class, new PrefabAdapter());
@@ -62,7 +62,7 @@ public class CommandParameterAdapterManager {
     /**
      * @return {@code true}, if the adapter didn't override a previously present adapter
      */
-    public <T> boolean registerAdapter(Class<? extends T> clazz, CommandParameterAdapter<T> adapter) {
+    public <T> boolean registerAdapter(Class<? extends T> clazz, ParameterAdapter<T> adapter) {
         return adapters.put(clazz, adapter) == null;
     }
 
@@ -74,13 +74,13 @@ public class CommandParameterAdapterManager {
      * @param clazz The type of the returned object
      * @param composed The string from which to parse
      * @return The parsed object
-     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public <T> T parse(Class<T> clazz, String composed) throws ClassCastException {
         Preconditions.checkNotNull(composed, "The String to parse must not be null");
 
-        CommandParameterAdapter adapter = getAdapter(clazz);
+        ParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
@@ -88,26 +88,26 @@ public class CommandParameterAdapterManager {
     }
 
     /**
-     * @param parsed The object to compose
+     * @param parsed The object to convertToString
      * @param clazz The class pointing to the desired adapter
      * @return The composed object
-     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public <T> String compose(T parsed, Class<? super T> clazz) throws ClassCastException {
-        Preconditions.checkNotNull(parsed, "The Object to compose must not be null");
+        Preconditions.checkNotNull(parsed, "The Object to convertToString must not be null");
 
-        CommandParameterAdapter adapter = getAdapter(clazz);
+        ParameterAdapter adapter = getAdapter(clazz);
 
         Preconditions.checkNotNull(adapter, "No adapter found for " + clazz.getCanonicalName());
 
-        return adapter.compose(parsed);
+        return adapter.convertToString(parsed);
     }
 
     /**
-     * @param parsed The object to compose
+     * @param parsed The object to convertToString
      * @return The composed object
-     * @throws ClassCastException If the {@link CommandParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
+     * @throws ClassCastException If the {@link ParameterAdapter} is linked with an incorrect {@link java.lang.Class}.
      */
     @SuppressWarnings("unchecked")
     public String compose(Object parsed) throws ClassCastException {
@@ -116,7 +116,7 @@ public class CommandParameterAdapterManager {
         return compose(parsed, (Class<? super Object>) clazz);
     }
 
-    public CommandParameterAdapter getAdapter(Class<?> clazz) {
+    public ParameterAdapter getAdapter(Class<?> clazz) {
         return adapters.get(clazz);
     }
 }

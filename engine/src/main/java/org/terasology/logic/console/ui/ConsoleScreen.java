@@ -15,15 +15,12 @@
  */
 package org.terasology.logic.console.ui;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
-import org.terasology.logic.console.commands.Command;
+import org.terasology.logic.console.commandSystem.Command;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
-import org.terasology.naming.Name;
 import org.terasology.registry.In;
 import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;

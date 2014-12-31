@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.commands;
+package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -21,13 +21,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Primitives;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
-import org.terasology.logic.console.commands.exceptions.CommandInitializationException;
-import org.terasology.logic.console.commands.exceptions.CommandParameterParseException;
-import org.terasology.logic.console.commands.exceptions.CommandSuggestionException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandInitializationException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandParameterParseException;
+import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
@@ -42,8 +43,7 @@ import java.util.Set;
  * @author Limeth
  */
 public abstract class AbstractCommand implements Command {
-    public static final String METHOD_NAME_EXECUTE = "execute";
-    public static final String METHOD_NAME_SUGGEST = "suggest";
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractCommand.class);
     private final Name name;
     private final String requiredPermission;
@@ -68,26 +68,6 @@ public abstract class AbstractCommand implements Command {
         this.executionMethod = executionMethod;
 
         postConstruct();
-    }
-
-    public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText,
-                           String executionMethodName) {
-        this.name = name;
-        this.requiredPermission = requiredPermission != null ? requiredPermission : PermissionManager.OPERATOR_PERMISSION;
-        this.runOnServer = runOnServer;
-        this.description = description;
-        this.helpText = helpText;
-        this.executionMethod = findExecutionMethod(executionMethodName);
-
-        postConstruct();
-    }
-
-    public AbstractCommand(Name name, String requiredPermission, boolean runOnServer, String description, String helpText) {
-        this(name, requiredPermission, runOnServer, description, helpText, (String) null);
-    }
-
-    public AbstractCommand(Name name, boolean runOnServer, String description, String helpText) {
-        this(name, PermissionManager.OPERATOR_PERMISSION, runOnServer, description, helpText);
     }
 
     private void postConstruct() {
@@ -156,38 +136,6 @@ public abstract class AbstractCommand implements Command {
         }
     }
 
-    private SpecificAccessibleObject<Method> findExecutionMethod(String methodName) throws CommandInitializationException {
-        String lookupName = methodName != null ? methodName : METHOD_NAME_EXECUTE;
-        List<Method> methods = findMethods(lookupName);
-
-        if (methods.size() < 0) {
-            throw new CommandInitializationException("No " + lookupName + " method found");
-        } else if (methods.size() > 1) {
-            throw new CommandInitializationException("More than 1 " + lookupName + " methods found");
-        }
-
-        Method method = methods.get(0);
-
-        return new SpecificAccessibleObject<>(method, this);
-    }
-
-    private List<Method> findMethods(String methodName) {
-        Class<?> clazz = getClass();
-        Method[] methods = clazz.getDeclaredMethods();
-
-        List<Method> result = Lists.newArrayList();
-
-        for (Method method : methods) {
-            String currentMethodName = method.getName();
-
-            if (currentMethodName.equals(methodName)) {
-                result.add(method);
-            }
-        }
-
-        return result;
-    }
-
     private void checkArgumentCompatibility(Method method) throws CommandInitializationException {
         Class<?>[] methodParameters = method.getParameterTypes();
 
@@ -212,7 +160,7 @@ public abstract class AbstractCommand implements Command {
             Class<?> providedType = methodParameters[i];
 
             if (providedType.isPrimitive()) {
-                providedType = CommandParameter.PRIMITIVES_TO_WRAPPERS.get(providedType);
+                providedType = Primitives.wrap(providedType);
             }
 
             if (expectedType.isPresent() && !expectedType.get().isAssignableFrom(providedType)) {
@@ -287,7 +235,7 @@ public abstract class AbstractCommand implements Command {
                 StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
 
                 for (int i = varargsIndex + 1; i < rawParameters.size(); i++) {
-                    rawParam.append(org.terasology.logic.console.commands.referenced.CommandParameter.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
+                    rawParam.append(org.terasology.logic.console.commandSystem.annotations.CommandParameter.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
                 }
 
                 result.add(rawParam.toString());
