@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.commands.adapter;
 
-import com.sun.istack.internal.NotNull;
+import com.google.common.base.Preconditions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,55 +26,64 @@ import java.util.Map;
 public class BasicCommandParameterAdapter {
     public static final CommandParameterAdapter<Long> LONG = new CommandParameterAdapter<Long>() {
         @Override
-        public Long parse(@NotNull String composed) {
+        public Long parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Long.parseLong(composed);
         }
 
         @Override
-        public String compose(@NotNull Long parsed) {
+        public String compose(Long parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Integer> INTEGER = new CommandParameterAdapter<Integer>() {
         @Override
-        public Integer parse(@NotNull String composed) {
+        public Integer parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Integer.parseInt(composed);
         }
 
         @Override
-        public String compose(@NotNull Integer parsed) {
+        public String compose(Integer parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Short> SHORT = new CommandParameterAdapter<Short>() {
         @Override
-        public Short parse(@NotNull String composed) {
+        public Short parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Short.parseShort(composed);
         }
 
         @Override
-        public String compose(@NotNull Short parsed) {
+        public String compose(Short parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Byte> BYTE = new CommandParameterAdapter<Byte>() {
         @Override
-        public Byte parse(@NotNull String composed) {
+        public Byte parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Byte.parseByte(composed);
         }
 
         @Override
-        public String compose(@NotNull Byte parsed) {
+        public String compose(Byte parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Character> CHARACTER = new CommandParameterAdapter<Character>() {
         @Override
-        public Character parse(@NotNull String composed) {
+        public Character parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             if (composed.length() != 1) {
                 throw new IllegalArgumentException("The string to parse must be of length 1");
             }
@@ -83,55 +92,64 @@ public class BasicCommandParameterAdapter {
         }
 
         @Override
-        public String compose(@NotNull Character parsed) {
+        public String compose(Character parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Double> DOUBLE = new CommandParameterAdapter<Double>() {
         @Override
-        public Double parse(@NotNull String composed) {
+        public Double parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Double.parseDouble(composed);
         }
 
         @Override
-        public String compose(@NotNull Double parsed) {
+        public String compose(Double parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Float> FLOAT = new CommandParameterAdapter<Float>() {
         @Override
-        public Float parse(@NotNull String composed) {
+        public Float parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Float.parseFloat(composed);
         }
 
         @Override
-        public String compose(@NotNull Float parsed) {
+        public String compose(Float parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<Boolean> BOOLEAN = new CommandParameterAdapter<Boolean>() {
         @Override
-        public Boolean parse(@NotNull String composed) {
+        public Boolean parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return Boolean.parseBoolean(composed);
         }
 
         @Override
-        public String compose(@NotNull Boolean parsed) {
+        public String compose(Boolean parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed.toString();
         }
     };
 
     public static final CommandParameterAdapter<String> STRING = new CommandParameterAdapter<String>() {
         @Override
-        public String parse(@NotNull String composed) {
+        public String parse(String composed) {
+            Preconditions.checkNotNull(composed, "'composed' must not be null!");
             return composed;
         }
 
         @Override
-        public String compose(@NotNull String parsed) {
+        public String compose(String parsed) {
+            Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
             return parsed;
         }
     };

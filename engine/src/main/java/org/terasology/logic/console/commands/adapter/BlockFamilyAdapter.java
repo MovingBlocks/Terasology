@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.console.commands.adapter;
 
-import com.sun.istack.internal.NotNull;
+import com.google.common.base.Preconditions;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
@@ -25,12 +25,14 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class BlockFamilyAdapter implements CommandParameterAdapter<BlockFamily> {
     @Override
-    public BlockFamily parse(@NotNull String composed) {
+    public BlockFamily parse(String composed) {
+        Preconditions.checkNotNull(composed, "'composed' must not be null!");
         return CoreRegistry.get(BlockManager.class).getBlockFamily(composed);
     }
 
     @Override
-    public String compose(@NotNull BlockFamily parsed) {
+    public String compose(BlockFamily parsed) {
+        Preconditions.checkNotNull(parsed, "'parsed' must not be null!");
         return parsed.getURI().toString();
     }
 }
