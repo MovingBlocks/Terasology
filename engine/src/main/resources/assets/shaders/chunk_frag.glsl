@@ -135,23 +135,20 @@ void main() {
     bool isWater = false;
     bool isOceanWater = false;
 
-    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
-        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
-            vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0;
+    if (checkFlag(BLOCK_HINT_WATER_SURFACE, blockHint) && isUpside > 0.99) {
+        vec2 scaledVertexWorldPos = vertexWorldPos.xz / 32.0f;
 
-            vec2 waterOffset = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.0075), scaledVertexWorldPos.y + timeToTick(time, 0.0075));
-            vec2 waterOffset2 = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.005), scaledVertexWorldPos.y - timeToTick(time, 0.005));
+        vec2 waterOffset = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.0075), scaledVertexWorldPos.y + timeToTick(time, 0.0075));
+        vec2 waterOffset2 = vec2(scaledVertexWorldPos.x + timeToTick(time, 0.005), scaledVertexWorldPos.y - timeToTick(time, 0.005));
 
-            normalWaterOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-            normalWaterOffset += (texture2D(textureWaterNormalAlt, waterOffset2).xyz * 2.0 - 1.0).xy;
-            normalWaterOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+        normalWaterOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+        normalWaterOffset += (texture2D(textureWaterNormalAlt, waterOffset2).xyz * 2.0 - 1.0).xy;
+        normalWaterOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
-            normalWater.xy += normalWaterOffset;
-            normalWater = normalize(normalWater);
+        normalWater.xy += normalWaterOffset;
+        normalWater = normalize(normalWater);
 
-            isOceanWater = true;
-        }
-
+        isOceanWater = true;
         isWater = true;
     }
 #endif
