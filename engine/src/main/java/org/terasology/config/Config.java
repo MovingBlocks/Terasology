@@ -78,6 +78,11 @@ public final class Config {
     private SecurityConfig security = new SecurityConfig();
 
     /**
+     * Transient fields are not persisted in GSON's serialization process.
+     */
+    private transient TransientConfig transients = new TransientConfig();
+
+    /**
      * Create a new, empty config
      */
     public Config() {
@@ -126,6 +131,9 @@ public final class Config {
         return security;
     }
 
+    public TransientConfig getTransients() {
+        return transients;
+    }
 
     /**
      * Saves this config to the default configuration file

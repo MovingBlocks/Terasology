@@ -15,19 +15,13 @@
  */
 package org.terasology.game;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.terasology.engine.TerasologyEngine;
 import org.terasology.engine.EngineTime;
-import org.terasology.engine.paths.PathManager;
-
-import java.io.IOException;
 
 /**
  * @author Immortius
  */
 public class Game {
-    private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
     private EngineTime time;
 
@@ -44,11 +38,6 @@ public class Game {
     public void load(GameManifest manifest) {
         this.name = manifest.getTitle();
         this.seed = manifest.getSeed();
-        try {
-            PathManager.getInstance().setCurrentSaveTitle(manifest.getTitle());
-        } catch (IOException e) {
-            logger.error("Failed to set save path", e);
-        }
         time.setGameTime(manifest.getTime());
     }
 

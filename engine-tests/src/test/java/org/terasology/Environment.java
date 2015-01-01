@@ -36,7 +36,7 @@ public class Environment {
 
     /**
      * Default setup order
-     * @param modules 
+     * @param modules
      */
     public Environment(Name ... moduleNames) {
 
@@ -129,7 +129,7 @@ public class Environment {
         // empty
     }
 
-    protected void setupStorageManager() {
+    protected void setupStorageManager() throws IOException {
         // empty
     }
 

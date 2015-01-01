@@ -16,7 +16,10 @@
 package org.terasology.engine;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
@@ -34,6 +37,7 @@ import org.terasology.engine.subsystem.lwjgl.LwjglInput;
 import org.terasology.engine.subsystem.lwjgl.LwjglTimer;
 import org.terasology.game.GameManifest;
 import org.terasology.network.NetworkMode;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
 
@@ -62,6 +66,7 @@ import java.util.List;
  *      <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
  *      <tr><td>-headless</td><td>Start headless.</td></tr>
  *      <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ *      <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
  *      <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
  *  </tbody>
  * </table>
@@ -84,9 +89,11 @@ public final class Terasology {
     private static final String START_HEADLESS = "-headless";
     private static final String LOAD_LAST_GAME = "-loadlastgame";
     private static final String NO_CRASH_REPORT = "-noCrashReport";
+    private static final String NO_SAVE_GAMES = "-noSaveGames";
 
     private static boolean isHeadless;
     private static boolean crashReportEnabled = true;
+    private static boolean writeSaveGamesEnabled = true;
     private static boolean loadLastGame;
 
     private Terasology() {
@@ -98,6 +105,9 @@ public final class Terasology {
         handleLaunchArguments(args);
 
         try (final TerasologyEngine engine = new TerasologyEngine(createSubsystemList())) {
+            if (!writeSaveGamesEnabled) {
+                CoreRegistry.get(Config.class).getTransients().setWriteSaveGamesEnabled(writeSaveGamesEnabled);
+            }
             if (isHeadless) {
                 engine.subscribeToStateChange(new HeadlessStateChangeListener());
                 engine.run(new StateHeadlessSetup());
@@ -137,14 +147,29 @@ public final class Terasology {
 
         String printUsageFlags = Joiner.on("|").join(PRINT_USAGE_FLAGS);
 
+        List<String> opts = ImmutableList.of(
+                printUsageFlags,
+                USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>",
+                START_HEADLESS,
+                LOAD_LAST_GAME,
+                NO_CRASH_REPORT,
+                NO_SAVE_GAMES);
+
+        StringBuilder optText = new StringBuilder();
+
+        for (String opt : opts) {
+            optText.append(" [" + opt + "]");
+        }
+
         System.out.println("Usage:");
         System.out.println();
-        System.out.println("    terasology [" + printUsageFlags + "] [" + USE_CURRENT_DIR_AS_HOME + "|" + USE_SPECIFIED_DIR_AS_HOME + "<path>] [" + START_HEADLESS + "] [" + LOAD_LAST_GAME + "] [" + NO_CRASH_REPORT + "]");
+        System.out.println("    terasology" + optText.toString());
         System.out.println();
         System.out.println("By default Terasology saves data such as game saves and logs into subfolders of a platform-specific \"home directory\".");
+        System.out.println("Saving can be explicitly disabled using the \"" + NO_SAVE_GAMES + "\" flag.");
         System.out.println("Optionally, the user can override the default by using one of the following launch arguments:");
         System.out.println();
-        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "           Use the current directory as the home directory.");
+        System.out.println("    " + USE_CURRENT_DIR_AS_HOME + "        Use the current directory as the home directory.");
         System.out.println("    " + USE_SPECIFIED_DIR_AS_HOME + "<path> Use the specified directory as the home directory.");
         System.out.println();
         System.out.println("It is also possible to start Terasology in headless mode (no graphics), i.e. to act as a server.");
@@ -189,6 +214,8 @@ public final class Terasology {
             } else if (arg.equals(START_HEADLESS)) {
                 isHeadless = true;
                 crashReportEnabled = false;
+            } else if (arg.equals(NO_SAVE_GAMES)) {
+                writeSaveGamesEnabled = false;
             } else if (arg.equals(NO_CRASH_REPORT)) {
                 crashReportEnabled = false;
             } else if (arg.equals(LOAD_LAST_GAME)) {

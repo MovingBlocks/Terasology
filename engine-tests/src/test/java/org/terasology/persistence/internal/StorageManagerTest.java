@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.persistence;
+package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
 
@@ -43,7 +43,10 @@ import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -66,6 +69,7 @@ import javax.vecmath.Vector3f;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -88,18 +92,19 @@ public class StorageManagerTest {
 
     private ModuleManager moduleManager;
     private NetworkSystem networkSystem;
-    private StorageManagerInternal esm;
+    private ReadWriteStorageManager esm;
     private EngineEntityManager entityManager;
     private Block testBlock;
     private Block testBlock2;
     private EntityRef character;
+    private Path savePath;
 
     @Before
     public void setup() throws Exception {
         JavaArchive homeArchive = ShrinkWrap.create(JavaArchive.class);
         FileSystem vfs = ShrinkWrapFileSystems.newFileSystem(homeArchive);
         PathManager.getInstance().useOverrideHomePath(temporaryFolder.getRoot().toPath());
-        PathManager.getInstance().setCurrentSaveTitle("testSave");
+        savePath = PathManager.getInstance().getSavePath("testSave");
 
         assert !Files.isRegularFile(vfs.getPath("global.dat"));
 
@@ -127,7 +132,7 @@ public class StorageManagerTest {
         testBlock2.setId((short) 2);
         blockManager.addBlockFamily(new SymmetricFamily(new BlockUri("test:testblock2"), testBlock2), true);
 
-        esm = new StorageManagerInternal(moduleManager.getEnvironment(), entityManager, false);
+        esm = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), entityManager, false);
         CoreRegistry.put(StorageManager.class, esm);
 
         ComponentSystemManager componentSystemManager = new ComponentSystemManager();
@@ -219,7 +224,7 @@ public class StorageManagerTest {
         esm.waitForCompletionOfPreviousSaveAndStartSaving();
         esm.finishSavingAndShutdown();
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         List<EntityRef> entities = Lists.newArrayList(newEntityManager.getEntitiesWith(StringComponent.class));
@@ -237,7 +242,7 @@ public class StorageManagerTest {
         esm.finishSavingAndShutdown();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         PlayerStore restored = newSM.loadPlayerStore(PLAYER_ID);
@@ -286,7 +291,7 @@ public class StorageManagerTest {
         esm.finishSavingAndShutdown();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager,
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager,
                 storeChunkInZips);
         newSM.loadGlobalStore();
 
@@ -319,7 +324,7 @@ public class StorageManagerTest {
         esm.finishSavingAndShutdown();
 
         EngineEntityManager newEntityManager = new EntitySystemBuilder().build(moduleManager.getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        StorageManager newSM = new StorageManagerInternal(moduleManager.getEnvironment(), newEntityManager, false);
+        StorageManager newSM = new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), newEntityManager, false);
         newSM.loadGlobalStore();
 
         ChunkStore restored = newSM.loadChunkStore(CHUNK_POS);
