@@ -154,6 +154,7 @@ message ServerInfoMessage {
     optional string version = 15;
     optional string gameName = 16;
     optional int64 time = 17;
+    optional float reflectionHeight = 18;
 
     extensions 5000 to max;
 }
