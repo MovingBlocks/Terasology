@@ -99,19 +99,6 @@ public final class MethodCommand extends AbstractCommand {
         }
     }
 
-    /**
-     * Registers this command to the console.
-     *
-     * @return {@code this}, the same object
-     */
-    public MethodCommand register() {
-        Console console = CoreRegistry.get(Console.class);
-
-        console.registerCommand(this);
-
-        return this;
-    }
-
     @Override
     protected List<Parameter> constructParameters() {
         SpecificAccessibleObject<Method> specificExecutionMethod = getExecutionMethod();
@@ -133,7 +120,6 @@ public final class MethodCommand extends AbstractCommand {
                 CommandParam parameterAnnotation
                         = (CommandParam) annotation;
                 String name = parameterAnnotation.value();
-                char arrayDelimiter = parameterAnnotation.arrayDelimiter();
                 Class<? extends CommandParameterSuggester> suggesterClass = parameterAnnotation.suggester();
                 boolean required = parameterAnnotation.required();
                 CommandParameterSuggester suggester;
@@ -147,7 +133,7 @@ public final class MethodCommand extends AbstractCommand {
                 if (type.isArray()) {
                     Class<?> childType = type.getComponentType();
 
-                    return CommandParameter.array(name, childType, arrayDelimiter, required, suggester);
+                    return CommandParameter.array(name, childType, required, suggester);
                 } else {
                     return CommandParameter.single(name, type, required, suggester);
                 }

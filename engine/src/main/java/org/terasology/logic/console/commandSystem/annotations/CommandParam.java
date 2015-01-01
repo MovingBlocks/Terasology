@@ -34,9 +34,6 @@ import java.util.Set;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface CommandParam {
-    char ARRAY_DELIMITER_DEFAULT = ',';
-    char ARRAY_DELIMITER_VARARGS = ' ';
-    char ARRAY_DELIMITER_ESCAPE_CHARACTER = '\\';
 
     /**
      * @return The parameter name
@@ -52,15 +49,6 @@ public @interface CommandParam {
      * @return The class used for suggesting values for this parameter
      */
     Class<? extends CommandParameterSuggester> suggester() default EmptyCommandParameterSuggester.class;
-
-    /**
-     * Used if the command method parameter is an array.
-     * The {@code \} (backslash) character is used for escaping the delimiter.
-     * The space character can be used only when the parameter is the last one as a {@code varargs} parameter.
-     *
-     * @return The array delimiter
-     */
-    char arrayDelimiter() default ARRAY_DELIMITER_DEFAULT;
 
     /**
      * A class representing no suggester - needed, because Annotations fields don't accept nulls

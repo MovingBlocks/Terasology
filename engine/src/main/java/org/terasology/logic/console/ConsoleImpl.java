@@ -325,14 +325,6 @@ public class ConsoleImpl implements Console {
         //get the parameters
         List<String> params = splitParameters(parameterPart);
 
-        // remove quotation marks
-        for (int i = 0; i < params.size(); i++) {
-            String value = params.get(i);
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                params.set(i, value.substring(1, value.length() - 1));
-            }
-        }
-
         return params;
     }
 
@@ -340,10 +332,15 @@ public class ConsoleImpl implements Console {
         String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
         List<String> params = Lists.newArrayList();
         for (String s : rawParams) {
-            if (s.trim().isEmpty()) {
+            String param = s;
+
+            if (param.trim().isEmpty()) {
                 continue;
             }
-            params.add(s);
+            if (param.length() > 1 && param.startsWith("\"") && param.endsWith("\"")) {
+                param = param.substring(1, param.length() - 1);
+            }
+            params.add(param);
         }
         return params;
     }

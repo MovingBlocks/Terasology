@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 import org.slf4j.Logger;
@@ -35,7 +36,9 @@ import org.terasology.naming.Name;
 import org.terasology.utilities.reflection.SpecificAccessibleObject;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -117,7 +120,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
                 throw new CommandInitializationException("A command parameter must not be null! Index: " + i);
             }
 
-            if (parameter.isVarargs() && i < commandParameters.size() - 1) {
+            if (parameter.isArray() && i < commandParameters.size() - 1) {
                 throw new CommandInitializationException("A varargs parameter must be at the end. Invalid: " + i + "; " + parameter.getName());
             }
 
@@ -185,63 +188,33 @@ public abstract class AbstractCommand implements ConsoleCommand {
         usage = builder.toString();
     }
 
-    private Object[] processParametersCommand(List<String> rawParameters, EntityRef sender) throws CommandParameterParseException {
-        List<String> joinedParameters = joinVarargs(rawParameters);
-        Object[] processedParameters = new Object[commandParameters.size()];
-
-        for (int i = 0; i < joinedParameters.size() && i < rawParameters.size(); i++) {
-            String rawParam = joinedParameters.get(i);
-            CommandParameter param = commandParameters.get(i);
-            processedParameters[i] = param.getValue(rawParam);
-        }
-
-        return processedParameters;
-    }
-
     private Object[] processParametersMethod(List<String> rawParameters, EntityRef sender) throws CommandParameterParseException {
-        List<String> joinedParameters = joinVarargs(rawParameters);
         Object[] processedParameters = new Object[executionMethodParameters.size()];
-        int joinedParameterIndex = 0;
+        Queue<String> parameterStrings = Queues.newArrayDeque(rawParameters);
 
         for (int i = 0; i < executionMethodParameters.size(); i++) {
             Parameter parameterType = executionMethodParameters.get(i);
 
-            if (parameterType instanceof CommandParameter && joinedParameterIndex < joinedParameters.size()) {
+            if (parameterType instanceof CommandParameter) {
                 CommandParameter parameter = (CommandParameter) parameterType;
-                String joinedParameter = joinedParameters.get(joinedParameterIndex++);
-
-                processedParameters[i] = parameter.getValue(joinedParameter);
+                if (parameterStrings.isEmpty()) {
+                    if (parameter.isArray()) {
+                        processedParameters[i] = parameter.getArrayValue(Collections.<String>emptyList());
+                    } else {
+                        processedParameters[i] = null;
+                    }
+                } else if (parameter.isArray()) {
+                    processedParameters[i] = parameter.getArrayValue(Lists.newArrayList(parameterStrings));
+                    parameterStrings.clear();
+                } else {
+                    processedParameters[i] = parameter.getValue(parameterStrings.poll());
+                }
             } else if (parameterType == MarkerParameters.SENDER) {
                 processedParameters[i] = sender;
             }
         }
 
         return processedParameters;
-    }
-
-    private List<String> joinVarargs(List<String> rawParameters) {
-        List<String> result = Lists.newArrayList();
-        int singleParameterCount = commandParameters.size() + (endsWithVarargs() ? -1 : 0);
-
-        for (int i = 0; i < singleParameterCount && i < rawParameters.size(); i++) {
-            result.add(rawParameters.get(i));
-        }
-
-        if (endsWithVarargs()) {
-            int varargsIndex = commandParameters.size() - 1;
-
-            if (rawParameters.size() > varargsIndex) {
-                StringBuilder rawParam = new StringBuilder(rawParameters.get(varargsIndex));
-
-                for (int i = varargsIndex + 1; i < rawParameters.size(); i++) {
-                    rawParam.append(CommandParam.ARRAY_DELIMITER_VARARGS).append(rawParameters.get(i));
-                }
-
-                result.add(rawParam.toString());
-            }
-        }
-
-        return result;
     }
 
     @Override
@@ -276,7 +249,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
         Object[] processedParametersWithoutSender;
 
         try {
-            processedParametersWithoutSender = processParametersCommand(rawParameters, sender);
+            processedParametersWithoutSender = processParametersMethod(rawParameters, sender);
         } catch (CommandParameterParseException e) {
             String warning = "Invalid parameter '" + e.getParameter() + "'";
             String message = e.getMessage();
@@ -328,10 +301,10 @@ public abstract class AbstractCommand implements ConsoleCommand {
             }
         }
 
-        Set<String> composedResult = composeAll(result, suggestedParameter);
+        Set<String> stringSuggestions = convertToString(result, suggestedParameter);
 
         //Only return results starting with currentValue
-        return Sets.filter(composedResult, new Predicate<String>() {
+        return Sets.filter(stringSuggestions, new Predicate<String>() {
             @Override
             public boolean apply(String input) {
                 return input != null && (currentValue == null || input.startsWith(currentValue));
@@ -339,11 +312,11 @@ public abstract class AbstractCommand implements ConsoleCommand {
         });
     }
 
-    private static Set<String> composeAll(Set<Object> collection, CommandParameter parameter) {
+    private static Set<String> convertToString(Set<Object> collection, CommandParameter parameter) {
         Set<String> result = Sets.newHashSetWithExpectedSize(collection.size());
 
         for (Object component : collection) {
-            result.add(parameter.composeSingle(component));
+            result.add(parameter.convertToString(component));
         }
 
         return result;
@@ -383,7 +356,7 @@ public abstract class AbstractCommand implements ConsoleCommand {
     }
 
     public boolean endsWithVarargs() {
-        return commandParameters.size() > 0 && commandParameters.get(commandParameters.size() - 1).isVarargs();
+        return commandParameters.size() > 0 && commandParameters.get(commandParameters.size() - 1).isArray();
     }
 
     @Override
