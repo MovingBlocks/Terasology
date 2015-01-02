@@ -20,6 +20,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -38,10 +39,11 @@ public class WorldBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldBuilder.class);
 
-    private long seed;
-    private List<FacetProvider> providersList = Lists.newArrayList();
-    private Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
-    private List<WorldRasterizer> rasterizers = Lists.newArrayList();
+    private final long seed;
+    private final List<FacetProvider> providersList = Lists.newArrayList();
+    private final Set<Class<? extends WorldFacet>> facetCalculationInProgress = Sets.newHashSet();
+    private final List<WorldRasterizer> rasterizers = Lists.newArrayList();
+    private int seaLevel = 32;
 
     public WorldBuilder(long seed) {
         this.seed = seed;
@@ -71,11 +73,20 @@ public class WorldBuilder {
         return this;
     }
 
+    /**
+     * @param level the sea level, measured in blocks
+     * @return this
+     */
+    public WorldBuilder setSeaLevel(int level) {
+        this.seaLevel = level;
+        return this;
+    }
+
     public World build() {
         // TODO: ensure the required providers are present
 
         ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains = determineProviderChains();
-        return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains));
+        return new WorldImpl(providerChains, rasterizers, determineBorders(providerChains), seaLevel);
     }
 
     private Map<Class<? extends WorldFacet>, Border3D> determineBorders(ListMultimap<Class<? extends WorldFacet>, FacetProvider> providerChains) {

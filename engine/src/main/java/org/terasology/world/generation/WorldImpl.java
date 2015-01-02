@@ -30,21 +30,29 @@ import com.google.common.collect.Sets;
  * @author Immortius
  */
 public class WorldImpl implements World {
-    private ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
-    private List<WorldRasterizer> worldRasterizers;
-    private Map<Class<? extends WorldFacet>, Border3D> borders;
+    private final ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains;
+    private final List<WorldRasterizer> worldRasterizers;
+    private final Map<Class<? extends WorldFacet>, Border3D> borders;
+    private final int seaLevel;
 
-    public WorldImpl(ListMultimap<Class<? extends WorldFacet>,
-        FacetProvider> facetProviderChains,
-                     List<WorldRasterizer> worldRasterizers, Map<Class<? extends WorldFacet>, Border3D> borders) {
+    public WorldImpl(ListMultimap<Class<? extends WorldFacet>, FacetProvider> facetProviderChains,
+                     List<WorldRasterizer> worldRasterizers,
+                     Map<Class<? extends WorldFacet>, Border3D> borders,
+                     int seaLevel) {
         this.facetProviderChains = facetProviderChains;
         this.worldRasterizers = worldRasterizers;
         this.borders = borders;
+        this.seaLevel = seaLevel;
     }
 
     @Override
     public Region getWorldData(Region3i region) {
         return new RegionImpl(region, facetProviderChains, borders);
+    }
+
+    @Override
+    public int getSeaLevel() {
+        return seaLevel;
     }
 
     @Override

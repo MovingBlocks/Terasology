@@ -28,6 +28,11 @@ public interface World {
 
     Region getWorldData(Region3i region);
 
+    /**
+     * @return the sea level, measured in blocks
+     */
+    int getSeaLevel();
+
     void rasterizeChunk(CoreChunk chunk);
 
     /**

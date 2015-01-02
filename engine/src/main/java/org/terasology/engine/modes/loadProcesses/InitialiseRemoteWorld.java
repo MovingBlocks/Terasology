@@ -73,6 +73,8 @@ public class InitialiseRemoteWorld extends SingleStepLoadProcess {
         // Init. a new world
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
+        float reflectionHeight = CoreRegistry.get(NetworkSystem.class).getServer().getInfo().getReflectionHeight();
+        worldRenderer.getActiveCamera().setReflectionHeight(reflectionHeight);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
