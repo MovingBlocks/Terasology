@@ -41,22 +41,16 @@ dependencies {
     compile project(':engine')
 }
 
-// Change the output dir
-sourceSets {
-    main {
-        java {
-            output.classesDir 'build/classes'
-        }
-        output.resourcesDir 'build/classes'
-    }
-}
-
 // Instructions for packaging a jar file for the PC facade
 jar {
     manifest {
         //TODO: Maybe later add the engine's version number into here?
         def manifestClasspath = "$subDirLibs/" + configurations.runtime.collect { it.getName() }.join(" $subDirLibs/")
-        attributes("Main-Class": mainClassName, "Class-Path" : manifestClasspath, "Implementation-Title": "Terasology-" + project.name, "Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+        attributes("Main-Class": mainClassName)
+        attributes("Class-Path" : manifestClasspath)
+        attributes("Implementation-Title": "Terasology-" + project.name)
+        attributes("Implementation-Version": env.BUILD_NUMBER + ", " + env.GIT_BRANCH + ", " + env.BUILD_ID)
+        attributes("SplashScreen-Image": "splash.jpg")
     }
 }
 
@@ -202,9 +196,12 @@ task distApp (type: Sync) {
         }
     }
     from('launchScripts') {
-        exclude('*.xml')
         exclude('TeraEd.exe')
     }
+	
+    // launch4j requires the splash screen to also exist next to the exe
+    from("${sourceSets.main.output.resourcesDir}/splash.jpg")
+
     from("$buildDir/$versionFileName") {}
 
     into(subDirLibs) {
