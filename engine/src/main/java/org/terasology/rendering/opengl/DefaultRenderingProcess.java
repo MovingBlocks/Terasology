@@ -1358,6 +1358,20 @@ public class DefaultRenderingProcess {
         // TODO: Used to be huge for super screenies, shrunk down for performance until size is an in-game option
         overwriteRtWidth = 1152;
         overwriteRtHeight = 700;
+
+        if(config.getRendering().getScreenshotSize() == 0) {
+            overwriteRtWidth = Display.getWidth() * 2;
+            overwriteRtHeight = Display.getHeight() * 2;
+        } else if(config.getRendering().getScreenshotSize() == 1) {
+            overwriteRtWidth = Display.getWidth();
+            overwriteRtHeight = Display.getHeight();
+        } else if(config.getRendering().getScreenshotSize() == 2) {
+            overwriteRtWidth = Display.getWidth() / 2;
+            overwriteRtHeight = Display.getHeight() / 2;
+        } else if(config.getRendering().getScreenshotSize() == 3) {
+            overwriteRtWidth = Display.getWidth() / 4;
+            overwriteRtHeight = Display.getHeight() / 4;
+        }
         createOrUpdateFullscreenFbos();
     }
 

@@ -79,6 +79,12 @@ public class VideoSettingsScreen extends CoreScreenLayer {
             waterReflection.bindSelection(new WaterReflectionBinding(config.getRendering()));
         }
 
+        UIDropdown<ScreenshotSize> screenshotSize = find("screenshotSize", UIDropdown.class);
+        if (screenshotSize != null) {
+            screenshotSize.setOptions(Lists.newArrayList(ScreenshotSize.THUMBNAIL, ScreenshotSize.SMALL, ScreenshotSize.NORMAL, ScreenshotSize.SUPER));
+            screenshotSize.bindSelection(new ScreenshotSizeBinding(config.getRendering()));
+        }
+
         UIDropdown<Integer> blur = find("blur", UIDropdown.class);
         if (blur != null) {
             blur.setOptions(Lists.newArrayList(0, 1, 2, 3));
