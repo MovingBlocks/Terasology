@@ -16,6 +16,7 @@
 package org.terasology.rendering.cameras;
 
 import org.terasology.config.Config;
+import org.terasology.math.AABB;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
 
@@ -224,5 +225,9 @@ public abstract class Camera {
 
     public boolean isReflected() {
         return reflected;
+    }
+
+    public boolean hasInSight(AABB aabb) {
+        return viewFrustum.intersects(aabb);
     }
 }

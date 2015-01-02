@@ -146,8 +146,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(PhysicsEngine.class, worldRenderer.getBulletRenderer());
-        CoreRegistry.put(Physics.class, worldRenderer.getBulletRenderer());
 
         return true;
     }

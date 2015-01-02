@@ -20,9 +20,11 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.monitoring.chunk.ChunkMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.utilities.concurrency.TaskMaster;
@@ -133,6 +135,8 @@ public final class ChunkMeshUpdateManager {
 
     private static class ChunkUpdateTask implements ChunkTask {
 
+        private final int numberOfMeshSegments = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
+
         private RenderableChunk c;
         private ChunkTessellator tessellator;
         private WorldProvider worldProvider;
@@ -162,13 +166,13 @@ public final class ChunkMeshUpdateManager {
 
         @Override
         public void run() {
-            ChunkMesh[] newMeshes = new ChunkMesh[WorldRendererLwjgl.VERTICAL_SEGMENTS];
+            ChunkMesh[] newMeshes = new ChunkMesh[numberOfMeshSegments];
             ChunkView chunkView = worldProvider.getLocalView(c.getPosition());
             if (chunkView != null) {
                 c.setDirty(false);
-                int meshHeight = ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS;
-                for (int seg = 0; seg < WorldRendererLwjgl.VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(chunkView, meshHeight, seg * (ChunkConstants.SIZE_Y / WorldRendererLwjgl.VERTICAL_SEGMENTS));
+                int meshHeight = ChunkConstants.SIZE_Y / numberOfMeshSegments;
+                for (int seg = 0; seg < numberOfMeshSegments; seg++) {
+                    newMeshes[seg] = tessellator.generateMesh(chunkView, meshHeight, seg * (ChunkConstants.SIZE_Y / numberOfMeshSegments));
                 }
 
                 c.setPendingMesh(newMeshes);

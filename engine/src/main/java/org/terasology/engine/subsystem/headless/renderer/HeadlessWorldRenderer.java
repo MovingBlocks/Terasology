@@ -57,16 +57,11 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     private final List<RenderableChunk> chunksInProximity = Lists.newArrayListWithCapacity(MAX_CHUNKS);
     private Vector3i chunkPos = new Vector3i();
 
-    /* PHYSICS */
-    // TODO: Remove physics handling from world renderer
-    private final BulletPhysics bulletPhysics;
-
     private Config config;
 
     public HeadlessWorldRenderer(WorldProvider worldProvider, ChunkProvider chunkProvider, LocalPlayerSystem localPlayerSystem) {
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
-        bulletPhysics = new BulletPhysics(worldProvider);
 
         localPlayerSystem.setPlayerCamera(noCamera);
         config = CoreRegistry.get(Config.class);
@@ -100,11 +95,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     @Override
     public WorldProvider getWorldProvider() {
         return worldProvider;
-    }
-
-    @Override
-    public PhysicsEngine getBulletRenderer() {
-        return bulletPhysics;
     }
 
     @Override
@@ -217,12 +207,6 @@ public class HeadlessWorldRenderer implements WorldRenderer {
     public Skysphere getSkysphere() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public boolean isAABBVisible(AABB aabb) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

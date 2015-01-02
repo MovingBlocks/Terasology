@@ -189,7 +189,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
             Vector3f worldPos = location.getWorldPosition();
             float worldScale = location.getWorldScale();
             AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
-            if (worldRenderer.isAABBVisible(aabb)) {
+            if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -270,7 +270,7 @@ public class MeshRenderer extends BaseComponentSystem implements RenderSystem {
                 matrixCameraSpace.set(worldRot, worldPositionCameraSpace, worldScale);
 
                 AABB aabb = meshComp.mesh.getAABB().transform(transWorldSpace);
-                if (worldRenderer.isAABBVisible(aabb)) {
+                if (worldRenderer.getActiveCamera().hasInSight(aabb)) {
                     if (meshComp.mesh != lastMesh) {
                         if (lastMesh != null) {
                             lastMesh.postRender();

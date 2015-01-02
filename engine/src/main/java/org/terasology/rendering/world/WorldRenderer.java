@@ -55,8 +55,6 @@ public interface WorldRenderer {
 
     void dispose();
 
-    PhysicsEngine getBulletRenderer();
-
     boolean pregenerateChunks();
 
     WorldProvider getWorldProvider();
@@ -84,8 +82,6 @@ public interface WorldRenderer {
     float getTick();
 
     Skysphere getSkysphere();
-
-    boolean isAABBVisible(AABB aabb);
 
     WorldRenderingStage getCurrentRenderStage();
 
