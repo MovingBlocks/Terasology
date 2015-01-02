@@ -68,6 +68,14 @@
                                 "id": "graphicsPreset"
                             },
                             {
+                                "type" : "UILabel",
+                                "text" : "Screenshot size: "
+                            },
+                            {
+                                "type": "UIDropdown",
+                                "id" : "screenshotSize"
+                            },
+                            {
                                 "type": "UILabel",
                                 "text": "V-Sync: "
                             },

@@ -71,9 +71,11 @@ public abstract class Camera {
     protected float cachedFov;
     protected float cachedZNear;
     protected float cachedZFar;
+    protected float cachedReflectionHeight;
 
-    /* ETC */
+    /* (Water) Reflection */
     private boolean reflected;
+    private float reflectionHeight = 32;
 
     /**
      * Applies the projection and modelview matrix.
@@ -143,12 +145,22 @@ public abstract class Camera {
         this.reflected = reflected;
     }
 
+    public float getReflectionHeight() {
+        return reflectionHeight;
+    }
+
+    public void setReflectionHeight(float reflectionHeight) {
+        this.reflectionHeight = reflectionHeight;
+    }
+
     public void updatePrevViewProjectionMatrix() {
         prevViewProjectionMatrix.set(viewProjectionMatrix);
     }
 
     public float getClipHeight() {
-        return 31.5f;
+        // msteiger: I believe the offset results from the
+        // slightly lowered water surface height.
+        return reflectionHeight - 0.5f;
     }
 
     public Matrix4f getViewMatrix() {
