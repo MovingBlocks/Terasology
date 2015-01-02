@@ -55,11 +55,12 @@ public enum ScreenshotSize {
 
     public abstract void apply(RenderingConfig config);
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public int getIndex() {
         return index;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
     }
 }
