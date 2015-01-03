@@ -1398,7 +1398,8 @@ public class DefaultRenderingProcess {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
-                final String fileName = "Terasology-" + sdf.format(cal.getTime()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + ".png";
+                final String format = config.getRendering().getScreenshotFormat();
+                final String fileName = "Terasology-" + sdf.format(cal.getTime()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
 
@@ -1413,7 +1414,7 @@ public class DefaultRenderingProcess {
                 }
 
                 try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
-                    ImageIO.write(image, "png", out);
+                    ImageIO.write(image, format, out);
                     logger.info("Screenshot '" + fileName + "' saved! ");
                 } catch (IOException e) {
                     logger.warn("Failed to save screenshot!", e);
