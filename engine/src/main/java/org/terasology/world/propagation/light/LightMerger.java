@@ -23,10 +23,20 @@ import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
-import org.terasology.world.propagation.*;
+import org.terasology.world.propagation.BatchPropagator;
+import org.terasology.world.propagation.LocalChunkView;
+import org.terasology.world.propagation.PropagationRules;
+import org.terasology.world.propagation.PropagatorWorldView;
+import org.terasology.world.propagation.StandardBatchPropagator;
+import org.terasology.world.propagation.SunlightRegenBatchPropagator;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Immortius
@@ -43,10 +53,11 @@ public class LightMerger<T> {
     private LightPropagationRules lightRules = new LightPropagationRules();
     private SunlightRegenPropagationRules sunlightRegenRules = new SunlightRegenPropagationRules();
 
+    private boolean running = true;
+
     public LightMerger(GeneratingChunkProvider chunkProvider) {
         this.chunkProvider = chunkProvider;
     }
-    private boolean running = true;
 
     public void beginMerge(final Chunk chunk, final T data) {
         resultFuture = executorService.submit(new Callable<T>() {

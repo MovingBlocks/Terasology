@@ -19,7 +19,6 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * Rules to drive value propagation.
@@ -45,7 +44,7 @@ public interface PropagationRules {
     /**
      * @param existingValue
      * @param side
-     * @param from the block the value is leaving
+     * @param from          the block the value is leaving
      * @return The value propagate in the given direction from an existing value
      */
     byte propagateValue(byte existingValue, Side side, Block from);
@@ -56,7 +55,6 @@ public interface PropagationRules {
     byte getMaxValue();
 
     /**
-     *
      * @param block
      * @param side
      * @return Whether the given block can propagated out through side
@@ -81,6 +79,7 @@ public interface PropagationRules {
 
     /**
      * Sets the value for a given chunk position
+     *
      * @param chunk
      * @param pos
      * @param value

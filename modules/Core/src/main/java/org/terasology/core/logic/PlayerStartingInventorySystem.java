@@ -15,11 +15,15 @@
  */
 package org.terasology.core.logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ReceiveEvent;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
@@ -28,8 +32,12 @@ import org.terasology.registry.In;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.items.BlockItemFactory;
 
+import java.util.Arrays;
+
 @RegisterSystem
 public class PlayerStartingInventorySystem extends BaseComponentSystem {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlayerStartingInventorySystem.class);
 
     @In
     BlockManager blockManager;
@@ -87,4 +95,10 @@ public class PlayerStartingInventorySystem extends BaseComponentSystem {
         inventoryManager.giveItem(player, EntityRef.NULL, chest);
     }
 
+
+    @Command
+    public String test(@CommandParam("first") String first, @CommandParam("remainder") String ... remainder) {
+        logger.info("test run with arguments '{}', '{}'", first, Arrays.asList(remainder));
+        return first + " " + Arrays.asList(remainder).toString();
+    }
 }

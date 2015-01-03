@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2015 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@ package org.terasology.engine;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import org.terasology.config.Config;
 import org.terasology.crashreporter.CrashReporter;
 import org.terasology.engine.modes.StateLoading;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.paths.PathManager;
+import org.terasology.engine.splash.SplashScreen;
 import org.terasology.engine.subsystem.EngineSubsystem;
 import org.terasology.engine.subsystem.headless.HeadlessAudio;
 import org.terasology.engine.subsystem.headless.HeadlessGraphics;
@@ -50,31 +50,31 @@ import java.util.List;
 
 /**
  * Class providing the main() method for launching Terasology as a PC app.
- *
+ * <p/>
  * Through the following launch arguments default locations to store logs and
  * game saves can be overridden, by using the current directory or a specified
  * one as the home directory. Furthermore, Terasology can be launched headless,
  * to save resources while acting as a server or to run in an environment with
  * no graphics, audio or input support. Additional arguments are available to
  * reload the latest game on startup and to disable crash reporting.
- *
+ * <p/>
  * Available launch arguments:
- *
+ * <p/>
  * <table>
- *  <tbody>
- *      <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
- *      <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
- *      <tr><td>-headless</td><td>Start headless.</td></tr>
- *      <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
- *      <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
- *      <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
- *  </tbody>
+ * <tbody>
+ * <tr><td>-homedir</td><td>Use the current directory as the home directory.</td></tr>
+ * <tr><td>-homedir=path</td><td>Use the specified path as the home directory.</td></tr>
+ * <tr><td>-headless</td><td>Start headless.</td></tr>
+ * <tr><td>-loadlastgame</td><td>Load the latest game on startup.</td></tr>
+ * <tr><td>-noSaveGames</td><td>Disable writing of save games.</td></tr>
+ * <tr><td>-noCrashReport</td><td>Disable crash reporting</td></tr>
+ * </tbody>
  * </table>
- *
+ * <p/>
  * When used via command line an usage help and some examples can be obtained via:
- *
- *      terasology -help    or    terasology /?
- *
+ * <p/>
+ * terasology -help    or    terasology /?
+ * <p/>
  * In case of crashes Terasology logs available information in <logpath>/Terasology.log
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -99,7 +99,16 @@ public final class Terasology {
     private Terasology() {
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+
+        // To have the splash screen in your favorite IDE add
+        //
+        //   eclipse:  -splash:src/main/resources/splash.jpg (the PC facade root folder is the working dir.)
+        //   IntelliJ: -splash:facades/PC/src/main/resources/splash.jpg (root project is the working dir.)
+        //
+        // as JVM argument (not program argument!)
+
+        SplashScreen.getInstance().post("Java Runtime " + System.getProperty("java.version") + " loaded");
 
         handlePrintUsageRequest(args);
         handleLaunchArguments(args);
@@ -124,12 +133,15 @@ public final class Terasology {
                     });
                 }
 
+                SplashScreen.getInstance().close();
                 engine.run(new StateMainMenu());
             }
         } catch (RuntimeException e) {
             if (!GraphicsEnvironment.isHeadless()) {
                 logException(e);
             }
+        } finally {
+            SplashScreen.getInstance().close();
         }
     }
 

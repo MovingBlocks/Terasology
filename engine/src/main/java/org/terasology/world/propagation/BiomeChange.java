@@ -17,7 +17,6 @@ package org.terasology.world.propagation;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.biomes.Biome;
-import org.terasology.world.block.Block;
 
 /**
  * Used for notifying listeners that the biome at a spot in the world has changed.

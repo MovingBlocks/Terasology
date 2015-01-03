@@ -58,6 +58,7 @@ public abstract class TimeBase implements EngineTime {
                 Thread.sleep(0, 1000);
             } catch (InterruptedException e) {
                 // do nothing
+                logger.debug("Tick sleep interrupted", e);
             }
             now = getRawTimeInMs();
             newDelta = now - last.get();

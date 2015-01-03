@@ -24,9 +24,7 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
-import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntLongMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntLongHashMap;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -57,7 +55,12 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.module.Module;
 import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.network.*;
+import org.terasology.network.Client;
+import org.terasology.network.JoinStatus;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.Server;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.exceptions.HostingFailedException;
@@ -83,6 +86,7 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import org.terasology.world.generator.WorldGenerator;
 
 import java.net.BindException;
 import java.net.InetSocketAddress;
@@ -766,12 +770,16 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     NetData.ServerInfoMessage getServerInfoMessage() {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         serverInfoMessageBuilder.setTime(time.getGameTimeInMs());
-        WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        if (world != null) {
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        if (worldProvider != null) {
             NetData.WorldInfo.Builder worldInfoBuilder = NetData.WorldInfo.newBuilder();
-            worldInfoBuilder.setTime(world.getTime().getMilliseconds());
-            worldInfoBuilder.setTitle(world.getTitle());
+            worldInfoBuilder.setTime(worldProvider.getTime().getMilliseconds());
+            worldInfoBuilder.setTitle(worldProvider.getTitle());
             serverInfoMessageBuilder.addWorldInfo(worldInfoBuilder);
+        }
+        WorldGenerator worldGen = CoreRegistry.get(WorldGenerator.class);
+        if (worldGen != null) {
+            serverInfoMessageBuilder.setReflectionHeight(worldGen.getWorld().getSeaLevel());
         }
         for (Module module : CoreRegistry.get(ModuleManager.class).getEnvironment()) {
             Boolean serverSideOnly = module.getMetadata().getExtension(ModuleManager.SERVER_SIDE_ONLY_EXT, Boolean.class);

@@ -19,7 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
@@ -58,7 +63,7 @@ public class SaveTransactionHelper {
     /**
      * Merges all outstanding changes into the save game. If this operation gets interrupted it can be started again
      * without any file corruption when the file system supports atomic moves.
-     *
+     * <p/>
      * The write lock for the save directory should be acquired before this method gets called.
      */
     public void mergeChanges() throws IOException {
@@ -66,7 +71,7 @@ public class SaveTransactionHelper {
         final Path targetDirectory = storagePathProvider.getStoragePathDirectory();
 
         Files.walkFileTree(sourceDirectory, new SimpleFileVisitor<Path>() {
-            boolean atomicNotPossibleLogged = false;
+            boolean atomicNotPossibleLogged;
 
             @Override
             public FileVisitResult preVisitDirectory(Path sourceSubDir, BasicFileAttributes attrs) throws IOException {

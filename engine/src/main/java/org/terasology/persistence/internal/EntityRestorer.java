@@ -32,6 +32,10 @@ final class EntityRestorer {
 
     private EngineEntityManager entityManager;
 
+    public EntityRestorer(EngineEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     public Map<String, EntityRef> restore(EntityData.EntityStore store) {
         EntitySerializer serializer = new EntitySerializer(entityManager);
         Map<Class<? extends Component>, Integer> idMap = Maps.newHashMap();
@@ -52,9 +56,4 @@ final class EntityRestorer {
         }
         return namedEntities;
     }
-
-    public EntityRestorer(EngineEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
-
 }

@@ -40,6 +40,7 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector2i;
 import org.terasology.math.Vector3i;
 import org.terasology.module.Module;
+import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.persistence.typeHandling.extensionTypes.AssetTypeHandler;
@@ -47,6 +48,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockFamilyTypeHan
 import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.CollisionGroupTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.ColorTypeHandler;
+import org.terasology.persistence.typeHandling.extensionTypes.NameTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.PrefabTypeHandler;
 import org.terasology.persistence.typeHandling.extensionTypes.TextureRegionTypeHandler;
 import org.terasology.persistence.typeHandling.gson.JsonTypeHandlerAdapter;
@@ -129,6 +131,7 @@ public class UILoader implements AssetLoader<UIData> {
         library.add(Material.class, new AssetTypeHandler<>(AssetType.MATERIAL, Material.class));
         library.add(SkeletalMesh.class, new AssetTypeHandler<>(AssetType.SKELETON_MESH, SkeletalMesh.class));
         library.add(MeshAnimation.class, new AssetTypeHandler<>(AssetType.ANIMATION, MeshAnimation.class));
+        library.add(Name.class, new NameTypeHandler());
         library.add(UISkin.class, new AssetTypeHandler<>(AssetType.UI_SKIN, UISkin.class));
         library.add(Vector4f.class, new Vector4fTypeHandler());
         library.add(Vector3f.class, new Vector3fTypeHandler());

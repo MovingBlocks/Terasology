@@ -35,10 +35,9 @@ public class CompressedChunkBuilder {
     private byte[] result;
 
     /**
-     *
      * @param entityStore encoded entities to be stored.
-     * @param chunk chunk for which {@link ChunkImpl#createSnapshot()} has been called.
-     *  @param viaSnapshot specifies if the previously taken snapshot will be encoded or if
+     * @param chunk       chunk for which {@link ChunkImpl#createSnapshot()} has been called.
+     * @param viaSnapshot specifies if the previously taken snapshot will be encoded or if
      */
     public CompressedChunkBuilder(EntityData.EntityStore entityStore, ChunkImpl chunk, boolean viaSnapshot) {
         this.entityStore = entityStore;
@@ -66,7 +65,7 @@ public class CompressedChunkBuilder {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (GZIPOutputStream gzipOut = new GZIPOutputStream(baos)) {
             store.writeTo(gzipOut);
-        } catch(IOException e) {
+        } catch (IOException e) {
             // as no real IO is involved this should not happen
             throw new RuntimeException(e);
         }

@@ -71,7 +71,7 @@ public class GLSLMaterial extends BaseMaterial {
 
     private ShaderManager shaderManager;
     private ShaderParameters shaderParameters;
-    private boolean disposed = false;
+    private boolean disposed;
 
     public GLSLMaterial(AssetUri uri, MaterialData data) {
         super(uri);

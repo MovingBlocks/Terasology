@@ -137,24 +137,12 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
         sortLibrary();
     }
 
-    private class AnimationPoolUriBinding extends ReadOnlyBinding<List<ComponentFieldUri>>{
-        private List<ComponentFieldUri> list;
-
-        @Override
-        public List<ComponentFieldUri> get() {
-            if (list == null) {
-                list = Collections.unmodifiableList(determineAnimationPoolUris());
-            }
-            return list;
-        }
-    }
-
     private List<ComponentFieldUri> determineAnimationPoolUris() {
         final List<ComponentFieldUri> animationSetUris = Lists.newArrayList();
-        for (ComponentMetadata<?> componentMetadata: componentLibrary.iterateComponentMetadata()) {
+        for (ComponentMetadata<?> componentMetadata : componentLibrary.iterateComponentMetadata()) {
             SimpleUri uri = componentMetadata.getUri();
 
-            for (FieldMetadata<?,?> fieldMetadata: componentMetadata.getFields()) {
+            for (FieldMetadata<?, ?> fieldMetadata : componentMetadata.getFields()) {
                 if (fieldMetadata.getType().isAssignableFrom(List.class)) {
                     Type fieldType = fieldMetadata.getField().getGenericType();
                     if (fieldType instanceof ParameterizedType) {
@@ -244,5 +232,17 @@ public class BehaviorNodeFactory extends BaseComponentSystem {
 
     public List<BehaviorNodeComponent> getNodesComponents(String category) {
         return categoryComponents.get(category);
+    }
+
+    private class AnimationPoolUriBinding extends ReadOnlyBinding<List<ComponentFieldUri>> {
+        private List<ComponentFieldUri> list;
+
+        @Override
+        public List<ComponentFieldUri> get() {
+            if (list == null) {
+                list = Collections.unmodifiableList(determineAnimationPoolUris());
+            }
+            return list;
+        }
     }
 }

@@ -227,7 +227,7 @@ public class InputSystem extends BaseComponentSystem {
 
         //process mouse movement y axis
         if (deltaMouse.y != 0) {
-            int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1: deltaMouse.y;
+            int yMovement = config.getInput().isMouseYAxisInverted() ? deltaMouse.y * -1 : deltaMouse.y;
             MouseAxisEvent event = new MouseYAxisEvent(yMovement * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {

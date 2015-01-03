@@ -23,12 +23,13 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.console.commands.Command;
-import org.terasology.logic.console.commands.exceptions.CommandExecutionException;
+import org.terasology.logic.console.commandSystem.ConsoleCommand;
+import org.terasology.logic.console.commandSystem.exceptions.CommandExecutionException;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.naming.Name;
 import org.terasology.network.ClientComponent;
@@ -39,8 +40,8 @@ import org.terasology.utilities.collection.CircularBuffer;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,20 +54,21 @@ public class ConsoleImpl implements Console {
     private static final int MAX_MESSAGE_HISTORY = 255;
     private static final int MAX_COMMAND_HISTORY = 30;
     private static final Logger logger = LoggerFactory.getLogger(ConsoleImpl.class);
+
     private final CircularBuffer<Message> messageHistory = CircularBuffer.create(MAX_MESSAGE_HISTORY);
     private final CircularBuffer<String> localCommandHistory = CircularBuffer.create(MAX_COMMAND_HISTORY);
-    private final HashMap<Name, Command> commandRegistry = new HashMap<Name, Command>();
+    private final Map<Name, ConsoleCommand> commandRegistry = Maps.newHashMap();
     private final Set<ConsoleSubscriber> messageSubscribers = Sets.newSetFromMap(new MapMaker().weakKeys().<ConsoleSubscriber, Boolean>makeMap());
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
 
     /**
-     * Registers a {@link org.terasology.logic.console.commands.Command}.
+     * Registers a {@link org.terasology.logic.console.commandSystem.ConsoleCommand}.
      *
      * @param command The command to be registered
      */
     @Override
-    public void registerCommand(Command command) {
+    public void registerCommand(ConsoleCommand command) {
         Name commandName = command.getName();
 
         if (commandRegistry.containsKey(commandName)) {
@@ -75,7 +77,7 @@ public class ConsoleImpl implements Console {
                     command.getClass().getCanonicalName());
         } else {
             commandRegistry.put(commandName, command);
-            logger.info("Command '{}' successfully registered for class '{}'.", commandName,
+            logger.debug("Command '{}' successfully registered for class '{}'.", commandName,
                     command.getSource().getClass().getCanonicalName());
         }
     }
@@ -203,7 +205,7 @@ public class ConsoleImpl implements Console {
         }
 
         //get the command
-        Command cmd = getCommand(commandName);
+        ConsoleCommand cmd = getCommand(commandName);
 
         //check if the command is loaded
         if (cmd == null) {
@@ -229,7 +231,7 @@ public class ConsoleImpl implements Console {
             return true;
         } else {
             try {
-                String result = cmd.executeRaw(params, callingClient);
+                String result = cmd.execute(params, callingClient);
                 if (!Strings.isNullOrEmpty(result)) {
                     if (callingClient.exists()) {
                         callingClient.send(new ConsoleMessageEvent(result));
@@ -323,14 +325,6 @@ public class ConsoleImpl implements Console {
         //get the parameters
         List<String> params = splitParameters(parameterPart);
 
-        // remove quotation marks
-        for (int i = 0; i < params.size(); i++) {
-            String value = params.get(i);
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                params.set(i, value.substring(1, value.length() - 1));
-            }
-        }
-
         return params;
     }
 
@@ -338,10 +332,15 @@ public class ConsoleImpl implements Console {
         String[] rawParams = paramStr.split(PARAM_SPLIT_REGEX);
         List<String> params = Lists.newArrayList();
         for (String s : rawParams) {
-            if (s.trim().isEmpty()) {
+            String param = s;
+
+            if (param.trim().isEmpty()) {
                 continue;
             }
-            params.add(s);
+            if (param.length() > 1 && param.startsWith("\"") && param.endsWith("\"")) {
+                param = param.substring(1, param.length() - 1);
+            }
+            params.add(param);
         }
         return params;
     }
@@ -353,7 +352,7 @@ public class ConsoleImpl implements Console {
      * @return An array of commands with given name
      */
     @Override
-    public Command getCommand(Name name) {
+    public ConsoleCommand getCommand(Name name) {
         return commandRegistry.get(name);
     }
 
@@ -363,7 +362,7 @@ public class ConsoleImpl implements Console {
      * @return Returns the command list.
      */
     @Override
-    public Collection<Command> getCommands() {
+    public Collection<ConsoleCommand> getCommands() {
         return commandRegistry.values();
     }
 }

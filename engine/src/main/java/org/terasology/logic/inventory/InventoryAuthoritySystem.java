@@ -26,7 +26,12 @@ import org.terasology.logic.inventory.action.GiveItemAction;
 import org.terasology.logic.inventory.action.MoveItemAction;
 import org.terasology.logic.inventory.action.RemoveItemAction;
 import org.terasology.logic.inventory.action.SwitchItemAction;
-import org.terasology.logic.inventory.events.*;
+import org.terasology.logic.inventory.events.BeforeItemPutInInventory;
+import org.terasology.logic.inventory.events.BeforeItemRemovedFromInventory;
+import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.logic.inventory.events.MoveItemAmountRequest;
+import org.terasology.logic.inventory.events.MoveItemRequest;
+import org.terasology.logic.inventory.events.MoveItemToSlotsRequest;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
 
@@ -246,7 +251,7 @@ public class InventoryAuthoritySystem extends BaseComponentSystem implements Inv
     public void moveItemRequest(MoveItemRequest request, EntityRef entity) {
         try {
             InventoryUtils.moveItem(request.getInstigator(), request.getFromInventory(), request.getFromSlot(),
-                     request.getToInventory(), request.getToSlot());
+                    request.getToInventory(), request.getToSlot());
 
         } finally {
             entity.send(new InventoryChangeAcknowledgedRequest(request.getChangeId()));

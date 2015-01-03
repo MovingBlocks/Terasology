@@ -519,11 +519,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
             scheduleNextAutoSave();
             return false;
         }
-        if (currentTime >= nextAutoSave) {
-            return true;
-        } else {
-            return false;
-        }
+        return currentTime >= nextAutoSave;
     }
 
     private void scheduleNextAutoSave() {

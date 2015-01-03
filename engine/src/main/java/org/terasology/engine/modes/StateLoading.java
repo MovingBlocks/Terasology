@@ -18,13 +18,42 @@ package org.terasology.engine.modes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Queues;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.Time;
-import org.terasology.engine.modes.loadProcesses.*;
+import org.terasology.engine.modes.loadProcesses.AwaitCharacterSpawn;
+import org.terasology.engine.modes.loadProcesses.CacheBlocks;
+import org.terasology.engine.modes.loadProcesses.CacheTextures;
+import org.terasology.engine.modes.loadProcesses.CreateRemoteWorldEntity;
+import org.terasology.engine.modes.loadProcesses.CreateWorldEntity;
+import org.terasology.engine.modes.loadProcesses.EnsureSaveGameConsistency;
+import org.terasology.engine.modes.loadProcesses.InitialiseBlockTypeEntities;
+import org.terasology.engine.modes.loadProcesses.InitialiseCommandSystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseEntitySystem;
+import org.terasology.engine.modes.loadProcesses.InitialiseGraphics;
+import org.terasology.engine.modes.loadProcesses.InitialisePhysics;
+import org.terasology.engine.modes.loadProcesses.InitialiseRemoteWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseSystems;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorld;
+import org.terasology.engine.modes.loadProcesses.InitialiseWorldGenerator;
+import org.terasology.engine.modes.loadProcesses.JoinServer;
+import org.terasology.engine.modes.loadProcesses.LoadEntities;
+import org.terasology.engine.modes.loadProcesses.LoadPrefabs;
+import org.terasology.engine.modes.loadProcesses.PostBeginSystems;
+import org.terasology.engine.modes.loadProcesses.PreBeginSystems;
+import org.terasology.engine.modes.loadProcesses.PrepareWorld;
+import org.terasology.engine.modes.loadProcesses.ProcessBlockPrefabs;
+import org.terasology.engine.modes.loadProcesses.RegisterBiomes;
+import org.terasology.engine.modes.loadProcesses.RegisterBlockFamilyFactories;
+import org.terasology.engine.modes.loadProcesses.RegisterBlocks;
+import org.terasology.engine.modes.loadProcesses.RegisterInputSystem;
+import org.terasology.engine.modes.loadProcesses.RegisterMods;
+import org.terasology.engine.modes.loadProcesses.RegisterSystems;
+import org.terasology.engine.modes.loadProcesses.SetupLocalPlayer;
+import org.terasology.engine.modes.loadProcesses.SetupRemotePlayer;
+import org.terasology.engine.modes.loadProcesses.StartServer;
 import org.terasology.game.Game;
 import org.terasology.game.GameManifest;
 import org.terasology.network.JoinStatus;
@@ -47,7 +76,7 @@ public class StateLoading implements GameState {
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private JoinStatus joinStatus;
-    
+
     private NUIManager nuiManager;
 
     private LoadingScreen loadingScreen;
@@ -86,7 +115,7 @@ public class StateLoading implements GameState {
         EngineTime time = (EngineTime) CoreRegistry.get(Time.class);
         time.setPaused(true);
         time.setGameTime(0);
-        
+
         CoreRegistry.get(Game.class).load(gameManifest);
         switch (netMode) {
             case CLIENT:

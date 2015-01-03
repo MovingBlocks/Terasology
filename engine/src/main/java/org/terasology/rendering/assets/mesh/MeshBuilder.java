@@ -28,6 +28,53 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 public class MeshBuilder {
+    private static final float[] VERTICES = {
+            // Front face
+            0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 1.0f,
+
+            // Back face
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+
+            // Top face
+            0.0f, 1.0f, 0.0f,
+            0.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 0.0f,
+
+            // Bottom face
+            0.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 1.0f,
+            0.0f, 0.0f, 1.0f,
+
+            // Right face
+            1.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 0.0f, 1.0f,
+
+            // Left face
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 1.0f,
+            0.0f, 1.0f, 0.0f
+    };
+
+    private static final int[] INDICES = {
+            0, 1, 2, 0, 2, 3,    // front
+            4, 5, 6, 4, 6, 7,    // back
+            8, 9, 10, 8, 10, 11,   // top
+            12, 13, 14, 12, 14, 15,   // bottom
+            16, 17, 18, 16, 18, 19,   // right
+            20, 21, 22, 20, 22, 23    // left
+    };
+
     private MeshData meshData = new MeshData();
     private int vertexCount;
     private TextureMapper textureMapper;
@@ -40,7 +87,7 @@ public class MeshBuilder {
         return this;
     }
 
-    public MeshBuilder addPoly(Vector3f v1, Vector3f v2, Vector3f v3, Vector3f ... vn) {
+    public MeshBuilder addPoly(Vector3f v1, Vector3f v2, Vector3f v3, Vector3f... vn) {
         for (int i = 0; i < vn.length + 1; i++) {
             addIndices(vertexCount, vertexCount + i + 2, vertexCount + i + 1);
         }
@@ -82,7 +129,7 @@ public class MeshBuilder {
         return this;
     }
 
-    public MeshBuilder addIndices(int ... indices) {
+    public MeshBuilder addIndices(int... indices) {
         meshData.getIndices().add(indices);
         return this;
     }
@@ -128,50 +175,5 @@ public class MeshBuilder {
         Vector2f map(int vertexIndex, float u, float v);
     }
 
-    private static final float VERTICES[] = {
-            // Front face
-            0.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 1.0f,
 
-            // Back face
-            0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-
-            // Top face
-            0.0f, 1.0f, 0.0f,
-            0.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 0.0f,
-
-            // Bottom face
-            0.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 1.0f,
-            0.0f, 0.0f, 1.0f,
-
-            // Right face
-            1.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 0.0f, 1.0f,
-
-            // Left face
-            0.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f,
-            0.0f, 1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f
-    };
-
-    private static final int INDICES[] = {
-            0, 1, 2, 0, 2, 3,    // front
-            4, 5, 6, 4, 6, 7,    // back
-            8, 9, 10, 8, 10, 11,   // top
-            12, 13, 14, 12, 14, 15,   // bottom
-            16, 17, 18, 16, 18, 19,   // right
-            20, 21, 22, 20, 22, 23    // left
-    };
 }

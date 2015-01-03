@@ -23,7 +23,11 @@ import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.logic.inventory.action.MoveItemAction;
 import org.terasology.logic.inventory.action.SwitchItemAction;
-import org.terasology.logic.inventory.events.*;
+import org.terasology.logic.inventory.events.AbstractMoveItemRequest;
+import org.terasology.logic.inventory.events.InventoryChangeAcknowledgedRequest;
+import org.terasology.logic.inventory.events.MoveItemAmountRequest;
+import org.terasology.logic.inventory.events.MoveItemRequest;
+import org.terasology.logic.inventory.events.MoveItemToSlotsRequest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.registry.In;
 import org.terasology.registry.Share;
@@ -69,7 +73,7 @@ public class InventoryClientSystem extends BaseComponentSystem implements Invent
 
     private void recalculatePredictedState() {
         for (AbstractMoveItemRequest request : pendingMoves.values()) {
-            if (request instanceof MoveItemRequest){
+            if (request instanceof MoveItemRequest) {
                 MoveItemRequest r = (MoveItemRequest) request;
                 InventoryUtils.moveItem(r.getInstigator(), r.getFromInventory(), r.getFromSlot(), r.getToInventory(),
                         r.getToSlot());
