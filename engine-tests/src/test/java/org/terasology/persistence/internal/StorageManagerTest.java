@@ -16,7 +16,6 @@
 package org.terasology.persistence.internal;
 
 import com.google.common.collect.Lists;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.nio.file.ShrinkWrapFileSystems;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -46,7 +45,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.ChunkStore;
 import org.terasology.persistence.PlayerStore;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.testUtil.ModuleManagerFactory;
@@ -66,7 +64,6 @@ import org.terasology.world.chunks.internal.ChunkImpl;
 import org.terasology.world.internal.WorldInfo;
 
 import javax.vecmath.Vector3f;
-
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,7 +71,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -149,7 +149,6 @@ public class StorageManagerTest {
         WorldProvider worldProvider = mock(WorldProvider.class);
         when(worldProvider.getWorldInfo()).thenReturn(new WorldInfo());
         CoreRegistry.put(WorldProvider.class, worldProvider);
-
 
 
     }

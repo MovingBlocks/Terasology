@@ -148,7 +148,7 @@ public class MovementDebugCommands extends BaseComponentSystem {
 
         HealthComponent healthDefault = ((PojoPrefab) asset).getComponent(HealthComponent.class);
         HealthComponent health = clientComp.character.getComponent(HealthComponent.class);
-        if(health != null && healthDefault != null){
+        if (health != null && healthDefault != null) {
             health.fallingDamageSpeedThreshold = healthDefault.fallingDamageSpeedThreshold;
             health.horizontalDamageSpeedThreshold = healthDefault.horizontalDamageSpeedThreshold;
             health.excessSpeedDamageMultiplier = healthDefault.excessSpeedDamageMultiplier;

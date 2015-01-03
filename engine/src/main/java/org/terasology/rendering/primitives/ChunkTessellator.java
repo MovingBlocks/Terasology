@@ -27,7 +27,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;

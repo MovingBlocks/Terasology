@@ -16,9 +16,8 @@
 
 package org.terasology.input.cameraTarget;
 
-import org.terasology.config.Config;
-import org.terasology.registry.CoreRegistry;
 import com.google.common.base.Objects;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
@@ -28,6 +27,7 @@ import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -123,7 +123,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
     }
 
     private void updateFocalDistance(HitResult hitInfo, float delta) {
-        float focusRate = 4.0f;//how fast the focus distance is updated
+        float focusRate = 4.0f; //how fast the focus distance is updated
         //if the hit result from a trace has a recorded a hit
         if (hitInfo.isHit()) {
             Vector3f playerToTargetRay = new Vector3f();
@@ -131,7 +131,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
             playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getPosition());
             //gradually adjust focalDistance from it's current value to the hit point distance
             focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
-        //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
+            //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
         } else {
             focalDistance = TeraMath.lerp(focalDistance, TARGET_DISTANCE, delta * focusRate);
         }

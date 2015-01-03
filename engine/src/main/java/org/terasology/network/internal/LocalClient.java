@@ -17,18 +17,17 @@
 package org.terasology.network.internal;
 
 import org.terasology.config.Config;
-import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
+import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.world.ViewDistance;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * A local client.
@@ -66,7 +65,7 @@ public class LocalClient extends AbstractClient {
         }
         return Color.WHITE;
     }
-    
+
     @Override
     public String getId() {
         return "local";

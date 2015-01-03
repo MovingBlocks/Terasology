@@ -19,7 +19,6 @@ package org.terasology.world.chunks;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Vector3i;
 import org.terasology.world.internal.ChunkViewCore;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 import java.util.Collection;
 
@@ -109,7 +108,6 @@ public interface ChunkProvider {
     /**
      * Returns the chunk at the given position if possible.
      *
-     *
      * @param x The chunk position on the x-axis
      * @param y The chunk position on the y-axis
      * @param z The chunk position on the z-axis
@@ -119,7 +117,6 @@ public interface ChunkProvider {
 
     /**
      * Returns the chunk at the given position if possible.
-     *
      *
      * @param chunkPos The position of the chunk to obtain
      * @return The chunk, or null if the chunk is not ready

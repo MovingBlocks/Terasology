@@ -19,7 +19,25 @@ import org.lwjgl.opengl.KHRDebugCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.lwjgl.opengl.GL43.*;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_HIGH;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_LOW;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_MEDIUM;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SEVERITY_NOTIFICATION;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_API;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_APPLICATION;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_OTHER;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_SHADER_COMPILER;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_THIRD_PARTY;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_SOURCE_WINDOW_SYSTEM;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_ERROR;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_MARKER;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_OTHER;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_PERFORMANCE;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_POP_GROUP;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_PORTABILITY;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_PUSH_GROUP;
+import static org.lwjgl.opengl.GL43.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
 
 /**
  * Callback used by the OpenGL driver to output additional debug information about our use of the API.
@@ -31,7 +49,7 @@ class DebugCallback implements KHRDebugCallback.Handler {
     @Override
     public void handleMessage(int source, int type, int id, int severity, String message) {
         String logFormat = "[{}] [{}] {}";
-        Object[] args = new Object[] { getSourceString(source), getTypeString(type), message };
+        Object[] args = new Object[]{getSourceString(source), getTypeString(type), message};
 
         switch (severity) {
             case GL_DEBUG_SEVERITY_HIGH:

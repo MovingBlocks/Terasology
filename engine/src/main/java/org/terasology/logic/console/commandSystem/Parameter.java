@@ -16,7 +16,6 @@
 package org.terasology.logic.console.commandSystem;
 
 import com.google.common.base.Optional;
-import org.terasology.entitySystem.entity.EntityRef;
 
 /**
  * Classes extending this interface occur in command method parameter definition

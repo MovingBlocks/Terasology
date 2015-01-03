@@ -32,11 +32,11 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.editor.EditorRange;
-import org.terasology.monitoring.PerformanceMonitor;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.math.TeraMath;
+import org.terasology.monitoring.PerformanceMonitor;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
@@ -1359,16 +1359,16 @@ public class DefaultRenderingProcess {
         overwriteRtWidth = 1152;
         overwriteRtHeight = 700;
 
-        if(config.getRendering().getScreenshotSize() == 0) {
+        if (config.getRendering().getScreenshotSize() == 0) {
             overwriteRtWidth = Display.getWidth() * 2;
             overwriteRtHeight = Display.getHeight() * 2;
-        } else if(config.getRendering().getScreenshotSize() == 1) {
+        } else if (config.getRendering().getScreenshotSize() == 1) {
             overwriteRtWidth = Display.getWidth();
             overwriteRtHeight = Display.getHeight();
-        } else if(config.getRendering().getScreenshotSize() == 2) {
+        } else if (config.getRendering().getScreenshotSize() == 2) {
             overwriteRtWidth = Display.getWidth() / 2;
             overwriteRtHeight = Display.getHeight() / 2;
-        } else if(config.getRendering().getScreenshotSize() == 3) {
+        } else if (config.getRendering().getScreenshotSize() == 3) {
             overwriteRtWidth = Display.getWidth() / 4;
             overwriteRtHeight = Display.getHeight() / 4;
         }

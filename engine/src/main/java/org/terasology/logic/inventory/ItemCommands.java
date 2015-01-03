@@ -48,7 +48,10 @@ public class ItemCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
-    public String giveItem(@Sender EntityRef client, @CommandParam("prefabId or blockName") String itemPrefabName, @CommandParam(value = "amount", required = false) Integer amount) {
+    public String giveItem(
+            @Sender EntityRef client,
+            @CommandParam("prefabId or blockName") String itemPrefabName,
+            @CommandParam(value = "amount", required = false) Integer amount) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);

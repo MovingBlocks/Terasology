@@ -317,8 +317,11 @@ public abstract class AbstractCommand implements ConsoleCommand {
         Class<?> requiredClass = suggestedParameter.getType();
 
         for (Object resultComponent : result) {
-            if (resultComponent == null && requiredClass.isPrimitive()
-            || resultComponent != null && !requiredClass.isAssignableFrom(resultComponent.getClass())) {
+            if (resultComponent == null && requiredClass.isPrimitive()) {
+                throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
+                        + " returns a collection containing an invalid type. Required: " + requiredClass.getCanonicalName()
+                        + "; provided: null");
+            } else if (resultComponent != null && !requiredClass.isAssignableFrom(resultComponent.getClass())) {
                 throw new CommandSuggestionException("The 'suggest' method of command class " + getClass().getCanonicalName()
                         + " returns a collection containing an invalid type. Required: " + requiredClass.getCanonicalName()
                         + "; provided: " + resultComponent.getClass().getCanonicalName());

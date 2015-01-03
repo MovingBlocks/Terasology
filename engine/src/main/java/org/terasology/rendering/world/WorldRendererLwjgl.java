@@ -46,7 +46,6 @@ import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.logic.LightComponent;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.LightGeometryHelper;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;

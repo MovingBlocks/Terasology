@@ -13,26 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.propagation;
 
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.chunks.LitChunk;
+package org.terasology.persistence.typeHandling.extensionTypes;
+
+import org.terasology.naming.Name;
+import org.terasology.persistence.typeHandling.StringRepresentationTypeHandler;
 
 /**
  * @author Immortius
  */
-public interface BatchPropagator {
-    void process(BlockChange... changes);
+public class NameTypeHandler extends StringRepresentationTypeHandler<Name> {
 
-    void process(Iterable<BlockChange> blockChanges);
+    @Override
+    public String getAsString(Name item) {
+        if (item == null) {
+            return "";
+        }
+        return item.toString();
+    }
 
-    void propagateBetween(LitChunk chunk, LitChunk adjChunk, Side side, boolean propagateExternal);
-
-    void propagateFrom(Vector3i pos, Block block);
-
-    void propagateFrom(Vector3i pos, byte value);
-
-    void regenerate(Vector3i pos, byte value);
+    @Override
+    public Name getFromString(String representation) {
+        return new Name(representation);
+    }
 }

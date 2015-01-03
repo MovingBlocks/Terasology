@@ -27,7 +27,12 @@ import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.annotations.Command;
 import org.terasology.logic.console.commandSystem.annotations.CommandParam;
 import org.terasology.logic.console.commandSystem.annotations.Sender;
-import org.terasology.network.*;
+import org.terasology.network.Client;
+import org.terasology.network.ClientComponent;
+import org.terasology.network.ClientInfoComponent;
+import org.terasology.network.ColorComponent;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.StorageManager;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -36,6 +41,7 @@ import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * Commands to administer a remote server
+ *
  * @author Martin Steiger
  */
 @RegisterSystem

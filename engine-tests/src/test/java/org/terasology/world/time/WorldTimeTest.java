@@ -17,11 +17,11 @@
 package org.terasology.world.time;
 
 import junit.framework.Assert;
-
 import org.junit.Test;
 
 /**
  * Tests the world-time related classes
+ *
  * @author Martin Steiger
  */
 public class WorldTimeTest {
@@ -29,7 +29,7 @@ public class WorldTimeTest {
     @Test
     public void testEventMatchesDaily() {
 
-        float[] fracs = new float[] { 0.40f, 0.405f, 0.395f, 0.11111f, 0.3950001f, 0.400001f };
+        float[] fracs = new float[]{0.40f, 0.405f, 0.395f, 0.11111f, 0.3950001f, 0.400001f};
         int[] hits = new int[fracs.length];
 
         long days = 3;

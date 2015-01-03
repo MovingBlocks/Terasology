@@ -188,13 +188,17 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (suggestedIndex <= 0) {
             return suggestion;
         } else {
-            String result = commandName.toString();
+            StringBuilder result = new StringBuilder();
+            result.append(commandName.toString());
 
             for (int i = 0; i < suggestedIndex - 1; i++) {
-                result += " " + commandParameters.get(i);
+                result.append(" ");
+                result.append(commandParameters.get(i));
             }
 
-            return result + " " + suggestion;
+            result.append(" ");
+            result.append(suggestion);
+            return result.toString();
         }
     }
 

@@ -16,6 +16,17 @@
 
 package org.terasology.persistence.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.entity.internal.EngineEntityManager;
+import org.terasology.math.Vector3i;
+import org.terasology.module.ModuleEnvironment;
+import org.terasology.persistence.ChunkStore;
+import org.terasology.persistence.PlayerStore;
+import org.terasology.persistence.StorageManager;
+import org.terasology.persistence.serializers.PrefabSerializer;
+import org.terasology.protobuf.EntityData;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,21 +37,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.GZIPInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.engine.paths.PathManager;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
-import org.terasology.math.Vector3i;
-import org.terasology.module.ModuleEnvironment;
-import org.terasology.persistence.ChunkStore;
-import org.terasology.persistence.PlayerStore;
-import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.serializers.PrefabSerializer;
-import org.terasology.protobuf.EntityData;
-
 /**
  * An abstract implementation of {@link StorageManager} that is able
  * to read from a data store.
+ *
  * @author Immortius
  * @author Florian <florian@fkoeberle.de>
  * @author Martin Steiger
