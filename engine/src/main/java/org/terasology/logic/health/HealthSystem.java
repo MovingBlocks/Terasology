@@ -211,15 +211,9 @@ public class HealthSystem extends BaseComponentSystem implements UpdateSubscribe
         return "Inflicted damage of " + amount;
     }
 
-    @Command(shortDescription = "Restores your health to max", runOnServer = true)
-    public String health(@Sender EntityRef clientEntity) {
-        ClientComponent clientComp = clientEntity.getComponent(ClientComponent.class);
-        clientComp.character.send(new DoHealEvent(100000, clientComp.character));
-        return "Health restored";
-    }
-
-    @Command(shortDescription = "Restores your health by an amount", runOnServer = true)
-    public void health(@Sender EntityRef client, @CommandParam("amount") int amount) {
+    @Command(shortDescription = "Restores your health by a specifiad amount (or fully)", runOnServer = true)
+    public void health(@Sender EntityRef client, @CommandParam(value = "amount", required = false) Integer amountParam) {
+        int amount = amountParam != null ? amountParam : 100000;
         ClientComponent clientComp = client.getComponent(ClientComponent.class);
         clientComp.character.send(new DoHealEvent(amount, clientComp.character));
     }
