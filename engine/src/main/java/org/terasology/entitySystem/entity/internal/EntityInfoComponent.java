@@ -17,6 +17,8 @@ package org.terasology.entitySystem.entity.internal;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
+import org.terasology.entitySystem.prefab.Prefab;
+import org.terasology.entitySystem.prefab.internal.NullPrefab;
 import org.terasology.network.Replicate;
 
 /**
@@ -25,7 +27,7 @@ import org.terasology.network.Replicate;
  * @author Immortius <immortius@gmail.com>
  */
 public class EntityInfoComponent implements Component {
-    public String parentPrefab = "";
+    public Prefab parentPrefab = new NullPrefab();
     public boolean persisted = true;
 
     @Replicate
@@ -35,7 +37,7 @@ public class EntityInfoComponent implements Component {
     public EntityInfoComponent() {
     }
 
-    public EntityInfoComponent(String parentPrefab, boolean persisted, boolean alwaysRelevant) {
+    public EntityInfoComponent(Prefab parentPrefab, boolean persisted, boolean alwaysRelevant) {
         this.parentPrefab = parentPrefab;
         this.persisted = persisted;
         this.alwaysRelevant = alwaysRelevant;

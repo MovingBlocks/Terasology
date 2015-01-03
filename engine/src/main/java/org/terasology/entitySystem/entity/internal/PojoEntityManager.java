@@ -134,7 +134,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             for (Component component : prefab.iterateComponents()) {
                 builder.addComponent(componentLibrary.copy(component));
             }
-            builder.addComponent(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+            builder.addComponent(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
         }
         return builder;
     }
@@ -181,7 +181,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         for (Component component : components) {
             if (component instanceof EntityInfoComponent) {
                 EntityInfoComponent comp = (EntityInfoComponent) component;
-                prefab = prefabManager.getPrefab(comp.parentPrefab);
+                prefab = comp.parentPrefab;
                 break;
             }
         }
@@ -237,7 +237,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
                 loc.setWorldRotation(rotation);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 
@@ -257,7 +257,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
                 loc.setWorldPosition(position);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 
@@ -267,7 +267,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
         for (Component component : prefab.iterateComponents()) {
             components.add(componentLibrary.copy(component));
         }
-        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+        components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
         return create(components);
     }
 
@@ -398,7 +398,7 @@ public class PojoEntityManager implements LowLevelEntityManager, EngineEntityMan
             for (Component component : prefab.iterateComponents()) {
                 components.add(componentLibrary.copy(component));
             }
-            components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted(), prefab.isAlwaysRelevant()));
+            components.add(new EntityInfoComponent(prefab, prefab.isPersisted(), prefab.isAlwaysRelevant()));
 
             return createEntityWithoutLifecycleEvents(components);
         } else {

@@ -198,7 +198,7 @@ public class EntitySerializer {
                     componentMap.put(component.getClass(), componentLibrary.copy(component));
                 }
             }
-            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true, prefab.isAlwaysRelevant()));
+            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(prefab, true, prefab.isAlwaysRelevant()));
         }
         return componentMap;
     }

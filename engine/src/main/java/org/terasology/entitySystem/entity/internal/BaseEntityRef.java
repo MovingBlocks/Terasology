@@ -93,7 +93,7 @@ public abstract class BaseEntityRef extends EntityRef {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
             if (info != null) {
-                return entityManager.getPrefabManager().getPrefab(info.parentPrefab);
+                return info.parentPrefab;
             }
         }
         return null;
@@ -103,8 +103,8 @@ public abstract class BaseEntityRef extends EntityRef {
     public AssetUri getPrefabURI() {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
-            if (info != null && !info.parentPrefab.isEmpty()) {
-                return new AssetUri(AssetType.PREFAB, info.parentPrefab);
+            if (info != null && !info.parentPrefab.exists()) {
+                return new AssetUri(AssetType.PREFAB, info.parentPrefab.getName());
             }
         }
         return null;
