@@ -89,43 +89,37 @@ public class ConsoleImpl implements Console {
     }
 
     /**
-     * Adds a message to the console (as a CoreMessageType.CONSOLE message)
-     *
-     * @param message The message content
-     */
-    @Override
-    public void addMessage(String message) {
-        addMessage(new Message(message));
-    }
-
-    /**
-     * Adds a message to the console
-     *
-     * @param message The content of the message
-     * @param type    The type of the message
-     */
-    @Override
-    public void addMessage(String message, MessageType type) {
-        addMessage(new Message(message, type));
-    }
-
-    private void addErrorMessage(String message) {
-        addMessage(new Message(message, CoreMessageType.ERROR));
-    }
-
-    /**
      * Adds a message to the console
      *
      * @param message The message to be added
      */
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(Message message, EntityRef client) {
+        if (client.exists()) {
+            client.send(new ConsoleMessageEvent(message));
+            return;
+        }
+
         String uncoloredText = FontColor.stripColor(message.getMessage());
         logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
         for (ConsoleSubscriber subscriber : messageSubscribers) {
             subscriber.onNewConsoleMessage(message);
         }
+    }
+
+    @Override
+    public void addMessage(String message, String messageType, EntityRef client) {
+        addMessage(new Message(message, messageType), client);
+    }
+
+    @Override
+    public void addMessage(String message, EntityRef client) {
+        addMessage(message, Message.TYPE_INFO, client);
+    }
+
+    private void addErrorMessage(String message, EntityRef client) {
+        addMessage(FontColor.getColored(message, ConsoleColors.ERROR), Message.TYPE_ERROR, client);
     }
 
     @Override
@@ -150,8 +144,8 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public Iterable<Message> getMessages(MessageType... types) {
-        final List<MessageType> allowedTypes = Arrays.asList(types);
+    public Iterable<Message> getMessages(String... types) {
+        final List<String> allowedTypes = Arrays.asList(types);
 
         // JAVA8: this can be simplified using Stream.filter()
         return Collections2.filter(messageHistory, new Predicate<Message>() {
@@ -209,20 +203,20 @@ public class ConsoleImpl implements Console {
 
         //check if the command is loaded
         if (cmd == null) {
-            addErrorMessage("Unknown command '" + commandName + "'");
+            addErrorMessage("Unknown command '" + commandName + "'", callingClient);
             return false;
         }
 
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").");
+            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").", callingClient);
             return false;
         }
 
         if (params.size() < cmd.getRequiredParameterCount()) {
-            addErrorMessage("Please, provide required arguments marked by <>.");
-            addMessage(cmd.getUsage());
+            addErrorMessage("Please, provide required arguments marked by <>.", callingClient);
+            addMessage(new Message(cmd.getUsage()), callingClient);
             return false;
         }
 
@@ -233,11 +227,7 @@ public class ConsoleImpl implements Console {
             try {
                 String result = cmd.execute(params, callingClient);
                 if (!Strings.isNullOrEmpty(result)) {
-                    if (callingClient.exists()) {
-                        callingClient.send(new ConsoleMessageEvent(result));
-                    } else {
-                        addMessage(result);
-                    }
+                    addMessage(new Message(result), callingClient);
                 }
 
                 return true;
@@ -262,12 +252,7 @@ public class ConsoleImpl implements Console {
                 String errorReport = FontColor.getColored("An error occurred while executing command '"
                                                           + cmd.getName() + "': " + causeMessage, ConsoleColors.ERROR);
 
-                if (callingClient.exists()) {
-                    callingClient.send(new ConsoleMessageEvent(errorReport));
-                } else {
-                    addErrorMessage(errorReport);
-                }
-
+                addErrorMessage(errorReport, callingClient);
                 return false;
             }
         }

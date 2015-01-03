@@ -30,7 +30,6 @@ import org.terasology.input.binds.general.ChatButton;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.console.commandSystem.annotations.Command;
@@ -83,8 +82,9 @@ public class ChatSystem extends BaseComponentSystem {
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            Message message = event.getFormattedMessage();
-            if (message.getType() == CoreMessageType.CHAT || message.getType() == CoreMessageType.NOTIFICATION) {
+            String message = event.getMessage();
+            String type = event.getMessageType();
+            if (type.equals(Message.TYPE_CHAT) || type.equals(Message.TYPE_NOTIFICATION)) {
 
                 // show overlay only if chat and console are hidden
                 if (!nuiManager.isOpen(CHAT_UI) && !nuiManager.isOpen(CONSOLE_UI)) {

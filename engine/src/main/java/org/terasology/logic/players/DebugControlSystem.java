@@ -33,6 +33,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.console.ConsoleMessageEvent;
+import org.terasology.logic.console.Message;
 import org.terasology.logic.debug.DebugProperties;
 import org.terasology.logic.health.DoDamageEvent;
 import org.terasology.network.ClientComponent;
@@ -152,7 +153,7 @@ public class DebugControlSystem extends BaseComponentSystem {
                     break;
                 case Keyboard.KeyId.F7:
                     config.getRendering().getDebug().cycleStage();
-                    entity.send(new ConsoleMessageEvent("Set debug stage to: " + config.getRendering().getDebug().getStage()));
+                    entity.send(new ConsoleMessageEvent(new Message("Set debug stage to: " + config.getRendering().getDebug().getStage())));
                     event.consume();
                     break;
                 case Keyboard.KeyId.F8:

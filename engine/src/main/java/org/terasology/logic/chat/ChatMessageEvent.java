@@ -18,7 +18,6 @@ package org.terasology.logic.chat;
 
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.DisplayNameComponent;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.ColorComponent;
@@ -43,12 +42,11 @@ public class ChatMessageEvent implements MessageEvent {
         this.from = from;
     }
 
-    public String getMessage() {
+    public String getMessageWithoutSender() {
         return message;
     }
 
-    @Override
-    public Message getFormattedMessage() {
+    public String getMessage() {
         DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
         ColorComponent colorInfo = from.getComponent(ColorComponent.class);
         String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";
@@ -57,9 +55,13 @@ public class ChatMessageEvent implements MessageEvent {
             playerName = FontColor.getColored(playerName, colorInfo.color);
         }
         
-        return new Message(String.format("%s: %s", playerName, message), CoreMessageType.CHAT);
+        return String.format("%s: %s", playerName, message);
     }
 
+    @Override
+    public String getMessageType() {
+        return Message.TYPE_CHAT;
+    }
 
     @Override
     public String toString() {

@@ -57,7 +57,7 @@ public class ConsoleSystem extends BaseComponentSystem {
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            console.addMessage(event.getFormattedMessage());
+            console.addMessage(event.getMessage(), event.getMessageType(), EntityRef.NULL);
         }
     }
 

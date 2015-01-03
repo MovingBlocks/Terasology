@@ -16,7 +16,6 @@
 package org.terasology.logic.console.ui;
 
 import org.terasology.logic.console.Console;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.Canvas;
@@ -62,7 +61,7 @@ public class MiniChatOverlay extends CoreScreenLayer {
         message.bindText(new ReadOnlyBinding<String>() {
             @Override
             public String get() {
-                Iterable<Message> msgs = console.getMessages(CoreMessageType.CHAT, CoreMessageType.NOTIFICATION);
+                Iterable<Message> msgs = console.getMessages(Message.TYPE_CHAT, Message.TYPE_NOTIFICATION);
                 String last = "";
 
                 for (Message msg : msgs) {

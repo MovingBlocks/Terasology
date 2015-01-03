@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.ConsoleColors;
-import org.terasology.logic.console.CoreMessageType;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.console.commandSystem.ConsoleCommand;
 import org.terasology.logic.console.commandSystem.exceptions.CommandSuggestionException;
@@ -109,7 +108,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 }
             }
 
-            console.addMessage("Error when suggesting command: " + causeMessage, CoreMessageType.ERROR);
+            console.addMessage("Error when suggesting command: " + causeMessage, Message.TYPE_ERROR, EntityRef.NULL);
             return null;
         }
     }
@@ -119,7 +118,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (rawCommand.length() <= 0) {
             reset();
             previousMessage = new Message("Type 'help' to list all commands.");
-            console.addMessage(previousMessage);
+            console.addMessage(previousMessage, EntityRef.NULL);
             return null;
         } else if (query == null) {
             query = rawCommand;
@@ -174,7 +173,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (previousMessage != null) {
             console.replaceMessage(previousMessage, matchMessage);
         } else {
-            console.addMessage(matchMessage);
+            console.addMessage(matchMessage, EntityRef.NULL);
         }
 
         previousMessage = matchMessage;

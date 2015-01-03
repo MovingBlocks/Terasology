@@ -15,13 +15,13 @@
  */
 package org.terasology.logic.console.ui;
 
+import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.MouseInput;
 import org.terasology.logic.console.Console;
 import org.terasology.logic.console.Message;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector2i;
 import org.terasology.registry.In;
-import org.terasology.rendering.FontColor;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.CoreScreenLayer;
 import org.terasology.rendering.nui.InteractionListener;
@@ -87,7 +87,7 @@ public class ConsoleScreen extends CoreScreenLayer {
             public String get() {
                 StringBuilder messageList = new StringBuilder();
                 for (Message message : console.getMessages()) {
-                    messageList.append(FontColor.getColored(message.getMessage(), message.getType().getColor()));
+                    messageList.append(message.getMessage());
                     messageList.append(Message.NEW_LINE);
                 }
                 return messageList.toString();
@@ -107,7 +107,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                     "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
                     "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
                     "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
-                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
+                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE, EntityRef.NULL);
             welcomePrinted = true;
         }
     }
