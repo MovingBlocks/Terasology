@@ -47,13 +47,15 @@ import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius <immortius@gmail.com>, Limeth
  */
 @RegisterSystem(RegisterMode.ALWAYS)
 public class CharacterSoundSystem extends BaseComponentSystem {
 
     private static final long MIN_TIME = 10;
-    private static final float VOLUME_MODIFIER_LANDING = 0.1f;
+    private static final float LANDING_VOLUME_MODIFIER = 0.2f; //The sound volume is multiplied by this number
+    private static final float LANDING_VELOCITY_THRESHOLD = 7; //How fast do you have to be falling for the sound to play
+    private static final float LANDING_VOLUME_MAX = 2; //The maximum modifier value
     private Random random = new FastRandom();
 
     @In
@@ -106,9 +108,14 @@ public class CharacterSoundSystem extends BaseComponentSystem {
     @ReceiveEvent
     public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
         Vector3f velocity = event.getVelocity();
+        float soundVolumeModifier = (velocity.y * -1 - LANDING_VELOCITY_THRESHOLD) * LANDING_VOLUME_MODIFIER;
 
-        if (velocity.y > 0f) {
+        if (soundVolumeModifier <= 0f) {
             return;
+        }
+
+        if (soundVolumeModifier > LANDING_VOLUME_MAX) {
+            soundVolumeModifier = LANDING_VOLUME_MAX;
         }
 
         if (characterSounds.lastSoundTime + MIN_TIME < time.getGameTimeInMs()) {
@@ -119,7 +126,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
                 sound = random.nextItem(characterSounds.footstepSounds);
             }
             if (sound != null) {
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume * velocity.y * -1 * VOLUME_MODIFIER_LANDING));
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume * soundVolumeModifier));
                 characterSounds.lastSoundTime = time.getGameTimeInMs();
                 entity.saveComponent(characterSounds);
             }
