@@ -16,14 +16,10 @@
 package org.terasology.entitySystem.entity;
 
 import org.terasology.asset.AssetUri;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.entitySystem.MutableComponentContainer;
-import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
-import org.terasology.persistence.serializers.EntityDataJSONFormat;
-import org.terasology.persistence.serializers.EntitySerializer;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -121,10 +117,6 @@ public abstract class EntityRef implements MutableComponentContainer {
     /**
      * @return A full, json style description of the entity.
      */
-    public String toFullDescription() {
-        EntitySerializer serializer = new EntitySerializer((EngineEntityManager) CoreRegistry.get(EntityManager.class));
-        serializer.setUsingFieldIds(false);
-        return EntityDataJSONFormat.write(serializer.serialize(this));
-    }
+    public abstract String toFullDescription();
 
 }

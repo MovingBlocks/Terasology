@@ -156,4 +156,8 @@ public final class NullEntityRef extends EntityRef {
         return 0;
     }
 
+    @Override
+    public String toFullDescription() {
+        return "{}";
+    }
 }

@@ -23,6 +23,8 @@ import org.terasology.entitySystem.entity.LowLevelEntityManager;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.network.NetworkComponent;
+import org.terasology.persistence.serializers.EntityDataJSONFormat;
+import org.terasology.persistence.serializers.EntitySerializer;
 
 import java.util.Collections;
 
@@ -203,5 +205,12 @@ public abstract class BaseEntityRef extends EntityRef {
             entityInfo = addComponent(new EntityInfoComponent());
         }
         return entityInfo;
+    }
+
+    @Override
+    public String toFullDescription() {
+        EntitySerializer serializer = new EntitySerializer((EngineEntityManager)entityManager);
+        serializer.setUsingFieldIds(false);
+        return EntityDataJSONFormat.write(serializer.serialize(this));
     }
 }
