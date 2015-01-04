@@ -68,7 +68,7 @@ public class RenderableWorldImpl implements RenderableWorld {
     private Region3i renderableRegion = Region3i.EMPTY;
     private RenderQueuesHelper renderQueues;
 
-    private Camera activeCamera;
+    private Camera playerCamera;
     private Camera shadowMapCamera;
 
     private Config config = CoreRegistry.get(Config.class);
@@ -78,13 +78,13 @@ public class RenderableWorldImpl implements RenderableWorld {
     private int statVisibleChunks;
     private int statIgnoredPhases;
 
-    public RenderableWorldImpl(WorldProvider worldProvider, ChunkProvider chunkProvider, GLBufferPool bufferPool, Camera activeCamera, Camera shadowMapCamera) {
+    public RenderableWorldImpl(WorldProvider worldProvider, ChunkProvider chunkProvider, GLBufferPool bufferPool, Camera playerCamera, Camera shadowMapCamera) {
         this.worldProvider = worldProvider;
         this.chunkProvider = chunkProvider;
         chunkTessellator = new ChunkTessellator(bufferPool);
         chunkMeshUpdateManager = new ChunkMeshUpdateManager(chunkTessellator, worldProvider);
 
-        this.activeCamera = activeCamera;
+        this.playerCamera = playerCamera;
         this.shadowMapCamera = shadowMapCamera;
 
         renderQueues = new RenderQueuesHelper(new PriorityQueue<>(MAX_LOADABLE_CHUNKS, new ChunkFrontToBackComparator()),
@@ -244,7 +244,7 @@ public class RenderableWorldImpl implements RenderableWorld {
      * @return The player offset chunk
      */
     private Vector3i calcCameraCoordinatesInChunkUnits() {
-        Vector3f cameraCoordinates = activeCamera.getPosition();
+        Vector3f cameraCoordinates = playerCamera.getPosition();
         return new Vector3i((int) (cameraCoordinates.x / ChunkConstants.SIZE_X),
                             (int) (cameraCoordinates.y / ChunkConstants.SIZE_Y),
                             (int) (cameraCoordinates.z / ChunkConstants.SIZE_Z));
@@ -266,7 +266,7 @@ public class RenderableWorldImpl implements RenderableWorld {
 
         if (processChunkUpdates) {
             PerformanceMonitor.startActivity("Building Mesh VBOs");
-            chunkMeshUpdateManager.setCameraPosition(activeCamera.getPosition());
+            chunkMeshUpdateManager.setCameraPosition(playerCamera.getPosition());
             for (RenderableChunk chunk : chunkMeshUpdateManager.availableChunksForUpdate()) {
                 if (chunksInProximityOfCamera.contains(chunk) && chunk.hasPendingMesh()) {
                     for (ChunkMesh pendingMesh : chunk.getPendingMesh()) {
@@ -388,15 +388,15 @@ public class RenderableWorldImpl implements RenderableWorld {
     }
 
     public boolean isChunkVisible(RenderableChunk chunk) {
-        return isChunkVisible(activeCamera, chunk);
+        return isChunkVisible(playerCamera, chunk);
     }
 
     public boolean isChunkVisible(Camera camera, RenderableChunk chunk) {
-        return camera.getViewFrustum().intersects(chunk.getAABB());
+        return camera.hasInSight(chunk.getAABB());
     }
 
     public boolean isChunkVisibleReflection(RenderableChunk chunk) {
-        return activeCamera.getViewFrustumReflected().intersects(chunk.getAABB());
+        return playerCamera.getViewFrustumReflected().intersects(chunk.getAABB());
     }
 
     public RenderQueuesHelper getRenderQueues() {
