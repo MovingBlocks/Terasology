@@ -1399,7 +1399,7 @@ public class DefaultRenderingProcess {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss");
 
                 final String format = config.getRendering().getScreenshotFormat();
-                final String fileName = "Terasology-" + sdf.format(new Date()).toString() + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
+                final String fileName = "Terasology-" + sdf.format(new Date()) + "-" + fboSceneFinal.width + "x" + fboSceneFinal.height + "." + format;
                 Path path = PathManager.getInstance().getScreenshotPath().resolve(fileName);
                 BufferedImage image = new BufferedImage(fboSceneFinal.width, fboSceneFinal.height, BufferedImage.TYPE_INT_RGB);
 
