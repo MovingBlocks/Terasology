@@ -107,7 +107,7 @@ public class ConsoleScreen extends CoreScreenLayer {
                     "Text parameters should be in quotes, no commas needed between multiple parameters." + Message.NEW_LINE +
                     "You can use auto-completion by typing a partial command then hitting 'tab' - examples:" + Message.NEW_LINE +
                     "'gh' + 'tab' = 'ghost'" + Message.NEW_LINE +
-                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE, EntityRef.NULL);
+                    "'lS' + 'tab' = 'listShapes' (camel casing abbreviated commands)" + Message.NEW_LINE);
             welcomePrinted = true;
         }
     }

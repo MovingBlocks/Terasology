@@ -42,11 +42,11 @@ public class ChatMessageEvent implements MessageEvent {
         this.from = from;
     }
 
-    public String getMessageWithoutSender() {
+    public String getMessage() {
         return message;
     }
 
-    public String getMessage() {
+    public String getFormattedMessage() {
         DisplayNameComponent displayInfo = from.getComponent(DisplayNameComponent.class);
         ColorComponent colorInfo = from.getComponent(ColorComponent.class);
         String playerName = (displayInfo != null) ? displayInfo.name : "Unknown";

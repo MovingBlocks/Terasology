@@ -40,7 +40,7 @@ public interface Console {
      *
      * @param message
      */
-    void addMessage(Message message, EntityRef client);
+    void addMessage(Message message);
 
     /**
      * Creates and adds a message to the console.
@@ -48,14 +48,14 @@ public interface Console {
      * @param message the content String
      * @param messageType the type of the message
      */
-    void addMessage(String message, String messageType, EntityRef client);
+    void addMessage(String message, String messageType);
 
     /**
      * Creates and adds an 'info' message to the console.
      *
      * @param message the content String
      */
-    void addMessage(String message, EntityRef client);
+    void addMessage(String message);
 
     /**
      * @return An iterator over all messages in the console

@@ -82,7 +82,6 @@ public class ChatSystem extends BaseComponentSystem {
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            String message = event.getMessage();
             String type = event.getMessageType();
             if (type.equals(Message.TYPE_CHAT) || type.equals(Message.TYPE_NOTIFICATION)) {
 

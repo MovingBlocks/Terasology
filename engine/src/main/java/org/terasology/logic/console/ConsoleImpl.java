@@ -88,18 +88,22 @@ public class ConsoleImpl implements Console {
         messageHistory.clear();
     }
 
+    private void sendMessage(Message message, EntityRef target) {
+        if (target.exists() && !target.getComponent(ClientComponent.class).local) {
+            target.send(new ConsoleMessageEvent(message));
+            return;
+        }
+
+        addMessage(message);
+    }
+
     /**
      * Adds a message to the console
      *
      * @param message The message to be added
      */
     @Override
-    public void addMessage(Message message, EntityRef client) {
-        if (client.exists()) {
-            client.send(new ConsoleMessageEvent(message));
-            return;
-        }
-
+    public void addMessage(Message message) {
         String uncoloredText = FontColor.stripColor(message.getMessage());
         logger.info("[{}] {}", message.getType(), uncoloredText);
         messageHistory.add(message);
@@ -109,17 +113,17 @@ public class ConsoleImpl implements Console {
     }
 
     @Override
-    public void addMessage(String message, String messageType, EntityRef client) {
-        addMessage(new Message(message, messageType), client);
+    public void addMessage(String message, String messageType) {
+        addMessage(new Message(message, messageType));
     }
 
     @Override
-    public void addMessage(String message, EntityRef client) {
-        addMessage(message, Message.TYPE_INFO, client);
+    public void addMessage(String message) {
+        addMessage(message, Message.TYPE_INFO);
     }
 
-    private void addErrorMessage(String message, EntityRef client) {
-        addMessage(FontColor.getColored(message, ConsoleColors.ERROR), Message.TYPE_ERROR, client);
+    private void sendErrorMessage(String message, EntityRef client) {
+        sendMessage(new Message(FontColor.getColored(message, ConsoleColors.ERROR), Message.TYPE_ERROR), client);
     }
 
     @Override
@@ -203,20 +207,20 @@ public class ConsoleImpl implements Console {
 
         //check if the command is loaded
         if (cmd == null) {
-            addErrorMessage("Unknown command '" + commandName + "'", callingClient);
+            sendErrorMessage("Unknown command '" + commandName + "'", callingClient);
             return false;
         }
 
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").", callingClient);
+            sendErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").", callingClient);
             return false;
         }
 
         if (params.size() < cmd.getRequiredParameterCount()) {
-            addErrorMessage("Please, provide required arguments marked by <>.", callingClient);
-            addMessage(new Message(cmd.getUsage()), callingClient);
+            sendErrorMessage("Please, provide required arguments marked by <>.", callingClient);
+            sendMessage(new Message(cmd.getUsage()), callingClient);
             return false;
         }
 
@@ -227,7 +231,7 @@ public class ConsoleImpl implements Console {
             try {
                 String result = cmd.execute(params, callingClient);
                 if (!Strings.isNullOrEmpty(result)) {
-                    addMessage(new Message(result), callingClient);
+                    sendMessage(new Message(result), callingClient);
                 }
 
                 return true;
@@ -249,10 +253,11 @@ public class ConsoleImpl implements Console {
                     }
                 }
 
-                String errorReport = FontColor.getColored("An error occurred while executing command '"
-                                                          + cmd.getName() + "': " + causeMessage, ConsoleColors.ERROR);
+                String errorReport = "An error occurred while executing command '"
+                        + cmd.getName() + "': " + causeMessage;
 
-                addErrorMessage(errorReport, callingClient);
+                sendErrorMessage(errorReport, callingClient);
+                logger.error(errorReport, e);
                 return false;
             }
         }

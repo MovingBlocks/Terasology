@@ -46,6 +46,11 @@ public class ConsoleMessageEvent implements MessageEvent {
     }
 
     @Override
+    public String getFormattedMessage() {
+        return message;
+    }
+
+    @Override
     public String getMessageType() {
         return messageType;
     }

@@ -29,8 +29,6 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.registry.In;
 import org.terasology.rendering.nui.NUIManager;
 
-import java.util.List;
-
 /**
  * @author Immortius
  */
@@ -57,16 +55,15 @@ public class ConsoleSystem extends BaseComponentSystem {
     public void onMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            console.addMessage(event.getMessage(), event.getMessageType(), EntityRef.NULL);
+            console.addMessage(event.getFormattedMessage(), event.getMessageType());
         }
     }
 
     @ReceiveEvent(components = ClientComponent.class, netFilter = RegisterMode.AUTHORITY)
     public void onCommand(CommandEvent event, EntityRef entity) {
-        List<String> params = event.getParameters();
         ConsoleCommand cmd = console.getCommand(event.getCommandName());
 
-        if (cmd.getRequiredParameterCount() == params.size() && cmd.isRunOnServer()) {
+        if (cmd.isRunOnServer()) {
             console.execute(event.getCommandName(), event.getParameters(), entity);
         }
     }

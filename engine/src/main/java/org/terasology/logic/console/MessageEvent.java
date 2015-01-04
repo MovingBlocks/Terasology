@@ -29,6 +29,11 @@ public interface MessageEvent extends Event {
     String getMessage();
 
     /**
+     * @return The displayed string
+     */
+    String getFormattedMessage();
+
+    /**
      * @return The type of this message
      */
     String getMessageType();

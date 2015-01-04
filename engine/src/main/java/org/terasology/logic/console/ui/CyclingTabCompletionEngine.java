@@ -108,7 +108,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
                 }
             }
 
-            console.addMessage("Error when suggesting command: " + causeMessage, Message.TYPE_ERROR, EntityRef.NULL);
+            console.addMessage("Error when suggesting command: " + causeMessage, Message.TYPE_ERROR);
             return null;
         }
     }
@@ -118,7 +118,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (rawCommand.length() <= 0) {
             reset();
             previousMessage = new Message("Type 'help' to list all commands.");
-            console.addMessage(previousMessage, EntityRef.NULL);
+            console.addMessage(previousMessage);
             return null;
         } else if (query == null) {
             query = rawCommand;
@@ -173,7 +173,7 @@ public class CyclingTabCompletionEngine implements TabCompletionEngine {
         if (previousMessage != null) {
             console.replaceMessage(previousMessage, matchMessage);
         } else {
-            console.addMessage(matchMessage, EntityRef.NULL);
+            console.addMessage(matchMessage);
         }
 
         previousMessage = matchMessage;

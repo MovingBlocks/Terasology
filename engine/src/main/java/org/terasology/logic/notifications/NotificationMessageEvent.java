@@ -63,6 +63,11 @@ public class NotificationMessageEvent implements MessageEvent {
     }
 
     @Override
+    public String getFormattedMessage() {
+        return message;
+    }
+
+    @Override
     public String getMessageType() {
         return Message.TYPE_NOTIFICATION;
     }
