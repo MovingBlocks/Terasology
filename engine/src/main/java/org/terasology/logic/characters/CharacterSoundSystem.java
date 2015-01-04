@@ -53,6 +53,7 @@ import java.util.List;
 public class CharacterSoundSystem extends BaseComponentSystem {
 
     private static final long MIN_TIME = 10;
+    private static final float VOLUME_MODIFIER_LANDING = 0.1f;
     private Random random = new FastRandom();
 
     @In
@@ -104,7 +105,9 @@ public class CharacterSoundSystem extends BaseComponentSystem {
 
     @ReceiveEvent
     public void onLanded(VerticalCollisionEvent event, EntityRef entity, CharacterSoundComponent characterSounds) {
-        if (event.getVelocity().y > 0f) {
+        Vector3f velocity = event.getVelocity();
+
+        if (velocity.y > 0f) {
             return;
         }
 
@@ -116,7 +119,7 @@ public class CharacterSoundSystem extends BaseComponentSystem {
                 sound = random.nextItem(characterSounds.footstepSounds);
             }
             if (sound != null) {
-                entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume));
+                entity.send(new PlaySoundEvent(entity, sound, characterSounds.landingVolume * velocity.y * -1 * VOLUME_MODIFIER_LANDING));
                 characterSounds.lastSoundTime = time.getGameTimeInMs();
                 entity.saveComponent(characterSounds);
             }
