@@ -16,7 +16,6 @@
 package org.terasology.persistence.typeHandling.extensionTypes;
 
 import com.google.common.collect.Lists;
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
@@ -79,7 +78,6 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
     public List<EntityRef> deserializeCollection(PersistedData data, DeserializationContext context) {
         PersistedDataArray array = data.getAsArray();
         List<EntityRef> result = Lists.newArrayListWithCapacity(array.size());
-        addEntitiesForIntArray(result, array);
         addEntitiesFromLongArray(result, array);
         return result;
     }
@@ -91,14 +89,5 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
             result.add(entityManager.createEntityRefWithId(item));
         }
     }
-
-    private void addEntitiesForIntArray(List<EntityRef> result, PersistedDataArray array) {
-        TIntIterator iterator = array.getAsIntegerArray().iterator();
-        while (iterator.hasNext()) {
-            int item = iterator.next();
-            result.add(entityManager.createEntityRefWithId(item));
-        }
-    }
-
 
 }
