@@ -219,21 +219,15 @@ public final class CommandParameter<T> implements Parameter {
             usage.append(' ').append(getName());
         }
 
-        if (required) {
+        if (isArray()) {
+            usage.insert(0, '(');
+            usage.append("...)");
+        } else if (isRequired()) {
             usage.insert(0, '<');
             usage.append('>');
         } else {
             usage.insert(0, '(');
             usage.append(')');
-        }
-
-        if (isArray()) {
-            usage.append(" (")
-                    .append(simpleTypeName)
-                    .append(' ')
-                    .append(getName())
-                    .append(")...");
-
         }
 
         return usage.toString();
