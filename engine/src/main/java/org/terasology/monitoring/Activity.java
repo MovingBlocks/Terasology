@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.monitoring.impl;
-
-import gnu.trove.map.TObjectDoubleMap;
-import org.terasology.monitoring.Activity;
+package org.terasology.monitoring;
 
 /**
- * Base interface for performance monitor implementations.
- *
- * @author Immortius <immortius@gmail.com>
+ * Activity allows for the use the use of an activity in a try-with-resources block - when the block ends so too does the activity.
+ * @author Immortius
  */
-public interface PerformanceMonitorInternal {
-    void rollCycle();
+public interface Activity extends AutoCloseable {
 
-    Activity startActivity(String activity);
-
-    void endActivity();
-
-    TObjectDoubleMap<String> getRunningMean();
-
-    TObjectDoubleMap<String> getDecayingSpikes();
-
-    TObjectDoubleMap<String> getAllocationMean();
+    @Override
+    void close();
 }

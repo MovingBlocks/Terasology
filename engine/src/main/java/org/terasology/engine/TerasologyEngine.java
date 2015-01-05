@@ -48,6 +48,7 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.logic.behavior.asset.BehaviorTreeData;
 import org.terasology.logic.console.commandSystem.adapter.ParameterAdapterManager;
+import org.terasology.monitoring.Activity;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.ThreadActivity;
 import org.terasology.monitoring.ThreadMonitor;
@@ -428,34 +429,34 @@ public class TerasologyEngine implements GameEngine {
 
             Iterator<Float> updateCycles = time.tick();
 
-            PerformanceMonitor.startActivity("Network Update");
-            networkSystem.update();
-            PerformanceMonitor.endActivity();
+            try (Activity ignored = PerformanceMonitor.startActivity("Network Update")) {
+                networkSystem.update();
+            }
 
             totalDelta = 0;
             while (updateCycles.hasNext()) {
                 updateDelta = updateCycles.next(); // gameTime gets updated here!
                 totalDelta += time.getDeltaInMs();
-                PerformanceMonitor.startActivity("Main Update");
-                currentState.update(updateDelta);
-                PerformanceMonitor.endActivity();
+                try (Activity ignored = PerformanceMonitor.startActivity("Main Update")) {
+                    currentState.update(updateDelta);
+                }
             }
 
             subsystemsDelta = totalDelta / 1000f;
 
             for (EngineSubsystem subsystem : getSubsystems()) {
-                PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName());
-                subsystem.preUpdate(currentState, subsystemsDelta);
-                PerformanceMonitor.endActivity();
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
+                    subsystem.preUpdate(currentState, subsystemsDelta);
+                }
             }
 
             // Waiting processes are set by modules via GameThread.a/synch() methods.
             GameThread.processWaitingProcesses();
 
             for (EngineSubsystem subsystem : getSubsystems()) {
-                PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName());
-                subsystem.postUpdate(currentState, subsystemsDelta);
-                PerformanceMonitor.endActivity();
+                try (Activity ignored = PerformanceMonitor.startActivity(subsystem.getClass().getSimpleName())) {
+                    subsystem.postUpdate(currentState, subsystemsDelta);
+                }
             }
 
             PerformanceMonitor.rollCycle();

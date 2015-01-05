@@ -17,11 +17,13 @@ package org.terasology.monitoring.impl;
 
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.terasology.monitoring.Activity;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class NullPerformanceMonitor implements PerformanceMonitorInternal {
+    private static final NullActivity NULL_ACTIVITY = new NullActivity();
     private TObjectDoubleMap<String> metrics = new TObjectDoubleHashMap<>();
 
     @Override
@@ -29,7 +31,8 @@ public class NullPerformanceMonitor implements PerformanceMonitorInternal {
     }
 
     @Override
-    public void startActivity(String activity) {
+    public Activity startActivity(String activity) {
+        return NULL_ACTIVITY;
     }
 
     @Override

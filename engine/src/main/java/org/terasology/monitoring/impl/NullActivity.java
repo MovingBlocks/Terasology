@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,14 @@
  */
 package org.terasology.monitoring.impl;
 
-import gnu.trove.map.TObjectDoubleMap;
 import org.terasology.monitoring.Activity;
 
 /**
- * Base interface for performance monitor implementations.
- *
- * @author Immortius <immortius@gmail.com>
+ * An activity that does nothing when it is closed.
+ * @author Immortius
  */
-public interface PerformanceMonitorInternal {
-    void rollCycle();
-
-    Activity startActivity(String activity);
-
-    void endActivity();
-
-    TObjectDoubleMap<String> getRunningMean();
-
-    TObjectDoubleMap<String> getDecayingSpikes();
-
-    TObjectDoubleMap<String> getAllocationMean();
+public class NullActivity implements Activity {
+    @Override
+    public void close() {
+    }
 }
