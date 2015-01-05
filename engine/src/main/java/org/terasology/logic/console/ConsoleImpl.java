@@ -216,13 +216,13 @@ public class ConsoleImpl implements Console {
         String requiredPermission = cmd.getRequiredPermission();
 
         if (!clientHasPermission(callingClient, requiredPermission)) {
-            addErrorMessage("You do not have enough permissions to execute this command (" + requiredPermission + ").");
+            callingClient.send(new ErrorMessageEvent("You do not have enough permissions to execute this command (" + requiredPermission + ")."));
             return false;
         }
 
         if (params.size() < cmd.getRequiredParameterCount()) {
-            addErrorMessage("Please, provide required arguments marked by <>.");
-            addMessage(cmd.getUsage());
+            callingClient.send(new ErrorMessageEvent("Please, provide required arguments marked by <>."));
+            callingClient.send(new ConsoleMessageEvent(cmd.getUsage()));
             return false;
         }
 
@@ -233,11 +233,7 @@ public class ConsoleImpl implements Console {
             try {
                 String result = cmd.execute(params, callingClient);
                 if (!Strings.isNullOrEmpty(result)) {
-                    if (callingClient.exists()) {
-                        callingClient.send(new ConsoleMessageEvent(result));
-                    } else {
-                        addMessage(result);
-                    }
+                    callingClient.send(new ConsoleMessageEvent(result));
                 }
 
                 return true;
@@ -248,26 +244,13 @@ public class ConsoleImpl implements Console {
                 logger.trace("An error occurred while executing a command: ", e);
 
                 if (Strings.isNullOrEmpty(causeMessage)) {
-                    causeMessage = cause.getMessage();
-
-                    if (Strings.isNullOrEmpty(causeMessage)) {
-                        causeMessage = cause.toString();
-
-                        if (Strings.isNullOrEmpty(causeMessage)) {
-                            return false;
-                        }
-                    }
+                    causeMessage = cause.toString();
                 }
 
-                String errorReport = FontColor.getColored("An error occurred while executing command '"
-                                                          + cmd.getName() + "': " + causeMessage, ConsoleColors.ERROR);
-
-                if (callingClient.exists()) {
-                    callingClient.send(new ConsoleMessageEvent(errorReport));
-                } else {
-                    addErrorMessage(errorReport);
+                if (!Strings.isNullOrEmpty(causeMessage)) {
+                    callingClient.send(new ErrorMessageEvent("An error occurred while executing command '"
+                            + cmd.getName() + "': " + causeMessage));
                 }
-
                 return false;
             }
         }
