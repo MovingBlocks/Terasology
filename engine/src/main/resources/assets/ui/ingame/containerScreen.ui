@@ -10,9 +10,9 @@
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,
-                    "position-top" : {
-                        "target" : "CENTER",
-                        "offset" : 16
+                    "position-bottom" : {
+                        "target" : "BOTTOM",
+                        "offset" : 128
                     },
                     "position-horizontal-center" : {}
                 }
@@ -25,7 +25,8 @@
                     "use-content-width" : true,
                     "use-content-height" : true,
                     "position-bottom" : {
-                        "target" : "CENTER",
+                        "target" : "TOP",
+                        "widget" : "inventory",
                         "offset" : 16
                     },
                     "position-horizontal-center" : {}
