@@ -6,29 +6,29 @@
             {
                 "type" : "InventoryGrid",
                 "id" : "inventory",
-                "maxHorizontalCells" : 6,
+                "maxHorizontalCells" : 10,
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,
-                    "position-right" : {
+                    "position-top" : {
                         "target" : "CENTER",
                         "offset" : 16
                     },
-                    "position-vertical-center" : {}
+                    "position-horizontal-center" : {}
                 }
             },
             {
                 "type" : "InventoryGrid",
                 "id" : "container",
-                "maxHorizontalCells" : 4,
+                "maxHorizontalCells" : 10,
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,
-                    "position-left" : {
+                    "position-bottom" : {
                         "target" : "CENTER",
                         "offset" : 16
                     },
-                    "position-vertical-center" : {}
+                    "position-horizontal-center" : {}
                 }
             }
         ]

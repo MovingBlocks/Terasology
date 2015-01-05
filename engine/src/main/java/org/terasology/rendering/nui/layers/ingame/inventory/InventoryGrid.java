@@ -52,14 +52,14 @@ public class InventoryGrid extends CoreWidget {
     public void update(float delta) {
         super.update(delta);
 
-        int numSlots = InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset();
+        int numSlots = getNumSlots();
 
         // allow the UI to shrink the cell count if the inventory shrinks
         if (numSlots < cells.size()) {
-            cells.clear();
-        }
-
-        if (numSlots > cells.size() && cells.size() < getMaxCellCount()) {
+            for(int i = cells.size()-1; i >= 0; --i) {
+                cells.remove(i);
+            }
+        } else if(numSlots > cells.size()) {
             for (int i = cells.size(); i < numSlots && i < getMaxCellCount(); ++i) {
                 InventoryCell cell = new InventoryCell();
                 cell.bindTargetInventory(new ReadOnlyBinding<EntityRef>() {
@@ -76,7 +76,7 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int numSlots = Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        int numSlots = getNumSlots();
         if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(maxHorizontalCells, canvas.size().getX() / cellSize.getX());
@@ -90,7 +90,7 @@ public class InventoryGrid extends CoreWidget {
 
     @Override
     public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        int numSlots = Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
+        int numSlots = getNumSlots();
         if (numSlots != 0 && !cells.isEmpty()) {
             Vector2i cellSize = canvas.calculatePreferredSize(cells.get(0));
             int horizontalCells = Math.min(Math.min(maxHorizontalCells, numSlots), sizeHint.getX() / cellSize.getX());
@@ -157,6 +157,10 @@ public class InventoryGrid extends CoreWidget {
 
     public void setMaxCellCount(int val) {
         maxCellCount.set(val);
+    }
+    
+    public int getNumSlots() {
+        return Math.min(InventoryUtils.getSlotCount(getTargetEntity()) - getCellOffset(), getMaxCellCount());
     }
 
     private final class SlotBinding extends ReadOnlyBinding<Integer> {
