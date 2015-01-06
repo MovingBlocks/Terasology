@@ -15,7 +15,6 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import com.google.common.base.Objects;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;
@@ -51,22 +50,7 @@ public class PojoEntityRef extends BaseEntityRef {
         return exists;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof PojoEntityRef) {
-            PojoEntityRef other = (PojoEntityRef) o;
-            return !exists() && !other.exists() || getId() == other.getId();
-        }
-        return false;
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 
     @Override
     public String toString() {

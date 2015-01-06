@@ -141,22 +141,6 @@ public final class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o instanceof EntityRef) {
-            return !((EntityRef) o).exists();
-        }
-        return o == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
-
-    @Override
     public String toFullDescription() {
         return "{}";
     }

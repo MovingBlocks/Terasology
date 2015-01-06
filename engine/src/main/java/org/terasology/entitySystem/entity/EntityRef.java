@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.entity;
 
+import com.google.common.base.Objects;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.MutableComponentContainer;
 import org.terasology.entitySystem.entity.internal.NullEntityRef;
@@ -23,7 +24,7 @@ import org.terasology.entitySystem.prefab.Prefab;
 
 /**
  * A wrapper around an entity id providing access to common functionality
- *
+ **
  * @author Immortius <immortius@gmail.com>
  */
 public abstract class EntityRef implements MutableComponentContainer {
@@ -119,4 +120,20 @@ public abstract class EntityRef implements MutableComponentContainer {
      */
     public abstract String toFullDescription();
 
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o instanceof EntityRef) {
+            EntityRef other = (EntityRef) o;
+            return !exists() && !other.exists() || getId() == other.getId();
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hashCode(getId());
+    }
 }
