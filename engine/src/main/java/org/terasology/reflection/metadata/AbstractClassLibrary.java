@@ -41,7 +41,7 @@ import java.util.Set;
 public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
 
     private ModuleManager moduleManager = CoreRegistry.get(ModuleManager.class);
-    private CopyStrategyLibrary copyStrategyLibrary;
+    protected final CopyStrategyLibrary copyStrategyLibrary;
     private ReflectFactory reflectFactory;
 
     private Map<Class<? extends T>, ClassMetadata<? extends T, ?>> classLookup = Maps.newHashMap();
@@ -50,6 +50,26 @@ public abstract class AbstractClassLibrary<T> implements ClassLibrary<T> {
     public AbstractClassLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         this.reflectFactory = factory;
         this.copyStrategyLibrary = copyStrategies;
+    }
+
+    public AbstractClassLibrary(AbstractClassLibrary<T> factory, CopyStrategyLibrary copyStrategies) {
+        this.reflectFactory = factory.reflectFactory;
+        this.copyStrategyLibrary = copyStrategies;
+        for (Table.Cell<Name, Name, ClassMetadata<? extends T, ?>> cell: factory.uriLookup.cellSet()) {
+            Name objectName = cell.getRowKey();
+            Name moduleName = cell.getColumnKey();
+            ClassMetadata<? extends T, ?> oldMetaData = cell.getValue();
+            Class<? extends T> clazz = oldMetaData.getType();
+            SimpleUri uri = oldMetaData.getUri();
+            ClassMetadata<? extends T, ?> metadata = createMetadata(clazz, factory.reflectFactory, copyStrategies, uri);
+
+            if (metadata != null) {
+                classLookup.put(clazz, metadata);
+                uriLookup.put(objectName, moduleName, metadata);
+            } else {
+                throw new RuntimeException("Failed to create copy of class library");
+            }
+        }
     }
 
     /**

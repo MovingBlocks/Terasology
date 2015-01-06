@@ -57,6 +57,17 @@ public class CopyStrategyLibrary {
         this.reflectFactory = reflectFactory;
     }
 
+
+    /**
+     * This constructor is not public, as it allows the direct setting of an internal field without a save copy.
+     * @param strategies must not be used after it has been passed to this constructor.
+     */
+    private CopyStrategyLibrary(Map<Class<?>, CopyStrategy<?>> strategies, ReflectFactory reflectFactory) {
+        this.strategies = strategies;
+        this.reflectFactory = reflectFactory;
+    }
+
+
     /**
      * Registers a copy strategy for a base type.
      *
@@ -145,6 +156,15 @@ public class CopyStrategyLibrary {
             strategies.put(typeClass, defaultStrategy);
             return defaultStrategy;
         }
+    }
+
+    /**
+     * @return a copy of the this library that uses the specified stategy for the specified type.
+     */
+    public <T>  CopyStrategyLibrary createCopyOfLibraryWithStrategy(Class<T> type, CopyStrategy<T> strategy) {
+        Map<Class<?>, CopyStrategy<?>> newStrategies = Maps.newHashMap(strategies);
+        newStrategies.put(type, strategy);
+        return new CopyStrategyLibrary(newStrategies, this.reflectFactory);
     }
 
     /**

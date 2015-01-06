@@ -45,6 +45,9 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 import org.terasology.protobuf.EntityData;
+import org.terasology.reflection.copy.CopyStrategyLibrary;
+import org.terasology.reflection.reflect.ReflectFactory;
+import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.FilesUtil;
 import org.terasology.utilities.concurrency.ShutdownTask;
@@ -111,6 +114,11 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private EngineEntityManager privateEntityManager;
     private EntitySetDeltaRecorder entitySetDeltaRecorder;
+    /**
+     * A component library that provides a copy() method that replaces {@link EntityRef}s which {@link EntityRef}s
+     * that will use the privateEntityManager.
+     */
+    private ComponentLibrary entityRefReplacingComponentLibrary;
 
     public ReadWriteStorageManager(Path savePath, ModuleEnvironment environment, EngineEntityManager entityManager) throws IOException {
         this(savePath, environment, entityManager, true);
@@ -123,21 +131,25 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         entityManager.subscribeDestroyListener(this);
         entityManager.subscribeChangeListener(this);
         // TODO Ensure that the component library and the type serializer library are thread save (e.g. immutable)
-        this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary(),
-                entityManager.getTypeSerializerLibrary());
+        this.privateEntityManager = createPrivateEntityManager(entityManager.getComponentLibrary());
         Files.createDirectories(getStoragePathProvider().getStoragePathDirectory());
         this.saveTransactionHelper = new SaveTransactionHelper(getStoragePathProvider());
         this.saveThreadManager = TaskMaster.createFIFOTaskMaster("Saving", 1);
         this.config = CoreRegistry.get(Config.class);
-        this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(entityManager.getComponentLibrary());
+        this.entityRefReplacingComponentLibrary = privateEntityManager.getComponentLibrary()
+                .createCopyUsingCopyStrategy(EntityRef.class, new DelayedEntityRefCopyStrategy(privateEntityManager));
+        this.entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
 
     }
 
-    private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary,
-                                                                  TypeSerializationLibrary typeSerializationLibrary) {
+    private static EngineEntityManager createPrivateEntityManager(ComponentLibrary componentLibrary) {
         PojoEntityManager pojoEntityManager = new PojoEntityManager();
+        ReflectFactory reflectFactory = new ReflectionReflectFactory();
+        CopyStrategyLibrary copyStrategyLibrary = new CopyStrategyLibrary(reflectFactory);
+        // TODO use CoreRegistry.get(CopyStrategyLibrary.class) ?
         pojoEntityManager.setComponentLibrary(componentLibrary);
-        pojoEntityManager.setTypeSerializerLibrary(typeSerializationLibrary);
+        pojoEntityManager.setTypeSerializerLibrary(
+                TypeSerializationLibrary.createDefaultLibrary(pojoEntityManager, reflectFactory, copyStrategyLibrary));
         return pojoEntityManager;
     }
 
@@ -441,7 +453,7 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
         }
         scheduleNextAutoSave();
         PerformanceMonitor.endActivity();
-        entitySetDeltaRecorder = new EntitySetDeltaRecorder(getEntityManager().getComponentLibrary());
+        entitySetDeltaRecorder = new EntitySetDeltaRecorder(this.entityRefReplacingComponentLibrary);
         logger.info("Saving - Snapshot created: Writing phase starts");
     }
 

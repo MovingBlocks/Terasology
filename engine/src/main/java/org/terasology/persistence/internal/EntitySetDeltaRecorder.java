@@ -42,9 +42,12 @@ class EntitySetDeltaRecorder {
     private TLongSet deactivatedEntities = new TLongHashSet();
 
 
-
-    public EntitySetDeltaRecorder(ComponentLibrary componentLibray) {
-        this.componentLibrary = componentLibray;
+    /**
+     *
+     * @param specialComponentLibrary must be a component library that uses a special copy strategy for entity refs.
+     */
+    public EntitySetDeltaRecorder(ComponentLibrary specialComponentLibrary) {
+        this.componentLibrary = specialComponentLibrary;
     }
 
     public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> componentClass) {

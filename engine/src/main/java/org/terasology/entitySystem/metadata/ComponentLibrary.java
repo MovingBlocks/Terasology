@@ -22,6 +22,7 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.module.Module;
 import org.terasology.naming.Name;
+import org.terasology.reflection.copy.CopyStrategy;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.metadata.AbstractClassLibrary;
 import org.terasology.reflection.metadata.ClassMetadata;
@@ -38,6 +39,18 @@ public class ComponentLibrary extends AbstractClassLibrary<Component> {
 
     public ComponentLibrary(ReflectFactory factory, CopyStrategyLibrary copyStrategies) {
         super(factory, copyStrategies);
+    }
+
+    private ComponentLibrary(ComponentLibrary componentLibrary, CopyStrategyLibrary newCopyStrategies) {
+        super(componentLibrary, newCopyStrategies);
+    }
+
+    /**
+     * @return a copy of the this library that uses the specified strategy for the specified type.
+     */
+    public <T> ComponentLibrary createCopyUsingCopyStrategy(Class<T> type, CopyStrategy<T> strategy) {
+        CopyStrategyLibrary newCopyStrategies = copyStrategyLibrary.createCopyOfLibraryWithStrategy(type, strategy);
+        return new ComponentLibrary(this, newCopyStrategies);
     }
 
     @Override
