@@ -52,6 +52,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -263,6 +264,29 @@ public class SaveTransaction extends AbstractTask {
                 return true;
             }
         });
+        final List<EntityRef> entitiesToDestroy = Lists.newArrayList();
+        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
+            @Override
+            public boolean execute(long entityId) {
+                EntityRef entityToDestroy;
+                if (privateEntityManager.isActiveEntity(entityId)) {
+                    entityToDestroy = privateEntityManager.getEntity(entityId);
+                } else {
+                    /**
+                     * Create the entity as theere could be a component that references a {@link DelayedEntityRef}
+                     * with the specified id. It is important that the {@link DelayedEntityRef} will reference
+                     * a destroyed {@link EntityRef} instance. That is why a entity will be created, potentially
+                     * bound to one or more {@link DelayedEntityRef}s and then destroyed.
+                     *
+                     */
+                    entityToDestroy = privateEntityManager.createEntityWithId(entityId,
+                            Collections.<Component>emptyList());
+                }
+                entitiesToDestroy.add(entityToDestroy);
+                return true;
+            }
+        });
+
         /*
          * Bind the delayed entities refs, before destroying the entities:
          *
@@ -271,13 +295,9 @@ public class SaveTransaction extends AbstractTask {
          */
         deltaToSave.bindAllDelayedEntityRefsTo(privateEntityManager);
 
-        deltaToSave.getDestroyedEntities().forEach(new TLongProcedure() {
-            @Override
-            public boolean execute(long entityId) {
-                privateEntityManager.getEntity(entityId).destroy();
-                return true;
-            }
-        });
+        for (EntityRef entityRef: entitiesToDestroy) {
+            entityRef.destroy();
+        }
 
         deltaToSave.getDeactivatedEntities().forEach(new TLongProcedure() {
             @Override
