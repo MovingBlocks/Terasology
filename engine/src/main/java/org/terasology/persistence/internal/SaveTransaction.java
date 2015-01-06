@@ -236,6 +236,15 @@ public class SaveTransaction extends AbstractTask {
                 if (entityId >= privateEntityManager.getNextId()) {
                     privateEntityManager.setNextId(entityId + 1);
                 }
+                return true;
+            }
+        });
+        deltaToSave.getEntityDeltas().forEachEntry(new TLongObjectProcedure<EntityDelta>() {
+            @Override
+            public boolean execute(long entityId, EntityDelta delta) {
+                if (entityId >= privateEntityManager.getNextId()) {
+                    privateEntityManager.setNextId(entityId + 1);
+                }
                 if (privateEntityManager.isActiveEntity(entityId)) {
                     EntityRef entity = privateEntityManager.getEntity(entityId);
                     for (Component changedComponent: delta.getChangedComponents().values()) {
