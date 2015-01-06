@@ -56,7 +56,7 @@ public class InventoryGrid extends CoreWidget {
 
         // allow the UI to grow or shrink the cell count if the inventory changes size
         if (numSlots < cells.size()) {
-            for (int i = cells.size() - 1; i >= 0; --i) {
+            for (int i = cells.size(); i > numSlots && i > 0; --i) {
                 cells.remove(i);
             }
         } else if (numSlots > cells.size()) {
