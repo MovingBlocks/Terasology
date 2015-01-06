@@ -193,13 +193,18 @@ public class MigComponent implements ComponentWrapper {
     }
 
     @Override
-    public void paintDebugOutline() {
+    public void paintDebugOutline(boolean showVisualPadding) {
 
     }
 
     @Override
-    public int getComponetType(boolean disregardScrollPane) {
+    public int getComponentType(boolean disregardScrollPane) {
         return TYPE_UNKNOWN;
+    }
+
+    @Override
+    public int getContentBias() {
+        return -1;
     }
 
     @Override
