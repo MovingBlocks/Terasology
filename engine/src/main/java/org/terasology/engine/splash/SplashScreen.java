@@ -22,7 +22,8 @@ package org.terasology.engine.splash;
  */
 public final class SplashScreen {
 
-    private static final SplashScreenCore INSTANCE = (java.awt.SplashScreen.getSplashScreen() != null)
+    private static final SplashScreenCore INSTANCE =
+            (!java.awt.GraphicsEnvironment.isHeadless() && java.awt.SplashScreen.getSplashScreen() != null)
             ? new SplashScreenImpl()
             : new SplashScreenStub();
 
