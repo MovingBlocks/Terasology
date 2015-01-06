@@ -16,28 +16,22 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.game.GameManifest;
 import org.terasology.registry.CoreRegistry;
+import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.generator.WorldGenerator;
 
 /**
+ * Initialize the world generator.
+ * <br/><br/>
+ * This is done after the world entity has been created/loaded so that
+ * world generation config. is available at the time of initialization.
  * @author Martin Steiger
  */
 public class InitialiseWorldGenerator extends SingleStepLoadProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(InitialiseWorldGenerator.class);
-
-    private GameManifest gameManifest;
-
-    public InitialiseWorldGenerator(GameManifest gameManifest) {
-        this.gameManifest = gameManifest;
-    }
-
     @Override
     public String getMessage() {
-        return "Generating world ...";
+        return "Initialize world generator ...";
     }
 
     @Override
@@ -45,6 +39,9 @@ public class InitialiseWorldGenerator extends SingleStepLoadProcess {
 
         WorldGenerator worldGenerator = CoreRegistry.get(WorldGenerator.class);
         worldGenerator.initialize();
+
+        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        worldRenderer.getActiveCamera().setReflectionHeight(worldGenerator.getWorld().getSeaLevel());
 
         return true;
     }
