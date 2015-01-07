@@ -18,9 +18,9 @@ package org.terasology.rendering.cameras;
 import org.lwjgl.BufferUtils;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.AABB;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 
 /**

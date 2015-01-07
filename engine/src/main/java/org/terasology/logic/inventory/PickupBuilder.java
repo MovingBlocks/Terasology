@@ -21,9 +21,8 @@ import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.common.lifespan.LifespanComponent;
 import org.terasology.logic.inventory.events.ItemDroppedEvent;
 import org.terasology.logic.location.LocationComponent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

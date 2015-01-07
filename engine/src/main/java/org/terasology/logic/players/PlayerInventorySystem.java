@@ -34,14 +34,13 @@ import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.InventoryUtils;
 import org.terasology.logic.players.event.SelectItemRequest;
 import org.terasology.logic.players.event.SelectedItemChangedEvent;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.nui.NUIManager;
 import org.terasology.rendering.nui.layers.hud.HudToolbar;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

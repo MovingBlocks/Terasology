@@ -17,8 +17,7 @@
 package org.terasology.physics.events;
 
 import org.terasology.entitySystem.event.Event;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Created with IntelliJ IDEA.

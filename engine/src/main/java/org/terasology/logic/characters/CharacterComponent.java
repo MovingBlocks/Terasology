@@ -15,17 +15,17 @@
  */
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * Information common to characters (the physical body of players and creatures)
@@ -91,8 +91,7 @@ public final class CharacterComponent implements Component {
     public float handAnimation;
 
     public Quat4f getLookRotation() {
-        Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
+        Quat4f lookRotation = new Quat4f(TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
         return lookRotation;
     }
 

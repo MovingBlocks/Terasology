@@ -18,6 +18,7 @@ package org.terasology.rendering.opengl;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
+
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
@@ -25,12 +26,15 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.MatrixUtils;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.ShaderManager;
 import org.terasology.rendering.assets.material.BaseMaterial;
@@ -40,8 +44,6 @@ import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.shader.ShaderParameters;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Collections;

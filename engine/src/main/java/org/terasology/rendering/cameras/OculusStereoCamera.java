@@ -17,12 +17,11 @@ package org.terasology.rendering.cameras;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.math.MatrixUtils;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.oculusVr.OculusVrHelper;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glMatrixMode;

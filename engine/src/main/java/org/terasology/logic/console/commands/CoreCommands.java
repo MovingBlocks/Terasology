@@ -17,6 +17,7 @@ package org.terasology.logic.console.commands;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Function;
+
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -45,6 +46,8 @@ import org.terasology.logic.console.suggesters.CommandNameSuggester;
 import org.terasology.logic.inventory.PickupBuilder;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.naming.Name;
 import org.terasology.network.JoinStatus;
 import org.terasology.network.NetworkMode;
@@ -67,8 +70,6 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.items.BlockItemFactory;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -262,7 +263,7 @@ public class CoreCommands extends BaseComponentSystem {
 		} else {
 			dir.set(Direction.FORWARD.getVector3f());
 		}
-		Quat4f rotation = QuaternionUtil.shortestArcQuat(Direction.FORWARD.getVector3f(), dir, new Quat4f());
+		Quat4f rotation = Quat4f.shortestArcQuat(Direction.FORWARD.getVector3f(), dir);
 
 		Prefab prefab = Assets.getPrefab(prefabName);
 		if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {

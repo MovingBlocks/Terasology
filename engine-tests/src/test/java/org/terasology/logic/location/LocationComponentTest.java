@@ -15,17 +15,16 @@
  */
 package org.terasology.logic.location;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.TerasologyTestingEnvironment;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.lifecycleEvents.BeforeRemoveComponent;
+import org.terasology.math.QuaternionUtil;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.testUtil.TeraAssert;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -41,9 +40,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
     Vector3f pos1 = new Vector3f(1, 2, 3);
     Vector3f pos2 = new Vector3f(2, 3, 4);
     Vector3f pos1plus2 = new Vector3f(3, 5, 7);
-    Quat4f yawRotation = new Quat4f(0, 0, 0, 1);
-    Quat4f pitchRotation = new Quat4f(0, 0, 0, 1);
-    Quat4f yawPitch = new Quat4f(0, 0, 0, 1);
+    Quat4f yawRotation;
+    Quat4f pitchRotation;
+    Quat4f yawPitch;
 
     @Before
     public void setup() {
@@ -51,9 +50,9 @@ public class LocationComponentTest extends TerasologyTestingEnvironment {
         entity = mock(EntityRef.class);
         when(entity.getComponent(LocationComponent.class)).thenReturn(loc);
         when(entity.exists()).thenReturn(true);
-        QuaternionUtil.setEuler(yawRotation, TeraMath.DEG_TO_RAD * 90, 0, 0);
-        QuaternionUtil.setEuler(pitchRotation, 0, TeraMath.DEG_TO_RAD * 45, 0);
-        QuaternionUtil.setEuler(yawPitch, TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
+        yawRotation = new Quat4f(TeraMath.DEG_TO_RAD * 90, 0, 0);
+        pitchRotation = new Quat4f(0, TeraMath.DEG_TO_RAD * 45, 0);
+        yawPitch = new Quat4f(TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
 
 //        CoreRegistry.get(ComponentSystemManager.class).register(locationSystem, "engine:locationSystem");
 //        CoreRegistry.get(ComponentSystemManager.class).initialise();

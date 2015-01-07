@@ -17,14 +17,13 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
 import org.terasology.editor.EditorRange;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 
 /**
  * Shader parameters for the Light Shaft shader program.
@@ -71,8 +70,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
             Vector4f sunPositionWorldSpace4 = new Vector4f(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
-            Vector4f sunPositionScreenSpace = new Vector4f();
-            activeCamera.getViewProjectionMatrix().transform(sunPositionWorldSpace4, sunPositionScreenSpace);
+            Vector4f sunPositionScreenSpace = new Vector4f(sunPositionWorldSpace4);
+            activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);
 
             sunPositionScreenSpace.x /= sunPositionScreenSpace.w;
             sunPositionScreenSpace.y /= sunPositionScreenSpace.w;

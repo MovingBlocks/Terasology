@@ -16,6 +16,7 @@
 package org.terasology.persistence;
 
 import com.google.common.collect.ImmutableMap;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +29,8 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkSystem;
 import org.terasology.persistence.serializers.ComponentSerializer;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
@@ -38,9 +41,6 @@ import org.terasology.reflection.copy.CopyStrategyLibrary;
 import org.terasology.reflection.reflect.ReflectFactory;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.testUtil.ModuleManagerFactory;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -17,9 +17,8 @@
 package org.terasology.world.block.loader;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.module.sandbox.API;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Martin Steiger

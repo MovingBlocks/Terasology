@@ -20,12 +20,11 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.EditorRange;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.opengl.DefaultRenderingProcess;
-
-import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 

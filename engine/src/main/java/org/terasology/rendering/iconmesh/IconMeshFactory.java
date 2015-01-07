@@ -21,12 +21,12 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.module.sandbox.API;
 import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
-import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 
 @API

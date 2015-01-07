@@ -18,8 +18,7 @@ package org.terasology.audio.openAL;
 import org.lwjgl.openal.AL10;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
-
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;

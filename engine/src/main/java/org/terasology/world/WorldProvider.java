@@ -16,11 +16,10 @@
 package org.terasology.world;
 
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Provides the basic interface for all world providers.

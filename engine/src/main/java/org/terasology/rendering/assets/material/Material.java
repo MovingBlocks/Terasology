@@ -17,15 +17,15 @@
 package org.terasology.rendering.assets.material;
 
 import org.terasology.asset.Asset;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Tuple2f;
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Tuple4f;
 import java.nio.FloatBuffer;
 
 /**
@@ -77,9 +77,9 @@ public interface Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    void setFloat2(String name, Tuple2f value);
+    void setFloat2(String name, Vector2f value);
 
-    void setFloat2(String name, Tuple2f value, boolean currentOnly);
+    void setFloat2(String name, Vector2f value, boolean currentOnly);
 
     /**
      * Sets a float2 uniform parameter (for all feature permutations)
@@ -109,9 +109,9 @@ public interface Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    void setFloat3(String name, Tuple3f value);
+    void setFloat3(String name, Vector3f value);
 
-    void setFloat3(String name, Tuple3f value, boolean currentOnly);
+    void setFloat3(String name, Vector3f value, boolean currentOnly);
 
     /**
      * Sets a float3 uniform parameter (for all feature permutations)
@@ -142,9 +142,9 @@ public interface Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    void setFloat4(String name, Tuple4f value);
+    void setFloat4(String name, Vector4f value);
 
-    void setFloat4(String name, Tuple4f value, boolean currentOnly);
+    void setFloat4(String name, Vector4f value, boolean currentOnly);
 
     /**
      * Sets a float4 uniform parameter (for all feature permutations)

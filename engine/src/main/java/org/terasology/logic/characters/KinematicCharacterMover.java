@@ -15,7 +15,8 @@
  */
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.math.QuaternionUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -29,16 +30,14 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.physics.engine.CharacterCollider;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.physics.engine.SweepCallback;
 import org.terasology.physics.events.MovedEvent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * Calculates character movement using a physics-engine provided CharacterCollider.
@@ -135,7 +134,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (!oldPosition.equals(newPosition)) {
             // get the old position's blocks
             Block[] oldBlocks = new Block[(int) Math.ceil(characterHeight)];
-            Vector3i currentPosition = oldPosition.clone();
+            Vector3i currentPosition = new Vector3i(oldPosition);
             for (int currentHeight = 0; currentHeight < oldBlocks.length; currentHeight++) {
                 oldBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
                 currentPosition.add(0, 1, 0);
@@ -143,7 +142,7 @@ public class KinematicCharacterMover implements CharacterMover {
 
             // get the new position's blocks
             Block[] newBlocks = new Block[(int) Math.ceil(characterHeight)];
-            currentPosition = newPosition.clone();
+            currentPosition = new Vector3i(newPosition);
             for (int currentHeight = 0; currentHeight < characterHeight; currentHeight++) {
                 newBlocks[currentHeight] = worldProvider.getBlock(currentPosition);
                 currentPosition.add(0, 1, 0);
@@ -203,7 +202,7 @@ public class KinematicCharacterMover implements CharacterMover {
                     //If any of our sides are near a climbable block, check if we are near to the side
                     Vector3i myPos = new Vector3i(worldPos, 0.5f);
                     Vector3i climbBlockPos = new Vector3i(side, 0.5f);
-                    Vector3i dir = block.getDirection().getVector3i().clone();
+                    Vector3i dir = new Vector3i(block.getDirection().getVector3i());
                     float currentDistance = 10f;
 
                     if (dir.x != 0 && Math.abs(worldPos.x - (float) climbBlockPos.x + (float) dir.x * .5f) < movementComp.radius + 0.1f) {
@@ -291,8 +290,8 @@ public class KinematicCharacterMover implements CharacterMover {
             reflectDir.normalize();
             Vector3f perpendicularDir = Vector3fUtil.getPerpendicularComponent(reflectDir, hitNormal, new Vector3f());
             if (normalMag != 0.0f) {
-                Vector3f perpComponent = new Vector3f();
-                perpComponent.scale(normalMag * movementLength, perpendicularDir);
+                Vector3f perpComponent = new Vector3f(perpendicularDir);
+                perpComponent.scale(normalMag * movementLength);
                 direction.set(perpComponent);
             }
         }
@@ -392,7 +391,8 @@ public class KinematicCharacterMover implements CharacterMover {
                         }
                         normalizedDir.set(expectedMove);
                         expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
-                        targetPos.add(position, expectedMove);
+                        targetPos.set(position);
+                        targetPos.add(expectedMove);
                     } else {
                         hit = true;
                         break;
@@ -536,10 +536,9 @@ public class KinematicCharacterMover implements CharacterMover {
                                 CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
-            AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
-            result.getRotation().set(axisAngle);
+            result.getRotation().set(new Vector3f(0, 1, 0), yaw);
         } else {
-            QuaternionUtil.setEuler(result.getRotation(), TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0);
+            result.getRotation().set(new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0, 0));
         }
     }
 
@@ -657,13 +656,12 @@ public class KinematicCharacterMover implements CharacterMover {
         if (state.getClimbDirection() == null) {
             return;
         }
-        Quat4f rotation = new Quat4f();
         Vector3f tmp;
 
         Vector3i climbDir3i = state.getClimbDirection();
         Vector3f climbDir3f = climbDir3i.toVector3f();
 
-        QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+        Quat4f rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
         tmp = new Vector3f(0.0f, 0.0f, -1.0f);
         QuaternionUtil.quatRotate(rotation, tmp, tmp);
         float angleToClimbDirection = tmp.angle(climbDir3f);
@@ -674,7 +672,7 @@ public class KinematicCharacterMover implements CharacterMover {
         if (angleToClimbDirection < Math.PI / 4.0 || Math.abs(input.getPitch()) > 60f) {
             float pitchAmount = state.isGrounded() ? 45f : 90f;
             float pitch = input.getPitch() > 30f ? pitchAmount : -pitchAmount;
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), TeraMath.DEG_TO_RAD * pitch, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
         // looking sidewards from ladder
@@ -684,14 +682,14 @@ public class KinematicCharacterMover implements CharacterMover {
             QuaternionUtil.quatRotate(rotation, climbDir3f, tmp);
             float leftOrRight = tmp.x;
             float plusOrMinus = (leftOrRight < 0f ? -1.0f : 1.0f) * (climbDir3i.x != 0 ? -1.0f : 1.0f);
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * input.getYaw(), 0f,
                 TeraMath.DEG_TO_RAD * rollAmount * plusOrMinus
             );
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
 
         // facing away from ladder
         } else {
-            QuaternionUtil.setEuler(rotation, TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
+            rotation = new Quat4f(TeraMath.DEG_TO_RAD * state.getYaw(), 0, 0);
             QuaternionUtil.quatRotate(rotation, desiredVelocity, desiredVelocity);
             clearMovementToDirection = false;
         }

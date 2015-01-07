@@ -31,6 +31,8 @@ import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.registry.CoreRegistry;
@@ -52,9 +54,6 @@ import org.terasology.world.block.Block;
 import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.RenderableChunk;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -531,16 +530,15 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         Vector3f worldPosition = new Vector3f();
         worldPosition.sub(lightWorldPosition, activeCamera.getPosition());
 
-        Vector3f lightViewPosition = new Vector3f();
-        camera.getViewMatrix().transform(worldPosition, lightViewPosition);
+        Vector3f lightViewPosition = new Vector3f(worldPosition);
+        camera.getViewMatrix().transformVector(lightViewPosition);      // msteiger: I guess this should be transformPoint
 
         program.setFloat3("lightViewPos", lightViewPosition.x, lightViewPosition.y, lightViewPosition.z, true);
 
         Matrix4f modelMatrix = new Matrix4f();
-        modelMatrix.setIdentity();
+        modelMatrix.set(lightComponent.lightAttenuationRange);
 
         modelMatrix.setTranslation(worldPosition);
-        modelMatrix.setScale(lightComponent.lightAttenuationRange);
         program.setMatrix4("modelMatrix", modelMatrix, true);
 
         if (!geometryOnly) {
@@ -656,9 +654,9 @@ public final class WorldRendererLwjgl implements WorldRenderer {
         float texelSize = 1.0f / config.getRendering().getShadowMapResolution();
         texelSize *= 2.0f;
 
-        lightCamera.getViewProjectionMatrix().transform(lightPosition);
+        lightCamera.getViewProjectionMatrix().transformVector(lightPosition);           // msteiger: I guess this should be transformPoint
         lightPosition.set(TeraMath.fastFloor(lightPosition.x / texelSize) * texelSize, 0.0f, TeraMath.fastFloor(lightPosition.z / texelSize) * texelSize);
-        lightCamera.getInverseViewProjectionMatrix().transform(lightPosition);
+        lightCamera.getInverseViewProjectionMatrix().transformVector(lightPosition);    // msteiger: I guess this should be transformPoint
 
         // ... we position our new camera at the position of the player and move it
         // quite a bit into the direction of the sun (our main light).

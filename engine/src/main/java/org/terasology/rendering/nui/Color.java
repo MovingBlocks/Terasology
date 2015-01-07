@@ -16,11 +16,12 @@
 package org.terasology.rendering.nui;
 
 import com.google.common.base.Preconditions;
+
 import org.terasology.module.sandbox.API;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Objects;

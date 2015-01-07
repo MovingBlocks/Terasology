@@ -31,10 +31,6 @@ import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshDataBuilder;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,6 +42,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.terasology.math.geom.Matrix4f;
+import org.terasology.math.geom.Quat4f;
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Importer for Collada data exchange model files.
@@ -489,8 +490,7 @@ public class ColladaLoader {
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
             Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Vector3f translationVector = new Vector3f();
-            matrix4f.get(translationVector);
+            Vector3f translationVector = matrix4f.getTranslation();
             translationVectorArray[i] = translationVector;
         }
 

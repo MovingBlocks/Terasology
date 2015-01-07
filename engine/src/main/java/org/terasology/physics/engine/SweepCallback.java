@@ -15,7 +15,7 @@
  */
 package org.terasology.physics.engine;
 
-import javax.vecmath.Vector3f;
+import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides the results from a CharacterCollider sweep()

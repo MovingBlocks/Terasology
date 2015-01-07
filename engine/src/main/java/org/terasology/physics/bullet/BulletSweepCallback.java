@@ -19,11 +19,11 @@ package org.terasology.physics.bullet;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.physics.engine.SweepCallback;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import org.terasology.physics.engine.SweepCallback;
 
 /**
  * The bullet implementation of SweepCallback, that holds the results of a collision sweep. (detect what
@@ -36,10 +36,10 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     protected final Vector3f up;
     protected float minSlopeDot;
 
-    public BulletSweepCallback(CollisionObject me, final Vector3f up, float minSlopeDot) {
+    public BulletSweepCallback(CollisionObject me, org.terasology.math.geom.Vector3f up, float minSlopeDot) {
         super(new Vector3f(), new Vector3f());
         this.me = me;
-        this.up = up;
+        this.up = new Vector3f(up.x, up.y, up.z);
         this.minSlopeDot = minSlopeDot;
     }
 
@@ -91,13 +91,13 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     }
 
     @Override
-    public Vector3f getHitNormalWorld() {
-        return hitNormalWorld;
+    public org.terasology.math.geom.Vector3f getHitNormalWorld() {
+        return new org.terasology.math.geom.Vector3f(hitNormalWorld.x, hitNormalWorld.y, hitNormalWorld.z);
     }
 
     @Override
-    public Vector3f getHitPointWorld() {
-        return hitPointWorld;
+    public org.terasology.math.geom.Vector3f getHitPointWorld() {
+        return new org.terasology.math.geom.Vector3f(hitPointWorld.x, hitPointWorld.y, hitPointWorld.z);
     }
 
     @Override
@@ -106,18 +106,18 @@ public class BulletSweepCallback extends CollisionWorld.ClosestConvexResultCallb
     }
 
     @Override
-    public boolean checkForStep(Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
+    public boolean checkForStep(org.terasology.math.geom.Vector3f direction, float stepHeight, float slopeFactor, float checkForwardDistance) {
         boolean moveUpStep;
         boolean hitStep = false;
         float stepSlope = 1f;
-        Vector3f lookAheadOffset = new Vector3f(direction);
+        Vector3f lookAheadOffset = new Vector3f(direction.x, direction.y, direction.z);
         lookAheadOffset.y = 0;
         lookAheadOffset.normalize();
         lookAheadOffset.scale(checkForwardDistance);
-        Vector3f fromWorld = new Vector3f(this.getHitPointWorld());
+        Vector3f fromWorld = new Vector3f(hitPointWorld);
         fromWorld.y += stepHeight + 0.05f;
         fromWorld.add(lookAheadOffset);
-        Vector3f toWorld = new Vector3f(this.getHitPointWorld());
+        Vector3f toWorld = new Vector3f(hitPointWorld);
         toWorld.y -= 0.05f;
         toWorld.add(lookAheadOffset);
         CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);

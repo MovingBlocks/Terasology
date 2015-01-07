@@ -16,6 +16,7 @@
 package org.terasology.core.world.generator.facetProviders;
 
 import org.terasology.math.Rect2i;
+import org.terasology.math.geom.Vector2f;
 import org.terasology.utilities.procedural.BrownianNoise3D;
 import org.terasology.utilities.procedural.Noise3DTo2DAdapter;
 import org.terasology.utilities.procedural.PerlinNoise;
@@ -28,8 +29,6 @@ import org.terasology.world.generation.Produces;
 import org.terasology.world.generation.Requires;
 import org.terasology.world.generation.facets.SeaLevelFacet;
 import org.terasology.world.generation.facets.SurfaceHeightFacet;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius

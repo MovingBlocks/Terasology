@@ -20,12 +20,11 @@ import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
 import org.terasology.editor.EditorRange;
 import org.terasology.math.TeraMath;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.world.sun.CelestialSystem;
-
-import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_FRONT;

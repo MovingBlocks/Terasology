@@ -33,6 +33,7 @@ import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.module.Module;
 import org.terasology.module.ModuleEnvironment;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -54,8 +55,6 @@ import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.internal.ChunkImpl;
-
-import javax.vecmath.Vector3f;
 
 import java.io.IOException;
 import java.nio.file.Files;

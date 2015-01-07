@@ -16,14 +16,15 @@
 package org.terasology.logic.particles;
 
 import com.google.common.collect.Lists;
+
+import org.terasology.math.geom.Vector2f;
+import org.terasology.math.geom.Vector3f;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.reflection.MappedContainer;
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**

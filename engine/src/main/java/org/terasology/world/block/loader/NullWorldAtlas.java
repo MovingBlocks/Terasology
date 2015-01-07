@@ -16,9 +16,8 @@
 
 package org.terasology.world.block.loader;
 
-import javax.vecmath.Vector2f;
-
 import org.terasology.asset.AssetUri;
+import org.terasology.math.geom.Vector2f;
 
 /**
  * Dummy implementation of WorldAtlas

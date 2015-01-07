@@ -17,11 +17,10 @@
 package org.terasology.logic.characters;
 
 import org.terasology.engine.Time;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.ServerEvent;
 import org.terasology.registry.CoreRegistry;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

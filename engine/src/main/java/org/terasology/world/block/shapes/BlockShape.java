@@ -16,12 +16,12 @@
 package org.terasology.world.block.shapes;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
+
 import org.terasology.asset.Asset;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.BlockPart;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.

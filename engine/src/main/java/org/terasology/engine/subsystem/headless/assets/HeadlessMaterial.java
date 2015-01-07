@@ -17,10 +17,9 @@ package org.terasology.engine.subsystem.headless.assets;
 
 import java.nio.FloatBuffer;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-
 import org.terasology.asset.AssetUri;
+import org.terasology.math.geom.Matrix3f;
+import org.terasology.math.geom.Matrix4f;
 import org.terasology.rendering.assets.material.MaterialData;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;

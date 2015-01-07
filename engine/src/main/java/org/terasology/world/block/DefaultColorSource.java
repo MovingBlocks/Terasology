@@ -18,10 +18,11 @@ package org.terasology.world.block;
 import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.math.geom.Vector4f;
 import org.terasology.world.biomes.Biome;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector4f;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
