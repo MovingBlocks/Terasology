@@ -16,24 +16,23 @@
 
 package org.terasology.utilities.procedural;
 
-import org.terasology.math.Rect2i;
-import org.terasology.math.geom.Vector2f;
-
 /**
  * Computes Brownian noise based on some noise generator.
  * Originally, Brown integrates white noise, but using other noises can be sometimes useful, too.
+ *
  * @author Martin Steiger
  */
 public class BrownianNoise2D extends BrownianNoise implements Noise2D {
 
     private final Noise2D other;
-    
+
     /**
      * Uses the default number of octaves
+     *
      * @param other the noise to use as a basis
      */
     public BrownianNoise2D(Noise2D other) {
-        this.other = other; 
+        this.other = other;
     }
 
     /**

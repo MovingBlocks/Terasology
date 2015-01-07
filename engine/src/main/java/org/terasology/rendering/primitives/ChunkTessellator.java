@@ -31,7 +31,6 @@ import org.terasology.math.geom.Vector4f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.RenderMath;
 import org.terasology.world.ChunkView;
-import org.terasology.world.WorldProvider;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
@@ -262,7 +261,11 @@ public final class ChunkTessellator {
         // TODO: Needs review - too much hardcoded special cases and corner cases resulting from this.
         ChunkVertexFlag vertexFlag = ChunkVertexFlag.NORMAL;
         if (block.isWater()) {
-            vertexFlag = ChunkVertexFlag.WATER;
+            if (view.getBlock(x, y + 1, z).isWater()) {
+                vertexFlag = ChunkVertexFlag.WATER;
+            } else {
+                vertexFlag = ChunkVertexFlag.WATER_SURFACE;
+            }
         } else if (block.isLava()) {
             vertexFlag = ChunkVertexFlag.LAVA;
         } else if (block.isWaving() && block.isDoubleSided()) {

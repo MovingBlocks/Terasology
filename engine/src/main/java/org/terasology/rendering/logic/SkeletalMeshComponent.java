@@ -16,6 +16,7 @@
 
 package org.terasology.rendering.logic;
 
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -27,6 +28,7 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.nui.properties.Range;
 import org.terasology.world.block.ForceBlockActive;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,9 +39,25 @@ public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;
 
+    /**
+     * Should not be set manually. Stores the data of the selected animation variation.
+     */
     @Replicate
     public MeshAnimation animation;
+
+    /**
+     * If true, an animation from {@link #animationPool} will be played when the current animation is done.
+     */
+    @Replicate
     public boolean loop;
+
+    /**
+     * When the current animation is done and loop is true then a random animation will be picked from this pool of
+     * animations.
+     */
+    @Replicate
+    public List<MeshAnimation> animationPool = Lists.newArrayList();
+
     public float animationRate = 1.0f;
     @Range(min = -2.5f, max = 2.5f)
     public float heightOffset;

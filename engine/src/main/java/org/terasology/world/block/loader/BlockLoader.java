@@ -35,20 +35,25 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.naming.Name;
-import org.terasology.registry.CoreRegistry;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector2f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.math.geom.Vector4f;
+import org.terasology.naming.Name;
 import org.terasology.persistence.ModuleContext;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.utilities.gson.CaseInsensitiveEnumTypeAdapterFactory;
 import org.terasology.utilities.gson.JsonMergeUtil;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.utilities.gson.Vector4fTypeAdapter;
 import org.terasology.world.BlockSoundsRegistry;
-import org.terasology.world.block.*;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAppearance;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.BlockSounds;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.DefaultColorSource;
 import org.terasology.world.block.family.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactory;
@@ -441,7 +446,7 @@ public class BlockLoader implements BlockBuilderHelper {
             BlockSounds sounds = soundsRegistry.getBlockSounds(def.sounds);
             if (sounds == null) {
                 logger.warn("Block definition {} references block sounds {}, which don't exist.",
-                    defaultName, def.sounds);
+                        defaultName, def.sounds);
                 block.setSounds(soundsRegistry.getDefaultBlockSounds());
             } else {
                 block.setSounds(sounds);

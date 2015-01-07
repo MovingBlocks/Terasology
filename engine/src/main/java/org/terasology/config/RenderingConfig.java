@@ -71,6 +71,8 @@ public class RenderingConfig {
     private boolean vSync;
     private boolean clampLighting;
     private int fboScale = 100;
+    private int screenshotSize = 1;
+    private String screenshotFormat = "png";
     private PerspectiveCameraSettings cameraSettings = new PerspectiveCameraSettings(CameraSetting.NORMAL);
 
     private RenderingDebugConfig debug = new RenderingDebugConfig();
@@ -427,6 +429,22 @@ public class RenderingConfig {
 
     public void setClampLighting(boolean clampLighting) {
         this.clampLighting = clampLighting;
+    }
+
+    public int getScreenshotSize() {
+        return screenshotSize;
+    }
+
+    public void setScreenshotSize(int screenshotSize) {
+        this.screenshotSize = screenshotSize;
+    }
+
+    public String getScreenshotFormat() {
+        return screenshotFormat;
+    }
+
+    public void setScreenshotFormat(String screenshotFormat) {
+        this.screenshotFormat = screenshotFormat;
     }
 
     @Override

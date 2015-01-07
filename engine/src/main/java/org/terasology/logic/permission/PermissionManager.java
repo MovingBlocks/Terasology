@@ -19,11 +19,12 @@ import com.google.common.base.Predicate;
 import org.terasology.entitySystem.entity.EntityRef;
 
 public interface PermissionManager {
-    public static final String OPERATOR_PERMISSION = "op";
+    String OPERATOR_PERMISSION = "op";
 
     /**
      * Adds specified permission to the player (character).
-     * @param player Player (character) to add permission to.
+     *
+     * @param player     Player (character) to add permission to.
      * @param permission Permission to add.
      */
     void addPermission(EntityRef player, String permission);
@@ -31,7 +32,8 @@ public interface PermissionManager {
     /**
      * Checks if the specified player (character) has said permission.
      * Note: Local player is considered to have all the permissions in all situations.
-     * @param player Player (character) to check.
+     *
+     * @param player     Player (character) to check.
      * @param permission Permission to check.
      * @return If player (character) has permission.
      */
@@ -40,7 +42,8 @@ public interface PermissionManager {
     /**
      * Checks if the specified player (character) has permission that is accepted by the specified predicate.
      * Note: Local player is considered to have all the permissions in all situations.
-     * @param player Player (character) to check.
+     *
+     * @param player              Player (character) to check.
      * @param permissionPredicate Permission predicate to check against.
      * @return If player (character) has permission matching the predicate.
      */
@@ -48,7 +51,8 @@ public interface PermissionManager {
 
     /**
      * Removes specified permission from the player (character).
-     * @param player Player (character) to remove permission from.
+     *
+     * @param player     Player (character) to remove permission from.
      * @param permission Permission to remove.
      */
     void removePermission(EntityRef player, String permission);

@@ -38,13 +38,14 @@ import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.internal.NetworkSystemImpl;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.reflection.reflect.ReflectionReflectFactory;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.block.BlockManager;
 
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 
 import static org.mockito.Mockito.mock;
 
@@ -96,7 +97,6 @@ public abstract class TerasologyTestingEnvironment {
             CoreRegistry.put(CollisionGroupManager.class, collisionGroupManager);
             CoreRegistry.put(ModuleManager.class, moduleManager);
         }
-        PathManager.getInstance().setCurrentSaveTitle("world1");
     }
 
     @Before
@@ -108,7 +108,8 @@ public abstract class TerasologyTestingEnvironment {
         NetworkSystemImpl networkSystem = new NetworkSystemImpl(mockTime);
         CoreRegistry.put(NetworkSystem.class, networkSystem);
         engineEntityManager = new EntitySystemBuilder().build(CoreRegistry.get(ModuleManager.class).getEnvironment(), networkSystem, new ReflectionReflectFactory());
-        CoreRegistry.put(StorageManager.class, new StorageManagerInternal(moduleManager.getEnvironment(), engineEntityManager));
+        Path savePath = PathManager.getInstance().getSavePath("world1");
+        CoreRegistry.put(StorageManager.class, new ReadWriteStorageManager(savePath, moduleManager.getEnvironment(), engineEntityManager));
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);

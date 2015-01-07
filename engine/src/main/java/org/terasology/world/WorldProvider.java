@@ -15,12 +15,9 @@
  */
 package org.terasology.world;
 
-import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.math.geom.Vector3f;
-import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
-import org.terasology.world.generation.Region;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
 

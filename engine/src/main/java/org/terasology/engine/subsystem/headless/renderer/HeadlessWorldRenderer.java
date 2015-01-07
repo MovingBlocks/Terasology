@@ -18,7 +18,6 @@ package org.terasology.engine.subsystem.headless.renderer;
 import com.google.common.collect.Lists;
 
 import org.terasology.config.Config;
-import org.terasology.engine.ComponentSystemManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;

@@ -17,6 +17,7 @@ package org.terasology.persistence.typeHandling.protobuf;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -282,38 +283,70 @@ public class ProtobufPersistedData implements PersistedData, PersistedDataArray 
 
     @Override
     public TDoubleList getAsDoubleArray() {
-        TDoubleList result = new TDoubleArrayList(data.getDoubleCount());
-        for (int i = 0; i < data.getDoubleCount(); ++i) {
-            result.add(data.getDouble(i));
+        if (data.getDoubleCount() != 0) {
+            TDoubleList result = new TDoubleArrayList(data.getDoubleCount());
+            for (int i = 0; i < data.getDoubleCount(); ++i) {
+                result.add(data.getDouble(i));
+            }
+            return result;
+        } else {
+            TDoubleList result = new TDoubleArrayList(data.getFloatCount());
+            for (int i = 0; i < data.getFloatCount(); ++i) {
+                result.add(data.getFloat(i));
+            }
+            return result;
         }
-        return result;
     }
 
     @Override
     public TFloatList getAsFloatArray() {
-        TFloatList result = new TFloatArrayList(data.getFloatCount());
-        for (int i = 0; i < data.getFloatCount(); ++i) {
-            result.add(data.getFloat(i));
+        if (data.getFloatCount() != 0) {
+            TFloatList result = new TFloatArrayList(data.getFloatCount());
+            for (int i = 0; i < data.getFloatCount(); ++i) {
+                result.add(data.getFloat(i));
+            }
+            return result;
+        } else {
+            TFloatList result = new TFloatArrayList(data.getDoubleCount());
+            for (int i = 0; i < data.getDoubleCount(); ++i) {
+                result.add((float) data.getDouble(i));
+            }
+            return result;
         }
-        return result;
     }
 
     @Override
     public TIntList getAsIntegerArray() {
-        TIntList result = new TIntArrayList(data.getIntegerCount());
-        for (int i = 0; i < data.getIntegerCount(); ++i) {
-            result.add(data.getInteger(i));
+        if (data.getIntegerCount() > 0) {
+            TIntList result = new TIntArrayList(data.getIntegerCount());
+            for (int i = 0; i < data.getIntegerCount(); ++i) {
+                result.add(data.getInteger(i));
+            }
+            return result;
+        } else {
+            TIntList result = new TIntArrayList(data.getLongCount());
+            for (int i = 0; i < data.getLongCount(); ++i) {
+                result.add(Ints.saturatedCast(data.getLong(i)));
+            }
+            return result;
         }
-        return result;
     }
 
     @Override
     public TLongList getAsLongArray() {
-        TLongList result = new TLongArrayList(data.getLongCount());
-        for (int i = 0; i < data.getLongCount(); ++i) {
-            result.add(data.getLong(i));
+        if (data.getLongCount() > 0) {
+            TLongList result = new TLongArrayList(data.getLongCount());
+            for (int i = 0; i < data.getLongCount(); ++i) {
+                result.add(data.getLong(i));
+            }
+            return result;
+        } else {
+            TLongList result = new TLongArrayList(data.getIntegerCount());
+            for (int i = 0; i < data.getIntegerCount(); ++i) {
+                result.add(data.getInteger(i));
+            }
+            return result;
         }
-        return result;
     }
 
     @Override

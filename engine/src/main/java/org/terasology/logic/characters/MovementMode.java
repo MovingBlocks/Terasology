@@ -35,7 +35,8 @@ public enum MovementMode {
     public float maxSpeed;
     public boolean applyInertiaToVertical;
 
-    private MovementMode(float scaleGravity, float scaleInertia, boolean useCollision, boolean canBeGrounded, boolean respondToEnvironment, float maxSpeed, boolean applyInertiaToVertical) {
+    private MovementMode(float scaleGravity, float scaleInertia, boolean useCollision, boolean canBeGrounded,
+                         boolean respondToEnvironment, float maxSpeed, boolean applyInertiaToVertical) {
         this.scaleGravity = scaleGravity;
         this.scaleInertia = scaleInertia;
         this.useCollision = useCollision;

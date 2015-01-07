@@ -45,7 +45,11 @@ import org.terasology.world.block.BlockSounds;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactoryRegistry;
-import org.terasology.world.block.loader.*;
+import org.terasology.world.block.loader.BlockLoader;
+import org.terasology.world.block.loader.BlockSoundsFactory;
+import org.terasology.world.block.loader.BlockSoundsLoader;
+import org.terasology.world.block.loader.FreeformFamily;
+import org.terasology.world.block.loader.WorldAtlas;
 
 import java.util.Iterator;
 import java.util.List;
@@ -338,7 +342,7 @@ public class BlockManagerImpl extends BlockManager {
         BlockSounds sounds = getBlockSounds(BlockSounds.DEFAULT_ID);
         if (sounds == null) {
             throw new IllegalStateException("Default block sounds are missing from engine module: "
-                + BlockSounds.DEFAULT_ID);
+                    + BlockSounds.DEFAULT_ID);
         }
         return sounds;
     }

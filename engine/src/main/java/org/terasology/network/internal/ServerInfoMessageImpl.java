@@ -78,6 +78,11 @@ class ServerInfoMessageImpl implements ServerInfoMessage {
     }
 
     @Override
+    public float getReflectionHeight() {
+        return info.getReflectionHeight();
+    }
+
+    @Override
     public List<NameVersion> getModuleList() {
         List<NameVersion> result = Lists.newArrayList();
 

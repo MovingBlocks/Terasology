@@ -22,8 +22,9 @@ import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.logic.console.Command;
-import org.terasology.logic.console.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Command;
+import org.terasology.logic.console.commandSystem.annotations.CommandParam;
+import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.network.ClientComponent;
 import org.terasology.registry.In;
 import org.terasology.world.block.entity.BlockCommands;
@@ -47,7 +48,10 @@ public class ItemCommands extends BaseComponentSystem {
     private EntityManager entityManager;
 
     @Command(shortDescription = "Adds an item to your inventory", runOnServer = true)
-    public String giveItem(@CommandParam("prefabId or blockName") String itemPrefabName, EntityRef client) {
+    public String giveItem(
+            @Sender EntityRef client,
+            @CommandParam("prefabId or blockName") String itemPrefabName,
+            @CommandParam(value = "amount", required = false) Integer amount) {
         Prefab prefab = prefabManager.getPrefab(itemPrefabName);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = entityManager.create(prefab);
@@ -57,7 +61,7 @@ public class ItemCommands extends BaseComponentSystem {
             }
             return "You received an item of " + prefab.getName();
         } else {
-            return blockCommands.giveBlock(itemPrefabName, client);
+            return blockCommands.giveBlock(client, itemPrefabName, amount, null);
         }
     }
 

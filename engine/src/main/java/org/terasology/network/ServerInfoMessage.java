@@ -58,4 +58,9 @@ public interface ServerInfoMessage {
      */
     List<NameVersion> getModuleList();
 
+    /**
+     * @return the block height that is used to compute (water) reflections
+     */
+    float getReflectionHeight();
+
 }

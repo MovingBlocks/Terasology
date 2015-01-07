@@ -154,6 +154,7 @@ task cacheReflections {
     inputs.files project.classes.outputs.files
     outputs.file file(sourceSets.main.output.classesDir.toString() + "/reflections.cache")
     dependsOn classes
+    
     doFirst {
         // Without the .mkdirs() we might hit a scenario where the classes dir doesn't exist yet
         file(sourceSets.main.output.classesDir.toString()).mkdirs()
@@ -224,6 +225,7 @@ task createVersionInfoFile {
 
 jar.dependsOn createVersionInfoFile
 jar.dependsOn cacheReflections
+jar.finalizedBy cleanReflections
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // General IDE customization                                                                                         //
@@ -238,5 +240,6 @@ idea {
         inheritOutputDirs = false
         outputDir = file('build/classes')
         testOutputDir = file('build/testClasses')
+        downloadSources = true
     }
 }

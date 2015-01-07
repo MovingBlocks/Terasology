@@ -18,7 +18,6 @@ package org.terasology.audio.openAL.streamingSound;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AbstractAsset;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.AudioManager;
 import org.terasology.audio.StreamingSound;
 import org.terasology.audio.StreamingSoundData;
 import org.terasology.audio.openAL.OpenALException;

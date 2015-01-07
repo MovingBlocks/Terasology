@@ -53,6 +53,7 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.FloatBuffer;
 import java.util.List;
+import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -80,6 +81,8 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
 
     @In
     private Config config;
+
+    private Random random = new Random();
 
     @ReceiveEvent(components = {SkeletalMeshComponent.class, LocationComponent.class})
     public void newSkeleton(OnActivatedComponent event, EntityRef entity) {
@@ -111,37 +114,66 @@ public class SkeletonRenderer extends BaseComponentSystem implements RenderSyste
     public void update(float delta) {
         for (EntityRef entity : entityManager.getEntitiesWith(SkeletalMeshComponent.class, LocationComponent.class)) {
             SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
-            if (skeletalMeshComp.animation != null && skeletalMeshComp.animation.getFrameCount() > 0) {
-                skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
-                float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
 
-                if (skeletalMeshComp.loop) {
-                    while ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
-                        framePos -= skeletalMeshComp.animation.getFrameCount();
-                        skeletalMeshComp.animationTime -= skeletalMeshComp.animation.getTimePerFrame() * skeletalMeshComp.animation.getFrameCount();
-                    }
-                    int frameId = (int) framePos;
-                    MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameId);
-                    MeshAnimationFrame frameB = skeletalMeshComp.animation.getFrame((frameId + 1) % skeletalMeshComp.animation.getFrameCount());
-                    updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameId);
-                } else {
-                    if ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
-                        MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(skeletalMeshComp.animation.getFrameCount() - 1);
-                        updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
-                        MeshAnimation animation = skeletalMeshComp.animation;
-                        skeletalMeshComp.animationTime = 0;
-                        skeletalMeshComp.animation = null;
-                        entity.send(new AnimEndEvent(animation));
-                    } else {
-                        int frameId = (int) framePos;
-                        MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameId);
-                        MeshAnimationFrame frameB = (frameId + 1 >= skeletalMeshComp.animation.getFrameCount()) ? frameA : skeletalMeshComp.animation.getFrame(frameId + 1);
-                        updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameId);
-                    }
-                }
-                entity.saveComponent(skeletalMeshComp);
+            if (skeletalMeshComp.animation == null && skeletalMeshComp.animationPool != null) {
+                skeletalMeshComp.animation = randomAnimationData(skeletalMeshComp, random);
             }
+
+            if (skeletalMeshComp.animation == null) {
+                continue;
+            }
+
+            if (skeletalMeshComp.animation.getFrameCount() <= 0) {
+                continue;
+            }
+
+            skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
+            float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
+
+            if ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
+                while ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
+                    framePos -= skeletalMeshComp.animation.getFrameCount();
+                    skeletalMeshComp.animationTime -= skeletalMeshComp.animation.getTimePerFrame() * skeletalMeshComp.animation.getFrameCount();
+                }
+                if (!skeletalMeshComp.loop) {
+                    skeletalMeshComp.animation = null;
+                    entity.send(new AnimEndEvent(skeletalMeshComp.animation));
+                }
+                MeshAnimation newAnimation = randomAnimationData(skeletalMeshComp, random);
+
+                if (newAnimation == null) {
+                    MeshAnimationFrame frame = skeletalMeshComp.animation.getFrame(
+                            skeletalMeshComp.animation.getFrameCount() - 1);
+                    updateSkeleton(skeletalMeshComp, frame, frame, 1.0f);
+                    skeletalMeshComp.animation = null;
+                    entity.saveComponent(skeletalMeshComp);
+                    continue;
+                }
+                skeletalMeshComp.animation = newAnimation;
+            }
+            int frameId = (int) framePos;
+            MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameId);
+            MeshAnimationFrame frameB;
+            if (skeletalMeshComp.loop) {
+                frameB = skeletalMeshComp.animation.getFrame((frameId + 1) % skeletalMeshComp.animation.getFrameCount());
+            } else {
+                frameB = (frameId + 1 >= skeletalMeshComp.animation.getFrameCount()) ? frameA : skeletalMeshComp.animation.getFrame(frameId + 1);
+            }
+            updateSkeleton(skeletalMeshComp, frameA, frameB, framePos - frameId);
+            entity.saveComponent(skeletalMeshComp);
         }
+    }
+
+
+    private static MeshAnimation randomAnimationData(SkeletalMeshComponent skeletalMeshComp, Random random) {
+        List<MeshAnimation> animationPool = skeletalMeshComp.animationPool;
+        if (animationPool == null) {
+            return null;
+        }
+        if (animationPool.isEmpty()) {
+            return null;
+        }
+        return animationPool.get(random.nextInt(animationPool.size()));
     }
 
     private void updateSkeleton(SkeletalMeshComponent skeletalMeshComp, MeshAnimationFrame frameA, MeshAnimationFrame frameB, float interpolationVal) {

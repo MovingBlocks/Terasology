@@ -35,6 +35,9 @@ public class AssetTypeHandler<T extends Asset> extends StringRepresentationTypeH
 
     @Override
     public String getAsString(T item) {
+        if (item == null) {
+            return "";
+        }
         return item.getURI().toSimpleString();
     }
 

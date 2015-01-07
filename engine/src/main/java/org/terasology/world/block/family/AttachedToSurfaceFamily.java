@@ -23,7 +23,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import java.util.Locale;
 import java.util.Map;
 
 /**

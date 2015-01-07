@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.console.internal;
+package org.terasology.logic.console.commandSystem.exceptions;
 
-public class InvalidCommandCallException extends Exception {
-    public InvalidCommandCallException(String message) {
-        super(message);
+/**
+ * @author Limeth
+ */
+public class CommandInitializationException extends IllegalArgumentException {
+    public CommandInitializationException() {
     }
 
-    public InvalidCommandCallException(String message, Throwable cause) {
-        super(message, cause);
+    public CommandInitializationException(String s) {
+        super(s);
     }
 }

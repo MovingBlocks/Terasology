@@ -19,7 +19,6 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
-import org.terasology.world.chunks.internal.ChunkImpl;
 
 /**
  * @author Immortius

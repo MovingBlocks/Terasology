@@ -207,7 +207,7 @@ public final class Rect2i implements Iterable<Vector2i> {
      *
      * @param a
      * @param b
-     * @return A collection of rectangles that compose the difference of a - b. May be empty if a is completely encompassed by b.
+     * @return A collection of rectangles that convertToString the difference of a - b. May be empty if a is completely encompassed by b.
      */
     public static List<Rect2i> difference(Rect2i a, Rect2i b) {
         List<Rect2i> result = Lists.newArrayList();

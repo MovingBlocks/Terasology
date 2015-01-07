@@ -16,21 +16,28 @@
 
 package org.terasology.engine.modes.loadProcesses;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.engine.ComponentSystemManager;
 import org.terasology.engine.GameEngine;
 import org.terasology.engine.TerasologyConstants;
 import org.terasology.engine.modes.StateMainMenu;
 import org.terasology.engine.module.ModuleManager;
+import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.RenderingSubsystemFactory;
 import org.terasology.entitySystem.entity.EntityManager;
 import org.terasology.entitySystem.entity.internal.EngineEntityManager;
 import org.terasology.game.GameManifest;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerSystem;
+import org.terasology.module.ModuleEnvironment;
 import org.terasology.persistence.StorageManager;
-import org.terasology.persistence.internal.StorageManagerInternal;
+import org.terasology.persistence.internal.ReadOnlyStorageManager;
+import org.terasology.persistence.internal.ReadWriteStorageManager;
 import org.terasology.physics.Physics;
 import org.terasology.physics.engine.PhysicsEngine;
 import org.terasology.reflection.copy.CopyStrategyLibrary;
@@ -77,7 +84,8 @@ public class InitialiseWorld extends SingleStepLoadProcess {
     @Override
     public boolean step() {
 
-        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(CoreRegistry.get(ModuleManager.class).getEnvironment(),
+        ModuleEnvironment environment = CoreRegistry.get(ModuleManager.class).getEnvironment();
+        CoreRegistry.put(WorldGeneratorPluginLibrary.class, new DefaultWorldGeneratorPluginLibrary(environment,
                 CoreRegistry.get(ReflectFactory.class), CoreRegistry.get(CopyStrategyLibrary.class)));
 
         WorldInfo worldInfo = gameManifest.getWorldInfo(TerasologyConstants.MAIN_WORLD);
@@ -105,8 +113,19 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         // Init. a new world
         EngineEntityManager entityManager = (EngineEntityManager) CoreRegistry.get(EntityManager.class);
-        StorageManager storageManager = CoreRegistry.put(StorageManager.class,
-                new StorageManagerInternal(CoreRegistry.get(ModuleManager.class).getEnvironment(), entityManager));
+        boolean writeSaveGamesEnabled = CoreRegistry.get(Config.class).getTransients().isWriteSaveGamesEnabled();
+        Path savePath = PathManager.getInstance().getSavePath(gameManifest.getTitle());
+        StorageManager storageManager;
+        try {
+            storageManager = writeSaveGamesEnabled
+                    ? new ReadWriteStorageManager(savePath, environment, entityManager)
+                    : new ReadOnlyStorageManager(savePath, environment, entityManager);
+        } catch (IOException e) {
+            logger.error("Unable to create storage manager!", e);
+            CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Unable to create storage manager!"));
+            return true; // We need to return true, otherwise the loading state will just call us again immediately
+        }
+        CoreRegistry.put(StorageManager.class, storageManager);
         LocalChunkProvider chunkProvider = new LocalChunkProvider(storageManager, entityManager, worldGenerator);
         CoreRegistry.get(ComponentSystemManager.class).register(new RelevanceSystem(chunkProvider), "engine:relevanceSystem");
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, chunkProvider));

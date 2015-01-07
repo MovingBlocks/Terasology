@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 MovingBlocks
+ * Copyright 2014 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.logic.console.commandSystem.adapter;
 
-package org.terasology.logic.console;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.Assets;
+import org.terasology.entitySystem.prefab.Prefab;
 
 /**
- * Used to provide the name of a Command's params (since the names are otherwise unavailable)
- *
- * @author Immortius
+ * @author Limeth
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface CommandParam {
-    String value();
+public class PrefabAdapter implements ParameterAdapter<Prefab> {
+    @Override
+    public Prefab parse(String raw) {
+        return Assets.get(AssetType.PREFAB, raw, Prefab.class);
+    }
+
+    @Override
+    public String convertToString(Prefab value) {
+        return value.getURI().toSimpleString();
+    }
 }

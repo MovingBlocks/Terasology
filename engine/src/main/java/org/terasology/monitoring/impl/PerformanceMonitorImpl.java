@@ -25,6 +25,7 @@ import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectLongProcedure;
 import org.terasology.engine.EngineTime;
 import org.terasology.engine.Time;
+import org.terasology.monitoring.Activity;
 import org.terasology.registry.CoreRegistry;
 
 import java.util.Deque;
@@ -40,8 +41,10 @@ import java.util.List;
 public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
     private static final int RETAINED_CYCLES = 60;
     private static final double DECAY_RATE = 0.98;
+    private static final Activity OFF_THREAD_ACTIVITY = new NullActivity();
+    private final Activity activityInstance = new ActivityInstance();
 
-    private Deque<Activity> activityStack;
+    private Deque<ActivityInfo> activityStack;
     private List<TObjectLongMap<String>> metricData;
     private List<TObjectLongMap<String>> allocationData;
     private TObjectLongMap<String> currentData;
@@ -122,21 +125,22 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         currentMemData = new TObjectLongHashMap<>();
     }
 
-    public void startActivity(String activity) {
+    public Activity startActivity(String activity) {
         if (Thread.currentThread() != mainThread) {
-            return;
+            return OFF_THREAD_ACTIVITY;
         }
-        Activity newActivity = new Activity();
+        ActivityInfo newActivity = new ActivityInfo();
         newActivity.name = activity;
         newActivity.startTime = timer.getRawTimeInMs();
         newActivity.startMem = Runtime.getRuntime().freeMemory();
         if (!activityStack.isEmpty()) {
-            Activity currentActivity = activityStack.peek();
+            ActivityInfo currentActivity = activityStack.peek();
             currentActivity.ownTime += newActivity.startTime - ((currentActivity.resumeTime > 0) ? currentActivity.resumeTime : currentActivity.startTime);
             currentActivity.ownMem += (currentActivity.startMem - newActivity.startMem > 0) ? currentActivity.startMem - newActivity.startMem : 0;
         }
 
         activityStack.push(newActivity);
+        return activityInstance;
     }
 
     public void endActivity() {
@@ -144,7 +148,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
             return;
         }
 
-        Activity oldActivity = activityStack.pop();
+        ActivityInfo oldActivity = activityStack.pop();
         long time = timer.getRawTimeInMs();
         long total = (oldActivity.resumeTime > 0) ? oldActivity.ownTime + time - oldActivity.resumeTime : time - oldActivity.startTime;
         currentData.adjustOrPutValue(oldActivity.name, total, total);
@@ -153,7 +157,7 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         currentMemData.adjustOrPutValue(oldActivity.name, totalMem, totalMem);
 
         if (!activityStack.isEmpty()) {
-            Activity currentActivity = activityStack.peek();
+            ActivityInfo currentActivity = activityStack.peek();
             currentActivity.resumeTime = time;
             currentActivity.startMem = endMem;
         }
@@ -192,12 +196,20 @@ public class PerformanceMonitorImpl implements PerformanceMonitorInternal {
         return result;
     }
 
-    private static class Activity {
+    private static class ActivityInfo {
         public String name;
         public long startTime;
         public long resumeTime;
         public long ownTime;
         public long startMem;
         public long ownMem;
+    }
+
+    private class ActivityInstance implements Activity {
+
+        @Override
+        public void close() {
+            endActivity();
+        }
     }
 }

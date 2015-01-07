@@ -15,10 +15,8 @@
  */
 package org.terasology.logic.characters.interactions;
 
-import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.Event;
 import org.terasology.network.ServerEvent;
-import org.terasology.logic.characters.interactions.InteractionUtil;
 
 /**
  * Request the server to cancel the current interaction.

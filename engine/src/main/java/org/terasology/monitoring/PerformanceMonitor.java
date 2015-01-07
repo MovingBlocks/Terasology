@@ -48,8 +48,8 @@ public final class PerformanceMonitor {
      *
      * @param activity The name of the activity stating.
      */
-    public static void startActivity(String activity) {
-        instance.startActivity(activity);
+    public static Activity startActivity(String activity) {
+        return instance.startActivity(activity);
     }
 
     /**

@@ -15,8 +15,6 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.TLongSet;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.entity.LowLevelEntityManager;

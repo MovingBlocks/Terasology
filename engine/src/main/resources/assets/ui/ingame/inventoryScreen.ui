@@ -6,7 +6,7 @@
             {
                 "type" : "InventoryGrid",
                 "id" : "inventory",
-                "maxHorizontalCells" : 6,
+                "maxHorizontalCells" : 10,
                 "layoutInfo" : {
                     "use-content-width" : true,
                     "use-content-height" : true,

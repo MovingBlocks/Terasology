@@ -1,0 +1,11 @@
+{
+    "BehaviorNode" : {
+        "type"      : "SetAnimationNode",
+        "name"      : "Set animation to play",
+        "category"  : "logic",
+        "shape"     : "rect",
+        "description": "Makes the skeletal mesh play a certain animation and then loop though animations from a pool. Returns SUCCESS instantly",
+        "color"     : [0.7, 0.7, 0.7],
+        "textColor" : [  0,   0,   0]
+    }
+}

@@ -18,7 +18,6 @@ package org.terasology.logic.debug;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.entitySystem.systems.RegisterMode;
 import org.terasology.entitySystem.systems.RegisterSystem;
-import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.module.sandbox.API;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.registry.In;
@@ -31,12 +30,12 @@ import java.security.PrivilegedAction;
 
 /**
  * @author synopia
- *
- * Debug property editor. Usage:
- *
- * CoreRegistry.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
- *
- * Ingame press F1 to see the property editor. Only annotated fields will show up.
+ *         <p/>
+ *         Debug property editor. Usage:
+ *         <p/>
+ *         CoreRegistry.get(DebugPropertiesSystem.class).addProperty("Model 1", model);
+ *         <p/>
+ *         Ingame press F1 to see the property editor. Only annotated fields will show up.
  */
 @API
 @RegisterSystem(RegisterMode.CLIENT)

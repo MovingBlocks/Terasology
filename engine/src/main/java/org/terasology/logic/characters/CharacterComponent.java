@@ -20,8 +20,6 @@ import org.terasology.math.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Owns;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.logic.characters.interactions.InteractionEndPredicted;
-import org.terasology.logic.characters.interactions.InteractionStartPredicted;
 import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.geom.Quat4f;
@@ -44,15 +42,15 @@ public final class CharacterComponent implements Component {
     public float interactionRange = 5f;
     /**
      * The current interaction target of a character which has been authorized by the authority (e.g. the server).
-     *
+     * <p/>
      * Modules should not modify this field directly.
      */
     public EntityRef authorizedInteractionTarget = EntityRef.NULL;
     /**
      * This field is only set for clients (including clients that are servers).
-     *
+     * <p/>
      * It contains the number of the activationId that caused the interaction start.
-     *
+     * <p/>
      * The field is used to tell the client which interaction got canceled. Thus if the client has started another
      * interaction when it receives the old cancel, it won't wrongly cancel the new interaction.
      */
@@ -61,17 +59,18 @@ public final class CharacterComponent implements Component {
     /**
      * This field is only set for clients (including clients that are servers). The clients set it
      * best to their knowledge.
-     *
-     * The events {@link InteractionStartPredicted} and {@link InteractionEndPredicted} inform about changes of this
+     * <p/>
+     * The events {@link org.terasology.logic.characters.interactions.InteractionStartPredicted} and
+     * {@link org.terasology.logic.characters.interactions.InteractionEndPredicted} inform about changes of this
      * field.
      */
     public EntityRef predictedInteractionTarget = EntityRef.NULL;
 
     /**
      * This field is only set for clients (including clients that are servers).
-     *
+     * <p/>
      * It contains the number of the activationId that caused the interaction start.
-     *
+     * <p/>
      * The field is used to determine if a incoming interaction cancel is for the current interaction or not.
      */
     public int predictedInteractionId;

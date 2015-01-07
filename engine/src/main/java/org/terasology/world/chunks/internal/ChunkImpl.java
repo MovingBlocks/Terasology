@@ -488,6 +488,16 @@ public class ChunkImpl implements Chunk {
     }
 
     @Override
+    public boolean hasMesh() {
+        return activeMesh != null;
+    }
+
+    @Override
+    public boolean hasPendingMesh() {
+        return pendingMesh != null;
+    }
+
+    @Override
     public ChunkMesh[] getMesh() {
         return activeMesh;
     }

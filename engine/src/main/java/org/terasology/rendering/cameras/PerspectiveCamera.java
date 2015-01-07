@@ -124,7 +124,8 @@ public class PerspectiveCamera extends Camera {
         if (cachedPosition.equals(getPosition()) && cachedViewigDirection.equals(getViewingDirection())
                 && cachedBobbingRotationOffsetFactor == bobbingRotationOffsetFactor && cachedBobbingVerticalOffsetFactor == bobbingVerticalOffsetFactor
                 && cachedFov == fov
-                && cachedZFar == getzFar() && cachedZNear == getzNear()) {
+                && cachedZFar == getzFar() && cachedZNear == getzNear()
+                && cachedReflectionHeight == getReflectionHeight()) {
             return;
         }
 
@@ -140,7 +141,7 @@ public class PerspectiveCamera extends Camera {
                 up.x + tempRightVector.x, up.y + tempRightVector.y, up.z + tempRightVector.z);
 
         reflectionMatrix.setRow(0, 1.0f, 0.0f, 0.0f, 0.0f);
-        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + 32f));
+        reflectionMatrix.setRow(1, 0.0f, -1.0f, 0.0f, 2f * (-position.y + getReflectionHeight()));
         reflectionMatrix.setRow(2, 0.0f, 0.0f, 1.0f, 0.0f);
         reflectionMatrix.setRow(3, 0.0f, 0.0f, 0.0f, 1.0f);
         viewMatrixReflected.mul(viewMatrix, reflectionMatrix);
@@ -161,6 +162,7 @@ public class PerspectiveCamera extends Camera {
         cachedFov = fov;
         cachedZNear = getzNear();
         cachedZFar = getzFar();
+        cachedReflectionHeight = getReflectionHeight();
 
         updateFrustum();
     }

@@ -130,7 +130,7 @@ public class IntMathTest {
      *
      * @return list of powers of two
      */
-    private static final List<Integer> generateAllPowersOfTwo() {
+    private static List<Integer> generateAllPowersOfTwo() {
         List<Integer> powersOfTwo = new ArrayList<>();
 
         int value = 1;
