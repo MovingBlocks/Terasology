@@ -141,7 +141,6 @@ public class InitialiseWorld extends SingleStepLoadProcess {
 
         RenderingSubsystemFactory engineSubsystemFactory = CoreRegistry.get(RenderingSubsystemFactory.class);
         WorldRenderer worldRenderer = engineSubsystemFactory.createWorldRenderer(worldProvider, chunkProvider, CoreRegistry.get(LocalPlayerSystem.class));
-        worldRenderer.getActiveCamera().setReflectionHeight(worldGenerator.getWorld().getSeaLevel());
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
